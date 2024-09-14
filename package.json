@@ -1,0 +1,19 @@
+{
+    "name": "@repo/root",
+    "version": "0.0.0-semantically-released",
+    "scripts": {},
+    "dependencies": {
+        "@rencedm112/with-env": "^0.0.39",
+        "@repo/biome-config": "workspace:*",
+        "@repo/tsconfig": "workspace:*",
+        "turbo": "^2.1.2"
+    },
+    "workspaces": ["packages/*", "apps/*"],
+    "packageManager": "bun@1.1.27",
+    "publishConfig": {
+        "access": "restricted"
+    },
+    "devDependencies": {
+        "@biomejs/biome": "^1.9.0"
+    }
+}
