@@ -1,5 +1,5 @@
 {
-    "name": "@repo/ui-core",
+    "name": "@repo/ui-utils",
     "version": "0.0.0-semantically-released",
     "description": "",
     "main": "./src/index.ts",
@@ -9,10 +9,10 @@
     "license": "ISC",
     "dependencies": {
         "@material/material-color-utilities": "^0.3.0",
-        "deepmerge": "^4.3.1",
-        "just-clone": "^6.2.0"
+        "@repo/utils": "workspace:*"
     },
     "devDependencies": {
-        "@repo/tsconfig": "workspace:*"
+        "@repo/tsconfig": "workspace:*",
+        "@repo/type-utils": "workspace:*"
     }
 }

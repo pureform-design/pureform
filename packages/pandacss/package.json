@@ -1,11 +1,11 @@
 {
-    "name": "@repo/utils",
+    "name": "@pureform/pandacss",
     "version": "0.0.0-semantically-released",
     "exports": {
-        ".": "./src/index.ts"
+        "plugin": "./src/plugin.ts"
     },
-    "dependencies": {
-        "@repo/type-utils": "workspace:*"
+    "peerDependencies": {
+        "@pandacss/dev": "^0.46.0"
     },
     "devDependencies": {
         "@repo/tsconfig": "workspace:*"
