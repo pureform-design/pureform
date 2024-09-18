@@ -5,7 +5,7 @@
         ".": "./src/index.ts"
     },
     "scripts": {
-        "test:unit": "with-env 'vitest run'"
+        "test:unit": "with-env 'vitest run --config vitest.config.unit.ts'"
     },
     "dependencies": {
         "@repo/type-utils": "workspace:*"
