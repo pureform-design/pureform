@@ -1,1 +1,1 @@
-export type Pixel = `${number}px`;
+export type Pixel = `${number}px` | number;

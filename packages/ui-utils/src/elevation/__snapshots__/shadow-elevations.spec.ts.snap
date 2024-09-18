@@ -1,0 +1,553 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 0 1`] = `
+{
+  "ambient": {
+    "blurRadius": "0px",
+    "offsetX": "0px",
+    "offsetY": "0px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "0px",
+    "offsetX": "0px",
+    "offsetY": "0px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "0px",
+    "offsetX": "0px",
+    "offsetY": "0px",
+    "spreadRadius": "0px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 1 1`] = `
+{
+  "ambient": {
+    "blurRadius": "3px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "1px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "1px",
+    "offsetX": "0px",
+    "offsetY": "2px",
+    "spreadRadius": "-1px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 2 1`] = `
+{
+  "ambient": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "2px",
+    "offsetX": "0px",
+    "offsetY": "2px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "1px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "-2px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 3 1`] = `
+{
+  "ambient": {
+    "blurRadius": "8px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "4px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "3px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "-2px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 4 1`] = `
+{
+  "ambient": {
+    "blurRadius": "10px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "4px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "4px",
+    "offsetX": "0px",
+    "offsetY": "2px",
+    "spreadRadius": "-1px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 5 1`] = `
+{
+  "ambient": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "8px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "-1px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 6 1`] = `
+{
+  "ambient": {
+    "blurRadius": "18px",
+    "offsetX": "0px",
+    "offsetY": "1px",
+    "spreadRadius": "0px",
+  },
+  "penumbra": {
+    "blurRadius": "10px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "0px",
+  },
+  "umbra": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "-1px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 7 1`] = `
+{
+  "ambient": {
+    "blurRadius": "16px",
+    "offsetX": "0px",
+    "offsetY": "2px",
+    "spreadRadius": "1px",
+  },
+  "penumbra": {
+    "blurRadius": "10px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "1px",
+  },
+  "umbra": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "4px",
+    "spreadRadius": "-2px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 8 1`] = `
+{
+  "ambient": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "2px",
+  },
+  "penumbra": {
+    "blurRadius": "10px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "1px",
+  },
+  "umbra": {
+    "blurRadius": "5px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "-3px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 9 1`] = `
+{
+  "ambient": {
+    "blurRadius": "16px",
+    "offsetX": "0px",
+    "offsetY": "3px",
+    "spreadRadius": "2px",
+  },
+  "penumbra": {
+    "blurRadius": "12px",
+    "offsetX": "0px",
+    "offsetY": "9px",
+    "spreadRadius": "1px",
+  },
+  "umbra": {
+    "blurRadius": "6px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "-3px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 10 1`] = `
+{
+  "ambient": {
+    "blurRadius": "18px",
+    "offsetX": "0px",
+    "offsetY": "4px",
+    "spreadRadius": "3px",
+  },
+  "penumbra": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "10px",
+    "spreadRadius": "1px",
+  },
+  "umbra": {
+    "blurRadius": "6px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "-3px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 11 1`] = `
+{
+  "ambient": {
+    "blurRadius": "20px",
+    "offsetX": "0px",
+    "offsetY": "4px",
+    "spreadRadius": "3px",
+  },
+  "penumbra": {
+    "blurRadius": "15px",
+    "offsetX": "0px",
+    "offsetY": "11px",
+    "spreadRadius": "1px",
+  },
+  "umbra": {
+    "blurRadius": "7px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "-4px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 12 1`] = `
+{
+  "ambient": {
+    "blurRadius": "22px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "4px",
+  },
+  "penumbra": {
+    "blurRadius": "17px",
+    "offsetX": "0px",
+    "offsetY": "12px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "8px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "-4px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 13 1`] = `
+{
+  "ambient": {
+    "blurRadius": "24px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "4px",
+  },
+  "penumbra": {
+    "blurRadius": "19px",
+    "offsetX": "0px",
+    "offsetY": "13px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "8px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "-4px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 14 1`] = `
+{
+  "ambient": {
+    "blurRadius": "26px",
+    "offsetX": "0px",
+    "offsetY": "5px",
+    "spreadRadius": "4px",
+  },
+  "penumbra": {
+    "blurRadius": "21px",
+    "offsetX": "0px",
+    "offsetY": "14px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "9px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "-4px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 15 1`] = `
+{
+  "ambient": {
+    "blurRadius": "28px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "5px",
+  },
+  "penumbra": {
+    "blurRadius": "22px",
+    "offsetX": "0px",
+    "offsetY": "15px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "9px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "-5px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 16 1`] = `
+{
+  "ambient": {
+    "blurRadius": "30px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "5px",
+  },
+  "penumbra": {
+    "blurRadius": "24px",
+    "offsetX": "0px",
+    "offsetY": "16px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "10px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "-5px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 17 1`] = `
+{
+  "ambient": {
+    "blurRadius": "32px",
+    "offsetX": "0px",
+    "offsetY": "6px",
+    "spreadRadius": "5px",
+  },
+  "penumbra": {
+    "blurRadius": "26px",
+    "offsetX": "0px",
+    "offsetY": "17px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "11px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "-5px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 18 1`] = `
+{
+  "ambient": {
+    "blurRadius": "34px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "6px",
+  },
+  "penumbra": {
+    "blurRadius": "28px",
+    "offsetX": "0px",
+    "offsetY": "18px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "11px",
+    "offsetX": "0px",
+    "offsetY": "9px",
+    "spreadRadius": "-5px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 19 1`] = `
+{
+  "ambient": {
+    "blurRadius": "36px",
+    "offsetX": "0px",
+    "offsetY": "7px",
+    "spreadRadius": "6px",
+  },
+  "penumbra": {
+    "blurRadius": "29px",
+    "offsetX": "0px",
+    "offsetY": "19px",
+    "spreadRadius": "2px",
+  },
+  "umbra": {
+    "blurRadius": "12px",
+    "offsetX": "0px",
+    "offsetY": "9px",
+    "spreadRadius": "-6px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 20 1`] = `
+{
+  "ambient": {
+    "blurRadius": "38px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "7px",
+  },
+  "penumbra": {
+    "blurRadius": "31px",
+    "offsetX": "0px",
+    "offsetY": "20px",
+    "spreadRadius": "3px",
+  },
+  "umbra": {
+    "blurRadius": "13px",
+    "offsetX": "0px",
+    "offsetY": "10px",
+    "spreadRadius": "-6px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 21 1`] = `
+{
+  "ambient": {
+    "blurRadius": "40px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "7px",
+  },
+  "penumbra": {
+    "blurRadius": "33px",
+    "offsetX": "0px",
+    "offsetY": "21px",
+    "spreadRadius": "3px",
+  },
+  "umbra": {
+    "blurRadius": "13px",
+    "offsetX": "0px",
+    "offsetY": "10px",
+    "spreadRadius": "-6px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 22 1`] = `
+{
+  "ambient": {
+    "blurRadius": "42px",
+    "offsetX": "0px",
+    "offsetY": "8px",
+    "spreadRadius": "7px",
+  },
+  "penumbra": {
+    "blurRadius": "35px",
+    "offsetX": "0px",
+    "offsetY": "22px",
+    "spreadRadius": "3px",
+  },
+  "umbra": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "10px",
+    "spreadRadius": "-6px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 23 1`] = `
+{
+  "ambient": {
+    "blurRadius": "44px",
+    "offsetX": "0px",
+    "offsetY": "9px",
+    "spreadRadius": "8px",
+  },
+  "penumbra": {
+    "blurRadius": "36px",
+    "offsetX": "0px",
+    "offsetY": "23px",
+    "spreadRadius": "3px",
+  },
+  "umbra": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "11px",
+    "spreadRadius": "-7px",
+  },
+}
+`;
