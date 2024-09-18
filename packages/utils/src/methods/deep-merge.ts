@@ -6,7 +6,7 @@ function hasPropertyValue<T extends Object, K extends keyof T>(
     o: T,
     k: K,
 ): o is T & Record<K, unknown> {
-    return k in o && o[k] !== undefined && o[k] !== null;
+    return k in o;
 }
 
 export type DeepMergeOptions = {
@@ -37,9 +37,9 @@ export function deepMerge<T1 extends Object, T2 extends Object>(
             } else {
                 output[key] = o2Value;
             }
-        } else if (hasPropertyValueFn(o1, key)) {
-            output[key] = o2[key];
         } else if (hasPropertyValueFn(o2, key)) {
+            output[key] = o2[key];
+        } else if (hasPropertyValueFn(o1, key)) {
             output[key] = o1[key];
         }
     }

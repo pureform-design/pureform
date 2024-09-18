@@ -7,12 +7,18 @@
     "keywords": [],
     "author": "",
     "license": "ISC",
+    "scripts": {
+        "test:unit": "with-env 'vitest run'",
+        "test:coverage": "with-env 'vitest run --coverage'"
+    },
     "dependencies": {
         "@material/material-color-utilities": "^0.3.0",
         "@repo/utils": "workspace:*"
     },
     "devDependencies": {
         "@repo/tsconfig": "workspace:*",
-        "@repo/type-utils": "workspace:*"
+        "@repo/type-utils": "workspace:*",
+        "@vitest/coverage-v8": "^2.1.1",
+        "vitest": "^2.1.1"
     }
 }

@@ -4,10 +4,15 @@
     "exports": {
         ".": "./src/index.ts"
     },
+    "scripts": {
+        "test:unit": "with-env 'vitest run'"
+    },
     "dependencies": {
         "@repo/type-utils": "workspace:*"
     },
     "devDependencies": {
-        "@repo/tsconfig": "workspace:*"
+        "@repo/tsconfig": "workspace:*",
+        "@vitest/coverage-v8": "^2.1.1",
+        "vitest": "^2.1.1"
     }
 }

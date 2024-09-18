@@ -2,5 +2,15 @@
     "$schema": "https://turbo.build/schema.json",
     "ui": "tui",
     "tasks": {
+        "test:unit": {
+            "cache": true,
+            "dependsOn": ["^test:unit"],
+            "inputs": ["src/**"]
+        },
+        "test:coverage": {
+            "cache": true,
+            "dependsOn": ["^test:coverage"],
+            "inputs": ["src/**"]
+        }
     }
 }

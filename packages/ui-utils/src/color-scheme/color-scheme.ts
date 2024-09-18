@@ -8,6 +8,7 @@ import type {
     BaseColorGroup,
     BaseKeyColorGroup,
     HexColor,
+    NeutralColorGroup,
     SystemColor,
 } from "../types";
 
@@ -44,18 +45,15 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
     > = {};
     private _colorInfo: ColorInfoRecord<TCustomColorGroups>;
 
-    private static keyColorGroups: BaseKeyColorGroup[] = [
-        "info",
-        "negative",
-        "notice",
-        "positive",
-        "primary",
-        "secondary",
-        "tertiary",
+    private static neutralColorGroups: NeutralColorGroup[] = [
+        "neutral",
+        "neutralVariant",
     ];
 
-    private static isKeyColorGroup(color: string): boolean {
-        return ColorScheme.keyColorGroups.includes(color as BaseKeyColorGroup);
+    private static isNeutral(color: string): boolean {
+        return ColorScheme.neutralColorGroups.includes(
+            color as NeutralColorGroup,
+        );
     }
 
     public static create<TCustomColorGroups extends string = BaseColorGroup>(
@@ -194,7 +192,7 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         } as ColorInfoRecord<TCustomColorGroups>;
 
         const keyColors = this.corePalette.colorGroups.filter(
-            ColorScheme.isKeyColorGroup,
+            (cg) => !ColorScheme.isNeutral(cg),
         );
 
         for (const color of keyColors) {

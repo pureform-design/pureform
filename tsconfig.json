@@ -1,5 +1,5 @@
 {
-    "extends": ["./packages/ts/tsconfig/base.json"],
+    "extends": ["@repo/tsconfig/base.json"],
     "compilerOptions": {
         "outDir": "./dist",
         "module": "ESNext",
