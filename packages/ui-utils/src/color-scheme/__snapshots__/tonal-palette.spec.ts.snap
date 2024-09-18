@@ -1,0 +1,203 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 1`] = `"#000000"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 2`] = `"#000500"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 3`] = `"#000a00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 4`] = `"#000f00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 5`] = `"#001200"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 6`] = `"#001500"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 7`] = `"#001800"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 8`] = `"#001b00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 9`] = `"#001d00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 10`] = `"#001f00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 11`] = `"#002200"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 12`] = `"#002400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 13`] = `"#002600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 14`] = `"#002900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 15`] = `"#002b00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 16`] = `"#002d00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 17`] = `"#013000"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 18`] = `"#013200"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 19`] = `"#013500"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 20`] = `"#013700"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 21`] = `"#013a00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 22`] = `"#013c00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 23`] = `"#013f00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 24`] = `"#014100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 25`] = `"#014400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 26`] = `"#014600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 27`] = `"#014900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 28`] = `"#014b00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 29`] = `"#014e00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 30`] = `"#015100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 31`] = `"#015300"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 32`] = `"#015600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 33`] = `"#015900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 34`] = `"#015b00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 35`] = `"#025e00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 36`] = `"#026100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 37`] = `"#026300"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 38`] = `"#026600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 39`] = `"#026900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 40`] = `"#026c00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 41`] = `"#026e00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 42`] = `"#027100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 43`] = `"#027400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 44`] = `"#027700"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 45`] = `"#027a00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 46`] = `"#027c00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 47`] = `"#027f00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 48`] = `"#028200"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 49`] = `"#028500"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 50`] = `"#028800"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 51`] = `"#038b00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 52`] = `"#038e00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 53`] = `"#039100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 54`] = `"#039400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 55`] = `"#039600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 56`] = `"#039900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 57`] = `"#039c00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 58`] = `"#039f00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 59`] = `"#03a200"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 60`] = `"#03a500"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 61`] = `"#03a800"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 62`] = `"#03ab00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 63`] = `"#03ae00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 64`] = `"#03b100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 65`] = `"#03b400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 66`] = `"#03b700"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 67`] = `"#03ba00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 68`] = `"#03be00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 69`] = `"#03c100"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 70`] = `"#03c400"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 71`] = `"#03c700"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 72`] = `"#03ca00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 73`] = `"#03cd00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 74`] = `"#03d000"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 75`] = `"#02d300"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 76`] = `"#02d600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 77`] = `"#02d900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 78`] = `"#02dd00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 79`] = `"#02e000"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 80`] = `"#02e300"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 81`] = `"#02e600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 82`] = `"#02e900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 83`] = `"#01ed00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 84`] = `"#01f000"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 85`] = `"#01f300"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 86`] = `"#01f600"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 87`] = `"#00f900"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 88`] = `"#00fd00"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 89`] = `"#28ff1d"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 90`] = `"#5aff47"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 91`] = `"#77ff61"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 92`] = `"#8dff76"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 93`] = `"#9fff88"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 94`] = `"#afff99"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 95`] = `"#bdffa9"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 96`] = `"#cbffb8"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 97`] = `"#d7ffc6"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 98`] = `"#e2ffd4"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 99`] = `"#edffe1"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 100`] = `"#f7ffee"`;
+
+exports[`TonalPalette > should match snapshots hex colors from tone 0 to 100 101`] = `"#ffffff"`;
