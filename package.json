@@ -4,12 +4,12 @@
     "scripts": {},
     "dependencies": {},
     "workspaces": ["packages/*", "apps/*"],
-    "packageManager": "bun@1.1.27",
+    "packageManager": "bun@1.1.29",
     "publishConfig": {
         "access": "restricted"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.1",
+        "@biomejs/biome": "^1.9.2",
         "@rencedm112/with-env": "^0.0.39",
         "@repo/biome-config": "workspace:*",
         "@repo/tsconfig": "workspace:*",

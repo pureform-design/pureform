@@ -30,12 +30,14 @@ describe("Typography", () => {
 
     it("should be able to create a typography instance with custom options", () => {
         const t = Typography.create({
-            asd: {
-                font: "asd",
-                lineHeight: "asd",
-                size: "asd",
-                tracking: "asd",
-                weight: "asd",
+            custom: {
+                asd: {
+                    fontFamily: "asd",
+                    lineHeight: "asd",
+                    fontSize: "asd",
+                    letterSpacing: "asd",
+                    fontWeight: "asd",
+                },
             },
         });
         expect(t.get("asd")).toBeTruthy();

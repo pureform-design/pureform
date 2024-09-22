@@ -1,28 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`ShadowElevations > should match the snapshot shadow elevation for 0 1`] = `
-{
-  "ambient": {
-    "blurRadius": "0px",
-    "offsetX": "0px",
-    "offsetY": "0px",
-    "spreadRadius": "0px",
-  },
-  "penumbra": {
-    "blurRadius": "0px",
-    "offsetX": "0px",
-    "offsetY": "0px",
-    "spreadRadius": "0px",
-  },
-  "umbra": {
-    "blurRadius": "0px",
-    "offsetX": "0px",
-    "offsetY": "0px",
-    "spreadRadius": "0px",
-  },
-}
-`;
-
 exports[`ShadowElevations > should match the snapshot shadow elevation for 1 1`] = `
 {
   "ambient": {
@@ -547,6 +524,29 @@ exports[`ShadowElevations > should match the snapshot shadow elevation for 23 1`
     "blurRadius": "14px",
     "offsetX": "0px",
     "offsetY": "11px",
+    "spreadRadius": "-7px",
+  },
+}
+`;
+
+exports[`ShadowElevations > should match the snapshot shadow elevation for 24 1`] = `
+{
+  "ambient": {
+    "blurRadius": "38px",
+    "offsetX": "0px",
+    "offsetY": "9px",
+    "spreadRadius": "6px",
+  },
+  "penumbra": {
+    "blurRadius": "34px",
+    "offsetX": "0px",
+    "offsetY": "24px",
+    "spreadRadius": "3px",
+  },
+  "umbra": {
+    "blurRadius": "14px",
+    "offsetX": "0px",
+    "offsetY": "9px",
     "spreadRadius": "-7px",
   },
 }

@@ -1,6 +1,6 @@
 import {
     argbFromHex,
-    type Hct,
+    Hct,
     hexFromArgb,
     TonalPalette as MaterialTonalPalette,
 } from "@material/material-color-utilities";
@@ -8,14 +8,15 @@ import type { HexColor } from "../types";
 
 export class TonalPalette {
     private _matTp: MaterialTonalPalette;
+    private _cache = new Map<number, HexColor>();
 
     private constructor(tp: MaterialTonalPalette);
     private constructor(hax: HexColor);
-    private constructor(hex: HexColor | MaterialTonalPalette) {
-        if (typeof hex === "string") {
-            this._matTp = MaterialTonalPalette.fromInt(argbFromHex(hex));
+    private constructor(tpOrHex: HexColor | MaterialTonalPalette) {
+        if (typeof tpOrHex === "string") {
+            this._matTp = MaterialTonalPalette.fromInt(argbFromHex(tpOrHex));
         } else {
-            this._matTp = hex;
+            this._matTp = tpOrHex;
         }
     }
 
@@ -41,18 +42,28 @@ export class TonalPalette {
     public toneHex(tone: number): HexColor {
         TonalPalette.throwWhenInvalidTone(tone);
 
-        return hexFromArgb(this._matTp.tone(tone)) as HexColor;
+        if (this._cache.has(tone)) {
+            return this._cache.get(tone) as HexColor;
+        }
+
+        const h = hexFromArgb(this._matTp.tone(tone)) as HexColor;
+
+        this._cache.set(tone, h);
+
+        return h;
     }
 
     public toneHct(tone: number): Hct {
         TonalPalette.throwWhenInvalidTone(tone);
 
-        return this._matTp.getHct(tone);
+        const argb = this.toneArgb(tone);
+
+        return Hct.fromInt(argb);
     }
 
     public toneArgb(tone: number): number {
         TonalPalette.throwWhenInvalidTone(tone);
-
-        return this._matTp.tone(tone);
+        const hex = this.toneHex(tone);
+        return argbFromHex(hex);
     }
 }

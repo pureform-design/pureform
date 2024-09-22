@@ -1,9 +1,9 @@
 export type TextStyle = {
-    readonly font: string;
+    readonly fontFamily: string;
     readonly lineHeight: string;
-    readonly size: string;
-    readonly weight: string;
-    readonly tracking: string;
+    readonly fontSize: string;
+    readonly fontWeight: string;
+    readonly letterSpacing: string;
 };
 
 export type BaseTextStyleName =

@@ -46,15 +46,15 @@ describe("ShadowElevations", () => {
         }
     });
 
-    it.for([
-        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-        20, 21, 22, 23,
-    ])("should match the snapshot shadow elevation for %i", (i) => {
-        const se = ShadowElevations.create();
+    it.for(new Array(24).fill(0).map((_, i) => i + 1))(
+        "should match the snapshot shadow elevation for %i",
+        (i) => {
+            const se = ShadowElevations.create();
 
-        const shadow = se.getAtPixel(i);
-        expect(shadow).toMatchSnapshot();
-    });
+            const shadow = se.getAtPixel(i);
+            expect(shadow).toMatchSnapshot();
+        },
+    );
 
     it("should be able to get a shadow elevation using custom elevation", () => {
         const se = ShadowElevations.create({

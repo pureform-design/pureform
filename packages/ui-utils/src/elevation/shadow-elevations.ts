@@ -1,41 +1,14 @@
-import { deepMerge } from "@repo/utils";
-import type { Pixel } from "../types";
-import type {
-    BaseElevation,
-    BoxShadow,
-    ElevationConfig,
-    ShadowElevation,
-} from "./types";
-import {
-    ambientMap,
-    penumbraMap,
-    precalculatedAtPixel,
-    umbraMap,
-} from "./precalculated";
-
-type Config = ElevationConfig | Pixel;
+import { type BaseElevationArgs, BaseElevations } from "./base-elevations";
+import { precalculatedAtPixel } from "./precalculated";
+import type { BaseElevation, BoxShadow, ShadowElevation } from "./types";
 
 export type ShadowElevationArgs<
     TCustomElevation extends string = BaseElevation,
-> = { elevations: Partial<Record<BaseElevation | TCustomElevation, Config>> };
+> = BaseElevationArgs<TCustomElevation>;
 
-export class ShadowElevations<TCustomElevation extends string = BaseElevation> {
-    private static defaultElevationOptions: ShadowElevationArgs = {
-        elevations: {
-            level0: 0,
-            level1: 1,
-            level2: 2,
-            level3: 3,
-            level4: 4,
-            level5: 5,
-        },
-    };
-
-    private elevationConfigs: Record<
-        TCustomElevation | BaseElevation,
-        ElevationConfig
-    >;
-
+export class ShadowElevations<
+    TCustomElevation extends string = BaseElevation,
+> extends BaseElevations<TCustomElevation> {
     private elevationLevelCache: Record<string, ShadowElevation> = {};
     private elevationPxCache: Record<number, ShadowElevation> = {};
 
@@ -46,44 +19,7 @@ export class ShadowElevations<TCustomElevation extends string = BaseElevation> {
     }
 
     protected constructor(args?: ShadowElevationArgs<TCustomElevation>) {
-        const options = deepMerge(
-            ShadowElevations.defaultElevationOptions as ShadowElevationArgs<TCustomElevation>,
-            args ?? {},
-        );
-        const configs = {} as Record<
-            TCustomElevation | BaseElevation,
-            ElevationConfig
-        >;
-
-        for (const key of Object.keys(options.elevations)) {
-            const value = options.elevations[key as TCustomElevation];
-            let numPx = -1;
-            if (typeof value === "number" || typeof value === "string") {
-                numPx =
-                    typeof value === "number" ? value : Number.parseInt(value);
-            } else if (typeof value === "object") {
-                numPx =
-                    typeof value.pixel === "number"
-                        ? value.pixel
-                        : Number.parseInt(value.pixel);
-            } else {
-                throw new Error(
-                    "Invalid elevation value, must be a number or object with a pixel property",
-                );
-            }
-
-            if (numPx < 0) {
-                throw new Error(
-                    "Invalid elevation pixel, must be greater than 0",
-                );
-            }
-
-            configs[key as TCustomElevation] = {
-                pixel: numPx,
-            };
-        }
-
-        this.elevationConfigs = configs;
+        super(args);
     }
 
     public get(elevation: TCustomElevation | BaseElevation): ShadowElevation {
@@ -112,18 +48,24 @@ export class ShadowElevations<TCustomElevation extends string = BaseElevation> {
 
     // Penumbra functions
     private static penumbraOffsetY(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 1.0;
         const intercept = 0.0;
         return Math.floor(slope * px + intercept);
     }
 
     private static penumbraBlurRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 1.37;
         const intercept = 1.18;
         return Math.floor(slope * px + intercept);
     }
 
     private static penumbraSpreadRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 0.13;
         const intercept = 0.03;
         return Math.floor(slope * px + intercept);
@@ -131,18 +73,24 @@ export class ShadowElevations<TCustomElevation extends string = BaseElevation> {
 
     // Umbra functions
     private static umbraOffsetY(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 0.39;
         const intercept = 0.63;
         return Math.floor(slope * px + intercept);
     }
 
     private static umbraBlurRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 0.56;
         const intercept = 1.02;
         return Math.floor(slope * px + intercept);
     }
 
     private static umbraSpreadRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = -0.26;
         const intercept = -0.12;
         return Math.floor(slope * px + intercept);
@@ -150,18 +98,24 @@ export class ShadowElevations<TCustomElevation extends string = BaseElevation> {
 
     // Ambient functions
     private static ambientOffsetY(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 0.39;
         const intercept = 0.63;
         return Math.floor(slope * px + intercept);
     }
 
     private static ambientBlurRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 1.52;
         const intercept = 2.33;
         return Math.floor(slope * px + intercept);
     }
 
     private static ambientSpreadRadius(px: number): number {
+        if (px === 0) return 0;
+
         const slope = 0.29;
         const intercept = 0.0;
         return Math.floor(slope * px + intercept);

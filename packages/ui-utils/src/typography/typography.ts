@@ -2,10 +2,12 @@ import { deepMerge } from "@repo/utils";
 import type { BaseTextStyleName, TextStyle } from "../types";
 import type { DeepPartial } from "@repo/type-utils";
 
-type OverrideTextStyles<
+export type TextStyleArgs<
     TCustomTextStyleName extends string = BaseTextStyleName,
-> = DeepPartial<Record<BaseTextStyleName, TextStyle>> &
-    Partial<Record<TCustomTextStyleName, TextStyle>>;
+> = {
+    custom: DeepPartial<Record<BaseTextStyleName, TextStyle>> &
+        Partial<Record<TCustomTextStyleName, TextStyle>>;
+};
 
 export class Typography<
     TCustomTextStyleName extends string = BaseTextStyleName,
@@ -15,141 +17,136 @@ export class Typography<
         TextStyle
     > = {
         displayLarge: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "4rem",
-            size: "3.5625rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "3.5625rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         displayMedium: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "3.25rem",
-            size: "2.8125rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "2.8125rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         displaySmall: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "2.75rem",
-            size: "2.25rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "2.25rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         headlineLarge: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "2.5rem",
-            size: "2rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "2rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         headlineMedium: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "2.25rem",
-            size: "1.75rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "1.75rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         headlineSmall: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "2rem",
-            size: "1.5rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "1.5rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         titleLarge: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.75rem",
-            size: "1.375rem",
-            tracking: "0rem",
-            weight: "400",
+            fontSize: "1.375rem",
+            letterSpacing: "0rem",
+            fontWeight: "400",
         },
         titleMedium: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.5rem",
-            size: "1rem",
-            tracking: "0.009375rem",
-            weight: "500",
+            fontSize: "1rem",
+            letterSpacing: "0.009375rem",
+            fontWeight: "500",
         },
         titleSmall: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.25rem",
-            size: "0.875rem",
-            tracking: "0.00625rem",
-            weight: "500",
+            fontSize: "0.875rem",
+            letterSpacing: "0.00625rem",
+            fontWeight: "500",
         },
         bodyLarge: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.5rem",
-            size: "1rem",
-            tracking: "0.03125rem",
-            weight: "400",
+            fontSize: "1rem",
+            letterSpacing: "0.03125rem",
+            fontWeight: "400",
         },
         bodyMedium: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.25rem",
-            size: "0.875rem",
-            tracking: "0.015625rem",
-            weight: "400",
+            fontSize: "0.875rem",
+            letterSpacing: "0.015625rem",
+            fontWeight: "400",
         },
         bodySmall: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1rem",
-            size: "0.75rem",
-            tracking: "0.025rem",
-            weight: "400",
+            fontSize: "0.75rem",
+            letterSpacing: "0.025rem",
+            fontWeight: "400",
         },
         labelLarge: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1.25rem",
-            size: "14px",
-            tracking: "0.00625rem",
-            weight: "500",
+            fontSize: "14px",
+            letterSpacing: "0.00625rem",
+            fontWeight: "500",
         },
         labelMedium: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1rem",
-            size: "0.75rem",
-            tracking: "0.03125rem",
-            weight: "500",
+            fontSize: "0.75rem",
+            letterSpacing: "0.03125rem",
+            fontWeight: "500",
         },
         labelSmall: {
-            font: "Roboto",
+            fontFamily: "Roboto, sans-serif",
             lineHeight: "1rem",
-            size: "0.6875rem",
-            tracking: "0.03125rem",
-            weight: "500",
+            fontSize: "0.6875rem",
+            letterSpacing: "0.03125rem",
+            fontWeight: "500",
         },
     } as Record<TCustomTextStyleName | BaseTextStyleName, TextStyle>;
 
     public static create<
         TCustomTextStyleName extends string = BaseTextStyleName,
     >(
-        overrides?: OverrideTextStyles<TCustomTextStyleName>,
+        args?: TextStyleArgs<TCustomTextStyleName>,
     ): Typography<TCustomTextStyleName> {
-        return new Typography(overrides);
+        return new Typography(args);
     }
 
     public copy(
-        overrides?: DeepPartial<
+        args?: DeepPartial<
             Record<BaseTextStyleName | TCustomTextStyleName, TextStyle>
         >,
     ): Typography<TCustomTextStyleName> {
         const newTypography = new Typography<TCustomTextStyleName>();
 
-        newTypography._scale = deepMerge(
-            this._scale,
-            (overrides ?? {}) as Record<BaseTextStyleName, TextStyle>,
-        );
+        newTypography._scale = deepMerge(this._scale, args ?? {});
 
         return newTypography;
     }
 
-    protected constructor(
-        overrides?: OverrideTextStyles<TCustomTextStyleName>,
-    ) {
+    protected constructor(args?: TextStyleArgs<TCustomTextStyleName>) {
         this._scale = deepMerge(
             this._scale,
-            (overrides ?? {}) as Record<BaseTextStyleName, TextStyle>,
+            (args?.custom ?? {}) as Record<BaseTextStyleName, TextStyle>,
         );
     }
 

@@ -11,6 +11,22 @@
             "cache": true,
             "dependsOn": ["^test:coverage"],
             "inputs": ["src/**"]
+        },
+        "build": {
+            "dependsOn": ["^build"],
+            "inputs": ["src/**"],
+            "outputs": ["dist/**"]
+        },
+        "codegen": {
+            "dependsOn": ["^codegen"],
+            "inputs": ["src/**"]
+        },
+        "dev": {
+            "dependsOn": ["^dev", "^codegen"],
+            "interactive": false,
+            "persistent": true,
+            "cache": false,
+            "inputs": ["src/**"]
         }
     }
 }

@@ -1,23 +1,19 @@
-import {
-    argbFromHex,
-    Hct,
-    hexFromArgb,
-} from "@material/material-color-utilities";
+import { argbFromHex, Hct } from "@material/material-color-utilities";
 import { CorePalette, type ColorConfig } from ".";
-import type {
-    BaseColorGroup,
-    BaseKeyColorGroup,
-    HexColor,
-    NeutralColorGroup,
-    SystemColor,
-} from "../types";
+import type { BaseColorGroup, HexColor, SystemColor } from "../types";
 
 export type ColorSchemeMode = "light" | "dark";
 
 export type ColorSchemeArgs<TCustomColorGroups extends string> = {
-    sourceColor: HexColor;
-    customColorSeeds?: Partial<
+    source: HexColor;
+    customSeeds?: Partial<
         Record<TCustomColorGroups | BaseColorGroup, ColorConfig>
+    >;
+    overrides?: Partial<
+        Record<
+            SystemColor<TCustomColorGroups | BaseColorGroup>,
+            HexColor | { dark?: HexColor; light?: HexColor }
+        >
     >;
 };
 
@@ -32,6 +28,8 @@ export type ColorInfo<TCustomColorGroups extends string = BaseColorGroup> = {
     colorGroup: TCustomColorGroups | BaseColorGroup;
     lightTone: number;
     darkTone: number;
+    lightOverride?: HexColor;
+    darkOverride?: HexColor;
 };
 
 function capitalize<S extends string>(str: S): Capitalize<S> {
@@ -40,21 +38,8 @@ function capitalize<S extends string>(str: S): Capitalize<S> {
 
 export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
     protected corePalette: CorePalette<TCustomColorGroups | BaseColorGroup>;
-    private _cache: Partial<
-        Record<SystemColor<TCustomColorGroups | BaseColorGroup>, HexColor>
-    > = {};
+    private _cache: Partial<Record<string, HexColor>> = {};
     private _colorInfo: ColorInfoRecord<TCustomColorGroups>;
-
-    private static neutralColorGroups: NeutralColorGroup[] = [
-        "neutral",
-        "neutralVariant",
-    ];
-
-    private static isNeutral(color: string): boolean {
-        return ColorScheme.neutralColorGroups.includes(
-            color as NeutralColorGroup,
-        );
-    }
 
     public static create<TCustomColorGroups extends string = BaseColorGroup>(
         args: ColorSchemeArgs<TCustomColorGroups>,
@@ -64,11 +49,10 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
 
     protected constructor(args: ColorSchemeArgs<TCustomColorGroups>) {
         this.corePalette = CorePalette.fromSourceHexWithCustomColors(
-            args.sourceColor,
-            args.customColorSeeds ?? {},
+            args.source,
+            args.customSeeds ?? {},
         );
-
-        const colorInfo: ColorInfoRecord<TCustomColorGroups> = {
+        const colorInfo = {
             outline: {
                 colorGroup: "neutralVariant",
                 lightTone: 50,
@@ -191,103 +175,121 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
             },
         } as ColorInfoRecord<TCustomColorGroups>;
 
-        const keyColors = this.corePalette.colorGroups.filter(
-            (cg) => !ColorScheme.isNeutral(cg),
-        );
+        const colorGroups = this.corePalette.colorGroups;
 
-        for (const color of keyColors) {
-            const key: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+        for (const colorGroup of colorGroups) {
+            const cg: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 40,
                 darkTone: 80,
             };
-            const onKey: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCg: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 100,
                 darkTone: 20,
             };
-            const onKeyLow: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgLow: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 90,
                 darkTone: 10,
             };
-            const onKeyLowest: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgLowest: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 80,
                 darkTone: 0,
             };
-            const keyContainer: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const cgContainer: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 90,
                 darkTone: 30,
             };
-            const onKeyContainer: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgContainer: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 30,
                 darkTone: 90,
             };
-            const onKeyContainerLow: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgContainerLow: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 30,
                 darkTone: 70,
             };
-            const onKeyContainerLowest: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgContainerLowest: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 50,
                 darkTone: 50,
             };
-            const keyFixed: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const cgFixed: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 90,
                 darkTone: 90,
             };
-            const onKeyFixed: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgFixed: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 10,
                 darkTone: 10,
             };
-            const onKeyFixedVariant: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const onCgFixedVariant: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 30,
                 darkTone: 30,
             };
-            const keyFixedDim: ColorInfo<TCustomColorGroups> = {
-                colorGroup: color,
+            const cgFixedDim: ColorInfo<TCustomColorGroups> = {
+                colorGroup: colorGroup,
                 lightTone: 80,
                 darkTone: 80,
             };
 
-            colorInfo[color as SystemColor<TCustomColorGroups>] = key;
+            colorInfo[colorGroup as SystemColor<TCustomColorGroups>] = cg;
             colorInfo[
-                `on${capitalize(color)}` as SystemColor<TCustomColorGroups>
-            ] = onKey;
+                `on${capitalize(colorGroup)}` as SystemColor<TCustomColorGroups>
+            ] = onCg;
             colorInfo[
-                `on${capitalize(color)}Low` as SystemColor<TCustomColorGroups>
-            ] = onKeyLow;
+                `on${capitalize(colorGroup)}Low` as SystemColor<TCustomColorGroups>
+            ] = onCgLow;
             colorInfo[
-                `on${capitalize(color)}Lowest` as SystemColor<TCustomColorGroups>
-            ] = onKeyLowest;
-            colorInfo[`${color}Container` as SystemColor<TCustomColorGroups>] =
-                keyContainer;
+                `on${capitalize(colorGroup)}Lowest` as SystemColor<TCustomColorGroups>
+            ] = onCgLowest;
             colorInfo[
-                `on${capitalize(color)}Container` as SystemColor<TCustomColorGroups>
-            ] = onKeyContainer;
+                `${colorGroup}Container` as SystemColor<TCustomColorGroups>
+            ] = cgContainer;
             colorInfo[
-                `on${capitalize(color)}ContainerLow` as SystemColor<TCustomColorGroups>
-            ] = onKeyContainerLow;
+                `on${capitalize(colorGroup)}Container` as SystemColor<TCustomColorGroups>
+            ] = onCgContainer;
             colorInfo[
-                `on${capitalize(color)}ContainerLowest` as SystemColor<TCustomColorGroups>
-            ] = onKeyContainerLowest;
-            colorInfo[`${color}Fixed` as SystemColor<TCustomColorGroups>] =
-                keyFixed;
+                `on${capitalize(colorGroup)}ContainerLow` as SystemColor<TCustomColorGroups>
+            ] = onCgContainerLow;
             colorInfo[
-                `on${capitalize(color)}Fixed` as SystemColor<TCustomColorGroups>
-            ] = onKeyFixed;
+                `on${capitalize(colorGroup)}ContainerLowest` as SystemColor<TCustomColorGroups>
+            ] = onCgContainerLowest;
+            colorInfo[`${colorGroup}Fixed` as SystemColor<TCustomColorGroups>] =
+                cgFixed;
             colorInfo[
-                `on${capitalize(color)}FixedVariant` as SystemColor<TCustomColorGroups>
-            ] = onKeyFixedVariant;
-            colorInfo[`${color}FixedDim` as SystemColor<TCustomColorGroups>] =
-                keyFixedDim;
+                `on${capitalize(colorGroup)}Fixed` as SystemColor<TCustomColorGroups>
+            ] = onCgFixed;
+            colorInfo[
+                `on${capitalize(colorGroup)}FixedVariant` as SystemColor<TCustomColorGroups>
+            ] = onCgFixedVariant;
+            colorInfo[
+                `${colorGroup}FixedDim` as SystemColor<TCustomColorGroups>
+            ] = cgFixedDim;
+        }
+
+        for (const [key, value] of Object.entries(args.overrides ?? {})) {
+            const k = key as SystemColor<TCustomColorGroups | BaseColorGroup>;
+            const v = value as HexColor | { dark?: HexColor; light?: HexColor };
+
+            if (typeof v === "string") {
+                colorInfo[k].lightOverride = v;
+                colorInfo[k].darkOverride = v;
+            } else {
+                if (v.light) {
+                    colorInfo[k].lightOverride = v.light;
+                }
+
+                if (v.dark) {
+                    colorInfo[k].darkOverride = v.dark;
+                }
+            }
         }
 
         this._colorInfo = colorInfo;
@@ -297,7 +299,17 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         color: SystemColor<TCustomColorGroups | BaseColorGroup>,
         mode: ColorSchemeMode,
     ): HexColor {
-        const cached = this._cache[color];
+        if (mode === "light" && this._colorInfo[color].lightOverride) {
+            return this._colorInfo[color].lightOverride;
+        }
+
+        if (mode === "dark" && this._colorInfo[color].darkOverride) {
+            return this._colorInfo[color].darkOverride;
+        }
+
+        const key = `${color}.${mode}`;
+
+        const cached = this._cache[key];
 
         if (cached) {
             return cached;
@@ -313,8 +325,7 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         } else {
             hex = cp.toneHex(info.darkTone);
         }
-
-        this._cache[color] = hex;
+        this._cache[key] = hex;
 
         return hex;
     }
@@ -323,49 +334,68 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         color: SystemColor<TCustomColorGroups | BaseColorGroup>,
         mode: ColorSchemeMode,
     ): number {
-        const cached = this._cache[color];
+        const hex = this.getHex(color, mode);
 
-        if (cached) {
-            return argbFromHex(cached);
-        }
-
-        const info = this._colorInfo[color];
-
-        const cp = this.corePalette.get(info.colorGroup);
-
-        let argb = 0;
-        if (mode === "light") {
-            argb = cp.toneArgb(info.lightTone);
-        } else {
-            argb = cp.toneArgb(info.darkTone);
-        }
-
-        this._cache[color] = hexFromArgb(argb) as HexColor;
-
-        return argb;
+        return argbFromHex(hex);
     }
 
     public getHct(
         color: SystemColor<TCustomColorGroups | BaseColorGroup>,
         mode: ColorSchemeMode,
     ): Hct {
-        const cached = this._cache[color];
+        const argb = this.getArgb(color, mode);
 
-        if (cached) {
-            return Hct.fromInt(argbFromHex(cached));
+        return Hct.fromInt(argb);
+    }
+
+    public getAllHex(
+        mode: ColorSchemeMode,
+    ): Record<SystemColor<TCustomColorGroups | BaseColorGroup>, HexColor> {
+        const result = {} as Record<
+            SystemColor<TCustomColorGroups | BaseColorGroup>,
+            HexColor
+        >;
+
+        const colors = Object.keys(this._colorInfo) as SystemColor<
+            TCustomColorGroups | BaseColorGroup
+        >[];
+
+        for (const color of colors) {
+            result[color] = this.getHex(color, mode);
         }
 
-        const info = this._colorInfo[color];
+        return result;
+    }
 
-        const cp = this.corePalette.get(info.colorGroup);
+    public getAllArgb(
+        mode: ColorSchemeMode,
+    ): Record<SystemColor<TCustomColorGroups | BaseColorGroup>, number> {
+        const hex = this.getAllHex(mode);
 
-        const hct =
-            mode === "light"
-                ? cp.toneHct(info.lightTone)
-                : cp.toneHct(info.darkTone);
+        return Object.fromEntries(
+            Object.entries(hex).map(([key, value]) => [
+                key,
+                argbFromHex(value),
+            ]),
+        ) as Record<SystemColor<TCustomColorGroups | BaseColorGroup>, number>;
+    }
 
-        this._cache[color] = hexFromArgb(hct.toInt()) as HexColor;
+    public getAllHct(
+        mode: ColorSchemeMode,
+    ): Record<SystemColor<TCustomColorGroups | BaseColorGroup>, Hct> {
+        const argb = this.getAllArgb(mode);
 
-        return hct;
+        return Object.fromEntries(
+            Object.entries(argb).map(([key, value]) => [
+                key,
+                Hct.fromInt(value),
+            ]),
+        ) as Record<SystemColor<TCustomColorGroups | BaseColorGroup>, Hct>;
+    }
+
+    public getInfo(
+        color: SystemColor<TCustomColorGroups | BaseColorGroup>,
+    ): ColorInfo<TCustomColorGroups> {
+        return this._colorInfo[color];
     }
 }
