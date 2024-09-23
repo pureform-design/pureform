@@ -15,6 +15,7 @@ export function ColorDisplay(props: ColorDisplayProps) {
             rounded="xl"
             borderColor="outlineVariant"
             borderWidth="thin"
+            pfShadowElevation="level1"
         >
             {props.children}
         </Box>

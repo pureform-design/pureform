@@ -145,4 +145,37 @@ export class SurfaceElevations<
 
         return Hct.fromInt(argb);
     }
+
+    private get configKeys() {
+        return Object.keys(this.elevationConfigs) as (
+            | TCustomElevation
+            | BaseElevation
+        )[];
+    }
+
+    private mapConfigKeyValueRecord<T>(
+        fn: (key: TCustomElevation | BaseElevation) => T,
+    ) {
+        return Object.fromEntries(
+            this.configKeys.map((key) => [key, fn(key)]),
+        ) as Record<TCustomElevation | BaseElevation, T>;
+    }
+
+    public allHexElevations(
+        mode: ColorSchemeMode,
+    ): Record<TCustomElevation | BaseElevation, HexColor> {
+        return this.mapConfigKeyValueRecord((key) => this.getHex(key, mode));
+    }
+
+    public allArgbElevations(
+        mode: ColorSchemeMode,
+    ): Record<TCustomElevation | BaseElevation, number> {
+        return this.mapConfigKeyValueRecord((key) => this.getArgb(key, mode));
+    }
+
+    public allHctElevations(
+        mode: ColorSchemeMode,
+    ): Record<TCustomElevation | BaseElevation, Hct> {
+        return this.mapConfigKeyValueRecord((key) => this.getHct(key, mode));
+    }
 }

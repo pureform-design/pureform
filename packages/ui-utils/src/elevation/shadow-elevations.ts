@@ -1,6 +1,12 @@
+import type { Pixel } from "../types";
 import { type BaseElevationArgs, BaseElevations } from "./base-elevations";
 import { precalculatedAtPixel } from "./precalculated";
-import type { BaseElevation, BoxShadow, ShadowElevation } from "./types";
+import type {
+    BaseElevation,
+    BoxShadow,
+    ElevationConfig,
+    ShadowElevation,
+} from "./types";
 
 export type ShadowElevationArgs<
     TCustomElevation extends string = BaseElevation,
@@ -148,29 +154,42 @@ export class ShadowElevations<
         };
     }
 
-    public getAtPixel(px: number): ShadowElevation {
-        if (px < 0) {
+    public getAtPixel(px: Pixel): ShadowElevation {
+        const num = typeof px === "number" ? px : Number.parseInt(px);
+        if (num < 0) {
             throw new Error("Invalid elevation pixel, must be greater than 0");
         }
 
-        const cached = this.elevationPxCache[px];
+        const cached = this.elevationPxCache[num];
 
         if (cached) {
             return cached;
         }
 
-        if (px >= 0 && px <= 23) {
-            return precalculatedAtPixel(px);
+        if (num >= 0 && num <= 23) {
+            return precalculatedAtPixel(num);
         }
 
         const shadow: ShadowElevation = {
-            umbra: ShadowElevations.umbraAtPixel(px),
-            penumbra: ShadowElevations.penumbraAtPixel(px),
-            ambient: ShadowElevations.ambientAtPixel(px),
+            umbra: ShadowElevations.umbraAtPixel(num),
+            penumbra: ShadowElevations.penumbraAtPixel(num),
+            ambient: ShadowElevations.ambientAtPixel(num),
         };
 
-        this.elevationPxCache[px] = shadow;
+        this.elevationPxCache[num] = shadow;
 
         return shadow;
+    }
+
+    public all(): Record<TCustomElevation | BaseElevation, ShadowElevation> {
+        const config = this.elevationConfigs;
+        const keys = Object.keys(config) as (
+            | TCustomElevation
+            | BaseElevation
+        )[];
+
+        return Object.fromEntries(
+            keys.map((key) => [key, this.get(key)]),
+        ) as Record<TCustomElevation | BaseElevation, ShadowElevation>;
     }
 }

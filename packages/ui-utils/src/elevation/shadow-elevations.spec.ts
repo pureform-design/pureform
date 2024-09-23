@@ -82,4 +82,10 @@ describe("ShadowElevations", () => {
 
         expect(() => se.getAtPixel(-1)).toThrow();
     });
+
+    it("should have 6 elevation levels by default", () => {
+        const se = ShadowElevations.create();
+
+        expect(Object.keys(se.all())).toHaveLength(6);
+    });
 });

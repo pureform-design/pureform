@@ -16,6 +16,7 @@
         "noEmit": true,
         "jsx": "preserve",
         "jsxImportSource": "solid-js",
+        "checkJs": false,
 
         /* Linting */
         "strict": true,
@@ -27,5 +28,5 @@
             "~/*": ["./src/*"]
         }
     },
-    "include": ["src"],
+    "include": ["src"]
 }

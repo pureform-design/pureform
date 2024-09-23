@@ -7,11 +7,13 @@ import {
     type BaseTextStyleName,
     type TextStyleArgs,
 } from "@repo/ui-utils";
+import type { Prefix } from "./types";
+import { normalizePrefix } from "./helpers";
 
 export type DefineTextStylesArgs<
     TCustomTextStyleNames extends string = BaseTextStyleName,
 > = { custom?: TextStyleArgs<TCustomTextStyleNames>["custom"] } & {
-    prefix?: string;
+    prefix?: Prefix;
 };
 
 export function defineTextStyles<
@@ -24,9 +26,13 @@ export function defineTextStyles<
 
     const styles: CompositionStyles["textStyles"] = {};
 
+    const prefix = normalizePrefix(args?.prefix);
+
     for (const name of Object.keys(all) as (keyof typeof all)[]) {
         const style = all[name];
-        const actual = args?.prefix ? `${args.prefix}.${name}` : name;
+        const actual = prefix.textStylePrefix
+            ? `${prefix.textStylePrefix}.${name}`
+            : name;
         styles[actual] = {
             value: style,
         };

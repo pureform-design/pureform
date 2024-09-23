@@ -53,4 +53,15 @@ describe("SurfaceElevations", () => {
             expect(surface).toBeTypeOf("number");
         },
     );
+
+    it("should have 6 elevation levels by default", () => {
+        const se = createSurfaceElevations();
+
+        expect(Object.keys(se.allArgbElevations("dark"))).toHaveLength(6);
+        expect(Object.keys(se.allHexElevations("dark"))).toHaveLength(6);
+        expect(Object.keys(se.allHctElevations("dark"))).toHaveLength(6);
+        expect(Object.keys(se.allArgbElevations("light"))).toHaveLength(6);
+        expect(Object.keys(se.allHexElevations("light"))).toHaveLength(6);
+        expect(Object.keys(se.allHctElevations("light"))).toHaveLength(6);
+    });
 });
