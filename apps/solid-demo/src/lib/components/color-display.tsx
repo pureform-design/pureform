@@ -13,7 +13,7 @@ export function ColorDisplay(props: ColorDisplayProps) {
             w="60"
             h="24"
             rounded="xl"
-            borderColor="outlineVariant"
+            borderColor="pf.outlineVariant"
             borderWidth="thin"
             pfShadowElevation="level1"
         >

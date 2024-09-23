@@ -1,16 +1,14 @@
 import { defineUtility } from "@pandacss/dev";
 import {
-    type ColorScheme,
-    ShadowElevations,
     type BaseColorGroup,
     type BaseElevation,
     type BaseElevationArgs,
+    type ColorScheme,
     type ShadowElevation,
-    type HexColor,
-    type Pixel,
+    ShadowElevations,
 } from "@repo/ui-utils";
-import type { Prefix } from "../types";
 import { normalizePrefix } from "../helpers";
+import type { Prefix } from "../types";
 
 export type DefineShadowElevationUtilityArgs<
     TCustomElevation extends string = BaseElevation,
@@ -59,7 +57,7 @@ export function defineShadowElevationUtility<
         className: "shadow-elevation",
         property: "boxShadow",
         values,
-        transform(value, { token, utils }) {
+        transform(value, { utils }) {
             const px =
                 typeof value === "number" ? value : Number.parseInt(value);
 

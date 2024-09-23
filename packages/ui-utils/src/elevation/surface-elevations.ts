@@ -1,6 +1,6 @@
 import { Hct, type ColorScheme, type ColorSchemeMode } from "../color-scheme";
 import type { BaseElevation } from "./types";
-import type { HexColor, Pixel } from "../types";
+import type { BaseColorGroup, HexColor, Pixel } from "../types";
 import { BaseElevations, type BaseElevationArgs } from "./base-elevations";
 import {
     alphaFromArgb,
@@ -17,20 +17,24 @@ export type SurfaceElevationArgs<
 
 export class SurfaceElevations<
     TCustomElevation extends string = BaseElevation,
+    TCustomColorGroups extends string = BaseColorGroup,
 > extends BaseElevations<TCustomElevation> {
-    private _cache = new Map<number, HexColor>();
+    private _cache = new Map<string, HexColor>();
 
     protected constructor(
-        private colorScheme: ColorScheme,
+        private colorScheme: ColorScheme<TCustomColorGroups>,
         args?: SurfaceElevationArgs<TCustomElevation>,
     ) {
         super(args);
     }
 
-    public static create<TCustomElevation extends string = BaseElevation>(
-        colorScheme: ColorScheme,
+    public static create<
+        TCustomElevation extends string = BaseElevation,
+        TCustomColorGroups extends string = BaseColorGroup,
+    >(
+        colorScheme: ColorScheme<TCustomColorGroups>,
         args?: SurfaceElevationArgs<TCustomElevation>,
-    ): SurfaceElevations<TCustomElevation> {
+    ): SurfaceElevations<TCustomElevation, TCustomColorGroups> {
         return new SurfaceElevations(colorScheme, args);
     }
 
@@ -57,14 +61,14 @@ export class SurfaceElevations<
     }
 
     private static compositeOver(fg: number, bg: number): number {
-        const bgA = alphaFromArgb(fg);
-        const bgR = redFromArgb(fg);
-        const bgG = greenFromArgb(fg);
-        const bgB = blueFromArgb(fg);
-        const fgA = alphaFromArgb(bg);
-        const fgR = redFromArgb(bg);
-        const fgG = greenFromArgb(bg);
-        const fgB = blueFromArgb(bg);
+        const fgA = alphaFromArgb(fg);
+        const fgR = redFromArgb(fg);
+        const fgG = greenFromArgb(fg);
+        const fgB = blueFromArgb(fg);
+        const bgA = alphaFromArgb(bg);
+        const bgR = redFromArgb(bg);
+        const bgG = greenFromArgb(bg);
+        const bgB = blueFromArgb(bg);
 
         const a = fgA + bgA * (1 - fgA);
 
@@ -115,13 +119,27 @@ export class SurfaceElevations<
         return this.getHctAtPixel(px, mode);
     }
 
+    public getTintAlphaAtPixel(px: Pixel): number {
+        const num = typeof px === "number" ? px : Number.parseInt(px);
+
+        return 4.5 * Math.log(num + 1) + 2;
+    }
+
+    public getTintAlpha(elevation: BaseElevation | TCustomElevation): number {
+        this.throwIfInvalidElevation(elevation);
+        const px = this.elevationConfigs[elevation].pixel;
+
+        return this.getTintAlphaAtPixel(px);
+    }
+
     public getHexAtPixel(px: Pixel, mode: ColorSchemeMode): HexColor {
         const num = typeof px === "number" ? px : Number.parseInt(px);
-        if (this._cache.has(num)) {
-            return this._cache.get(num) as HexColor;
+        const key = `${num}.${mode}`;
+        if (this._cache.has(key)) {
+            return this._cache.get(key) as HexColor;
         }
 
-        const alpha = 4.5 * Math.log(num + 1) + 2;
+        const alpha = this.getTintAlphaAtPixel(num);
         const primary = this.colorScheme.getArgb("primary", mode);
         const surface = this.colorScheme.getArgb("surface", mode);
         const newPrimary = SurfaceElevations.setAlpha(primary, alpha);
@@ -129,7 +147,7 @@ export class SurfaceElevations<
 
         const h = hexFromArgb(newSurface) as HexColor;
 
-        this._cache.set(num, h);
+        this._cache.set(key, h);
 
         return h;
     }

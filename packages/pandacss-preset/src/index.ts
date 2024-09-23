@@ -12,7 +12,9 @@ import { defineColorSemanticTokens } from "./colors";
 import { type DefineTextStylesArgs, defineTextStyles } from "./text-styles";
 import {
     defineShadowElevationUtility,
+    defineSurfaceElevationUtility,
     type DefineShadowElevationUtilityArgs,
+    type DefineSurfaceElevationUtilityArgs,
 } from "./utilities";
 import { normalizePrefix } from "./helpers";
 
@@ -65,6 +67,8 @@ export function pureformPreset<
 
     const prefix = args.prefix;
 
+    const utilPrefix = normalPrefix.utilityPrefix;
+
     if (prefix) {
         textStyleArgs.prefix = prefix;
         elevationConfig.prefix = prefix;
@@ -75,18 +79,25 @@ export function pureformPreset<
         elevationConfig.elevations = elevations;
     }
 
+    const elConfTyped = elevationConfig as DefineShadowElevationUtilityArgs<
+        TCustomElevation,
+        TCustomColorGroups
+    >;
+
     return definePreset({
         presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
         name: "@pureform/pandacss-preset",
         utilities: {
             extend: {
-                [prefix ? `${prefix}ShadowElevation` : "shadowElevation"]:
-                    defineShadowElevationUtility(
-                        elevationConfig as DefineShadowElevationUtilityArgs<
-                            TCustomElevation,
-                            TCustomColorGroups
-                        >,
-                    ),
+                [utilPrefix
+                    ? `${utilPrefix}ShadowElevation`
+                    : "shadowElevation"]:
+                    defineShadowElevationUtility(elConfTyped),
+
+                [utilPrefix
+                    ? `${utilPrefix}SurfaceElevation`
+                    : "surfaceElevation"]:
+                    defineSurfaceElevationUtility(elConfTyped),
             },
         },
         theme: {
