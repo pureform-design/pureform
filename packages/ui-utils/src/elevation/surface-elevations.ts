@@ -10,6 +10,7 @@ import {
     hexFromArgb,
     redFromArgb,
 } from "@material/material-color-utilities";
+import chroma from "chroma-js";
 
 export type SurfaceElevationArgs<
     TCustomElevation extends string = BaseElevation,
@@ -60,25 +61,6 @@ export class SurfaceElevations<
         return (fgC * fgA + bgC * bgA * (1 - fgA)) / a;
     }
 
-    private static compositeOver(fg: number, bg: number): number {
-        const fgA = alphaFromArgb(fg);
-        const fgR = redFromArgb(fg);
-        const fgG = greenFromArgb(fg);
-        const fgB = blueFromArgb(fg);
-        const bgA = alphaFromArgb(bg);
-        const bgR = redFromArgb(bg);
-        const bgG = greenFromArgb(bg);
-        const bgB = blueFromArgb(bg);
-
-        const a = fgA + bgA * (1 - fgA);
-
-        const r = SurfaceElevations.compositeComponent(fgR, bgR, fgA, bgA, a);
-        const g = SurfaceElevations.compositeComponent(fgG, bgG, fgA, bgA, a);
-        const b = SurfaceElevations.compositeComponent(fgB, bgB, fgA, bgA, a);
-
-        return SurfaceElevations.argb(a, r, g, b);
-    }
-
     private throwIfInvalidElevation(
         elevation: BaseElevation | TCustomElevation,
     ) {
@@ -122,6 +104,8 @@ export class SurfaceElevations<
     public getTintAlphaAtPixel(px: Pixel): number {
         const num = typeof px === "number" ? px : Number.parseInt(px);
 
+        if (num === 0) return 0;
+
         return 4.5 * Math.log(num + 1) + 2;
     }
 
@@ -140,16 +124,22 @@ export class SurfaceElevations<
         }
 
         const alpha = this.getTintAlphaAtPixel(num);
-        const primary = this.colorScheme.getArgb("primary", mode);
-        const surface = this.colorScheme.getArgb("surface", mode);
-        const newPrimary = SurfaceElevations.setAlpha(primary, alpha);
-        const newSurface = SurfaceElevations.compositeOver(newPrimary, surface);
+        const primary = this.colorScheme.getHex("primary", mode);
+        const surface = this.colorScheme.getHex("surface", mode);
 
-        const h = hexFromArgb(newSurface) as HexColor;
+        try {
+            const chromaPrimary = chroma(primary);
+            const chromaSurface = chroma(surface);
 
-        this._cache.set(key, h);
+            const tint = chromaPrimary.alpha(alpha / 100);
 
-        return h;
+            const tintedSurface = chromaSurface.mix(tint, alpha / 100);
+            return tintedSurface.hex() as HexColor;
+        } catch (err) {
+            console.error(err);
+        }
+
+        return surface;
     }
 
     public getArgbAtPixel(px: Pixel, mode: ColorSchemeMode): number {

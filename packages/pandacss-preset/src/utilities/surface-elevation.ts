@@ -54,13 +54,12 @@ export function defineSurfaceElevationUtility<
             const tintOverlayAlpha = surface.getTintAlphaAtPixel(value);
 
             const tintColorMix = `color-mix(in srgb, transparent ${100 - tintOverlayAlpha}%, ${primaryColor} ${tintOverlayAlpha}%)`;
-            const tintImg = `linear-gradient(to bottom, ${tintColorMix}, ${tintColorMix})`;
-            const surfaceImg = `linear-gradient(to bottom, ${surfaceColor}, ${surfaceColor})`;
 
-            const background = `${tintImg}, ${surfaceImg}`;
+            const backgroundColor = `color-mix(in srgb, ${surfaceColor}, ${tintColorMix})`;
 
             return {
-                background,
+                // backgroundColor: surface.getHexAtPixel(value, "light"),
+                backgroundColor,
             };
         },
     });
