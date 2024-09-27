@@ -47,6 +47,10 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         return new ColorScheme(args);
     }
 
+    public getAllColorGroups() {
+        return this.corePalette.colorGroups;
+    }
+
     protected constructor(args: ColorSchemeArgs<TCustomColorGroups>) {
         this.corePalette = CorePalette.fromSourceHexWithCustomColors(
             args.source,

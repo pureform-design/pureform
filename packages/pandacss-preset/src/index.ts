@@ -1,32 +1,53 @@
 import { definePreset } from "@pandacss/dev";
 import {
-    ColorScheme,
     type BaseColorGroup,
     type BaseElevation,
     type BaseElevationArgs,
     type BaseTextStyleName,
+    ColorScheme,
     type ColorSchemeArgs,
     type TextStyleArgs,
+    Typography,
 } from "@repo/ui-utils";
-import { defineColorSemanticTokens } from "./colors";
+import { defineColorSemanticTokens } from "./tokens/colors";
+import { normalizePrefix, prefix } from "./helpers";
 import { type DefineTextStylesArgs, defineTextStyles } from "./text-styles";
 import {
+    type DefineShadowElevationUtilityArgs,
     defineShadowElevationUtility,
     defineSurfaceElevationUtility,
-    type DefineShadowElevationUtilityArgs,
-    type DefineSurfaceElevationUtilityArgs,
 } from "./utilities";
-import { normalizePrefix } from "./helpers";
+import { defineButton, type DefineButtonArgs } from "./components";
+import type { Prefix } from "./types";
+import {
+    defineStateContainer,
+    type DefineStateContainerArgs,
+} from "./components/state-container";
+import { defineScrim, type DefineScrimArgs } from "./components/scrim";
 
 type PresetArgs<
     TCustomColorGroups extends string = BaseColorGroup,
     TCustomTextStyles extends string = BaseTextStyleName,
     TCustomElevation extends string = BaseElevation,
 > = {
-    prefix?: string;
+    prefix?: Prefix;
     colors: ColorSchemeArgs<TCustomColorGroups>;
     textStyles?: DefineTextStylesArgs<TCustomTextStyles>["custom"];
     elevations?: BaseElevationArgs<TCustomElevation>["elevations"];
+    components?: {
+        button?: Omit<
+            DefineButtonArgs<TCustomColorGroups, TCustomTextStyles>,
+            "prefix" | "colorScheme" | "typography"
+        >;
+        state?: Omit<
+            DefineStateContainerArgs<TCustomColorGroups>,
+            "prefix" | "colorScheme"
+        >;
+        scrim?: Omit<
+            DefineScrimArgs<TCustomColorGroups>,
+            "prefix" | "colorScheme"
+        >;
+    };
 };
 
 export function pureformPreset<
@@ -65,13 +86,36 @@ export function pureformPreset<
         colorScheme,
     };
 
-    const prefix = args.prefix;
+    const pref = args.prefix;
 
     const utilPrefix = normalPrefix.utilityPrefix;
 
-    if (prefix) {
-        textStyleArgs.prefix = prefix;
-        elevationConfig.prefix = prefix;
+    const typography = Typography.create({
+        custom: textStyleArgs.custom ?? {},
+    });
+
+    const buttonArgs = {
+        ...(args?.components?.button ?? {}),
+        colorScheme,
+        typography,
+    } as DefineButtonArgs<TCustomColorGroups, TCustomTextStyleNames>;
+
+    const stateLayerArgs = {
+        ...(args?.components?.state ?? {}),
+        colorScheme,
+    } as DefineStateContainerArgs<TCustomColorGroups>;
+
+    const scrimArgs = {
+        ...(args?.components?.scrim ?? {}),
+        colorScheme,
+    } as DefineScrimArgs<TCustomColorGroups>;
+
+    if (pref) {
+        textStyleArgs.prefix = pref;
+        elevationConfig.prefix = pref;
+        buttonArgs.prefix = pref;
+        stateLayerArgs.prefix = pref;
+        scrimArgs.prefix = pref;
     }
 
     const elevations = args.elevations;
@@ -84,28 +128,38 @@ export function pureformPreset<
         TCustomColorGroups
     >;
 
+    function getComponentName(name: string) {
+        return prefix("camel", normalPrefix, name, "component");
+    }
+
+    const buttonName = getComponentName("button");
+    const stateContainerName = getComponentName("stateContainer");
+    const scrimName = getComponentName("scrim");
+
     return definePreset({
         presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
         name: "@pureform/pandacss-preset",
-        utilities: {
-            extend: {
-                [utilPrefix
-                    ? `${utilPrefix}ShadowElevation`
-                    : "shadowElevation"]:
-                    defineShadowElevationUtility(elConfTyped),
-
-                [utilPrefix
-                    ? `${utilPrefix}SurfaceElevation`
-                    : "surfaceElevation"]:
-                    defineSurfaceElevationUtility(elConfTyped),
+        globalCss: {
+            "html, body": {
+                fontSize: "16px",
             },
         },
+        utilities: {
+            [utilPrefix ? `${utilPrefix}ShadowElevation` : "shadowElevation"]:
+                defineShadowElevationUtility(elConfTyped),
+
+            [utilPrefix ? `${utilPrefix}SurfaceElevation` : "surfaceElevation"]:
+                defineSurfaceElevationUtility(elConfTyped),
+        },
         theme: {
-            extend: {
-                textStyles: defineTextStyles(textStyleArgs),
-                semanticTokens: {
-                    colors: semanticTokenColors,
-                },
+            slotRecipes: {
+                [buttonName]: defineButton(buttonArgs),
+                [stateContainerName]: defineStateContainer(buttonArgs),
+                [scrimName]: defineScrim(scrimArgs),
+            },
+            textStyles: defineTextStyles(textStyleArgs),
+            semanticTokens: {
+                colors: semanticTokenColors,
             },
         },
     });

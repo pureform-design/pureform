@@ -54,9 +54,9 @@ export class CorePalette<TCustomColorGroups extends string = BaseColorGroup> {
             Math.min(sourceChroma / 6, 8),
         );
         const tpNegative = TonalPalette.fromHueAndChroma(25, 84);
-        const tpInfo = TonalPalette.fromHex("#1DD2FF");
-        const tpNotice = TonalPalette.fromHex("#FFDD1D");
-        const tpPositive = TonalPalette.fromHex("#17D560");
+        const tpInfo = TonalPalette.fromHueAndChroma(219, 74);
+        const tpNotice = TonalPalette.fromHueAndChroma(92, 53);
+        const tpPositive = TonalPalette.fromHueAndChroma(147, 74);
 
         return {
             info: tpInfo,
@@ -89,9 +89,13 @@ export class CorePalette<TCustomColorGroups extends string = BaseColorGroup> {
             const value = customColorSeeds[key as TCustomColorGroup];
             if (value) {
                 if (typeof value === "string") {
-                    palettes[key as BaseColorGroup] = TonalPalette.fromHex(
-                        value as HexColor,
+                    const blended = Blend.harmonize(
+                        argbFromHex(value),
+                        argbFromHex(sourceSeed),
                     );
+
+                    palettes[key as BaseColorGroup] =
+                        TonalPalette.fromArgb(blended);
                 } else {
                     if (value.harmonize) {
                         const blended = Blend.harmonize(

@@ -2,7 +2,8 @@
     "name": "@repo/utils",
     "version": "0.0.0-semantically-released",
     "exports": {
-        ".": "./src/index.ts"
+        ".": "./src/index.ts",
+        "./*": "./src/*/index.ts"
     },
     "scripts": {
         "test:unit": "with-env 'vitest run --config vitest.config.unit.ts'"
