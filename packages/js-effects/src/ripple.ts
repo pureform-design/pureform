@@ -17,7 +17,7 @@ type CssClasses =
 
 export type CreateRippleOptions = {
     diameter: number;
-    relativeOrigin: { x: number; y: number };
+    origin: { x: number; y: number };
     color?: string;
     /**
      * Use this to provide a custom prototype element for the ripple. The default prototype is a span.
@@ -69,8 +69,8 @@ export function createRipple(opts: CreateRippleOptions) {
     const ripple = opts.getPrototype?.() ?? getRipplePrototype();
     ripple.dataset.ripple = "";
     const diameter = `${opts.diameter}px`;
-    const originX = `${opts.relativeOrigin.x}px`;
-    const originY = `${opts.relativeOrigin.y}px`;
+    const originX = `${opts.origin.x}px`;
+    const originY = `${opts.origin.y}px`;
 
     const applyTo = opts.applyValuesTo ?? "style";
 
@@ -180,10 +180,7 @@ function getExistingRipples(rippleLayer: HTMLElement) {
     return Array.from(rippleLayer.querySelectorAll("[data-ripple]"));
 }
 
-export type RippleOptions = Omit<
-    CreateRippleOptions,
-    "relativeOrigin" | "diameter"
-> & {
+export type RippleOptions = Omit<CreateRippleOptions, "origin" | "diameter"> & {
     color?: string;
     removeExistingRipples?: boolean;
     getExistingRipples?: (rippleLayer: HTMLElement) => HTMLElement[];
@@ -192,6 +189,7 @@ export type RippleOptions = Omit<
     animate?: boolean | ((ripple: HTMLElement, disponse: () => void) => void);
     disposeOnEvents?: boolean | string[];
     centerOrigin?: boolean;
+    disabled?: boolean;
 };
 
 function animateRipple(
@@ -222,6 +220,12 @@ function animateRipple(
 
 export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
     function handleClick(e: MouseEvent) {
+        const isDisabled = options?.disabled ?? false;
+
+        if (isDisabled) {
+            return;
+        }
+
         const rippleLayer =
             options?.getRippleLayer?.(rippleContainer) ??
             getRippleLayer(rippleContainer);
@@ -260,7 +264,7 @@ export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
             const ripple = createRipple({
                 ...options,
                 ...color,
-                relativeOrigin: {
+                origin: {
                     x: originX,
                     y: originY,
                 },
@@ -301,5 +305,5 @@ export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
 }
 
 function getDuration(diameter: number) {
-    return 750 + diameter * 0.125;
+    return 600 + diameter * 0.125;
 }
