@@ -1,6 +1,6 @@
 import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup } from "@pureform/ui-utils";
-import { getCssVar, prefix } from "../helpers";
+import { getClass, getCssVar, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs } from "./types";
 
 export type DefineStateContainerArgs<
@@ -17,7 +17,7 @@ export function defineStateContainer<
     const focusedVar = getCssVar(np, "state-focused-opacity");
     const pressedVar = getCssVar(np, "state-pressed-opacity");
     const draggedVar = getCssVar(np, "state-dragged-opacity");
-    const className = "state-container";
+    const className = getClass(np, "state-container");
     const defaultJsx = "StateContainer";
     const jsx = [prefix("pascal", np, defaultJsx, "component"), defaultJsx];
 

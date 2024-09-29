@@ -7,6 +7,7 @@ function createNormalizedPrefix(
     componentPrefix: string,
     textStylePrefix: string,
     cssVarPrefix: string,
+    classPrefix: string,
 ): NormalPrefix {
     return {
         tokenPrefix,
@@ -14,12 +15,14 @@ function createNormalizedPrefix(
         componentPrefix,
         textStylePrefix,
         cssVarPrefix,
+        classPrefix,
     };
 }
 
 export function normalizePrefix(prefix?: Prefix) {
     if (typeof prefix === "string" || typeof prefix === "undefined") {
         return createNormalizedPrefix(
+            prefix ?? "",
             prefix ?? "",
             prefix ?? "",
             prefix ?? "",
@@ -34,6 +37,7 @@ export function normalizePrefix(prefix?: Prefix) {
     const jsxPrefix = prefix.componentPrefix ?? defaultPrefix;
     const textStylePrefix = prefix.textStylePrefix ?? defaultPrefix;
     const cssVarPrefix = prefix.cssVarPrefix ?? defaultPrefix;
+    const classPrefix = prefix.classPrefix ?? defaultPrefix;
 
     return createNormalizedPrefix(
         tokenPrefix,
@@ -41,6 +45,7 @@ export function normalizePrefix(prefix?: Prefix) {
         jsxPrefix,
         textStylePrefix,
         cssVarPrefix,
+        classPrefix,
     );
 }
 
@@ -52,7 +57,7 @@ export function prefix(
     method: "dot" | "camel" | "pascal" | "kebab" | "snake",
     prefix: Prefix | NormalPrefix,
     key: string,
-    type: "token" | "utility" | "component" | "textStyle" | "cssVar",
+    type: "token" | "utility" | "component" | "textStyle" | "cssVar" | "class",
 ) {
     const pf = isNormalPrefix(prefix) ? prefix : normalizePrefix(prefix);
 
@@ -72,6 +77,9 @@ export function prefix(
             break;
         case "cssVar":
             actualPrefix = pf.cssVarPrefix;
+            break;
+        case "class":
+            actualPrefix = pf.classPrefix;
             break;
         default:
             throw new Error("Invalid prefix type");
@@ -102,4 +110,8 @@ export function getToken(pref: NormalPrefix, name: string) {
 
 export function getUtility(pref: NormalPrefix, name: string) {
     return prefix("camel", pref, name, "utility");
+}
+
+export function getClass(pref: NormalPrefix, name: string) {
+    return prefix("dot", pref, name, "class");
 }

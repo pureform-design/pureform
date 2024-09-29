@@ -1,6 +1,6 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup } from "@pureform/ui-utils";
-import { getCssVar, prefix } from "../helpers";
+import { getClass, getCssVar, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs } from "./types";
 import { mapColors } from "./utils";
 
@@ -12,7 +12,7 @@ export function defineRippleLayer<TColorGroup extends string = BaseColorGroup>(
 ) {
     const np = args.prefix;
 
-    const className = "ripple-layer";
+    const className = getClass(np, "ripple-layer");
     const defaultJsx = "RippleLayer";
     const jsx = [prefix("pascal", np, defaultJsx, "component"), defaultJsx];
 
@@ -52,7 +52,7 @@ export function defineRippleLayer<TColorGroup extends string = BaseColorGroup>(
                 top: `calc(var(${originY}, 0px) - var(${diameter}, 100%) / 2)`,
                 left: `calc(var(${originX}, 0px) - var(${diameter}, 100%) / 2)`,
                 aspectRatio: "1 / 1",
-                // filter: `blur(calc(var(${diameter}, 10px) / 2))`,
+                filter: `blur(calc(var(${diameter}, 10px) / 2))`,
             },
         },
         variants: {

@@ -6,8 +6,8 @@ import {
     type ColorScheme,
     SurfaceElevations,
 } from "@pureform/ui-utils";
-import { normalizePrefix } from "../helpers";
 import type { NormalPrefix } from "../types";
+import { getToken } from "../helpers";
 
 export type DefineSurfaceElevationUtilityArgs<
     TCustomElevation extends string = BaseElevation,
@@ -42,12 +42,8 @@ export function defineSurfaceElevationUtility<
         property: "backgroundColor",
         values,
         transform(value, { token }) {
-            const primaryTokenKey = normalPrefix.tokenPrefix
-                ? `colors.${normalPrefix.tokenPrefix}.primary`
-                : "colors.primary";
-            const surfaceTokenKey = normalPrefix.tokenPrefix
-                ? `colors.${normalPrefix.tokenPrefix}.surface`
-                : "colors.surface";
+            const primaryTokenKey = `colors.${getToken(normalPrefix, "primary")}`;
+            const surfaceTokenKey = `colors.${getToken(normalPrefix, "surface")}`;
 
             const surfaceColor = token(surfaceTokenKey);
             const primaryColor = token(primaryTokenKey);

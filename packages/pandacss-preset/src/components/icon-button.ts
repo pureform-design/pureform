@@ -1,7 +1,7 @@
 import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup } from "@pureform/ui-utils";
 import { capitalize } from "@repo/utils/string";
-import { getCssVar, getToken, getUtility, prefix } from "../helpers";
+import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs } from "./types";
 
@@ -13,7 +13,7 @@ export function defineIconButton<TColorGroup extends string = BaseColorGroup>(
 ) {
     const np = args.prefix;
 
-    const className = "icon-button";
+    const className = getClass(np, "icon-button");
     const defaultJsx = "IconButton";
     const jsx = [prefix("kebab", np, defaultJsx, "component"), defaultJsx];
 

@@ -2,13 +2,14 @@ import { cx } from "$/css";
 import { Box } from "$/jsx";
 import {
     pfButton,
+    pfCard,
     pfIconButton,
-    pfStateContainer,
     pfRippleLayer,
+    pfStateContainer,
 } from "$/recipes";
+import { ripple } from "@pureform/js-effects";
 import { onCleanup } from "solid-js";
 import { ColorDisplay } from "./lib";
-import { ripple } from "@pureform/js-effects";
 
 export function App() {
     const buttonSm = pfButton({
@@ -53,6 +54,9 @@ export function App() {
         color: "negative",
     });
     const rippleLayer = pfRippleLayer();
+    const card = pfCard({
+        variant: "elevated",
+    });
 
     return (
         <>
@@ -138,25 +142,26 @@ export function App() {
                 <span class={buttonLg2.touchTarget} />
                 <span class={rippleLayer.root} data-ripple-layer />
             </button>
+            <Box
+                w="400px"
+                h="400px"
+                position="relative"
+                overflow="hidden"
+                class={card.root}
+                ref={(el) => {
+                    const dispose = ripple(el, {
+                        class: rippleLayer.ripple,
+                    });
+
+                    onCleanup(dispose);
+                }}
+                textStyle="pf.titleLarge"
+            >
+                <span class={rippleLayer.root} data-ripple-layer />
+                Hello
+            </Box>
             <Box bg="pf.background" h="[100dvh]">
                 <div class="dark">
-                    <Box
-                        w="400px"
-                        h="400px"
-                        bg="pf.tertiaryContainer"
-                        color="pf.onTertiaryContainer"
-                        position="relative"
-                        overflow="hidden"
-                        ref={(el) => {
-                            const dispose = ripple(el, {
-                                class: rippleLayer.ripple,
-                            });
-
-                            onCleanup(dispose);
-                        }}
-                    >
-                        <span class={rippleLayer.root} data-ripple-layer />
-                    </Box>
                     <ColorDisplay
                         bg="pf.primaryContainer"
                         color="pf.onPrimaryContainer"

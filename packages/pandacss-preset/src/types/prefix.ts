@@ -4,6 +4,7 @@ export type NormalPrefix = {
     componentPrefix: string;
     textStylePrefix: string;
     cssVarPrefix: string;
+    classPrefix: string;
 };
 
 export type Prefix =

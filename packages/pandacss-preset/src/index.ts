@@ -19,6 +19,7 @@ import {
 } from "./utilities";
 import {
     defineButton,
+    defineCard,
     defineRippleLayer,
     type DefineButtonArgs,
     type DefineRippleLayerArgs,
@@ -33,6 +34,7 @@ import {
     defineIconButton,
     type DefineIconButtonArgs,
 } from "./components/icon-button";
+import type { DefineCardArgs } from "./components/card";
 
 type PresetArgs<
     TCustomColorGroups extends string = BaseColorGroup,
@@ -63,6 +65,10 @@ type PresetArgs<
         ripple?: Omit<
             DefineRippleLayerArgs<TCustomColorGroups>,
             "prefix" | "colorScheme"
+        >;
+        card?: Omit<
+            DefineCardArgs<TCustomColorGroups, TCustomTextStyles>,
+            "prefix" | "colorScheme" | "typography"
         >;
     };
 };
@@ -132,6 +138,13 @@ export function pureformPreset<
         prefix: np,
     } as DefineRippleLayerArgs<TCustomColorGroups>;
 
+    const cardArgs = {
+        ...(args?.components?.card ?? {}),
+        colorScheme,
+        prefix: np,
+        typography,
+    } as DefineCardArgs<TCustomColorGroups, TCustomTextStyleNames>;
+
     const elevations = args.elevations;
     if (elevations) {
         elevationConfig.elevations = elevations;
@@ -151,6 +164,7 @@ export function pureformPreset<
     const iconButtonName = getRecipeName("iconButton");
     const scrimName = getRecipeName("scrim");
     const rippleLayerName = getRecipeName("rippleLayer");
+    const cardName = getRecipeName("card");
 
     return definePreset({
         presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
@@ -174,6 +188,7 @@ export function pureformPreset<
                 [scrimName]: defineScrim(scrimArgs),
                 [iconButtonName]: defineIconButton(buttonArgs),
                 [rippleLayerName]: defineRippleLayer(rippleArgs),
+                [cardName]: defineCard(cardArgs),
             },
             textStyles: defineTextStyles(textStyleArgs),
             semanticTokens: {

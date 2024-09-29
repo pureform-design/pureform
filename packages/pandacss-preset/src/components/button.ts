@@ -1,7 +1,7 @@
 import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup, BaseTextStyleName } from "@pureform/ui-utils";
 import { capitalize } from "@repo/utils/string";
-import { getCssVar, getToken, getUtility, prefix } from "../helpers";
+import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";
 
@@ -15,7 +15,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
 ) {
     const np = args.prefix;
 
-    const className = "button";
+    const className = getClass(np, "button");
     const defaultJsx = "Button";
     const jsx = [prefix("kebab", np, defaultJsx, "component"), defaultJsx];
 
