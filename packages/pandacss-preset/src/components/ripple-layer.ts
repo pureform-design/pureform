@@ -52,7 +52,7 @@ export function defineRippleLayer<TColorGroup extends string = BaseColorGroup>(
                 top: `calc(var(${originY}, 0px) - var(${diameter}, 100%) / 2)`,
                 left: `calc(var(${originX}, 0px) - var(${diameter}, 100%) / 2)`,
                 aspectRatio: "1 / 1",
-                filter: `blur(calc(var(${diameter}, 10px) / 2))`,
+                // filter: `blur(calc(var(${diameter}, 10px) / 2))`,
             },
         },
         variants: {

@@ -202,18 +202,20 @@ function animateRipple(
     const animation = ripple.animate(
         [
             { transform: "scale(0)", opacity: 0 },
-            { opacity: 1, offset: 0.7 },
-            { opacity: 1, offset: 0.8 },
+            { opacity: 1, offset: 0.25 },
+            { transform: "scale(1)", offset: 0.5, opacity: 1 },
             { transform: "scale(1)", opacity: 0, offset: 1 },
         ],
         {
             duration,
-            easing: "cubic-bezier(0.05, 0.7, 0.1, 1.0)",
+            easing: "linear",
         },
     );
 
     animation.finished.then(() => {
-        animation.commitStyles();
+        if (ripple.parentElement) {
+            animation.commitStyles();
+        }
         dispose();
     });
 }
@@ -299,5 +301,5 @@ export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
 }
 
 function getDuration(diameter: number) {
-    return 2000 + diameter * 0.5;
+    return 750 + diameter * 0.125;
 }

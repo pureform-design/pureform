@@ -56,26 +56,70 @@ export function App() {
 
     return (
         <>
-            <button class={cx(buttonSm.root, sc.root)} type="button">
+            <button
+                class={cx(buttonSm.root, sc.root)}
+                type="button"
+                ref={(el) => {
+                    const dispose = ripple(el, {
+                        class: rippleLayer.ripple,
+                    });
+
+                    onCleanup(dispose);
+                }}
+            >
                 <span class={sc.stateLayer} />
                 <span class={buttonSm.label}>Hello</span>
+                <span class={rippleLayer.root} data-ripple-layer />
                 <span class={buttonSm.touchTarget} />
             </button>
-            <button class={cx(icon.root, sc.root, "group")} type="button">
+            <button
+                class={cx(icon.root, sc.root, "group")}
+                type="button"
+                ref={(el) => {
+                    const dispose = ripple(el, {
+                        class: rippleLayer.ripple,
+                    });
+
+                    onCleanup(dispose);
+                }}
+            >
                 <span class={sc.stateLayer} />X
                 <span class={icon.touchTarget} />
+                <span class={rippleLayer.root} data-ripple-layer />
             </button>
 
-            <button class={cx(buttonMd.root, sc.root, "group")} type="button">
+            <button
+                class={cx(buttonMd.root, sc.root, "group")}
+                type="button"
+                ref={(el) => {
+                    const dispose = ripple(el, {
+                        class: rippleLayer.ripple,
+                    });
+
+                    onCleanup(dispose);
+                }}
+            >
                 <span class={sc.stateLayer} />
                 <span class={buttonMd.label}>Hello</span>
                 <span class={buttonMd.touchTarget} />
+                <span class={rippleLayer.root} data-ripple-layer />
             </button>
 
-            <button class={cx(buttonLg.root, sc.root)} type="button">
+            <button
+                class={cx(buttonLg.root, sc.root)}
+                type="button"
+                ref={(el) => {
+                    const dispose = ripple(el, {
+                        class: rippleLayer.ripple,
+                    });
+
+                    onCleanup(dispose);
+                }}
+            >
                 <span class={sc.stateLayer} />
                 <span class={buttonLg.label}>Hello</span>
                 <span class={buttonLg.touchTarget} />
+                <span class={rippleLayer.root} data-ripple-layer />
             </button>
 
             <button
