@@ -1,6 +1,5 @@
 import { capitalize, lowerFirst } from "@repo/utils/string";
 import type { NormalPrefix, Prefix } from "../types";
-import type { BaseTextStyleName, Typography } from "@repo/ui-utils";
 
 function createNormalizedPrefix(
     tokenPrefix: string,
@@ -46,13 +45,7 @@ export function normalizePrefix(prefix?: Prefix) {
 }
 
 function isNormalPrefix(prefix: Prefix | NormalPrefix): prefix is NormalPrefix {
-    return (
-        typeof prefix === "object" &&
-        "tokenPrefix" in prefix &&
-        "utilityPrefix" in prefix &&
-        "componentPrefix" in prefix &&
-        "textStylePrefix" in prefix
-    );
+    return typeof prefix === "object" && !("default" in prefix);
 }
 
 export function prefix(

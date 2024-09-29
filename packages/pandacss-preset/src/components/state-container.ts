@@ -1,7 +1,7 @@
-import { defineSlotRecipe, type SystemStyleObject } from "@pandacss/dev";
-import type { BaseColorGroup } from "@repo/ui-utils";
+import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
+import type { BaseColorGroup } from "@pureform/ui-utils";
+import { getCssVar, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs } from "./types";
-import { getCssVar, normalizePrefix, prefix } from "../helpers";
 
 export type DefineStateContainerArgs<
     TColorGroup extends string = BaseColorGroup,
@@ -10,7 +10,7 @@ export type DefineStateContainerArgs<
 export function defineStateContainer<
     TColorGroup extends string = BaseColorGroup,
 >(args: DefineStateContainerArgs<TColorGroup>) {
-    const np = normalizePrefix(args.prefix);
+    const np = args.prefix;
 
     const stateLayerVar = getCssVar(np, "state-opacity");
     const hoveredVar = getCssVar(np, "state-hovered-opacity");
@@ -28,6 +28,7 @@ export function defineStateContainer<
         base: {
             root: {
                 position: "relative",
+                overflow: "hidden",
                 ...{
                     [stateLayerVar]: `calc(var(${hoveredVar}, 0) + var(${focusedVar}, 0) + var(${pressedVar}, 0) + var(${draggedVar}, 0))`,
                     [hoveredVar]: 0,

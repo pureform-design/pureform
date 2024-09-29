@@ -1,22 +1,20 @@
 import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
-import type { BaseColorGroup, BaseTextStyleName } from "@pureform/ui-utils";
+import type { BaseColorGroup } from "@pureform/ui-utils";
 import { capitalize } from "@repo/utils/string";
 import { getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
-import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";
+import type { BaseArgs, ColorArgs } from "./types";
 
-export type DefineButtonArgs<
-    TColorGroup extends string = BaseColorGroup,
-    TCustomTextStyle extends string = BaseTextStyleName,
-> = BaseArgs & ColorArgs<TColorGroup> & TypographyArgs<TCustomTextStyle>;
+export type DefineIconButtonArgs<TColorGroup extends string = BaseColorGroup> =
+    BaseArgs & ColorArgs<TColorGroup>;
 
-export function defineButton<TColorGroup extends string = BaseColorGroup>(
-    args: DefineButtonArgs<TColorGroup>,
+export function defineIconButton<TColorGroup extends string = BaseColorGroup>(
+    args: DefineIconButtonArgs<TColorGroup>,
 ) {
     const np = args.prefix;
 
-    const className = "button";
-    const defaultJsx = "Button";
+    const className = "icon-button";
+    const defaultJsx = "IconButton";
     const jsx = [prefix("kebab", np, defaultJsx, "component"), defaultJsx];
 
     const colors = {} as Record<
@@ -24,9 +22,15 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
         { root: SystemStyleObject }
     >;
 
-    const buttonMainVar = getCssVar(np, "button-color-main");
-    const buttonMainContrastVar = getCssVar(np, "button-color-main-contrast");
-    const buttonMainContainerVar = getCssVar(np, "button-color-main-container");
+    const buttonMainVar = getCssVar(np, "icon-button-color-main");
+    const buttonMainContrastVar = getCssVar(
+        np,
+        "icon-button-color-main-contrast",
+    );
+    const buttonMainContainerVar = getCssVar(
+        np,
+        "icon-button-color-main-container",
+    );
     const buttonMainContainerContrastVar = getCssVar(
         np,
         "button-color-main-container-contrast",
@@ -55,7 +59,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
     return defineSlotRecipe({
         className,
         jsx,
-        slots: ["root", "label", "icon", "touchTarget"],
+        slots: ["root", "icon", "touchTarget"],
         base: {
             root: {
                 position: "relative",
@@ -64,7 +68,6 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
-                gap: "2",
             },
             touchTarget,
         },
@@ -86,7 +89,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                         outline: 1,
                     },
                 },
-                text: {
+                standard: {
                     root: {
                         bg: "transparent",
                         color: `var(${buttonMainVar})`,
@@ -110,50 +113,33 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                 small: {
                     root: {
                         height: "8",
-                        px: "4",
+                        width: "8",
                     },
                     touchTarget: {
                         height: "10",
-                        width: "full",
-                    },
-                    label: {
-                        ...args.typography.get("labelLarge"),
+                        width: "10",
                     },
                 },
                 medium: {
                     root: {
                         height: "10",
-                        px: "6",
+                        width: "10",
                     },
                     touchTarget: {
                         height: "12",
-                        width: "full",
-                    },
-                    label: {
-                        ...args.typography.get("labelLarge"),
+                        width: "12",
                     },
                 },
                 large: {
                     root: {
                         height: "12",
-                        px: "8",
+                        width: "12",
                     },
                     touchTarget: {
                         height: "12",
-                        width: "full",
-                    },
-                    label: {
-                        ...args.typography.get("labelLarge"),
+                        width: "12",
                     },
                 },
-            },
-            leading: {
-                true: {},
-                false: {},
-            },
-            trailing: {
-                true: {},
-                false: {},
             },
             disabled: {
                 true: {
@@ -165,62 +151,8 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
         },
         compoundVariants: [
             {
-                leading: true,
-                size: "small",
-                css: {
-                    root: {
-                        pl: "2",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "small",
-                css: {
-                    root: {
-                        pr: "2",
-                    },
-                },
-            },
-            {
-                leading: true,
-                size: "medium",
-                css: {
-                    root: {
-                        pl: "4",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "medium",
-                css: {
-                    root: {
-                        pr: "4",
-                    },
-                },
-            },
-            {
-                leading: true,
-                size: "large",
-                css: {
-                    root: {
-                        pl: "6",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "large",
-                css: {
-                    root: {
-                        pr: "6",
-                    },
-                },
-            },
-            {
                 disabled: true,
-                variant: "text",
+                variant: "standard",
                 css: {
                     root: {
                         color: `token(colors.${disabledColor})/38`,
@@ -275,8 +207,6 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
             color: "primary",
             size: "medium",
             variant: "filled",
-            leading: false,
-            trailing: false,
         },
     });
 }

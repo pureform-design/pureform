@@ -8,7 +8,7 @@ import {
     type ColorSchemeArgs,
     type TextStyleArgs,
     Typography,
-} from "@repo/ui-utils";
+} from "@pureform/ui-utils";
 import { defineColorSemanticTokens } from "./tokens/colors";
 import { normalizePrefix, prefix } from "./helpers";
 import { type DefineTextStylesArgs, defineTextStyles } from "./text-styles";
@@ -17,13 +17,22 @@ import {
     defineShadowElevationUtility,
     defineSurfaceElevationUtility,
 } from "./utilities";
-import { defineButton, type DefineButtonArgs } from "./components";
+import {
+    defineButton,
+    defineRippleLayer,
+    type DefineButtonArgs,
+    type DefineRippleLayerArgs,
+} from "./components";
 import type { Prefix } from "./types";
 import {
     defineStateContainer,
     type DefineStateContainerArgs,
 } from "./components/state-container";
 import { defineScrim, type DefineScrimArgs } from "./components/scrim";
+import {
+    defineIconButton,
+    type DefineIconButtonArgs,
+} from "./components/icon-button";
 
 type PresetArgs<
     TCustomColorGroups extends string = BaseColorGroup,
@@ -32,19 +41,27 @@ type PresetArgs<
 > = {
     prefix?: Prefix;
     colors: ColorSchemeArgs<TCustomColorGroups>;
-    textStyles?: DefineTextStylesArgs<TCustomTextStyles>["custom"];
+    typography?: DefineTextStylesArgs<TCustomTextStyles>["custom"];
     elevations?: BaseElevationArgs<TCustomElevation>["elevations"];
     components?: {
         button?: Omit<
             DefineButtonArgs<TCustomColorGroups, TCustomTextStyles>,
             "prefix" | "colorScheme" | "typography"
         >;
-        state?: Omit<
+        iconButton?: Omit<
+            DefineIconButtonArgs<TCustomColorGroups>,
+            "prefix" | "colorScheme"
+        >;
+        stateContainer?: Omit<
             DefineStateContainerArgs<TCustomColorGroups>,
             "prefix" | "colorScheme"
         >;
         scrim?: Omit<
             DefineScrimArgs<TCustomColorGroups>,
+            "prefix" | "colorScheme"
+        >;
+        ripple?: Omit<
+            DefineRippleLayerArgs<TCustomColorGroups>,
             "prefix" | "colorScheme"
         >;
     };
@@ -61,34 +78,30 @@ export function pureformPreset<
         TCustomElevation
     >,
 ) {
-    const normalPrefix = normalizePrefix(args.prefix);
-    const semanticTokenColors = normalPrefix.tokenPrefix
+    const np = normalizePrefix(args.prefix);
+    const semanticTokenColors = np.tokenPrefix
         ? {
-              [normalPrefix.tokenPrefix]: defineColorSemanticTokens(
-                  args.colors,
-              ),
+              [np.tokenPrefix]: defineColorSemanticTokens(args.colors),
           }
         : defineColorSemanticTokens(args.colors);
-
-    const textStyleArgs: DefineTextStylesArgs<
-        TCustomTextStyleNames | BaseTextStyleName
-    > = {};
-
-    if (args.textStyles) {
-        textStyleArgs.custom = args.textStyles as TextStyleArgs<
-            TCustomTextStyleNames | BaseTextStyleName
-        >["custom"];
-    }
 
     const colorScheme = ColorScheme.create(args.colors);
 
     const elevationConfig: Record<string, unknown> = {
         colorScheme,
+        prefix: np,
     };
 
-    const pref = args.prefix;
+    const utilPrefix = np.utilityPrefix;
 
-    const utilPrefix = normalPrefix.utilityPrefix;
+    const textStyleArgs: DefineTextStylesArgs<
+        TCustomTextStyleNames | BaseTextStyleName
+    > = {
+        prefix: np,
+        custom: (args.typography ?? {}) as TextStyleArgs<
+            TCustomTextStyleNames | BaseTextStyleName
+        >["custom"],
+    };
 
     const typography = Typography.create({
         custom: textStyleArgs.custom ?? {},
@@ -98,25 +111,26 @@ export function pureformPreset<
         ...(args?.components?.button ?? {}),
         colorScheme,
         typography,
+        prefix: np,
     } as DefineButtonArgs<TCustomColorGroups, TCustomTextStyleNames>;
 
     const stateLayerArgs = {
-        ...(args?.components?.state ?? {}),
+        ...(args?.components?.stateContainer ?? {}),
         colorScheme,
+        prefix: np,
     } as DefineStateContainerArgs<TCustomColorGroups>;
 
     const scrimArgs = {
         ...(args?.components?.scrim ?? {}),
         colorScheme,
+        prefix: np,
     } as DefineScrimArgs<TCustomColorGroups>;
 
-    if (pref) {
-        textStyleArgs.prefix = pref;
-        elevationConfig.prefix = pref;
-        buttonArgs.prefix = pref;
-        stateLayerArgs.prefix = pref;
-        scrimArgs.prefix = pref;
-    }
+    const rippleArgs = {
+        ...(args?.components?.ripple ?? {}),
+        colorScheme,
+        prefix: np,
+    } as DefineRippleLayerArgs<TCustomColorGroups>;
 
     const elevations = args.elevations;
     if (elevations) {
@@ -128,13 +142,15 @@ export function pureformPreset<
         TCustomColorGroups
     >;
 
-    function getComponentName(name: string) {
-        return prefix("camel", normalPrefix, name, "component");
+    function getRecipeName(name: string) {
+        return prefix("camel", np, name, "component");
     }
 
-    const buttonName = getComponentName("button");
-    const stateContainerName = getComponentName("stateContainer");
-    const scrimName = getComponentName("scrim");
+    const buttonName = getRecipeName("button");
+    const stateContainerName = getRecipeName("stateContainer");
+    const iconButtonName = getRecipeName("iconButton");
+    const scrimName = getRecipeName("scrim");
+    const rippleLayerName = getRecipeName("rippleLayer");
 
     return definePreset({
         presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
@@ -154,8 +170,10 @@ export function pureformPreset<
         theme: {
             slotRecipes: {
                 [buttonName]: defineButton(buttonArgs),
-                [stateContainerName]: defineStateContainer(buttonArgs),
+                [stateContainerName]: defineStateContainer(stateLayerArgs),
                 [scrimName]: defineScrim(scrimArgs),
+                [iconButtonName]: defineIconButton(buttonArgs),
+                [rippleLayerName]: defineRippleLayer(rippleArgs),
             },
             textStyles: defineTextStyles(textStyleArgs),
             semanticTokens: {

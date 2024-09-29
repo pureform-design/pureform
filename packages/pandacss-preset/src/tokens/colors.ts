@@ -3,7 +3,7 @@ import {
     ColorScheme,
     type BaseColorGroup,
     type ColorSchemeArgs,
-} from "@repo/ui-utils";
+} from "@pureform/ui-utils";
 
 export function defineColorSemanticTokens<
     TCustomColorGroups extends string = BaseColorGroup,

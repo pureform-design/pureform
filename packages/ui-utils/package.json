@@ -1,5 +1,5 @@
 {
-    "name": "@repo/ui-utils",
+    "name": "@pureform/ui-utils",
     "version": "0.0.0-semantically-released",
     "description": "",
     "main": "./src/index.ts",

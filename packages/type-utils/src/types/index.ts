@@ -8,3 +8,4 @@ export * from "./simplify";
 export * from "./union-to-intersection";
 export * from "./deep-merge";
 export * from "./deep-partial";
+export * from "./hinted-string";

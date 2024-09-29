@@ -1,12 +1,10 @@
 {
-    "name": "@pureform/pandacss-preset",
+    "name": "@pureform/js-effects",
     "version": "0.0.0-semantically-released",
     "main": "./src/index.ts",
     "exports": {
-        ".": "./src/index.ts"
-    },
-    "peerDependencies": {
-        "@pandacss/dev": "^0.46.0"
+        ".": "./src/index.ts",
+        "./*": "./src/*/index.ts"
     },
     "dependencies": {
         "@pureform/ui-utils": "workspace:*"

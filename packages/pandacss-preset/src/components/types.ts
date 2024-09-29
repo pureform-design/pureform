@@ -3,11 +3,11 @@ import type {
     BaseTextStyleName,
     ColorScheme,
     Typography,
-} from "@repo/ui-utils";
-import type { Prefix } from "../types";
+} from "@pureform/ui-utils";
+import type { NormalPrefix } from "../types";
 
 export type BaseArgs = {
-    prefix?: Prefix;
+    prefix: NormalPrefix;
 };
 
 export type ColorArgs<TCustomColorGroups extends string = BaseColorGroup> = {

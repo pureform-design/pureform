@@ -1,2 +1,2 @@
-export * from "./methods";
+export * from "./object";
 export * from "./string";

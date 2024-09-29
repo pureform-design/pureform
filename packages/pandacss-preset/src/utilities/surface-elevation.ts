@@ -5,16 +5,16 @@ import {
     type BaseElevationArgs,
     type ColorScheme,
     SurfaceElevations,
-} from "@repo/ui-utils";
+} from "@pureform/ui-utils";
 import { normalizePrefix } from "../helpers";
-import type { Prefix } from "../types";
+import type { NormalPrefix } from "../types";
 
 export type DefineSurfaceElevationUtilityArgs<
     TCustomElevation extends string = BaseElevation,
     TCustomColorGroups extends string = BaseColorGroup,
 > = BaseElevationArgs<TCustomElevation> & {
     colorScheme: ColorScheme<TCustomColorGroups>;
-    prefix?: Prefix;
+    prefix: NormalPrefix;
 };
 
 export function defineSurfaceElevationUtility<
@@ -35,7 +35,7 @@ export function defineSurfaceElevationUtility<
         ]),
     );
 
-    const normalPrefix = normalizePrefix(args.prefix);
+    const normalPrefix = args.prefix;
 
     return defineUtility({
         className: "surface-elevation",

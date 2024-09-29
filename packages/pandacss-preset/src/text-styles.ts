@@ -1,24 +1,23 @@
 import {
-    defineTextStyles as pandaDefineTextStyles,
     type CompositionStyles,
+    defineTextStyles as pandaDefineTextStyles,
 } from "@pandacss/dev";
 import {
-    Typography,
     type BaseTextStyleName,
     type TextStyleArgs,
-} from "@repo/ui-utils";
-import type { Prefix } from "./types";
-import { normalizePrefix } from "./helpers";
+    Typography,
+} from "@pureform/ui-utils";
+import type { NormalPrefix } from "./types";
 
 export type DefineTextStylesArgs<
     TCustomTextStyleNames extends string = BaseTextStyleName,
 > = { custom?: TextStyleArgs<TCustomTextStyleNames>["custom"] } & {
-    prefix?: Prefix;
+    prefix: NormalPrefix;
 };
 
 export function defineTextStyles<
     TCustomTextStyleNames extends string = BaseTextStyleName,
->(args?: DefineTextStylesArgs<TCustomTextStyleNames | BaseTextStyleName>) {
+>(args: DefineTextStylesArgs<TCustomTextStyleNames | BaseTextStyleName>) {
     const t = Typography.create({
         custom: args?.custom ?? {},
     });
@@ -26,7 +25,7 @@ export function defineTextStyles<
 
     const styles: CompositionStyles["textStyles"] = {};
 
-    const prefix = normalizePrefix(args?.prefix);
+    const prefix = args.prefix;
 
     for (const name of Object.keys(all) as (keyof typeof all)[]) {
         const style = all[name];

@@ -6,16 +6,16 @@ import {
     type ColorScheme,
     type ShadowElevation,
     ShadowElevations,
-} from "@repo/ui-utils";
-import { normalizePrefix } from "../helpers";
-import type { Prefix } from "../types";
+} from "@pureform/ui-utils";
+import { getToken } from "../helpers";
+import type { NormalPrefix } from "../types";
 
 export type DefineShadowElevationUtilityArgs<
     TCustomElevation extends string = BaseElevation,
     TCustomColorGroups extends string = BaseColorGroup,
 > = BaseElevationArgs<TCustomElevation> & {
     colorScheme: ColorScheme<TCustomColorGroups>;
-    prefix?: Prefix;
+    prefix: NormalPrefix;
 };
 
 function boxShadow(
@@ -51,7 +51,7 @@ export function defineShadowElevationUtility<
         ]),
     );
 
-    const prefix = normalizePrefix(args.prefix);
+    const np = args.prefix;
 
     return defineUtility({
         className: "shadow-elevation",
@@ -61,9 +61,7 @@ export function defineShadowElevationUtility<
             const px =
                 typeof value === "number" ? value : Number.parseInt(value);
 
-            const shadowColorKey = prefix.tokenPrefix
-                ? `${prefix.tokenPrefix}.shadow`
-                : "shadow";
+            const shadowColorKey = getToken(np, "shadow");
 
             const shadowElevation = shadow.getAtPixel(px);
             const umbraColor = utils.colorMix(`${shadowColorKey}/20`);

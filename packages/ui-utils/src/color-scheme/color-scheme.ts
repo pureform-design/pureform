@@ -1,5 +1,6 @@
-import { argbFromHex, Hct } from "@material/material-color-utilities";
-import { CorePalette, type ColorConfig } from ".";
+import { Hct, argbFromHex } from "@material/material-color-utilities";
+import { clone } from "@repo/utils";
+import { type ColorConfig, CorePalette } from ".";
 import type { BaseColorGroup, HexColor, SystemColor } from "../types";
 
 export type ColorSchemeMode = "light" | "dark";
@@ -401,5 +402,9 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
         color: SystemColor<TCustomColorGroups | BaseColorGroup>,
     ): ColorInfo<TCustomColorGroups> {
         return this._colorInfo[color];
+    }
+
+    public getAllInfo(): ColorInfoRecord<TCustomColorGroups> {
+        return clone(this._colorInfo);
     }
 }
