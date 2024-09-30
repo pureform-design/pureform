@@ -4,6 +4,7 @@ import { capitalize } from "@repo/utils/string";
 import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs } from "./types";
+import { opacityMix } from "./utils";
 
 export type DefineIconButtonArgs<TColorGroup extends string = BaseColorGroup> =
     BaseArgs & ColorArgs<TColorGroup>;
@@ -55,6 +56,8 @@ export function defineIconButton<TColorGroup extends string = BaseColorGroup>(
     const disabledColor = getToken(np, "onSurface");
 
     const shadowElevation = getUtility(np, "shadowElevation");
+    const disabledOutline = getCssVar(np, "icon-button-disabled-outline-color");
+    const disabledBg = getCssVar(np, "icon-button-disabled-background-color");
 
     return defineSlotRecipe({
         className,
@@ -76,37 +79,69 @@ export function defineIconButton<TColorGroup extends string = BaseColorGroup>(
             variant: {
                 filled: {
                     root: {
-                        bg: `var(${buttonMainVar})`,
+                        backgroundColor: `var(${buttonMainVar})`,
                         color: `var(${buttonMainContrastVar})`,
+                        ...{
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 outlined: {
                     root: {
-                        bg: "transparent",
+                        backgroundColor: "transparent",
                         color: `var(${buttonMainVar})`,
                         outlineColor: `token(colors.${getToken(np, "outline")})`,
                         outlineStyle: "solid",
                         outline: 1,
+                        ...{
+                            [disabledBg]: "transparent",
+                            [disabledOutline]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                        },
                     },
                 },
                 standard: {
                     root: {
-                        bg: "transparent",
+                        backgroundColor: "transparent",
                         color: `var(${buttonMainVar})`,
+                        ...{
+                            [disabledBg]: "transparent",
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 tonal: {
                     root: {
-                        bg: `var(${buttonMainContainerVar})`,
+                        backgroundColor: `var(${buttonMainContainerVar})`,
                         color: `var(${buttonMainContainerContrastVar})`,
+                        ...{
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 elevated: {
                     root: {
+                        backgroundColor: `token(colors.${getToken(np, "surfaceContainerLow")})`,
                         color: `var(${buttonMainVar})`,
-                        bg: `token(colors.${getToken(np, "surfaceContainerLow")})`,
-                        [shadowElevation]: "level1",
-                    } as unknown as SystemStyleObject,
+                        ...{
+                            [shadowElevation]: "level1",
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
+                    },
                 },
             },
             size: {
@@ -145,68 +180,19 @@ export function defineIconButton<TColorGroup extends string = BaseColorGroup>(
                 true: {
                     root: {
                         pointerEvents: "none",
+                        color: `token(colors.${disabledColor})/38`,
+                        backgroundColor: `var(${disabledBg})`,
+                        outlineColor: `var(${disabledOutline})`,
+                        ...{ [shadowElevation]: "level0" },
                     },
                 },
             },
         },
-        compoundVariants: [
-            {
-                disabled: true,
-                variant: "standard",
-                css: {
-                    root: {
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "outlined",
-                css: {
-                    root: {
-                        color: `token(colors.${disabledColor})/38`,
-                        outlineColor: `token(colors.${disabledColor})/12`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "filled",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "tonal",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "elevated",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                        ...{
-                            [shadowElevation]: "level0",
-                        },
-                    },
-                },
-            },
-        ],
         defaultVariants: {
             color: "primary",
             size: "medium",
             variant: "filled",
+            disabled: false,
         },
     });
 }

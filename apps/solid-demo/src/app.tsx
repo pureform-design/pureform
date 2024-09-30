@@ -16,19 +16,23 @@ export function App() {
         size: "small",
         color: "info",
         variant: "outlined",
+        disabled: true,
     });
     const buttonMd = pfButton({
         size: "medium",
         color: "negative",
         variant: "elevated",
+        disabled: true,
     });
     const buttonLg = pfButton({
         size: "large",
         color: "positive",
+        disabled: true,
     });
     const buttonLg2 = pfButton({
         size: "large",
         color: "notice",
+        disabled: true,
     });
     const sc = pfStateContainer({
         hovered: {
@@ -52,6 +56,8 @@ export function App() {
     });
     const icon = pfIconButton({
         color: "negative",
+        variant: "outlined",
+        disabled: true,
     });
     const rippleLayer = pfRippleLayer();
     const card = pfCard({

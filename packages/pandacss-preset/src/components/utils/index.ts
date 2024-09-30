@@ -26,3 +26,15 @@ export function mapColors<
         }),
     );
 }
+
+export function opacityMix(color: string, opacity: number | `${number}%`) {
+    if (typeof opacity === "number" && (opacity > 1 || opacity < 0)) {
+        throw new Error(
+            "Opacity must be between 0 and 1 or a percentage string",
+        );
+    }
+
+    const pct = typeof opacity === "number" ? `${opacity * 100}%` : opacity;
+
+    return `color-mix(in srgb, ${color} ${pct}, transparent)`;
+}

@@ -4,6 +4,7 @@ import { capitalize } from "@repo/utils/string";
 import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";
+import { opacityMix } from "./utils";
 
 export type DefineButtonArgs<
     TColorGroup extends string = BaseColorGroup,
@@ -52,6 +53,11 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
 
     const shadowElevation = getUtility(np, "shadowElevation");
 
+    const disabledBg = getCssVar(np, "button-disabled-background-color");
+    const disabledOutline = getCssVar(np, "button-disabled-outline-color");
+    const leadingPadding = getCssVar(np, "button-leading-padding");
+    const trailingPadding = getCssVar(np, "button-trailing-padding");
+
     return defineSlotRecipe({
         className,
         jsx,
@@ -75,6 +81,13 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         bg: `var(${buttonMainVar})`,
                         color: `var(${buttonMainContrastVar})`,
+                        ...{
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 outlined: {
@@ -84,26 +97,51 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                         outlineColor: `token(colors.${getToken(np, "outline")})`,
                         outlineStyle: "solid",
                         outline: 1,
+                        ...{
+                            [disabledBg]: "transparent",
+                            [disabledOutline]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                        },
                     },
                 },
                 text: {
                     root: {
                         bg: "transparent",
                         color: `var(${buttonMainVar})`,
+                        ...{
+                            [disabledBg]: "transparent",
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 tonal: {
                     root: {
                         bg: `var(${buttonMainContainerVar})`,
                         color: `var(${buttonMainContainerContrastVar})`,
+                        ...{
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
                     },
                 },
                 elevated: {
                     root: {
                         color: `var(${buttonMainVar})`,
                         bg: `token(colors.${getToken(np, "surfaceContainerLow")})`,
-                        [shadowElevation]: "level1",
-                    } as unknown as SystemStyleObject,
+                        ...{
+                            [shadowElevation]: "level1",
+                            [disabledBg]: opacityMix(
+                                `token(colors.${disabledColor})`,
+                                0.12,
+                            ),
+                            [disabledOutline]: "transparent",
+                        },
+                    },
                 },
             },
             size: {
@@ -111,6 +149,10 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "8",
                         px: "4",
+                        ...{
+                            [leadingPadding]: "token(spacing.2)",
+                            [trailingPadding]: "token(spacing.2)",
+                        },
                     },
                     touchTarget: {
                         height: "10",
@@ -124,6 +166,10 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "10",
                         px: "6",
+                        ...{
+                            [leadingPadding]: "token(spacing.4)",
+                            [trailingPadding]: "token(spacing.4)",
+                        },
                     },
                     touchTarget: {
                         height: "12",
@@ -137,6 +183,10 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "12",
                         px: "8",
+                        ...{
+                            [leadingPadding]: "token(spacing.6)",
+                            [trailingPadding]: "token(spacing.6)",
+                        },
                     },
                     touchTarget: {
                         height: "12",
@@ -148,135 +198,45 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                 },
             },
             leading: {
-                true: {},
-                false: {},
+                true: {
+                    root: {
+                        pl: `var(${leadingPadding})`,
+                    },
+                },
+                false: {
+                    root: {},
+                },
             },
             trailing: {
-                true: {},
+                true: {
+                    root: {
+                        pr: `var(${trailingPadding})`,
+                    },
+                },
                 false: {},
             },
             disabled: {
                 true: {
                     root: {
                         pointerEvents: "none",
+                        color: opacityMix(
+                            `token(colors.${disabledColor})`,
+                            0.38,
+                        ),
+                        bg: `var(${disabledBg})`,
+                        outlineColor: `var(${disabledOutline})`,
+                        ...{ [shadowElevation]: "level0" },
                     },
                 },
             },
         },
-        compoundVariants: [
-            {
-                leading: true,
-                size: "small",
-                css: {
-                    root: {
-                        pl: "2",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "small",
-                css: {
-                    root: {
-                        pr: "2",
-                    },
-                },
-            },
-            {
-                leading: true,
-                size: "medium",
-                css: {
-                    root: {
-                        pl: "4",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "medium",
-                css: {
-                    root: {
-                        pr: "4",
-                    },
-                },
-            },
-            {
-                leading: true,
-                size: "large",
-                css: {
-                    root: {
-                        pl: "6",
-                    },
-                },
-            },
-            {
-                trailing: true,
-                size: "large",
-                css: {
-                    root: {
-                        pr: "6",
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "text",
-                css: {
-                    root: {
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "outlined",
-                css: {
-                    root: {
-                        color: `token(colors.${disabledColor})/38`,
-                        outlineColor: `token(colors.${disabledColor})/12`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "filled",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "tonal",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                    },
-                },
-            },
-            {
-                disabled: true,
-                variant: "elevated",
-                css: {
-                    root: {
-                        bg: `token(colors.${disabledColor})/12`,
-                        color: `token(colors.${disabledColor})/38`,
-                        ...{
-                            [shadowElevation]: "level0",
-                        },
-                    },
-                },
-            },
-        ],
         defaultVariants: {
             color: "primary",
             size: "medium",
             variant: "filled",
             leading: false,
             trailing: false,
+            disabled: false,
         },
     });
 }
