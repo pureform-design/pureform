@@ -18,13 +18,13 @@
     "dependencies": {
         "@material/material-color-utilities": "^0.3.0",
         "@repo/utils": "workspace:*",
-        "chroma-js": "^3.1.1"
+        "chroma-js": "^3.1.2"
     },
     "devDependencies": {
         "@repo/tsconfig": "workspace:*",
         "@repo/type-utils": "workspace:*",
         "@types/chroma-js": "^2.4.4",
-        "@vitest/coverage-v8": "^2.1.1",
-        "vitest": "^2.1.1"
+        "@vitest/coverage-v8": "^2.1.4",
+        "vitest": "^2.1.4"
     }
 }
