@@ -1,7 +1,9 @@
 {
     "name": "@repo/root",
     "version": "0.0.0-semantically-released",
-    "scripts": {},
+    "scripts": {
+        "test": "with-env 'vitest run'"
+    },
     "dependencies": {},
     "workspaces": ["packages/*", "apps/*"],
     "packageManager": "bun@1.1.29",
