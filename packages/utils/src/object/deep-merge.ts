@@ -3,7 +3,10 @@ import type {
     AnyRecord,
     ArrayMergeMode,
     DeepMerge,
+    UnionDefault,
 } from "@pureform/type-utils";
+
+export type { DeepMerge };
 
 function isRecord(o: unknown): o is AnyRecord {
     return typeof o === "object" && o !== null && !isArray(o);
@@ -106,18 +109,14 @@ export class DeepMergeError extends Error {
 export function deepMerge<
     T1 extends AnyRecord,
     T2 extends AnyRecord,
-    TArrayMergeMode extends ArrayMergeMode = "memberwise-merge",
+    TArrayMergeMode extends ArrayMergeMode,
 >(
     o1: T1,
     o2: T2,
     options?: DeepMergeOptions<TArrayMergeMode>,
-): DeepMerge<T1, T2, TArrayMergeMode> {
+): DeepMerge<T1, T2, UnionDefault<TArrayMergeMode, "memberwise-merge">> {
     if (isRecord(o1) && isRecord(o2)) {
-        return mergeRecord(o1, o2, options) as DeepMerge<
-            T1,
-            T2,
-            TArrayMergeMode
-        >;
+        return mergeRecord(o1, o2, options);
     }
 
     throw new DeepMergeError(

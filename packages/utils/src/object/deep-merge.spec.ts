@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { deepMerge } from "./deep-merge";
+import { deepMerge, type DeepMerge } from "./deep-merge";
 
 describe("deepMerge", () => {
     const obj1 = {
+        arr: [1, 2, 3, 10],
         a: 1,
         b: 2,
         c: 3,
@@ -11,10 +12,10 @@ describe("deepMerge", () => {
             b: 2,
             v: "test",
         },
-        arr: [1, 2, 3, 10],
-    };
+    } as const;
 
     const obj2 = {
+        arr: [4, 5, 6, undefined],
         a: 4,
         b: 5,
         d: 6,
@@ -26,8 +27,7 @@ describe("deepMerge", () => {
             a: 4,
             b: 5,
         },
-        arr: [4, 5, 6, undefined],
-    };
+    } as const;
 
     const objMerged = {
         a: 4,
@@ -45,12 +45,12 @@ describe("deepMerge", () => {
             b: 5,
         },
         arr: [4, 5, 6, 10],
-    };
+    } as const;
 
     it("should deeply merge two objects", () => {
-        const merged = deepMerge(obj1, obj2);
+        const result = deepMerge(obj1, obj2);
 
-        expect(merged).toEqual(objMerged);
+        expect(result).toEqual(objMerged);
     });
 
     it("should 'memberwise-merge' two arrays by default", () => {

@@ -1,1 +1,1 @@
-export type ArrayLength<T extends unknown[]> = T["length"];
+export type ArrayLength<T extends readonly unknown[]> = T["length"];

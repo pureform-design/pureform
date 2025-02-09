@@ -13,3 +13,4 @@ export * from "./any-array";
 export * from "./any-record";
 export * from "./deep-nullish";
 export * from "./deep-required";
+export * from "./union-utils";

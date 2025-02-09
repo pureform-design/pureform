@@ -11,8 +11,8 @@ type MergeCoreArrayClause<
     T2,
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
-> = PickArray<T1> extends AnyArray
-    ? PickArray<T2> extends AnyArray
+> = PickArray<T1> extends readonly [...AnyArray]
+    ? PickArray<T2> extends readonly [...AnyArray]
         ? IsAnyNever<PickArray<T1>, PickArray<T2>> extends true
             ? Coalesce<T2, T1, TNullish>
             : Coalesce<
@@ -75,7 +75,7 @@ type MergeRecord<
           : never;
 };
 
-type PickArray<T> = T extends AnyArray ? T : never;
+type PickArray<T> = T extends readonly [...AnyArray] ? T : never;
 type PickRecord<T> = T extends AnyRecord ? T : never;
 
 type IsNever<T> = [T] extends [never] ? true : false;
@@ -83,19 +83,19 @@ type IsNever<T> = [T] extends [never] ? true : false;
 type IsAnyNever<T1, T2> = IsNever<T1> extends true ? true : IsNever<T2>;
 
 type MergeNonTuple<
-    T1 extends AnyArray,
-    T2 extends AnyArray,
+    T1 extends readonly [...AnyArray],
+    T2 extends readonly [...AnyArray],
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
 > = MergeCore<T1[number], T2[number], TArrayMergeMode, TNullish>[];
 
 type MergeTuple<
-    T1 extends AnyArray,
-    T2 extends AnyArray,
+    T1 extends readonly [...AnyArray],
+    T2 extends readonly [...AnyArray],
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
-> = T1 extends [infer F1, ...infer R1]
-    ? T2 extends [infer F2, ...infer R2]
+> = T1 extends readonly [infer F1, ...infer R1]
+    ? T2 extends readonly [infer F2, ...infer R2]
         ? [
               MergeCore<F1, F2, TArrayMergeMode, TNullish>,
               ...MergeTuple<R1, R2, TArrayMergeMode, TNullish>,
@@ -104,8 +104,8 @@ type MergeTuple<
     : T2; // If T1 is exhausted, return remaining T2 elements
 
 type MergeArray<
-    T1 extends AnyArray,
-    T2 extends AnyArray,
+    T1 extends readonly [...AnyArray],
+    T2 extends readonly [...AnyArray],
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
 > = TArrayMergeMode extends "memberwise-merge"
