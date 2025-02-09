@@ -9,6 +9,7 @@ describe("deepMerge", () => {
         x: {
             a: 1,
             b: 2,
+            v: "test",
         },
         arr: [1, 2, 3, 10],
     };
@@ -37,7 +38,7 @@ describe("deepMerge", () => {
             a: 1,
             b: 2,
             f: 7,
-            v: undefined,
+            v: "test",
         },
         y: {
             a: 4,
