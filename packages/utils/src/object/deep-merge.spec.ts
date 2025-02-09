@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deepMerge, type DeepMerge } from "./deep-merge";
+import { deepMerge } from "./deep-merge";
 
 describe("deepMerge", () => {
     const obj1 = {
