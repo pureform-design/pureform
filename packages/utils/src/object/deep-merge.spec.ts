@@ -10,6 +10,7 @@ describe("deepMerge", () => {
             a: 1,
             b: 2,
         },
+        arr: [1, 2, 3, 10],
     };
 
     const obj2 = {
@@ -24,6 +25,7 @@ describe("deepMerge", () => {
             a: 4,
             b: 5,
         },
+        arr: [4, 5, 6, undefined],
     };
 
     const objMerged = {
@@ -41,6 +43,7 @@ describe("deepMerge", () => {
             a: 4,
             b: 5,
         },
+        arr: [4, 5, 6, 10],
     };
 
     it("should deeply merge two objects", () => {
@@ -49,7 +52,7 @@ describe("deepMerge", () => {
         expect(merged).toEqual(objMerged);
     });
 
-    it("should deeply merge two arrays", () => {
+    it("should 'memberwise-merge' two arrays by default", () => {
         const arr1 = [obj1];
 
         const arr2 = [obj2];
@@ -57,5 +60,37 @@ describe("deepMerge", () => {
         const merged = deepMerge({ x: arr1 }, { x: arr2 });
 
         expect(merged).toEqual({ x: [objMerged] });
+    });
+
+    it("should replace arrays with mode 'replace'", () => {
+        const arr1 = [obj1] as const;
+
+        const arr2 = [obj2] as const;
+
+        const merged = deepMerge(
+            { x: arr1 },
+            { x: arr2 },
+            {
+                arrayMergeMode: "replace",
+            },
+        );
+
+        expect(merged).toEqual({ x: [obj2] });
+    });
+
+    it("should concat arrays with mode 'concat'", () => {
+        const arr1 = [obj1] as const;
+
+        const arr2 = [obj2] as const;
+
+        const merged = deepMerge(
+            { x: arr1 },
+            { x: arr2 },
+            {
+                arrayMergeMode: "concat",
+            },
+        );
+
+        expect(merged).toEqual({ x: [obj1, obj2] });
     });
 });

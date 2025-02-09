@@ -2,6 +2,8 @@ import type { AnyArray } from "./any-array";
 import type { AnyRecord } from "./any-record";
 import type { IsTuple } from "./is-tuple";
 
+export type Nullish = undefined | null;
+
 export type ExcludeNullish<
     T,
     TNullish extends null | undefined = GetNullish<T>,

@@ -5,7 +5,7 @@ import type { BaseElevation, ElevationConfig } from "./types";
 type Config = ElevationConfig | Pixel;
 
 export type BaseElevationArgs<TCustomElevation extends string = BaseElevation> =
-    { elevations: Partial<Record<BaseElevation | TCustomElevation, Config>> };
+    { elevations?: Partial<Record<BaseElevation | TCustomElevation, Config>> };
 
 export abstract class BaseElevations<
     TCustomElevation extends string = BaseElevation,

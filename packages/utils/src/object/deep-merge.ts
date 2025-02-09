@@ -1,8 +1,8 @@
 import type {
     AnyArray,
     AnyRecord,
+    ArrayMergeMode,
     DeepMerge,
-    Mergeable,
 } from "@pureform/type-utils";
 
 function isRecord(o: unknown): o is AnyRecord {
@@ -13,19 +13,19 @@ function isArray(o: unknown): o is AnyArray {
     return o !== null && Array.isArray(o);
 }
 
-export type DeepMergeOptions<TMergeArray extends boolean = true> = {
-    mergeArrays?: TMergeArray;
+export type DeepMergeOptions<TArrayMergeMode extends ArrayMergeMode> = {
+    arrayMergeMode?: TArrayMergeMode;
 };
 
 function mergeRecord<
     T1 extends AnyRecord,
     T2 extends AnyRecord,
-    TMergeArrays extends boolean = true,
+    TArrayMergeMode extends ArrayMergeMode,
 >(
     o1: T1,
     o2: T2,
-    options?: DeepMergeOptions<TMergeArrays>,
-): DeepMerge<T1, T2, TMergeArrays> {
+    options?: DeepMergeOptions<TArrayMergeMode>,
+): DeepMerge<T1, T2, TArrayMergeMode> {
     const output: Record<string, unknown> = {};
     const allKeys = new Set([...Object.keys(o1), ...Object.keys(o2)]);
 
@@ -41,36 +41,51 @@ function mergeRecord<
         }
     }
 
-    return output as DeepMerge<T1, T2, TMergeArrays>;
+    return output as DeepMerge<T1, T2, TArrayMergeMode>;
 }
 
 function mergeArrays<
     T1 extends AnyArray,
     T2 extends AnyArray,
-    TMergeArrays extends boolean = true,
->(o1: T1, o2: T2, options?: DeepMergeOptions<TMergeArrays>) {
-    if (options?.mergeArrays ?? true) {
-        const o1Length = o1.length;
-        const o2Length = o2.length;
-        const output = new Array(o1Length > o2Length ? o1Length : o2Length);
+    TArrayMergeMode extends ArrayMergeMode,
+>(o1: T1, o2: T2, options?: DeepMergeOptions<TArrayMergeMode>) {
+    const mode = options?.arrayMergeMode ?? "memberwise-merge";
 
-        for (let i = 0; i < o1Length; i++) {
-            const o1Value = o1[i];
-            const o2Value = o2[i];
+    switch (mode) {
+        case "memberwise-merge": {
+            const o1Length = o1.length;
+            const o2Length = o2.length;
+            const output = new Array(o1Length > o2Length ? o1Length : o2Length);
 
-            if (isArray(o1Value) && isArray(o2Value)) {
-                output[i] = mergeArrays(o1Value, o2Value, options);
-            } else if (isRecord(o1Value) && isRecord(o2Value)) {
-                output[i] = mergeRecord(o1Value, o2Value, options);
-            } else {
-                output[i] = o2Value ?? o1Value;
+            for (let i = 0; i < o1Length; i++) {
+                const o1Value = o1[i];
+                const o2Value = o2[i];
+
+                if (isArray(o1Value) && isArray(o2Value)) {
+                    output[i] = mergeArrays(o1Value, o2Value, options);
+                } else if (isRecord(o1Value) && isRecord(o2Value)) {
+                    output[i] = mergeRecord(o1Value, o2Value, options);
+                } else {
+                    output[i] = o2Value ?? o1Value;
+                }
             }
+
+            return output;
         }
-
-        return output;
+        case "concat": {
+            return [...o1, ...o2];
+        }
+        case "replace": {
+            return o2 ?? o1;
+        }
+        default: {
+            throw new DeepMergeError(
+                `Invalid array merge mode: ${mode}`,
+                o1,
+                o2,
+            );
+        }
     }
-
-    return o2;
 }
 
 export class DeepMergeError extends Error {
@@ -91,14 +106,18 @@ export class DeepMergeError extends Error {
 export function deepMerge<
     T1 extends AnyRecord,
     T2 extends AnyRecord,
-    TMergeArray extends boolean = true,
+    TArrayMergeMode extends ArrayMergeMode = "memberwise-merge",
 >(
     o1: T1,
     o2: T2,
-    options?: DeepMergeOptions<TMergeArray>,
-): DeepMerge<T1, T2, TMergeArray> {
+    options?: DeepMergeOptions<TArrayMergeMode>,
+): DeepMerge<T1, T2, TArrayMergeMode> {
     if (isRecord(o1) && isRecord(o2)) {
-        return mergeRecord(o1, o2, options) as DeepMerge<T1, T2, TMergeArray>;
+        return mergeRecord(o1, o2, options) as DeepMerge<
+            T1,
+            T2,
+            TArrayMergeMode
+        >;
     }
 
     throw new DeepMergeError(
