@@ -12,6 +12,6 @@
         "@pureform/ui-utils": "workspace:*"
     },
     "devDependencies": {
-        "@repo/tsconfig": "workspace:*"
+        "@pureform/tsconfig": "workspace:*"
     }
 }

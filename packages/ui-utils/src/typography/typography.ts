@@ -1,6 +1,6 @@
-import { deepMerge } from "@repo/utils";
+import { deepMerge } from "@pureform/utils";
 import type { BaseTextStyleName, TextStyle } from "../types";
-import type { DeepPartial } from "@repo/type-utils";
+import type { DeepPartial } from "@pureform/type-utils";
 
 export type TextStyleArgs<
     TCustomTextStyleName extends string = BaseTextStyleName,
@@ -12,10 +12,7 @@ export type TextStyleArgs<
 export class Typography<
     TCustomTextStyleName extends string = BaseTextStyleName,
 > {
-    private _scale: Record<
-        TCustomTextStyleName | BaseTextStyleName,
-        TextStyle
-    > = {
+    private _scale = {
         displayLarge: {
             fontFamily: "Roboto, sans-serif",
             lineHeight: "4rem",
@@ -144,10 +141,7 @@ export class Typography<
     }
 
     protected constructor(args?: TextStyleArgs<TCustomTextStyleName>) {
-        this._scale = deepMerge(
-            this._scale,
-            (args?.custom ?? {}) as Record<BaseTextStyleName, TextStyle>,
-        );
+        this._scale = deepMerge(this._scale, args?.custom ?? {});
     }
 
     public get(style: BaseTextStyleName | TCustomTextStyleName): TextStyle {

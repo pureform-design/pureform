@@ -1,5 +1,5 @@
-import type { WorkspaceProjectConfiguration } from "vitest/config";
+import type { TestProjectConfiguration } from "vitest/config";
 
 export default [
-    "./**/vitest.config.{unit,e2e,integration}.ts",
-] satisfies WorkspaceProjectConfiguration[];
+    "./**/vitest.config.{unit,e2e,integration,api}.ts",
+] satisfies TestProjectConfiguration[];

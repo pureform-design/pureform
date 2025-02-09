@@ -5,28 +5,28 @@
         "test:unit": {
             "cache": true,
             "dependsOn": ["^test:unit"],
-            "inputs": ["src/**"]
+            "inputs": ["src/**", "package.json", "tsconfig.json"]
         },
         "test:coverage": {
             "cache": true,
             "dependsOn": ["^test:coverage"],
-            "inputs": ["src/**"]
+            "inputs": ["src/**", "package.json", "tsconfig.json"]
         },
         "build": {
             "dependsOn": ["^build"],
-            "inputs": ["src/**"],
-            "outputs": ["dist/**"]
+            "outputs": ["dist/**"],
+            "inputs": ["src/**", "package.json", "tsconfig.json"]
         },
         "codegen": {
             "dependsOn": ["^codegen"],
-            "inputs": ["src/**"]
+            "inputs": ["src/**", "package.json", "tsconfig.json"]
         },
         "dev": {
             "dependsOn": ["^dev", "^codegen"],
             "interactive": false,
             "persistent": true,
             "cache": false,
-            "inputs": ["src/**"]
+            "inputs": ["src/**", "package.json", "tsconfig.json"]
         }
     }
 }

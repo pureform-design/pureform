@@ -1,5 +1,5 @@
 import { Hct, argbFromHex } from "@material/material-color-utilities";
-import { clone } from "@repo/utils";
+import { clone } from "@pureform/utils";
 import { type ColorConfig, CorePalette } from ".";
 import type { BaseColorGroup, HexColor, SystemColor } from "../types";
 

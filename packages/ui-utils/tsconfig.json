@@ -1,4 +1,4 @@
 {
-  "extends": ["@repo/tsconfig/base.json"],
+  "extends": ["@pureform/tsconfig/base.json"],
   "exclude": ["coverage"]
 }

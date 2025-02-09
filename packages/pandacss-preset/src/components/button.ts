@@ -1,6 +1,6 @@
 import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup, BaseTextStyleName } from "@pureform/ui-utils";
-import { capitalize } from "@repo/utils/string";
+import { capitalize } from "@pureform/utils/string";
 import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";

@@ -62,6 +62,7 @@ export function App() {
     const rippleLayer = pfRippleLayer();
     const card = pfCard({
         variant: "elevated",
+        disabled: true,
     });
 
     return (

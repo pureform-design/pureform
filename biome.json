@@ -1,11 +1,11 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.9.0/schema.json",
     "extends": [
-        "./node_modules/@repo/biome-config/formatter.json",
-        "./node_modules/@repo/biome-config/linter.json",
-        "./node_modules/@repo/biome-config/import-sorter.json",
-        "./node_modules/@repo/biome-config/javascript.json",
-        "./node_modules/@repo/biome-config/vcs.json"
+        "./node_modules/@pureform/biome-config/formatter.json",
+        "./node_modules/@pureform/biome-config/linter.json",
+        "./node_modules/@pureform/biome-config/import-sorter.json",
+        "./node_modules/@pureform/biome-config/javascript.json",
+        "./node_modules/@pureform/biome-config/vcs.json"
     ],
     "files": {
         "ignore": [

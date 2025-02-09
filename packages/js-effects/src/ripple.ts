@@ -1,11 +1,11 @@
-let RIPPLE_TEMPLATE: HTMLElement;
+let INTERNAL_RIPPLE_TEMPLATE: HTMLElement;
 
 function getRipplePrototype() {
-    if (!RIPPLE_TEMPLATE) {
-        RIPPLE_TEMPLATE = document.createElement("span");
+    if (!INTERNAL_RIPPLE_TEMPLATE) {
+        INTERNAL_RIPPLE_TEMPLATE = document.createElement("span");
     }
 
-    return RIPPLE_TEMPLATE.cloneNode(true) as HTMLElement;
+    return INTERNAL_RIPPLE_TEMPLATE.cloneNode(true) as HTMLElement;
 }
 
 type CssClasses =
@@ -140,7 +140,7 @@ function getCenteredOrigin(container: DOMRect) {
 }
 
 type MaterialRippleEvent = {
-    __customRippleMetaData: {
+    __INTERNAL_customRippleMetaData: {
         rippled: boolean;
         allowPropagation: boolean;
     };
@@ -149,11 +149,11 @@ type MaterialRippleEvent = {
 function markAsRippled(e: Event, allowPropagation = false) {
     const ev = e as unknown as MaterialRippleEvent;
 
-    if (ev.__customRippleMetaData) {
-        ev.__customRippleMetaData.rippled = true;
-        ev.__customRippleMetaData.allowPropagation = allowPropagation;
+    if (ev.__INTERNAL_customRippleMetaData) {
+        ev.__INTERNAL_customRippleMetaData.rippled = true;
+        ev.__INTERNAL_customRippleMetaData.allowPropagation = allowPropagation;
     } else {
-        ev.__customRippleMetaData = {
+        ev.__INTERNAL_customRippleMetaData = {
             rippled: true,
             allowPropagation,
         };
@@ -162,7 +162,7 @@ function markAsRippled(e: Event, allowPropagation = false) {
 
 function shouldRipple(e: Event) {
     const meta = (e as unknown as MaterialRippleEvent)
-        .__customRippleMetaData ?? {
+        .__INTERNAL_customRippleMetaData ?? {
         rippled: false,
         allowPropagation: false,
     };

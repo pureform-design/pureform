@@ -1,10 +1,10 @@
 {
-    "name": "@repo/type-utils",
+    "name": "@pureform/type-utils",
     "version": "0.0.0-semantically-released",
     "exports": {
         ".": "./src/index.ts"
     },
     "devDependencies": {
-        "@repo/tsconfig": "workspace:*"
+        "@pureform/tsconfig": "workspace:*"
     }
 }

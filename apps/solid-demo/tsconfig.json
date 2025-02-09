@@ -1,5 +1,5 @@
 {
-    "extends": ["@repo/tsconfig/base.json"],
+    "extends": ["@pureform/tsconfig/base.json"],
     "files": [],
     "compilerOptions": {
         "target": "ES2020",

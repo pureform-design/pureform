@@ -1,5 +1,5 @@
 {
-    "name": "@repo/utils",
+    "name": "@pureform/utils",
     "version": "0.0.0-semantically-released",
     "exports": {
         ".": "./src/index.ts",
@@ -9,11 +9,11 @@
         "test:unit": "with-env 'vitest run --config vitest.config.unit.ts'"
     },
     "dependencies": {
-        "@repo/type-utils": "workspace:*"
+        "@pureform/type-utils": "workspace:*"
     },
     "devDependencies": {
-        "@repo/tsconfig": "workspace:*",
-        "@vitest/coverage-v8": "^2.1.4",
-        "vitest": "^2.1.4"
+        "@pureform/tsconfig": "workspace:*",
+        "@vitest/coverage-v8": "^3.0.5",
+        "vitest": "^3.0.5"
     }
 }

@@ -1,12 +1,7 @@
 import type { Pixel } from "../types";
 import { type BaseElevationArgs, BaseElevations } from "./base-elevations";
 import { precalculatedAtPixel } from "./precalculated";
-import type {
-    BaseElevation,
-    BoxShadow,
-    ElevationConfig,
-    ShadowElevation,
-} from "./types";
+import type { BaseElevation, BoxShadow, ShadowElevation } from "./types";
 
 export type ShadowElevationArgs<
     TCustomElevation extends string = BaseElevation,
