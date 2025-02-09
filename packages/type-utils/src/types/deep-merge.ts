@@ -81,13 +81,6 @@ type MergeRest<
           : Coalesce<T2, T1, TNullish>
       : Coalesce<T2, T1, TNullish>;
 
-type X = MergeRest<
-    { a: string } | null,
-    { a: number } | null,
-    true,
-    undefined | null
->;
-
 type MergeNonTuple<
     T1 extends AnyArray,
     T2 extends AnyArray,
