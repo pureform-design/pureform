@@ -1,6 +1,7 @@
-import { TonalPalette } from "./tonal-palette";
-import { Hct } from "./hct";
 import { describe, expect, it } from "vitest";
+
+import { Hct } from "./hct";
+import { TonalPalette } from "./tonal-palette";
 
 const GREEN_ARGB = 0xff00ff00;
 

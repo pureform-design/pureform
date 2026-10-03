@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: ts
+
+extends: ["./base.omni.yaml"]
+
+cache:
+  key:
+    files:
+      - "package.json"
+      - "./src/**/*.{ts,tsx,js,jsx,cjs,mjs,mts,cts}"
+
+tasks:
+  test:unit:
+    exec: bun run test:unit
+
+  test:integration:
+    exec: bun run test:integration
+    dependencies:
+      - test:unit
+
+  test:
+    exec: ""
+    dependencies:
+      - ^test
+      - test:unit
+      - test:integration
+
+  build:
+    exec: bun run build
+    dependencies:
+      - test
+      - ^build
+    cache:
+      output:
+        files:
+          - dist/**/*
+
+meta:
+  language: typescript

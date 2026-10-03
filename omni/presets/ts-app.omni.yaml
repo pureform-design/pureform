@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: ts-app
+
+extends:
+  - "./ts.omni.yaml"
+
+tasks:
+  dev:
+    exec: bun run dev
+    persistent: true
+
+meta:
+  type: app

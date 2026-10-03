@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: ts-vite
+
+extends:
+  - "./ts.omni.yaml"
+
+tasks:
+  test:unit:
+    exec: bun x vitest --config ./vitest.config.unit.ts run
+    cache:
+      key:
+        files:
+          append:
+            - "./vite.config.ts"
+            - "./vitest.config.unit.ts"
+
+  test:integration:
+    exec: bun run vitest --config ./vitest.config.integration.ts run
+    cache:
+      key:
+        files:
+          append:
+            - "./vite.config.ts"
+            - "./vitest.config.integration.ts"
+
+  build:
+    exec: bun x vite build
+    cache:
+      key:
+        files:
+          append:
+            - "./vite.config.ts"

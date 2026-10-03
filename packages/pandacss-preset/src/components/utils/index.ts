@@ -1,7 +1,8 @@
 import type { BaseColorGroup, ColorScheme } from "@pureform/ui-utils";
-import type { NormalPrefix } from "../../types";
 import { keyOf } from "@pureform/utils";
+
 import { getToken } from "../../helpers";
+import type { NormalPrefix } from "../../types";
 
 type ColorInfo = {
     name: string;

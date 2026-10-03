@@ -1,12 +1,11 @@
-import {
-    type CompositionStyles,
-    defineTextStyles as pandaDefineTextStyles,
-} from "@pandacss/dev";
+import { defineTextStyles as pandaDefineTextStyles } from "@pandacss/dev";
+import { type CompositionStyles } from "@pandacss/types";
 import {
     type BaseTextStyleName,
     type TextStyleArgs,
     Typography,
 } from "@pureform/ui-utils";
+
 import type { NormalPrefix } from "./types";
 
 export type DefineTextStylesArgs<

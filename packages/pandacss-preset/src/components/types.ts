@@ -4,6 +4,7 @@ import type {
     ColorScheme,
     Typography,
 } from "@pureform/ui-utils";
+
 import type { NormalPrefix } from "../types";
 
 export type BaseArgs = {

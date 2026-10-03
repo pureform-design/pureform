@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { keyOf } from "./keyof";
 
 describe("keyOf", () => {

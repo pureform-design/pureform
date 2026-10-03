@@ -1,0 +1,6 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: base
+
+tasks:
+  passthrough:
+    description: Only exists so dependents can be re-executed based on the changes of a dependees

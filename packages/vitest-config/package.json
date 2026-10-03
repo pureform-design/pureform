@@ -1,0 +1,23 @@
+{
+    "name": "@pureform/vitest-config",
+    "version": "0.0.0",
+    "type": "module",
+    "exports": {
+        "./*": {
+            "import": "./src/*.ts",
+            "require": "./src/*.ts"
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "unplugin-dts": "catalog:"
+    },
+    "peerDependencies": {
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

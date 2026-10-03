@@ -1,0 +1,8 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: ts-cli
+
+extends:
+  - "./ts.omni.yaml"
+
+meta:
+  type: cli

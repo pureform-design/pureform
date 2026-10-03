@@ -1,5 +1,6 @@
 import { defineSlotRecipe } from "@pandacss/dev";
 import type { BaseColorGroup } from "@pureform/ui-utils";
+
 import { getClass, getToken, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs } from "./types";
 

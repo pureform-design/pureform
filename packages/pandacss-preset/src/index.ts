@@ -1,4 +1,6 @@
-import { definePreset } from "@pandacss/dev";
+import { definePreset, type Preset } from "@pandacss/dev";
+import basePreset from "@pandacss/preset-base";
+import pandaPreset from "@pandacss/preset-panda";
 import {
     type BaseColorGroup,
     type BaseElevation,
@@ -9,14 +11,7 @@ import {
     type TextStyleArgs,
     Typography,
 } from "@pureform/ui-utils";
-import { defineColorSemanticTokens } from "./tokens/colors";
-import { normalizePrefix, prefix } from "./helpers";
-import { type DefineTextStylesArgs, defineTextStyles } from "./text-styles";
-import {
-    type DefineShadowElevationUtilityArgs,
-    defineShadowElevationUtility,
-    defineSurfaceElevationUtility,
-} from "./utilities";
+
 import {
     defineButton,
     defineCard,
@@ -24,17 +19,25 @@ import {
     type DefineButtonArgs,
     type DefineRippleLayerArgs,
 } from "./components";
-import type { Prefix } from "./types";
-import {
-    defineStateContainer,
-    type DefineStateContainerArgs,
-} from "./components/state-container";
-import { defineScrim, type DefineScrimArgs } from "./components/scrim";
+import type { DefineCardArgs } from "./components/card";
 import {
     defineIconButton,
     type DefineIconButtonArgs,
 } from "./components/icon-button";
-import type { DefineCardArgs } from "./components/card";
+import { defineScrim, type DefineScrimArgs } from "./components/scrim";
+import {
+    defineStateContainer,
+    type DefineStateContainerArgs,
+} from "./components/state-container";
+import { normalizePrefix, prefix } from "./helpers";
+import { type DefineTextStylesArgs, defineTextStyles } from "./text-styles";
+import { defineColorSemanticTokens } from "./tokens/colors";
+import type { Prefix } from "./types";
+import {
+    type DefineShadowElevationUtilityArgs,
+    defineShadowElevationUtility,
+    defineSurfaceElevationUtility,
+} from "./utilities";
 
 type PresetArgs<
     TCustomColorGroups extends string = BaseColorGroup,
@@ -114,32 +117,32 @@ export function pureformPreset<
     });
 
     const buttonArgs = {
-        ...(args?.components?.button ?? {}),
+        ...args?.components?.button,
         colorScheme,
         typography,
         prefix: np,
     } as DefineButtonArgs<TCustomColorGroups, TCustomTextStyleNames>;
 
     const stateLayerArgs = {
-        ...(args?.components?.stateContainer ?? {}),
+        ...args?.components?.stateContainer,
         colorScheme,
         prefix: np,
     } as DefineStateContainerArgs<TCustomColorGroups>;
 
     const scrimArgs = {
-        ...(args?.components?.scrim ?? {}),
+        ...args?.components?.scrim,
         colorScheme,
         prefix: np,
     } as DefineScrimArgs<TCustomColorGroups>;
 
     const rippleArgs = {
-        ...(args?.components?.ripple ?? {}),
+        ...args?.components?.ripple,
         colorScheme,
         prefix: np,
     } as DefineRippleLayerArgs<TCustomColorGroups>;
 
     const cardArgs = {
-        ...(args?.components?.card ?? {}),
+        ...args?.components?.card,
         colorScheme,
         prefix: np,
         typography,
@@ -167,7 +170,7 @@ export function pureformPreset<
     const cardName = getRecipeName("card");
 
     return definePreset({
-        presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
+        presets: [basePreset, pandaPreset as Preset],
         name: "@pureform/pandacss-preset",
         globalCss: {
             "html, body": {

@@ -1,17 +1,34 @@
 {
     "name": "@pureform/pandacss-preset",
     "version": "0.0.0-semantically-released",
-    "main": "./src/index.ts",
+    "description": "A TypeScript Package",
     "exports": {
-        ".": "./src/index.ts"
-    },
-    "peerDependencies": {
-        "@pandacss/dev": "^0.46.0"
-    },
-    "dependencies": {
-        "@pureform/ui-utils": "workspace:*"
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
     },
     "devDependencies": {
-        "@pureform/tsconfig": "workspace:*"
+        "@pandacss/preset-base": "catalog:",
+        "@pandacss/preset-panda": "catalog:",
+        "@pandacss/types": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/ui-utils": "catalog:",
+        "@pureform/utils": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@pandacss/dev": "catalog:"
     }
 }

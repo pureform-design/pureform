@@ -6,8 +6,9 @@ import {
     type ColorScheme,
     SurfaceElevations,
 } from "@pureform/ui-utils";
-import type { NormalPrefix } from "../types";
+
 import { getToken } from "../helpers";
+import type { NormalPrefix } from "../types";
 
 export type DefineSurfaceElevationUtilityArgs<
     TCustomElevation extends string = BaseElevation,

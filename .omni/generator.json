@@ -1,0 +1,9 @@
+{
+  "root": true,
+  "version": "1.0.0",
+  "shared": {
+    "input": {
+      "scope_name": "pureform"
+    }
+  }
+}

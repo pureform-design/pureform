@@ -58,7 +58,9 @@ function mergeArrays<
         case "memberwise-merge": {
             const o1Length = o1.length;
             const o2Length = o2.length;
-            const output = new Array(o1Length > o2Length ? o1Length : o2Length);
+            const output = Array.from({
+                length: o1Length > o2Length ? o1Length : o2Length,
+            });
 
             for (let i = 0; i < o1Length; i++) {
                 const o1Value = o1[i];

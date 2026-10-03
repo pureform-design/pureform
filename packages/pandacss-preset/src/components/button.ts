@@ -1,6 +1,8 @@
-import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
+import { defineSlotRecipe } from "@pandacss/dev";
+import type { SystemStyleObject } from "@pandacss/types";
 import type { BaseColorGroup, BaseTextStyleName } from "@pureform/ui-utils";
-import { capitalize } from "@pureform/utils/string";
+import { capitalize } from "@pureform/utils";
+
 import { getClass, getCssVar, getToken, getUtility, prefix } from "../helpers";
 import { touchTarget } from "./style-snippets";
 import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";
@@ -81,6 +83,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         bg: `var(${buttonMainVar})`,
                         color: `var(${buttonMainContrastVar})`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [disabledBg]: opacityMix(
                                 `token(colors.${disabledColor})`,
@@ -97,6 +100,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                         outlineColor: `token(colors.${getToken(np, "outline")})`,
                         outlineStyle: "solid",
                         outline: 1,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [disabledBg]: "transparent",
                             [disabledOutline]: opacityMix(
@@ -110,6 +114,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         bg: "transparent",
                         color: `var(${buttonMainVar})`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [disabledBg]: "transparent",
                             [disabledOutline]: "transparent",
@@ -120,6 +125,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         bg: `var(${buttonMainContainerVar})`,
                         color: `var(${buttonMainContainerContrastVar})`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [disabledBg]: opacityMix(
                                 `token(colors.${disabledColor})`,
@@ -133,6 +139,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         color: `var(${buttonMainVar})`,
                         bg: `token(colors.${getToken(np, "surfaceContainerLow")})`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [shadowElevation]: "level1",
                             [disabledBg]: opacityMix(
@@ -149,6 +156,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "8",
                         px: "4",
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [leadingPadding]: "token(spacing.2)",
                             [trailingPadding]: "token(spacing.2)",
@@ -166,6 +174,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "10",
                         px: "6",
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [leadingPadding]: "token(spacing.4)",
                             [trailingPadding]: "token(spacing.4)",
@@ -183,6 +192,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         height: "12",
                         px: "8",
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [leadingPadding]: "token(spacing.6)",
                             [trailingPadding]: "token(spacing.6)",
@@ -225,6 +235,7 @@ export function defineButton<TColorGroup extends string = BaseColorGroup>(
                         ),
                         bg: `var(${disabledBg})`,
                         outlineColor: `var(${disabledOutline})`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{ [shadowElevation]: "level0" },
                     },
                 },

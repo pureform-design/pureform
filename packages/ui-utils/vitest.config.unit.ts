@@ -1,7 +1,14 @@
-import type { UserWorkspaceConfig } from "vitest/config";
+import unitTestConfig from "@pureform/vitest-config/unit";
+import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
-export default {
+import baseConfig from "./vite.config";
+
+export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     test: {
-        include: ["src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+        testTimeout: 1000,
+        include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
+        exclude: [
+            "./src/**/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
+        ],
     },
-} satisfies UserWorkspaceConfig;
+} satisfies UserWorkspaceConfig);

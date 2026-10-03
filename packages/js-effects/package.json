@@ -1,15 +1,29 @@
 {
     "name": "@pureform/js-effects",
     "version": "0.0.0-semantically-released",
-    "main": "./src/index.ts",
+    "description": "A TypeScript Package",
     "exports": {
-        ".": "./src/index.ts",
-        "./*": "./src/*/index.ts"
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
     },
     "dependencies": {
-        "@pureform/ui-utils": "workspace:*"
+        "@pureform/ui-utils": "catalog:"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "workspace:*"
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

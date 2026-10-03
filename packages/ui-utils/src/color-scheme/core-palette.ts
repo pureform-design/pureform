@@ -4,6 +4,7 @@ import {
     Hct,
     hexFromArgb,
 } from "@material/material-color-utilities";
+
 import type { BaseColorGroup, HexColor } from "../types";
 import { TonalPalette } from "./tonal-palette";
 

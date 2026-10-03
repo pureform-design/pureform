@@ -1,5 +1,7 @@
-import { defineSlotRecipe, type SystemStyleObject } from "@pandacss/dev";
+import { defineSlotRecipe } from "@pandacss/dev";
+import type { SystemStyleObject } from "@pandacss/types";
 import type { BaseColorGroup, BaseTextStyleName } from "@pureform/ui-utils";
+
 import { getClass, getToken, getUtility, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs, TypographyArgs } from "./types";
 
@@ -34,6 +36,7 @@ export function defineCard<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         bg: getToken(np, "surfaceContainerLow"),
                         color: getToken(np, "onSurface"),
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [shadowElevation]: "level1",
                         },
@@ -136,6 +139,7 @@ export function defineCard<TColorGroup extends string = BaseColorGroup>(
                     root: {
                         backgroundColor: `${getToken(np, "surfaceVariant")}/38`,
                         color: `${getToken(np, "onSurface")}/38`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [shadowElevation]: "level0",
                         },
@@ -150,6 +154,7 @@ export function defineCard<TColorGroup extends string = BaseColorGroup>(
                         backgroundColor: `${getToken(np, "surface")}/38`,
                         color: `${getToken(np, "onSurface")}/38`,
                         outlineColor: `${getToken(np, "outline")}/12`,
+                        // oxlint-disable-next-line unicorn/no-useless-spread
                         ...{
                             [shadowElevation]: "level0",
                         },

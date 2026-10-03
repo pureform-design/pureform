@@ -37,15 +37,14 @@ export type TransmuteNullish<
     TNullish extends null | undefined = undefined | null,
 > = AddNullishToMembers<ExcludeNullish<T, TNullish>, TNullish>;
 
-export type IsNullish<
-    T,
-    TNullish extends null | undefined = null | undefined,
-> = GetNullish<T, TNullish> extends never ? false : true;
+export type IsNullish<T, TNullish extends null | undefined = null | undefined> =
+    GetNullish<T, TNullish> extends never ? false : true;
 
 export type Coalesce<
     TMaybeNullish,
     TFallback,
     TNullish extends undefined | null = undefined | null,
-> = IsNullish<TMaybeNullish, TNullish> extends true
-    ? ExcludeNullish<TMaybeNullish, TNullish> | TFallback
-    : TMaybeNullish;
+> =
+    IsNullish<TMaybeNullish, TNullish> extends true
+        ? ExcludeNullish<TMaybeNullish, TNullish> | TFallback
+        : TMaybeNullish;

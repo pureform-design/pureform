@@ -1,0 +1,15 @@
+{
+  "version": "1.0.0",
+  "git": {
+    "https://github.com/cursor/plugins.git": {
+      "main": {
+        "commit": "fadd23794c0075468eb8964b0fd93e06e09486ad"
+      }
+    },
+    "https://github.com/mattpocock/skills.git": {
+      "v1.2.3": {
+        "commit": "6acc160e4e0cd062dbbbd7a1b26ae92855edf07e"
+      }
+    }
+  }
+}

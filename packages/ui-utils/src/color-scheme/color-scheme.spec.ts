@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { ColorScheme } from "./color-scheme";
 
 describe("ColorScheme", () => {

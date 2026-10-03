@@ -4,6 +4,7 @@ import {
     hexFromArgb,
     TonalPalette as MaterialTonalPalette,
 } from "@material/material-color-utilities";
+
 import type { HexColor } from "../types";
 
 export class TonalPalette {

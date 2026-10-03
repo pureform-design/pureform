@@ -1,0 +1,22 @@
+{
+    "name": "@pureform/vite-config",
+    "version": "0.2.1",
+    "type": "module",
+    "exports": {
+        "./*": {
+            "import": "./src/*.ts",
+            "require": "./src/*.ts"
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "unplugin-dts": "catalog:"
+    },
+    "peerDependencies": {
+        "rolldown": "catalog:",
+        "vite": "catalog:"
+    }
+}

@@ -11,54 +11,56 @@ type MergeCoreArrayClause<
     T2,
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
-> = PickArray<T1> extends readonly [...AnyArray]
-    ? PickArray<T2> extends readonly [...AnyArray]
-        ? IsAnyNever<PickArray<T1>, PickArray<T2>> extends true
-            ? Coalesce<T2, T1, TNullish>
-            : Coalesce<
-                  | Coalesce<
-                        | MergeArray<
-                              PickArray<T1>,
-                              PickArray<T2>,
-                              TArrayMergeMode,
-                              TNullish
-                          >
-                        | GetNullish<T2, TNullish>,
-                        T1,
-                        TNullish
-                    >
-                  | GetNullish<T1, TNullish>,
-                  T2
-              >
-        : Coalesce<T2, T1, TNullish>
-    : Coalesce<T2, T1, TNullish>;
+> =
+    PickArray<T1> extends readonly [...AnyArray]
+        ? PickArray<T2> extends readonly [...AnyArray]
+            ? IsAnyNever<PickArray<T1>, PickArray<T2>> extends true
+                ? Coalesce<T2, T1, TNullish>
+                : Coalesce<
+                      | Coalesce<
+                            | MergeArray<
+                                  PickArray<T1>,
+                                  PickArray<T2>,
+                                  TArrayMergeMode,
+                                  TNullish
+                              >
+                            | GetNullish<T2, TNullish>,
+                            T1,
+                            TNullish
+                        >
+                      | GetNullish<T1, TNullish>,
+                      T2
+                  >
+            : Coalesce<T2, T1, TNullish>
+        : Coalesce<T2, T1, TNullish>;
 
 type MergeCore<
     T1,
     T2,
     TArrayMergeMode extends ArrayMergeMode,
     TNullish extends Nullish,
-> = PickRecord<T1> extends AnyRecord
-    ? PickRecord<T2> extends AnyRecord
-        ? IsAnyNever<PickRecord<T1>, PickRecord<T2>> extends true
-            ? MergeCoreArrayClause<T1, T2, TArrayMergeMode, TNullish>
-            : Coalesce<
-                  | Coalesce<
-                        | MergeRecord<
-                              PickRecord<T1>,
-                              PickRecord<T2>,
-                              TArrayMergeMode,
-                              TNullish
-                          >
-                        | GetNullish<T2, TNullish>,
-                        T1,
-                        TNullish
-                    >
-                  | GetNullish<T1, TNullish>,
-                  T2
-              >
-        : Coalesce<T2, T1, TNullish>
-    : MergeCoreArrayClause<T1, T2, TArrayMergeMode, TNullish>;
+> =
+    PickRecord<T1> extends AnyRecord
+        ? PickRecord<T2> extends AnyRecord
+            ? IsAnyNever<PickRecord<T1>, PickRecord<T2>> extends true
+                ? MergeCoreArrayClause<T1, T2, TArrayMergeMode, TNullish>
+                : Coalesce<
+                      | Coalesce<
+                            | MergeRecord<
+                                  PickRecord<T1>,
+                                  PickRecord<T2>,
+                                  TArrayMergeMode,
+                                  TNullish
+                              >
+                            | GetNullish<T2, TNullish>,
+                            T1,
+                            TNullish
+                        >
+                      | GetNullish<T1, TNullish>,
+                      T2
+                  >
+            : Coalesce<T2, T1, TNullish>
+        : MergeCoreArrayClause<T1, T2, TArrayMergeMode, TNullish>;
 
 type MergeRecord<
     T1 extends AnyRecord,

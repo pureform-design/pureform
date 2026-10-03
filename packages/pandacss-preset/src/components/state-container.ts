@@ -1,5 +1,7 @@
-import { type SystemStyleObject, defineSlotRecipe } from "@pandacss/dev";
+import { defineSlotRecipe } from "@pandacss/dev";
+import { type SystemStyleObject } from "@pandacss/types";
 import type { BaseColorGroup } from "@pureform/ui-utils";
+
 import { getClass, getCssVar, prefix } from "../helpers";
 import type { BaseArgs, ColorArgs } from "./types";
 
@@ -29,6 +31,7 @@ export function defineStateContainer<
             root: {
                 position: "relative",
                 overflow: "hidden",
+                // oxlint-disable-next-line unicorn/no-useless-spread
                 ...{
                     [stateLayerVar]: `calc(var(${hoveredVar}, 0) + var(${focusedVar}, 0) + var(${pressedVar}, 0) + var(${draggedVar}, 0))`,
                     [hoveredVar]: 0,

@@ -1,5 +1,6 @@
-import { clone } from "./clone";
 import { describe, expect, it } from "vitest";
+
+import { clone } from "./clone";
 
 describe("clone", () => {
     it("should clone an object", () => {

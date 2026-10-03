@@ -4,12 +4,13 @@ import { pureformPreset } from "@pureform/pandacss-preset";
 export default defineConfig({
     presets: [
         pureformPreset({
-            prefix: "pf",
             colors: {
-                source: "#6a5acd",
+                source: "#AD32F0",
             },
+            prefix: "pf",
         }),
     ],
+
     // Whether to use css reset
     preflight: true,
 
@@ -25,8 +26,5 @@ export default defineConfig({
     // Files to exclude
     exclude: [],
     // The output directory for your css system
-    outdir: "./src/styled-system",
-    importMap: "$",
-
-    jsxFramework: "solid",
+    outdir: "./styled-system",
 });

@@ -1,6 +1,7 @@
-import { deepMerge } from "@pureform/utils";
-import type { BaseTextStyleName, TextStyle } from "../types";
 import type { DeepPartial } from "@pureform/type-utils";
+import { deepMerge } from "@pureform/utils";
+
+import type { BaseTextStyleName, TextStyle } from "../types";
 
 export type TextStyleArgs<
     TCustomTextStyleName extends string = BaseTextStyleName,

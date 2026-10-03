@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: ts-lib
+
+extends:
+  - "./ts.omni.yaml"
+
+tasks:
+  publish:
+    exec: bun publish --tolerate-republish
+    dependencies:
+      - build
+      - ^publish
+
+meta:
+  type: lib
+  publish: true
+  release:
+    npm: true

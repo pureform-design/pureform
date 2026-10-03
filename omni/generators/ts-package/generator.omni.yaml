@@ -1,0 +1,179 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/generator.json
+name: ts-package
+display_name: TypeScript Package
+description: A TypeScript package generator
+
+inputs:
+  - name: scope_name
+    type: string
+    remember: true
+    message: What is the name of your package scope?
+    default: "pureform"
+
+  - name: package_name
+    type: string
+    message: What is the name of your package?
+    default: "{{ output_dir | base_name }}"
+    validators:
+      - condition: "{{ value | length > 0 }}"
+        error_message: Package name must not be empty
+      - condition: "{{ value is matching(pat='^[a-zA-Z_]{1}[a-zA-Z0-9_-]*$') }}"
+        error_message: >
+          Package name must only contain alphanumeric characters, underscores, and hyphens,
+          and must start with a letter
+
+  - name: package_type
+    type: string
+    message: What type of package is this?
+    allowed:
+      - name: Library
+        value: lib
+      - name: Application
+        value: app
+      - name: Script
+        value: script
+      - name: Service Tests
+        value: service-tests
+      - name: E2E Tests
+        value: e2e-tests
+    default: lib
+
+  - if: "{{ inputs.package_type == 'script' }}"
+    name: script_can_be_used_as_lib
+    type: boolean
+    message: Can this script be used as a library?
+    default: false
+
+  - if: "{{ inputs.package_type == 'script' }}"
+    name: shebang_executor
+    type: string
+    message: What shebang should be used for the script?
+    allowed:
+      - name: Node.js
+        value: "node"
+      - name: Bun
+        value: "bun"
+      - name: Deno
+        value: "deno"
+    default: "node"
+
+  - name: package_description
+    type: string
+    message: What is the description of your package?
+    default: A TypeScript Package
+
+  - if: "{{ inputs.package_type != 'e2e-tests' and inputs.package_type != 'service-tests' }}"
+    name: unit_test
+    type: boolean
+    message: Do you want to add unit tests?
+    default: true
+
+  - if: "{{ inputs.package_type != 'e2e-tests' and inputs.package_type != 'service-tests' }}"
+    name: integration_test
+    type: boolean
+    message: Do you want to add integration tests?
+    default: true
+
+  - name: package_version
+    type: string
+    message: What is the version of your package?
+    default: 0.0.0-semantically-released
+
+  - name: package_license
+    type: string
+    message: What is the license of your package?
+    default: MIT
+
+  - name: published
+    type: boolean
+    message: Will the package be published to a registry?
+    default: false
+
+  - if: "{{ inputs.published }}"
+    name: publish_access
+    type: string
+    message: What is the publish access of your package?
+    allowed:
+      - name: Public
+        value: public
+      - name: Restricted
+        value: restricted
+    default: public
+
+targets:
+  cog_config: "@workspace/cog.toml"
+
+vars:
+  scope_name: "{{ inputs.scope_name }}"
+  full_package_name: "@{{ inputs.scope_name }}/{{ inputs.package_name }}"
+  generated_dir: "{{ output_dir | relative_path(root=workspace_dir) | replace(from='\\\\', to='/') }}"
+
+actions:
+  - type: add-many
+    base_path: templates
+    files:
+      include:
+        - templates/**/*
+      exclude:
+        - "templates/src/add.ts.tpl"
+        - "templates/src/cli/index.ts.tpl"
+        - "templates/vitest.config.*.ts.tpl"
+        - "templates/src/__tests__/integration.spec.ts.tpl"
+        - "templates/src/add.spec.ts.tpl"
+
+  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'script' }}"
+    type: add-many
+    base_path: templates
+    files:
+      - templates/src/add.ts.tpl
+
+  - if: "{{ inputs.package_type == 'script' }}"
+    type: add-many
+    base_path: templates
+    files:
+      - templates/src/cli/index.ts.tpl
+
+  - if: "{{ inputs.package_type == 'e2e-tests' }}"
+    type: add-many
+    base_path: templates
+    files:
+      - "templates/vitest.config.e2e.ts.tpl"
+
+  - if: "{{ inputs.package_type == 'service-tests' }}"
+    type: add-many
+    base_path: templates
+    files:
+      - "templates/vitest.config.service.ts.tpl"
+
+  - if: "{{ inputs.integration_test | default(value=false) }}"
+    type: add-many
+    base_path: templates
+    files:
+      - templates/vitest.config.integration.ts.tpl
+      - templates/src/__tests__/integration.spec.ts.tpl
+
+  - if: "{{ inputs.unit_test | default(value=false) }}"
+    type: add-many
+    base_path: templates
+    files:
+      - templates/vitest.config.unit.ts.tpl
+      - templates/src/add.spec.ts.tpl
+
+  - type: prepend-content
+    target: cog_config
+    entries:
+      - content: |
+          [monorepo.packages."{{ vars.full_package_name }}"]
+          path = "{{ vars.generated_dir }}"
+          include = [
+              "{{ vars.generated_dir }}/**",
+          ]
+          public_api = {{ inputs.published }}
+        pattern: "@anchor:new-typescript-package"
+
+  - type: transform-many
+    command: bun x oxfmt --stdin-filepath=$FILEPATH
+    supports_dry_run: true
+    files:
+      - "**/*.ts"
+      - "**/*.json"

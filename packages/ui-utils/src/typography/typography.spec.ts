@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { Typography } from "./typography";
 
 describe("Typography", () => {

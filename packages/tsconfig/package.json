@@ -1,18 +1,25 @@
 {
     "name": "@pureform/tsconfig",
-    "version": "0.0.0-semantically-released",
+    "version": "0.1.1",
     "description": "",
-    "main": "base.json",
     "keywords": [],
-    "author": "",
     "license": "ISC",
-    "devDependencies": {
-        "typescript": "^5.7.3"
+    "author": "",
+    "exports": {
+        "./base.json": "./base.json",
+        "./with-paths.json": "./with-paths.json",
+        "./types.json": "./types.json"
     },
-    "peerDependencies": {
-        "typescript": "^5.1.6"
+    "publishConfig": {
+        "access": "public"
     },
     "dependencies": {
-        "@rencedm112/tsconfig": "^3.0.6"
+        "@rencedm112/tsconfig": "^3.0.7"
+    },
+    "devDependencies": {
+        "typescript": "catalog:"
+    },
+    "peerDependencies": {
+        "typescript": "catalog:"
     }
 }

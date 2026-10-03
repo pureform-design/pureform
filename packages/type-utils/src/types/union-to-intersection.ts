@@ -1,7 +1,5 @@
 export type UnionToIntersection<U> = (
-    U extends unknown
-        ? (x: U) => void
-        : U
+    U extends unknown ? (x: U) => void : U
 ) extends (x: infer I) => void
     ? I
     : U;

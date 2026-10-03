@@ -1,4 +1,5 @@
 import { deepMerge } from "@pureform/utils";
+
 import type { Pixel } from "../types";
 import type { BaseElevation, ElevationConfig } from "./types";
 

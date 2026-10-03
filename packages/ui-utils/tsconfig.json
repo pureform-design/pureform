@@ -1,4 +1,4 @@
 {
-  "extends": ["@pureform/tsconfig/base.json"],
-  "exclude": ["coverage"]
+    "extends": ["@pureform/tsconfig/with-paths.json", "./tsconfig.project.json"],
+    "compilerOptions": {}
 }

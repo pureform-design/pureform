@@ -1,19 +1,30 @@
 {
     "name": "@pureform/utils",
     "version": "0.0.0-semantically-released",
+    "description": "A TypeScript Package",
+    "type": "module",
     "exports": {
-        ".": "./src/index.ts",
-        "./*": "./src/*/index.ts"
-    },
-    "scripts": {
-        "test:unit": "with-env 'vitest run --config vitest.config.unit.ts'"
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
     },
     "dependencies": {
         "@pureform/type-utils": "workspace:*"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "workspace:*",
-        "@vitest/coverage-v8": "^3.0.5",
-        "vitest": "^3.0.5"
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

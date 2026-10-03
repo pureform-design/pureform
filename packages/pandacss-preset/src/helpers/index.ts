@@ -1,4 +1,5 @@
-import { capitalize, lowerFirst } from "@pureform/utils/string";
+import { capitalize, lowerFirst } from "@pureform/utils";
+
 import type { NormalPrefix, Prefix } from "../types";
 
 function createNormalizedPrefix(

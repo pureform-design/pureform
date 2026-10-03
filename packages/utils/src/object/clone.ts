@@ -27,15 +27,5 @@ export function clone<T>(value: T, options?: CloneOptions): T {
         return value;
     }
 
-    if (Array.isArray(value)) {
-        return value.map((v) => clone(v, o)) as unknown as T;
-    }
-
-    if (typeof value === "object") {
-        return Object.fromEntries(
-            Object.entries(value).map(([k, v]) => [k, clone(v, o)]),
-        ) as T;
-    }
-
-    return value;
+    return structuredClone(value);
 }

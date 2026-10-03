@@ -1,0 +1,58 @@
+from_latest_tag = false
+ignore_merge_commits = true
+ignore_fixup_commits = true
+disable_changelog = false
+disable_bump_commit = false
+generate_mono_repository_global_tag = true
+generate_mono_repository_package_tags = true
+branch_whitelist = []
+skip_ci = "[skip ci]"
+skip_untracked = false
+pre_bump_hooks = [
+    "bun x @omni-oss/set-version {{version}}",
+    "git add package.json",
+]
+post_bump_hooks = ["git push origin {{version_tag}}"]
+pre_package_bump_hooks = [
+    "bun x @omni-oss/set-version {{version}}",
+    "git add .",
+]
+post_package_bump_hooks = ["git push origin {{version_tag}}"]
+tag_prefix = "v"
+
+[git_hooks.commit-msg]
+script = """#!/bin/sh
+set -e
+cog verify --file $1
+cog check
+"""
+
+[commit_types]
+
+[changelog]
+path = "CHANGELOG.md"
+authors = []
+
+[bump_profiles]
+
+#@anchor:new-typescript-package
+
+[monorepo.packages.root]
+bump_order = 10000
+path = "."
+changelog_path = "CHANGELOG.root.md"
+include = [
+    "package.json",
+    "bun.lock",
+    "LICENSE",
+    "README.md",
+    "workspace.omni.yaml",
+    "vitest.workspace.ts",
+]
+public_api = false
+pre_bump_hooks = [
+    # force regenarate lockfile
+    "rm bun.lock",
+    "bun install --lockfile-only",
+    "git add package.json bun.lock",
+]

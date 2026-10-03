@@ -1,27 +1,47 @@
 {
-    "name": "@pureform/solid-demo",
-    "private": true,
+    "name": "example-fullstack-tanstack",
     "version": "0.0.0",
+    "description": "",
+    "license": "MIT",
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "postinstall": "bun codegen:css",
-        "codegen:css": "pandacss codegen --clean",
-        "codegen": "bun codegen:css",
-        "build": "tsc -b && vite build",
-        "preview": "vite preview"
+        "build": "vite build",
+        "start": "node --env-file-if-exists=.env dist/server/node.js",
+        "serve": "vite preview",
+        "test": "vitest",
+        "lint": "oxlint src"
     },
     "dependencies": {
-        "solid-js": "^1.9.4",
-        "@pureform/js-effects": "workspace:*"
+        "@pureform/js-effects": "catalog:",
+        "@remix-run/cookie": "catalog:",
+        "@solidjs/meta": "catalog:",
+        "@solidjs/web": "catalog:",
+        "@tanstack/solid-query": "catalog:",
+        "@tanstack/solid-router": "catalog:",
+        "solid-js": "catalog:",
+        "zod": "catalog:"
     },
     "devDependencies": {
-        "@pandacss/dev": "^0.52.0",
-        "@pureform/pandacss-preset": "workspace:*",
-        "@pureform/tsconfig": "workspace:*",
-        "typescript": "^5.7.3",
-        "vite": "^6.1.0",
-        "vite-plugin-solid": "^2.11.1",
-        "vite-tsconfig-paths": "^5.1.4"
+        "@pandacss/dev": "catalog:",
+        "@pandacss/vite": "catalog:",
+        "@pureform/pandacss-preset": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@solidjs/diagnostics": "catalog:",
+        "@solidjs/start-devtools": "catalog:",
+        "@solidjs/testing-library": "catalog:",
+        "@solidjs/vite-plugin": "catalog:",
+        "@tanstack/router-plugin": "catalog:",
+        "@testing-library/jest-dom": "catalog:",
+        "@types/node": "catalog:",
+        "eslint-plugin-solid": "catalog:",
+        "filesystem-routing": "catalog:",
+        "jsdom": "catalog:",
+        "oxlint": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }
