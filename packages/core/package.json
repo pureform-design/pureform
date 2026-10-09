@@ -65,8 +65,15 @@
             "default": "./src/__fixtures__/button.ts"
         },
         "./ast/helpers/*": {
-            "types": "./src/ast/helpers/*.ts",
-            "development": "./src/ast/helpers/*.ts"
+            "types": "./dist/ast/helpers/*.d.ts",
+            "import": {
+                "development": "./src/ast/helpers/*.ts",
+                "default": "./dist/ast/helpers/*.mjs"
+            },
+            "require": {
+                "development": "./src/ast/helpers/*.ts",
+                "default": "./dist/ast/helpers/*.mjs"
+            }
         }
     },
     "dependencies": {},
