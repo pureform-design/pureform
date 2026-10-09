@@ -1,5 +1,6 @@
 // Assemble a Panda preset from a CoreConfig.
 
+import type { Preset } from "@pandacss/types";
 import { tokenValue, validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
@@ -60,7 +61,7 @@ const defined = <T extends Record<string, unknown>>(obj: T): Partial<T> =>
 export const compilePreset = (
     config: CoreConfig,
     options: CompileOptions = {},
-) => {
+): Preset => {
     validateConfig(config);
     const ctx: CompileCtx = {
         config,
@@ -92,5 +93,5 @@ export const compilePreset = (
         }),
         utilities: compileUtilities(ctx),
         themes,
-    });
+    }) as unknown as Preset;
 };
