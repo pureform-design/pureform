@@ -5,8 +5,6 @@
 // what they build, a component (name plus tokens plus recipe) rather than just the `recipe`
 // sub-field, and the Panda adapter lowers them to `defineRecipe` / `defineSlotRecipe`.
 
-import { deepMerge } from "@pureform/utils";
-
 import { unitless } from "./ast";
 import type { NumericScalarNode } from "./ast";
 import { validateConfig } from "./path";
@@ -55,21 +53,51 @@ export const defineConfig = (config: CoreConfig): CoreConfig => {
     return config;
 };
 
-/** Deep-merge a base config with overrides (later wins; maps merge; leaf nodes and arrays
- *  replace). Built on `@pureform/utils` `deepMerge`. */
+/** Deep-merge a base config with overrides, later wins. Plain record tiers (`tokens`,
+ *  `semanticTokens`, `components`) merge by key. A value node, a `meta(...)` envelope, and an
+ *  array all replace wholesale, since a node is atomic: merging a `dynamic` over an `alias`
+ *  field by field would produce a malformed node, so the later one wins outright. */
 export const mergeConfigs = (
     base: CoreConfig,
     ...overrides: Partial<CoreConfig>[]
 ): CoreConfig =>
     overrides.reduce<CoreConfig>(
         (acc, o) =>
-            deepMerge(
+            mergeRecords(
                 acc as unknown as Record<string, unknown>,
-                o as unknown as Record<string, unknown>,
-                { arrayMergeMode: "replace" },
+                o as Record<string, unknown>,
             ) as unknown as CoreConfig,
         base,
     );
+
+const isPlainRecord = (v: unknown): v is Record<string, unknown> =>
+    v !== null && typeof v === "object" && !Array.isArray(v);
+
+// A node is atomic for merge purposes if it carries a `type` discriminant (a ValueNode) or a
+// `$value` sentinel (a metadata envelope). Component specs also carry `kind`, so they too are
+// replaced wholesale rather than field-merged.
+const isAtomic = (v: Record<string, unknown>): boolean =>
+    typeof v.type === "string" || "$value" in v || typeof v.kind === "string";
+
+const mergeValue = (a: unknown, b: unknown): unknown => {
+    if (b === undefined) return a;
+    if (isPlainRecord(a) && isPlainRecord(b) && !isAtomic(a) && !isAtomic(b)) {
+        return mergeRecords(a, b);
+    }
+    // Arrays, nodes, envelopes, specs, and scalars: the later value replaces.
+    return b;
+};
+
+const mergeRecords = (
+    a: Record<string, unknown>,
+    b: Record<string, unknown>,
+): Record<string, unknown> => {
+    const out: Record<string, unknown> = { ...a };
+    for (const [key, value] of Object.entries(b)) {
+        out[key] = key in out ? mergeValue(out[key], value) : value;
+    }
+    return out;
+};
 
 /** Annotate a token value with metadata, for example
  *  `meta(oklch(...), { description: "Brand", deprecated: "use brand" })`. Produces a `WithMeta`
