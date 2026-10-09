@@ -35,6 +35,13 @@ authors = []
 
 [bump_profiles]
 
+[monorepo.packages."@pureform/core"]
+path = "packages/core"
+include = [
+    "packages/core/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]

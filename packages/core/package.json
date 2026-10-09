@@ -1,0 +1,79 @@
+{
+    "name": "@pureform/core",
+    "version": "0.0.0-semantically-released",
+    "description": "Agnostic styling AST and config contract (Layer 1)",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./ast": {
+            "types": "./dist/ast/index.d.ts",
+            "import": {
+                "development": "./src/ast/index.ts",
+                "default": "./dist/ast.mjs"
+            },
+            "require": {
+                "development": "./src/ast/index.ts",
+                "default": "./dist/ast.mjs"
+            }
+        },
+        "./ast/helpers": {
+            "types": "./dist/ast/helpers/index.d.ts",
+            "import": {
+                "development": "./src/ast/helpers/index.ts",
+                "default": "./dist/ast/helpers.mjs"
+            },
+            "require": {
+                "development": "./src/ast/helpers/index.ts",
+                "default": "./dist/ast/helpers.mjs"
+            }
+        },
+        "./ast/helpers/keyword": {
+            "types": "./dist/ast/helpers/keyword/index.d.ts",
+            "import": {
+                "development": "./src/ast/helpers/keyword/index.ts",
+                "default": "./dist/ast/helpers/keyword.mjs"
+            },
+            "require": {
+                "development": "./src/ast/helpers/keyword/index.ts",
+                "default": "./dist/ast/helpers/keyword.mjs"
+            }
+        },
+        "./types": {
+            "types": "./dist/types.d.ts",
+            "import": {
+                "development": "./src/types.ts",
+                "default": "./dist/types.mjs"
+            },
+            "require": {
+                "development": "./src/types.ts",
+                "default": "./dist/types.mjs"
+            }
+        },
+        "./ast/helpers/*": {
+            "types": "./src/ast/helpers/*.ts",
+            "development": "./src/ast/helpers/*.ts"
+        }
+    },
+    "dependencies": {
+        "@pureform/utils": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/type-utils": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}
