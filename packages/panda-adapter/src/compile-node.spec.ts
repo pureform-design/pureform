@@ -49,6 +49,7 @@ const ctx = (over: Partial<CompileCtx> = {}): CompileCtx => ({
     config: emptyConfig,
     prefix: undefined,
     target: "css",
+    refStyle: "fn",
     ...over,
 });
 

@@ -10,6 +10,7 @@ import type { ValueNode } from "@pureform/core/ast";
 import {
     aliasTarget,
     formatColor,
+    formatTokenRef,
     hyphenate,
     KEYWORD_CSS,
     varName,
@@ -32,7 +33,8 @@ export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
             return formatColor(node);
         case "alias": {
             const target = aliasTarget(node.path);
-            if (target.kind === "token") return target.ref;
+            if (target.kind === "token")
+                return formatTokenRef(target.ref, ctx.refStyle);
             if (target.kind === "textStyle") return target.name;
             // Resolve: follow the alias and inline the result (component tokens resolve to a
             // dynamic var; metadata is unwrapped so it stays transparent).

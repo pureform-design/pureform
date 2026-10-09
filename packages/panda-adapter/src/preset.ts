@@ -21,6 +21,8 @@ const compileTokenGroups = (
     ctx: CompileCtx,
 ): Record<string, Record<string, { value: string }>> | undefined => {
     if (!groups) return undefined;
+    // Token definitions use the curly ref form.
+    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
     return Object.fromEntries(
         Object.entries(groups).map(([group, entries]) => [
             group,
@@ -30,7 +32,7 @@ const compileTokenGroups = (
                     {
                         value: compileNodeToCSS(
                             tokenValue(entry) as ValueNode,
-                            ctx,
+                            tctx,
                         ),
                     },
                 ]),
@@ -64,6 +66,7 @@ export const compilePreset = (
         config,
         prefix: options.prefix,
         target: options.target ?? "css",
+        refStyle: "fn",
     };
 
     const { recipes, slotRecipes } = compileRecipes(ctx);

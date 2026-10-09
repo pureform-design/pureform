@@ -21,9 +21,15 @@ export interface CompileOptions {
 }
 
 /** Everything the node and style compilers need: the config to resolve refs against, the var
- *  prefix policy, and the target id. */
+ *  prefix policy, and the target id.
+ *
+ *  `refStyle` picks how an aliased token reference is spelled. Panda resolves the function form
+ *  `token(colors.brand)` only in style-value contexts (recipes, style maps). In a token or
+ *  semantic-token DEFINITION it resolves only the curly form `{colors.brand}` (even inside a
+ *  `var()` fallback), so token tiers compile with `refStyle: "curly"`. */
 export interface CompileCtx {
     config: CoreConfig;
     prefix: VarPrefix | undefined;
     target: string;
+    refStyle: "fn" | "curly";
 }

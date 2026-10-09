@@ -43,27 +43,31 @@ export const compileThemeTokens = (
     ctx: CompileCtx,
 ): Record<string, PandaTokenGroup> => {
     const { config } = ctx;
+    // Token definitions resolve the curly `{...}` ref form, not `token(...)`.
+    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
     const out: Record<string, PandaTokenGroup> = {};
     for (const [group, entries] of Object.entries(config.tokens)) {
-        out[CATEGORY[group] ?? group] = groupToPanda(entries, ctx);
+        out[CATEGORY[group] ?? group] = groupToPanda(entries, tctx);
     }
-    if (config.durations) out.durations = groupToPanda(config.durations, ctx);
-    if (config.easings) out.easings = groupToPanda(config.easings, ctx);
-    if (config.zIndices) out.zIndex = groupToPanda(config.zIndices, ctx);
-    if (config.fonts) out.fonts = groupToPanda(config.fonts, ctx);
+    if (config.durations) out.durations = groupToPanda(config.durations, tctx);
+    if (config.easings) out.easings = groupToPanda(config.easings, tctx);
+    if (config.zIndices) out.zIndex = groupToPanda(config.zIndices, tctx);
+    if (config.fonts) out.fonts = groupToPanda(config.fonts, tctx);
     return out;
 };
 
 /** `theme.semanticTokens`: each group keyed by its Panda category namespace. */
 export const compileSemanticTokens = (
     ctx: CompileCtx,
-): Record<string, PandaTokenGroup> =>
-    Object.fromEntries(
+): Record<string, PandaTokenGroup> => {
+    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
+    return Object.fromEntries(
         Object.entries(ctx.config.semanticTokens).map(([group, entries]) => [
             CATEGORY[group] ?? group,
-            groupToPanda(entries, ctx),
+            groupToPanda(entries, tctx),
         ]),
     );
+};
 
 /** `theme.breakpoints`: a flat name-to-size map (not token envelopes). */
 export const compileBreakpoints = (

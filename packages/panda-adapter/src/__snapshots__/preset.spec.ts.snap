@@ -13,22 +13,22 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
     "semanticTokens": {
       "colors": {
         "brand": {
-          "value": "var(--global-colors-brand, token(colors.violet600))",
+          "value": "var(--global-colors-brand, {colors.violet600})",
         },
         "brandHover": {
-          "value": "var(--global-colors-brandHover, token(colors.violet700))",
+          "value": "var(--global-colors-brandHover, {colors.violet700})",
         },
         "danger": {
-          "value": "token(colors.red600)",
+          "value": "{colors.red600}",
         },
         "dangerHover": {
-          "value": "token(colors.red700)",
+          "value": "{colors.red700}",
         },
         "onBrand": {
-          "value": "token(colors.white)",
+          "value": "{colors.white}",
         },
         "onDanger": {
-          "value": "token(colors.white)",
+          "value": "{colors.white}",
         },
       },
     },

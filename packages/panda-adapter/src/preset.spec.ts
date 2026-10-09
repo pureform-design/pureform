@@ -31,9 +31,9 @@ describe("compilePreset (canonical button)", () => {
     it("emits semantic tokens as var-with-token-fallback and plain token refs", () => {
         const colors = obj(obj(theme.semanticTokens).colors);
         expect(obj(colors.brand).value).toBe(
-            "var(--global-colors-brand, token(colors.violet600))",
+            "var(--global-colors-brand, {colors.violet600})",
         );
-        expect(obj(colors.onBrand).value).toBe("token(colors.white)");
+        expect(obj(colors.onBrand).value).toBe("{colors.white}");
     });
 
     it("compiles the button as a slot recipe with its slots and variants", () => {
