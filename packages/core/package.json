@@ -59,6 +59,11 @@
                 "default": "./dist/types.mjs"
             }
         },
+        "./fixtures/button": {
+            "types": "./src/__fixtures__/button.ts",
+            "development": "./src/__fixtures__/button.ts",
+            "default": "./src/__fixtures__/button.ts"
+        },
         "./ast/helpers/*": {
             "types": "./src/ast/helpers/*.ts",
             "development": "./src/ast/helpers/*.ts"

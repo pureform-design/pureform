@@ -2639,6 +2639,19 @@ Each is additive / non-breaking, though not all are pure union widenings):
 - **Typed variant selections to generated component prop types.** Correctly scoped to
   **Layer 4** (component codegen / delivery), not a Layer-1 expressiveness gap.
 
+**Phase 2 coverage check (full slotted button).** The real multi-slot button (slots `root`,
+`label`, `leadingIcon`, `trailingIcon`; `color` / `variant` / `size` / `leading` / `trailing`
+variant groups; compound and default variants; per-state styles; a `when(...)` opacity; a
+`colorMix` overlay; logical spacing; component tokens as runtime dynamics; a static elevation
+utility applied by name) was modeled as a `CoreConfig` and passes `defineConfig` with no
+errors. It is the fixture the adapter compiles. The modeling surfaced one minor ergonomic
+observation, not a blocker: a boolean variant group (`leading`, `trailing`) is keyed by the
+strings `"true"` / `"false"`, since `variants` is `Record<string, ...>` and has no dedicated
+boolean form. This matches Panda's own boolean-variant spelling, so it lowers cleanly; a typed
+boolean-variant sugar is a possible future nicety, deferred. The pre-existing `AlignKeyword`
+`space*` observation (valid type-wise on `alignItems` though only meaningful on the justify
+axes) still stands as the one un-split slot noted above.
+
 ---
 
 ## 10. Glossary
