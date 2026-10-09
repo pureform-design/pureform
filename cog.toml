@@ -42,6 +42,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/panda-adapter"]
+path = "packages/panda-adapter"
+include = [
+    "packages/panda-adapter/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]

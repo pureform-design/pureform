@@ -97,6 +97,25 @@
         "oxlint": "catalog:",
       },
     },
+    "packages/panda-adapter": {
+      "name": "@pureform/panda-adapter",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pandacss/types": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+      "peerDependencies": {
+        "@pandacss/dev": "catalog:",
+      },
+    },
     "packages/pandacss-preset": {
       "name": "@pureform/pandacss-preset",
       "version": "0.0.0-semantically-released",
@@ -562,6 +581,8 @@
     "@pureform/oxfmt-config": ["@pureform/oxfmt-config@workspace:packages/oxfmt-config"],
 
     "@pureform/oxlint-config": ["@pureform/oxlint-config@workspace:packages/oxlint-config"],
+
+    "@pureform/panda-adapter": ["@pureform/panda-adapter@workspace:packages/panda-adapter"],
 
     "@pureform/pandacss-preset": ["@pureform/pandacss-preset@workspace:packages/pandacss-preset"],
 

@@ -1,0 +1,336 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compilePreset (canonical button) > produces a stable Panda preset shape 1`] = `
+{
+  "name": "pureform",
+  "theme": {
+    "breakpoints": {
+      "lg": "1024px",
+      "md": "768px",
+      "sm": "640px",
+    },
+    "recipes": {},
+    "semanticTokens": {
+      "colors": {
+        "brand": {
+          "value": "var(--global-colors-brand, token(colors.violet600))",
+        },
+        "brandHover": {
+          "value": "var(--global-colors-brandHover, token(colors.violet700))",
+        },
+        "danger": {
+          "value": "token(colors.red600)",
+        },
+        "dangerHover": {
+          "value": "token(colors.red700)",
+        },
+        "onBrand": {
+          "value": "token(colors.white)",
+        },
+        "onDanger": {
+          "value": "token(colors.white)",
+        },
+      },
+    },
+    "slotRecipes": {
+      "button": {
+        "base": {
+          "label": {
+            "textStyle": "buttonLabel",
+          },
+          "leadingIcon": {
+            "height": "token(sizes.iconMd)",
+            "width": "token(sizes.iconMd)",
+          },
+          "root": {
+            "_disabled": {
+              "cursor": "not-allowed",
+              "shadowElevation": "level0",
+            },
+            "_hover": {
+              "shadowElevation": "level2",
+            },
+            "alignItems": "center",
+            "backgroundColor": "var(--ui-button-bg, var(--components-button-bg, token(colors.brand)))",
+            "borderRadius": "var(--ui-button-radius, var(--components-button-radius, token(radii.md)))",
+            "color": "var(--ui-button-fg, var(--components-button-fg, token(colors.onBrand)))",
+            "cursor": "pointer",
+            "display": "inline-flex",
+            "fontFamily": "token(fonts.sans)",
+            "gap": "token(spacing.2)",
+            "justifyContent": "center",
+            "opacity": {
+              "_disabled": "0.38",
+              "base": "1",
+            },
+            "shadowElevation": "level1",
+            "transition": "all token(durations.fast) token(easings.standard)",
+          },
+          "trailingIcon": {
+            "height": "token(sizes.iconMd)",
+            "width": "token(sizes.iconMd)",
+          },
+        },
+        "className": "btn",
+        "compoundVariants": [
+          {
+            "color": "danger",
+            "css": {
+              "root": {
+                "borderColor": "token(colors.danger)",
+                "color": "token(colors.danger)",
+              },
+            },
+            "variant": "outline",
+          },
+          {
+            "css": {
+              "root": {
+                "backgroundColor": "color-mix(in srgb, token(colors.brand), token(colors.white) 8%)",
+              },
+            },
+            "size": "sm",
+            "variant": "solid",
+          },
+        ],
+        "defaultVariants": {
+          "color": "brand",
+          "leading": "false",
+          "size": "md",
+          "trailing": "false",
+          "variant": "solid",
+        },
+        "jsx": [
+          "Button",
+        ],
+        "slots": [
+          "root",
+          "label",
+          "leadingIcon",
+          "trailingIcon",
+        ],
+        "variants": {
+          "color": {
+            "brand": {
+              "root": {
+                "backgroundColor": "token(colors.brand)",
+                "color": "token(colors.onBrand)",
+              },
+            },
+            "danger": {
+              "root": {
+                "backgroundColor": "token(colors.danger)",
+                "color": "token(colors.onDanger)",
+              },
+            },
+          },
+          "leading": {
+            "false": {
+              "leadingIcon": {
+                "display": "none",
+              },
+            },
+            "true": {},
+          },
+          "size": {
+            "lg": {
+              "label": {
+                "fontSize": "token(fontSizes.lg)",
+              },
+              "leadingIcon": {
+                "height": "token(sizes.iconLg)",
+                "width": "token(sizes.iconLg)",
+              },
+              "root": {
+                "paddingBlockEnd": "token(spacing.3)",
+                "paddingBlockStart": "token(spacing.3)",
+                "paddingInlineEnd": "token(spacing.5)",
+                "paddingInlineStart": "token(spacing.5)",
+              },
+              "trailingIcon": {
+                "height": "token(sizes.iconLg)",
+                "width": "token(sizes.iconLg)",
+              },
+            },
+            "md": {
+              "label": {
+                "fontSize": "token(fontSizes.md)",
+              },
+              "root": {
+                "paddingBlockEnd": "token(spacing.2)",
+                "paddingBlockStart": "token(spacing.2)",
+                "paddingInlineEnd": "token(spacing.4)",
+                "paddingInlineStart": "token(spacing.4)",
+              },
+            },
+            "sm": {
+              "label": {
+                "fontSize": "token(fontSizes.sm)",
+              },
+              "leadingIcon": {
+                "height": "token(sizes.iconSm)",
+                "width": "token(sizes.iconSm)",
+              },
+              "root": {
+                "paddingBlockEnd": "token(spacing.1)",
+                "paddingBlockStart": "token(spacing.1)",
+                "paddingInlineEnd": "token(spacing.2)",
+                "paddingInlineStart": "token(spacing.2)",
+              },
+              "trailingIcon": {
+                "height": "token(sizes.iconSm)",
+                "width": "token(sizes.iconSm)",
+              },
+            },
+          },
+          "trailing": {
+            "false": {
+              "trailingIcon": {
+                "display": "none",
+              },
+            },
+            "true": {},
+          },
+          "variant": {
+            "ghost": {
+              "root": {
+                "backgroundColor": "transparent",
+                "color": "token(colors.brand)",
+              },
+            },
+            "outline": {
+              "root": {
+                "backgroundColor": "transparent",
+                "borderColor": "token(colors.brand)",
+                "borderStyle": "solid",
+                "borderWidth": "1px",
+                "color": "token(colors.brand)",
+              },
+            },
+            "solid": {
+              "root": {},
+            },
+          },
+        },
+      },
+    },
+    "textStyles": {
+      "buttonLabel": {
+        "value": {
+          "fontWeight": "600",
+          "letterSpacing": "0px",
+          "lineHeight": "1.2",
+        },
+      },
+    },
+    "tokens": {
+      "colors": {
+        "red600": {
+          "value": "rgb(220 38 38)",
+        },
+        "red700": {
+          "value": "rgb(185 28 28)",
+        },
+        "violet600": {
+          "value": "rgb(124 58 237)",
+        },
+        "violet700": {
+          "value": "rgb(109 40 217)",
+        },
+        "white": {
+          "value": "rgb(255 255 255)",
+        },
+      },
+      "durations": {
+        "fast": {
+          "value": "150ms",
+        },
+      },
+      "easings": {
+        "standard": {
+          "value": "cubic-bezier(0.2, 0, 0, 1)",
+        },
+      },
+      "fontSizes": {
+        "lg": {
+          "value": "18px",
+        },
+        "md": {
+          "value": "16px",
+        },
+        "sm": {
+          "value": "14px",
+        },
+      },
+      "fonts": {
+        "sans": {
+          "value": "Inter, system-ui, sans-serif",
+        },
+      },
+      "radii": {
+        "full": {
+          "value": "9999px",
+        },
+        "lg": {
+          "value": "12px",
+        },
+        "md": {
+          "value": "8px",
+        },
+        "sm": {
+          "value": "4px",
+        },
+      },
+      "sizes": {
+        "iconLg": {
+          "value": "24px",
+        },
+        "iconMd": {
+          "value": "20px",
+        },
+        "iconSm": {
+          "value": "16px",
+        },
+      },
+      "spacing": {
+        "1": {
+          "value": "4px",
+        },
+        "2": {
+          "value": "8px",
+        },
+        "3": {
+          "value": "12px",
+        },
+        "4": {
+          "value": "16px",
+        },
+        "5": {
+          "value": "20px",
+        },
+      },
+      "zIndex": {
+        "base": {
+          "value": "0",
+        },
+        "overlay": {
+          "value": "200",
+        },
+        "raised": {
+          "value": "100",
+        },
+      },
+    },
+  },
+  "utilities": {
+    "shadowElevation": {
+      "transform": [Function],
+      "values": [
+        "level0",
+        "level1",
+        "level2",
+      ],
+    },
+  },
+}
+`;

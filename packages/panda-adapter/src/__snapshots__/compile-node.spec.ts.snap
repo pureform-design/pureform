@@ -1,0 +1,20 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compileNodeToCSS composites > snapshots each composite node kind 1`] = `
+{
+  "animation": "1000px infinite spin",
+  "calc": "calc(100% - 16px)",
+  "colorMix": "color-mix(in srgb, token(colors.brand), rgb(255 255 255) 8%)",
+  "easingCubic": "cubic-bezier(0.4, 0, 0.2, 1)",
+  "easingKeyword": "ease-in-out",
+  "easingSteps": "steps(4, end)",
+  "filter": "blur(4px)",
+  "fontFamily": "Inter, system-ui, sans-serif",
+  "gradient": "linear-gradient(90, rgb(0 0 0), rgb(255 255 255) 100%)",
+  "mathFnClamp": "clamp(10px, calc(2 * 4px), 40px)",
+  "mathFnMin": "min(10px, 50%)",
+  "shadow": "0px 1px 3px rgb(0 0 0)",
+  "transform": "translate(1px, 2px) rotate(45)",
+  "transition": "background-color 150px ease-in-out",
+}
+`;
