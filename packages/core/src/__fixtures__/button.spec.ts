@@ -25,8 +25,6 @@ describe("canonical button fixture", () => {
             "color",
             "variant",
             "size",
-            "leading",
-            "trailing",
         ]);
         expect(button.recipe.compoundVariants).toHaveLength(2);
     });

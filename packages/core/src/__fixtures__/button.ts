@@ -379,15 +379,6 @@ export const buttonConfig: CoreConfig = {
                             },
                         },
                     },
-                    // Boolean-style variant groups toggling the icon slots.
-                    leading: {
-                        true: {},
-                        false: { leadingIcon: { display: none } },
-                    },
-                    trailing: {
-                        true: {},
-                        false: { trailingIcon: { display: none } },
-                    },
                 },
                 compoundVariants: [
                     {
@@ -425,8 +416,6 @@ export const buttonConfig: CoreConfig = {
                     color: "brand",
                     variant: "solid",
                     size: "md",
-                    leading: "false",
-                    trailing: "false",
                 },
             },
         }),
