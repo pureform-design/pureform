@@ -1,6 +1,7 @@
 import { cx } from "$css";
 import { box } from "$patterns";
 import {
+    button as pureformButton,
     pfButton,
     pfCard,
     pfIconButton,
@@ -66,8 +67,19 @@ export function App() {
         disabled: true,
     });
 
+    // Button styled entirely from adapter-generated output (the pureform CoreConfig compiled
+    // to this Panda preset by @pureform/panda-adapter).
+    const generated = pureformButton({
+        color: "brand",
+        variant: "solid",
+        size: "md",
+    });
+
     return (
         <>
+            <button class={generated.root} type="button">
+                <span class={generated.label}>Generated button</span>
+            </button>
             <button
                 class={cx(buttonSm.root, sc.root)}
                 type="button"

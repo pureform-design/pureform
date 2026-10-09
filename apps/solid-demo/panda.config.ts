@@ -1,6 +1,8 @@
 import { defineConfig } from "@pandacss/dev";
 import { pureformPreset } from "@pureform/pandacss-preset";
 
+import { pureformGeneratedPreset } from "./panda.pureform-generated";
+
 export default defineConfig({
     presets: [
         pureformPreset({
@@ -9,6 +11,7 @@ export default defineConfig({
             },
             prefix: "pf",
         }),
+        pureformGeneratedPreset,
     ],
 
     // Whether to use css reset

@@ -4,6 +4,12 @@ name: "@pureform/site"
 extends:
   - "@workspace/omni/presets/ts-vite-app.omni.yaml"
 
+dependencies:
+  append:
+    - "@pureform/core"
+    - "@pureform/panda-adapter"
+    - "@pureform/ui-utils"
+
 cache:
   key:
     files:

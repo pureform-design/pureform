@@ -18,7 +18,7 @@
       "name": "example-fullstack-tanstack",
       "version": "0.0.0",
       "dependencies": {
-        "@pureform/js-effects": "catalog:",
+        "@pureform/js-effects": "workspace:^",
         "@remix-run/cookie": "catalog:",
         "@solidjs/meta": "catalog:",
         "@solidjs/web": "catalog:",
@@ -30,8 +30,11 @@
       "devDependencies": {
         "@pandacss/dev": "catalog:",
         "@pandacss/vite": "catalog:",
+        "@pureform/core": "workspace:^",
+        "@pureform/panda-adapter": "workspace:^",
         "@pureform/pandacss-preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
+        "@pureform/ui-utils": "workspace:^",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
         "@solidjs/diagnostics": "catalog:",
@@ -53,9 +56,6 @@
     "packages/core": {
       "name": "@pureform/core",
       "version": "0.0.0-semantically-released",
-      "dependencies": {
-        "@pureform/utils": "catalog:",
-      },
       "devDependencies": {
         "@pureform/tsconfig": "catalog:",
         "@pureform/type-utils": "catalog:",
