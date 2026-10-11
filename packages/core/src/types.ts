@@ -123,9 +123,10 @@ export interface ThemeOverride {
  *  through `apply`. A discriminated union of two flavors; build with `defineStaticUtility` or
  *  `defineDynamicUtility` so `kind` is injected. */
 interface BaseUtilityDef {
-    /** Doc and typing hint: the primary property this utility stands in for. For a
-     *  multi-property template (for example `mx`) it is advisory only; lowers to Panda's
-     *  shorthand seed. */
+    /** Advisory label naming the primary property this utility stands in for, for anyone
+     *  reading the config. It carries no behavior: the Panda adapter never emits it, and a
+     *  utility's actual output comes from its `values` steps (static) or compiled `template`
+     *  (dynamic). Leave it off when the steps are already self-describing. */
     property?: string;
 }
 
