@@ -238,12 +238,6 @@ export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
 
         markAsRippled(e, options?.allowPropagation);
 
-        const color = options?.color
-            ? {
-                  color: "currentColor",
-              }
-            : {};
-
         if (options?.removeExistingRipples ?? true) {
             const existing =
                 options?.getExistingRipples?.(rippleLayer) ??
@@ -263,7 +257,6 @@ export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
 
             const ripple = createRipple({
                 ...options,
-                ...color,
                 origin: {
                     x: originX,
                     y: originY,
