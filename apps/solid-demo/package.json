@@ -30,7 +30,6 @@
         "@pandacss/vite": "catalog:",
         "@pureform/core": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
-        "@pureform/pandacss-preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/ui-utils": "workspace:^",
         "@pureform/vite-config": "catalog:",

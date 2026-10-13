@@ -35,7 +35,6 @@
         "@pandacss/vite": "catalog:",
         "@pureform/core": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
-        "@pureform/pandacss-preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/ui-utils": "workspace:^",
         "@pureform/vite-config": "catalog:",
@@ -109,26 +108,6 @@
       "devDependencies": {
         "@pandacss/types": "catalog:",
         "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
-        "typescript": "catalog:",
-        "vite": "catalog:",
-        "vitest": "catalog:",
-      },
-      "peerDependencies": {
-        "@pandacss/dev": "catalog:",
-      },
-    },
-    "packages/pandacss-preset": {
-      "name": "@pureform/pandacss-preset",
-      "version": "0.0.0-semantically-released",
-      "devDependencies": {
-        "@pandacss/preset-base": "catalog:",
-        "@pandacss/preset-panda": "catalog:",
-        "@pandacss/types": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/ui-utils": "catalog:",
-        "@pureform/utils": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
         "typescript": "catalog:",
@@ -238,7 +217,6 @@
     "@pureform/js-effects": "workspace:^",
     "@pureform/oxfmt-config": "workspace:^",
     "@pureform/oxlint-config": "workspace:^",
-    "@pureform/pandacss-preset": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
     "@pureform/type-utils": "workspace:^",
     "@pureform/ui-utils": "workspace:^",
@@ -547,7 +525,7 @@
 
     "@pandacss/transformer": ["@pandacss/transformer@2.0.1", "", { "dependencies": { "@pandacss/compiler": "2.0.1", "@pandacss/compiler-shared": "2.0.1", "unplugin": "^2.3.11" }, "peerDependencies": { "rollup": ">=3.0.0", "vite": ">=6.0.0", "webpack": ">=5.0.0" }, "optionalPeers": ["rollup", "vite", "webpack"] }, "sha512-OmIe7uc7jX/y7nEUWFtQMkS4URnyK0A7ninoSVT7SrSrpi2AYY7fkZRJk2wVDCuKquuHkRbzdzTFuv/r6sPtyw=="],
 
-    "@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+    "@pandacss/types": ["@pandacss/types@2.1.2", "", {}, "sha512-Vbu+E+PFjrkkJnyofMdxr7q0pzOlM6cUm8mLahUcWtpE8wzK7S/VnGhpFc4YfImvRC52yMt9ViKufYENbYKI2w=="],
 
     "@pandacss/vite": ["@pandacss/vite@2.0.1", "", { "dependencies": { "@pandacss/compiler": "2.0.1", "@pandacss/compiler-shared": "2.0.1", "@pandacss/transformer": "2.0.1" }, "peerDependencies": { "vite": ">=6.0.0" } }, "sha512-OSZpq2PAh7sn91+3qVzf27dZxstDCtVNdTb6Y+7WbnfHH2+PbwafoRKQvUMtokBbakKjZDVD7qL7jWa7SxqHbg=="],
 
@@ -588,8 +566,6 @@
     "@pureform/oxlint-config": ["@pureform/oxlint-config@workspace:packages/oxlint-config"],
 
     "@pureform/panda-adapter": ["@pureform/panda-adapter@workspace:packages/panda-adapter"],
-
-    "@pureform/pandacss-preset": ["@pureform/pandacss-preset@workspace:packages/pandacss-preset"],
 
     "@pureform/tsconfig": ["@pureform/tsconfig@workspace:packages/tsconfig"],
 
@@ -1323,11 +1299,23 @@
 
     "@oxc-parser/binding-wasm32-wasi/@emnapi/runtime": ["@emnapi/runtime@1.11.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-vgj7R3y3Wgx24IQaGPA/R6YFXLHVMOZ0uVEyIQPaWs+rd1AzfEMXlAC22FYwO1XkKR6NPsq7mUandH8oIRdZFw=="],
 
+    "@pandacss/cli/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
+    "@pandacss/compiler/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
+    "@pandacss/compiler-shared/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
+    "@pandacss/config/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
     "@pandacss/config/magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
 
     "@pandacss/config/rolldown": ["rolldown@1.2.7", "", { "dependencies": { "@oxc-project/types": "=0.148.0", "@rolldown/pluginutils": "^1.0.0" }, "optionalDependencies": { "@rolldown/binding-android-arm-eabi": "1.2.7", "@rolldown/binding-android-arm64": "1.2.7", "@rolldown/binding-darwin-arm64": "1.2.7", "@rolldown/binding-darwin-x64": "1.2.7", "@rolldown/binding-freebsd-x64": "1.2.7", "@rolldown/binding-linux-arm-gnueabihf": "1.2.7", "@rolldown/binding-linux-arm64-gnu": "1.2.7", "@rolldown/binding-linux-arm64-musl": "1.2.7", "@rolldown/binding-linux-ppc64-gnu": "1.2.7", "@rolldown/binding-linux-s390x-gnu": "1.2.7", "@rolldown/binding-linux-x64-gnu": "1.2.7", "@rolldown/binding-linux-x64-musl": "1.2.7", "@rolldown/binding-openharmony-arm64": "1.2.7", "@rolldown/binding-win32-arm64-msvc": "1.2.7", "@rolldown/binding-win32-x64-msvc": "1.2.7" }, "bin": { "rolldown": "./bin/cli.mjs" } }, "sha512-g0EtLvBjTUB7jhyV0S/TCup3v/XSVl45vUIGbOGU4QPiyjTenCe4mKuFvW9fEgYmS2Fo42AUssRmNuMziXdrig=="],
 
-    "@pandacss/preset-typography/@pandacss/types": ["@pandacss/types@2.1.2", "", {}, "sha512-Vbu+E+PFjrkkJnyofMdxr7q0pzOlM6cUm8mLahUcWtpE8wzK7S/VnGhpFc4YfImvRC52yMt9ViKufYENbYKI2w=="],
+    "@pandacss/dev/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
+    "@pandacss/preset-base/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
+
+    "@pandacss/preset-panda/@pandacss/types": ["@pandacss/types@2.0.1", "", {}, "sha512-e47ROgprzZYEIjHLWcrvz8icw09Xr0yvy/pX9CoBzs293l4/bWDLAViQ1FkAD/ISmFisZj/Sbe4RjoEbdB1hEA=="],
 
     "@rollup/pluginutils/estree-walker": ["estree-walker@2.0.2", "", {}, "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="],
 
