@@ -5,7 +5,6 @@ import { tokenValue, validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 
-import { compileNodeToCSS } from "./compile-node";
 import type { CompileCtx, CompileOptions } from "./options";
 import { compileRecipes } from "./recipes";
 import {
@@ -15,12 +14,13 @@ import {
     compileTextStyles,
     compileThemeTokens,
     compileUtilities,
+    tokenEntry,
 } from "./tokens";
 
 const compileTokenGroups = (
     groups: Record<string, Record<string, Token<ValueNode>>> | undefined,
     ctx: CompileCtx,
-): Record<string, Record<string, { value: string }>> | undefined => {
+) => {
     if (!groups) return undefined;
     // Token definitions use the curly ref form.
     const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
@@ -30,17 +30,53 @@ const compileTokenGroups = (
             Object.fromEntries(
                 Object.entries(entries).map(([name, entry]) => [
                     name,
-                    {
-                        value: compileNodeToCSS(
-                            tokenValue(entry) as ValueNode,
-                            tctx,
-                        ),
-                    },
+                    tokenEntry(entry, tctx),
                 ]),
             ),
         ]),
     );
 };
+
+// Core's color-scheme conditions follow the system preference, and a `.light` or `.dark` class
+// on an ancestor (usually `<html>`) overrides it, so an app can offer a toggle. Panda's own
+// `dark` condition only reads a class, so the preset replaces both.
+const COLOR_SCHEME_CONDITIONS = {
+    dark: {
+        "@media (prefers-color-scheme: dark)": {
+            ":root:not(.light) &": "@slot",
+        },
+        ".dark &": "@slot",
+    },
+    light: {
+        "@media (prefers-color-scheme: light)": {
+            ":root:not(.dark) &": "@slot",
+        },
+        ".light &": "@slot",
+    },
+};
+
+const hasDarkCase = (node: ValueNode): boolean =>
+    node.type === "conditional" &&
+    node.cases.some((c) =>
+        (Array.isArray(c.on) ? c.on : [c.on]).some(
+            (on) => on === "dark" || on === "light",
+        ),
+    );
+
+// Tell the browser which schemes the page supports, so its own controls and scrollbars match.
+// Only emitted when some semantic token actually varies by scheme.
+const colorSchemeCss = (config: CoreConfig) =>
+    Object.values(config.semanticTokens).some((group) =>
+        Object.values(group).some((entry) =>
+            hasDarkCase(tokenValue(entry) as ValueNode),
+        ),
+    )
+        ? {
+              ":root": { colorScheme: "light dark" },
+              ":root.light": { colorScheme: "light" },
+              ":root.dark": { colorScheme: "dark" },
+          }
+        : undefined;
 
 const compileThemeOverride = (override: ThemeOverride, ctx: CompileCtx) => {
     const tokens = compileTokenGroups(override.tokens, ctx);
@@ -91,6 +127,8 @@ export const compilePreset = (
             recipes,
             slotRecipes,
         }),
+        conditions: { extend: COLOR_SCHEME_CONDITIONS },
+        globalCss: colorSchemeCss(config),
         utilities: compileUtilities(ctx),
         themes,
     }) as unknown as Preset;

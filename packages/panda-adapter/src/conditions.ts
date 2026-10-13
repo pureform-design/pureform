@@ -15,6 +15,7 @@ import type {
 } from "@pureform/core/ast";
 
 import { compileNodeToCSS } from "./compile-node";
+import { aliasTarget } from "./css";
 import type { CompileCtx } from "./options";
 
 // Interaction, form, color-scheme, and direction conditions that map to a Panda built-in key.
@@ -122,7 +123,7 @@ export const conditionKey = (condition: Condition, ctx: CompileCtx): string => {
     }
 };
 
-type CondObject = { [key: string]: string | CondObject };
+export type CondObject = { [key: string]: string | CondObject };
 
 const assignNested = (
     target: CondObject,
@@ -164,11 +165,12 @@ export const compileValue = (
     ctx: CompileCtx,
 ): string | CondObject => {
     if (node.type === "conditional") return compileConditional(node, ctx);
-    if (node.type === "alias") {
+    // A token tier emits its own conditional values, so an alias into one stays a token ref.
+    // Anything else that resolves to a conditional (a component token) is unfolded in place.
+    if (node.type === "alias" && aliasTarget(node.path).kind !== "token") {
         const resolved = tokenValue(
             getByPath(ctx.config, node.path),
         ) as ValueNode;
-        // Only unfold when the alias resolves to a conditional; otherwise keep the token ref.
         if (resolved.type === "conditional") {
             return compileConditional(resolved, ctx);
         }

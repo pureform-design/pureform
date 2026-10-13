@@ -1,4 +1,5 @@
 import { defineComponent } from "@pureform/core";
+import { alias, hex, when } from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
 import { describe, expect, it } from "vitest";
 
@@ -112,5 +113,60 @@ describe("compilePreset (boolean variant groups)", () => {
             on: true,
             size: "sm",
         });
+    });
+});
+
+describe("compilePreset (color schemes)", () => {
+    const config = {
+        tokens: {
+            colors: { ink: hex("#111111"), paper: hex("#eeeeee") },
+        },
+        semanticTokens: {
+            colors: {
+                text: when(
+                    "dark",
+                    alias("tokens", "colors", "paper"),
+                    alias("tokens", "colors", "ink"),
+                ),
+            },
+        },
+        components: {
+            label: defineComponent({
+                name: "label",
+                recipe: {
+                    base: { color: alias("semanticTokens", "colors", "text") },
+                },
+            }),
+        },
+    };
+    const preset = compilePreset(config);
+    const theme = obj(preset.theme);
+
+    it("emits a scheme-dependent semantic token as a Panda conditional token", () => {
+        expect(obj(obj(theme.semanticTokens).colors).text).toEqual({
+            value: { base: "{colors.ink}", _dark: "{colors.paper}" },
+        });
+    });
+
+    it("keeps a recipe's alias to that token as a token ref", () => {
+        expect(obj(obj(obj(theme.recipes).label).base).color).toBe(
+            "token(colors.text)",
+        );
+    });
+
+    it("follows the system scheme unless a class overrides it", () => {
+        expect(obj(obj(preset.conditions).extend).dark).toEqual({
+            "@media (prefers-color-scheme: dark)": {
+                ":root:not(.light) &": "@slot",
+            },
+            ".dark &": "@slot",
+        });
+    });
+
+    it("declares both schemes to the browser only when a token varies by scheme", () => {
+        expect(obj(preset.globalCss)[":root"]).toEqual({
+            colorScheme: "light dark",
+        });
+        expect(compilePreset(buttonConfig).globalCss).toBeUndefined();
     });
 });

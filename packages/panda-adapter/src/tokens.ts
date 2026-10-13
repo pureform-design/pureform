@@ -6,6 +6,8 @@ import type { StyleMap, ValueNode } from "@pureform/core/ast";
 import type { Token, UtilityDef } from "@pureform/core/types";
 
 import { compileNodeToCSS } from "./compile-node";
+import { compileConditional } from "./conditions";
+import type { CondObject } from "./conditions";
 import type { CompileCtx } from "./options";
 import { compileStyleMap } from "./style-map";
 
@@ -19,12 +21,23 @@ const CATEGORY: Record<string, string> = {
     borderWidth: "borderWidths",
 };
 
-type PandaToken = { value: string };
+type PandaToken = { value: string | CondObject };
 type PandaTokenGroup = Record<string, PandaToken>;
 
-const tokenEntry = (entry: Token<ValueNode>, ctx: CompileCtx): PandaToken => ({
-    value: compileNodeToCSS(tokenValue(entry) as ValueNode, ctx),
-});
+// A conditional token, for example a color with a dark-scheme case, becomes Panda's
+// conditional token value (`{ base, _dark }`), which Panda emits as one CSS var per condition.
+export const tokenEntry = (
+    entry: Token<ValueNode>,
+    ctx: CompileCtx,
+): PandaToken => {
+    const node = tokenValue(entry) as ValueNode;
+    return {
+        value:
+            node.type === "conditional"
+                ? compileConditional(node, ctx)
+                : compileNodeToCSS(node, ctx),
+    };
+};
 
 const groupToPanda = (
     group: Record<string, Token<ValueNode>>,

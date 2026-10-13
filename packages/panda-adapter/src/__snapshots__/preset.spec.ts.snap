@@ -2,6 +2,22 @@
 
 exports[`compilePreset (canonical button) > produces a stable Panda preset shape 1`] = `
 {
+  "conditions": {
+    "extend": {
+      "dark": {
+        ".dark &": "@slot",
+        "@media (prefers-color-scheme: dark)": {
+          ":root:not(.light) &": "@slot",
+        },
+      },
+      "light": {
+        ".light &": "@slot",
+        "@media (prefers-color-scheme: light)": {
+          ":root:not(.dark) &": "@slot",
+        },
+      },
+    },
+  },
   "name": "pureform",
   "theme": {
     "breakpoints": {
