@@ -13,6 +13,16 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         "paddingInlineStart": "token(spacing.4)",
         "position": "relative",
       },
+      "touchTarget": {
+        "height": "100%",
+        "left": "50%",
+        "minHeight": "token(sizes.touchTarget)",
+        "minWidth": "token(sizes.touchTarget)",
+        "position": "absolute",
+        "top": "50%",
+        "transform": "translate(-50%, -50%)",
+        "width": "100%",
+      },
     },
     "className": "card",
     "compoundVariants": [
@@ -93,6 +103,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
     ],
     "slots": [
       "root",
+      "touchTarget",
     ],
     "variants": {
       "interactive": {

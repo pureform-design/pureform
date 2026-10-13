@@ -1,7 +1,8 @@
 // The pureform card: a Material surface that groups related content.
 //
 // A card is static by default. Set `interactive` when the whole card is clickable; it then
-// takes a state layer, lifts on hover, and dims when disabled.
+// takes a state layer, lifts on hover, and dims when disabled. Render the touch target slot in
+// an interactive card so even a small card meets the Material minimum hit area.
 
 import { defineSlotComponent } from "@pureform/core";
 import {
@@ -16,7 +17,7 @@ import {
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 
 import { stateLayer } from "../state-layer";
-import { disabledColor, sys } from "./shared";
+import { disabledColor, sys, touchTarget } from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
 
@@ -86,7 +87,7 @@ export const card = defineSlotComponent({
         description:
             "Material card. Set interactive when the whole card is clickable.",
     },
-    slots: ["root"],
+    slots: ["root", "touchTarget"],
     recipe: {
         base: {
             root: {
@@ -98,6 +99,7 @@ export const card = defineSlotComponent({
                 paddingInlineStart: alias("tokens", "spacing", "4"),
                 paddingInlineEnd: alias("tokens", "spacing", "4"),
             },
+            touchTarget,
         },
         variants: {
             variant: {
