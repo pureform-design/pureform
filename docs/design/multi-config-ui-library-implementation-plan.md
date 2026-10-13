@@ -348,11 +348,8 @@ Revisit both once Layers 1 and 2 are proven in `apps/solid-demo`.
 
 ## 10. Cross-cutting concerns
 
-- **Catalog discipline.** Every new third-party dependency goes through the root
-  `package.json` catalog (`catalog:` refs). Do not pin inline. Workspace packages are the
-  exception: reference them with `workspace:^` directly and never add them to the catalog.
-  bun 1.4.2 can't re-resolve a catalog entry that points to `workspace:^`, so editing one
-  breaks `bun install` with `Workspace dependency "X" not found`.
+- **Catalog discipline.** Every new dependency goes through the root `package.json`
+  catalog (`catalog:` refs), matching existing packages. Do not pin inline.
 - **Keep `project.omni.yaml` in sync, especially dependencies.** Each package's
   `project.omni.yaml` declares the omni project graph that drives task ordering and
   caching. Whenever a package gains or drops a workspace dependency in its
