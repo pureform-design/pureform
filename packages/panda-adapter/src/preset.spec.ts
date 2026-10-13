@@ -1,3 +1,4 @@
+import { defineComponent } from "@pureform/core";
 import { buttonConfig } from "@pureform/core/fixtures/button";
 import { describe, expect, it } from "vitest";
 
@@ -75,5 +76,41 @@ describe("compilePreset (canonical button)", () => {
     it("defines the elevation utility with its steps", () => {
         const util = obj(obj(preset.utilities).shadowElevation);
         expect(util.values).toEqual(["level0", "level1", "level2"]);
+    });
+});
+
+describe("compilePreset (boolean variant groups)", () => {
+    const toggle = defineComponent({
+        name: "toggle",
+        recipe: {
+            base: {},
+            variants: {
+                on: { true: {}, false: {} },
+                size: { sm: {}, md: {} },
+            },
+            compoundVariants: [
+                { match: { on: "true", size: "sm" }, style: {} },
+            ],
+            defaultVariants: { on: "false", size: "md" },
+        },
+    });
+    const recipe = obj(
+        obj(
+            obj(
+                compilePreset({
+                    tokens: {},
+                    semanticTokens: {},
+                    components: { toggle },
+                }).theme,
+            ).recipes,
+        ).toggle,
+    );
+
+    it("spells boolean selections as booleans so Panda's runtime matches them", () => {
+        expect(recipe.defaultVariants).toEqual({ on: false, size: "md" });
+        expect(req((recipe.compoundVariants as Obj[])[0])).toMatchObject({
+            on: true,
+            size: "sm",
+        });
     });
 });

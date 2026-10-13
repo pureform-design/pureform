@@ -31,10 +31,26 @@ const hints = (spec: AnyComponentSpec): PandaHints => {
     };
 };
 
+// Core keys a boolean variant group by the strings "true" and "false". Panda types such a group
+// as a boolean and its runtime compares selections strictly, so a compound match or default
+// left as a string never matches `recipe({ flag: true })`.
+const toPandaSelection = (value: string): string | boolean =>
+    value === "true" ? true : value === "false" ? false : value;
+
+const toPandaSelections = (
+    selections: Record<string, string>,
+): Record<string, string | boolean> =>
+    Object.fromEntries(
+        Object.entries(selections).map(([group, value]) => [
+            group,
+            toPandaSelection(value),
+        ]),
+    );
+
 const compoundOf = (
     match: Record<string, string>,
     css: Record<string, unknown>,
-): Record<string, unknown> => ({ ...match, css });
+): Record<string, unknown> => ({ ...toPandaSelections(match), css });
 
 const compileRecipe = (spec: ComponentSpec, ctx: CompileCtx) => {
     const { className, jsx } = hints(spec);
@@ -61,7 +77,7 @@ const compileRecipe = (spec: ComponentSpec, ctx: CompileCtx) => {
         compoundVariants: (spec.recipe.compoundVariants ?? []).map((cv) =>
             compoundOf(cv.match, compileStyleMap(cv.style, ctx)),
         ),
-        defaultVariants: spec.recipe.defaultVariants ?? {},
+        defaultVariants: toPandaSelections(spec.recipe.defaultVariants ?? {}),
     };
 };
 
@@ -107,7 +123,7 @@ const compileSlotRecipe = (spec: SlottedComponentSpec, ctx: CompileCtx) => {
         compoundVariants: (spec.recipe.compoundVariants ?? []).map((cv) =>
             compoundOf(cv.match, compileSlotStyles(cv.style, ctx)),
         ),
-        defaultVariants: spec.recipe.defaultVariants ?? {},
+        defaultVariants: toPandaSelections(spec.recipe.defaultVariants ?? {}),
     };
 };
 
