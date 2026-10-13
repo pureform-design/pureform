@@ -17,7 +17,7 @@
         }
     },
     "dependencies": {
-        "@pureform/core": "workspace:^"
+        "@pureform/core": "catalog:"
     },
     "devDependencies": {
         "@pandacss/types": "catalog:",

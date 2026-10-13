@@ -18,7 +18,7 @@
       "name": "example-fullstack-tanstack",
       "version": "0.0.0",
       "dependencies": {
-        "@pureform/js-effects": "workspace:^",
+        "@pureform/js-effects": "catalog:",
         "@remix-run/cookie": "catalog:",
         "@solidjs/meta": "catalog:",
         "@solidjs/web": "catalog:",
@@ -33,9 +33,9 @@
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
-        "@pureform/core": "workspace:^",
-        "@pureform/material": "workspace:^",
-        "@pureform/panda-adapter": "workspace:^",
+        "@pureform/core": "catalog:",
+        "@pureform/material": "catalog:",
+        "@pureform/panda-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
@@ -72,7 +72,7 @@
       "name": "@pureform/js-effects",
       "version": "0.0.0-semantically-released",
       "dependencies": {
-        "@pureform/material": "workspace:^",
+        "@pureform/material": "catalog:",
       },
       "devDependencies": {
         "@pureform/tsconfig": "catalog:",
@@ -88,7 +88,7 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@material/material-color-utilities": "catalog:",
-        "@pureform/core": "workspace:^",
+        "@pureform/core": "catalog:",
         "@pureform/utils": "catalog:",
         "chroma-js": "catalog:",
       },
@@ -123,7 +123,7 @@
       "name": "@pureform/panda-adapter",
       "version": "0.0.0-semantically-released",
       "dependencies": {
-        "@pureform/core": "workspace:^",
+        "@pureform/core": "catalog:",
       },
       "devDependencies": {
         "@pandacss/types": "catalog:",
@@ -167,12 +167,12 @@
       "name": "@pureform/utils",
       "version": "0.0.0-semantically-released",
       "dependencies": {
-        "@pureform/type-utils": "workspace:*",
+        "@pureform/type-utils": "catalog:",
       },
       "devDependencies": {
-        "@pureform/tsconfig": "workspace:^",
-        "@pureform/vite-config": "workspace:^",
-        "@pureform/vitest-config": "workspace:^",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
@@ -214,9 +214,12 @@
     "@pandacss/preset-typography": "^2.0.1",
     "@pandacss/types": "^2.0.1",
     "@pandacss/vite": "^2.0.1",
+    "@pureform/core": "workspace:^",
     "@pureform/js-effects": "workspace:^",
+    "@pureform/material": "workspace:^",
     "@pureform/oxfmt-config": "workspace:^",
     "@pureform/oxlint-config": "workspace:^",
+    "@pureform/panda-adapter": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
     "@pureform/type-utils": "workspace:^",
     "@pureform/utils": "workspace:^",

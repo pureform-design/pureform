@@ -13,7 +13,7 @@
         "lint": "oxlint src"
     },
     "dependencies": {
-        "@pureform/js-effects": "workspace:^",
+        "@pureform/js-effects": "catalog:",
         "@remix-run/cookie": "catalog:",
         "@solidjs/meta": "catalog:",
         "@solidjs/web": "catalog:",
@@ -28,9 +28,9 @@
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
-        "@pureform/core": "workspace:^",
-        "@pureform/material": "workspace:^",
-        "@pureform/panda-adapter": "workspace:^",
+        "@pureform/core": "catalog:",
+        "@pureform/material": "catalog:",
+        "@pureform/panda-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",

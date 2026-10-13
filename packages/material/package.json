@@ -18,7 +18,7 @@
     },
     "dependencies": {
         "@material/material-color-utilities": "catalog:",
-        "@pureform/core": "workspace:^",
+        "@pureform/core": "catalog:",
         "@pureform/utils": "catalog:",
         "chroma-js": "catalog:"
     },
