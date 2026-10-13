@@ -11,6 +11,15 @@ export default defineConfig({
     // Whether to use css reset
     preflight: true,
 
+    // pureform leaves document styling to the app: paint the page with the palette's canvas
+    // pair so components sit on the surface they were designed for.
+    globalCss: {
+        "html, body": {
+            backgroundColor: "canvas",
+            color: "onCanvas",
+        },
+    },
+
     // Allow only tokens to properties with predefined tokens
     //strictTokens: true,
 
