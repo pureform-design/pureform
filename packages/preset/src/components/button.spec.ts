@@ -27,11 +27,14 @@ describe("button", () => {
         );
         expect(filledPrimary?.style.root?.color).toEqual({
             type: "alias",
-            path: ["tokens", "colors", "onPrimary"],
+            path: ["semanticTokens", "colors", "onPrimary"],
         });
         expect(filledPrimary?.style.root?.backgroundColor).toMatchObject({
             type: "conditional",
-            base: { type: "alias", path: ["tokens", "colors", "primary"] },
+            base: {
+                type: "alias",
+                path: ["semanticTokens", "colors", "primary"],
+            },
         });
     });
 

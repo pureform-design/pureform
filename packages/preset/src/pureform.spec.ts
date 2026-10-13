@@ -15,8 +15,20 @@ describe("pureform", () => {
 
     it("regenerates the palette from the seed", () => {
         expect(
-            pureform({ seed: "#006A60" }).tokens.colors?.primary,
-        ).not.toEqual(pureform().tokens.colors?.primary);
+            pureform({ seed: "#006A60" }).tokens.colors?.primaryLight,
+        ).not.toEqual(pureform().tokens.colors?.primaryLight);
+    });
+
+    it("ships both schemes by default", () => {
+        const preset = compilePreset(pureform());
+        const colors = (preset.theme?.semanticTokens?.colors ?? {}) as Record<
+            string,
+            { value: unknown }
+        >;
+        expect(colors.primary?.value).toEqual({
+            base: "{colors.primaryLight}",
+            _dark: "{colors.primaryDark}",
+        });
     });
 
     it("compiles to a Panda preset with every slot recipe", () => {

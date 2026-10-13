@@ -9,7 +9,7 @@ import { defineConfig, mergeConfigs } from "@pureform/core";
 import { alias } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { elevation, palette, typescale } from "@pureform/material";
-import type { ColorSchemeMode, HexColor } from "@pureform/material";
+import type { HexColor, PaletteMode } from "@pureform/material";
 
 import { button } from "./components/button";
 import { card } from "./components/card";
@@ -21,15 +21,17 @@ import { stateLayerTokens } from "./state-layer";
 export interface PureformOptions {
     /** Seed color the whole palette is generated from. Default Material's baseline purple. */
     seed?: HexColor;
-    /** Which scheme mode the palette is generated for. Default `"light"`. */
-    mode?: ColorSchemeMode;
+    /** Which schemes to generate. Default `"both"`: the page follows the system preference,
+     *  and a `.light` or `.dark` class on `<html>` overrides it. A single mode fixes the scheme
+     *  at build time. */
+    mode?: PaletteMode;
 }
 
 const DEFAULT_SEED: HexColor = "#6750A4";
 
 /** Build the full pureform config. Every alias resolves, or this throws naming the bad path. */
 export const pureform = (options: PureformOptions = {}): CoreConfig => {
-    const { seed = DEFAULT_SEED, mode = "light" } = options;
+    const { seed = DEFAULT_SEED, mode = "both" } = options;
 
     return defineConfig(
         mergeConfigs(

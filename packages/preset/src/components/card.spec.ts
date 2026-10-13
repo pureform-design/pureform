@@ -14,7 +14,7 @@ describe("card", () => {
             card.recipe.variants?.variant?.filled?.root?.backgroundColor,
         ).toEqual({
             type: "alias",
-            path: ["tokens", "colors", "surfaceContainerHighest"],
+            path: ["semanticTokens", "colors", "surfaceContainerHighest"],
         });
         const interactiveFilled = card.recipe.compoundVariants?.find(
             (c) =>

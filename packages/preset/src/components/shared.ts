@@ -31,8 +31,10 @@ export type ColorGroup = (typeof COLOR_GROUPS)[number];
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-/** A Material system color from the palette, for example `sys("onPrimary")`. */
-export const sys = (name: string): AliasNode => alias("tokens", "colors", name);
+/** A Material system color from the palette, for example `sys("onPrimary")`. It reads the
+ *  semantic token, so it follows the light or dark scheme. */
+export const sys = (name: string): AliasNode =>
+    alias("semanticTokens", "colors", name);
 
 /** The content color drawn on a group's main color, for example `onPrimary`. */
 export const on = (name: string): AliasNode => sys(`on${capitalize(name)}`);
