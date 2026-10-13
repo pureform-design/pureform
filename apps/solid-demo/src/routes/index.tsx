@@ -28,13 +28,16 @@ function IndexRoute() {
                         return (
                             <button class={b.root} type="button">
                                 <span class={b.touchTarget} />
-                                <span class={b.label}>{variant}</span>
+                                <span class={b.label}>
+                                    {variant.toUpperCase()}
+                                </span>
                             </button>
                         );
                     }}
                 </For>
                 <button class={button().root} type="button" disabled>
-                    <span class={button().label}>disabled</span>
+                    <span class={button().touchTarget} />
+                    <span class={button().label}>DISABLED</span>
                 </button>
             </section>
 
@@ -59,6 +62,15 @@ function IndexRoute() {
                         );
                     }}
                 </For>
+                <button class={iconButton().root} type="button" disabled>
+                    <span class={iconButton().touchTarget} />
+                    <svg class={iconButton().icon} viewBox="0 0 24 24">
+                        <path
+                            fill="currentColor"
+                            d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                        />
+                    </svg>
+                </button>
             </section>
 
             <section style={row}>
