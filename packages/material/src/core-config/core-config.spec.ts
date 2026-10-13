@@ -1,4 +1,5 @@
-import { mergeConfigs, tokenValue } from "@pureform/core";
+import { defineConfig, mergeConfigs, tokenValue } from "@pureform/core";
+import { alias } from "@pureform/core/ast";
 import type { ScalarNode } from "@pureform/core/ast";
 import type { CoreConfig, Token } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
@@ -79,6 +80,51 @@ describe("elevation", () => {
             expect(boxShadow.layers).toHaveLength(3);
         }
     });
+
+    it("draws each layer from the shadow color and its opacity token", () => {
+        const util = elevation().utilities?.shadowElevation;
+        if (util?.kind !== "static") throw new Error("expected static utility");
+        const boxShadow = util.values.level1?.boxShadow;
+        if (!boxShadow || !("layers" in boxShadow)) {
+            throw new Error("expected a layered shadow");
+        }
+        expect(boxShadow.layers[0]?.color).toEqual({
+            type: "colorMix",
+            space: "srgb",
+            base: { type: "keyword", value: "transparent" },
+            with: {
+                type: "alias",
+                path: ["semanticTokens", "colors", "elevationShadow"],
+            },
+            amount: {
+                type: "alias",
+                path: ["tokens", "opacity", "elevationUmbra"],
+            },
+        });
+    });
+
+    it("emits the layer opacities as percent tokens", () => {
+        expect(elevation().tokens.opacity?.elevationPenumbra).toEqual({
+            type: "numeric",
+            value: 14,
+            unit: "%",
+        });
+    });
+
+    it("binds the shadow color to the Material shadow by default", () => {
+        expect(elevation().semanticTokens.colors?.elevationShadow).toEqual({
+            type: "alias",
+            path: ["tokens", "colors", "shadow"],
+        });
+    });
+
+    it("accepts a custom shadow color", () => {
+        const custom = alias("tokens", "colors", "ink");
+        expect(
+            elevation({ shadowColor: custom }).semanticTokens.colors
+                ?.elevationShadow,
+        ).toBe(custom);
+    });
 });
 
 describe("fragments compose with mergeConfigs", () => {
@@ -92,5 +138,7 @@ describe("fragments compose with mergeConfigs", () => {
         expect(asColor(merged.tokens.colors?.primary)?.type).toBe("color");
         expect(merged.semanticTokens.colors?.brand).toBeDefined();
         expect(merged.utilities?.shadowElevation).toBeDefined();
+        // Every alias the elevation layers use resolves once a palette is composed in.
+        expect(() => defineConfig(merged)).not.toThrow();
     });
 });
