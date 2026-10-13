@@ -1,0 +1,138 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`card > compiles to a stable Panda slot recipe 1`] = `
+{
+  "card": {
+    "base": {
+      "root": {
+        "borderRadius": "token(radii.medium)",
+        "color": "token(colors.onSurface)",
+        "paddingBlockEnd": "token(spacing.4)",
+        "paddingBlockStart": "token(spacing.4)",
+        "paddingInlineEnd": "token(spacing.4)",
+        "paddingInlineStart": "token(spacing.4)",
+        "position": "relative",
+      },
+    },
+    "className": "card",
+    "compoundVariants": [
+      {
+        "css": {
+          "root": {
+            "_disabled": {
+              "backgroundColor": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.onSurface) token(opacity.disabledContainer))",
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "shadowElevation": "level0",
+            },
+            "_hover": {
+              "shadowElevation": "level2",
+            },
+            "backgroundColor": {
+              "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.onSurface) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.onSurface) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.onSurface) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerLow)",
+            },
+          },
+        },
+        "interactive": "true",
+        "variant": "elevated",
+      },
+      {
+        "css": {
+          "root": {
+            "_disabled": {
+              "backgroundColor": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurface) token(opacity.disabledContainer))",
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "shadowElevation": "level0",
+            },
+            "_hover": {
+              "shadowElevation": "level1",
+            },
+            "backgroundColor": {
+              "_active": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurface) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurface) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurface) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerHighest)",
+            },
+          },
+        },
+        "interactive": "true",
+        "variant": "filled",
+      },
+      {
+        "css": {
+          "root": {
+            "_disabled": {
+              "backgroundColor": "color-mix(in srgb, token(colors.surface), token(colors.onSurface) token(opacity.disabledContainer))",
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "shadowElevation": "level0",
+            },
+            "_hover": {
+              "shadowElevation": "level1",
+            },
+            "backgroundColor": {
+              "_active": "color-mix(in srgb, token(colors.surface), token(colors.onSurface) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.surface), token(colors.onSurface) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.surface), token(colors.onSurface) token(opacity.stateHover))",
+              "base": "token(colors.surface)",
+            },
+          },
+        },
+        "interactive": "true",
+        "variant": "outlined",
+      },
+    ],
+    "defaultVariants": {
+      "interactive": "false",
+      "variant": "elevated",
+    },
+    "jsx": [
+      "Card",
+    ],
+    "slots": [
+      "root",
+    ],
+    "variants": {
+      "interactive": {
+        "false": {
+          "root": {},
+        },
+        "true": {
+          "root": {
+            "_disabled": {
+              "pointerEvents": "none",
+            },
+            "cursor": "pointer",
+          },
+        },
+      },
+      "variant": {
+        "elevated": {
+          "root": {
+            "backgroundColor": "token(colors.surfaceContainerLow)",
+            "shadowElevation": "level1",
+          },
+        },
+        "filled": {
+          "root": {
+            "backgroundColor": "token(colors.surfaceContainerHighest)",
+            "shadowElevation": "level0",
+          },
+        },
+        "outlined": {
+          "root": {
+            "backgroundColor": "token(colors.surface)",
+            "outlineColor": "token(colors.outlineVariant)",
+            "outlineOffset": "-1px",
+            "outlineStyle": "solid",
+            "outlineWidth": "1px",
+            "shadowElevation": "level0",
+          },
+        },
+      },
+    },
+  },
+}
+`;
