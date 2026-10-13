@@ -10,6 +10,7 @@ describe("pureform", () => {
             "iconButton",
             "card",
             "scrim",
+            "ripple",
         ]);
     });
 
@@ -38,6 +39,7 @@ describe("pureform", () => {
             "iconButton",
             "card",
             "scrim",
+            "ripple",
         ]);
     });
 });

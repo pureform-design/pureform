@@ -14,6 +14,7 @@ import type { HexColor, PaletteMode } from "@pureform/material";
 import { button } from "./components/button";
 import { card } from "./components/card";
 import { iconButton } from "./components/icon-button";
+import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { foundation } from "./foundation";
 import { stateLayerTokens } from "./state-layer";
@@ -44,7 +45,7 @@ export const pureform = (options: PureformOptions = {}): CoreConfig => {
             stateLayerTokens(),
             {
                 componentBaseStyles: { fontFamily: alias("fonts", "plain") },
-                components: { button, iconButton, card, scrim },
+                components: { button, iconButton, card, scrim, ripple },
             },
         ),
     );
