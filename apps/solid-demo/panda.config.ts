@@ -37,6 +37,7 @@ export default defineConfig({
             iconButton: ["*"],
             card: ["*"],
             scrim: ["*"],
+            ripple: ["*"],
         },
     },
 

@@ -3,6 +3,8 @@ import type { JSX } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import { For, createStore } from "solid-js";
 
+import { Ripple } from "../lib/ripple";
+
 export const Route = createFileRoute("/tokens")({
     head: () => ({ meta: [{ title: "Component tokens" }] }),
     component: TokensRoute,
@@ -339,6 +341,7 @@ function TokensRoute() {
                             return (
                                 <button class={b.root} type="button">
                                     <span class={b.touchTarget} />
+                                    <Ripple />
                                     <svg class={b.icon} viewBox="0 0 24 24">
                                         <path fill="currentColor" d={STAR} />
                                     </svg>
@@ -370,6 +373,7 @@ function TokensRoute() {
                                     aria-label={variant}
                                 >
                                     <span class={b.touchTarget} />
+                                    <Ripple centered />
                                     <svg class={b.icon} viewBox="0 0 24 24">
                                         <path fill="currentColor" d={STAR} />
                                     </svg>
@@ -386,6 +390,7 @@ function TokensRoute() {
                             return (
                                 <div class={c.root} role="button" tabindex={0}>
                                     <span class={c.touchTarget} />
+                                    <Ripple />
                                     {variant} card
                                 </div>
                             );

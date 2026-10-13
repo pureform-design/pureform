@@ -2,6 +2,8 @@ import { button, card, iconButton, scrim } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
 import { For } from "solid-js";
 
+import { Ripple } from "../lib/ripple";
+
 export const Route = createFileRoute("/")({
     component: IndexRoute,
 });
@@ -28,6 +30,7 @@ function IndexRoute() {
                         return (
                             <button class={b.root} type="button">
                                 <span class={b.touchTarget} />
+                                <Ripple />
                                 <span class={b.label}>
                                     {variant.toUpperCase()}
                                 </span>
@@ -52,6 +55,7 @@ function IndexRoute() {
                                 aria-label={variant}
                             >
                                 <span class={b.touchTarget} />
+                                <Ripple centered />
                                 <svg class={b.icon} viewBox="0 0 24 24">
                                     <path
                                         fill="currentColor"
@@ -86,6 +90,7 @@ function IndexRoute() {
                     role="button"
                     tabindex={0}
                 >
+                    <Ripple />
                     interactive card
                 </div>
             </section>
