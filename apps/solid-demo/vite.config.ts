@@ -49,6 +49,9 @@ export default defineConfig({
             toPath: (file) => "/api" + routePathFromFile(file),
         }),
     ],
+    resolve: {
+        tsconfigPaths: true,
+    },
     server: {
         port: 3000,
     },

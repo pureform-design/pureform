@@ -1,16 +1,15 @@
 import { defineConfig } from "@pandacss/dev";
-import { pureformPreset } from "@pureform/pandacss-preset";
+import basePreset from "@pandacss/preset-base";
+import pandaPreset from "@pandacss/preset-panda";
+import typographyPreset from "@pandacss/preset-typography";
 
 import { pureformGeneratedPreset } from "./panda.pureform-generated";
 
 export default defineConfig({
     presets: [
-        pureformPreset({
-            colors: {
-                source: "#AD32F0",
-            },
-            prefix: "pf",
-        }),
+        basePreset,
+        pandaPreset,
+        typographyPreset(),
         pureformGeneratedPreset,
     ],
 

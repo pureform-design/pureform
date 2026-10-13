@@ -29,6 +29,9 @@
       },
       "devDependencies": {
         "@pandacss/dev": "catalog:",
+        "@pandacss/preset-base": "catalog:",
+        "@pandacss/preset-panda": "catalog:",
+        "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/core": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
@@ -539,6 +542,8 @@
     "@pandacss/preset-base": ["@pandacss/preset-base@2.0.1", "", { "dependencies": { "@pandacss/types": "2.0.1" } }, "sha512-kqnBbdjBOio+x2kRBs6RB3iRvSyYCgoKcVCKIJgN7JUmFvK/72Fr1stJxmZbpvG7rev6q2FrE18fAzGITERfUg=="],
 
     "@pandacss/preset-panda": ["@pandacss/preset-panda@2.0.1", "", { "dependencies": { "@pandacss/types": "2.0.1" } }, "sha512-1tU7WWzZ7k5WoAtv0xSgTG07yamynmJ1nJUJMY6d2G5LzzLAfanwwMocXf4aGmy5y9xd6hXkkEWVY8Dp7W/dpA=="],
+
+    "@pandacss/preset-typography": ["@pandacss/preset-typography@2.1.2", "", { "dependencies": { "@pandacss/types": "2.1.2" } }, "sha512-SJnAAnSi/ETtZl1/SGqFfC0OnC6MQmABFo1DAq6UGDUSAfWhSOGDeuKsY/7WVp9JxZyfsudI0dIvHvgAln5trw=="],
 
     "@pandacss/transformer": ["@pandacss/transformer@2.0.1", "", { "dependencies": { "@pandacss/compiler": "2.0.1", "@pandacss/compiler-shared": "2.0.1", "unplugin": "^2.3.11" }, "peerDependencies": { "rollup": ">=3.0.0", "vite": ">=6.0.0", "webpack": ">=5.0.0" }, "optionalPeers": ["rollup", "vite", "webpack"] }, "sha512-OmIe7uc7jX/y7nEUWFtQMkS4URnyK0A7ninoSVT7SrSrpi2AYY7fkZRJk2wVDCuKquuHkRbzdzTFuv/r6sPtyw=="],
 
@@ -1321,6 +1326,8 @@
     "@pandacss/config/magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
 
     "@pandacss/config/rolldown": ["rolldown@1.2.7", "", { "dependencies": { "@oxc-project/types": "=0.148.0", "@rolldown/pluginutils": "^1.0.0" }, "optionalDependencies": { "@rolldown/binding-android-arm-eabi": "1.2.7", "@rolldown/binding-android-arm64": "1.2.7", "@rolldown/binding-darwin-arm64": "1.2.7", "@rolldown/binding-darwin-x64": "1.2.7", "@rolldown/binding-freebsd-x64": "1.2.7", "@rolldown/binding-linux-arm-gnueabihf": "1.2.7", "@rolldown/binding-linux-arm64-gnu": "1.2.7", "@rolldown/binding-linux-arm64-musl": "1.2.7", "@rolldown/binding-linux-ppc64-gnu": "1.2.7", "@rolldown/binding-linux-s390x-gnu": "1.2.7", "@rolldown/binding-linux-x64-gnu": "1.2.7", "@rolldown/binding-linux-x64-musl": "1.2.7", "@rolldown/binding-openharmony-arm64": "1.2.7", "@rolldown/binding-win32-arm64-msvc": "1.2.7", "@rolldown/binding-win32-x64-msvc": "1.2.7" }, "bin": { "rolldown": "./bin/cli.mjs" } }, "sha512-g0EtLvBjTUB7jhyV0S/TCup3v/XSVl45vUIGbOGU4QPiyjTenCe4mKuFvW9fEgYmS2Fo42AUssRmNuMziXdrig=="],
+
+    "@pandacss/preset-typography/@pandacss/types": ["@pandacss/types@2.1.2", "", {}, "sha512-Vbu+E+PFjrkkJnyofMdxr7q0pzOlM6cUm8mLahUcWtpE8wzK7S/VnGhpFc4YfImvRC52yMt9ViKufYENbYKI2w=="],
 
     "@rollup/pluginutils/estree-walker": ["estree-walker@2.0.2", "", {}, "sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w=="],
 
