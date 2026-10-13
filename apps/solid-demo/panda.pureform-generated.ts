@@ -18,7 +18,10 @@ const ui = palette("#AD32F0", { space: "oklch" });
 const demoConfig = mergeConfigs(
     buttonConfig,
     // Feed the generated primitives in as additional color tokens.
-    { tokens: { colors: ui.tokens.colors } },
+    {
+        tokens: { colors: ui.tokens.colors },
+        semanticTokens: { colors: ui.semanticTokens.colors },
+    },
     // Replace the elevation utility with the Material-generated one.
     elevation(),
     // Drive the button's brand from the generated palette.
