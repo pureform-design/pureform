@@ -6,9 +6,8 @@ extends:
 
 dependencies:
   append:
-    - "@pureform/core"
     - "@pureform/panda-adapter"
-    - "@pureform/material"
+    - "@pureform/preset"
     - "@pureform/js-effects"
     - "@pureform/tsconfig"
     - "@pureform/vite-config"

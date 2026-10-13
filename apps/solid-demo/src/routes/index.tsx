@@ -1,24 +1,95 @@
-import { button as pureformButton } from "$recipes";
+import { button, card, iconButton, scrim } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
+import { For } from "solid-js";
 
 export const Route = createFileRoute("/")({
     component: IndexRoute,
 });
 
-function IndexRoute() {
-    // Button styled entirely from adapter-generated output (the pureform CoreConfig compiled
-    // to this Panda preset by @pureform/panda-adapter).
-    const button = pureformButton({
-        color: "brand",
-        variant: "solid",
-        size: "lg",
-    });
+const FILLS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
+const ICON_FILLS = [
+    "filled",
+    "tonal",
+    "outlined",
+    "standard",
+    "elevated",
+] as const;
+const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
+const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
+
+function IndexRoute() {
     return (
-        <>
-            <button class={button.root} type="button">
-                <span class={button.label}>Generated button</span>
-            </button>
-        </>
+        <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={row}>
+                <For each={FILLS}>
+                    {(variant) => {
+                        const b = button({ variant });
+                        return (
+                            <button class={b.root} type="button">
+                                <span class={b.touchTarget} />
+                                <span class={b.label}>{variant}</span>
+                            </button>
+                        );
+                    }}
+                </For>
+                <button class={button().root} type="button" disabled>
+                    <span class={button().label}>disabled</span>
+                </button>
+            </section>
+
+            <section style={row}>
+                <For each={ICON_FILLS}>
+                    {(variant) => {
+                        const b = iconButton({ variant });
+                        return (
+                            <button
+                                class={b.root}
+                                type="button"
+                                aria-label={variant}
+                            >
+                                <span class={b.touchTarget} />
+                                <svg class={b.icon} viewBox="0 0 24 24">
+                                    <path
+                                        fill="currentColor"
+                                        d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                    />
+                                </svg>
+                            </button>
+                        );
+                    }}
+                </For>
+            </section>
+
+            <section style={row}>
+                <For each={CARD_FILLS}>
+                    {(variant) => (
+                        <div class={card({ variant }).root}>{variant} card</div>
+                    )}
+                </For>
+                <div
+                    class={
+                        card({ variant: "elevated", interactive: true }).root
+                    }
+                    role="button"
+                    tabindex={0}
+                >
+                    interactive card
+                </div>
+            </section>
+
+            <section
+                style={{
+                    position: "relative",
+                    width: "240px",
+                    height: "120px",
+                }}
+            >
+                <div class={card({ variant: "filled" }).root}>
+                    content under a scrim
+                </div>
+                <div class={scrim().root} />
+            </section>
+        </main>
     );
 }

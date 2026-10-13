@@ -105,9 +105,9 @@ type CompoundVariants = NonNullable<SlottedSpec["recipe"]["compoundVariants"]>;
 
 /** One compound variant per color group and variant, setting the root's state-layered
  *  container, its content color, and its disabled colors. `fills` maps each variant name to
- *  how it fills. The disabled colors live here rather than on the variant because Panda emits
- *  compound variants as atomic utilities, which outrank recipe variants: a disabled color on
- *  the variant would lose to the compound's resting color. */
+ *  how it fills. The disabled colors live here rather than on the variant because Panda puts
+ *  compound variants in a cascade layer after the variants layer: a disabled color on the
+ *  variant would lose to the compound's resting color. */
 export const colorCompounds = (fills: Record<string, Fill>): CompoundVariants =>
     Object.entries(fills).flatMap(([variant, fill]) =>
         COLOR_GROUPS.map((color) => {

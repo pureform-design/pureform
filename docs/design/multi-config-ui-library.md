@@ -2637,6 +2637,10 @@ Each is additive / non-breaking, though not all are pure union widenings):
 - **Scroll- or view-driven animation timelines.** A genuine _structural_ addition (extra
   fields on `AnimationNode` or a new node, plus a portability story), not vocabulary.
   Deferred until a real component needs motion tied to scroll/visibility rather than time.
+- **Ripple.** `pf-ripple-layer` positions and sizes its ripple from CSS variables that
+  JavaScript sets on each press, and tints it with `currentColor`. Both are runtime
+  behavior, so the ripple belongs to Layer 4 (`@pureform/solid`), which can drive the
+  press origin. Deferred until then; the state layer covers press feedback meanwhile.
 
 **B. Not a core gap** (reclassified; these need no Layer-1 node):
 
@@ -2647,6 +2651,10 @@ Each is additive / non-breaking, though not all are pure union widenings):
   spread (beyond the first-class `textStyles` + `utilities`), and no node is needed.
 - **Typed variant selections to generated component prop types.** Correctly scoped to
   **Layer 4** (component codegen / delivery), not a Layer-1 expressiveness gap.
+- **A state container component.** `pf-state-container` drew a state layer in its own slot,
+  switched on by hovered/pressed props that JavaScript set. `stateLayer()` in
+  `@pureform/preset` replaces it: each component tints its own container through portable
+  `hover`/`focusVisible`/`pressed` conditions, so no extra element or JavaScript is needed.
 
 **Phase 2 coverage check (full slotted button).** The real multi-slot button (slots `root`,
 `label`, `leadingIcon`, `trailingIcon`; `color` / `variant` / `size` / `leading` / `trailing`

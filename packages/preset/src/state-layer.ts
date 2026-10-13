@@ -31,8 +31,9 @@ const tint = (
 ) => colorMix(base, content, alias("tokens", "opacity", opacity));
 
 /** A background color that tints `base` with `content` on hover, keyboard focus, and press.
- *  Each state reads its opacity from the `stateLayerTokens()` fragment. The adapter emits press
- *  after hover, so a pressed component shows the press tint while the pointer is over it. */
+ *  Each state reads its opacity from the `stateLayerTokens()` fragment. Panda writes the press
+ *  rule after the hover rule, so a pressed component shows the press tint while the pointer is
+ *  over it. */
 export const stateLayer = ({
     base,
     content,

@@ -3,15 +3,10 @@ import basePreset from "@pandacss/preset-base";
 import pandaPreset from "@pandacss/preset-panda";
 import typographyPreset from "@pandacss/preset-typography";
 
-import { pureformGeneratedPreset } from "./panda.pureform-generated";
+import { pureformPreset } from "./panda.pureform";
 
 export default defineConfig({
-    presets: [
-        basePreset,
-        pandaPreset,
-        typographyPreset(),
-        pureformGeneratedPreset,
-    ],
+    presets: [basePreset, pandaPreset, typographyPreset(), pureformPreset],
 
     // Whether to use css reset
     preflight: true,

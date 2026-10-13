@@ -4,3 +4,4 @@ export * from "./components/button";
 export * from "./components/icon-button";
 export * from "./components/card";
 export * from "./components/scrim";
+export * from "./pureform";

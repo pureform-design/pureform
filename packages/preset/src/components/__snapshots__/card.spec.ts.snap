@@ -35,7 +35,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
           },
         },
-        "interactive": "true",
+        "interactive": true,
         "variant": "elevated",
       },
       {
@@ -57,7 +57,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
           },
         },
-        "interactive": "true",
+        "interactive": true,
         "variant": "filled",
       },
       {
@@ -80,12 +80,12 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
           },
         },
-        "interactive": "true",
+        "interactive": true,
         "variant": "outlined",
       },
     ],
     "defaultVariants": {
-      "interactive": "false",
+      "interactive": false,
       "variant": "elevated",
     },
     "jsx": [
