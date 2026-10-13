@@ -10,8 +10,11 @@ import type {
     ColorKeyword,
     CursorKeyword,
     DisplayKeyword,
+    FlexDirectionKeyword,
     KeywordNode,
     LineStyleKeyword,
+    OverflowKeyword,
+    PointerEventsKeyword,
     PortableCondition,
     PositionKeyword,
     TextAlignKeyword,
@@ -66,8 +69,17 @@ export interface StyleMap {
     // layout / box
     display?: Keyword<DisplayKeyword>;
     position?: Keyword<PositionKeyword>;
+    flexDirection?: Keyword<FlexDirectionKeyword>;
     alignItems?: Keyword<AlignKeyword>;
     justifyContent?: Keyword<AlignKeyword>;
+    overflow?: Keyword<OverflowKeyword>;
+    // a number, or literal("16 / 9")
+    aspectRatio?: Dimension;
+    // physical offsets for a positioned element
+    top?: Dimension;
+    right?: Dimension;
+    bottom?: Dimension;
+    left?: Dimension;
     // color
     color?: Color;
     backgroundColor?: Color;
@@ -75,6 +87,10 @@ export interface StyleMap {
     // sizing / spacing (physical)
     width?: Dimension;
     height?: Dimension;
+    minWidth?: Dimension;
+    minHeight?: Dimension;
+    maxWidth?: Dimension;
+    maxHeight?: Dimension;
     paddingTop?: Dimension;
     paddingRight?: Dimension;
     paddingBottom?: Dimension;
@@ -82,6 +98,11 @@ export interface StyleMap {
     borderRadius?: Dimension;
     borderWidth?: Dimension;
     borderStyle?: Keyword<LineStyleKeyword>;
+    // outline sits outside the border box and takes no layout space
+    outlineWidth?: Dimension;
+    outlineStyle?: Keyword<LineStyleKeyword>;
+    outlineColor?: Color;
+    outlineOffset?: Dimension;
     gap?: Dimension;
     // sizing / spacing (logical / flow-relative). Prefer these for direction-aware layout:
     // they auto-flip in RTL on every target (web inline/block, native start/end), so you
@@ -96,6 +117,8 @@ export interface StyleMap {
     marginBlockEnd?: Dimension;
     insetInlineStart?: Dimension;
     insetInlineEnd?: Dimension;
+    insetBlockStart?: Dimension;
+    insetBlockEnd?: Dimension;
     borderStartStartRadius?: Dimension;
     borderStartEndRadius?: Dimension;
     borderEndStartRadius?: Dimension;
@@ -123,6 +146,7 @@ export interface StyleMap {
     backdropFilter?: Filter;
     // interaction / motion
     cursor?: Keyword<CursorKeyword>;
+    pointerEvents?: Keyword<PointerEventsKeyword>;
     transition?: Transition;
     transitionTimingFunction?: Easing;
     animation?: Animation;

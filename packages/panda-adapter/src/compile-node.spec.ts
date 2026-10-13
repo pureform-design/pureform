@@ -31,13 +31,22 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
-import { blur, filter } from "@pureform/core/ast";
+import {
+    absolute,
+    blur,
+    filter,
+    hidden,
+    none,
+    rowReverse,
+    solid,
+} from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
 import { compileNodeToCSS } from "./compile-node";
 import { compileValue } from "./conditions";
 import type { CompileCtx } from "./options";
+import { compileStyleMap } from "./style-map";
 
 const emptyConfig: CoreConfig = {
     tokens: {},
@@ -213,6 +222,39 @@ describe("compileValue conditionals", () => {
         expect(compileValue(node, ctx())).toEqual({
             base: "1",
             _disabled: "0.38",
+        });
+    });
+});
+
+describe("compileStyleMap layout and interaction properties", () => {
+    it("lowers each property to its Panda key and CSS value", () => {
+        expect(
+            compileStyleMap(
+                {
+                    position: absolute,
+                    top: px(0),
+                    insetBlockEnd: px(0),
+                    flexDirection: rowReverse,
+                    overflow: hidden,
+                    aspectRatio: unitless(1),
+                    minWidth: px(48),
+                    outlineStyle: solid,
+                    outlineWidth: px(1),
+                    pointerEvents: none,
+                },
+                ctx(),
+            ),
+        ).toEqual({
+            position: "absolute",
+            top: "0px",
+            insetBlockEnd: "0px",
+            flexDirection: "row-reverse",
+            overflow: "hidden",
+            aspectRatio: "1",
+            minWidth: "48px",
+            outlineStyle: "solid",
+            outlineWidth: "1px",
+            pointerEvents: "none",
         });
     });
 });

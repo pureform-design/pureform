@@ -2589,6 +2589,15 @@ real (non-canonical-button) components.
   binding goes in the per-target `$meta.platformHints.panda` bag (`{ jsx, className }`),
   opaque to core (§4.2). This reuses the `platformHints` escape rather than adding
   first-class fields, keeping Panda jargon out of the public API.
+- ~~**[OPEN] Layout and interaction properties missing from `StyleMap`.**~~ **[RESOLVED]**
+  Porting `pf-card`, `pf-icon-button` and `pf-scrim` to core specs needed properties the
+  curated map lacked, though most of their keyword vocabularies already existed: physical
+  offsets (`top`/`right`/`bottom`/`left`) and the block-axis logical pair
+  (`insetBlockStart`/`End`), `overflow`, `flexDirection`, `pointerEvents` (a new portable
+  `auto`/`none` vocabulary), `aspectRatio`, `outlineWidth`/`Style`/`Color`/`Offset`, and
+  `minWidth`/`minHeight`/`maxWidth`/`maxHeight`. All exist on web and React Native, so they
+  join the portable map; the adapter needed no change because it lowers every key the same
+  way.
 
 **Deferred and out-of-scope.** Two distinct kinds, split so they aren't conflated:
 

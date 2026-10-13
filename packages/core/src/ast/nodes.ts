@@ -216,6 +216,10 @@ export type CursorKeyword =
     | "grab";
 /** Portable: `clip` lowers to `hidden` where unsupported (React Native). */
 export type OverflowKeyword = "visible" | "hidden" | "scroll" | "auto" | "clip";
+/** Whether an element takes pointer or touch input. `none` lets input pass through to what is
+ *  beneath, for decorative overlays. React Native's `box-none`/`box-only` have no web
+ *  equivalent, so only the portable pair is here. */
+export type PointerEventsKeyword = "auto" | "none";
 /** `transparent` is a static color constant (verbatim on every target). `currentColor` is
  *  not here: it is a live link to the `color` property (dynamic even on web), so it cannot be
  *  a static keyword. Use `literal("currentColor")` web-side, or model it as a reference to the
