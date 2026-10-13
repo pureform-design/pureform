@@ -28,6 +28,11 @@ export interface PaletteOptions {
 
 // Semantic role to the Material system color it binds to. The role names are framework-level
 // (`brand`, `danger`), so a recipe aliases a role and stays independent of the Material tier.
+//
+// A role name must never equal a system color name. Core keeps `tokens` and `semanticTokens`
+// apart, but Panda puts both in one `colors` namespace, so a role named `surface` aliasing the
+// `surface` primitive lowers to `{colors.surface}` pointing at itself. That is why the default
+// surface pair is `canvas`/`onCanvas` (Material already uses `background`).
 const SEMANTIC_ROLES: Record<string, string> = {
     brand: "primary",
     onBrand: "onPrimary",
@@ -35,8 +40,8 @@ const SEMANTIC_ROLES: Record<string, string> = {
     onAccent: "onSecondary",
     danger: "negative",
     onDanger: "onNegative",
-    surface: "surface",
-    onSurface: "onSurface",
+    canvas: "surface",
+    onCanvas: "onSurface",
 };
 
 /** Build a `tokens` and `semanticTokens` fragment from a seed color. Primitives are every

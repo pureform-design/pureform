@@ -36,6 +36,28 @@ describe("palette", () => {
             path: ["tokens", "colors", "primary"],
         });
     });
+
+    it("binds the surface pair under names distinct from the primitives", () => {
+        const { semanticTokens } = palette(SEED);
+        expect(semanticTokens.colors?.canvas).toEqual({
+            type: "alias",
+            path: ["tokens", "colors", "surface"],
+        });
+        expect(semanticTokens.colors?.onCanvas).toEqual({
+            type: "alias",
+            path: ["tokens", "colors", "onSurface"],
+        });
+    });
+
+    // Panda shares one `colors` namespace between tokens and semantic tokens, so a role that
+    // reuses a primitive's name lowers to a self-reference.
+    it("never names a semantic role after a primitive", () => {
+        const { tokens, semanticTokens } = palette(SEED);
+        const primitives = new Set(Object.keys(tokens.colors ?? {}));
+        for (const role of Object.keys(semanticTokens.colors ?? {})) {
+            expect(primitives.has(role), role).toBe(false);
+        }
+    });
 });
 
 describe("elevation", () => {
