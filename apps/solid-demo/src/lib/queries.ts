@@ -4,29 +4,9 @@
 // machinery (src/server-config.ts) refreshes them by key — three consumers,
 // one definition.
 import type { FetchQueryOptions } from "@tanstack/solid-query";
-import { QueryClient, queryOptions } from "@tanstack/solid-query";
+import { QueryClient } from "@tanstack/solid-query";
 
-import { flightGateSkips, serverQueryFn } from "./flight";
-import { getCurrentUser, getUser, getUsers } from "./users";
-
-export const usersQuery = () =>
-    queryOptions({ queryKey: ["users"], queryFn: () => getUsers() });
-
-export const userQuery = (id: string) =>
-    queryOptions({ queryKey: ["users", id], queryFn: () => getUser(id) });
-
-// The session read is component-owned: no route prefetches it, because it
-// is shell state every page shows rather than any page's data. That puts
-// it outside every loader — so this one query declares its fetch as a
-// recipe (`serverQueryFn`, src/lib/flight.ts): when a mutation names its
-// key (`reload({ revalidate: 'current-user' })`), the server re-executes
-// the call and ships the fresh session on the mutation's own response.
-// Loader-owned queries like the two above never need this — plain queryFn.
-export const currentUserQuery = () =>
-    queryOptions({
-        queryKey: ["current-user"],
-        ...serverQueryFn(getCurrentUser),
-    });
+import { flightGateSkips } from "./flight";
 
 // One factory for every side that needs a cache: the client boot
 // (src/App.tsx, one for the session), the per-request SSR setup
