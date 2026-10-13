@@ -1,7 +1,7 @@
 import { button, card, iconButton, scrim } from "$recipes";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
-import { For, createMemo, createSignal } from "solid-js";
+import { For, createStore } from "solid-js";
 
 export const Route = createFileRoute("/tokens")({
     head: () => ({ meta: [{ title: "Component tokens" }] }),
@@ -211,10 +211,15 @@ const row = {
 function TokensRoute() {
     // Only tokens the user touched are set, so untouched ones keep following the palette
     // (colors in particular switch with the light or dark scheme).
-    const [overrides, setOverrides] = createSignal<Record<string, string>>({});
+    const [overrides, setOverrides] = createStore<Record<string, string>>({});
     const set = (token: string, value: string) =>
-        setOverrides((o) => ({ ...o, [varFor(token)]: value }));
-    const style = createMemo(() => overrides() as JSX.CSSProperties);
+        setOverrides((draft) => {
+            draft[varFor(token)] = value;
+        });
+    const reset = () =>
+        setOverrides((draft) => {
+            for (const key of Object.keys(draft)) delete draft[key];
+        });
 
     const toggleScheme = () => {
         const root = document.documentElement;
@@ -247,7 +252,7 @@ function TokensRoute() {
                 <button
                     class={button({ variant: "text" }).root}
                     type="button"
-                    onClick={() => setOverrides({})}
+                    onClick={reset}
                 >
                     <span class={button().label}>Reset tokens</span>
                 </button>
@@ -258,7 +263,7 @@ function TokensRoute() {
                             <For each={group.controls}>
                                 {(c) => {
                                     const current = () =>
-                                        overrides()[varFor(c.token)];
+                                        overrides[varFor(c.token)];
                                     return (
                                         <>
                                             <label for={c.token}>
@@ -310,7 +315,13 @@ function TokensRoute() {
                 </For>
             </aside>
 
-            <div style={{ ...style(), display: "grid", gap: "32px" }}>
+            <div
+                style={{
+                    ...(overrides as JSX.CSSProperties),
+                    display: "grid",
+                    gap: "32px",
+                }}
+            >
                 <section style={row}>
                     <For
                         each={
