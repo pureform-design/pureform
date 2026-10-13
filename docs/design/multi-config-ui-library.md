@@ -2637,10 +2637,11 @@ Each is additive / non-breaking, though not all are pure union widenings):
 - **Scroll- or view-driven animation timelines.** A genuine _structural_ addition (extra
   fields on `AnimationNode` or a new node, plus a portability story), not vocabulary.
   Deferred until a real component needs motion tied to scroll/visibility rather than time.
-- **Ripple.** `pf-ripple-layer` positions and sizes its ripple from CSS variables that
-  JavaScript sets on each press, and tints it with `currentColor`. Both are runtime
-  behavior, so the ripple belongs to Layer 4 (`@pureform/solid`), which can drive the
-  press origin. Deferred until then; the state layer covers press feedback meanwhile.
+- ~~**Ripple.**~~ **[RESOLVED]** The split follows the runtime boundary. `@pureform/preset`
+  ships a `ripple` slot component with the static styles: a layer that clips to its surface,
+  and a ripple circle in `currentColor` at the pressed state-layer opacity. `ripple()` from
+  `@pureform/js-effects` handles the press: it sizes and positions each ripple element from
+  the pointer and animates it out. No core node was needed.
 
 **B. Not a core gap** (reclassified; these need no Layer-1 node):
 
