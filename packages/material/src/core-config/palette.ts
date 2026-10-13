@@ -5,8 +5,8 @@
 // AST nodes (`hct(...)` or `oklch(...)` colors, `alias(...)` references) and composes through
 // `mergeConfigs`. The dependency only points toward core; core never depends back on this.
 
-import { alias, hct, oklch } from "@pureform/core/ast";
-import type { AliasNode, ColorNode } from "@pureform/core/ast";
+import { alias, hct, oklch, when } from "@pureform/core/ast";
+import type { AliasNode, ColorNode, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import chroma from "chroma-js";
 
@@ -19,9 +19,13 @@ import type { HexColor } from "../types";
  *  perceptually uniform space adapters can gamut-map. */
 export type PaletteSpace = "hct" | "oklch";
 
+/** Which schemes to generate. `"both"` lets the page follow the system preference or a toggle
+ *  at runtime; a single mode fixes the scheme at build time. */
+export type PaletteMode = ColorSchemeMode | "both";
+
 export interface PaletteOptions {
-    /** Which scheme mode seeds the primitive tokens. Default `"light"`. */
-    mode?: ColorSchemeMode;
+    /** Which schemes to generate. Default `"both"`. */
+    mode?: PaletteMode;
     /** Color space the primitives are encoded in. Default `"hct"`. */
     space?: PaletteSpace;
 }
@@ -29,10 +33,10 @@ export interface PaletteOptions {
 // Semantic role to the Material system color it binds to. The role names are framework-level
 // (`brand`, `danger`), so a recipe aliases a role and stays independent of the Material tier.
 //
-// A role name must never equal a system color name. Core keeps `tokens` and `semanticTokens`
-// apart, but Panda puts both in one `colors` namespace, so a role named `surface` aliasing the
-// `surface` primitive lowers to `{colors.surface}` pointing at itself. That is why the default
-// surface pair is `canvas`/`onCanvas` (Material already uses `background`).
+// A role name must never equal a system color name. Panda puts tokens and semantic tokens in
+// one `colors` namespace, so a role named `surface` aliasing the `surface` system color lowers
+// to `{colors.surface}` pointing at itself. That is why the default surface pair is
+// `canvas`/`onCanvas` (Material already uses `background`).
 const SEMANTIC_ROLES: Record<string, string> = {
     brand: "primary",
     onBrand: "onPrimary",
@@ -44,17 +48,21 @@ const SEMANTIC_ROLES: Record<string, string> = {
     onCanvas: "onSurface",
 };
 
-/** Build a `tokens` and `semanticTokens` fragment from a seed color. Primitives are every
- *  Material system color at the chosen mode; semantic roles alias into them so recipes bind to
- *  a role, not a raw tier. Compose it over a base config:
- *  `mergeConfigs(baseConfig, palette(seed))`. */
-export const palette = (
-    seed: HexColor,
-    options: PaletteOptions = {},
-): Pick<CoreConfig, "tokens" | "semanticTokens"> => {
-    const { mode = "light", space = "hct" } = options;
-    const scheme = ColorScheme.create({ source: seed });
+const MODES: ColorSchemeMode[] = ["light", "dark"];
 
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/** The primitive token name for a system color in one scheme, for example `primaryDark`. */
+export const schemeColorName = (
+    systemColor: string,
+    mode: ColorSchemeMode,
+): string => `${systemColor}${capitalize(mode)}`;
+
+const primitives = (
+    scheme: ColorScheme,
+    mode: ColorSchemeMode,
+    space: PaletteSpace,
+): Record<string, ColorNode> => {
     const colors: Record<string, ColorNode> = {};
     if (space === "oklch") {
         for (const [name, hex] of Object.entries(scheme.getAllHex(mode))) {
@@ -67,11 +75,51 @@ export const palette = (
             colors[name] = hct(color.hue, color.chroma, color.tone);
         }
     }
+    return colors;
+};
 
-    const semanticColors: Record<string, AliasNode> = {};
+/** Build a `tokens` and `semanticTokens` fragment from a seed color.
+ *
+ *  Every Material system color is emitted as a primitive per scheme (`primaryLight`,
+ *  `primaryDark`) and as a semantic token under its plain name (`primary`) that picks the
+ *  scheme through the `dark` condition. Recipes alias the semantic token, so they follow the
+ *  scheme with no scheme-awareness of their own. The framework roles (`brand`, `canvas`)
+ *  alias the semantic system colors. Compose it over a base config:
+ *  `mergeConfigs(baseConfig, palette(seed))`. */
+export const palette = (
+    seed: HexColor,
+    options: PaletteOptions = {},
+): Pick<CoreConfig, "tokens" | "semanticTokens"> => {
+    const { mode = "both", space = "hct" } = options;
+    const scheme = ColorScheme.create({ source: seed });
+    const modes = mode === "both" ? MODES : [mode];
+
+    const colors: Record<string, ColorNode> = {};
+    for (const m of modes) {
+        for (const [name, node] of Object.entries(
+            primitives(scheme, m, space),
+        )) {
+            colors[schemeColorName(name, m)] = node;
+        }
+    }
+
+    const systemColors = Object.keys(scheme.getAllHex("light"));
+    const semanticColors: Record<string, ValueNode> = {};
+    for (const name of systemColors) {
+        const ref = (m: ColorSchemeMode): AliasNode =>
+            alias("tokens", "colors", schemeColorName(name, m));
+        semanticColors[name] =
+            mode === "both"
+                ? when("dark", ref("dark"), ref("light"))
+                : ref(mode);
+    }
     for (const [role, systemColor] of Object.entries(SEMANTIC_ROLES)) {
-        if (systemColor in colors) {
-            semanticColors[role] = alias("tokens", "colors", systemColor);
+        if (systemColor in semanticColors) {
+            semanticColors[role] = alias(
+                "semanticTokens",
+                "colors",
+                systemColor,
+            );
         }
     }
 

@@ -18,46 +18,67 @@ const asColor = (entry?: Token<ScalarNode>) => {
 };
 
 describe("palette", () => {
-    it("emits primitive color tokens in the hct space by default", () => {
-        const brand = asColor(palette(SEED).tokens.colors?.primary);
-        expect(brand?.type).toBe("color");
-        expect(brand?.space).toBe("hct");
-        expect(brand?.components).toHaveLength(3);
+    it("emits a primitive per scheme in the hct space by default", () => {
+        const { colors } = palette(SEED).tokens;
+        for (const name of ["primaryLight", "primaryDark"]) {
+            const color = asColor(colors?.[name]);
+            expect(color?.space, name).toBe("hct");
+            expect(color?.components).toHaveLength(3);
+        }
+        expect(colors?.primaryLight).not.toEqual(colors?.primaryDark);
     });
 
     it("emits primitives in oklch when asked", () => {
-        const brand = asColor(
-            palette(SEED, { space: "oklch" }).tokens.colors?.primary,
+        const color = asColor(
+            palette(SEED, { space: "oklch" }).tokens.colors?.primaryLight,
         );
-        expect(brand?.space).toBe("oklch");
+        expect(color?.space).toBe("oklch");
     });
 
-    it("binds semantic roles with aliases into the token tier", () => {
-        expect(palette(SEED).semanticTokens.colors?.brand).toEqual({
-            type: "alias",
-            path: ["tokens", "colors", "primary"],
+    it("switches each system color on the dark condition", () => {
+        expect(palette(SEED).semanticTokens.colors?.primary).toEqual({
+            type: "conditional",
+            base: { type: "alias", path: ["tokens", "colors", "primaryLight"] },
+            cases: [
+                {
+                    on: "dark",
+                    value: {
+                        type: "alias",
+                        path: ["tokens", "colors", "primaryDark"],
+                    },
+                },
+            ],
         });
     });
 
-    it("binds the surface pair under names distinct from the primitives", () => {
+    it("fixes the scheme at build time when given a single mode", () => {
+        const { tokens, semanticTokens } = palette(SEED, { mode: "dark" });
+        expect(tokens.colors?.primaryLight).toBeUndefined();
+        expect(semanticTokens.colors?.primary).toEqual({
+            type: "alias",
+            path: ["tokens", "colors", "primaryDark"],
+        });
+    });
+
+    it("binds the framework roles to the semantic system colors", () => {
         const { semanticTokens } = palette(SEED);
+        expect(semanticTokens.colors?.brand).toEqual({
+            type: "alias",
+            path: ["semanticTokens", "colors", "primary"],
+        });
         expect(semanticTokens.colors?.canvas).toEqual({
             type: "alias",
-            path: ["tokens", "colors", "surface"],
-        });
-        expect(semanticTokens.colors?.onCanvas).toEqual({
-            type: "alias",
-            path: ["tokens", "colors", "onSurface"],
+            path: ["semanticTokens", "colors", "surface"],
         });
     });
 
-    // Panda shares one `colors` namespace between tokens and semantic tokens, so a role that
-    // reuses a primitive's name lowers to a self-reference.
-    it("never names a semantic role after a primitive", () => {
+    // Panda shares one `colors` namespace between tokens and semantic tokens, so a semantic
+    // token that reuses a primitive's name lowers to a self-reference.
+    it("never names a semantic token after a primitive", () => {
         const { tokens, semanticTokens } = palette(SEED);
         const primitives = new Set(Object.keys(tokens.colors ?? {}));
-        for (const role of Object.keys(semanticTokens.colors ?? {})) {
-            expect(primitives.has(role), role).toBe(false);
+        for (const name of Object.keys(semanticTokens.colors ?? {})) {
+            expect(primitives.has(name), name).toBe(false);
         }
     });
 });
@@ -115,7 +136,7 @@ describe("elevation", () => {
     it("binds the shadow color to the Material shadow by default", () => {
         expect(elevation().semanticTokens.colors?.elevationShadow).toEqual({
             type: "alias",
-            path: ["tokens", "colors", "shadow"],
+            path: ["semanticTokens", "colors", "shadow"],
         });
     });
 
@@ -136,7 +157,7 @@ describe("fragments compose with mergeConfigs", () => {
             components: {},
         };
         const merged = mergeConfigs(base, palette(SEED), elevation());
-        expect(asColor(merged.tokens.colors?.primary)?.type).toBe("color");
+        expect(asColor(merged.tokens.colors?.primaryLight)?.type).toBe("color");
         expect(merged.semanticTokens.colors?.brand).toBeDefined();
         expect(merged.utilities?.shadowElevation).toBeDefined();
         // Every alias the elevation layers use resolves once a palette is composed in.

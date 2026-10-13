@@ -77,7 +77,7 @@ export const elevation = (
 ): Pick<CoreConfig, "tokens" | "semanticTokens" | "utilities"> => {
     const {
         levels = DEFAULT_LEVELS,
-        shadowColor = alias("tokens", "colors", "shadow"),
+        shadowColor = alias("semanticTokens", "colors", "shadow"),
     } = options;
     const shadows = ShadowElevations.create();
 
