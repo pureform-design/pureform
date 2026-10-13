@@ -9,6 +9,10 @@ dependencies:
     - "@pureform/core"
     - "@pureform/panda-adapter"
     - "@pureform/material"
+    - "@pureform/js-effects"
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/vitest-config"
 
 cache:
   key:
