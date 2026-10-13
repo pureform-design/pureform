@@ -16,7 +16,7 @@
         }
     },
     "dependencies": {
-        "@pureform/ui-utils": "workspace:^"
+        "@pureform/material": "workspace:^"
     },
     "devDependencies": {
         "@pureform/tsconfig": "catalog:",

@@ -26,7 +26,7 @@ export const hsl = (h: number, s: number, l: number, a?: number): ColorNode =>
     color("hsl", [h, s, l], a);
 export const oklch = (l: number, c: number, h: number, a?: number): ColorNode =>
     color("oklch", [l, c, h], a);
-/** Material HCT, `ui-utils`' generation space. */
+/** Material HCT, `@pureform/material`' generation space. */
 export const hct = (h: number, c: number, t: number, a?: number): ColorNode =>
     color("hct", [h, c, t], a);
 

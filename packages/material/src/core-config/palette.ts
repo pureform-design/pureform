@@ -1,6 +1,6 @@
 // Generate a `@pureform/core` token fragment from a single seed color.
 //
-// `ui-utils` is a value generator that feeds primitives into a `CoreConfig`. A generated
+// `@pureform/material` is a value generator that feeds primitives into a `CoreConfig`. A generated
 // palette must be indistinguishable from a hand-authored fragment, so it emits the same plain
 // AST nodes (`hct(...)` or `oklch(...)` colors, `alias(...)` references) and composes through
 // `mergeConfigs`. The dependency only points toward core; core never depends back on this.

@@ -9,7 +9,7 @@ dependencies:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
-    - "@pureform/ui-utils"
+    - "@pureform/material"
 
 tasks:
   test:unit:

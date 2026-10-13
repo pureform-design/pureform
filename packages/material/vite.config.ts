@@ -12,7 +12,7 @@ export default createConfig({
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
-                    `${entryName || "ui-utils"}.${format === "cjs" ? "cjs" : "mjs"}`,
+                    `${entryName || "material"}.${format === "cjs" ? "cjs" : "mjs"}`,
                 name: "UiUtils",
             },
         },

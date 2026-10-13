@@ -33,7 +33,6 @@
         "@pureform/vitest-config": "workspace:^",
         "@pureform/utils": "workspace:^",
         "@pureform/type-utils": "workspace:^",
-        "@pureform/ui-utils": "workspace:^",
         "typescript": "^7.0.2",
         "@typescript/typescript6": "^6.0.2",
         "@omni-oss/log": "^0.1.1",

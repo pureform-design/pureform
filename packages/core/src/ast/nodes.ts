@@ -224,7 +224,7 @@ export type ColorKeyword = "transparent";
 
 /** Color spaces the AST can carry. A color encodes its space at the source, the way a numeric
  *  encodes its unit; adapters render to the target's syntax and gamut-downgrade if needed (for
- *  example display-p3 to srgb) rather than assuming sRGB-hex. `hct` and `oklch` are `ui-utils`'
+ *  example display-p3 to srgb) rather than assuming sRGB-hex. `hct` and `oklch` are `@pureform/material`'
  *  generation spaces, preserved instead of flattened to hex. */
 export type ColorSpace =
     | "srgb"

@@ -34,9 +34,9 @@
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/core": "workspace:^",
+        "@pureform/material": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
         "@pureform/tsconfig": "catalog:",
-        "@pureform/ui-utils": "workspace:^",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
         "@solidjs/diagnostics": "catalog:",
@@ -72,12 +72,32 @@
       "name": "@pureform/js-effects",
       "version": "0.0.0-semantically-released",
       "dependencies": {
-        "@pureform/ui-utils": "workspace:^",
+        "@pureform/material": "workspace:^",
       },
       "devDependencies": {
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
+    "packages/material": {
+      "name": "@pureform/material",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@material/material-color-utilities": "catalog:",
+        "@pureform/core": "workspace:^",
+        "@pureform/utils": "catalog:",
+        "chroma-js": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/type-utils": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/chroma-js": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
@@ -143,26 +163,6 @@
         "vitest": "catalog:",
       },
     },
-    "packages/ui-utils": {
-      "name": "@pureform/ui-utils",
-      "version": "0.0.0-semantically-released",
-      "dependencies": {
-        "@material/material-color-utilities": "catalog:",
-        "@pureform/core": "workspace:^",
-        "@pureform/utils": "catalog:",
-        "chroma-js": "catalog:",
-      },
-      "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/type-utils": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
-        "@types/chroma-js": "catalog:",
-        "typescript": "catalog:",
-        "vite": "catalog:",
-        "vitest": "catalog:",
-      },
-    },
     "packages/utils": {
       "name": "@pureform/utils",
       "version": "0.0.0-semantically-released",
@@ -219,7 +219,6 @@
     "@pureform/oxlint-config": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
     "@pureform/type-utils": "workspace:^",
-    "@pureform/ui-utils": "workspace:^",
     "@pureform/utils": "workspace:^",
     "@pureform/vite-config": "workspace:^",
     "@pureform/vitest-config": "workspace:^",
@@ -561,6 +560,8 @@
 
     "@pureform/js-effects": ["@pureform/js-effects@workspace:packages/js-effects"],
 
+    "@pureform/material": ["@pureform/material@workspace:packages/material"],
+
     "@pureform/oxfmt-config": ["@pureform/oxfmt-config@workspace:packages/oxfmt-config"],
 
     "@pureform/oxlint-config": ["@pureform/oxlint-config@workspace:packages/oxlint-config"],
@@ -570,8 +571,6 @@
     "@pureform/tsconfig": ["@pureform/tsconfig@workspace:packages/tsconfig"],
 
     "@pureform/type-utils": ["@pureform/type-utils@workspace:packages/type-utils"],
-
-    "@pureform/ui-utils": ["@pureform/ui-utils@workspace:packages/ui-utils"],
 
     "@pureform/utils": ["@pureform/utils@workspace:packages/utils"],
 

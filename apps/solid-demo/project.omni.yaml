@@ -8,7 +8,7 @@ dependencies:
   append:
     - "@pureform/core"
     - "@pureform/panda-adapter"
-    - "@pureform/ui-utils"
+    - "@pureform/material"
 
 cache:
   key:
