@@ -138,6 +138,23 @@
         "@pandacss/dev": "catalog:",
       },
     },
+    "packages/preset": {
+      "name": "@pureform/preset",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "catalog:",
+        "@pureform/material": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/panda-adapter": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/tsconfig": {
       "name": "@pureform/tsconfig",
       "version": "0.1.1",
@@ -220,6 +237,7 @@
     "@pureform/oxfmt-config": "workspace:^",
     "@pureform/oxlint-config": "workspace:^",
     "@pureform/panda-adapter": "workspace:^",
+    "@pureform/preset": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
     "@pureform/type-utils": "workspace:^",
     "@pureform/utils": "workspace:^",
@@ -570,6 +588,8 @@
     "@pureform/oxlint-config": ["@pureform/oxlint-config@workspace:packages/oxlint-config"],
 
     "@pureform/panda-adapter": ["@pureform/panda-adapter@workspace:packages/panda-adapter"],
+
+    "@pureform/preset": ["@pureform/preset@workspace:packages/preset"],
 
     "@pureform/tsconfig": ["@pureform/tsconfig@workspace:packages/tsconfig"],
 

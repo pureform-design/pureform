@@ -49,6 +49,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/preset"]
+path = "packages/preset"
+include = [
+    "packages/preset/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
