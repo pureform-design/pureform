@@ -50,8 +50,6 @@ describe("compilePreset (canonical button)", () => {
             "color",
             "variant",
             "size",
-            "leading",
-            "trailing",
         ]);
     });
 

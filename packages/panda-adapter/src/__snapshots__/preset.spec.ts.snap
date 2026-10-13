@@ -95,9 +95,7 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
         ],
         "defaultVariants": {
           "color": "brand",
-          "leading": "false",
           "size": "md",
-          "trailing": "false",
           "variant": "solid",
         },
         "jsx": [
@@ -123,14 +121,6 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
                 "color": "token(colors.onDanger)",
               },
             },
-          },
-          "leading": {
-            "false": {
-              "leadingIcon": {
-                "display": "none",
-              },
-            },
-            "true": {},
           },
           "size": {
             "lg": {
@@ -182,14 +172,6 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
                 "width": "token(sizes.iconSm)",
               },
             },
-          },
-          "trailing": {
-            "false": {
-              "trailingIcon": {
-                "display": "none",
-              },
-            },
-            "true": {},
           },
           "variant": {
             "ghost": {
