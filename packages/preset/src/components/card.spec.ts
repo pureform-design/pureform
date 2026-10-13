@@ -15,7 +15,7 @@ describe("card", () => {
             card.recipe.variants?.variant?.filled?.root?.backgroundColor,
         ).toEqual({
             type: "alias",
-            path: ["semanticTokens", "colors", "surfaceContainerHighest"],
+            path: ["components", "card", "filledContainer"],
         });
         const interactiveFilled = card.recipe.compoundVariants?.find(
             (c) =>
@@ -36,5 +36,14 @@ describe("card touch target", () => {
     it("has a touch target slot styled like the buttons'", () => {
         expect(card.slots).toEqual(["root", "touchTarget"]);
         expect(card.recipe.base.touchTarget).toBe(touchTarget);
+    });
+});
+
+describe("card tokens", () => {
+    it("falls back to the foundation radius when the var is unset", () => {
+        const preset = compilePreset(configWith(card));
+        expect(preset.theme?.slotRecipes?.card?.base?.root).toMatchObject({
+            borderRadius: "var(--components-card-radius, token(radii.medium))",
+        });
     });
 });

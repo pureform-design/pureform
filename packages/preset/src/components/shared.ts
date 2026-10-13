@@ -4,14 +4,21 @@ import {
     absolute,
     alias,
     colorMix,
+    dynamic,
+    mul,
     pct,
-    px,
     solid,
     transform,
     translate,
     transparent,
+    unitless,
 } from "@pureform/core/ast";
-import type { AliasNode, ColorValue, StyleMap } from "@pureform/core/ast";
+import type {
+    AliasNode,
+    ColorValue,
+    StyleMap,
+    ValueNode,
+} from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 
 import { stateLayer } from "../state-layer";
@@ -35,6 +42,26 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
  *  semantic token, so it follows the light or dark scheme. */
 export const sys = (name: string): AliasNode =>
     alias("semanticTokens", "colors", name);
+
+/** A component's token set. Each entry compiles to an overridable
+ *  `--<prefix>-components-<name>-<token>` var that falls back to the given default, so an app
+ *  can restyle a component at runtime by setting the var on it or any ancestor. `ref(token)`
+ *  is the alias a recipe reads it through. */
+export const componentTokens = <K extends string>(
+    name: string,
+    defaults: Record<K, ValueNode>,
+) => ({
+    tokens: Object.fromEntries(
+        Object.entries<ValueNode>(defaults).map(([token, value]) => [
+            token,
+            dynamic(["components", name, token], value),
+        ]),
+    ) as Record<K, ValueNode>,
+    ref: (token: K): AliasNode => alias("components", name, token),
+});
+
+/** The tokens every outlined control shares: its stroke width and color. */
+export type OutlineTokens = "outlineWidth" | "outlineColor";
 
 /** The content color drawn on a group's main color, for example `onPrimary`. */
 export const on = (name: string): AliasNode => sys(`on${capitalize(name)}`);
@@ -173,15 +200,18 @@ export const fillElevation = (fill: Fill): StyleMap => {
 
 /** The variant-level root style for a fill: its outline and elevation. The colors come from
  *  `colorCompounds`, since they also depend on the color group. */
-export const fillVariant = (fill: Fill): { root: StyleMap } => {
+export const fillVariant = (
+    fill: Fill,
+    ref: (token: OutlineTokens) => AliasNode,
+): { root: StyleMap } => {
     const elevation = fillElevation(fill);
     const outline: StyleMap =
         fill === "outlined"
             ? {
-                  outlineWidth: px(1),
+                  outlineWidth: ref("outlineWidth"),
                   outlineStyle: solid,
-                  outlineColor: sys("outline"),
-                  outlineOffset: px(-1),
+                  outlineColor: ref("outlineColor"),
+                  outlineOffset: mul(ref("outlineWidth"), unitless(-1)),
               }
             : {};
     return {

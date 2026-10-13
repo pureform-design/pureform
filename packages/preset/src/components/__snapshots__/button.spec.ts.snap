@@ -4,8 +4,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
-      "height": "token(sizes.iconSmall)",
-      "width": "token(sizes.iconSmall)",
+      "height": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "width": "var(--components-button-iconSize, token(sizes.iconSmall))",
     },
     "label": {
       "textStyle": "labelLarge",
@@ -15,12 +15,12 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "pointerEvents": "none",
       },
       "alignItems": "center",
-      "borderRadius": "token(radii.full)",
+      "borderRadius": "var(--components-button-radius, token(radii.full))",
       "borderWidth": "0px",
       "cursor": "pointer",
       "display": "inline-flex",
       "flexDirection": "row",
-      "gap": "token(spacing.2)",
+      "gap": "var(--components-button-gap, token(spacing.2))",
       "justifyContent": "center",
       "position": "relative",
     },
@@ -751,23 +751,23 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
     "size": {
       "large": {
         "root": {
-          "height": "token(sizes.controlLarge)",
-          "paddingInlineEnd": "token(spacing.8)",
-          "paddingInlineStart": "token(spacing.8)",
+          "height": "var(--components-button-heightLarge, token(sizes.controlLarge))",
+          "paddingInlineEnd": "var(--components-button-paddingLarge, token(spacing.8))",
+          "paddingInlineStart": "var(--components-button-paddingLarge, token(spacing.8))",
         },
       },
       "medium": {
         "root": {
-          "height": "token(sizes.controlMedium)",
-          "paddingInlineEnd": "token(spacing.6)",
-          "paddingInlineStart": "token(spacing.6)",
+          "height": "var(--components-button-heightMedium, token(sizes.controlMedium))",
+          "paddingInlineEnd": "var(--components-button-paddingMedium, token(spacing.6))",
+          "paddingInlineStart": "var(--components-button-paddingMedium, token(spacing.6))",
         },
       },
       "small": {
         "root": {
-          "height": "token(sizes.controlSmall)",
-          "paddingInlineEnd": "token(spacing.4)",
-          "paddingInlineStart": "token(spacing.4)",
+          "height": "var(--components-button-heightSmall, token(sizes.controlSmall))",
+          "paddingInlineEnd": "var(--components-button-paddingSmall, token(spacing.4))",
+          "paddingInlineStart": "var(--components-button-paddingSmall, token(spacing.4))",
         },
       },
     },
@@ -797,10 +797,10 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "outlined": {
         "root": {
           "_disabled": {},
-          "outlineColor": "token(colors.outline)",
-          "outlineOffset": "-1px",
+          "outlineColor": "var(--components-button-outlineColor, token(colors.outline))",
+          "outlineOffset": "calc(var(--components-button-outlineWidth, 1px) * -1)",
           "outlineStyle": "solid",
-          "outlineWidth": "1px",
+          "outlineWidth": "var(--components-button-outlineWidth, 1px)",
         },
       },
       "text": {

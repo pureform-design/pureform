@@ -9,11 +9,11 @@ describe("scrim", () => {
         expect(() => configWith(scrim)).not.toThrow();
     });
 
-    it("dims with the scrim color at the scrim opacity", () => {
+    it("dims with overridable color and opacity tokens", () => {
         const preset = compilePreset(configWith(scrim));
         expect(preset.theme?.slotRecipes?.scrim?.base?.root).toMatchObject({
             backgroundColor:
-                "color-mix(in srgb, transparent, token(colors.scrim) token(opacity.scrim))",
+                "color-mix(in srgb, transparent, var(--components-scrim-color, token(colors.scrim)) var(--components-scrim-opacity, token(opacity.scrim)))",
         });
     });
 });

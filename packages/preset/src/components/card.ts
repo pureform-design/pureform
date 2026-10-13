@@ -8,23 +8,36 @@ import { defineSlotComponent } from "@pureform/core";
 import {
     alias,
     colorMix,
+    mul,
     none,
     pointer,
     px,
     relative,
     solid,
+    unitless,
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 
 import { stateLayer } from "../state-layer";
-import { disabledColor, sys, touchTarget } from "./shared";
+import { componentTokens, disabledColor, sys, touchTarget } from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
 
+const { tokens, ref } = componentTokens("card", {
+    radius: alias("tokens", "radii", "medium"),
+    padding: alias("tokens", "spacing", "4"),
+    content: sys("onSurface"),
+    outlineWidth: px(1),
+    outlineColor: sys("outlineVariant"),
+    elevatedContainer: sys("surfaceContainerLow"),
+    filledContainer: sys("surfaceContainerHighest"),
+    outlinedContainer: sys("surface"),
+});
+
 const CONTAINER: Record<CardFill, ColorValue> = {
-    elevated: sys("surfaceContainerLow"),
-    filled: sys("surfaceContainerHighest"),
-    outlined: sys("surface"),
+    elevated: ref("elevatedContainer"),
+    filled: ref("filledContainer"),
+    outlined: ref("outlinedContainer"),
 };
 
 const RESTING: Record<CardFill, string> = {
@@ -39,7 +52,7 @@ const HOVERED: Record<CardFill, string> = {
     outlined: "level1",
 };
 
-const content = sys("onSurface");
+const content = ref("content");
 
 const fillVariant = (fill: CardFill): { root: StyleMap } => ({
     root: {
@@ -47,10 +60,10 @@ const fillVariant = (fill: CardFill): { root: StyleMap } => ({
         apply: { shadowElevation: RESTING[fill] },
         ...(fill === "outlined"
             ? {
-                  outlineWidth: px(1),
+                  outlineWidth: ref("outlineWidth"),
                   outlineStyle: solid,
-                  outlineColor: sys("outlineVariant"),
-                  outlineOffset: px(-1),
+                  outlineColor: ref("outlineColor"),
+                  outlineOffset: mul(ref("outlineWidth"), unitless(-1)),
               }
             : {}),
     },
@@ -87,17 +100,18 @@ export const card = defineSlotComponent({
         description:
             "Material card. Set interactive when the whole card is clickable.",
     },
+    tokens,
     slots: ["root", "touchTarget"],
     recipe: {
         base: {
             root: {
                 position: relative,
                 color: content,
-                borderRadius: alias("tokens", "radii", "medium"),
-                paddingBlockStart: alias("tokens", "spacing", "4"),
-                paddingBlockEnd: alias("tokens", "spacing", "4"),
-                paddingInlineStart: alias("tokens", "spacing", "4"),
-                paddingInlineEnd: alias("tokens", "spacing", "4"),
+                borderRadius: ref("radius"),
+                paddingBlockStart: ref("padding"),
+                paddingBlockEnd: ref("padding"),
+                paddingInlineStart: ref("padding"),
+                paddingInlineEnd: ref("padding"),
             },
             touchTarget,
         },

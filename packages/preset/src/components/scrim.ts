@@ -3,7 +3,12 @@
 import { defineSlotComponent } from "@pureform/core";
 import { absolute, alias, colorMix, px, transparent } from "@pureform/core/ast";
 
-import { sys } from "./shared";
+import { componentTokens, sys } from "./shared";
+
+const { tokens, ref } = componentTokens("scrim", {
+    color: sys("scrim"),
+    opacity: alias("tokens", "opacity", "scrim"),
+});
 
 export const scrim = defineSlotComponent({
     name: "scrim",
@@ -11,6 +16,7 @@ export const scrim = defineSlotComponent({
         description:
             "Dims the content behind a modal surface. Place it inside a positioned container.",
     },
+    tokens,
     slots: ["root"],
     recipe: {
         base: {
@@ -22,8 +28,8 @@ export const scrim = defineSlotComponent({
                 left: px(0),
                 backgroundColor: colorMix(
                     transparent,
-                    sys("scrim"),
-                    alias("tokens", "opacity", "scrim"),
+                    ref("color"),
+                    ref("opacity"),
                 ),
             },
         },

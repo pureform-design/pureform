@@ -19,7 +19,9 @@ import type { StyleMap } from "@pureform/core/ast";
 import {
     colorCompounds,
     colorVariants,
+    componentTokens,
     fillVariant,
+    sys,
     touchTarget,
 } from "./shared";
 import type { Fill } from "./shared";
@@ -32,11 +34,27 @@ const FILLS: Record<string, Fill> = {
     elevated: "elevated",
 };
 
-const size = (height: string, padding: string): { root: StyleMap } => ({
+const { tokens, ref } = componentTokens("button", {
+    radius: alias("tokens", "radii", "full"),
+    gap: alias("tokens", "spacing", "2"),
+    iconSize: alias("tokens", "sizes", "iconSmall"),
+    outlineWidth: px(1),
+    outlineColor: sys("outline"),
+    heightSmall: alias("tokens", "sizes", "controlSmall"),
+    heightMedium: alias("tokens", "sizes", "controlMedium"),
+    heightLarge: alias("tokens", "sizes", "controlLarge"),
+    paddingSmall: alias("tokens", "spacing", "4"),
+    paddingMedium: alias("tokens", "spacing", "6"),
+    paddingLarge: alias("tokens", "spacing", "8"),
+});
+
+type Size = "Small" | "Medium" | "Large";
+
+const size = (s: Size): { root: StyleMap } => ({
     root: {
-        height: alias("tokens", "sizes", height),
-        paddingInlineStart: alias("tokens", "spacing", padding),
-        paddingInlineEnd: alias("tokens", "spacing", padding),
+        height: ref(`height${s}`),
+        paddingInlineStart: ref(`padding${s}`),
+        paddingInlineEnd: ref(`padding${s}`),
     },
 });
 
@@ -46,6 +64,7 @@ export const button = defineSlotComponent({
         description:
             "Material common button. Render the icon slot only when there is an icon.",
     },
+    tokens,
     slots: ["root", "label", "icon", "touchTarget"],
     recipe: {
         base: {
@@ -55,16 +74,16 @@ export const button = defineSlotComponent({
                 flexDirection: row,
                 alignItems: center,
                 justifyContent: center,
-                gap: alias("tokens", "spacing", "2"),
+                gap: ref("gap"),
                 borderWidth: px(0),
-                borderRadius: alias("tokens", "radii", "full"),
+                borderRadius: ref("radius"),
                 cursor: pointer,
                 states: { disabled: { pointerEvents: none } },
             },
             label: { textStyle: alias("textStyles", "labelLarge") },
             icon: {
-                width: alias("tokens", "sizes", "iconSmall"),
-                height: alias("tokens", "sizes", "iconSmall"),
+                width: ref("iconSize"),
+                height: ref("iconSize"),
             },
             touchTarget,
         },
@@ -73,13 +92,13 @@ export const button = defineSlotComponent({
             variant: Object.fromEntries(
                 Object.entries(FILLS).map(([name, fill]) => [
                     name,
-                    fillVariant(fill),
+                    fillVariant(fill, ref),
                 ]),
             ),
             size: {
-                small: size("controlSmall", "4"),
-                medium: size("controlMedium", "6"),
-                large: size("controlLarge", "8"),
+                small: size("Small"),
+                medium: size("Medium"),
+                large: size("Large"),
             },
         },
         compoundVariants: colorCompounds(FILLS),
