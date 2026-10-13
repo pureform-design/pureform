@@ -1,6 +1,8 @@
 # Multi-config UI library, implementation plan
 
-> **Status:** draft. Companion to `multi-config-ui-library.md` (the design doc). The
+> **Status:** phases 0 to 4 are complete. `@pureform/ui-utils` has since been renamed to
+> `@pureform/material`, and the hand-written `@pureform/pandacss-preset` has been removed.
+> Older names below refer to those packages. Companion to `multi-config-ui-library.md` (the design doc). The
 > design doc is the contract: what the AST means and why. This doc is the build order:
 > which packages, in what sequence, with which acceptance gates. When the two disagree,
 > the design doc wins and this plan gets corrected.
@@ -80,7 +82,7 @@ of this plan.
 
 ---
 
-## 4. Phase 0, finalize and freeze the contract
+## 4. Phase 0, finalize and freeze the contract (complete)
 
 **Goal.** The design doc has no `[OPEN]` markers blocking Phase 1, and the node model is
 stable enough to implement against.
@@ -101,7 +103,7 @@ list. The `em` question is answered in the doc.
 
 ---
 
-## 5. Phase 1, scaffold `@pureform/core` and land the node model
+## 5. Phase 1, scaffold `@pureform/core` and land the node model (complete)
 
 **Goal.** The AST, its helpers, the schema types, path resolution, and the config
 validator exist and are unit-tested. No adapter yet.
@@ -207,7 +209,7 @@ the design doc shows (`import * as kw`, `import * as unit`).
 - `getByPath` resolves nested paths and detects cycles.
 - `mergeConfigs` deep-merges fragments and a later fragment wins.
 
-### 5e. `ui-utils` retrofit (Phase 1b, parallel-safe after 5c)
+### 5e. `ui-utils` retrofit (Phase 1b, parallel-safe after 5c) (complete)
 
 - Add `@pureform/core` to `ui-utils` dependencies (catalog ref).
 - Expose `palette(seed)` returning `{ tokens, semanticTokens }` built with core's
@@ -224,7 +226,7 @@ errors; vitest green.
 
 ---
 
-## 6. Phase 2, model one real component and validate coverage **[REPO]**
+## 6. Phase 2, model one real component and validate coverage (complete) **[REPO]**
 
 **Goal.** Prove `CoreConfig` covers a real component before building the adapter.
 
@@ -248,7 +250,7 @@ in the design doc.
 
 ---
 
-## 7. Phase 3, build `@pureform/panda-adapter`
+## 7. Phase 3, build `@pureform/panda-adapter` (complete)
 
 **Goal.** Compile a `CoreConfig` into valid Panda preset-shaped output. This is the
 focus of the plan: a working adapter, not a reconciliation with any existing preset.
@@ -297,7 +299,7 @@ Panda config without error.
 
 ---
 
-## 8. Phase 4, prove the adapter output end-to-end
+## 8. Phase 4, prove the adapter output end-to-end (complete)
 
 **Goal.** Render adapter output in a real app, so the compile path is proven beyond
 snapshots.
@@ -346,8 +348,11 @@ Revisit both once Layers 1 and 2 are proven in `apps/solid-demo`.
 
 ## 10. Cross-cutting concerns
 
-- **Catalog discipline.** Every new dependency goes through the root `package.json`
-  catalog (`catalog:` refs), matching existing packages. Do not pin inline.
+- **Catalog discipline.** Every new third-party dependency goes through the root
+  `package.json` catalog (`catalog:` refs). Do not pin inline. Workspace packages are the
+  exception: reference them with `workspace:^` directly and never add them to the catalog.
+  bun 1.4.2 can't re-resolve a catalog entry that points to `workspace:^`, so editing one
+  breaks `bun install` with `Workspace dependency "X" not found`.
 - **Keep `project.omni.yaml` in sync, especially dependencies.** Each package's
   `project.omni.yaml` declares the omni project graph that drives task ordering and
   caching. Whenever a package gains or drops a workspace dependency in its
