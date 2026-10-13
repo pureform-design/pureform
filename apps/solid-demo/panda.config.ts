@@ -20,6 +20,17 @@ export default defineConfig({
     // Where to look for your css declarations
     include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
 
+    // The demo picks variants at runtime, which static extraction can't see, so emit every
+    // variant of the pureform recipes.
+    staticCss: {
+        recipes: {
+            button: ["*"],
+            iconButton: ["*"],
+            card: ["*"],
+            scrim: ["*"],
+        },
+    },
+
     // Files to exclude
     exclude: [],
     // The output directory for your css system
