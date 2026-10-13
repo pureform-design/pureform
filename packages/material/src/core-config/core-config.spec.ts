@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { elevation } from "./elevation";
 import { palette } from "./palette";
+import { typescale } from "./typescale";
 
 const SEED = "#7c3aed" as const;
 
@@ -140,5 +141,32 @@ describe("fragments compose with mergeConfigs", () => {
         expect(merged.utilities?.shadowElevation).toBeDefined();
         // Every alias the elevation layers use resolves once a palette is composed in.
         expect(() => defineConfig(merged)).not.toThrow();
+    });
+});
+
+describe("typescale", () => {
+    it("emits a text style per Material role", () => {
+        expect(Object.keys(typescale().textStyles ?? {})).toHaveLength(15);
+    });
+
+    it("encodes lengths with their unit and reads the family from a font token", () => {
+        expect(typescale().textStyles?.labelLarge).toEqual({
+            fontFamily: { type: "alias", path: ["fonts", "plain"] },
+            fontSize: { type: "numeric", value: 14, unit: "px" },
+            lineHeight: { type: "numeric", value: 1.25, unit: "rem" },
+            letterSpacing: { type: "numeric", value: 0.00625, unit: "rem" },
+            fontWeight: { type: "numeric", value: 500, unit: "none" },
+        });
+    });
+
+    it("validates once composed into a config", () => {
+        expect(() =>
+            defineConfig(
+                mergeConfigs(
+                    { tokens: {}, semanticTokens: {}, components: {} },
+                    typescale(),
+                ),
+            ),
+        ).not.toThrow();
     });
 });
