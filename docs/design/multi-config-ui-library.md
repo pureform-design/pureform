@@ -2639,9 +2639,10 @@ Each is additive / non-breaking, though not all are pure union widenings):
   Deferred until a real component needs motion tied to scroll/visibility rather than time.
 - ~~**Ripple.**~~ **[RESOLVED]** The split follows the runtime boundary. `@pureform/preset`
   ships a `ripple` slot component with the static styles: a layer that clips to its surface,
-  and a ripple circle in `currentColor` at the pressed state-layer opacity. `ripple()` from
-  `@pureform/js-effects` handles the press: it sizes and positions each ripple element from
-  the pointer and animates it out. No core node was needed.
+  and a ripple circle in `currentColor` at the pressed state-layer opacity, with a soft
+  radial-gradient edge. `ripple()` from `@pureform/js-effects` handles the press with
+  Material's timing: it grows the ripple from the press point toward the center, holds it
+  while pressed, and fades it on release. The only core change was a `radialGradient` extent.
 
 **B. Not a core gap** (reclassified; these need no Layer-1 node):
 
