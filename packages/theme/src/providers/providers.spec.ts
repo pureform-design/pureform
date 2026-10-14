@@ -106,6 +106,16 @@ describe("roundedShape", () => {
         expect(shape.radii.small).toEqual(px(4));
         expect(shape.radii.full).toEqual(px(9999));
     });
+
+    it("squares every corner, full included, at a 0 base", () => {
+        const { shape } = resolveTheme({
+            ...providers(),
+            shape: roundedShape({ base: 0 }),
+        });
+        expect(Object.values(shape.radii)).toEqual(
+            Array.from({ length: 7 }, () => px(0)),
+        );
+    });
 });
 
 describe("gridLayout", () => {

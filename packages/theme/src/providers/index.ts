@@ -191,7 +191,8 @@ const SHAPE_MULTIPLES: Record<ShapeRole, number> = {
     full: 0,
 };
 
-/** Radii scaled from one base size, in px. `full` stays fully round. */
+/** Radii scaled from one base size, in px. `full` stays fully round, unless the base is 0:
+ *  then every corner is square, `full` included. */
 export const roundedShape = ({
     base = 4,
 }: { base?: number } = {}): ShapeProvider =>
@@ -200,7 +201,13 @@ export const roundedShape = ({
         name: "rounded",
         generate: () => ({
             radii: byName(SHAPE_ROLES, (role) =>
-                px(role === "full" ? 9999 : base * SHAPE_MULTIPLES[role]),
+                px(
+                    role === "full"
+                        ? base === 0
+                            ? 0
+                            : 9999
+                        : base * SHAPE_MULTIPLES[role],
+                ),
             ),
         }),
     });
