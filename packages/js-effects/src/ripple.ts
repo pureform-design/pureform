@@ -1,302 +1,215 @@
-let INTERNAL_RIPPLE_TEMPLATE: HTMLElement;
+// Material 3 press ripple.
+//
+// A press grows a ripple from the press point toward the center of the surface and holds it
+// while the pointer stays down. Release fades it out, but never before a minimum press time,
+// so a quick tap still shows the full ripple. Touch presses wait briefly so a scroll does not
+// ripple, and a keyboard click ripples from the center. The timings and sizes follow
+// Material's reference ripple.
 
-function getRipplePrototype() {
-    if (!INTERNAL_RIPPLE_TEMPLATE) {
-        INTERNAL_RIPPLE_TEMPLATE = document.createElement("span");
-    }
+const PRESS_GROW_MS = 450;
+const MINIMUM_PRESS_MS = 225;
+const FADE_MS = 375;
+const TOUCH_DELAY_MS = 150;
+const INITIAL_ORIGIN_SCALE = 0.2;
+const PADDING = 10;
+const SOFT_EDGE_MINIMUM_SIZE = 75;
+const SOFT_EDGE_CONTAINER_RATIO = 0.35;
+const STANDARD_EASING = "cubic-bezier(0.2, 0, 0, 1)";
 
-    return INTERNAL_RIPPLE_TEMPLATE.cloneNode(true) as HTMLElement;
-}
+type CssClasses = { [key: string]: boolean } | string | string[];
 
-type CssClasses =
-    | {
-          [key: string]: boolean;
-      }
-    | string
-    | string[];
-
-export type CreateRippleOptions = {
-    diameter: number;
-    origin: { x: number; y: number };
-    color?: string;
-    /**
-     * Use this to provide a custom prototype element for the ripple. The default prototype is a span.
-     */
-    getPrototype?: () => HTMLElement;
-    /**
-     * Use this to provide custom classes for the ripple. The classes will be applied to the prototype element.
-     */
+export type RippleOptions = {
+    /** Classes for each ripple element, usually the preset's ripple slot class. */
     class?: CssClasses;
-    /**
-     * Use this to apply values to the prototype element. The default is "style".
-     *
-     * @enum
-     * - "dataset" will apply the values to the dataset.
-     * - "cssVar" will apply the values to css variables.
-     * - "style" will apply the values to the style attribute.
-     * - "all" will apply the values to both the dataset, css variables, and the style.
-     * - "none" will not apply any values.
-     *
-     */
-    applyValuesTo?: "dataset" | "cssVar" | "all" | "none" | "style";
-    cssVars?: {
-        diameter?: string;
-        originX?: string;
-        originY?: string;
-    };
-    datasetKeys?: {
-        diameter?: string;
-        originX?: string;
-        originY?: string;
-    };
-};
-
-function normalizeClass(cls: CssClasses): string {
-    if (typeof cls === "string") {
-        return cls;
-    }
-
-    if (Array.isArray(cls)) {
-        return cls.join(" ");
-    }
-
-    return Object.keys(cls)
-        .filter((key) => cls[key])
-        .join(" ");
-}
-
-export function createRipple(opts: CreateRippleOptions) {
-    const ripple = opts.getPrototype?.() ?? getRipplePrototype();
-    ripple.dataset.ripple = "";
-    const diameter = `${opts.diameter}px`;
-    const originX = `${opts.origin.x}px`;
-    const originY = `${opts.origin.y}px`;
-
-    const applyTo = opts.applyValuesTo ?? "style";
-
-    if (applyTo === "cssVar" || applyTo === "all") {
-        ripple.style.setProperty(
-            opts?.cssVars?.diameter ?? "--diameter",
-            diameter,
-        );
-        ripple.style.setProperty(
-            opts?.cssVars?.originX ?? "--origin-x",
-            originX,
-        );
-        ripple.style.setProperty(
-            opts?.cssVars?.originY ?? "--origin-y",
-            originY,
-        );
-    }
-
-    if (applyTo === "dataset" || applyTo === "all") {
-        ripple.dataset[opts?.datasetKeys?.diameter ?? "diameter"] = diameter;
-        ripple.dataset[opts?.datasetKeys?.originX ?? "originX"] = originX;
-        ripple.dataset[opts?.datasetKeys?.originY ?? "originY"] = originY;
-    }
-
-    if (applyTo === "style" || applyTo === "all") {
-        ripple.style.width = diameter;
-        ripple.style.height = diameter;
-        ripple.style.top = `calc(${originY} - (${diameter} / 2))`;
-        ripple.style.left = `calc(${originX} - (${diameter} / 2))`;
-        ripple.style.filter = `blur(${(Number.parseInt(diameter) * 0.05) / 2}px)`;
-    }
-
-    if (opts.color) {
-        ripple.style.backgroundColor = opts.color;
-    }
-    const cls = opts.class;
-    if (cls) {
-        const classes = normalizeClass(cls).split(" ");
-
-        ripple.classList.add(...classes);
-    }
-
-    return ripple;
-}
-
-function getRippleDiameter(rect: DOMRect) {
-    return Math.max(rect.width, rect.height) * 3;
-}
-
-function getRelativeMousePosition(
-    container: DOMRect,
-    e: MouseEvent,
-): { x: number; y: number } {
-    const x = e.clientX;
-    const y = e.clientY;
-    const originX = x - container.left;
-    const originY = y - container.top;
-
-    return { x: originX, y: originY };
-}
-
-function getCenteredOrigin(container: DOMRect) {
-    return {
-        x: container.width / 2,
-        y: container.height / 2,
-    };
-}
-
-type MaterialRippleEvent = {
-    __INTERNAL_customRippleMetaData: {
-        rippled: boolean;
-        allowPropagation: boolean;
-    };
-} & Event;
-
-function markAsRippled(e: Event, allowPropagation = false) {
-    const ev = e as unknown as MaterialRippleEvent;
-
-    if (ev.__INTERNAL_customRippleMetaData) {
-        ev.__INTERNAL_customRippleMetaData.rippled = true;
-        ev.__INTERNAL_customRippleMetaData.allowPropagation = allowPropagation;
-    } else {
-        ev.__INTERNAL_customRippleMetaData = {
-            rippled: true,
-            allowPropagation,
-        };
-    }
-}
-
-function shouldRipple(e: Event) {
-    const meta = (e as unknown as MaterialRippleEvent)
-        .__INTERNAL_customRippleMetaData ?? {
-        rippled: false,
-        allowPropagation: false,
-    };
-
-    return !meta.rippled || meta.allowPropagation;
-}
-
-function getRippleLayer(rippleContainer: HTMLElement) {
-    return rippleContainer.querySelector(
-        "[data-ripple-layer]",
-    ) as HTMLElement | null;
-}
-
-function getExistingRipples(rippleLayer: HTMLElement) {
-    return Array.from(rippleLayer.querySelectorAll("[data-ripple]"));
-}
-
-export type RippleOptions = Omit<CreateRippleOptions, "origin" | "diameter"> & {
+    /** A background color for each ripple. Leave unset to let the class style it. */
     color?: string;
-    removeExistingRipples?: boolean;
-    getExistingRipples?: (rippleLayer: HTMLElement) => HTMLElement[];
-    allowPropagation?: boolean;
-    getRippleLayer?: (rippleContainer: HTMLElement) => HTMLElement;
-    animate?: boolean | ((ripple: HTMLElement, disponse: () => void) => void);
-    disposeOnEvents?: boolean | string[];
+    /** Element to use for each ripple. Default: a new `span`. */
+    createElement?: () => HTMLElement;
+    /** Find the layer the ripples are drawn in. Default: the `[data-ripple-layer]` child. */
+    getRippleLayer?: (container: HTMLElement) => HTMLElement | null;
+    /** Always grow from the center, as icon buttons do. */
     centerOrigin?: boolean;
-    disabled?: boolean;
+    /** Skip ripples, for example while the control is disabled. A disabled form control is
+     *  skipped without this. */
+    disabled?: boolean | (() => boolean);
+    /** Let an ancestor surface ripple for the same press too. By default the innermost
+     *  surface claims the press. */
+    allowPropagation?: boolean;
 };
 
-function animateRipple(
-    ripple: HTMLElement,
-    duration: number,
-    dispose: () => void,
-) {
-    const animation = ripple.animate(
-        [
-            { transform: "scale(0)", opacity: 0 },
-            { opacity: 1, offset: 0.25 },
-            { transform: "scale(1)", offset: 0.5, opacity: 1 },
-            { transform: "scale(1)", opacity: 0, offset: 1 },
-        ],
-        {
-            duration,
-            easing: "linear",
-        },
-    );
-
-    animation.finished.then(() => {
-        if (ripple.parentElement) {
-            animation.commitStyles();
-        }
-        dispose();
-    });
+function normalizeClass(cls: CssClasses): string[] {
+    if (typeof cls === "string") return cls.split(" ").filter(Boolean);
+    if (Array.isArray(cls)) return cls;
+    return Object.keys(cls).filter((key) => cls[key]);
 }
 
-export function ripple(rippleContainer: HTMLElement, options?: RippleOptions) {
-    function handleClick(e: MouseEvent) {
-        const isDisabled = options?.disabled ?? false;
+// Events already claimed by an inner surface, so nested surfaces ripple once per press.
+const claimed = new WeakSet<Event>();
 
-        if (isDisabled) {
-            return;
-        }
+function claim(e: Event, allowPropagation: boolean): boolean {
+    if (claimed.has(e)) return false;
+    if (!allowPropagation) claimed.add(e);
+    return true;
+}
 
-        const rippleLayer =
-            options?.getRippleLayer?.(rippleContainer) ??
-            getRippleLayer(rippleContainer);
-        if (!rippleLayer) {
-            return;
-        }
-        if (!shouldRipple(e)) {
-            return;
-        }
+function isDisabled(container: HTMLElement, options: RippleOptions) {
+    const disabled =
+        typeof options.disabled === "function"
+            ? options.disabled()
+            : options.disabled;
+    return (
+        disabled === true ||
+        container.matches(":disabled, [aria-disabled='true']")
+    );
+}
 
-        markAsRippled(e, options?.allowPropagation);
+type Point = { x: number; y: number };
 
-        if (options?.removeExistingRipples ?? true) {
-            const existing =
-                options?.getExistingRipples?.(rippleLayer) ??
-                getExistingRipples(rippleLayer);
+/** Geometry of one ripple in a layer of the given size, pressed at `origin`. */
+export function rippleGeometry(
+    rect: { width: number; height: number },
+    origin: Point,
+) {
+    const { width, height } = rect;
+    const maxDim = Math.max(width, height);
+    const softEdge = Math.max(
+        SOFT_EDGE_CONTAINER_RATIO * maxDim,
+        SOFT_EDGE_MINIMUM_SIZE,
+    );
+    const size = Math.floor(maxDim * INITIAL_ORIGIN_SCALE);
+    const maxRadius = Math.hypot(width, height) + PADDING;
+    return {
+        size,
+        scale: (maxRadius + softEdge) / size,
+        start: { x: origin.x - size / 2, y: origin.y - size / 2 },
+        end: { x: (width - size) / 2, y: (height - size) / 2 },
+    };
+}
 
-            for (const ripple of existing) {
-                ripple.remove();
-            }
-        }
+/** Attach Material press ripples to `container`. Returns a function that detaches them. */
+export function ripple(container: HTMLElement, options: RippleOptions = {}) {
+    let press: { element: HTMLElement; startedAt: number } | undefined;
+    let touchTimer: ReturnType<typeof setTimeout> | undefined;
 
-        requestAnimationFrame(() => {
-            const rippleLayerRect = rippleLayer.getBoundingClientRect();
-            const diameter = getRippleDiameter(rippleLayerRect);
-            const { x: originX, y: originY } = options?.centerOrigin
-                ? getCenteredOrigin(rippleLayerRect)
-                : getRelativeMousePosition(rippleLayerRect, e);
+    const layerOf = () =>
+        options.getRippleLayer?.(container) ??
+        container.querySelector<HTMLElement>("[data-ripple-layer]");
 
-            const ripple = createRipple({
-                ...options,
-                origin: {
-                    x: originX,
-                    y: originY,
+    function begin(origin: Point | "center") {
+        const layer = layerOf();
+        if (!layer) return;
+        end();
+
+        const rect = layer.getBoundingClientRect();
+        const {
+            size,
+            scale,
+            start,
+            end: target,
+        } = rippleGeometry(
+            rect,
+            origin === "center" || options.centerOrigin
+                ? { x: rect.width / 2, y: rect.height / 2 }
+                : { x: origin.x - rect.left, y: origin.y - rect.top },
+        );
+
+        const element =
+            options.createElement?.() ?? document.createElement("span");
+        element.dataset.ripple = "";
+        if (options.class)
+            element.classList.add(...normalizeClass(options.class));
+        if (options.color) element.style.backgroundColor = options.color;
+        element.style.width = `${size}px`;
+        element.style.height = `${size}px`;
+        layer.appendChild(element);
+
+        element.animate(
+            [
+                { transform: `translate(${start.x}px, ${start.y}px) scale(1)` },
+                {
+                    transform: `translate(${target.x}px, ${target.y}px) scale(${scale})`,
                 },
-                diameter: diameter,
-            });
-
-            rippleLayer.appendChild(ripple);
-
-            const dispose = () => {
-                ripple.remove();
-            };
-
-            const animate = options?.animate ?? true;
-            if (animate) {
-                if (typeof animate === "function") {
-                    animate(ripple, dispose);
-                } else {
-                    animateRipple(ripple, getDuration(diameter), dispose);
-                }
-            }
-
-            if (options?.disposeOnEvents) {
-                const events = Array.isArray(options.disposeOnEvents)
-                    ? options.disposeOnEvents
-                    : ["animationend", "animationcancel"];
-                for (const event of events) {
-                    ripple.addEventListener(event, dispose);
-                }
-            }
-        });
+            ],
+            {
+                duration: PRESS_GROW_MS,
+                easing: STANDARD_EASING,
+                fill: "forwards",
+            },
+        );
+        press = { element, startedAt: performance.now() };
     }
 
-    rippleContainer.addEventListener("pointerdown", handleClick);
+    function end() {
+        clearTimeout(touchTimer);
+        touchTimer = undefined;
+        if (!press) return;
+        const { element, startedAt } = press;
+        press = undefined;
+        const held = performance.now() - startedAt;
+        const fade = element.animate([{ opacity: 1 }, { opacity: 0 }], {
+            duration: FADE_MS,
+            delay: Math.max(MINIMUM_PRESS_MS - held, 0),
+            easing: "linear",
+            fill: "forwards",
+        });
+        fade.finished.then(
+            () => element.remove(),
+            () => element.remove(),
+        );
+    }
+
+    function onPointerDown(e: PointerEvent) {
+        if (e.button !== 0 || isDisabled(container, options)) return;
+        if (!claim(e, options.allowPropagation ?? false)) return;
+        const origin = { x: e.clientX, y: e.clientY };
+        if (e.pointerType === "touch") {
+            // Wait so a scroll that starts here cancels the press (as `pointercancel`) first.
+            clearTimeout(touchTimer);
+            touchTimer = setTimeout(() => begin(origin), TOUCH_DELAY_MS);
+        } else {
+            begin(origin);
+        }
+    }
+
+    function onPointerUp(e: PointerEvent) {
+        // A tap released inside the touch delay still gets its full ripple.
+        if (touchTimer !== undefined) {
+            clearTimeout(touchTimer);
+            touchTimer = undefined;
+            begin({ x: e.clientX, y: e.clientY });
+        }
+        end();
+    }
+
+    function onCancel() {
+        clearTimeout(touchTimer);
+        touchTimer = undefined;
+        end();
+    }
+
+    // A click with no pointer behind it (Enter or Space) ripples from the center.
+    function onClick(e: MouseEvent) {
+        if (e.detail !== 0 || isDisabled(container, options)) return;
+        if (!claim(e, options.allowPropagation ?? false)) return;
+        begin("center");
+        end();
+    }
+
+    const listeners: [string, EventListener][] = [
+        ["pointerdown", onPointerDown as EventListener],
+        ["pointerup", onPointerUp as EventListener],
+        ["pointerleave", onCancel],
+        ["pointercancel", onCancel],
+        ["click", onClick as EventListener],
+    ];
+    for (const [type, listener] of listeners) {
+        container.addEventListener(type, listener);
+    }
 
     return () => {
-        rippleContainer.removeEventListener("pointerdown", handleClick);
+        for (const [type, listener] of listeners) {
+            container.removeEventListener(type, listener);
+        }
+        onCancel();
     };
-}
-
-function getDuration(diameter: number) {
-    return 600 + diameter * 0.125;
 }
