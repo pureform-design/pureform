@@ -27,8 +27,11 @@ import { BASE_TEXT_STYLES } from "./contracts/typography";
 import {
     colorFromTokens,
     defineProvider,
+    elevationFromTokens,
     extend,
+    motionFromTokens,
     shapeFromTokens,
+    stateFromTokens,
     typographyFromTokens,
 } from "./provider";
 import { colorRole } from "./refs";
@@ -170,6 +173,60 @@ describe("resolveTheme", () => {
                 }),
             }),
         ).toThrow('sets text style "code" in undeclared font role "mono"');
+    });
+
+    it("names a value of the wrong kind", () => {
+        const radii = fill(SHAPE_ROLES, () => px(4));
+        expect(() =>
+            resolveTheme({
+                ...providers(),
+                shape: shapeFromTokens({
+                    radii: { ...radii, small: hex("#fff") as never },
+                }),
+            }),
+        ).toThrow(
+            'shape provider "tokens" gives radius "small" a color value, not a length in px, rem, em, or %',
+        );
+    });
+
+    it("checks durations, opacities, and elevation shadows by kind", () => {
+        const theme = providers();
+        const bad = (patch: object, message: string) =>
+            expect(() => resolveTheme({ ...theme, ...patch })).toThrow(message);
+        bad(
+            {
+                state: stateFromTokens({
+                    opacities: {
+                        ...theme.state.generate({} as never).opacities,
+                        stateHover: px(8),
+                    },
+                }),
+            },
+            'gives opacity "stateHover" a numeric value, not a percentage',
+        );
+        bad(
+            {
+                motion: motionFromTokens({
+                    ...theme.motion.generate({} as never),
+                    durations: {
+                        ...theme.motion.generate({} as never).durations,
+                        short1: px(50),
+                    },
+                }),
+            },
+            'gives duration "short1" a numeric value, not a duration in ms or s',
+        );
+        bad(
+            {
+                elevation: elevationFromTokens({
+                    levels: fill(ELEVATION_LEVELS, () => ({
+                        shadow: hex("#000") as never,
+                        tint: transparent,
+                    })),
+                }),
+            },
+            'gives level "level0" "shadow" a color value, not a shadow or none',
+        );
     });
 
     it("rejects a provider passed for the wrong domain", () => {

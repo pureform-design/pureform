@@ -82,6 +82,80 @@ const requireNames = (
     }
 };
 
+type Kind = { label: string; test: (node: unknown) => boolean };
+
+const nodeType = (node: unknown) => (node as { type?: string } | null)?.type;
+
+const numericIn = (label: string, units: readonly string[]): Kind => ({
+    label,
+    test: (node) =>
+        nodeType(node) === "numeric" &&
+        units.includes((node as { unit: string }).unit),
+});
+
+const COLOR_TYPES = [
+    "color",
+    "colorMix",
+    "keyword",
+    "literal",
+    "alias",
+    "dynamic",
+];
+
+// The value kinds each contract slot accepts. The types enforce these at compile time; this
+// repeats the check for plain JavaScript callers and casts.
+const KINDS = {
+    color: {
+        label: "a color",
+        test: (node: unknown): boolean =>
+            COLOR_TYPES.includes(nodeType(node) ?? "") ||
+            (nodeType(node) === "conditional" &&
+                [
+                    (node as { base: unknown }).base,
+                    ...(node as { cases: { value: unknown }[] }).cases.map(
+                        (c) => c.value,
+                    ),
+                ].every((v) => KINDS.color.test(v))),
+    },
+    length: numericIn("a length in px, rem, em, or %", [
+        "px",
+        "rem",
+        "em",
+        "%",
+    ]),
+    percent: numericIn("a percentage", ["%"]),
+    duration: numericIn("a duration in ms or s", ["ms", "s"]),
+    weight: numericIn("a unitless number", ["none"]),
+    easing: {
+        label: "an easing",
+        test: (node: unknown) => nodeType(node) === "easing",
+    },
+    font: {
+        label: "a font family",
+        test: (node: unknown) => nodeType(node) === "fontFamily",
+    },
+    shadow: {
+        label: "a shadow or none",
+        test: (node: unknown) =>
+            nodeType(node) === "shadow" || nodeType(node) === "keyword",
+    },
+} satisfies Record<string, Kind>;
+
+const requireKind = (
+    where: string,
+    group: string,
+    record: Record<string, unknown>,
+    kind: Kind,
+) => {
+    for (const [name, value] of Object.entries(record)) {
+        if (!kind.test(value)) {
+            throw new ContractError(
+                `${where} gives ${group} "${name}" a ${nodeType(value) ?? typeof value} value, not ${kind.label}`,
+            );
+        }
+    }
+};
+
 const run = <D extends keyof DomainContext, T>(
     provider: {
         domain: D;
@@ -237,6 +311,8 @@ export const resolveTheme = <
             ...NEUTRAL_ROLES,
             ...c.groups.flatMap(groupRoles),
         ]);
+        requireKind(where, "color role", c.roles, KINDS.color);
+        requireKind(where, "primitive color", c.primitives ?? {}, KINDS.color);
         if (options.requireDark) {
             for (const [role, value] of Object.entries(c.roles)) {
                 if (!hasDark(c.roles, value)) {
@@ -250,8 +326,22 @@ export const resolveTheme = <
     const typography = step("typography", providers.typography, (t, where) => {
         requireNames(where, "font role", t.fonts, BASE_FONT_ROLES);
         requireNames(where, "text style", t.styles, BASE_TEXT_STYLES);
+        requireKind(where, "font role", t.fonts, KINDS.font);
         for (const [name, style] of Object.entries(t.styles)) {
-            const { font } = style as { font: string };
+            const { font, ...values } = style as TextStyleNode<string>;
+            const { fontWeight, ...lengths } = values;
+            requireKind(
+                where,
+                `text style "${name}" value`,
+                lengths,
+                KINDS.length,
+            );
+            requireKind(
+                where,
+                `text style "${name}" value`,
+                { fontWeight },
+                KINDS.weight,
+            );
             if (!(font in t.fonts)) {
                 throw new ContractError(
                     `${where} sets text style "${name}" in undeclared font role "${font}"`,
@@ -259,23 +349,33 @@ export const resolveTheme = <
             }
         }
     });
-    const shape = step("shape", providers.shape, (c, where) =>
-        requireNames(where, "radius", c.radii, SHAPE_ROLES),
-    );
+    const shape = step("shape", providers.shape, (c, where) => {
+        requireNames(where, "radius", c.radii, SHAPE_ROLES);
+        requireKind(where, "radius", c.radii, KINDS.length);
+    });
     const layout = step("layout", providers.layout, (c, where) => {
         requireNames(where, "spacing step", c.spacing, SPACING_STEPS);
         requireNames(where, "size", c.sizes, SIZE_ROLES);
+        requireKind(where, "spacing step", c.spacing, KINDS.length);
+        requireKind(where, "size", c.sizes, KINDS.length);
     });
-    const state = step("state", providers.state, (c, where) =>
-        requireNames(where, "opacity", c.opacities, STATE_ROLES),
-    );
+    const state = step("state", providers.state, (c, where) => {
+        requireNames(where, "opacity", c.opacities, STATE_ROLES);
+        requireKind(where, "opacity", c.opacities, KINDS.percent);
+    });
     const motion = step("motion", providers.motion, (c, where) => {
         requireNames(where, "duration", c.durations, DURATION_ROLES);
         requireNames(where, "easing", c.easings, EASING_ROLES);
+        requireKind(where, "duration", c.durations, KINDS.duration);
+        requireKind(where, "easing", c.easings, KINDS.easing);
     });
-    const elevation = step("elevation", providers.elevation, (c, where) =>
-        requireNames(where, "level", c.levels, ELEVATION_LEVELS),
-    );
+    const elevation = step("elevation", providers.elevation, (c, where) => {
+        requireNames(where, "level", c.levels, ELEVATION_LEVELS);
+        for (const [level, { shadow, tint }] of Object.entries(c.levels)) {
+            requireKind(where, `level "${level}"`, { shadow }, KINDS.shadow);
+            requireKind(where, `level "${level}"`, { tint }, KINDS.color);
+        }
+    });
 
     const lowered: Partial<CoreConfig> = {
         tokens: {
