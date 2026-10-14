@@ -73,6 +73,9 @@ export interface PureformOptions<
     motion?: MotionProvider;
     /** Default `materialElevation()`. */
     elevation?: ElevationProvider;
+    /** Require every color role to have a dark value, for a page that offers both schemes.
+     *  Default `false`. */
+    requireDark?: boolean;
     /** Named themes, each replacing some of the providers above. Every token that differs
      *  from the base is emitted for the theme, and Panda applies it inside
      *  `[data-panda-theme=<name>]` (list the names in Panda's `staticCss.themes`). A theme
@@ -188,14 +191,19 @@ export const pureform = <
         motion: options.motion ?? materialMotion(),
         elevation: options.elevation ?? materialElevation(),
     };
-    const theme = resolveTheme(providers);
+    const resolveOptions = { requireDark: options.requireDark ?? false };
+    const theme = resolveTheme(providers, resolveOptions);
 
     const themes: Record<string, ThemeOverride> = {};
     for (const [name, overrides] of Object.entries(options.themes ?? {})) {
-        const variant = resolveTheme({
-            ...providers,
-            ...overrides,
-        } as ThemeProviders<string, string, string>);
+        const variant = resolveTheme(
+            { ...providers, ...overrides } as ThemeProviders<
+                string,
+                string,
+                string
+            >,
+            resolveOptions,
+        );
         const extra = variant.color.groups.filter(
             (group) =>
                 !(theme.color.groups as readonly string[]).includes(group),

@@ -1,11 +1,15 @@
 import { px } from "@pureform/core/ast";
 import {
     materialColor,
+    materialElevation,
     materialLayout,
+    materialMotion,
     materialShape,
+    materialState,
+    materialTypescale,
 } from "@pureform/material";
 import { compilePreset } from "@pureform/panda-adapter";
-import { extend } from "@pureform/theme";
+import { colorFromTokens, extend, resolveTheme } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
 
 import { scrim } from "./components/scrim";
@@ -111,6 +115,24 @@ describe("pureform providers", () => {
         });
         expect(config.tokens.spacing?.["2"]).toEqual(px(16));
         expect(config.tokens.sizes?.touchTarget).toEqual(px(56));
+    });
+
+    it("checks dark values when asked", () => {
+        expect(() => pureform({ requireDark: true })).not.toThrow();
+        const light = colorFromTokens({
+            ...resolveTheme({
+                color: materialColor({ mode: "light" }),
+                typography: materialTypescale(),
+                shape: materialShape(),
+                layout: materialLayout(),
+                state: materialState(),
+                motion: materialMotion(),
+                elevation: materialElevation(),
+            }).color,
+        });
+        expect(() => pureform({ color: light, requireDark: true })).toThrow(
+            "no dark value",
+        );
     });
 
     it("takes an extended provider", () => {
