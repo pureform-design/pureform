@@ -227,11 +227,11 @@ describe("compileValue conditionals", () => {
         });
     });
 
-    it("lowers dragged to Panda's data-dragging condition", () => {
+    it("lowers dragged to a data-dragging selector that outranks hover", () => {
         const node = when("dragged", unitless(0.16), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            _dragging: "0.16",
+            "&[data-dragging][data-dragging]": "0.16",
         });
     });
 });

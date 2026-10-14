@@ -46,8 +46,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateHover))",
             "base": "token(colors.primary)",
@@ -66,8 +66,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateHover))",
             "base": "token(colors.secondary)",
@@ -86,8 +86,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateHover))",
             "base": "token(colors.tertiary)",
@@ -106,8 +106,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.positive), token(colors.onPositive) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.positive), token(colors.onPositive) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.positive), token(colors.onPositive) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.positive), token(colors.onPositive) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.positive), token(colors.onPositive) token(opacity.stateHover))",
             "base": "token(colors.positive)",
@@ -126,8 +126,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.notice), token(colors.onNotice) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.notice), token(colors.onNotice) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.notice), token(colors.onNotice) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.notice), token(colors.onNotice) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.notice), token(colors.onNotice) token(opacity.stateHover))",
             "base": "token(colors.notice)",
@@ -146,8 +146,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.negative), token(colors.onNegative) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.negative), token(colors.onNegative) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.negative), token(colors.onNegative) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.negative), token(colors.onNegative) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.negative), token(colors.onNegative) token(opacity.stateHover))",
             "base": "token(colors.negative)",
@@ -166,8 +166,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateHover))",
             "base": "token(colors.info)",
@@ -186,8 +186,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateHover))",
             "base": "token(colors.primaryContainer)",
@@ -206,8 +206,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
             "base": "token(colors.secondaryContainer)",
@@ -226,8 +226,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
             "base": "token(colors.tertiaryContainer)",
@@ -246,8 +246,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateHover))",
             "base": "token(colors.positiveContainer)",
@@ -266,8 +266,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateHover))",
             "base": "token(colors.noticeContainer)",
@@ -286,8 +286,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateHover))",
             "base": "token(colors.negativeContainer)",
@@ -306,8 +306,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
             "base": "token(colors.infoContainer)",
@@ -327,8 +327,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
             "base": "transparent",
@@ -348,8 +348,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
             "base": "transparent",
@@ -369,8 +369,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
             "base": "transparent",
@@ -390,8 +390,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateHover))",
             "base": "transparent",
@@ -411,8 +411,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateHover))",
             "base": "transparent",
@@ -432,8 +432,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateHover))",
             "base": "transparent",
@@ -453,8 +453,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
             "base": "transparent",
@@ -473,8 +473,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
             "base": "transparent",
@@ -493,8 +493,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
             "base": "transparent",
@@ -513,8 +513,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
             "base": "transparent",
@@ -533,8 +533,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateHover))",
             "base": "transparent",
@@ -553,8 +553,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateHover))",
             "base": "transparent",
@@ -573,8 +573,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateHover))",
             "base": "transparent",
@@ -593,8 +593,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
             "base": "transparent",
@@ -613,8 +613,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -633,8 +633,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -653,8 +653,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -673,8 +673,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.positive) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.positive) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.positive) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.positive) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.positive) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -693,8 +693,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.notice) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.notice) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.notice) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.notice) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.notice) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -713,8 +713,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.negative) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.negative) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.negative) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.negative) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.negative) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",
@@ -733,8 +733,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateDragged))",
             "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.statePressed))",
-            "_dragging": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateDragged))",
             "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateFocus))",
             "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateHover))",
             "base": "token(colors.surfaceContainerLow)",

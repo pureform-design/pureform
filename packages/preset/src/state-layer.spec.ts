@@ -66,7 +66,7 @@ describe("stateLayer", () => {
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateFocus))",
                 _active:
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.statePressed))",
-                _dragging:
+                "&[data-dragging][data-dragging]":
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateDragged))",
             },
         });

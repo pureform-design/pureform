@@ -25,7 +25,9 @@ const CONDITION_KEY: Record<string, string> = {
     focusVisible: "_focusVisible",
     active: "_active",
     pressed: "_active",
-    dragged: "_dragging",
+    // Repeating the attribute raises specificity above hover, focus, and pressed, so the drag
+    // tint wins wherever Panda orders the rules; the pointer is over the element while dragging.
+    dragged: "&[data-dragging][data-dragging]",
     disabled: "_disabled",
     selected: "_selected",
     checked: "_checked",
