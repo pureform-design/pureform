@@ -4,4 +4,5 @@ export * from "./components/icon-button";
 export * from "./components/card";
 export * from "./components/scrim";
 export * from "./components/ripple";
+export * from "./components/text";
 export * from "./pureform";

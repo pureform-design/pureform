@@ -44,6 +44,7 @@ import { card } from "./components/card";
 import { createIconButton } from "./components/icon-button";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
+import { createText } from "./components/text";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -222,6 +223,7 @@ export const pureform = <
         card,
         scrim,
         ripple,
+        text: createText(Object.keys(theme.typography.styles)),
     };
     const chosen = options.components?.({ theme, defaults }) ?? defaults;
     const components = Object.fromEntries(

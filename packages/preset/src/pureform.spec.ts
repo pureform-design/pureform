@@ -23,6 +23,7 @@ describe("pureform", () => {
             "card",
             "scrim",
             "ripple",
+            "text",
         ]);
     });
 
@@ -210,5 +211,40 @@ describe("pureform themes", () => {
                 },
             }),
         ).toThrow('theme "coral" adds color groups coral');
+    });
+});
+
+describe("pureform text styles", () => {
+    const code = {
+        font: "mono" as const,
+        fontSize: "0.875rem",
+        lineHeight: "1.25rem",
+        letterSpacing: "0rem",
+        fontWeight: 400,
+    };
+    const config = pureform({
+        typography: materialTypescale({
+            fonts: {
+                mono: { families: ["JetBrains Mono"], generic: "monospace" },
+            },
+            custom: { code },
+        }),
+    });
+
+    it("gives the text component a style variant per text style", () => {
+        const spec = config.components.text;
+        const styles =
+            spec && "recipe" in spec
+                ? Object.keys(spec.recipe.variants?.style ?? {})
+                : [];
+        expect(styles).toHaveLength(16);
+        expect(styles).toContain("code");
+        expect(styles).toContain("labelLarge");
+    });
+
+    it("compiles an added style to a Panda text style variant", () => {
+        const recipe = compilePreset(config).theme?.recipes?.text;
+        expect(recipe?.variants?.style?.code).toEqual({ textStyle: "code" });
+        expect(recipe?.defaultVariants).toEqual({ style: "bodyMedium" });
     });
 });
