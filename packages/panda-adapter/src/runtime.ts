@@ -5,7 +5,7 @@
 // rebuild, as long as the new config has the same recipes. `themeVars` computes them.
 
 import { tokenValue } from "@pureform/core";
-import type { ValueNode } from "@pureform/core/ast";
+import type { ConditionalNode, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, Token } from "@pureform/core/types";
 
 import { compileNodeToCSS } from "./compile-node";
@@ -17,14 +17,31 @@ export interface ThemeVarsOptions {
     tokenPrefix?: string;
     /** The pureform component var prefix, as passed to `compilePreset`. Default none. */
     prefix?: CompileCtx["prefix"];
+    /** Resolve scheme-dependent tokens for this scheme. Without it they are left out. */
+    scheme?: "light" | "dark";
 }
+
+// A token that varies only by color scheme, resolved for one scheme. Any other condition
+// leaves it unresolved.
+const forScheme = (
+    node: ConditionalNode,
+    scheme: "light" | "dark",
+): ValueNode | undefined => {
+    let value: ValueNode = node.base;
+    for (const c of node.cases) {
+        if (c.on !== "dark" && c.on !== "light") return undefined;
+        if (c.on === scheme) value = c.value;
+    }
+    return value;
+};
 
 /** Every token in `config` as a CSS var name and value, ready for `element.style.setProperty`.
  *  Values that reference other tokens spell the var, so they follow overrides too.
  *
- *  A conditional semantic token (a color with a dark case) is left out: Panda already switches
- *  it by scheme, and it points at primitives this sets. Text styles and utilities are not vars,
- *  so a provider that changes them needs a rebuild. */
+ *  A token that varies by color scheme needs `scheme` to resolve, since Panda declares it on
+ *  the root and an override on a descendant would not reach it. Pass the scheme the page shows,
+ *  and recompute when it changes. Other conditional tokens are left out. Text styles and
+ *  utilities are not vars, so a provider that changes them needs a rebuild. */
 export const themeVars = (
     config: CoreConfig,
     options: ThemeVarsOptions = {},
@@ -39,8 +56,11 @@ export const themeVars = (
     const vars: Record<string, string> = {};
 
     const add = (path: string[], entry: Token<ValueNode>) => {
-        const node = tokenValue(entry) as ValueNode;
-        if (node.type === "conditional") return;
+        let node = tokenValue(entry) as ValueNode | undefined;
+        if (node?.type === "conditional") {
+            node = options.scheme ? forScheme(node, options.scheme) : undefined;
+        }
+        if (!node) return;
         const target = aliasTarget(path);
         if (target.kind !== "token") return;
         vars[tokenVarName(target.ref, options.tokenPrefix)] = compileNodeToCSS(

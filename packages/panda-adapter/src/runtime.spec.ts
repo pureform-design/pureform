@@ -50,8 +50,17 @@ describe("themeVars", () => {
         );
     });
 
-    it("leaves scheme-dependent tokens to Panda's own rules", () => {
+    it("leaves scheme-dependent tokens out without a scheme", () => {
         expect(themeVars(config)).not.toHaveProperty("--colors-primary");
+    });
+
+    it("resolves scheme-dependent tokens for the given scheme", () => {
+        expect(themeVars(config, { scheme: "light" })["--colors-primary"]).toBe(
+            "var(--colors-violet-light)",
+        );
+        expect(themeVars(config, { scheme: "dark" })["--colors-primary"]).toBe(
+            "var(--colors-violet-dark)",
+        );
     });
 
     it("applies Panda's prefix", () => {
