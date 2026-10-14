@@ -10,7 +10,7 @@ import type {
     EasingNode,
     NumericScalarNode,
 } from "@pureform/core/ast";
-import { defineProvider } from "@pureform/theme";
+import { defineProvider, gridLayout } from "@pureform/theme";
 import type {
     BaseColorGroup,
     ColorContract,
@@ -18,9 +18,11 @@ import type {
     DurationRole,
     EasingRole,
     ElevationProvider,
+    LayoutProvider,
     MotionProvider,
     ShapeProvider,
     ShapeRole,
+    SizeRole,
     StateProvider,
     StateRole,
     TypographyProvider,
@@ -120,6 +122,34 @@ export const materialShape = (
         name: "material",
         generate: () => ({ radii: toPx({ ...MATERIAL_RADII, ...radii }) }),
     });
+
+/** Material's component sizes, in px. */
+export const MATERIAL_SIZES: Record<SizeRole, number> = {
+    iconSmall: 18,
+    iconMedium: 24,
+    controlSmall: 32,
+    controlMedium: 40,
+    controlLarge: 48,
+    touchTarget: 48,
+};
+
+export interface MaterialLayoutOptions {
+    /** The spacing grid unit, in px. Default `4`. */
+    grid?: number;
+    /** Change or add component sizes, in px. */
+    sizes?: Partial<Record<SizeRole, number>> & Record<string, number>;
+}
+
+/** Material's 4px spacing grid and component sizes. */
+export const materialLayout = (
+    options: MaterialLayoutOptions = {},
+): LayoutProvider => {
+    const provider = gridLayout({
+        grid: options.grid ?? 4,
+        sizes: { ...MATERIAL_SIZES, ...options.sizes },
+    });
+    return { ...provider, name: "material" };
+};
 
 /** Material's state opacities, in percent: the state layer tints, the disabled strengths,
  *  and the scrim. */

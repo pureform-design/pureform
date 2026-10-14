@@ -13,6 +13,7 @@ import { describe, expect, it } from "vitest";
 import {
     materialColor,
     materialElevation,
+    materialLayout,
     materialMotion,
     materialShape,
     materialState,
@@ -23,6 +24,7 @@ const material = () => ({
     color: materialColor(),
     typography: materialTypescale(),
     shape: materialShape(),
+    layout: materialLayout(),
     state: materialState(),
     motion: materialMotion(),
     elevation: materialElevation(),
@@ -98,6 +100,7 @@ describe("Material providers", () => {
         const theme = resolveTheme({
             ...material(),
             shape: materialShape({ medium: 10, pill: 999 }),
+            layout: materialLayout({ grid: 5, sizes: { touchTarget: 44 } }),
             state: materialState({ stateHover: 6 }),
             motion: materialMotion({
                 durations: { medium2: 200 },
@@ -106,6 +109,8 @@ describe("Material providers", () => {
         });
         expect(theme.shape.radii.medium).toEqual(px(10));
         expect(theme.shape.radii.pill).toEqual(px(999));
+        expect(theme.layout.spacing["4"]).toEqual(px(20));
+        expect(theme.layout.sizes.touchTarget).toEqual(px(44));
         expect(theme.state.opacities.stateHover).toEqual(pct(6));
         expect(theme.motion.durations.medium2).toEqual(numeric(200, "ms"));
         expect(theme.motion.easings.bounce).toBeDefined();
