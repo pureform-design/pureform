@@ -145,3 +145,48 @@ describe("pureform providers", () => {
         );
     });
 });
+
+describe("pureform themes", () => {
+    const config = pureform({
+        themes: {
+            teal: {
+                color: materialColor({ seed: "#006A60" }),
+                shape: materialShape({ medium: 4 }),
+            },
+        },
+    });
+    const teal = config.themes?.teal;
+
+    it("emits only what a theme changes", () => {
+        expect(teal?.tokens?.colors?.primaryLight).toBeDefined();
+        expect(teal?.tokens?.radii).toEqual({ medium: px(4) });
+        expect(teal?.tokens?.spacing).toBeUndefined();
+        expect(teal?.fonts).toBeUndefined();
+    });
+
+    it("re-declares semantic tokens that read a changed token", () => {
+        expect(teal?.semanticTokens?.colors?.primary).toBeDefined();
+        expect(teal?.semanticTokens?.colors?.brand).toBeDefined();
+        expect(teal?.semanticTokens?.shadows).toBeUndefined();
+    });
+
+    it("compiles to a Panda theme", () => {
+        const preset = compilePreset(config);
+        const themes = preset.themes as Record<string, { tokens: object }>;
+        expect(themes.teal?.tokens).toHaveProperty("radii.medium.value", "4px");
+    });
+
+    it("rejects a theme that adds color groups", () => {
+        expect(() =>
+            pureform({
+                themes: {
+                    coral: {
+                        color: materialColor({
+                            customSeeds: { coral: "#FF7F50" },
+                        }),
+                    },
+                },
+            }),
+        ).toThrow('theme "coral" adds color groups coral');
+    });
+});
