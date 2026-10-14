@@ -1,3 +1,4 @@
+import { css } from "$css";
 import { button, card, iconButton } from "$recipes";
 import { cubicBezier, pct } from "@pureform/core/ast";
 import {
@@ -10,7 +11,13 @@ import {
 } from "@pureform/material";
 import { themeVars } from "@pureform/panda-adapter";
 import { pureform } from "@pureform/preset";
-import { extend, modularScale, roundedShape } from "@pureform/theme";
+import {
+    extend,
+    flatElevation,
+    modularScale,
+    roundedShape,
+    tonalElevation,
+} from "@pureform/theme";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import {
@@ -30,6 +37,8 @@ export const Route = createFileRoute("/providers")({
 
 // Each domain offers a few providers. Picking one rebuilds the pureform config in the browser
 // and applies its tokens to the preview as CSS vars, so the static Panda CSS restyles live.
+// Text styles and elevation levels read tokens too, so every domain switches without a
+// rebuild.
 type Choice<P> = { label: string; provider: () => P };
 
 const COLOR: Choice<ReturnType<typeof materialColor>>[] = [
@@ -57,8 +66,12 @@ const COLOR: Choice<ReturnType<typeof materialColor>>[] = [
 const TYPOGRAPHY: Choice<ReturnType<typeof materialTypescale>>[] = [
     { label: "Material (Roboto)", provider: () => materialTypescale() },
     {
-        label: "System UI",
-        provider: () => modularScale(),
+        label: "Modular scale 1.25, system UI",
+        provider: () => modularScale({ ratio: 1.25 }),
+    },
+    {
+        label: "Compact modular scale",
+        provider: () => modularScale({ base: 0.875, ratio: 1.15 }),
     },
     {
         label: "Serif headings, mono labels",
@@ -139,6 +152,8 @@ const ELEVATION: Choice<ReturnType<typeof materialElevation>>[] = [
                 },
             })),
     },
+    { label: "Tonal (tint, no shadow)", provider: () => tonalElevation() },
+    { label: "Flat", provider: () => flatElevation() },
     {
         label: "Heavy shadows",
         provider: () =>
@@ -160,7 +175,7 @@ const ELEVATION: Choice<ReturnType<typeof materialElevation>>[] = [
 
 const DOMAINS = [
     { key: "color", title: "Color", choices: COLOR },
-    { key: "typography", title: "Typography (fonts)", choices: TYPOGRAPHY },
+    { key: "typography", title: "Typography", choices: TYPOGRAPHY },
     { key: "shape", title: "Shape", choices: SHAPE },
     { key: "state", title: "State", choices: STATE },
     { key: "motion", title: "Motion (press and hold)", choices: MOTION },
@@ -173,6 +188,10 @@ const FILLS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
 const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
+
+const HEADLINE = css({ textStyle: "headlineMedium", margin: 0 });
+const TITLE = css({ textStyle: "titleLarge", margin: 0 });
+const BODY = css({ textStyle: "bodyMedium", marginTop: "2", marginBottom: 0 });
 
 type Scheme = "light" | "dark";
 
@@ -292,12 +311,6 @@ function ProvidersRoute() {
                         </fieldset>
                     )}
                 </For>
-                <p style={{ "font-size": "13px", opacity: 0.7 }}>
-                    Every token switches live. Text sizes and the elevation
-                    utility are compiled into static CSS, so a provider that
-                    changes those (a modular scale, tonal elevation) needs a
-                    rebuild to show fully.
-                </p>
             </aside>
 
             <section style={previewStyle()}>
@@ -306,6 +319,8 @@ function ProvidersRoute() {
                         {result().error}
                     </p>
                 )}
+
+                <h2 class={HEADLINE}>Theme preview</h2>
 
                 <div style={row}>
                     <For each={FILLS}>
@@ -382,21 +397,8 @@ function ProvidersRoute() {
                                     style={{ width: "200px", padding: "16px" }}
                                 >
                                     <Ripple />
-                                    <h3
-                                        style={{
-                                            margin: 0,
-                                            "font-family": "var(--fonts-brand)",
-                                            "font-size": "22px",
-                                        }}
-                                    >
-                                        {variant} card
-                                    </h3>
-                                    <p
-                                        style={{
-                                            margin: "8px 0 0",
-                                            "font-family": "var(--fonts-plain)",
-                                        }}
-                                    >
+                                    <h3 class={TITLE}>{variant} card</h3>
+                                    <p class={BODY}>
                                         Headings use the brand font; body text
                                         uses the plain one.
                                     </p>
