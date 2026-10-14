@@ -1,14 +1,26 @@
-import { colorMix, none, pct, px, rem, transparent } from "@pureform/core/ast";
+import {
+    alias,
+    colorMix,
+    none,
+    oklch,
+    pct,
+    px,
+    rem,
+    transparent,
+    when,
+} from "@pureform/core/ast";
 import { describe, expect, it } from "vitest";
 
 import {
     flatElevation,
     gridLayout,
     modularScale,
+    oklchPalette,
     roundedShape,
     tonalElevation,
 } from ".";
 import { providers } from "../__fixtures__/theme";
+import { colorFromTokens } from "../provider";
 import { colorRole } from "../refs";
 import { resolveTheme } from "../resolve";
 
@@ -113,5 +125,73 @@ describe("gridLayout", () => {
         expect(layout.spacing["4"]).toEqual(px(32));
         expect(config.tokens.sizes?.touchTarget).toEqual(px(44));
         expect(config.tokens.spacing?.["16"]).toEqual(px(128));
+    });
+});
+
+describe("oklchPalette", () => {
+    const palette = oklchPalette({
+        groups: { brand: { hue: 250 }, danger: { hue: 25, chroma: 0.2 } },
+    });
+
+    it("fills the color contract from hues", () => {
+        const { color } = resolveTheme(
+            { ...providers(), color: palette },
+            { requireDark: true },
+        );
+        expect(color.groups).toEqual(["brand", "danger"]);
+        expect(color.primitives?.dangerLight).toEqual(oklch(0.5, 0.2, 25));
+        expect(color.primitives?.onDangerContainerDark).toEqual(
+            oklch(0.92, 0.12, 25),
+        );
+        expect(color.roles.surface).toEqual(
+            when(
+                "dark",
+                alias("tokens", "colors", "surfaceDark"),
+                alias("tokens", "colors", "surfaceLight"),
+            ),
+        );
+    });
+
+    it("takes changed neutral tones", () => {
+        const theme = resolveTheme({
+            ...providers(),
+            color: oklchPalette({
+                groups: { primary: { hue: 140 } },
+                tones: { surface: { light: 1 } },
+            }),
+        });
+        expect(theme.color.primitives?.surfaceLight).toMatchObject({
+            components: [1, 0.006, 270],
+        });
+    });
+});
+
+describe("requireDark", () => {
+    it("rejects a role with no dark value", () => {
+        expect(() => resolveTheme(providers(), { requireDark: true })).toThrow(
+            'color provider "tokens" gives color role',
+        );
+    });
+
+    it("accepts keywords and aliases to roles with dark values", () => {
+        const base = resolveTheme({
+            ...providers(),
+            color: oklchPalette({ groups: { primary: { hue: 1 } } }),
+        }).color;
+        const withAlias = colorFromTokens({
+            groups: base.groups,
+            roles: {
+                ...base.roles,
+                brand: colorRole("primary"),
+                clear: transparent,
+            },
+            primitives: base.primitives ?? {},
+        });
+        expect(() =>
+            resolveTheme(
+                { ...providers(), color: withAlias },
+                { requireDark: true },
+            ),
+        ).not.toThrow();
     });
 });

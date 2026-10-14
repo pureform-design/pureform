@@ -227,3 +227,5 @@ export const gridLayout = ({
             ) as Record<SizeRole, NumericScalarNode>,
         }),
     });
+
+export * from "./oklch-palette";

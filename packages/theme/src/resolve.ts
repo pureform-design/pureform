@@ -170,6 +170,40 @@ export const elevationFragment = (
     };
 };
 
+export interface ResolveOptions {
+    /** Require every color role to have a dark value: a `when("dark", …)` case, a keyword
+     *  such as `transparent`, or an alias to a role that has one. Set it when the page offers
+     *  both schemes, so a hand-authored palette cannot leave a role fixed. Default `false`. */
+    requireDark?: boolean;
+}
+
+// Whether a role looks right in the dark scheme: it has a dark case, is scheme-independent
+// (a keyword), or aliases a role that does.
+const hasDark = (
+    roles: Record<string, unknown>,
+    value: unknown,
+    seen = new Set<unknown>(),
+): boolean => {
+    if (seen.has(value)) return false;
+    seen.add(value);
+    const node = value as {
+        type?: string;
+        path?: string[];
+        cases?: { on: unknown }[];
+    };
+    if (node?.type === "keyword") return true;
+    if (node?.type === "conditional") {
+        return (node.cases ?? []).some((c) =>
+            Array.isArray(c.on) ? c.on.includes("dark") : c.on === "dark",
+        );
+    }
+    if (node?.type === "alias" && node.path?.[0] === "semanticTokens") {
+        const target = roles[node.path.at(-1) ?? ""];
+        return target !== undefined && hasDark(roles, target, seen);
+    }
+    return false;
+};
+
 /** Run every provider in domain order, check each contract, and lower them all to config. */
 export const resolveTheme = <
     G extends string,
@@ -177,6 +211,7 @@ export const resolveTheme = <
     TStyle extends string,
 >(
     providers: ThemeProviders<G, TFont, TStyle>,
+    options: ResolveOptions = {},
 ): Theme<G, TFont, TStyle> => {
     const extras: (ThemeFragment | undefined)[] = [];
     const resolved: Partial<ResolvedTheme> = {};
@@ -197,12 +232,21 @@ export const resolveTheme = <
         return result.contract;
     };
 
-    const color = step("color", providers.color, (c, where) =>
+    const color = step("color", providers.color, (c, where) => {
         requireNames(where, "color role", c.roles, [
             ...NEUTRAL_ROLES,
             ...c.groups.flatMap(groupRoles),
-        ]),
-    );
+        ]);
+        if (options.requireDark) {
+            for (const [role, value] of Object.entries(c.roles)) {
+                if (!hasDark(c.roles, value)) {
+                    throw new ContractError(
+                        `${where} gives color role "${role}" no dark value`,
+                    );
+                }
+            }
+        }
+    });
     const typography = step("typography", providers.typography, (t, where) => {
         requireNames(where, "font role", t.fonts, BASE_FONT_ROLES);
         requireNames(where, "text style", t.styles, BASE_TEXT_STYLES);
