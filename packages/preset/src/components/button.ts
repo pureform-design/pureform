@@ -17,6 +17,7 @@ import {
 import type { StyleMap } from "@pureform/core/ast";
 
 import {
+    COLOR_GROUPS,
     colorCompounds,
     colorVariants,
     componentTokens,
@@ -24,7 +25,7 @@ import {
     sys,
     touchTarget,
 } from "./shared";
-import type { Fill } from "./shared";
+import type { ColorGroups, Fill } from "./shared";
 
 const FILLS: Record<string, Fill> = {
     filled: "filled",
@@ -58,54 +59,58 @@ const size = (s: Size): { root: StyleMap } => ({
     },
 });
 
-export const button = defineSlotComponent({
-    name: "button",
-    $meta: {
-        description:
-            "Material common button. Render the icon slot only when there is an icon.",
-    },
-    tokens,
-    slots: ["root", "label", "icon", "touchTarget"],
-    recipe: {
-        base: {
-            root: {
-                position: relative,
-                display: inlineFlex,
-                flexDirection: row,
-                alignItems: center,
-                justifyContent: center,
-                gap: ref("gap"),
-                borderWidth: px(0),
-                borderRadius: ref("radius"),
-                cursor: pointer,
-                states: { disabled: { pointerEvents: none } },
-            },
-            label: { textStyle: alias("textStyles", "labelLarge") },
-            icon: {
-                width: ref("iconSize"),
-                height: ref("iconSize"),
-            },
-            touchTarget,
+/** Build the button with a `color` variant per group in `groups`. */
+export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
+    defineSlotComponent({
+        name: "button",
+        $meta: {
+            description:
+                "Material common button. Render the icon slot only when there is an icon.",
         },
-        variants: {
-            color: colorVariants(),
-            variant: Object.fromEntries(
-                Object.entries(FILLS).map(([name, fill]) => [
-                    name,
-                    fillVariant(fill, ref),
-                ]),
-            ),
-            size: {
-                small: size("Small"),
-                medium: size("Medium"),
-                large: size("Large"),
+        tokens,
+        slots: ["root", "label", "icon", "touchTarget"],
+        recipe: {
+            base: {
+                root: {
+                    position: relative,
+                    display: inlineFlex,
+                    flexDirection: row,
+                    alignItems: center,
+                    justifyContent: center,
+                    gap: ref("gap"),
+                    borderWidth: px(0),
+                    borderRadius: ref("radius"),
+                    cursor: pointer,
+                    states: { disabled: { pointerEvents: none } },
+                },
+                label: { textStyle: alias("textStyles", "labelLarge") },
+                icon: {
+                    width: ref("iconSize"),
+                    height: ref("iconSize"),
+                },
+                touchTarget,
+            },
+            variants: {
+                color: colorVariants(groups),
+                variant: Object.fromEntries(
+                    Object.entries(FILLS).map(([name, fill]) => [
+                        name,
+                        fillVariant(fill, ref),
+                    ]),
+                ),
+                size: {
+                    small: size("Small"),
+                    medium: size("Medium"),
+                    large: size("Large"),
+                },
+            },
+            compoundVariants: colorCompounds(FILLS, groups),
+            defaultVariants: {
+                color: "primary",
+                variant: "filled",
+                size: "medium",
             },
         },
-        compoundVariants: colorCompounds(FILLS),
-        defaultVariants: {
-            color: "primary",
-            variant: "filled",
-            size: "medium",
-        },
-    },
-});
+    });
+
+export const button = createButton();

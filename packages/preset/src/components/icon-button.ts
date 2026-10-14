@@ -13,6 +13,7 @@ import {
 import type { StyleMap } from "@pureform/core/ast";
 
 import {
+    COLOR_GROUPS,
     colorCompounds,
     colorVariants,
     componentTokens,
@@ -20,7 +21,7 @@ import {
     sys,
     touchTarget,
 } from "./shared";
-import type { Fill } from "./shared";
+import type { ColorGroups, Fill } from "./shared";
 
 const FILLS: Record<string, Fill> = {
     filled: "filled",
@@ -46,48 +47,52 @@ const size = (
     root: { width: ref(token), height: ref(token) },
 });
 
-export const iconButton = defineSlotComponent({
-    name: "iconButton",
-    $meta: { description: "Material icon button holding a single icon." },
-    tokens,
-    slots: ["root", "icon", "touchTarget"],
-    recipe: {
-        base: {
-            root: {
-                position: relative,
-                display: inlineFlex,
-                alignItems: center,
-                justifyContent: center,
-                borderWidth: px(0),
-                borderRadius: ref("radius"),
-                cursor: pointer,
-                states: { disabled: { pointerEvents: none } },
+/** Build the iconButton with a `color` variant per group in `groups`. */
+export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
+    defineSlotComponent({
+        name: "iconButton",
+        $meta: { description: "Material icon button holding a single icon." },
+        tokens,
+        slots: ["root", "icon", "touchTarget"],
+        recipe: {
+            base: {
+                root: {
+                    position: relative,
+                    display: inlineFlex,
+                    alignItems: center,
+                    justifyContent: center,
+                    borderWidth: px(0),
+                    borderRadius: ref("radius"),
+                    cursor: pointer,
+                    states: { disabled: { pointerEvents: none } },
+                },
+                icon: {
+                    width: ref("iconSize"),
+                    height: ref("iconSize"),
+                },
+                touchTarget,
             },
-            icon: {
-                width: ref("iconSize"),
-                height: ref("iconSize"),
+            variants: {
+                color: colorVariants(groups),
+                variant: Object.fromEntries(
+                    Object.entries(FILLS).map(([name, fill]) => [
+                        name,
+                        fillVariant(fill, ref),
+                    ]),
+                ),
+                size: {
+                    small: size("sizeSmall"),
+                    medium: size("sizeMedium"),
+                    large: size("sizeLarge"),
+                },
             },
-            touchTarget,
-        },
-        variants: {
-            color: colorVariants(),
-            variant: Object.fromEntries(
-                Object.entries(FILLS).map(([name, fill]) => [
-                    name,
-                    fillVariant(fill, ref),
-                ]),
-            ),
-            size: {
-                small: size("sizeSmall"),
-                medium: size("sizeMedium"),
-                large: size("sizeLarge"),
+            compoundVariants: colorCompounds(FILLS, groups),
+            defaultVariants: {
+                color: "primary",
+                variant: "standard",
+                size: "medium",
             },
         },
-        compoundVariants: colorCompounds(FILLS),
-        defaultVariants: {
-            color: "primary",
-            variant: "standard",
-            size: "medium",
-        },
-    },
-});
+    });
+
+export const iconButton = createIconButton();

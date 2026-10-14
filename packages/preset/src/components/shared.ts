@@ -36,6 +36,10 @@ export const COLOR_GROUPS = [
 
 export type ColorGroup = (typeof COLOR_GROUPS)[number];
 
+/** The color groups a component offers through its `color` variant. The built-in groups by
+ *  default; `pureform()` passes the palette's groups, including custom ones. */
+export type ColorGroups = readonly string[];
+
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** A Material system color from the palette, for example `sys("onPrimary")`. It reads the
@@ -105,7 +109,7 @@ export type Fill = "filled" | "tonal" | "outlined" | "text" | "elevated";
 /** Container and content colors for one fill in one color group. */
 export const fillColors = (
     fill: Fill,
-    group: ColorGroup,
+    group: string,
 ): { container: ColorValue; content: ColorValue } => {
     switch (fill) {
         case "filled":
@@ -137,9 +141,12 @@ type CompoundVariants = NonNullable<SlottedSpec["recipe"]["compoundVariants"]>;
  *  how it fills. The disabled colors live here rather than on the variant because Panda puts
  *  compound variants in a cascade layer after the variants layer: a disabled color on the
  *  variant would lose to the compound's resting color. */
-export const colorCompounds = (fills: Record<string, Fill>): CompoundVariants =>
+export const colorCompounds = (
+    fills: Record<string, Fill>,
+    groups: ColorGroups = COLOR_GROUPS,
+): CompoundVariants =>
     Object.entries(fills).flatMap(([variant, fill]) =>
-        COLOR_GROUPS.map((color) => {
+        groups.map((color) => {
             const { container, content } = fillColors(fill, color);
             return {
                 match: { color, variant },
@@ -155,8 +162,10 @@ export const colorCompounds = (fills: Record<string, Fill>): CompoundVariants =>
 
 /** The `color` variant group: one empty entry per color group, so compound variants can match
  *  on it. */
-export const colorVariants = (): Record<string, { root: StyleMap }> =>
-    Object.fromEntries(COLOR_GROUPS.map((group) => [group, { root: {} }]));
+export const colorVariants = (
+    groups: ColorGroups = COLOR_GROUPS,
+): Record<string, { root: StyleMap }> =>
+    Object.fromEntries(groups.map((group) => [group, { root: {} }]));
 
 /** Disabled colors for a fill: Material draws a disabled control in the on-surface color, with
  *  a faint container for filled styles and a faint outline for the outlined style. */
