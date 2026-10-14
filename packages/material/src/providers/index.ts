@@ -4,16 +4,7 @@
 // published values (the shape scale, state opacities, motion tokens), so a theme can take
 // Material for some domains and its own providers for others.
 
-import {
-    cubicBezier,
-    fontFamily,
-    none,
-    numeric,
-    pct,
-    px,
-    transparent,
-    unitless,
-} from "@pureform/core/ast";
+import { cubicBezier, numeric, pct, px } from "@pureform/core/ast";
 import type {
     ColorNode,
     EasingNode,
@@ -26,27 +17,22 @@ import type {
     ColorProvider,
     DurationRole,
     EasingRole,
-    ElevationContract,
     ElevationProvider,
-    ElevationStyle,
     MotionProvider,
     ShapeProvider,
     ShapeRole,
     StateProvider,
     StateRole,
-    TextStyleNode,
-    TypographyContract,
     TypographyProvider,
 } from "@pureform/theme";
 
-import { elevation } from "../core-config/elevation";
+import { elevationContract } from "../core-config/elevation";
 import type { ElevationOptions } from "../core-config/elevation";
 import { palette, paletteColorGroups } from "../core-config/palette";
 import type { PaletteOptions } from "../core-config/palette";
-import { toLength } from "../core-config/typescale";
+import { typescaleContract } from "../core-config/typescale";
 import type { HexColor } from "../types";
-import { Typography } from "../typography";
-import type { BaseTextStyleName, TypographyArgs } from "../typography";
+import type { TypographyArgs } from "../typography";
 
 export interface MaterialColorOptions<
     TCustomColorGroups extends string = never,
@@ -81,24 +67,6 @@ export const materialColor = <TCustomColorGroups extends string = never>(
         },
     });
 
-const BASE_TEXT_STYLES: BaseTextStyleName[] = [
-    "displayLarge",
-    "displayMedium",
-    "displaySmall",
-    "headlineLarge",
-    "headlineMedium",
-    "headlineSmall",
-    "titleLarge",
-    "titleMedium",
-    "titleSmall",
-    "bodyLarge",
-    "bodyMedium",
-    "bodySmall",
-    "labelLarge",
-    "labelMedium",
-    "labelSmall",
-];
-
 /** Material's type scale. `fonts` changes or adds font stacks, and `custom` changes or adds
  *  text styles, as for `Typography.create()`. */
 export const materialTypescale = <
@@ -110,39 +78,7 @@ export const materialTypescale = <
     defineProvider({
         domain: "typography",
         name: "material",
-        generate: () => {
-            const scale = Typography.create<TCustomTextStyleName, TFontRole>(
-                options,
-            );
-            type Contract = TypographyContract<TFontRole, TCustomTextStyleName>;
-            const names = [
-                ...BASE_TEXT_STYLES,
-                ...Object.keys(options.custom ?? {}),
-            ];
-            const styles: Record<string, TextStyleNode<TFontRole>> = {};
-            for (const name of new Set(names)) {
-                const style = scale.get(name as TCustomTextStyleName);
-                styles[name] = {
-                    font: style.font,
-                    fontSize: toLength(style.fontSize),
-                    lineHeight: toLength(style.lineHeight),
-                    letterSpacing: toLength(style.letterSpacing),
-                    fontWeight: unitless(style.fontWeight),
-                };
-            }
-            const fonts: Record<
-                string,
-                Contract["fonts"][keyof Contract["fonts"]]
-            > = {};
-            for (const role of scale.fontRoles) {
-                const { families, generic } = scale.fonts[role];
-                fonts[role] = fontFamily([...families], generic);
-            }
-            return {
-                fonts: fonts as Contract["fonts"],
-                styles: styles as Contract["styles"],
-            };
-        },
+        generate: () => typescaleContract(options),
     });
 
 /** Material's layered shadows, with no tint. The shadow color and layer opacities stay tokens,
@@ -153,23 +89,7 @@ export const materialElevation = (
     defineProvider({
         domain: "elevation",
         name: "material",
-        generate: () => {
-            const { tokens, semanticTokens, utilities } = elevation(options);
-            const utility = utilities?.shadowElevation;
-            const values = utility?.kind === "static" ? utility.values : {};
-            const levels: Record<string, ElevationStyle> = {};
-            for (const [level, style] of Object.entries(values)) {
-                levels[level] = {
-                    shadow: (style.boxShadow ??
-                        none) as ElevationStyle["shadow"],
-                    tint: transparent,
-                };
-            }
-            return {
-                levels: levels as ElevationContract["levels"],
-                extra: { tokens, semanticTokens },
-            };
-        },
+        generate: () => elevationContract(options),
     });
 
 const toPx = <K extends string>(values: Record<K, number>) =>

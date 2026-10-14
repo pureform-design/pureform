@@ -8,6 +8,7 @@
 import { alias, hct, oklch, when } from "@pureform/core/ast";
 import type { AliasNode, ColorNode, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { BASE_COLOR_GROUPS } from "@pureform/theme";
 import chroma from "chroma-js";
 
 import { ColorScheme } from "../color-scheme";
@@ -37,23 +38,13 @@ export interface PaletteOptions<TCustomColorGroups extends string = never> {
     overrides?: ColorSchemeArgs<TCustomColorGroups>["overrides"];
 }
 
-const KEY_COLOR_GROUPS: BaseKeyColorGroup[] = [
-    "primary",
-    "secondary",
-    "tertiary",
-    "positive",
-    "notice",
-    "negative",
-    "info",
-];
-
 /** The color groups a palette generates key colors for: the built-in accent and semantic
  *  groups, then any new groups named in `customSeeds`, in order. Neutral groups are left out,
  *  since components tint with key colors only. */
 export const paletteColorGroups = <TCustomColorGroups extends string = never>(
     customSeeds: PaletteOptions<TCustomColorGroups>["customSeeds"] = {},
 ): (BaseKeyColorGroup | TCustomColorGroups)[] => {
-    const groups: string[] = [...KEY_COLOR_GROUPS];
+    const groups: string[] = [...BASE_COLOR_GROUPS];
     for (const name of Object.keys(customSeeds)) {
         if (
             !groups.includes(name) &&

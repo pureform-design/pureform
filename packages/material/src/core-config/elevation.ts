@@ -1,13 +1,12 @@
 // Generate a `@pureform/core` elevation fragment from the Material shadow model.
 //
-// Material elevation is several layered shadows (umbra, penumbra, ambient), not one. This
-// emits a static `shadowElevation` utility whose named steps each carry a composite
-// `shadow(...)` of those layers, so a recipe applies `{ shadowElevation: "level1" }` and the
-// adapter lowers it per target. The geometry of each level is fixed by the Material model, but
-// the shadow color and the per-layer opacities are tokens, so a theme can retint or soften
-// every level without regenerating the utility. Material's surface tint is left out.
+// Material elevation is several layered shadows (umbra, penumbra, ambient), not one. Each level
+// becomes a composite `shadow(...)` of those layers with no tint, lowered the way a theme
+// lowers the elevation contract: a shadow token per level and a `shadowElevation` utility, so
+// a recipe applies `{ shadowElevation: "level1" }`. The geometry of each level is fixed by the
+// Material model, but the shadow color and the per-layer opacities are tokens, so a theme can
+// retint or soften every level without regenerating anything.
 
-import { defineStaticUtility } from "@pureform/core";
 import {
     alias,
     colorMix,
@@ -17,29 +16,20 @@ import {
     shadow,
     transparent,
 } from "@pureform/core/ast";
-import type { ColorValue, ShadowLayer, StyleMap } from "@pureform/core/ast";
+import type { ColorValue, ShadowLayer } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { ELEVATION_LEVELS, elevationFragment } from "@pureform/theme";
+import type { ElevationContract } from "@pureform/theme";
 
 import { ShadowElevations } from "../elevation";
-import type { BaseElevation, BoxShadow } from "../elevation";
+import type { BoxShadow } from "../elevation";
 import type { Pixel } from "../types";
 
 export interface ElevationOptions {
-    /** Named levels to emit, in order. Default `level0` through `level5`. */
-    levels?: BaseElevation[];
     /** Color every shadow layer is drawn in. Default the Material `shadow` system color that
      *  `palette()` emits, so compose a palette alongside or pass a color here. */
     shadowColor?: ColorValue;
 }
-
-const DEFAULT_LEVELS: BaseElevation[] = [
-    "level0",
-    "level1",
-    "level2",
-    "level3",
-    "level4",
-    "level5",
-];
 
 /** Semantic color every elevation layer is drawn in. */
 export const ELEVATION_SHADOW_COLOR = "elevationShadow";
@@ -68,54 +58,71 @@ const toLayer = (box: BoxShadow, opacity: LayerOpacity): ShadowLayer => ({
     ),
 });
 
-/** Build an elevation fragment: the layer opacity tokens, the shadow color, and a static
- *  `shadowElevation` utility. Each level is a `StyleMap` setting `boxShadow`; `level0` resets
- *  to `none`. Compose it over a base config: `mergeConfigs(baseConfig, palette(seed),
- *  elevation())`. */
-export const elevation = (
+/** Material's shadow model as an elevation contract: each level's layered shadow with no
+ *  tint, plus the shadow color and layer opacity tokens the shadows read. */
+export const elevationContract = (
     options: ElevationOptions = {},
-): Pick<CoreConfig, "tokens" | "semanticTokens" | "utilities"> => {
-    const {
-        levels = DEFAULT_LEVELS,
-        shadowColor = alias("semanticTokens", "colors", "shadow"),
-    } = options;
+): ElevationContract & {
+    extra: Required<Pick<CoreConfig, "tokens" | "semanticTokens">>;
+} => {
+    const { shadowColor = alias("semanticTokens", "colors", "shadow") } =
+        options;
     const shadows = ShadowElevations.create();
 
-    const values: Record<string, StyleMap> = {};
-    for (const level of levels) {
+    const levels = {} as ElevationContract["levels"];
+    for (const level of ELEVATION_LEVELS) {
         const elev = shadows.get(level);
         const isFlat =
             toPx(elev.umbra.blurRadius) === 0 &&
             toPx(elev.penumbra.blurRadius) === 0 &&
             toPx(elev.ambient.blurRadius) === 0;
-        values[level] = isFlat
-            ? { boxShadow: none }
-            : {
-                  boxShadow: shadow(
+        levels[level] = {
+            shadow: isFlat
+                ? none
+                : shadow(
                       toLayer(elev.umbra, "elevationUmbra"),
                       toLayer(elev.penumbra, "elevationPenumbra"),
                       toLayer(elev.ambient, "elevationAmbient"),
                   ),
-              };
+            tint: transparent,
+        };
     }
 
     return {
-        tokens: {
-            opacity: Object.fromEntries(
-                Object.entries(ELEVATION_OPACITIES).map(([name, value]) => [
-                    name,
-                    pct(value),
-                ]),
-            ),
+        levels,
+        extra: {
+            tokens: {
+                opacity: Object.fromEntries(
+                    Object.entries(ELEVATION_OPACITIES).map(([name, value]) => [
+                        name,
+                        pct(value),
+                    ]),
+                ),
+            },
+            semanticTokens: {
+                colors: { [ELEVATION_SHADOW_COLOR]: shadowColor },
+            },
         },
+    };
+};
+
+/** Build an elevation fragment: the layer opacity tokens, the shadow color, a shadow and a
+ *  tint token per level, and the `shadowElevation` utility that reads them. Compose it over a
+ *  base config: `mergeConfigs(baseConfig, palette(seed), elevation())`. */
+export const elevation = (
+    options: ElevationOptions = {},
+): Pick<CoreConfig, "tokens" | "semanticTokens" | "utilities"> => {
+    const { levels, extra } = elevationContract(options);
+    const fragment = elevationFragment({ levels });
+    return {
+        tokens: extra.tokens,
         semanticTokens: {
-            colors: { [ELEVATION_SHADOW_COLOR]: shadowColor },
+            ...fragment.semanticTokens,
+            colors: {
+                ...fragment.semanticTokens.colors,
+                ...extra.semanticTokens.colors,
+            },
         },
-        utilities: {
-            shadowElevation: defineStaticUtility({
-                property: "boxShadow",
-                values,
-            }),
-        },
+        utilities: fragment.utilities,
     };
 };

@@ -1,6 +1,10 @@
-/** The font roles every type scale has. Material sets display, headline, and title styles in
- *  the brand typeface and body and label styles in the plain one. */
-export type BaseFontRole = "brand" | "plain";
+import type { BaseFontRole, BaseTextStyle } from "@pureform/theme";
+
+export type { BaseFontRole } from "@pureform/theme";
+
+/** Material's type roles, `displayLarge` through `labelSmall`. The names come from the
+ *  typography contract in `@pureform/theme`. */
+export type BaseTextStyleName = BaseTextStyle;
 
 /** The CSS generic family a font stack falls back to. */
 export type GenericFamily =
@@ -24,20 +28,3 @@ export type TextStyle<TFontRole extends string = never> = {
     readonly fontWeight: number;
     readonly letterSpacing: string;
 };
-
-export type BaseTextStyleName =
-    | "displayLarge"
-    | "displayMedium"
-    | "displaySmall"
-    | "headlineLarge"
-    | "headlineMedium"
-    | "headlineSmall"
-    | "titleLarge"
-    | "titleMedium"
-    | "titleSmall"
-    | "bodyLarge"
-    | "bodyMedium"
-    | "bodySmall"
-    | "labelLarge"
-    | "labelMedium"
-    | "labelSmall";

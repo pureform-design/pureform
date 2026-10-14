@@ -135,18 +135,27 @@ describe("palette color options", () => {
 
 describe("elevation", () => {
     it("resets level0 to no shadow", () => {
-        const util = elevation().utilities?.shadowElevation;
-        if (util?.kind !== "static") throw new Error("expected static utility");
-        expect(util.values.level0?.boxShadow).toEqual({
+        expect(elevation().semanticTokens.shadows?.level0).toEqual({
             type: "keyword",
             value: "none",
         });
     });
 
-    it("stacks three shadow layers for a raised level", () => {
+    it("applies each level through the shadow and tint tokens", () => {
         const util = elevation().utilities?.shadowElevation;
         if (util?.kind !== "static") throw new Error("expected static utility");
-        const boxShadow = util.values.level2?.boxShadow;
+        expect(util.values.level2?.boxShadow).toEqual({
+            type: "alias",
+            path: ["semanticTokens", "shadows", "level2"],
+        });
+        expect(elevation().semanticTokens.colors?.elevationTintLevel2).toEqual({
+            type: "keyword",
+            value: "transparent",
+        });
+    });
+
+    it("stacks three shadow layers for a raised level", () => {
+        const boxShadow = elevation().semanticTokens.shadows?.level2;
         expect(boxShadow && "layers" in boxShadow).toBe(true);
         if (boxShadow && "layers" in boxShadow) {
             expect(boxShadow.layers).toHaveLength(3);
@@ -154,9 +163,7 @@ describe("elevation", () => {
     });
 
     it("draws each layer from the shadow color and its opacity token", () => {
-        const util = elevation().utilities?.shadowElevation;
-        if (util?.kind !== "static") throw new Error("expected static utility");
-        const boxShadow = util.values.level1?.boxShadow;
+        const boxShadow = elevation().semanticTokens.shadows?.level1;
         if (!boxShadow || !("layers" in boxShadow)) {
             throw new Error("expected a layered shadow");
         }
@@ -220,13 +227,46 @@ describe("typescale", () => {
         expect(Object.keys(typescale().textStyles ?? {})).toHaveLength(15);
     });
 
-    it("encodes lengths with their unit and reads the family from a font token", () => {
-        expect(typescale().textStyles?.labelLarge).toEqual({
+    it("encodes lengths with their unit as tokens the style reads", () => {
+        const { tokens, textStyles } = typescale();
+        expect(tokens.fontSize?.labelLarge).toEqual({
+            type: "numeric",
+            value: 14,
+            unit: "px",
+        });
+        expect(tokens.lineHeight?.labelLarge).toEqual({
+            type: "numeric",
+            value: 1.25,
+            unit: "rem",
+        });
+        expect(tokens.letterSpacing?.labelLarge).toEqual({
+            type: "numeric",
+            value: 0.00625,
+            unit: "rem",
+        });
+        expect(tokens.fontWeight?.labelLarge).toEqual({
+            type: "numeric",
+            value: 500,
+            unit: "none",
+        });
+        expect(textStyles?.labelLarge).toEqual({
             fontFamily: { type: "alias", path: ["fonts", "plain"] },
-            fontSize: { type: "numeric", value: 14, unit: "px" },
-            lineHeight: { type: "numeric", value: 1.25, unit: "rem" },
-            letterSpacing: { type: "numeric", value: 0.00625, unit: "rem" },
-            fontWeight: { type: "numeric", value: 500, unit: "none" },
+            fontSize: {
+                type: "alias",
+                path: ["tokens", "fontSize", "labelLarge"],
+            },
+            lineHeight: {
+                type: "alias",
+                path: ["tokens", "lineHeight", "labelLarge"],
+            },
+            letterSpacing: {
+                type: "alias",
+                path: ["tokens", "letterSpacing", "labelLarge"],
+            },
+            fontWeight: {
+                type: "alias",
+                path: ["tokens", "fontWeight", "labelLarge"],
+            },
         });
     });
 

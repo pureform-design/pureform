@@ -1,3 +1,4 @@
+import { BASE_FONT_ROLES } from "@pureform/theme";
 import type { DeepPartial } from "@pureform/type-utils";
 import { deepMerge } from "@pureform/utils";
 
@@ -25,8 +26,6 @@ export type TypographyArgs<
             : TextStyle<NoInfer<TFontRole>>;
     };
 };
-
-const BASE_FONT_ROLES: BaseFontRole[] = ["brand", "plain"];
 
 const DEFAULT_FONTS: Record<BaseFontRole, FontStack> = {
     brand: { families: ["Roboto"], generic: "sans-serif" },
@@ -208,7 +207,8 @@ export class Typography<
         return [
             ...BASE_FONT_ROLES,
             ...Object.keys(this._fonts).filter(
-                (role) => !BASE_FONT_ROLES.includes(role as BaseFontRole),
+                (role) =>
+                    !(BASE_FONT_ROLES as readonly string[]).includes(role),
             ),
         ] as (BaseFontRole | TFontRole)[];
     }

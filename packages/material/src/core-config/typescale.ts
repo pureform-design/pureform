@@ -1,39 +1,22 @@
 // Generate a `@pureform/core` text style fragment from the Material type scale.
 //
-// Each Material role (`displayLarge` through `labelSmall`) becomes a composite text style, so a
-// recipe applies one through `textStyle: alias("textStyles", "labelLarge")`. Each style reads
-// its family from the font token of its role (`brand`, `plain`, or an added one), so swapping a
-// typeface is one override.
+// `typescaleContract` builds the typography contract from `Typography`: a font stack per role
+// and every Material role plus any added in `custom`. `typescale` lowers it the way a theme
+// does, so each style value is a token and the whole scale is CSS vars.
 
-import { alias, fontFamily, numeric, unitless } from "@pureform/core/ast";
-import type { NumericScalarNode, StyleMap } from "@pureform/core/ast";
+import { fontFamily, numeric, unitless } from "@pureform/core/ast";
+import type { FontFamilyNode, NumericScalarNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { BASE_TEXT_STYLES, typographyFragment } from "@pureform/theme";
+import type { TextStyleNode, TypographyContract } from "@pureform/theme";
 
 import { Typography } from "../typography";
-import type { BaseTextStyleName, TypographyArgs } from "../typography";
+import type { TypographyArgs } from "../typography";
 
 export type TypescaleOptions<
     TCustomTextStyleName extends string = never,
     TFontRole extends string = never,
 > = TypographyArgs<TCustomTextStyleName, TFontRole>;
-
-const ROLES: BaseTextStyleName[] = [
-    "displayLarge",
-    "displayMedium",
-    "displaySmall",
-    "headlineLarge",
-    "headlineMedium",
-    "headlineSmall",
-    "titleLarge",
-    "titleMedium",
-    "titleSmall",
-    "bodyLarge",
-    "bodyMedium",
-    "bodySmall",
-    "labelLarge",
-    "labelMedium",
-    "labelSmall",
-];
 
 /** Parse a type scale length, stored as a CSS string such as "1.25rem" or "14px". */
 export const toLength = (value: string): NumericScalarNode => {
@@ -44,28 +27,25 @@ export const toLength = (value: string): NumericScalarNode => {
     return numeric(Number(match[1]), match[2] as "px" | "rem" | "em");
 };
 
-/** Build a `fonts` and `textStyles` fragment from the Material type scale: a font token per
- *  role and a text style per Material role plus any added in `custom`. Compose it over a base
- *  config: `mergeConfigs(baseConfig, typescale())`. */
-export const typescale = <
+/** The Material type scale as a typography contract. */
+export const typescaleContract = <
     TCustomTextStyleName extends string = never,
     TFontRole extends string = never,
 >(
     options: TypescaleOptions<TCustomTextStyleName, TFontRole> = {},
-): Pick<CoreConfig, "fonts" | "textStyles"> => {
+): TypographyContract<TFontRole, TCustomTextStyleName> => {
+    type Contract = TypographyContract<TFontRole, TCustomTextStyleName>;
     const scale = Typography.create<TCustomTextStyleName, TFontRole>(options);
-    const styles = [
-        ...ROLES,
-        ...(Object.keys(options.custom ?? {}) as TCustomTextStyleName[]).filter(
-            (name) => !ROLES.includes(name as BaseTextStyleName),
-        ),
-    ];
+    const names = new Set<string>([
+        ...BASE_TEXT_STYLES,
+        ...Object.keys(options.custom ?? {}),
+    ]);
 
-    const textStyles: Record<string, StyleMap> = {};
-    for (const role of styles) {
-        const style = scale.get(role);
-        textStyles[role] = {
-            fontFamily: alias("fonts", style.font),
+    const styles: Record<string, TextStyleNode<TFontRole>> = {};
+    for (const name of names) {
+        const style = scale.get(name as TCustomTextStyleName);
+        styles[name] = {
+            font: style.font,
             fontSize: toLength(style.fontSize),
             lineHeight: toLength(style.lineHeight),
             letterSpacing: toLength(style.letterSpacing),
@@ -73,13 +53,24 @@ export const typescale = <
         };
     }
 
+    const fonts: Record<string, FontFamilyNode> = {};
+    for (const role of scale.fontRoles) {
+        const { families, generic } = scale.fonts[role];
+        fonts[role] = fontFamily([...families], generic);
+    }
+
     return {
-        fonts: Object.fromEntries(
-            scale.fontRoles.map((role) => {
-                const { families, generic } = scale.fonts[role];
-                return [role, fontFamily([...families], generic)];
-            }),
-        ),
-        textStyles,
+        fonts: fonts as Contract["fonts"],
+        styles: styles as Contract["styles"],
     };
 };
+
+/** Build a `fonts`, `tokens`, and `textStyles` fragment from the Material type scale. Compose it
+ *  over a base config: `mergeConfigs(baseConfig, typescale())`. */
+export const typescale = <
+    TCustomTextStyleName extends string = never,
+    TFontRole extends string = never,
+>(
+    options: TypescaleOptions<TCustomTextStyleName, TFontRole> = {},
+): Pick<CoreConfig, "tokens" | "fonts" | "textStyles"> =>
+    typographyFragment(typescaleContract(options));
