@@ -9,7 +9,7 @@ describe("ripple", () => {
         expect(() => configWith(ripple)).not.toThrow();
     });
 
-    it("clips to the surface and tints with the content color", () => {
+    it("clips to the surface and fades the content color at the edge", () => {
         const recipe = compilePreset(configWith(ripple)).theme?.slotRecipes
             ?.ripple;
         expect(recipe?.base?.root).toMatchObject({
@@ -18,8 +18,8 @@ describe("ripple", () => {
             pointerEvents: "none",
         });
         expect(recipe?.base?.ripple).toMatchObject({
-            backgroundColor:
-                "color-mix(in srgb, transparent, var(--components-ripple-color, currentColor) var(--components-ripple-opacity, token(opacity.statePressed)))",
+            backgroundImage:
+                "radial-gradient(closest-side, color-mix(in srgb, transparent, var(--components-ripple-color, currentColor) var(--components-ripple-opacity, token(opacity.statePressed))) max(calc(100% - 70px), 65%), transparent 100%)",
         });
     });
 });

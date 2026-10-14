@@ -1,9 +1,10 @@
 // The pureform ripple: the ink that spreads from the press point of an interactive surface.
 //
 // Only the styles live here. `ripple()` from `@pureform/js-effects` draws each ripple: it finds
-// the element marked `data-ripple-layer` inside the pressed surface, appends a ripple element
-// sized and positioned from the press, and animates it out. Give the layer the root class and
-// pass the ripple class to `ripple()` through its `class` option.
+// the element marked `data-ripple-layer` inside the pressed surface, appends a ripple element,
+// grows it from the press point toward the center while the press lasts, and fades it on
+// release. Give the layer the root class and pass the ripple class to `ripple()` through its
+// `class` option.
 
 import { defineSlotComponent } from "@pureform/core";
 import {
@@ -12,9 +13,13 @@ import {
     colorMix,
     hidden,
     literal,
+    max,
     none,
     pct,
     px,
+    radialGradient,
+    stop,
+    sub,
     transparent,
 } from "@pureform/core/ast";
 
@@ -47,12 +52,21 @@ export const ripple = defineSlotComponent({
             },
             ripple: {
                 position: absolute,
+                top: px(0),
+                left: px(0),
                 borderRadius: pct(50),
                 pointerEvents: none,
-                backgroundColor: colorMix(
-                    transparent,
-                    ref("color"),
-                    ref("opacity"),
+                // Solid in the middle and fading over the outer 70px (at least the outer 35%),
+                // the soft edge Material draws.
+                backgroundImage: radialGradient(
+                    [
+                        stop(
+                            colorMix(transparent, ref("color"), ref("opacity")),
+                            max(sub(pct(100), px(70)), pct(65)),
+                        ),
+                        stop(transparent, pct(100)),
+                    ],
+                    "closest-side",
                 ),
             },
         },
