@@ -144,6 +144,7 @@
       "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/material": "catalog:",
+        "@pureform/theme": "catalog:",
       },
       "devDependencies": {
         "@pureform/panda-adapter": "catalog:",

@@ -1,10 +1,11 @@
 import { defineConfig, mergeConfigs } from "@pureform/core";
 import { alias, hex } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { materialState } from "@pureform/material";
 import { compileStyleMap } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
-import { stateLayer, stateLayerTokens } from "./state-layer";
+import { stateLayer } from "./state-layer";
 
 const base = alias("semanticTokens", "colors", "brand");
 const content = alias("semanticTokens", "colors", "onBrand");
@@ -20,7 +21,7 @@ const config: CoreConfig = mergeConfigs(
         },
         components: {},
     },
-    stateLayerTokens(),
+    { tokens: { opacity: materialState().generate({} as never).opacities } },
 );
 
 describe("stateLayer", () => {
@@ -68,17 +69,6 @@ describe("stateLayer", () => {
                 _dragging:
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateDragged))",
             },
-        });
-    });
-});
-
-describe("stateLayerTokens", () => {
-    it("emits pureform's default opacities in percent", () => {
-        expect(stateLayerTokens().tokens.opacity).toEqual({
-            stateHover: { type: "numeric", value: 8, unit: "%" },
-            stateFocus: { type: "numeric", value: 10, unit: "%" },
-            statePressed: { type: "numeric", value: 10, unit: "%" },
-            stateDragged: { type: "numeric", value: 16, unit: "%" },
         });
     });
 });

@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/vitest-config"
     - "@pureform/core"
     - "@pureform/material"
+    - "@pureform/theme"
     - "@pureform/panda-adapter"
 
 tasks:
