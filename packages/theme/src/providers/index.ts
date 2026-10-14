@@ -6,16 +6,14 @@
 import {
     colorMix,
     fontFamily,
-    linearGradient,
     none,
     pct,
     px,
     rem,
-    stop,
     transparent,
     unitless,
 } from "@pureform/core/ast";
-import type { FontFamilyNode, StyleMap } from "@pureform/core/ast";
+import type { FontFamilyNode } from "@pureform/core/ast";
 
 import { ELEVATION_LEVELS, SHAPE_ROLES } from "../contracts/foundations";
 import type { ElevationLevel, ShapeRole } from "../contracts/foundations";
@@ -68,20 +66,14 @@ export const tonalElevation = (
                 level5: 14,
             };
             return {
-                levels: byName(ELEVATION_LEVELS, (level): StyleMap => {
-                    const tint = colorMix(
+                levels: byName(ELEVATION_LEVELS, (level) => ({
+                    shadow: none,
+                    tint: colorMix(
                         transparent,
                         colorRole(group),
                         pct(tints[level]),
-                    );
-                    return {
-                        boxShadow: none,
-                        backgroundImage: linearGradient([
-                            stop(tint),
-                            stop(tint),
-                        ]),
-                    };
-                }),
+                    ),
+                })),
             };
         },
     });
@@ -92,7 +84,10 @@ export const flatElevation = (): ElevationProvider =>
         domain: "elevation",
         name: "flat",
         generate: () => ({
-            levels: byName(ELEVATION_LEVELS, () => ({ boxShadow: none })),
+            levels: byName(ELEVATION_LEVELS, () => ({
+                shadow: none,
+                tint: transparent,
+            })),
         }),
     });
 

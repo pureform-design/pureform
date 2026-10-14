@@ -4,9 +4,11 @@
 // add names beyond these, and they pass through as extra tokens.
 
 import type {
+    ColorValue,
     EasingNode,
+    KeywordNode,
     NumericScalarNode,
-    StyleMap,
+    ShadowNode,
 } from "@pureform/core/ast";
 
 export const ELEVATION_LEVELS = [
@@ -20,9 +22,18 @@ export const ELEVATION_LEVELS = [
 
 export type ElevationLevel = (typeof ELEVATION_LEVELS)[number];
 
+/** One elevation level: a shadow and a tint over the surface. Every level sets both, so the
+ *  CSS always has a rule for each and a theme can switch between shadow and tonal elevation
+ *  at runtime. Use `none` for no shadow and `transparent` for no tint. */
+export interface ElevationStyle {
+    shadow: ShadowNode | KeywordNode<"none">;
+    tint: ColorValue;
+}
+
 export interface ElevationContract {
-    /** The styles `shadowElevation: "<level>"` applies: shadows, a tint, or both. */
-    levels: Record<ElevationLevel, StyleMap> & Record<string, StyleMap>;
+    /** What `shadowElevation: "<level>"` applies. */
+    levels: Record<ElevationLevel, ElevationStyle> &
+        Record<string, ElevationStyle>;
 }
 
 export const SHAPE_ROLES = [

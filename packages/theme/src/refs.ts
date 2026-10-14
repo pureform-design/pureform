@@ -24,7 +24,16 @@ export const PATHS = {
     opacity: ["tokens", "opacity"],
     duration: ["durations"],
     easing: ["easings"],
+    fontSize: ["tokens", "fontSize"],
+    lineHeight: ["tokens", "lineHeight"],
+    letterSpacing: ["tokens", "letterSpacing"],
+    fontWeight: ["tokens", "fontWeight"],
+    shadow: ["semanticTokens", "shadows"],
 } as const;
+
+/** The semantic color an elevation level's tint lowers to, for example `elevationTintLevel2`. */
+export const elevationTintName = (level: string): string =>
+    `elevationTint${level.charAt(0).toUpperCase()}${level.slice(1)}`;
 
 /** The utility that applies an elevation level. */
 export const ELEVATION_UTILITY = "shadowElevation";

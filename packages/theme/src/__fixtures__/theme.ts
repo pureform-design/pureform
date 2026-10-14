@@ -5,6 +5,7 @@ import {
     fontFamily,
     hex,
     none,
+    transparent,
     numeric,
     pct,
     px,
@@ -73,6 +74,9 @@ export const providers = () => ({
         easings: fill(EASING_ROLES, () => cubicBezier([0.2, 0, 0, 1])),
     }),
     elevation: elevationFromTokens({
-        levels: fill(ELEVATION_LEVELS, () => ({ boxShadow: none })),
+        levels: fill(ELEVATION_LEVELS, () => ({
+            shadow: none,
+            tint: transparent,
+        })),
     }),
 });

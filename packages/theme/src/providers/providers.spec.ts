@@ -1,8 +1,9 @@
-import { none, px, rem } from "@pureform/core/ast";
+import { colorMix, none, pct, px, rem, transparent } from "@pureform/core/ast";
 import { describe, expect, it } from "vitest";
 
 import { flatElevation, modularScale, roundedShape, tonalElevation } from ".";
 import { providers } from "../__fixtures__/theme";
+import { colorRole } from "../refs";
 import { resolveTheme } from "../resolve";
 
 describe("tonalElevation", () => {
@@ -11,22 +12,9 @@ describe("tonalElevation", () => {
             ...providers(),
             elevation: tonalElevation(),
         });
-        expect(theme.elevation.levels.level3).toMatchObject({
-            boxShadow: none,
-            backgroundImage: {
-                stops: [
-                    {
-                        color: {
-                            type: "colorMix",
-                            with: {
-                                path: ["semanticTokens", "colors", "primary"],
-                            },
-                            amount: { value: 11, unit: "%" },
-                        },
-                    },
-                    {},
-                ],
-            },
+        expect(theme.elevation.levels.level3).toEqual({
+            shadow: none,
+            tint: colorMix(transparent, colorRole("primary"), pct(11)),
         });
     });
 
@@ -35,20 +23,9 @@ describe("tonalElevation", () => {
             ...providers(),
             elevation: tonalElevation({ group: "danger" }),
         });
-        expect(theme.elevation.levels.level1).toMatchObject({
-            backgroundImage: {
-                stops: [
-                    {
-                        color: {
-                            with: {
-                                path: ["semanticTokens", "colors", "danger"],
-                            },
-                        },
-                    },
-                    {},
-                ],
-            },
-        });
+        expect(theme.elevation.levels.level1.tint).toEqual(
+            colorMix(transparent, colorRole("danger"), pct(5)),
+        );
     });
 });
 
@@ -60,7 +37,8 @@ describe("flatElevation", () => {
         });
         expect(Object.values(theme.elevation.levels)).toHaveLength(6);
         expect(theme.elevation.levels.level5).toEqual({
-            boxShadow: none,
+            shadow: none,
+            tint: transparent,
         });
     });
 });

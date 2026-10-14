@@ -4,7 +4,7 @@
 // Material text styles are required, and a provider may add styles (`code`) that set their
 // font through any declared role.
 
-import type { FontFamilyNode, NumericValue } from "@pureform/core/ast";
+import type { FontFamilyNode, NumericScalarNode } from "@pureform/core/ast";
 
 export const BASE_FONT_ROLES = ["brand", "plain"] as const;
 
@@ -30,13 +30,14 @@ export const BASE_TEXT_STYLES = [
 
 export type BaseTextStyle = (typeof BASE_TEXT_STYLES)[number];
 
-/** One text style. `font` names a font role; the rest are lengths and a unitless weight. */
+/** One text style. `font` names a font role; the rest are lengths and a unitless weight.
+ *  Each value becomes a token, so a theme can change the scale at runtime. */
 export interface TextStyleNode<TFont extends string = never> {
     font: BaseFontRole | TFont;
-    fontSize: NumericValue;
-    lineHeight: NumericValue;
-    letterSpacing: NumericValue;
-    fontWeight: NumericValue;
+    fontSize: NumericScalarNode;
+    lineHeight: NumericScalarNode;
+    letterSpacing: NumericScalarNode;
+    fontWeight: NumericScalarNode;
 }
 
 export interface TypographyContract<

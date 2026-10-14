@@ -1,10 +1,15 @@
 import {
+    alias,
     fontFamily,
     hex,
+    linearGradient,
+    none,
     numeric,
     pct,
     px,
     rem,
+    stop,
+    transparent,
     unitless,
     when,
 } from "@pureform/core/ast";
@@ -38,16 +43,41 @@ describe("resolveTheme", () => {
         expect(config.durations?.medium2).toEqual(numeric(200, "ms"));
         expect(config.easings?.emphasized).toBeDefined();
         expect(config.fonts?.brand).toEqual(fontFamily(["Fraunces"], "serif"));
+    });
+
+    it("lowers each text style value to a token the style reads", () => {
+        const { config } = resolveTheme(providers());
+        expect(config.tokens.fontSize?.labelLarge).toEqual(rem(0.875));
+        expect(config.tokens.lineHeight?.labelLarge).toEqual(rem(1.25));
+        expect(config.tokens.letterSpacing?.labelLarge).toEqual(rem(0));
+        expect(config.tokens.fontWeight?.labelLarge).toEqual(unitless(500));
         expect(config.textStyles?.labelLarge).toEqual({
-            fontFamily: { type: "alias", path: ["fonts", "plain"] },
-            fontSize: rem(0.875),
-            lineHeight: rem(1.25),
-            letterSpacing: rem(0),
-            fontWeight: unitless(500),
+            fontFamily: alias("fonts", "plain"),
+            fontSize: alias("tokens", "fontSize", "labelLarge"),
+            lineHeight: alias("tokens", "lineHeight", "labelLarge"),
+            letterSpacing: alias("tokens", "letterSpacing", "labelLarge"),
+            fontWeight: alias("tokens", "fontWeight", "labelLarge"),
         });
-        expect(config.utilities?.shadowElevation).toMatchObject({
+    });
+
+    it("lowers each elevation level to a shadow and a tint the utility reads", () => {
+        const { config } = resolveTheme(providers());
+        expect(config.semanticTokens.shadows?.level2).toEqual(none);
+        expect(config.semanticTokens.colors?.elevationTintLevel2).toEqual(
+            transparent,
+        );
+        const tint = stop(
+            alias("semanticTokens", "colors", "elevationTintLevel2"),
+        );
+        expect(config.utilities?.shadowElevation).toEqual({
             kind: "static",
             property: "boxShadow",
+            values: expect.objectContaining({
+                level2: {
+                    boxShadow: alias("semanticTokens", "shadows", "level2"),
+                    backgroundImage: linearGradient([tint, tint]),
+                },
+            }),
         });
     });
 
@@ -81,14 +111,15 @@ describe("resolveTheme", () => {
             name: "tinted",
             generate: ({ color }) => ({
                 levels: fill(ELEVATION_LEVELS, () => ({
-                    backgroundColor: colorRole(color.groups[0] ?? "primary"),
+                    shadow: none,
+                    tint: colorRole(color.groups[0] ?? "primary"),
                 })),
             }),
         });
         const theme = resolveTheme({ ...providers(), elevation: tinted });
-        expect(theme.elevation.levels.level3).toEqual({
-            backgroundColor: colorRole("primary"),
-        });
+        expect(theme.elevation.levels.level3.tint).toEqual(
+            colorRole("primary"),
+        );
     });
 
     it("keeps the contract through extend", () => {

@@ -4,8 +4,12 @@
 // plain JavaScript callers and casts, and names the provider and the missing name.
 
 import { defineStaticUtility, mergeConfigs } from "@pureform/core";
-import { alias } from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
+import { alias, linearGradient, stop } from "@pureform/core/ast";
+import type {
+    NumericScalarNode,
+    StyleMap,
+    ValueNode,
+} from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 
 import { NEUTRAL_ROLES, groupRoles } from "./contracts/color";
@@ -16,6 +20,7 @@ import {
     SHAPE_ROLES,
     STATE_ROLES,
 } from "./contracts/foundations";
+import type { ElevationContract } from "./contracts/foundations";
 import { BASE_FONT_ROLES, BASE_TEXT_STYLES } from "./contracts/typography";
 import type { TextStyleNode } from "./contracts/typography";
 import type {
@@ -30,7 +35,7 @@ import type {
     ThemeFragment,
     TypographyProvider,
 } from "./provider";
-import { ELEVATION_UTILITY } from "./refs";
+import { ELEVATION_UTILITY, PATHS, elevationTintName } from "./refs";
 
 export interface ThemeProviders<
     G extends string,
@@ -90,13 +95,46 @@ const run = <D extends keyof DomainContext, T>(
     return { contract: contract as T, extra, where };
 };
 
-const textStyleMap = (style: TextStyleNode<string>): StyleMap => ({
-    fontFamily: alias("fonts", style.font),
-    fontSize: style.fontSize,
-    lineHeight: style.lineHeight,
-    letterSpacing: style.letterSpacing,
-    fontWeight: style.fontWeight,
-});
+const TEXT_PROPERTIES = [
+    "fontSize",
+    "lineHeight",
+    "letterSpacing",
+    "fontWeight",
+] as const;
+
+// Each text style value becomes a token named after the style, and the style reads the
+// tokens, so the whole scale is CSS vars.
+const lowerTypography = (styles: Record<string, TextStyleNode<string>>) => {
+    const tokens: Record<string, Record<string, NumericScalarNode>> = {};
+    const textStyles: Record<string, StyleMap> = {};
+    for (const [name, style] of Object.entries(styles)) {
+        const map: StyleMap = { fontFamily: alias(...PATHS.font, style.font) };
+        for (const property of TEXT_PROPERTIES) {
+            (tokens[property] ??= {})[name] = style[property];
+            map[property] = alias(...PATHS[property], name);
+        }
+        textStyles[name] = map;
+    }
+    return { tokens, textStyles };
+};
+
+// Each level's shadow and tint become semantic tokens, and the utility reads them, so every
+// level is CSS vars and always sets both properties.
+const lowerElevation = (levels: ElevationContract["levels"]) => {
+    const shadows: Record<string, ValueNode> = {};
+    const tints: Record<string, ValueNode> = {};
+    const values: Record<string, StyleMap> = {};
+    for (const [level, { shadow, tint }] of Object.entries(levels)) {
+        shadows[level] = shadow;
+        tints[elevationTintName(level)] = tint;
+        const tintRef = alias(...PATHS.color, elevationTintName(level));
+        values[level] = {
+            boxShadow: alias(...PATHS.shadow, level),
+            backgroundImage: linearGradient([stop(tintRef), stop(tintRef)]),
+        };
+    }
+    return { shadows, tints, values };
+};
 
 /** Run every provider in domain order, check each contract, and lower them all to config. */
 export const resolveTheme = <
@@ -185,26 +223,30 @@ export const resolveTheme = <
     );
     extras.push(elevation.extra);
 
+    const type = lowerTypography(
+        typography.contract.styles as Record<string, TextStyleNode<string>>,
+    );
+    const elev = lowerElevation(elevation.contract.levels);
+
     const lowered: Partial<CoreConfig> = {
         tokens: {
             colors: color.contract.primitives ?? {},
             radii: shape.contract.radii,
             opacity: state.contract.opacities,
+            ...type.tokens,
         },
-        semanticTokens: { colors: color.contract.roles },
+        semanticTokens: {
+            colors: { ...color.contract.roles, ...elev.tints },
+            shadows: elev.shadows,
+        },
         fonts: typography.contract.fonts,
-        textStyles: Object.fromEntries(
-            Object.entries(typography.contract.styles).map(([name, style]) => [
-                name,
-                textStyleMap(style as TextStyleNode<string>),
-            ]),
-        ),
+        textStyles: type.textStyles,
         durations: motion.contract.durations,
         easings: motion.contract.easings,
         utilities: {
             [ELEVATION_UTILITY]: defineStaticUtility({
                 property: "boxShadow",
-                values: elevation.contract.levels,
+                values: elev.values,
             }),
         },
     };
