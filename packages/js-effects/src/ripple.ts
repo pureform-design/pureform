@@ -8,7 +8,8 @@
 // Two variants share that press handling and differ only in how a ripple is drawn:
 // - `ink-well`: Material's reference ripple, a soft-edged circle animated with CSS transforms.
 // - `ink-sparkle`: Material's sparkle ripple (Flutter's `InkSparkle`), drawn on a canvas as a
-//   faint fill with a band of twinkling sparkles riding its expanding edge.
+//   faint fill with a shimmering ring of sparkles that expands with it and thins out as the
+//   ripple reaches full size.
 
 const PRESS_GROW_MS = 450;
 const MINIMUM_PRESS_MS = 225;
@@ -29,7 +30,7 @@ export type SparkleOptions = {
     fillOpacity?: number;
     /** Peak opacity of a sparkle. Default `0.6`. */
     sparkleOpacity?: number;
-    /** Sparkles per 100 square pixels of surface. Default `1.2`. */
+    /** Sparkles per pixel of the ring they ride, drawn fresh each frame. Default `0.35`. */
     density?: number;
 };
 
@@ -157,13 +158,18 @@ const inkWell: Renderer = (layer, { size, scale, start, end }, options) => {
 // The standard easing's deceleration, close enough for a per-frame canvas progress.
 const decelerate = (t: number) => 1 - (1 - t) ** 3;
 
-const SPARKLE_BAND = 0.35;
+// Sparkles ride an expanding ring, are scattered around it by a fraction of its radius, and
+// leave a short trail of fading earlier frames.
+const SPARKLE_RING = 0.77;
+const SPARKLE_SCATTER = 1 / 6;
+const SPARKLE_MAX = 2048;
+const SPARKLE_TRAIL = [1, 0.6, 0.35, 0.15];
 
 const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
     const {
         fillOpacity = 0.1,
         sparkleOpacity = 0.6,
-        density = 1.2,
+        density = 0.35,
     } = options.sparkle ?? {};
     const { width, height } = layer.getBoundingClientRect();
     const dpr = globalThis.devicePixelRatio || 1;
@@ -185,29 +191,29 @@ const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
     ctx.scale(dpr, dpr);
     const color = options.color ?? getComputedStyle(layer).color;
 
-    const sparkles = Array.from(
-        { length: Math.round((width * height * density) / 100) },
-        () => ({
-            x: Math.random() * width,
-            y: Math.random() * height,
-            r: 0.5 + Math.random() * 0.8,
-            phase: Math.random() * Math.PI * 2,
-            speed: 0.01 + Math.random() * 0.02,
-        }),
-    );
-
     const startCenter = { x: start.x + size / 2, y: start.y + size / 2 };
     const endCenter = { x: end.x + size / 2, y: end.y + size / 2 };
     const startRadius = size / 2;
     const endRadius = (size * scale) / 2;
+    // From the center, the ring has to reach the far corners to sweep the whole surface.
+    const ringReach = Math.hypot(width, height) / 2 / SPARKLE_RING;
+
+    // One preallocated buffer per trail frame, reused round-robin so drawing allocates
+    // nothing per frame.
+    const trail = SPARKLE_TRAIL.map(() => ({
+        xs: new Float32Array(SPARKLE_MAX),
+        ys: new Float32Array(SPARKLE_MAX),
+        count: 0,
+        alpha: 0,
+    }));
+    let head = 0;
 
     const began = performance.now();
     let fadeFrom: number | undefined;
     let frame = 0;
 
     const draw = (now: number) => {
-        const elapsed = now - began;
-        const p = decelerate(Math.min(elapsed / PRESS_GROW_MS, 1));
+        const p = decelerate(Math.min((now - began) / PRESS_GROW_MS, 1));
         const cx = startCenter.x + (endCenter.x - startCenter.x) * p;
         const cy = startCenter.y + (endCenter.y - startCenter.y) * p;
         const radius = startRadius + (endRadius - startRadius) * p;
@@ -227,22 +233,47 @@ const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
         ctx.fillStyle = fill;
         ctx.fillRect(0, 0, width, height);
 
-        // The sparkles: brightest on the expanding edge, dimmer behind it, twinkling.
-        ctx.fillStyle = color;
-        const band = radius * SPARKLE_BAND;
-        for (const s of sparkles) {
-            const d = Math.hypot(s.x - cx, s.y - cy);
-            if (d > radius) continue;
-            const edge = 1 - Math.min((radius - d) / band, 1);
-            const twinkle = 0.5 + 0.5 * Math.sin(s.phase + elapsed * s.speed);
-            const alpha =
-                sparkleOpacity * (0.25 + 0.75 * edge) * twinkle * fade;
-            if (alpha <= 0.01) continue;
-            ctx.globalAlpha = alpha;
-            ctx.beginPath();
-            ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-            ctx.fill();
+        // A fresh set of sparkles each frame, so they shimmer rather than sit still. They thin
+        // out as the ripple reaches full size, so a held press settles into the plain fill.
+        // The ring grows at a steady pace to just cover the surface, so a small control sees
+        // the whole sweep instead of a ring that leaves it within a few frames.
+        const t = Math.min((now - began) / PRESS_GROW_MS, 1);
+        const ring = Math.max(ringReach * t, startRadius) * SPARKLE_RING;
+        const scatter = ring * SPARKLE_SCATTER;
+        const current = trail[head];
+        if (current) {
+            current.count =
+                t < 1
+                    ? Math.min(
+                          Math.round(2 * Math.PI * ring * density),
+                          SPARKLE_MAX,
+                      )
+                    : 0;
+            for (let i = 0; i < current.count; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const r = ring + (Math.random() - Math.random()) * scatter;
+                current.xs[i] = cx + Math.cos(angle) * r;
+                current.ys[i] = cy + Math.sin(angle) * r;
+            }
+            const noise = (Math.random() - Math.random()) * 0.15;
+            current.alpha = Math.min(Math.max(1 - t + noise, 0), 1);
         }
+
+        ctx.fillStyle = color;
+        for (let age = 0; age < trail.length; age++) {
+            const set = trail[(head - age + trail.length) % trail.length];
+            const alpha =
+                (set?.alpha ?? 0) *
+                (SPARKLE_TRAIL[age] ?? 0) *
+                sparkleOpacity *
+                fade;
+            if (!set || alpha <= 0.01) continue;
+            ctx.globalAlpha = alpha;
+            for (let i = 0; i < set.count; i++) {
+                ctx.fillRect(set.xs[i] ?? 0, set.ys[i] ?? 0, 1, 1);
+            }
+        }
+        head = (head + 1) % trail.length;
 
         if (fade > 0) frame = requestAnimationFrame(draw);
         else canvas.remove();
