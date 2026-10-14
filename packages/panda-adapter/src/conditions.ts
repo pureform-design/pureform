@@ -25,6 +25,7 @@ const CONDITION_KEY: Record<string, string> = {
     focusVisible: "_focusVisible",
     active: "_active",
     pressed: "_active",
+    dragged: "_dragging",
     disabled: "_disabled",
     selected: "_selected",
     checked: "_checked",

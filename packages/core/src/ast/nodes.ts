@@ -332,13 +332,15 @@ export interface PlatformNode {
     default: ValueNode;
 }
 
-/** Pointer / focus / interactivity states. */
+/** Pointer / focus / interactivity states. CSS has no dragging pseudo-class, so `dragged`
+ *  matches a `data-dragging` attribute that the drag code sets on the element. */
 export type InteractionCondition =
     | "hover"
     | "focus"
     | "focusVisible"
     | "active"
     | "pressed"
+    | "dragged"
     | "disabled";
 
 /** Form / selectable-control states. */

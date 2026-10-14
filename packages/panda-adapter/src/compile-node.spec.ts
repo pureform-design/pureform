@@ -226,6 +226,14 @@ describe("compileValue conditionals", () => {
             _disabled: "0.38",
         });
     });
+
+    it("lowers dragged to Panda's data-dragging condition", () => {
+        const node = when("dragged", unitless(0.16), unitless(0));
+        expect(compileValue(node, ctx())).toEqual({
+            base: "0",
+            _dragging: "0.16",
+        });
+    });
 });
 
 describe("compileStyleMap layout and interaction properties", () => {
