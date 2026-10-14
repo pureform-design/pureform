@@ -5,6 +5,7 @@ import {
     MATERIAL_DURATIONS,
     materialColor,
     materialElevation,
+    materialLayout,
     materialMotion,
     materialShape,
     materialState,
@@ -15,6 +16,7 @@ import { pureform } from "@pureform/preset";
 import {
     extend,
     flatElevation,
+    gridLayout,
     modularScale,
     oklchPalette,
     roundedShape,
@@ -120,6 +122,40 @@ const SHAPE: Choice<ReturnType<typeof materialShape>>[] = [
     },
 ];
 
+const LAYOUT: Choice<ReturnType<typeof materialLayout>>[] = [
+    { label: "Material (4px grid)", provider: () => materialLayout() },
+    {
+        label: "Compact",
+        provider: () =>
+            materialLayout({
+                grid: 3,
+                sizes: {
+                    iconSmall: 16,
+                    iconMedium: 20,
+                    controlSmall: 28,
+                    controlMedium: 32,
+                    controlLarge: 40,
+                    touchTarget: 40,
+                },
+            }),
+    },
+    {
+        label: "Comfortable",
+        provider: () =>
+            gridLayout({
+                grid: 5,
+                sizes: {
+                    iconSmall: 20,
+                    iconMedium: 28,
+                    controlSmall: 36,
+                    controlMedium: 48,
+                    controlLarge: 56,
+                    touchTarget: 56,
+                },
+            }),
+    },
+];
+
 const STATE: Choice<ReturnType<typeof materialState>>[] = [
     { label: "Material", provider: () => materialState() },
     {
@@ -203,6 +239,7 @@ const DOMAINS = [
     { key: "color", title: "Color", choices: COLOR },
     { key: "typography", title: "Typography", choices: TYPOGRAPHY },
     { key: "shape", title: "Shape", choices: SHAPE },
+    { key: "layout", title: "Layout", choices: LAYOUT },
     { key: "state", title: "State", choices: STATE },
     { key: "motion", title: "Motion (press and hold)", choices: MOTION },
     { key: "elevation", title: "Elevation", choices: ELEVATION },
@@ -253,6 +290,7 @@ function ProvidersRoute() {
         color: 0,
         typography: 0,
         shape: 0,
+        layout: 0,
         state: 0,
         motion: 0,
         elevation: 0,
@@ -264,6 +302,7 @@ function ProvidersRoute() {
                 color: COLOR[picked.color]!.provider(),
                 typography: TYPOGRAPHY[picked.typography]!.provider(),
                 shape: SHAPE[picked.shape]!.provider(),
+                layout: LAYOUT[picked.layout]!.provider(),
                 state: STATE[picked.state]!.provider(),
                 motion: MOTION[picked.motion]!.provider(),
                 elevation: ELEVATION[picked.elevation]!.provider(),
