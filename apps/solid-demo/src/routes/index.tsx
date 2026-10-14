@@ -78,6 +78,23 @@ function IndexRoute() {
             </section>
 
             <section style={row}>
+                <For each={FILLS}>
+                    {(variant) => {
+                        const b = button({ variant });
+                        return (
+                            <button class={b.root} type="button">
+                                <span class={b.touchTarget} />
+                                <Ripple variant="ink-sparkle" />
+                                <span class={b.label}>
+                                    {`${variant} sparkle`.toUpperCase()}
+                                </span>
+                            </button>
+                        );
+                    }}
+                </For>
+            </section>
+
+            <section style={row}>
                 <For each={CARD_FILLS}>
                     {(variant) => (
                         <div class={card({ variant }).root}>{variant} card</div>

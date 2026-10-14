@@ -1,10 +1,11 @@
 import { ripple as rippleRecipe } from "$recipes";
 import { ripple } from "@pureform/js-effects";
+import type { RippleVariant } from "@pureform/js-effects";
 import { onSettled } from "solid-js";
 
 // Render inside any positioned interactive surface. The layer listens for presses on its parent
 // and draws a ripple from the press point; the surface's text color tints it.
-export function Ripple(props: { centered?: boolean }) {
+export function Ripple(props: { centered?: boolean; variant?: RippleVariant }) {
     let layer: HTMLSpanElement | undefined;
     const classes = rippleRecipe();
 
@@ -14,6 +15,7 @@ export function Ripple(props: { centered?: boolean }) {
         return ripple(surface, {
             class: classes.ripple ?? "",
             centerOrigin: props.centered ?? false,
+            variant: props.variant ?? "ink-well",
         });
     });
 
