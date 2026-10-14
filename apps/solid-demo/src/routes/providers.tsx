@@ -2,6 +2,7 @@ import { css } from "$css";
 import { button, card, iconButton } from "$recipes";
 import { cubicBezier, pct } from "@pureform/core/ast";
 import {
+    MATERIAL_DURATIONS,
     materialColor,
     materialElevation,
     materialMotion,
@@ -133,18 +134,26 @@ const STATE: Choice<ReturnType<typeof materialState>>[] = [
     },
 ];
 
+// Every Material duration, multiplied.
+const scaled = (factor: number) =>
+    Object.fromEntries(
+        Object.entries(MATERIAL_DURATIONS).map(([name, ms]) => [
+            name,
+            Math.round(ms * factor),
+        ]),
+    );
+
 const MOTION: Choice<ReturnType<typeof materialMotion>>[] = [
     { label: "Material", provider: () => materialMotion() },
     {
         label: "Slow",
-        provider: () =>
-            materialMotion({ durations: { long1: 1200, medium3: 900 } }),
+        provider: () => materialMotion({ durations: scaled(2.5) }),
     },
     {
         label: "Snappy",
         provider: () =>
             materialMotion({
-                durations: { long1: 200, medium3: 150 },
+                durations: scaled(0.45),
                 easings: { standard: cubicBezier([0.3, 0, 0, 1]) },
             }),
     },
