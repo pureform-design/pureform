@@ -112,6 +112,11 @@ _into_ core's contract, rather than core consuming `ui-utils` as an upstream inp
 is no bespoke interchange type. The hand-off is `Partial<CoreConfig>` fragments built with
 core's own node constructors and composed via `mergeConfigs`. (See §8 #5.)
 
+**[DECIDED] Theme contracts sit between core and the generators.** `@pureform/theme`
+depends only on core. It names what components read from each foundation (the contracts) and
+how a generator fills one (a provider). `@pureform/material` implements Material's providers
+against it, and `@pureform/preset` builds `pureform()` from providers. See §4.8.
+
 **[DECIDED] Core stays design-system-agnostic.** Design-system-specific conveniences (e.g.
 Material _state layers_ and _elevation_ steps) do NOT live in core. They belong to a
 Material layer (`@pureform/ui-utils` / a `@pureform/material` generator) that takes a
@@ -2131,6 +2136,67 @@ token indirection fits, compose a separate full config via `mergeConfigs` rather
 `ThemeOverride`. Genuinely platform-specific theming remains available through the usual
 escapes (`platform()`, `rawRules`).
 
+### 4.8 Theme contracts and providers (`@pureform/theme`) **[DECIDED]**
+
+Components read a fixed vocabulary from each foundation: `onSurface`, `labelLarge`, the
+`radii.full` radius, the `stateHover` opacity, and so on. A **contract** names that vocabulary
+and the kind of value each name holds, using Material's names. A **provider** is anything that
+fills one contract. A theme is one provider per contract.
+
+| Contract     | Requires                                                                        | Lowers to                                                                                                         |
+| ------------ | ------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| `color`      | 17 surface roles, plus `g`, `onG`, `gContainer`, `onGContainer` per group       | `semanticTokens.colors`, primitives in `tokens.colors`                                                            |
+| `typography` | `brand` and `plain` font roles, the 15 Material text styles; both open          | `fonts`, `tokens.fontSize` / `lineHeight` / `letterSpacing` / `fontWeight` per style, `textStyles` that read them |
+| `shape`      | `none` through `full` radii                                                     | `tokens.radii`                                                                                                    |
+| `layout`     | spacing steps `0` through `16`, component sizes                                 | `tokens.spacing`, `tokens.sizes`                                                                                  |
+| `state`      | hover, focus, pressed, and dragged opacities, the disabled opacities, the scrim | `tokens.opacity`                                                                                                  |
+| `motion`     | Material's 16 durations and 7 easings                                           | `durations`, `easings`                                                                                            |
+| `elevation`  | a `{ shadow, tint }` pair for `level0` through `level5`                         | `semanticTokens.shadows`, an `elevationTint<Level>` color, the `shadowElevation` utility                          |
+
+Every contract also accepts names beyond the required ones, and they pass through as extra
+tokens.
+
+**Checked twice.** Each contract is a TypeScript type (`Record<Role, Kind>`), so a missing
+name or a wrong kind of value fails to compile, with the error on the offending line.
+`resolveTheme` repeats both checks at runtime for plain JavaScript and casts, naming the
+provider, the slot, and what was wrong: `shape provider "brand" gives radius "small" a color
+value, not a length`. `requireDark` adds a check that every color role has a dark value.
+
+**Resolution order.** Domains resolve in a fixed order (color, typography, shape, layout,
+state, motion, elevation), and each provider receives the contracts resolved before it. That
+is how `tonalElevation` tints with the first color group.
+
+**Composition.** `defineProvider` declares a provider. `extend(provider, change)` rewrites what
+one generates and keeps its contract type. `colorFromTokens` and the other `*FromTokens`
+helpers wrap a hand-authored contract. Shipped alternatives to Material: `oklchPalette`
+(colors from hues), `modularScale` (type sizes from a ratio), `roundedShape`, `gridLayout`,
+`tonalElevation`, and `flatElevation`.
+
+**Everything is a CSS var.** Text style values and elevation levels lower to tokens, and every
+elevation level always sets both `box-shadow` and `background-image`, so the static CSS has a
+rule for every property any provider might use. A theme can therefore swap any provider at
+runtime (§6) or per named theme without changing the recipes.
+
+**Named themes from providers.** `pureform({ themes: { teal: { color, shape } } })` resolves
+each named theme with some providers replaced and emits only what changes. A semantic token is
+declared once on the root and resolves its references there, so a theme also re-declares every
+semantic token that refers to a changed token. A theme cannot add color groups, because the
+components only have compound variants for the base groups.
+
+```ts
+pureform({
+    color: oklchPalette({
+        groups: { primary: { hue: 265 }, negative: { hue: 25 } },
+    }),
+    typography: modularScale({ ratio: 1.25 }),
+    shape: roundedShape({ base: 6 }),
+    elevation: tonalElevation(),
+    state: materialState({ stateHover: 6 }),
+    requireDark: true,
+    themes: { compact: { layout: materialLayout({ grid: 3 }) } },
+});
+```
+
 ---
 
 ## 5. Adapter resolution logic (Panda / Web CSS)
@@ -2405,6 +2471,13 @@ prefix** (so the bare forms above are the canonical names used throughout this d
 Setting a prefix is recommended for collision safety, and costs nothing on the
 machine-generated internal tiers. Var-name collisions _within_ a tier across scopes (e.g.
 `--ui-button-bg` at both scope and instance level) are intentional cascade behavior.
+
+**Runtime theming.** Recipes, text styles, and utilities are static CSS, but every value they
+read is a token var. `themeVars(config, { scheme })` from `@pureform/panda-adapter` returns
+those vars for any config, so an app can rebuild a config with other providers in the browser
+and set the vars on a subtree to restyle it with no rebuild. Scheme-dependent tokens need
+`scheme`, since Panda declares them on the root. Only recipe structure, such as a new color
+group's compound variants, needs a rebuild.
 
 ---
 
