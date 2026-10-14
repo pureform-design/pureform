@@ -1,5 +1,9 @@
 import { px } from "@pureform/core/ast";
-import { materialColor, materialShape } from "@pureform/material";
+import {
+    materialColor,
+    materialLayout,
+    materialShape,
+} from "@pureform/material";
 import { compilePreset } from "@pureform/panda-adapter";
 import { extend } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
@@ -99,6 +103,14 @@ describe("pureform providers", () => {
     it("replaces a domain with another provider", () => {
         const config = pureform({ shape: materialShape({ medium: 10 }) });
         expect(config.tokens.radii?.medium).toEqual(px(10));
+    });
+
+    it("takes a layout provider for spacing and sizes", () => {
+        const config = pureform({
+            layout: materialLayout({ grid: 8, sizes: { touchTarget: 56 } }),
+        });
+        expect(config.tokens.spacing?.["2"]).toEqual(px(16));
+        expect(config.tokens.sizes?.touchTarget).toEqual(px(56));
     });
 
     it("takes an extended provider", () => {

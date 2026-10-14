@@ -1,7 +1,7 @@
-// pureform as one composed config: a theme from one provider per contract, pureform's layout
-// foundation, and every component, validated together.
+// pureform as one composed config: a theme from one provider per contract and every component,
+// validated together.
 //
-// Each contract (color, typography, shape, state, motion, elevation) defaults to Material's
+// Each contract (color, typography, shape, layout, state, motion, elevation) defaults to Material's
 // provider, so `pureform()` alone is the Material design system. Pass a provider to replace a
 // domain, `extend()` one to change part of it, or `*FromTokens()` for a hand-authored one.
 //
@@ -14,6 +14,7 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import {
     materialColor,
     materialElevation,
+    materialLayout,
     materialMotion,
     materialShape,
     materialState,
@@ -24,6 +25,7 @@ import type {
     BaseColorGroup,
     ColorProvider,
     ElevationProvider,
+    LayoutProvider,
     MotionProvider,
     ResolvedTheme,
     ShapeProvider,
@@ -36,7 +38,6 @@ import { card } from "./components/card";
 import { createIconButton } from "./components/icon-button";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
-import { foundation } from "./foundation";
 
 /** What a `components` function receives: the resolved theme, and pureform's components built
  *  for its color groups. */
@@ -56,6 +57,8 @@ export interface PureformOptions<
     typography?: TypographyProvider<TFont, TStyle>;
     /** Default `materialShape()`. */
     shape?: ShapeProvider;
+    /** Spacing and component sizes. Default `materialLayout()`. */
+    layout?: LayoutProvider;
     /** Default `materialState()`. */
     state?: StateProvider;
     /** Default `materialMotion()`. */
@@ -84,6 +87,7 @@ export const pureform = <
             options.typography ??
             (materialTypescale() as TypographyProvider<TFont, TStyle>),
         shape: options.shape ?? materialShape(),
+        layout: options.layout ?? materialLayout(),
         state: options.state ?? materialState(),
         motion: options.motion ?? materialMotion(),
         elevation: options.elevation ?? materialElevation(),
@@ -107,7 +111,6 @@ export const pureform = <
     return defineConfig(
         mergeConfigs(
             { tokens: {}, semanticTokens: {}, components: {} },
-            foundation(),
             theme.config,
             {
                 componentBaseStyles: { fontFamily: fontRole("plain") },

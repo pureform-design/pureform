@@ -6,6 +6,7 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import {
     materialColor,
     materialElevation,
+    materialLayout,
     materialMotion,
     materialShape,
     materialState,
@@ -13,12 +14,11 @@ import {
 } from "@pureform/material";
 import { resolveTheme } from "@pureform/theme";
 
-import { foundation } from "../foundation";
-
 const theme = resolveTheme({
     color: materialColor(),
     typography: materialTypescale(),
     shape: materialShape(),
+    layout: materialLayout(),
     state: materialState(),
     motion: materialMotion(),
     elevation: materialElevation(),
@@ -28,7 +28,6 @@ export const configWith = (...components: AnyComponentSpec[]): CoreConfig =>
     defineConfig(
         mergeConfigs(
             { tokens: {}, semanticTokens: {}, components: {} },
-            foundation(),
             theme.config,
             {
                 components: Object.fromEntries(
