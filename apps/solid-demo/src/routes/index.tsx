@@ -1,4 +1,4 @@
-import { button, card, iconButton, scrim } from "$recipes";
+import { button, card, iconButton, scrim, text } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
 import { For } from "solid-js";
 
@@ -26,6 +26,15 @@ const THEMES = [undefined, "teal", "sharp"] as const;
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={{ display: "grid", gap: "8px" }}>
+                <h1 class={text({ style: "headlineMedium" })}>pureform</h1>
+                <p class={text({ style: "bodyLarge" })}>
+                    Components from theme providers. The theme adds a{" "}
+                    <code class={text({ style: "code" })}>code</code> text
+                    style, which becomes a typed variant.
+                </p>
+            </section>
+
             <section style={row}>
                 <For each={THEMES}>
                     {(theme) => (
