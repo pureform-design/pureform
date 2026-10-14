@@ -230,6 +230,41 @@ describe("typescale", () => {
         });
     });
 
+    it("emits a font token per role and points each style at its role", () => {
+        const { fonts, textStyles } = typescale();
+        expect(Object.keys(fonts ?? {})).toEqual(["brand", "plain"]);
+        expect(textStyles?.titleLarge?.fontFamily).toEqual({
+            type: "alias",
+            path: ["fonts", "brand"],
+        });
+    });
+
+    it("adds font roles and text styles", () => {
+        const { fonts, textStyles } = typescale({
+            fonts: {
+                mono: { families: ["JetBrains Mono"], generic: "monospace" },
+            },
+            custom: {
+                code: {
+                    font: "mono",
+                    fontSize: "0.875rem",
+                    lineHeight: "1.25rem",
+                    letterSpacing: "0rem",
+                    fontWeight: 400,
+                },
+            },
+        });
+        expect(fonts?.mono).toMatchObject({
+            stack: ["JetBrains Mono"],
+            generic: "monospace",
+        });
+        expect(Object.keys(textStyles ?? {})).toHaveLength(16);
+        expect(textStyles?.code?.fontFamily).toEqual({
+            type: "alias",
+            path: ["fonts", "mono"],
+        });
+    });
+
     it("validates once composed into a config", () => {
         expect(() =>
             defineConfig(
