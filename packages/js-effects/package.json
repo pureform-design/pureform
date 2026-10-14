@@ -2,6 +2,7 @@
     "name": "@pureform/js-effects",
     "version": "0.0.0-semantically-released",
     "description": "A TypeScript Package",
+    "type": "module",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
@@ -22,6 +23,7 @@
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "jsdom": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
