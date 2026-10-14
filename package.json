@@ -35,6 +35,7 @@
         "@pureform/type-utils": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/material": "workspace:^",
+        "@pureform/theme": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
         "@pureform/preset": "workspace:^",
         "typescript": "^7.0.2",

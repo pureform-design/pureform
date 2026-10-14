@@ -154,6 +154,21 @@
         "vitest": "catalog:",
       },
     },
+    "packages/theme": {
+      "name": "@pureform/theme",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/tsconfig": {
       "name": "@pureform/tsconfig",
       "version": "0.1.1",
@@ -237,6 +252,7 @@
     "@pureform/oxlint-config": "workspace:^",
     "@pureform/panda-adapter": "workspace:^",
     "@pureform/preset": "workspace:^",
+    "@pureform/theme": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
     "@pureform/type-utils": "workspace:^",
     "@pureform/utils": "workspace:^",
@@ -589,6 +605,8 @@
     "@pureform/panda-adapter": ["@pureform/panda-adapter@workspace:packages/panda-adapter"],
 
     "@pureform/preset": ["@pureform/preset@workspace:packages/preset"],
+
+    "@pureform/theme": ["@pureform/theme@workspace:packages/theme"],
 
     "@pureform/tsconfig": ["@pureform/tsconfig@workspace:packages/tsconfig"],
 
