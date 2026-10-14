@@ -19,6 +19,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
             <nav class="site-nav">
                 <Link to="/">Home</Link>
                 <Link to="/tokens">Tokens</Link>
+                <Link to="/providers">Providers</Link>
             </nav>
             <Outlet />
         </>

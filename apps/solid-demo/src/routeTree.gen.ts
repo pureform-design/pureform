@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProvidersRouteImport } from './routes/providers'
 import { Route as TokensRouteImport } from './routes/tokens'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProvidersRoute = ProvidersRouteImport.update({
+  id: '/providers',
+  path: '/providers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TokensRoute = TokensRouteImport.update({
@@ -25,27 +31,31 @@ const TokensRoute = TokensRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/providers': typeof ProvidersRoute
   '/tokens': typeof TokensRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/providers': typeof ProvidersRoute
   '/tokens': typeof TokensRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/providers': typeof ProvidersRoute
   '/tokens': typeof TokensRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tokens'
+  fullPaths: '/' | '/providers' | '/tokens'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tokens'
-  id: '__root__' | '/' | '/tokens'
+  to: '/' | '/providers' | '/tokens'
+  id: '__root__' | '/' | '/providers' | '/tokens'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProvidersRoute: typeof ProvidersRoute
   TokensRoute: typeof TokensRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/solid-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/providers': {
+      id: '/providers'
+      path: '/providers'
+      fullPath: '/providers'
+      preLoaderRoute: typeof ProvidersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tokens': {
@@ -70,6 +87,7 @@ declare module '@tanstack/solid-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProvidersRoute: ProvidersRoute,
   TokensRoute: TokensRoute,
 }
 export const routeTree = rootRouteImport
