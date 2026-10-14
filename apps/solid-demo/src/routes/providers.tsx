@@ -15,9 +15,11 @@ import {
     extend,
     flatElevation,
     modularScale,
+    oklchPalette,
     roundedShape,
     tonalElevation,
 } from "@pureform/theme";
+import type { BaseColorGroup, ColorProvider } from "@pureform/theme";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import {
@@ -41,7 +43,7 @@ export const Route = createFileRoute("/providers")({
 // rebuild.
 type Choice<P> = { label: string; provider: () => P };
 
-const COLOR: Choice<ReturnType<typeof materialColor>>[] = [
+const COLOR: Choice<ColorProvider<BaseColorGroup>>[] = [
     { label: "Material purple", provider: () => materialColor() },
     {
         label: "Cobalt",
@@ -50,6 +52,21 @@ const COLOR: Choice<ReturnType<typeof materialColor>>[] = [
     {
         label: "Teal",
         provider: () => materialColor({ seed: "#006A60" }),
+    },
+    {
+        label: "OKLCH hues (no Material)",
+        provider: () =>
+            oklchPalette({
+                groups: {
+                    primary: { hue: 265 },
+                    secondary: { hue: 220, chroma: 0.06 },
+                    tertiary: { hue: 330 },
+                    positive: { hue: 150 },
+                    notice: { hue: 80 },
+                    negative: { hue: 25, chroma: 0.18 },
+                    info: { hue: 240 },
+                },
+            }),
     },
     {
         label: "Coral, exact tertiary",
