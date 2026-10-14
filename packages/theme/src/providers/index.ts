@@ -13,10 +13,18 @@ import {
     transparent,
     unitless,
 } from "@pureform/core/ast";
-import type { FontFamilyNode } from "@pureform/core/ast";
+import type { FontFamilyNode, NumericScalarNode } from "@pureform/core/ast";
 
-import { ELEVATION_LEVELS, SHAPE_ROLES } from "../contracts/foundations";
-import type { ElevationLevel, ShapeRole } from "../contracts/foundations";
+import {
+    ELEVATION_LEVELS,
+    SHAPE_ROLES,
+    SPACING_STEPS,
+} from "../contracts/foundations";
+import type {
+    ElevationLevel,
+    ShapeRole,
+    SizeRole,
+} from "../contracts/foundations";
 import { BASE_TEXT_STYLES } from "../contracts/typography";
 import type {
     BaseFontRole,
@@ -27,6 +35,7 @@ import type {
 import { defineProvider } from "../provider";
 import type {
     ElevationProvider,
+    LayoutProvider,
     ShapeProvider,
     TypographyProvider,
 } from "../provider";
@@ -193,5 +202,28 @@ export const roundedShape = ({
             radii: byName(SHAPE_ROLES, (role) =>
                 px(role === "full" ? 9999 : base * SHAPE_MULTIPLES[role]),
             ),
+        }),
+    });
+
+export interface GridLayoutOptions {
+    /** The grid unit, in px. Spacing step `"n"` is `n` units. Default `4`. */
+    grid?: number;
+    /** Component sizes, in px. */
+    sizes: Record<SizeRole, number> & Record<string, number>;
+}
+
+/** Spacing on a grid of the given unit, with the given component sizes. */
+export const gridLayout = ({
+    grid = 4,
+    sizes,
+}: GridLayoutOptions): LayoutProvider =>
+    defineProvider({
+        domain: "layout",
+        name: "grid",
+        generate: () => ({
+            spacing: byName(SPACING_STEPS, (step) => px(Number(step) * grid)),
+            sizes: Object.fromEntries(
+                Object.entries(sizes).map(([name, value]) => [name, px(value)]),
+            ) as Record<SizeRole, NumericScalarNode>,
         }),
     });

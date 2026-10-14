@@ -18,6 +18,8 @@ import {
     EASING_ROLES,
     ELEVATION_LEVELS,
     SHAPE_ROLES,
+    SIZE_ROLES,
+    SPACING_STEPS,
     STATE_ROLES,
 } from "./contracts/foundations";
 import type { ElevationContract } from "./contracts/foundations";
@@ -25,7 +27,10 @@ import { BASE_FONT_ROLES, BASE_TEXT_STYLES } from "./contracts/typography";
 import type { TextStyleNode, TypographyContract } from "./contracts/typography";
 import type {
     ColorProvider,
+    Domain,
     DomainContext,
+    LayoutProvider,
+    Provider,
     ElevationProvider,
     MotionProvider,
     Provided,
@@ -45,6 +50,7 @@ export interface ThemeProviders<
     color: ColorProvider<G>;
     typography: TypographyProvider<TFont, TStyle>;
     shape: ShapeProvider;
+    layout: LayoutProvider;
     state: StateProvider;
     motion: MotionProvider;
     elevation: ElevationProvider;
@@ -173,112 +179,89 @@ export const resolveTheme = <
     providers: ThemeProviders<G, TFont, TStyle>,
 ): Theme<G, TFont, TStyle> => {
     const extras: (ThemeFragment | undefined)[] = [];
+    const resolved: Partial<ResolvedTheme> = {};
 
-    const color = run(providers.color, "color", {});
-    requireNames(color.where, "color role", color.contract.roles, [
-        ...NEUTRAL_ROLES,
-        ...color.contract.groups.flatMap(groupRoles),
-    ]);
-    extras.push(color.extra);
+    // Run one domain's provider with every contract resolved before it, check the result,
+    // and record it for the domains after.
+    const step = <D extends Domain, T>(
+        domain: D,
+        provider: Provider<D, T>,
+        check: (contract: T, where: string) => void,
+    ): T => {
+        const result = run(provider, domain, {
+            ...resolved,
+        } as DomainContext[D]);
+        check(result.contract, result.where);
+        extras.push(result.extra);
+        (resolved as Record<string, unknown>)[domain] = result.contract;
+        return result.contract;
+    };
 
-    const typography = run(providers.typography, "typography", {
-        color: color.contract,
-    });
-    requireNames(
-        typography.where,
-        "font role",
-        typography.contract.fonts,
-        BASE_FONT_ROLES,
+    const color = step("color", providers.color, (c, where) =>
+        requireNames(where, "color role", c.roles, [
+            ...NEUTRAL_ROLES,
+            ...c.groups.flatMap(groupRoles),
+        ]),
     );
-    requireNames(
-        typography.where,
-        "text style",
-        typography.contract.styles,
-        BASE_TEXT_STYLES,
-    );
-    for (const [name, style] of Object.entries(typography.contract.styles)) {
-        const { font } = style as { font: string };
-        if (!(font in typography.contract.fonts)) {
-            throw new ContractError(
-                `${typography.where} sets text style "${name}" in undeclared font role "${font}"`,
-            );
+    const typography = step("typography", providers.typography, (t, where) => {
+        requireNames(where, "font role", t.fonts, BASE_FONT_ROLES);
+        requireNames(where, "text style", t.styles, BASE_TEXT_STYLES);
+        for (const [name, style] of Object.entries(t.styles)) {
+            const { font } = style as { font: string };
+            if (!(font in t.fonts)) {
+                throw new ContractError(
+                    `${where} sets text style "${name}" in undeclared font role "${font}"`,
+                );
+            }
         }
-    }
-    extras.push(typography.extra);
-
-    const shape = run(providers.shape, "shape", {
-        color: color.contract,
-        typography: typography.contract,
     });
-    requireNames(shape.where, "radius", shape.contract.radii, SHAPE_ROLES);
-    extras.push(shape.extra);
-
-    const state = run(providers.state, "state", {
-        color: color.contract,
-        typography: typography.contract,
-        shape: shape.contract,
-    });
-    requireNames(state.where, "opacity", state.contract.opacities, STATE_ROLES);
-    extras.push(state.extra);
-
-    const motion = run(providers.motion, "motion", {
-        color: color.contract,
-        typography: typography.contract,
-        shape: shape.contract,
-        state: state.contract,
-    });
-    requireNames(
-        motion.where,
-        "duration",
-        motion.contract.durations,
-        DURATION_ROLES,
+    const shape = step("shape", providers.shape, (c, where) =>
+        requireNames(where, "radius", c.radii, SHAPE_ROLES),
     );
-    requireNames(motion.where, "easing", motion.contract.easings, EASING_ROLES);
-    extras.push(motion.extra);
-
-    const elevation = run(providers.elevation, "elevation", {
-        color: color.contract,
-        typography: typography.contract,
-        shape: shape.contract,
-        state: state.contract,
-        motion: motion.contract,
+    const layout = step("layout", providers.layout, (c, where) => {
+        requireNames(where, "spacing step", c.spacing, SPACING_STEPS);
+        requireNames(where, "size", c.sizes, SIZE_ROLES);
     });
-    requireNames(
-        elevation.where,
-        "level",
-        elevation.contract.levels,
-        ELEVATION_LEVELS,
+    const state = step("state", providers.state, (c, where) =>
+        requireNames(where, "opacity", c.opacities, STATE_ROLES),
     );
-    extras.push(elevation.extra);
+    const motion = step("motion", providers.motion, (c, where) => {
+        requireNames(where, "duration", c.durations, DURATION_ROLES);
+        requireNames(where, "easing", c.easings, EASING_ROLES);
+    });
+    const elevation = step("elevation", providers.elevation, (c, where) =>
+        requireNames(where, "level", c.levels, ELEVATION_LEVELS),
+    );
 
     const lowered: Partial<CoreConfig> = {
         tokens: {
-            colors: color.contract.primitives ?? {},
-            radii: shape.contract.radii,
-            opacity: state.contract.opacities,
+            colors: color.primitives ?? {},
+            radii: shape.radii,
+            spacing: layout.spacing,
+            sizes: layout.sizes,
+            opacity: state.opacities,
         },
-        semanticTokens: { colors: color.contract.roles },
-        durations: motion.contract.durations,
-        easings: motion.contract.easings,
+        semanticTokens: { colors: color.roles },
+        durations: motion.durations,
+        easings: motion.easings,
     };
 
     const { components: _, ...config } = mergeConfigs(
         { tokens: {}, semanticTokens: {}, components: {} },
         lowered,
-        typographyFragment(
-            typography.contract as TypographyContract<string, string>,
-        ),
-        elevationFragment(elevation.contract),
+        typographyFragment(typography as TypographyContract<string, string>),
+        elevationFragment(elevation),
         ...extras.filter((e): e is ThemeFragment => e !== undefined),
     );
 
     return {
-        color: color.contract,
-        typography: typography.contract,
-        shape: shape.contract,
-        state: state.contract,
-        motion: motion.contract,
-        elevation: elevation.contract,
+        color,
+        typography,
+        shape,
+        layout,
+        state,
+        motion,
+        elevation,
         config,
     };
 };

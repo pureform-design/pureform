@@ -21,6 +21,8 @@ import {
     EASING_ROLES,
     ELEVATION_LEVELS,
     SHAPE_ROLES,
+    SIZE_ROLES,
+    SPACING_STEPS,
     STATE_ROLES,
 } from "../contracts/foundations";
 import { BASE_TEXT_STYLES } from "../contracts/typography";
@@ -29,6 +31,7 @@ import {
     colorFromTokens,
     elevationFromTokens,
     motionFromTokens,
+    layoutFromTokens,
     shapeFromTokens,
     stateFromTokens,
     typographyFromTokens,
@@ -68,6 +71,10 @@ export const providers = () => ({
         styles: fill(BASE_TEXT_STYLES, () => label),
     }),
     shape: shapeFromTokens({ radii: fill(SHAPE_ROLES, () => px(4)) }),
+    layout: layoutFromTokens({
+        spacing: fill(SPACING_STEPS, (step) => px(Number(step) * 4)),
+        sizes: fill(SIZE_ROLES, () => px(40)),
+    }),
     state: stateFromTokens({ opacities: fill(STATE_ROLES, () => pct(10)) }),
     motion: motionFromTokens({
         durations: fill(DURATION_ROLES, () => numeric(200, "ms")),

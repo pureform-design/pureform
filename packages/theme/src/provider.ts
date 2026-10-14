@@ -1,7 +1,7 @@
 // Providers: anything that fills a contract.
 //
 // A provider names its domain and generates that domain's contract. Domains resolve in a fixed
-// order (color, typography, shape, state, motion, elevation), and each provider sees the
+// order (color, typography, shape, layout, state, motion, elevation), and each provider sees the
 // contracts resolved before it, so an elevation provider can tint with the color groups.
 
 import type { CoreConfig } from "@pureform/core/types";
@@ -9,6 +9,7 @@ import type { CoreConfig } from "@pureform/core/types";
 import type { ColorContract } from "./contracts/color";
 import type {
     ElevationContract,
+    LayoutContract,
     MotionContract,
     ShapeContract,
     StateContract,
@@ -19,6 +20,7 @@ export const DOMAINS = [
     "color",
     "typography",
     "shape",
+    "layout",
     "state",
     "motion",
     "elevation",
@@ -41,6 +43,7 @@ export interface ResolvedTheme<
     color: ColorContract<G>;
     typography: TypographyContract<TFont, TStyle>;
     shape: ShapeContract;
+    layout: LayoutContract;
     state: StateContract;
     motion: MotionContract;
     elevation: ElevationContract;
@@ -51,8 +54,9 @@ export interface DomainContext {
     color: Record<string, never>;
     typography: Pick<ResolvedTheme, "color">;
     shape: Pick<ResolvedTheme, "color" | "typography">;
-    state: Pick<ResolvedTheme, "color" | "typography" | "shape">;
-    motion: Pick<ResolvedTheme, "color" | "typography" | "shape" | "state">;
+    layout: Pick<ResolvedTheme, "color" | "typography" | "shape">;
+    state: Pick<ResolvedTheme, "color" | "typography" | "shape" | "layout">;
+    motion: Omit<ResolvedTheme, "motion" | "elevation">;
     elevation: Omit<ResolvedTheme, "elevation">;
 }
 
@@ -72,6 +76,7 @@ export type TypographyProvider<
     TStyle extends string = never,
 > = Provider<"typography", TypographyContract<TFont, TStyle>>;
 export type ShapeProvider = Provider<"shape", ShapeContract>;
+export type LayoutProvider = Provider<"layout", LayoutContract>;
 export type StateProvider = Provider<"state", StateContract>;
 export type MotionProvider = Provider<"motion", MotionContract>;
 export type ElevationProvider = Provider<"elevation", ElevationContract>;
@@ -80,6 +85,7 @@ export type AnyProvider =
     | ColorProvider<string>
     | TypographyProvider<string, string>
     | ShapeProvider
+    | LayoutProvider
     | StateProvider
     | MotionProvider
     | ElevationProvider;
@@ -130,6 +136,11 @@ export const shapeFromTokens = (
     contract: Provided<ShapeContract>,
     name?: string,
 ): ShapeProvider => fixed("shape")(contract, name);
+
+export const layoutFromTokens = (
+    contract: Provided<LayoutContract>,
+    name?: string,
+): LayoutProvider => fixed("layout")(contract, name);
 
 export const stateFromTokens = (
     contract: Provided<StateContract>,

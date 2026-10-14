@@ -10,6 +10,8 @@ import type {
     DurationRole,
     EasingRole,
     ShapeRole,
+    SizeRole,
+    SpacingStep,
     StateRole,
 } from "./contracts/foundations";
 import type { BaseFontRole, BaseTextStyle } from "./contracts/typography";
@@ -21,6 +23,8 @@ export const PATHS = {
     font: ["fonts"],
     textStyle: ["textStyles"],
     radius: ["tokens", "radii"],
+    spacing: ["tokens", "spacing"],
+    size: ["tokens", "sizes"],
     opacity: ["tokens", "opacity"],
     duration: ["durations"],
     easing: ["easings"],
@@ -50,6 +54,8 @@ export const colorRole = ref<ColorRole<BaseColorGroup> | (string & {})>(
 export const fontRole = ref<BaseFontRole | (string & {})>(PATHS.font);
 export const textStyle = ref<BaseTextStyle | (string & {})>(PATHS.textStyle);
 export const radius = ref<ShapeRole | (string & {})>(PATHS.radius);
+export const spacing = ref<SpacingStep | (string & {})>(PATHS.spacing);
+export const size = ref<SizeRole | (string & {})>(PATHS.size);
 export const opacity = ref<StateRole | (string & {})>(PATHS.opacity);
 export const duration = ref<DurationRole | (string & {})>(PATHS.duration);
 export const easing = ref<EasingRole | (string & {})>(PATHS.easing);

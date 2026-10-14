@@ -39,6 +39,8 @@ describe("resolveTheme", () => {
         const { config } = resolveTheme(providers());
         expect(config.semanticTokens.colors?.onDangerContainer).toBeDefined();
         expect(config.tokens.radii?.extraLarge).toEqual(px(4));
+        expect(config.tokens.spacing?.["4"]).toEqual(px(16));
+        expect(config.tokens.sizes?.touchTarget).toEqual(px(40));
         expect(config.tokens.opacity?.stateDragged).toEqual(pct(10));
         expect(config.durations?.medium2).toEqual(numeric(200, "ms"));
         expect(config.easings?.emphasized).toBeDefined();

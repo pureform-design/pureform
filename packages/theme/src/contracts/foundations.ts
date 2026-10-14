@@ -54,6 +54,43 @@ export interface ShapeContract {
         Record<string, NumericScalarNode>;
 }
 
+/** Spacing steps on a grid, keyed by multiple: `"4"` is four grid units. */
+export const SPACING_STEPS = [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "8",
+    "10",
+    "12",
+    "16",
+] as const;
+
+export type SpacingStep = (typeof SPACING_STEPS)[number];
+
+/** Component dimensions. `touchTarget` is the minimum interactive area, whatever the visible
+ *  size. */
+export const SIZE_ROLES = [
+    "iconSmall",
+    "iconMedium",
+    "controlSmall",
+    "controlMedium",
+    "controlLarge",
+    "touchTarget",
+] as const;
+
+export type SizeRole = (typeof SIZE_ROLES)[number];
+
+export interface LayoutContract {
+    spacing: Record<SpacingStep, NumericScalarNode> &
+        Record<string, NumericScalarNode>;
+    sizes: Record<SizeRole, NumericScalarNode> &
+        Record<string, NumericScalarNode>;
+}
+
 export const STATE_ROLES = [
     "stateHover",
     "stateFocus",
