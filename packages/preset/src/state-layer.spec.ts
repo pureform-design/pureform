@@ -34,6 +34,7 @@ describe("stateLayer", () => {
             "hover",
             "focusVisible",
             "pressed",
+            "dragged",
         ]);
         expect(layer.cases[2]?.value).toEqual({
             type: "colorMix",
@@ -64,6 +65,8 @@ describe("stateLayer", () => {
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateFocus))",
                 _active:
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.statePressed))",
+                _dragging:
+                    "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateDragged))",
             },
         });
     });
@@ -75,6 +78,7 @@ describe("stateLayerTokens", () => {
             stateHover: { type: "numeric", value: 8, unit: "%" },
             stateFocus: { type: "numeric", value: 10, unit: "%" },
             statePressed: { type: "numeric", value: 10, unit: "%" },
+            stateDragged: { type: "numeric", value: 16, unit: "%" },
         });
     });
 });

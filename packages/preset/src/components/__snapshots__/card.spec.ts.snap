@@ -39,6 +39,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
             "backgroundColor": {
               "_active": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "_dragging": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "_focusVisible": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
               "_hover": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
               "base": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
@@ -61,6 +62,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
             "backgroundColor": {
               "_active": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "_dragging": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "_focusVisible": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
               "_hover": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
               "base": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
@@ -84,6 +86,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             },
             "backgroundColor": {
               "_active": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "_dragging": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "_focusVisible": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
               "_hover": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
               "base": "var(--components-card-outlinedContainer, token(colors.surface))",

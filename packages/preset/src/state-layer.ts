@@ -9,12 +9,12 @@ import { alias, colorMix, pct, when } from "@pureform/core/ast";
 import type { ColorValue, ConditionalNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 
-/** Opacity token per interaction state, with pureform's defaults in percent. Dragging is left
- *  out because core has no dragged condition. */
+/** Opacity token per interaction state, with Material's defaults in percent. */
 export const STATE_LAYER_OPACITIES = {
     stateHover: 8,
     stateFocus: 10,
     statePressed: 10,
+    stateDragged: 16,
 } as const;
 
 export interface StateLayerOptions {
@@ -30,10 +30,11 @@ const tint = (
     opacity: keyof typeof STATE_LAYER_OPACITIES,
 ) => colorMix(base, content, alias("tokens", "opacity", opacity));
 
-/** A background color that tints `base` with `content` on hover, keyboard focus, and press.
- *  Each state reads its opacity from the `stateLayerTokens()` fragment. Panda writes the press
- *  rule after the hover rule, so a pressed component shows the press tint while the pointer is
- *  over it. */
+/** A background color that tints `base` with `content` on hover, keyboard focus, press, and
+ *  drag. Each state reads its opacity from the `stateLayerTokens()` fragment. Panda writes the
+ *  later rules after the earlier ones, so a pressed component shows the press tint while the
+ *  pointer is over it, and a dragged one shows the drag tint. Drag code marks the element with
+ *  `data-dragging`. */
 export const stateLayer = ({
     base,
     content,
@@ -42,6 +43,7 @@ export const stateLayer = ({
         .on("hover", tint(base, content, "stateHover"))
         .on("focusVisible", tint(base, content, "stateFocus"))
         .on("pressed", tint(base, content, "statePressed"))
+        .on("dragged", tint(base, content, "stateDragged"))
         .else(base);
 
 /** The opacity tokens `stateLayer()` reads. Compose it into any config that uses state
