@@ -20,9 +20,38 @@ const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
 
+// Named themes from panda.pureform.ts, each applied to a subtree by `data-panda-theme`.
+const THEMES = [undefined, "teal", "sharp"] as const;
+
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={row}>
+                <For each={THEMES}>
+                    {(theme) => (
+                        <div
+                            data-panda-theme={theme}
+                            style={{ display: "flex", gap: "8px" }}
+                        >
+                            <For each={["filled", "tonal"] as const}>
+                                {(variant) => {
+                                    const b = button({ variant });
+                                    return (
+                                        <button class={b.root} type="button">
+                                            <span class={b.touchTarget} />
+                                            <Ripple />
+                                            <span class={b.label}>
+                                                {`${theme ?? "base"} ${variant}`.toUpperCase()}
+                                            </span>
+                                        </button>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    )}
+                </For>
+            </section>
+
             <section style={row}>
                 <For each={FILLS}>
                     {(variant) => {

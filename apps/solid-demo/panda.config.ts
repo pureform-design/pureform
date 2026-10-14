@@ -32,6 +32,7 @@ export default defineConfig({
     // The demo picks variants at runtime, which static extraction can't see, so emit every
     // variant of the pureform recipes.
     staticCss: {
+        themes: ["teal", "sharp"],
         recipes: {
             button: ["*"],
             iconButton: ["*"],
