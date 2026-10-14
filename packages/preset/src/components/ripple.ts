@@ -5,11 +5,14 @@
 // grows it from the press point toward the center while the press lasts, and fades it on
 // release. Give the layer the root class and pass the ripple class to `ripple()` through its
 // `class` option.
+//
+// The layer declares the ripple's timing as a transition: `transform` for the grow and
+// `opacity` for the fade. The layer never animates either, but `ripple()` reads the computed
+// transition at press time, so the motion tokens (or the component tokens) time every ripple.
 
 import { defineSlotComponent } from "@pureform/core";
 import {
     absolute,
-    alias,
     colorMix,
     hidden,
     literal,
@@ -20,14 +23,20 @@ import {
     radialGradient,
     stop,
     sub,
+    transition,
     transparent,
+    tween,
 } from "@pureform/core/ast";
+import { duration, easing, opacity } from "@pureform/theme";
 
 import { componentTokens } from "./shared";
 
 const { tokens, ref } = componentTokens("ripple", {
     color: literal("currentColor"),
-    opacity: alias("tokens", "opacity", "statePressed"),
+    opacity: opacity("statePressed"),
+    growDuration: duration("long1"),
+    fadeDuration: duration("medium3"),
+    easing: easing("standard"),
 });
 
 export const ripple = defineSlotComponent({
@@ -49,6 +58,10 @@ export const ripple = defineSlotComponent({
                 overflow: hidden,
                 borderRadius: literal("inherit"),
                 pointerEvents: none,
+                transition: transition(
+                    tween("transform", ref("growDuration"), ref("easing")),
+                    tween("opacity", ref("fadeDuration"), easing("linear")),
+                ),
             },
             ripple: {
                 position: absolute,
