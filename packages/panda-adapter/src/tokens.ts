@@ -21,6 +21,10 @@ const CATEGORY: Record<string, string> = {
     borderWidth: "borderWidths",
 };
 
+/** The Panda token category a core token group lowers to. */
+export const pandaCategory = (group: string): string =>
+    CATEGORY[group] ?? group;
+
 type PandaToken = { value: string | CondObject };
 type PandaTokenGroup = Record<string, PandaToken>;
 

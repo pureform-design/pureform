@@ -115,6 +115,9 @@ export type AnyComponentSpec = ComponentSpec | SlottedComponentSpec;
 export interface ThemeOverride {
     tokens?: Record<string, Record<string, Token<ScalarNode>>>;
     semanticTokens?: Record<string, Record<string, Token<ValueNode>>>;
+    fonts?: Record<string, Token<FontFamilyNode>>;
+    durations?: Record<string, Token<NumericScalarNode>>;
+    easings?: Record<string, Token<EasingNode>>;
     /** Per-component token rebinds, keyed by component name. */
     components?: Record<string, { tokens?: Record<string, Token<ValueNode>> }>;
 }

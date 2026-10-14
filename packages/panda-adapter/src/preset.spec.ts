@@ -1,5 +1,13 @@
 import { defineComponent } from "@pureform/core";
-import { alias, hex, when } from "@pureform/core/ast";
+import {
+    alias,
+    cubicBezier,
+    fontFamily,
+    hex,
+    numeric,
+    px,
+    when,
+} from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
 import { describe, expect, it } from "vitest";
 
@@ -168,5 +176,40 @@ describe("compilePreset (color schemes)", () => {
             colorScheme: "light dark",
         });
         expect(compilePreset(buttonConfig).globalCss).toBeUndefined();
+    });
+});
+
+describe("compilePreset (themes)", () => {
+    const preset = compilePreset({
+        ...buttonConfig,
+        themes: {
+            brand: {
+                tokens: { fontSize: { body: px(18) }, radii: { md: px(2) } },
+                semanticTokens: { colors: { brand: hex("#ff0000") } },
+                fonts: { plain: fontFamily(["Inter"], "sans-serif") },
+                durations: { fast: numeric(80, "ms") },
+                easings: { standard: cubicBezier([0, 0, 1, 1]) },
+            },
+        },
+    });
+    const brand = (preset.themes as Record<string, any>).brand;
+
+    it("maps theme token groups to Panda categories", () => {
+        expect(brand.tokens.fontSizes.body).toEqual({ value: "18px" });
+        expect(brand.tokens.radii.md).toEqual({ value: "2px" });
+    });
+
+    it("carries fonts and motion into the theme's tokens", () => {
+        expect(brand.tokens.fonts.plain.value).toContain("Inter");
+        expect(brand.tokens.durations.fast).toEqual({ value: "80ms" });
+        expect(brand.tokens.easings.standard).toEqual({
+            value: "cubic-bezier(0, 0, 1, 1)",
+        });
+    });
+
+    it("keeps semantic overrides", () => {
+        expect(brand.semanticTokens.colors.brand).toEqual({
+            value: "rgb(255 0 0)",
+        });
     });
 });

@@ -14,6 +14,7 @@ import {
     compileTextStyles,
     compileThemeTokens,
     compileUtilities,
+    pandaCategory,
     tokenEntry,
 } from "./tokens";
 
@@ -21,12 +22,12 @@ const compileTokenGroups = (
     groups: Record<string, Record<string, Token<ValueNode>>> | undefined,
     ctx: CompileCtx,
 ) => {
-    if (!groups) return undefined;
+    if (!groups || Object.keys(groups).length === 0) return undefined;
     // Token definitions use the curly ref form.
     const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
     return Object.fromEntries(
         Object.entries(groups).map(([group, entries]) => [
-            group,
+            pandaCategory(group),
             Object.fromEntries(
                 Object.entries(entries).map(([name, entry]) => [
                     name,
@@ -79,7 +80,14 @@ const colorSchemeCss = (config: CoreConfig) =>
         : undefined;
 
 const compileThemeOverride = (override: ThemeOverride, ctx: CompileCtx) => {
-    const tokens = compileTokenGroups(override.tokens, ctx);
+    // Fonts and motion live beside the token groups in core, and among them in Panda.
+    const tokenGroups: Record<string, Record<string, Token<ValueNode>>> = {
+        ...override.tokens,
+        ...(override.fonts ? { fonts: override.fonts } : {}),
+        ...(override.durations ? { durations: override.durations } : {}),
+        ...(override.easings ? { easings: override.easings } : {}),
+    };
+    const tokens = compileTokenGroups(tokenGroups, ctx);
     const semanticTokens = compileTokenGroups(override.semanticTokens, ctx);
     return {
         ...(tokens ? { tokens } : {}),
