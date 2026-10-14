@@ -22,7 +22,7 @@ import {
 } from "./contracts/foundations";
 import type { ElevationContract } from "./contracts/foundations";
 import { BASE_FONT_ROLES, BASE_TEXT_STYLES } from "./contracts/typography";
-import type { TextStyleNode } from "./contracts/typography";
+import type { TextStyleNode, TypographyContract } from "./contracts/typography";
 import type {
     ColorProvider,
     DomainContext,
@@ -136,6 +136,34 @@ const lowerElevation = (levels: ElevationContract["levels"]) => {
     return { shadows, tints, values };
 };
 
+/** Lower a typography contract to core config: a font token per role, a token per text style
+ *  value, and text styles that read them. */
+export const typographyFragment = (
+    contract: TypographyContract<string, string>,
+): Required<Pick<CoreConfig, "tokens" | "fonts" | "textStyles">> => {
+    const { tokens, textStyles } = lowerTypography(
+        contract.styles as Record<string, TextStyleNode<string>>,
+    );
+    return { tokens, fonts: contract.fonts, textStyles };
+};
+
+/** Lower an elevation contract to core config: a shadow and a tint token per level, and the
+ *  `shadowElevation` utility that reads them. */
+export const elevationFragment = (
+    contract: ElevationContract,
+): Required<Pick<CoreConfig, "semanticTokens" | "utilities">> => {
+    const { shadows, tints, values } = lowerElevation(contract.levels);
+    return {
+        semanticTokens: { colors: tints, shadows },
+        utilities: {
+            [ELEVATION_UTILITY]: defineStaticUtility({
+                property: "boxShadow",
+                values,
+            }),
+        },
+    };
+};
+
 /** Run every provider in domain order, check each contract, and lower them all to config. */
 export const resolveTheme = <
     G extends string,
@@ -223,37 +251,24 @@ export const resolveTheme = <
     );
     extras.push(elevation.extra);
 
-    const type = lowerTypography(
-        typography.contract.styles as Record<string, TextStyleNode<string>>,
-    );
-    const elev = lowerElevation(elevation.contract.levels);
-
     const lowered: Partial<CoreConfig> = {
         tokens: {
             colors: color.contract.primitives ?? {},
             radii: shape.contract.radii,
             opacity: state.contract.opacities,
-            ...type.tokens,
         },
-        semanticTokens: {
-            colors: { ...color.contract.roles, ...elev.tints },
-            shadows: elev.shadows,
-        },
-        fonts: typography.contract.fonts,
-        textStyles: type.textStyles,
+        semanticTokens: { colors: color.contract.roles },
         durations: motion.contract.durations,
         easings: motion.contract.easings,
-        utilities: {
-            [ELEVATION_UTILITY]: defineStaticUtility({
-                property: "boxShadow",
-                values: elev.values,
-            }),
-        },
     };
 
     const { components: _, ...config } = mergeConfigs(
         { tokens: {}, semanticTokens: {}, components: {} },
         lowered,
+        typographyFragment(
+            typography.contract as TypographyContract<string, string>,
+        ),
+        elevationFragment(elevation.contract),
         ...extras.filter((e): e is ThemeFragment => e !== undefined),
     );
 
