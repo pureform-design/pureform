@@ -11,8 +11,8 @@ import type { CoreConfig } from "@pureform/core/types";
 import chroma from "chroma-js";
 
 import { ColorScheme } from "../color-scheme";
-import type { ColorSchemeMode } from "../color-scheme";
-import type { HexColor } from "../types";
+import type { ColorSchemeArgs, ColorSchemeMode } from "../color-scheme";
+import type { BaseKeyColorGroup, HexColor } from "../types";
 
 /** Color space the generated primitives are encoded in. `hct` preserves Material's generation
  *  space with no round-trip through hex; `oklch` re-encodes through chroma-js for a
@@ -23,12 +23,48 @@ export type PaletteSpace = "hct" | "oklch";
  *  at runtime; a single mode fixes the scheme at build time. */
 export type PaletteMode = ColorSchemeMode | "both";
 
-export interface PaletteOptions {
+export interface PaletteOptions<TCustomColorGroups extends string = never> {
     /** Which schemes to generate. Default `"both"`. */
     mode?: PaletteMode;
     /** Color space the primitives are encoded in. Default `"hct"`. */
     space?: PaletteSpace;
+    /** Seeds per color group. A built-in group (`tertiary`, `negative`) is regenerated from
+     *  its seed; a new name (`brandAlt`) adds a group with its full set of system colors. A
+     *  bare hex is harmonized toward the main seed; `{ hex, harmonize: false }` keeps it. */
+    customSeeds?: ColorSchemeArgs<TCustomColorGroups>["customSeeds"];
+    /** Fixed values for individual system colors, for both schemes or per scheme:
+     *  `{ surface: "#ffffff" }` or `{ primary: { dark: "#a0c4ff" } }`. */
+    overrides?: ColorSchemeArgs<TCustomColorGroups>["overrides"];
 }
+
+const KEY_COLOR_GROUPS: BaseKeyColorGroup[] = [
+    "primary",
+    "secondary",
+    "tertiary",
+    "positive",
+    "notice",
+    "negative",
+    "info",
+];
+
+/** The color groups a palette generates key colors for: the built-in accent and semantic
+ *  groups, then any new groups named in `customSeeds`, in order. Neutral groups are left out,
+ *  since components tint with key colors only. */
+export const paletteColorGroups = <TCustomColorGroups extends string = never>(
+    customSeeds: PaletteOptions<TCustomColorGroups>["customSeeds"] = {},
+): (BaseKeyColorGroup | TCustomColorGroups)[] => {
+    const groups: string[] = [...KEY_COLOR_GROUPS];
+    for (const name of Object.keys(customSeeds)) {
+        if (
+            !groups.includes(name) &&
+            name !== "neutral" &&
+            name !== "neutralVariant"
+        ) {
+            groups.push(name);
+        }
+    }
+    return groups as (BaseKeyColorGroup | TCustomColorGroups)[];
+};
 
 // Semantic role to the Material system color it binds to. The role names are framework-level
 // (`brand`, `danger`), so a recipe aliases a role and stays independent of the Material tier.
@@ -59,7 +95,7 @@ export const schemeColorName = (
 ): string => `${systemColor}${capitalize(mode)}`;
 
 const primitives = (
-    scheme: ColorScheme,
+    scheme: ColorScheme<string>,
     mode: ColorSchemeMode,
     space: PaletteSpace,
 ): Record<string, ColorNode> => {
@@ -84,14 +120,20 @@ const primitives = (
  *  `primaryDark`) and as a semantic token under its plain name (`primary`) that picks the
  *  scheme through the `dark` condition. Recipes alias the semantic token, so they follow the
  *  scheme with no scheme-awareness of their own. The framework roles (`brand`, `canvas`)
- *  alias the semantic system colors. Compose it over a base config:
+ *  alias the semantic system colors. `customSeeds` and `overrides` pass through to
+ *  `ColorScheme`, so custom groups get the same primitives and semantic tokens as the built-in
+ *  ones. Compose it over a base config:
  *  `mergeConfigs(baseConfig, palette(seed))`. */
-export const palette = (
+export const palette = <TCustomColorGroups extends string = never>(
     seed: HexColor,
-    options: PaletteOptions = {},
+    options: PaletteOptions<TCustomColorGroups> = {},
 ): Pick<CoreConfig, "tokens" | "semanticTokens"> => {
-    const { mode = "both", space = "hct" } = options;
-    const scheme = ColorScheme.create({ source: seed });
+    const { mode = "both", space = "hct", customSeeds, overrides } = options;
+    const scheme = ColorScheme.create<TCustomColorGroups>({
+        source: seed,
+        ...(customSeeds ? { customSeeds } : {}),
+        ...(overrides ? { overrides } : {}),
+    });
     const modes = mode === "both" ? MODES : [mode];
 
     const colors: Record<string, ColorNode> = {};

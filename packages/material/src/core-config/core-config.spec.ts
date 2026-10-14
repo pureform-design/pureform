@@ -5,7 +5,7 @@ import type { CoreConfig, Token } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
 import { elevation } from "./elevation";
-import { palette } from "./palette";
+import { palette, paletteColorGroups } from "./palette";
 import { typescale } from "./typescale";
 
 const SEED = "#7c3aed" as const;
@@ -80,6 +80,56 @@ describe("palette", () => {
         for (const name of Object.keys(semanticTokens.colors ?? {})) {
             expect(primitives.has(name), name).toBe(false);
         }
+    });
+});
+
+describe("palette color options", () => {
+    it("adds every system color for a custom group", () => {
+        const { tokens, semanticTokens } = palette(SEED, {
+            customSeeds: { coral: "#FF7F50" },
+        });
+        for (const name of ["coral", "onCoral", "coralContainer"]) {
+            expect(semanticTokens.colors?.[name], name).toBeDefined();
+            expect(tokens.colors?.[`${name}Light`], name).toBeDefined();
+        }
+    });
+
+    it("regenerates a built-in group from its custom seed", () => {
+        const custom = palette(SEED, {
+            customSeeds: { tertiary: { hex: "#00A86B", harmonize: false } },
+        });
+        expect(custom.tokens.colors?.tertiaryLight).not.toEqual(
+            palette(SEED).tokens.colors?.tertiaryLight,
+        );
+        expect(custom.tokens.colors?.primaryLight).toEqual(
+            palette(SEED).tokens.colors?.primaryLight,
+        );
+    });
+
+    it("pins overridden system colors per scheme", () => {
+        const { tokens } = palette(SEED, {
+            space: "oklch",
+            overrides: { surface: { dark: "#000000" } },
+        });
+        expect(asColor(tokens.colors?.surfaceDark)?.components[0]).toBe(0);
+        expect(
+            asColor(tokens.colors?.surfaceLight)?.components[0],
+        ).toBeGreaterThan(0.9);
+    });
+
+    it("lists the key color groups, built-in first, then custom", () => {
+        expect(
+            paletteColorGroups({ coral: "#FF7F50", tertiary: "#00A86B" }),
+        ).toEqual([
+            "primary",
+            "secondary",
+            "tertiary",
+            "positive",
+            "notice",
+            "negative",
+            "info",
+            "coral",
+        ]);
     });
 });
 
