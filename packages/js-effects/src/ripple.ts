@@ -294,7 +294,9 @@ const inkSparkle: Renderer = (
     let frame = 0;
 
     const draw = (now: number) => {
-        const p = decelerate(Math.min((now - began) / timing.grow, 1));
+        // A frame's timestamp can predate the press slightly, so clamp the progress at 0.
+        const t = Math.min(Math.max((now - began) / timing.grow, 0), 1);
+        const p = decelerate(t);
         const cx = startCenter.x + (endCenter.x - startCenter.x) * p;
         const cy = startCenter.y + (endCenter.y - startCenter.y) * p;
         const radius = startRadius + (endRadius - startRadius) * p;
@@ -318,7 +320,6 @@ const inkSparkle: Renderer = (
         // out as the ripple reaches full size, so a held press settles into the plain fill.
         // The ring grows at a steady pace to just cover the surface, so a small control sees
         // the whole sweep instead of a ring that leaves it within a few frames.
-        const t = Math.min((now - began) / timing.grow, 1);
         const ring = Math.max(ringReach * t, startRadius) * SPARKLE_RING;
         const scatter = ring * SPARKLE_SCATTER;
         const current = trail[head];
