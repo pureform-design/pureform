@@ -471,7 +471,16 @@ export interface GradientNode {
     stops: GradientStop[];
     /** deg or turn (linear and conic only). */
     angle?: NumericValue;
+    /** How far a radial gradient reaches (radial only). Omitted means `farthest-corner`. */
+    extent?: RadialExtent;
 }
+
+/** The ending-shape size keyword of a radial gradient. */
+export type RadialExtent =
+    | "closest-side"
+    | "closest-corner"
+    | "farthest-side"
+    | "farthest-corner";
 
 export interface GradientStop {
     color: ColorValue;

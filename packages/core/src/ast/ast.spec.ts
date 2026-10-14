@@ -19,6 +19,7 @@ import {
     numeric,
     oklch,
     pct,
+    radialGradient,
     platform,
     px,
     rem,
@@ -266,5 +267,17 @@ describe("when conditional", () => {
             type: "viewportBreakpoint",
             until: "lg",
         });
+    });
+});
+
+describe("radialGradient", () => {
+    it("records the extent only when given", () => {
+        expect(radialGradient([], "closest-side")).toEqual({
+            type: "gradient",
+            kind: "radial",
+            stops: [],
+            extent: "closest-side",
+        });
+        expect(radialGradient([])).not.toHaveProperty("extent");
     });
 });

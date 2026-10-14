@@ -11,6 +11,7 @@ import {
     hex,
     inlineFlex,
     linearGradient,
+    radialGradient,
     literal,
     min,
     mul,
@@ -27,6 +28,7 @@ import {
     transform,
     transition,
     translate,
+    transparent,
     tween,
     unitless,
     when,
@@ -256,5 +258,30 @@ describe("compileStyleMap layout and interaction properties", () => {
             outlineWidth: "1px",
             pointerEvents: "none",
         });
+    });
+});
+
+describe("compileNodeToCSS radial gradients", () => {
+    it("emits the extent keyword when one is given", () => {
+        expect(
+            compileNodeToCSS(
+                radialGradient(
+                    [
+                        stop(hex("#000000"), pct(65)),
+                        stop(transparent, pct(100)),
+                    ],
+                    "closest-side",
+                ),
+                ctx(),
+            ),
+        ).toBe(
+            "radial-gradient(closest-side, rgb(0 0 0) 65%, transparent 100%)",
+        );
+    });
+
+    it("omits it otherwise", () => {
+        expect(
+            compileNodeToCSS(radialGradient([stop(hex("#000000"))]), ctx()),
+        ).toBe("radial-gradient(rgb(0 0 0))");
     });
 });

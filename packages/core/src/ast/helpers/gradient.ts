@@ -4,6 +4,7 @@ import type {
     GradientNode,
     GradientStop,
     NumericValue,
+    RadialExtent,
 } from "../nodes";
 
 const grad = (
@@ -19,7 +20,15 @@ const grad = (
 
 export const linearGradient = (stops: GradientStop[], angle?: NumericValue) =>
     grad("linear", stops, angle);
-export const radialGradient = (stops: GradientStop[]) => grad("radial", stops);
+/** A radial gradient. `extent` sets how far it reaches; for example `"closest-side"` ends it
+ *  at the nearest edge of the box. */
+export const radialGradient = (
+    stops: GradientStop[],
+    extent?: RadialExtent,
+): GradientNode => ({
+    ...grad("radial", stops),
+    ...(extent ? { extent } : {}),
+});
 export const conicGradient = (stops: GradientStop[], angle?: NumericValue) =>
     grad("conic", stops, angle);
 

@@ -85,9 +85,13 @@ export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
                     : compileNodeToCSS(s.color, ctx),
             );
             const head =
-                node.kind !== "radial" && node.angle
-                    ? [compileNodeToCSS(node.angle, ctx)]
-                    : [];
+                node.kind === "radial"
+                    ? node.extent
+                        ? [node.extent]
+                        : []
+                    : node.angle
+                      ? [compileNodeToCSS(node.angle, ctx)]
+                      : [];
             return `${node.kind}-gradient(${[...head, ...stops].join(", ")})`;
         }
         case "transform":
