@@ -249,6 +249,8 @@ function TokensRoute() {
                     type="button"
                     onClick={toggleScheme}
                 >
+                    <span class={button().touchTarget} />
+                    <Ripple />
                     <span class={button().label}>Toggle light / dark</span>
                 </button>
                 <button
@@ -256,6 +258,7 @@ function TokensRoute() {
                     type="button"
                     onClick={reset}
                 >
+                    <Ripple />
                     <span class={button().label}>Reset tokens</span>
                 </button>
                 <For each={GROUPS}>
