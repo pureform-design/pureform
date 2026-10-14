@@ -2,8 +2,9 @@
 //
 // A press grows a ripple from the press point toward the center of the surface and holds it
 // while the pointer stays down. Release fades it out, but never before a minimum press time,
-// so a quick tap still shows the full ripple. Touch presses wait briefly so a scroll does not
-// ripple, and a keyboard click ripples from the center.
+// so a quick tap still shows most of the ripple. Touch presses wait briefly so a scroll does not
+// ripple, and a keyboard click ripples from the center. The timing comes from the ripple
+// layer's transition, so motion tokens drive it, and falls back to Material's ripple timing.
 //
 // Two variants share that press handling and differ only in how a ripple is drawn:
 // - `ink-well`: Material's reference ripple, a soft-edged circle animated with CSS transforms.
@@ -12,7 +13,6 @@
 //   ripple reaches full size.
 
 const PRESS_GROW_MS = 450;
-const MINIMUM_PRESS_MS = 225;
 const FADE_MS = 375;
 const TOUCH_DELAY_MS = 150;
 const INITIAL_ORIGIN_SCALE = 0.2;
@@ -20,6 +20,73 @@ const PADDING = 10;
 const SOFT_EDGE_MINIMUM_SIZE = 75;
 const SOFT_EDGE_CONTAINER_RATIO = 0.35;
 const STANDARD_EASING = "cubic-bezier(0.2, 0, 0, 1)";
+
+/** How long a ripple grows and fades, and the grow curve. A release waits for at least half
+ *  the grow, so a quick tap still shows most of the ripple. */
+export type RippleTiming = {
+    /** Grow duration, in ms. */
+    grow: number;
+    /** Fade duration, in ms. */
+    fade: number;
+    /** CSS easing for the grow. */
+    easing: string;
+};
+
+const DEFAULT_TIMING: RippleTiming = {
+    grow: PRESS_GROW_MS,
+    fade: FADE_MS,
+    easing: STANDARD_EASING,
+};
+
+// Split a computed list on top-level commas, keeping `cubic-bezier(a, b, c, d)` whole.
+const splitList = (value: string): string[] => {
+    const parts: string[] = [];
+    let depth = 0;
+    let current = "";
+    for (const char of value) {
+        if (char === "(") depth++;
+        if (char === ")") depth--;
+        if (char === "," && depth === 0) {
+            parts.push(current.trim());
+            current = "";
+        } else {
+            current += char;
+        }
+    }
+    if (current.trim()) parts.push(current.trim());
+    return parts;
+};
+
+const toMs = (value: string | undefined): number | undefined => {
+    if (!value) return undefined;
+    const n = Number.parseFloat(value);
+    if (Number.isNaN(n)) return undefined;
+    return value.endsWith("ms") ? n : n * 1000;
+};
+
+/** Read the timing a ripple layer declares through its transition: the `transform` entry
+ *  times the grow and the `opacity` entry the fade. Missing entries keep `fallback`. */
+export function readRippleTiming(
+    style: Pick<
+        CSSStyleDeclaration,
+        "transitionProperty" | "transitionDuration" | "transitionTimingFunction"
+    >,
+    fallback: RippleTiming = DEFAULT_TIMING,
+): RippleTiming {
+    const properties = splitList(style.transitionProperty);
+    const durations = splitList(style.transitionDuration);
+    const easings = splitList(style.transitionTimingFunction);
+    // CSS repeats a shorter list to match the property count.
+    const at = (list: string[], i: number) => list[i % list.length];
+    const grow = properties.indexOf("transform");
+    const fade = properties.indexOf("opacity");
+    const ms = (i: number) => (i < 0 ? undefined : toMs(at(durations, i)));
+    return {
+        grow: ms(grow) || fallback.grow,
+        fade: ms(fade) || fallback.fade,
+        easing: (grow < 0 ? undefined : at(easings, grow)) || fallback.easing,
+    };
+}
 
 type CssClasses = { [key: string]: boolean } | string | string[];
 
@@ -54,6 +121,9 @@ export type RippleOptions = {
     /** Let an ancestor surface ripple for the same press too. By default the innermost
      *  surface claims the press. */
     allowPropagation?: boolean;
+    /** Fixed timing. Default: read from the layer's transition (the preset's ripple layer
+     *  declares the motion tokens there), falling back to Material's ripple timing. */
+    timing?: Partial<RippleTiming>;
     /** Tuning for the `ink-sparkle` variant. */
     sparkle?: SparkleOptions;
 };
@@ -117,10 +187,16 @@ type RippleHandle = { release: (delay: number) => void };
 type Renderer = (
     layer: HTMLElement,
     geometry: Geometry,
+    timing: RippleTiming,
     options: RippleOptions,
 ) => RippleHandle;
 
-const inkWell: Renderer = (layer, { size, scale, start, end }, options) => {
+const inkWell: Renderer = (
+    layer,
+    { size, scale, start, end },
+    timing,
+    options,
+) => {
     const element = options.createElement?.() ?? document.createElement("span");
     element.dataset.ripple = "";
     if (options.class) element.classList.add(...normalizeClass(options.class));
@@ -136,13 +212,13 @@ const inkWell: Renderer = (layer, { size, scale, start, end }, options) => {
                 transform: `translate(${end.x}px, ${end.y}px) scale(${scale})`,
             },
         ],
-        { duration: PRESS_GROW_MS, easing: STANDARD_EASING, fill: "forwards" },
+        { duration: timing.grow, easing: timing.easing, fill: "forwards" },
     );
 
     return {
         release(delay) {
             const fade = element.animate([{ opacity: 1 }, { opacity: 0 }], {
-                duration: FADE_MS,
+                duration: timing.fade,
                 delay,
                 easing: "linear",
                 fill: "forwards",
@@ -165,7 +241,12 @@ const SPARKLE_SCATTER = 1 / 6;
 const SPARKLE_MAX = 2048;
 const SPARKLE_TRAIL = [1, 0.5, 0.2];
 
-const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
+const inkSparkle: Renderer = (
+    layer,
+    { size, scale, start, end },
+    timing,
+    options,
+) => {
     const {
         fillOpacity = 0.1,
         sparkleOpacity = 0.3,
@@ -213,14 +294,14 @@ const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
     let frame = 0;
 
     const draw = (now: number) => {
-        const p = decelerate(Math.min((now - began) / PRESS_GROW_MS, 1));
+        const p = decelerate(Math.min((now - began) / timing.grow, 1));
         const cx = startCenter.x + (endCenter.x - startCenter.x) * p;
         const cy = startCenter.y + (endCenter.y - startCenter.y) * p;
         const radius = startRadius + (endRadius - startRadius) * p;
         const fade =
             fadeFrom === undefined
                 ? 1
-                : 1 - Math.min(Math.max((now - fadeFrom) / FADE_MS, 0), 1);
+                : 1 - Math.min(Math.max((now - fadeFrom) / timing.fade, 0), 1);
 
         ctx.clearRect(0, 0, width, height);
 
@@ -237,7 +318,7 @@ const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
         // out as the ripple reaches full size, so a held press settles into the plain fill.
         // The ring grows at a steady pace to just cover the surface, so a small control sees
         // the whole sweep instead of a ring that leaves it within a few frames.
-        const t = Math.min((now - began) / PRESS_GROW_MS, 1);
+        const t = Math.min((now - began) / timing.grow, 1);
         const ring = Math.max(ringReach * t, startRadius) * SPARKLE_RING;
         const scatter = ring * SPARKLE_SCATTER;
         const current = trail[head];
@@ -290,7 +371,7 @@ const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
                     cancelAnimationFrame(frame);
                     canvas.remove();
                 },
-                delay + FADE_MS + 100,
+                delay + timing.fade + 100,
             );
         },
     };
@@ -303,7 +384,9 @@ const RENDERERS: Record<RippleVariant, Renderer> = {
 
 /** Attach Material press ripples to `container`. Returns a function that detaches them. */
 export function ripple(container: HTMLElement, options: RippleOptions = {}) {
-    let press: { handle: RippleHandle; startedAt: number } | undefined;
+    let press:
+        | { handle: RippleHandle; startedAt: number; minimum: number }
+        | undefined;
     let touchTimer: ReturnType<typeof setTimeout> | undefined;
 
     const layerOf = () =>
@@ -323,8 +406,13 @@ export function ripple(container: HTMLElement, options: RippleOptions = {}) {
                 : { x: origin.x - rect.left, y: origin.y - rect.top },
         );
         const render = RENDERERS[options.variant ?? "ink-well"];
+        const timing = {
+            ...readRippleTiming(getComputedStyle(layer)),
+            ...options.timing,
+        };
         press = {
-            handle: render(layer, geometry, options),
+            handle: render(layer, geometry, timing, options),
+            minimum: timing.grow / 2,
             startedAt: performance.now(),
         };
     }
@@ -333,10 +421,10 @@ export function ripple(container: HTMLElement, options: RippleOptions = {}) {
         clearTimeout(touchTimer);
         touchTimer = undefined;
         if (!press) return;
-        const { handle, startedAt } = press;
+        const { handle, startedAt, minimum } = press;
         press = undefined;
         const held = performance.now() - startedAt;
-        handle.release(Math.max(MINIMUM_PRESS_MS - held, 0));
+        handle.release(Math.max(minimum - held, 0));
     }
 
     function onPointerDown(e: PointerEvent) {
