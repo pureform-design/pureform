@@ -20,6 +20,7 @@ import {
     fillVariant,
     sys,
     touchTarget,
+    stateTransition,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -57,6 +58,7 @@ export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
+                    transition: stateTransition,
                     position: relative,
                     display: inlineFlex,
                     alignItems: center,

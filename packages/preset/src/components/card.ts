@@ -19,7 +19,13 @@ import {
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 
 import { stateLayer } from "../state-layer";
-import { componentTokens, disabledColor, sys, touchTarget } from "./shared";
+import {
+    componentTokens,
+    disabledColor,
+    sys,
+    touchTarget,
+    stateTransition,
+} from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
 
@@ -105,6 +111,7 @@ export const card = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                transition: stateTransition,
                 position: relative,
                 color: content,
                 borderRadius: ref("radius"),

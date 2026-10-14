@@ -9,8 +9,10 @@ import {
     pct,
     solid,
     transform,
+    transition,
     translate,
     transparent,
+    tween,
     unitless,
 } from "@pureform/core/ast";
 import type {
@@ -20,6 +22,7 @@ import type {
     ValueNode,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { duration, easing } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 
@@ -236,3 +239,14 @@ export const fillVariant = (
         },
     };
 };
+
+/** How a component eases between states: the state layer and colors over `short3`, and
+ *  elevation over `medium1`, both on the standard curve. The motion tokens set both, so a
+ *  theme's motion provider retimes every component. */
+export const stateTransition = transition(
+    tween("backgroundColor", duration("short3"), easing("standard")),
+    tween("color", duration("short3"), easing("standard")),
+    tween("borderColor", duration("short3"), easing("standard")),
+    tween("outlineColor", duration("short3"), easing("standard")),
+    tween("boxShadow", duration("medium1"), easing("standard")),
+);

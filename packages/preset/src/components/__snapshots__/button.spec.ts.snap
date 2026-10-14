@@ -23,6 +23,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "gap": "var(--components-button-gap, token(spacing.2))",
       "justifyContent": "center",
       "position": "relative",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "touchTarget": {
       "height": "100%",
