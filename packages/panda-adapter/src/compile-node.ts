@@ -34,7 +34,11 @@ export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
         case "alias": {
             const target = aliasTarget(node.path);
             if (target.kind === "token")
-                return formatTokenRef(target.ref, ctx.refStyle);
+                return formatTokenRef(
+                    target.ref,
+                    ctx.refStyle,
+                    ctx.tokenPrefix,
+                );
             if (target.kind === "textStyle") return target.name;
             // Resolve: follow the alias and inline the result (component tokens resolve to a
             // dynamic var; metadata is unwrapped so it stays transparent).

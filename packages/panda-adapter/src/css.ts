@@ -127,9 +127,19 @@ export const aliasTarget = (path: string[]): AliasTarget => {
     }
 };
 
+/** The CSS var Panda emits for a token ref: `colors.primaryLight` is
+ *  `--colors-primary-light`, after Panda's own prefix if one is set. */
+export const tokenVarName = (ref: string, tokenPrefix?: string): string =>
+    `--${[tokenPrefix, ...ref.split(".").map(hyphenate)].filter(Boolean).join("-")}`;
+
 /** Spell a token ref for the given context: `token(ref)` in a style value, `{ref}` in a token
- *  definition. */
+ *  definition, and `var(--ref)` at runtime. */
 export const formatTokenRef = (
     ref: string,
-    refStyle: "fn" | "curly",
-): string => (refStyle === "curly" ? `{${ref}}` : `token(${ref})`);
+    refStyle: "fn" | "curly" | "var",
+    tokenPrefix?: string,
+): string => {
+    if (refStyle === "curly") return `{${ref}}`;
+    if (refStyle === "var") return `var(${tokenVarName(ref, tokenPrefix)})`;
+    return `token(${ref})`;
+};

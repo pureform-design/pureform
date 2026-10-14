@@ -26,10 +26,13 @@ export interface CompileOptions {
  *  `refStyle` picks how an aliased token reference is spelled. Panda resolves the function form
  *  `token(colors.brand)` only in style-value contexts (recipes, style maps). In a token or
  *  semantic-token DEFINITION it resolves only the curly form `{colors.brand}` (even inside a
- *  `var()` fallback), so token tiers compile with `refStyle: "curly"`. */
+ *  `var()` fallback), so token tiers compile with `refStyle: "curly"`. At runtime, outside
+ *  Panda, `refStyle: "var"` spells the CSS var Panda emits for the token, using
+ *  `tokenPrefix` (Panda's own `prefix`, not the component var prefix). */
 export interface CompileCtx {
     config: CoreConfig;
     prefix: VarPrefix | undefined;
     target: string;
-    refStyle: "fn" | "curly";
+    refStyle: "fn" | "curly" | "var";
+    tokenPrefix?: string;
 }

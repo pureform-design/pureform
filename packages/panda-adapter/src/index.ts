@@ -4,3 +4,5 @@ export { compileNodeToCSS } from "./compile-node";
 export { compileStyleMap } from "./style-map";
 export { compileConditional, compileValue, conditionKey } from "./conditions";
 export type { CompileOptions, VarPrefix } from "./options";
+export { themeVars } from "./runtime";
+export type { ThemeVarsOptions } from "./runtime";
