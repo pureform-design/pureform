@@ -28,9 +28,9 @@ export type RippleVariant = "ink-well" | "ink-sparkle";
 export type SparkleOptions = {
     /** Opacity of the fill behind the sparkles. Default `0.1`, the pressed state opacity. */
     fillOpacity?: number;
-    /** Peak opacity of a sparkle. Default `0.6`. */
+    /** Peak opacity of a sparkle. Default `0.3`. */
     sparkleOpacity?: number;
-    /** Sparkles per pixel of the ring they ride, drawn fresh each frame. Default `0.35`. */
+    /** Sparkles per pixel of the ring they ride, drawn fresh each frame. Default `0.2`. */
     density?: number;
 };
 
@@ -159,17 +159,17 @@ const inkWell: Renderer = (layer, { size, scale, start, end }, options) => {
 const decelerate = (t: number) => 1 - (1 - t) ** 3;
 
 // Sparkles ride an expanding ring, are scattered around it by a fraction of its radius, and
-// leave a short trail of fading earlier frames.
+// leave a short trail of fading earlier frames. The defaults keep them faint, as Material does.
 const SPARKLE_RING = 0.77;
 const SPARKLE_SCATTER = 1 / 6;
 const SPARKLE_MAX = 2048;
-const SPARKLE_TRAIL = [1, 0.6, 0.35, 0.15];
+const SPARKLE_TRAIL = [1, 0.5, 0.2];
 
 const inkSparkle: Renderer = (layer, { size, scale, start, end }, options) => {
     const {
         fillOpacity = 0.1,
-        sparkleOpacity = 0.6,
-        density = 0.35,
+        sparkleOpacity = 0.3,
+        density = 0.2,
     } = options.sparkle ?? {};
     const { width, height } = layer.getBoundingClientRect();
     const dpr = globalThis.devicePixelRatio || 1;
