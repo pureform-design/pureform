@@ -35,8 +35,8 @@ const ROLES: BaseTextStyleName[] = [
     "labelSmall",
 ];
 
-// The Material scale stores lengths as CSS strings such as "1.25rem" or "14px".
-const toLength = (value: string): NumericScalarNode => {
+/** Parse a type scale length, stored as a CSS string such as "1.25rem" or "14px". */
+export const toLength = (value: string): NumericScalarNode => {
     const match = /^(-?[\d.]+)(px|rem|em)$/.exec(value);
     if (!match?.[1] || !match[2]) {
         throw new Error(`Unsupported type scale length: ${value}`);

@@ -88,6 +88,7 @@
       "dependencies": {
         "@material/material-color-utilities": "catalog:",
         "@pureform/core": "catalog:",
+        "@pureform/theme": "catalog:",
         "@pureform/utils": "catalog:",
         "chroma-js": "catalog:",
       },
