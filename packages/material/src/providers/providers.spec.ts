@@ -1,4 +1,12 @@
-import { cubicBezier, numeric, pct, px } from "@pureform/core/ast";
+import {
+    cubicBezier,
+    none,
+    numeric,
+    pct,
+    px,
+    rem,
+    transparent,
+} from "@pureform/core/ast";
 import { resolveTheme } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
 
@@ -40,6 +48,14 @@ describe("Material providers", () => {
             type: "alias",
             path: ["fonts", "brand"],
         });
+        expect(config.tokens.fontSize?.titleLarge).toEqual(rem(1.375));
+        expect(config.semanticTokens.shadows?.level2).toMatchObject({
+            type: "shadow",
+        });
+        expect(config.semanticTokens.shadows?.level0).toEqual(none);
+        expect(config.semanticTokens.colors?.elevationTintLevel2).toEqual(
+            transparent,
+        );
     });
 
     it("carry custom color groups", () => {

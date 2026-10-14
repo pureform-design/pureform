@@ -7,9 +7,11 @@
 import {
     cubicBezier,
     fontFamily,
+    none,
     numeric,
     pct,
     px,
+    transparent,
     unitless,
 } from "@pureform/core/ast";
 import type {
@@ -26,6 +28,7 @@ import type {
     EasingRole,
     ElevationContract,
     ElevationProvider,
+    ElevationStyle,
     MotionProvider,
     ShapeProvider,
     ShapeRole,
@@ -142,8 +145,8 @@ export const materialTypescale = <
         },
     });
 
-/** Material's layered shadows. The shadow color and layer opacities stay tokens, so a theme
- *  can retint every level. */
+/** Material's layered shadows, with no tint. The shadow color and layer opacities stay tokens,
+ *  so a theme can retint every level. */
 export const materialElevation = (
     options: Pick<ElevationOptions, "shadowColor"> = {},
 ): ElevationProvider =>
@@ -153,10 +156,17 @@ export const materialElevation = (
         generate: () => {
             const { tokens, semanticTokens, utilities } = elevation(options);
             const utility = utilities?.shadowElevation;
+            const values = utility?.kind === "static" ? utility.values : {};
+            const levels: Record<string, ElevationStyle> = {};
+            for (const [level, style] of Object.entries(values)) {
+                levels[level] = {
+                    shadow: (style.boxShadow ??
+                        none) as ElevationStyle["shadow"],
+                    tint: transparent,
+                };
+            }
             return {
-                levels: (utility?.kind === "static"
-                    ? utility.values
-                    : {}) as ElevationContract["levels"],
+                levels: levels as ElevationContract["levels"],
                 extra: { tokens, semanticTokens },
             };
         },
