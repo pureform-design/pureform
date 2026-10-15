@@ -6,7 +6,12 @@ import type { Overrides } from "@pureform/rn-adapter";
 import { PureformProvider, useTokens } from "@pureform/rn-adapter/react";
 import { Fragment, useState } from "react";
 import type { ReactNode } from "react";
-import { ScrollView, StyleSheet, View } from "react-native";
+import {
+    ScrollView,
+    StyleSheet,
+    View,
+    useWindowDimensions,
+} from "react-native";
 import { brands, precomputed, runtime } from "virtual:pureform-rn";
 
 import {
@@ -268,6 +273,7 @@ export function App() {
     const [mode, setMode] = useState<"precomputed" | "runtime">("precomputed");
     const [override, setOverride] = useState<keyof typeof OVERRIDES>("none");
     const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
+    const { width } = useWindowDimensions();
     const controls = (
         <View style={styles.section}>
             <Choices
@@ -304,6 +310,7 @@ export function App() {
             {...(theme === "teal" ? { theme } : {})}
             overrides={OVERRIDES[override]!}
             reducedMotion={motion === "reduced motion"}
+            width={width}
         >
             <Page controls={controls} />
         </PureformProvider>
