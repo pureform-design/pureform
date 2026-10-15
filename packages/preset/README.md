@@ -149,6 +149,34 @@ trailing icon or text. Mark a selected row with `aria-selected="true"`.
 - `color` (both): a group's container fills the selected row. With no color, a selected row
   keeps Material's secondary container.
 
+## Search bar
+
+A pill holding a leading icon, the input, and trailing icons. Focus anywhere in it shows the
+focus ring on the whole bar.
+
+```html
+<label class="{root}">
+    <span class="{leading}">⌕</span>
+    <input class="{input}" type="search" placeholder="Search" />
+    <span class="{trailing}">⋮</span>
+</label>
+```
+
+## Navigation
+
+`navigationBar` (bottom, destinations side by side) and `navigationRail` (a narrow column)
+share their markup. Mark the current destination with `aria-current="page"`; `color` fills its
+pill with a group's container.
+
+```html
+<nav class="{root}">
+    <a class="{item}" href="/" aria-current="page">
+        <span class="{indicator}"><span class="{icon}">⌂</span></span>
+        <span class="{label}">Home</span>
+    </a>
+</nav>
+```
+
 ## Tabs
 
 Mark the current tab with `aria-selected="true"`. `variant` is `primary` or `secondary`; turn
@@ -180,6 +208,52 @@ one, so the icon and headline center.
 
 The dialog doesn't trap focus or dim the page by itself. Use a native `<dialog>` (which traps
 focus), or put the `scrim` component behind it.
+
+## Snackbar and tooltip
+
+Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job.
+
+```html
+<div class="{root}" role="status">
+    <span class="{supportingText}">Message archived</span>
+    <button class="{action}">Undo</button>
+    <button class="{close}" aria-label="Dismiss">×</button>
+</div>
+
+<div class="{root}" role="tooltip" id="tip">Save to drafts</div>
+```
+
+`tooltip`'s `variant` is `plain` or `rich`; a rich tooltip adds `subhead`, `supportingText`,
+and `actions` slots.
+
+## Slider and progress
+
+The slider lays a native range input over its drawn track and handle. Both it and the linear
+progress indicator read their value from a `value` token, a CSS var you keep in step as a
+percentage (prefixed like every var, for example `--components-slider-value: 40%`).
+
+```html
+<div class="{root}" style="--components-slider-value: 40%">
+    <span class="{track}"></span>
+    <span class="{activeTrack}"></span>
+    <span class="{stateLayer}"></span>
+    <span class="{handle}"></span>
+    <input class="{input}" type="range" aria-label="Volume" />
+</div>
+
+<div
+    class="{root}"
+    role="progressbar"
+    aria-valuenow="40"
+    style="--components-linearProgress-value: 40%"
+>
+    <div class="{indicator}"></div>
+</div>
+```
+
+- `linearProgress`: turn on `indeterminate` when the amount is unknown.
+- `circularProgress`: an indeterminate spinner on one element. Give it `role="progressbar"` and
+  a label.
 
 ## Surfaces
 

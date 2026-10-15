@@ -6,7 +6,9 @@ import { createListItem } from "./list-item";
 import { createMenu } from "./menu";
 import { createNavigationBar } from "./navigation-bar";
 import { createNavigationRail } from "./navigation-rail";
+import { createLinearProgress } from "./progress";
 import { createRadio } from "./radio";
+import { createSlider } from "./slider";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
 import { createTabs } from "./tabs";
@@ -25,6 +27,8 @@ describe.each([
     ["listItem", createListItem],
     ["menu", createMenu],
     ["tabs", createTabs],
+    ["slider", createSlider],
+    ["linearProgress", createLinearProgress],
     ["navigationBar", createNavigationBar],
     ["navigationRail", createNavigationRail],
 ] as const)("%s color", (_, create) => {

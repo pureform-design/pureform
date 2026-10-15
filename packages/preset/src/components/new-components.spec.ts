@@ -7,7 +7,9 @@ import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
+import { linearProgress } from "./progress";
 import { searchBar } from "./search-bar";
+import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
 import { tooltip } from "./tooltip";
@@ -22,6 +24,8 @@ describe.each([
     ["navigationRail", navigationRail],
     ["snackbar", snackbar],
     ["tooltip", tooltip],
+    ["slider", slider],
+    ["linearProgress", linearProgress],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();
@@ -74,5 +78,15 @@ describe("navigation", () => {
         expect(css).toContain(".navigationBar__item:is(");
         expect(css).toContain("aria-current");
         expect(css).toContain("secondaryContainer");
+    });
+});
+
+describe("progress", () => {
+    it("adds its keyframes to the pureform config", async () => {
+        const { pureform } = await import("../pureform");
+        expect(Object.keys(pureform().keyframes ?? {})).toEqual([
+            "linearProgressSlide",
+            "circularProgressSpin",
+        ]);
     });
 });

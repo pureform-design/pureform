@@ -129,6 +129,7 @@ const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
     ["navigationBar", (s) => s.recipe.base.item, "height"],
     ["navigationRail", (s) => s.recipe.base.item, "itemHeight"],
     ["snackbar", (s) => s.recipe.base.close, "closeSize"],
+    ["slider", (s) => s.recipe.base.handle, "height"],
     [
         "listItem",
         (s) =>
@@ -147,11 +148,23 @@ describe("items", () => {
         });
     });
 
-    it.each(ITEMS)("%s's item is at least 44px tall", (name, _, token) => {
-        const node = slotted(name).tokens?.[token] as {
-            default?: { value: number; unit: string };
-        };
-        expect(node.default?.unit).toBe("px");
-        expect(node.default?.value).toBeGreaterThanOrEqual(44);
-    });
+    it.each(ITEMS)(
+        "%s's item is at least the touch target tall",
+        (name, _, token) => {
+            const node = slotted(name).tokens?.[token] as {
+                default?: { value?: number; unit?: string; path?: string[] };
+            };
+            // Either the theme's touch target itself, or a fixed size of at least 44px.
+            if (node.default?.path) {
+                expect(node.default.path).toEqual([
+                    "tokens",
+                    "sizes",
+                    "touchTarget",
+                ]);
+            } else {
+                expect(node.default?.unit).toBe("px");
+                expect(node.default?.value).toBeGreaterThanOrEqual(44);
+            }
+        },
+    );
 });

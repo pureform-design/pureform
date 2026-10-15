@@ -78,6 +78,109 @@ exports[`dialog > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "indicator": {
+      "backgroundColor": "var(--components-linearProgress-activeColor, token(colors.primary))",
+      "borderRadius": "token(radii.full)",
+      "height": "100%",
+      "insetInlineStart": "0px",
+      "position": "absolute",
+      "top": "0px",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "width token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-linearProgress-value, 0%)",
+    },
+    "root": {
+      "backgroundColor": "var(--components-linearProgress-trackColor, token(colors.secondaryContainer))",
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-linearProgress-height, 4px)",
+      "overflow": "hidden",
+      "position": "relative",
+      "width": "100%",
+    },
+  },
+  "className": "linearProgress",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "primary",
+    "indeterminate": false,
+  },
+  "jsx": [
+    "LinearProgress",
+  ],
+  "slots": [
+    "root",
+    "indicator",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "indicator": {
+          "backgroundColor": "token(colors.error)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.errorContainer)",
+        },
+      },
+      "info": {
+        "indicator": {
+          "backgroundColor": "token(colors.info)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.infoContainer)",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "indicator": {
+          "backgroundColor": "token(colors.secondary)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.secondaryContainer)",
+        },
+      },
+      "success": {
+        "indicator": {
+          "backgroundColor": "token(colors.success)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.successContainer)",
+        },
+      },
+      "tertiary": {
+        "indicator": {
+          "backgroundColor": "token(colors.tertiary)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.tertiaryContainer)",
+        },
+      },
+      "warning": {
+        "indicator": {
+          "backgroundColor": "token(colors.warning)",
+        },
+        "root": {
+          "backgroundColor": "token(colors.warningContainer)",
+        },
+      },
+    },
+    "indeterminate": {
+      "false": {},
+      "true": {
+        "indicator": {
+          "animation": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlide",
+          "width": "var(--components-linearProgress-indeterminateWidth, 40%)",
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
@@ -1407,6 +1510,260 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
     "trailing",
   ],
   "variants": {},
+}
+`;
+
+exports[`slider > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "activeTrack": {
+      "backgroundColor": {
+        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-slider-activeColor, token(colors.primary))",
+      },
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-slider-trackHeight, 4px)",
+      "insetInlineStart": "0px",
+      "position": "absolute",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-slider-value, 0%)",
+    },
+    "handle": {
+      "backgroundColor": {
+        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-slider-activeColor, token(colors.primary))",
+      },
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-slider-handleSize, 20px)",
+      "insetInlineStart": "calc(var(--components-slider-value, 0%) - calc(var(--components-slider-handleSize, 20px) * 0.5))",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-slider-handleSize, 20px)",
+    },
+    "input": {
+      "cursor": "pointer",
+      "height": "100%",
+      "left": "0px",
+      "opacity": "0",
+      "position": "absolute",
+      "top": "0px",
+      "width": "100%",
+    },
+    "root": {
+      "alignItems": "center",
+      "display": "flex",
+      "height": "var(--components-slider-height, token(sizes.touchTarget))",
+      "position": "relative",
+      "width": "100%",
+    },
+    "stateLayer": {
+      "backgroundColor": {
+        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.statePressed))",
+        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+        ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateFocus))",
+        ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateHover))",
+        "base": "transparent",
+      },
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-slider-stateLayerSize, 40px)",
+      "insetInlineStart": "calc(var(--components-slider-value, 0%) - calc(var(--components-slider-stateLayerSize, 40px) * 0.5))",
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-slider-stateLayerSize, 40px)",
+    },
+    "track": {
+      "backgroundColor": {
+        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        "base": "var(--components-slider-trackColor, token(colors.secondaryContainer))",
+      },
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-slider-trackHeight, 4px)",
+      "insetInlineEnd": "0px",
+      "insetInlineStart": "0px",
+      "position": "absolute",
+    },
+  },
+  "className": "slider",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "primary",
+  },
+  "jsx": [
+    "Slider",
+  ],
+  "slots": [
+    "root",
+    "track",
+    "activeTrack",
+    "stateLayer",
+    "handle",
+    "input",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.error)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.error)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "info": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.info)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.info)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.secondary)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.secondary)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "success": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.success)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.success)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "tertiary": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.tertiary)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.tertiary)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "warning": {
+        "activeTrack": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.warning)",
+          },
+        },
+        "handle": {
+          "backgroundColor": {
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "base": "token(colors.warning)",
+          },
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+    },
+  },
 }
 `;
 

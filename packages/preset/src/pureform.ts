@@ -53,11 +53,17 @@ import { createListItem } from "./components/list-item";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
+import {
+    PROGRESS_KEYFRAMES,
+    createCircularProgress,
+    createLinearProgress,
+} from "./components/progress";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
 import { separator } from "./components/separator";
+import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
@@ -280,6 +286,9 @@ export const pureform = <
         checkbox: createCheckbox(theme.color.groups),
         radio: createRadio(theme.color.groups),
         switchControl: createSwitch(theme.color.groups),
+        slider: createSlider(theme.color.groups),
+        linearProgress: createLinearProgress(theme.color.groups),
+        circularProgress: createCircularProgress(theme.color.groups),
         separator,
         listItem: createListItem(theme.color.groups),
         menu: createMenu(theme.color.groups),
@@ -327,6 +336,7 @@ export const pureform = <
             theme.config,
             {
                 componentBaseStyles: { fontFamily: fontRole("plain") },
+                keyframes: PROGRESS_KEYFRAMES,
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
             },

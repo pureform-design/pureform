@@ -106,6 +106,14 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("richContent"), token("richContainer"), TEXT_CONTRAST),
         pair(token("subheadColor"), token("richContainer"), TEXT_CONTRAST),
     ],
+    slider: [
+        pair(token("activeColor"), SURFACE, UI_CONTRAST),
+        pair(token("activeColor"), token("trackColor"), UI_CONTRAST),
+    ],
+    linearProgress: [
+        pair(token("activeColor"), token("trackColor"), UI_CONTRAST),
+    ],
+    circularProgress: [pair(token("activeColor"), SURFACE, UI_CONTRAST)],
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,
     supportingText: [
