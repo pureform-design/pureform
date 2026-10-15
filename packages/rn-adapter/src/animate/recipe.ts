@@ -1,0 +1,35 @@
+// Animated styles: a component's styles where each property with a transition moves to its new
+// value, and each keyframe animation runs, through React Native's Animated, which React
+// Native Web runs too. Pass the slots' styles to `Animated.View` and `Animated.Text`.
+
+import { useRecipeWithTransitions } from "../react";
+import type { State } from "../select";
+import type { ThemeValues } from "../values";
+import { useKeyframes } from "./keyframes";
+import { useTransitions } from "./transitions";
+
+/** A component's styles per slot, with transitioned and keyframed properties as animated
+ *  values. `tokens` gives this one instance its own token values. */
+export const useAnimatedRecipe = (
+    name: string,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+    tokens?: ThemeValues,
+): Record<string, Record<string, unknown>> => {
+    const { styles, transitions, animations } = useRecipeWithTransitions(
+        name,
+        variants,
+        state,
+        tokens,
+    );
+    const transition = useTransitions();
+    const keyframes = useKeyframes();
+    const out: Record<string, Record<string, unknown>> = {};
+    for (const [slot, style] of Object.entries(styles)) {
+        const animated: Record<string, unknown> = { ...style };
+        transition(slot, style, transitions[slot] ?? [], animated);
+        keyframes(slot, style, animations[slot], animated);
+        out[slot] = animated;
+    }
+    return out;
+};
