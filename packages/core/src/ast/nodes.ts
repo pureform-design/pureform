@@ -350,13 +350,15 @@ export type InteractionCondition =
     | "disabled";
 
 /** Form / selectable-control states. `filled` is a text input holding a value, or an element
- *  containing one, for example to float a text field's label. */
+ *  containing one, for example to float a text field's label. `expanded` is a control whose
+ *  popup is open, such as a select showing its menu. */
 export type FormCondition =
     | "selected"
     | "checked"
     | "invalid"
     | "readOnly"
-    | "filled";
+    | "filled"
+    | "expanded";
 
 /** Color-scheme states (lower to `prefers-color-scheme` or `[data-theme]`). */
 export type ColorSchemeCondition = "dark" | "light";
@@ -465,7 +467,8 @@ export interface SlotCondition {
 /** The slot states. Each describes the slot's element together with what it contains:
  *  `focusWithin` is focus on it or inside it, `filled` is a text input inside holding a value,
  *  `invalid` an input inside marked invalid, `disabled` a disabled control inside, `checked`
- *  and `indeterminate` a checkbox, radio, or switch inside in that state. `selected` and
+ *  and `indeterminate` a checkbox, radio, or switch inside in that state, `expanded` a control
+ *  inside whose popup is open. `selected` and
  *  `pressed` describe the slot's element only: selected (or toggled on) and pressed. */
 export type SlotState =
     | "hover"
@@ -476,6 +479,7 @@ export type SlotState =
     | "focusWithin"
     | "focusVisibleWithin"
     | "filled"
+    | "expanded"
     | "invalid"
     | "disabled";
 
