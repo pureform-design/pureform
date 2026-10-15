@@ -1,18 +1,21 @@
 import {
     button,
     card,
+    checkbox,
     chip,
+    divider,
     fab,
     iconButton,
+    radio,
     scrim,
     supportingText,
+    switchControl,
     text,
     textArea,
     textField,
 } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
-import { createSignal } from "solid-js";
-import { For } from "solid-js";
+import { createSignal, For } from "solid-js";
 
 import { Ripple } from "../lib/ripple";
 
@@ -38,6 +41,86 @@ const THEMES = [undefined, "teal", "sharp"] as const;
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={{ ...row, "align-items": "center" }}>
+                <For
+                    each={["off", "on", "mixed", "error", "disabled"] as const}
+                >
+                    {(state) => {
+                        const c = checkbox();
+                        return (
+                            <label class={c.root} title={`checkbox ${state}`}>
+                                <span class={c.touchTarget} />
+                                <input
+                                    ref={(el) => {
+                                        el.indeterminate = state === "mixed";
+                                    }}
+                                    class={c.input}
+                                    type="checkbox"
+                                    id={`checkbox-${state}`}
+                                    checked={
+                                        state === "on" || state === "error"
+                                    }
+                                    disabled={state === "disabled"}
+                                    aria-invalid={
+                                        state === "error" ? "true" : undefined
+                                    }
+                                />
+                                <span class={c.box}>
+                                    <span class={c.checkIcon}>✓</span>
+                                    <span class={c.indeterminateIcon}>–</span>
+                                </span>
+                            </label>
+                        );
+                    }}
+                </For>
+                <For each={["a", "b", "c"] as const}>
+                    {(value) => {
+                        const r = radio();
+                        return (
+                            <label class={r.root} title={`radio ${value}`}>
+                                <span class={r.touchTarget} />
+                                <input
+                                    class={r.input}
+                                    type="radio"
+                                    name="demo-radio"
+                                    id={`radio-${value}`}
+                                    checked={value === "a"}
+                                />
+                                <span class={r.ring}>
+                                    <span class={r.dot} />
+                                </span>
+                            </label>
+                        );
+                    }}
+                </For>
+                <For each={[false, true]}>
+                    {(on) => {
+                        const s = switchControl();
+                        return (
+                            <label
+                                class={s.root}
+                                title={`switch ${on ? "on" : "off"}`}
+                            >
+                                <span class={s.touchTarget} />
+                                <input
+                                    class={s.input}
+                                    type="checkbox"
+                                    role="switch"
+                                    id={`switch-${on ? "on" : "off"}`}
+                                    checked={on}
+                                />
+                                <span class={s.track}>
+                                    <span class={s.stateLayer} />
+                                    <span class={s.handle}>
+                                        <span class={s.icon}>✓</span>
+                                    </span>
+                                </span>
+                            </label>
+                        );
+                    }}
+                </For>
+            </section>
+            <hr class={divider()} />
             <section style={{ ...row, "align-items": "flex-start" }}>
                 <For each={["filled", "outlined"] as const}>
                     {(variant) => (
