@@ -77,6 +77,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/tailwind-adapter"]
+path = "packages/tailwind-adapter"
+include = [
+    "packages/tailwind-adapter/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]

@@ -1,0 +1,56 @@
+{
+    "name": "@pureform/tailwind-adapter",
+    "version": "0.0.0-semantically-released",
+    "description": "Compiles a pureform CoreConfig to a Tailwind v4 stylesheet",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./vite": {
+            "types": "./dist/vite.d.ts",
+            "import": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            },
+            "require": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:",
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/css-lowering": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/material": "catalog:",
+        "@pureform/preset": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@tailwindcss/node": "catalog:",
+        "tailwindcss": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "tailwindcss": "catalog:",
+        "vite": "catalog:"
+    },
+    "peerDependenciesMeta": {
+        "vite": {
+            "optional": true
+        }
+    }
+}
