@@ -27,6 +27,25 @@ export interface Transition {
     delay: number;
 }
 
+/** A style's keyframe animation, which selection returns beside the style. */
+export const ANIMATION = "animation";
+
+/** A looping or one-off keyframe animation: milliseconds, a curve as for transitions, how many
+ *  times it runs (`-1` for ever), its direction, and its frames, each a style at an offset
+ *  from 0 to 1. */
+export interface Animation {
+    name: string;
+    duration: number;
+    easing: string;
+    delay: number;
+    iterations: number;
+    direction: "normal" | "reverse" | "alternate" | "alternateReverse";
+    frames: {
+        offset: number;
+        style: Record<string, Concrete | Concrete[] | object>;
+    }[];
+}
+
 export type Expr =
     | { $ref: string }
     | { $dyn: string; default?: Value }

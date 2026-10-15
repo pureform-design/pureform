@@ -7,8 +7,8 @@
 
 import type { ComponentStyles } from "./lower";
 import { compositeOver, formatColor, parseColor } from "./rgba";
-import { TINT, TRANSITION } from "./values";
-import type { Transition, Value } from "./values";
+import { ANIMATION, TINT, TRANSITION } from "./values";
+import type { Animation, Transition, Value } from "./values";
 
 /** A component's state. Pressable reports the interaction states, props the rest. */
 export interface State {
@@ -113,6 +113,8 @@ const settle = (style: Style): Style => {
 export interface Selected {
     styles: Record<string, Style>;
     transitions: Record<string, Transition[]>;
+    /** Each slot's keyframe animation, where it has one. */
+    animations: Record<string, Animation>;
 }
 
 /** A component's style per slot (or its one style under `""`, without slots) for variants and
@@ -189,13 +191,23 @@ export const selectWithTransitions = (
     for (const slot of Object.keys(styles))
         if (!children.has(slot)) visit(slot);
     const transitions: Record<string, Transition[]> = {};
+    const animations: Record<string, Animation> = {};
     for (const [slot, style] of Object.entries(styles)) {
         const own = style[TRANSITION];
         delete style[TRANSITION];
+        const animation = style[ANIMATION];
+        delete style[ANIMATION];
+        if (
+            typeof animation === "object" &&
+            animation !== null &&
+            !Array.isArray(animation)
+        ) {
+            animations[slot] = animation as unknown as Animation;
+        }
         transitions[slot] = Array.isArray(own)
             ? (own as unknown as Transition[])
             : [];
         settle(style);
     }
-    return { styles, transitions };
+    return { styles, transitions, animations };
 };

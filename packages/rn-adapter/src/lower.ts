@@ -21,7 +21,7 @@ import { rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
 import { MIX_SPACES } from "./spaces";
 import type { MixSpace } from "./spaces";
-import { TINT, TRANSITION } from "./values";
+import { ANIMATION, TINT, TRANSITION } from "./values";
 import type { Value } from "./values";
 
 /** Options for lowering. */
@@ -235,6 +235,39 @@ const easingCurve = (node: EasingNode): string => {
     return `cubic-bezier(${points.join(", ")})`;
 };
 
+// A keyframes entry's frames, each at its offset, with the values React Native can take. A
+// frame's values are its base values: keyframes have no states.
+const keyframes = (name: string, ctx: Ctx): Value => {
+    const stops = (
+        ctx.config as { keyframes?: Record<string, Record<string, StyleMap>> }
+    ).keyframes?.[name];
+    if (!stops) throw new Unsupported(`no keyframes named "${name}"`);
+    return Object.entries(stops)
+        .map(([stop, map]) => {
+            const offset =
+                stop === "from"
+                    ? 0
+                    : stop === "to"
+                      ? 1
+                      : Number.parseFloat(stop) / 100;
+            const style: Record<string, Value> = {};
+            for (const [property, node] of Object.entries(map)) {
+                const rn = rnProperty(property);
+                if (!rn || node === undefined) continue;
+                try {
+                    style[rn] = lowerNode(node as ValueNode, {
+                        ...ctx,
+                        property,
+                    })[0]!.value;
+                } catch (error) {
+                    if (!(error instanceof Unsupported)) throw error;
+                }
+            }
+            return { offset, style };
+        })
+        .sort((a, b) => a.offset - b.offset);
+};
+
 /** Lower a value node to its cased values. */
 export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
     switch (node.type) {
@@ -382,6 +415,33 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         }
         case "easing":
             return plain(easingCurve(node));
+        case "animation": {
+            const zero = { type: "numeric", value: 0, unit: "ms" } as const;
+            const frames = keyframes(node.name, ctx);
+            return product(
+                [
+                    node.duration,
+                    node.easing ?? {
+                        type: "easing",
+                        kind: "keyword",
+                        name: "ease",
+                    },
+                    node.delay ?? zero,
+                ].map((n) => lowerNode(n as ValueNode, ctx)),
+                ([duration, easing, delay]) => ({
+                    name: node.name,
+                    duration: duration!,
+                    easing: easing!,
+                    delay: delay!,
+                    iterations:
+                        node.iterations === "infinite"
+                            ? -1
+                            : (node.iterations ?? 1),
+                    direction: node.direction ?? "normal",
+                    frames,
+                }),
+            );
+        }
         case "transition": {
             const parts = node.parts.flatMap((part) => {
                 const property = rnProperty(part.property);
@@ -480,9 +540,11 @@ const lowerStyle = (
                 ? TINT
                 : property === "transition"
                   ? TRANSITION
-                  : property === "filter"
-                    ? "boxShadow"
-                    : rnProperty(property);
+                  : property === "animation"
+                    ? ANIMATION
+                    : property === "filter"
+                      ? "boxShadow"
+                      : rnProperty(property);
         if (rn === null) continue;
         if (rn === undefined) {
             diagnostics.add(

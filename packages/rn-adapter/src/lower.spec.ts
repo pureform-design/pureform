@@ -144,6 +144,55 @@ describe("lowerRn values", () => {
     });
 });
 
+describe("lowerRn animations", () => {
+    it("carries the keyframes with the timing, in React Native's terms", () => {
+        const { rules } = rulesOf(
+            {
+                animation: {
+                    type: "animation",
+                    name: "slide",
+                    duration: { type: "numeric", value: 1, unit: "s" },
+                    iterations: "infinite",
+                },
+            } as unknown as StyleMap,
+            {
+                keyframes: {
+                    slide: {
+                        to: {
+                            opacity: {
+                                type: "numeric",
+                                value: 1,
+                                unit: "none",
+                            },
+                        },
+                        from: {
+                            opacity: {
+                                type: "numeric",
+                                value: 0,
+                                unit: "none",
+                            },
+                        },
+                    },
+                },
+            },
+        );
+        expect(rules[0]!.style).toEqual({
+            animation: {
+                name: "slide",
+                duration: 1000,
+                easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                delay: 0,
+                iterations: -1,
+                direction: "normal",
+                frames: [
+                    { offset: 0, style: { opacity: 0 } },
+                    { offset: 1, style: { opacity: 1 } },
+                ],
+            },
+        });
+    });
+});
+
 describe("lowerRn mixes", () => {
     it("keeps the space of a mix outside sRGB, and reports HCT", () => {
         const mix = (space: string) => ({

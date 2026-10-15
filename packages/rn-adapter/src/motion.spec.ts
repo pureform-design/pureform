@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 
-import { animatable, blend, easingPoints, interpolates, stops } from "./motion";
+import {
+    animatable,
+    blend,
+    channels,
+    easingPoints,
+    interpolates,
+    stops,
+} from "./motion";
 
 describe("easingPoints", () => {
     it("reads Bézier points, and takes anything else as linear", () => {
@@ -82,5 +89,57 @@ describe("animatable", () => {
         expect(animatable("transparent")).toBe("rgba(0, 0, 0, 0)");
         expect(animatable("#ff0000")).toBe("rgba(255, 0, 0, 1)");
         expect(animatable(4)).toBe(4);
+    });
+});
+
+describe("channels", () => {
+    it("moves each transform step and value through the frames' offsets", () => {
+        expect(
+            channels(
+                [
+                    {
+                        offset: 0,
+                        style: {
+                            transform: [{ translateX: "-100%" }],
+                            opacity: 0,
+                        },
+                    },
+                    {
+                        offset: 1,
+                        style: {
+                            transform: [{ translateX: "250%" }],
+                            opacity: 1,
+                        },
+                    },
+                ],
+                {},
+            ),
+        ).toEqual([
+            {
+                property: "transform",
+                step: [0, "translateX"],
+                inputRange: [0, 1],
+                outputRange: ["-100%", "250%"],
+            },
+            { property: "opacity", inputRange: [0, 1], outputRange: [0, 1] },
+        ]);
+    });
+
+    it("fills the ends from the style, and skips what can't move", () => {
+        expect(
+            channels(
+                [{ offset: 0.5, style: { opacity: 1, display: "none" } }],
+                {
+                    opacity: 0,
+                    display: "flex",
+                },
+            ),
+        ).toEqual([
+            {
+                property: "opacity",
+                inputRange: [0, 0.5, 1],
+                outputRange: [0, 1, 0],
+            },
+        ]);
     });
 });

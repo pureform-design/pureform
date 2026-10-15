@@ -95,3 +95,68 @@ export const animatable = (value: Concrete): Concrete =>
     typeof value === "string" && isColor(value)
         ? formatColor(parseColor(value))
         : value;
+
+/** One value a keyframe animation moves: a style property, or one step of a transform, with
+ *  its value at each frame's offset. */
+export interface Channel {
+    property: string;
+    /** The transform step's index and key, for a transform. */
+    step?: [index: number, key: string];
+    inputRange: number[];
+    outputRange: Concrete[];
+}
+
+type Frame = { offset: number; style: Record<string, unknown> };
+
+/** The channels a keyframe animation moves. A frame without a property takes the style's own
+ *  value, as CSS fills in a missing keyframe, and only what interpolates moves. */
+export const channels = (
+    frames: readonly Frame[],
+    base: Record<string, unknown>,
+): Channel[] => {
+    const all = [...frames];
+    if (all[0]?.offset !== 0) all.unshift({ offset: 0, style: {} });
+    if (all.at(-1)?.offset !== 1) all.push({ offset: 1, style: {} });
+    const inputRange = all.map((f) => f.offset);
+    const properties = new Set(frames.flatMap((f) => Object.keys(f.style)));
+    const out: Channel[] = [];
+    for (const property of properties) {
+        const at = (f: Frame) => f.style[property] ?? base[property];
+        if (property === "transform") {
+            const lists = all.map(
+                (f) => at(f) as Record<string, Concrete>[] | undefined,
+            );
+            const shape = lists.find(Boolean);
+            if (!shape || lists.some((l) => !l || l.length !== shape.length))
+                continue;
+            shape.forEach((op, index) => {
+                const key = Object.keys(op)[0]!;
+                const outputRange = lists.map(
+                    (l) => l![index]![key] as Concrete,
+                );
+                if (
+                    outputRange.every(
+                        (v, i) => i === 0 || interpolates(outputRange[0]!, v),
+                    )
+                ) {
+                    out.push({
+                        property,
+                        step: [index, key],
+                        inputRange,
+                        outputRange,
+                    });
+                }
+            });
+            continue;
+        }
+        const outputRange = all.map((f) => animatable(at(f) as Concrete));
+        if (
+            outputRange.every(
+                (v) => v !== undefined && interpolates(outputRange[0]!, v),
+            )
+        ) {
+            out.push({ property, inputRange, outputRange });
+        }
+    }
+    return out;
+};

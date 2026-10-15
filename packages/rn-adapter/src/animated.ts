@@ -5,10 +5,17 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
 
-import { animatable, blend, easingPoints, interpolates, stops } from "./motion";
+import {
+    animatable,
+    blend,
+    channels,
+    easingPoints,
+    interpolates,
+    stops,
+} from "./motion";
 import { useRecipeWithTransitions } from "./react";
 import type { State, Style } from "./select";
-import type { Concrete, ThemeValues, Transition } from "./values";
+import type { Animation, Concrete, ThemeValues, Transition } from "./values";
 
 // One property in motion: where it's going from and to, and how far along it is.
 interface Track {
@@ -18,6 +25,55 @@ interface Track {
     at: number;
     animation?: Animated.CompositeAnimation | undefined;
 }
+
+// A keyframe animation on one slot: its progress, and what drives it once started.
+interface Loop {
+    key: string;
+    animation: Animation;
+    progress: Animated.Value;
+    running?: Animated.CompositeAnimation;
+}
+
+// Drive a keyframe animation's progress from 0 to 1 each time through: backwards for
+// `reverse`, there and back for `alternate`, as many times as it runs.
+const run = (
+    progress: Animated.Value,
+    animation: Animation,
+): Animated.CompositeAnimation => {
+    const backwards =
+        animation.direction === "reverse" ||
+        animation.direction === "alternateReverse";
+    const alternate = animation.direction.startsWith("alternate");
+    const [start, end] = backwards ? [1, 0] : [0, 1];
+    const leg = (to: number) =>
+        Animated.timing(progress, {
+            toValue: to,
+            duration: animation.duration,
+            easing: curve(animation.easing),
+            useNativeDriver: false,
+        });
+    const once = alternate
+        ? Animated.sequence([leg(end), leg(start)])
+        : Animated.sequence([
+              Animated.timing(progress, {
+                  toValue: start,
+                  duration: 0,
+                  useNativeDriver: false,
+              }),
+              leg(end),
+          ]);
+    const loop = Animated.loop(once, {
+        iterations:
+            animation.iterations < 0
+                ? -1
+                : alternate
+                  ? Math.ceil(animation.iterations / 2)
+                  : animation.iterations,
+    });
+    return animation.delay > 0
+        ? Animated.sequence([Animated.delay(animation.delay), loop])
+        : loop;
+};
 
 // A change waiting to start once the render commits.
 interface Pending {
@@ -48,7 +104,7 @@ export const useAnimatedRecipe = (
     state: State = {},
     tokens?: ThemeValues,
 ): Record<string, Record<string, unknown>> => {
-    const { styles, transitions } = useRecipeWithTransitions(
+    const { styles, transitions, animations } = useRecipeWithTransitions(
         name,
         variants,
         state,
@@ -56,6 +112,8 @@ export const useAnimatedRecipe = (
     );
     const tracks = useRef(new Map<string, Track>());
     const pending = useRef<Pending[]>([]);
+    const loops = useRef(new Map<string, Loop>());
+    const stale = useRef<Loop[]>([]);
 
     const out: Record<string, Record<string, unknown>> = {};
     for (const [slot, style] of Object.entries(styles)) {
@@ -102,10 +160,48 @@ export const useAnimatedRecipe = (
                 });
             }
         }
+        const animation = animations[slot];
+        const key = animation ? JSON.stringify(animation) : undefined;
+        let loop = loops.current.get(slot);
+        if (loop && loop.key !== key) {
+            stale.current.push(loop);
+            loops.current.delete(slot);
+            loop = undefined;
+        }
+        if (animation && !loop) {
+            loop = { key: key!, animation, progress: new Animated.Value(0) };
+            loops.current.set(slot, loop);
+        }
+        if (loop) {
+            const transform = Array.isArray(style.transform)
+                ? (style.transform as Record<string, unknown>[]).map((op) => ({
+                      ...op,
+                  }))
+                : [];
+            for (const channel of channels(loop.animation.frames, style)) {
+                const value = loop.progress.interpolate({
+                    inputRange: channel.inputRange,
+                    outputRange: channel.outputRange as unknown as number[],
+                });
+                if (channel.step) {
+                    const [index, name] = channel.step;
+                    transform[index] = { ...transform[index], [name]: value };
+                } else {
+                    animated[channel.property] = value;
+                }
+            }
+            if (transform.length > 0) animated.transform = transform;
+        }
         out[slot] = animated;
     }
 
     useLayoutEffect(() => {
+        for (const loop of stale.current.splice(0)) loop.running?.stop();
+        for (const loop of loops.current.values()) {
+            if (loop.running) continue;
+            loop.running = run(loop.progress, loop.animation);
+            loop.running.start();
+        }
         for (const {
             track,
             transition,
@@ -131,6 +227,7 @@ export const useAnimatedRecipe = (
                 track.animation?.stop();
                 track.progress.removeAllListeners();
             }
+            for (const loop of loops.current.values()) loop.running?.stop();
         },
         [],
     );

@@ -24,4 +24,11 @@ export type { Selected, State, Style } from "./select";
 export { resolveTheme } from "./theme";
 export type { Scheme, ThemeOptions } from "./theme";
 export { dependencies, evaluate, isExpr } from "./values";
-export type { Concrete, Expr, ThemeValues, Transition, Value } from "./values";
+export type {
+    Animation,
+    Concrete,
+    Expr,
+    ThemeValues,
+    Transition,
+    Value,
+} from "./values";
