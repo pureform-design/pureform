@@ -20,12 +20,14 @@ import {
     translate,
     transparent,
     tween,
+    slot,
     when,
 } from "@pureform/core/ast";
 import type {
     Condition,
     AliasNode,
     ColorValue,
+    SlotCondition,
     StyleMap,
     ValueNode,
 } from "@pureform/core/ast";
@@ -381,3 +383,35 @@ export const inputText = (color: ColorValue): StyleMap => ({
     color,
     states: { disabled: { color: disabledColor("disabledContent") } },
 });
+
+/** A state layer that follows another slot: `base` tinted with `content` while `slotName` is
+ *  hovered, focused, or pressed. `selected` gives the colors once a state such as `checked` or
+ *  `selected` holds: its tint color, and its container if it fills. A disabled slot shows no
+ *  tint. */
+export const slotStateLayer = (
+    slotName: string,
+    rest: { base: ColorValue; content: ColorValue },
+    selected?: { state: SlotCondition; base?: ColorValue; content: ColorValue },
+) => {
+    const layer = when();
+    for (const [state, level] of [
+        ["hover", "stateHover"],
+        ["focusVisibleWithin", "stateFocus"],
+        ["pressed", "statePressed"],
+    ] as const) {
+        const condition = slot(slotName, state);
+        layer.on(condition, colorMix(rest.base, rest.content, opacity(level)));
+        if (selected) {
+            layer.on(
+                [selected.state, condition],
+                colorMix(
+                    selected.base ?? rest.base,
+                    selected.content,
+                    opacity(level),
+                ),
+            );
+        }
+    }
+    if (selected?.base) layer.on(selected.state, selected.base);
+    return layer.on(slot(slotName, "disabled"), rest.base).else(rest.base);
+};
