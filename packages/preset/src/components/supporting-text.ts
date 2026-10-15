@@ -5,13 +5,15 @@
 // every target. Inside a text field, use its own supporting text slot, which follows the
 // field's state and shares this style.
 
-import { defineComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { column, flex } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { colorRole, spacing, textStyle } from "@pureform/theme";
 
 import { COLOR_GROUPS, componentTokens, sys } from "./shared";
 import type { ColorGroups } from "./shared";
+
+const pf = typed();
 
 /** Supporting text's type and spacing. It takes a line of its own even as a span; core has no
  *  portable `block`, and a flex column is the same box on the web. */
@@ -30,14 +32,21 @@ const { tokens, ref } = componentTokens("supportingText", {
 /** Build the supporting text with `neutral` and a `tone` per group in `groups`. `error` reads
  *  the `errorColor` token, so it can be restyled on its own. */
 export const createSupportingText = (groups: ColorGroups = COLOR_GROUPS) =>
-    defineComponent({
+    pf.component({
         name: "supportingText",
         $meta: {
             description:
                 "Helper or error text under a control. tone sets its color: any color group, such as error.",
         },
         tokens,
-        recipe: {
+        variants: {
+            tone: [
+                "neutral",
+                "error",
+                ...groups.filter((group) => group !== "error"),
+            ],
+        },
+        recipe: () => ({
             base: { ...supportingTextStyle, color: ref("color") },
             variants: {
                 tone: {
@@ -51,7 +60,7 @@ export const createSupportingText = (groups: ColorGroups = COLOR_GROUPS) =>
                 },
             },
             defaultVariants: { tone: "neutral" },
-        },
+        }),
     });
 
 export const supportingText = createSupportingText();

@@ -7,7 +7,7 @@
 // `inset` indents it from the start (`start`, past a list item's leading icon) or from both
 // sides (`middle`).
 
-import { defineComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { px } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
@@ -19,14 +19,17 @@ const { tokens, ref } = componentTokens("separator", {
     inset: spacing("4"),
 });
 
-export const separator = defineComponent({
+const pf = typed();
+
+export const separator = pf.component({
     name: "separator",
     $meta: {
         description:
             "Material divider. Use an hr; inset indents it from the start or both sides.",
     },
     tokens,
-    recipe: {
+    variants: { inset: ["none", "start", "middle"] },
+    recipe: () => ({
         base: {
             // An hr draws a border by default; this is a filled line of the token's color.
             borderWidth: px(0),
@@ -46,5 +49,5 @@ export const separator = defineComponent({
             },
         },
         defaultVariants: { inset: "none" },
-    },
+    }),
 });

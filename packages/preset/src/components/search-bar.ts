@@ -10,7 +10,7 @@
 //     <span class={trailing}>🎤</span>
 //   </label>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { center, flex, pct, px, relative, row, slot } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing } from "@pureform/theme";
 
@@ -38,7 +38,9 @@ const { tokens, ref } = componentTokens("searchBar", {
     iconSize: sizeToken("iconMedium"),
 });
 
-export const searchBar = defineSlotComponent({
+const pf = typed();
+
+export const searchBar = pf.slotComponent({
     name: "searchBar",
     $meta: {
         description:
@@ -47,7 +49,7 @@ export const searchBar = defineSlotComponent({
     tokens,
     slots: ["root", "leading", "input", "trailing"],
     structure: { root: ["leading", "input", "trailing"] },
-    recipe: {
+    recipe: () => ({
         base: {
             root: {
                 ...surface(ref("container"), ref("inputColor"), "level3"),
@@ -85,5 +87,5 @@ export const searchBar = defineSlotComponent({
                 color: ref("trailingColor"),
             },
         },
-    },
+    }),
 });

@@ -4,7 +4,7 @@
 // (`aria-selected="true"` or `data-selected`) fills it with the secondary container, as a
 // selected filter or input chip. Render the icon slot only when there is an icon.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { px, solid, transparent, slot, when, add } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -112,13 +112,15 @@ const iconColor = (selected: ColorValue) =>
         .on(slot("root", "disabled"), disabledColor("disabledContent"))
         .else(ref("iconColor"));
 
+const pf = typed();
+
 /** Build the chip with a `color` variant per group in `groups`. A group colors the selected
  *  chip: its container and content, and the icon. At rest, every chip is neutral. */
 export const createChip = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "chip",
         $meta: {
             description:
@@ -127,7 +129,12 @@ export const createChip = (
         tokens,
         slots: ["root", "icon", "label", "touchTarget"],
         structure: { root: ["touchTarget", "icon", "label"] },
-        recipe: {
+        variants: {
+            variant: ["outlined", "elevated"],
+            color: groups,
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: () => ({
             base: {
                 root: {
                     ...pressableRoot,
@@ -178,7 +185,7 @@ export const createChip = (
                 color: DEFAULT_GROUP,
                 density: "inherit",
             },
-        },
+        }),
     });
 
 export const chip = createChip();

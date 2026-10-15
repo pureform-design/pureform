@@ -14,7 +14,7 @@
 //     </div>
 //   </dialog>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { auto, center, column, end, flex, px, row } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import { size as sizeToken } from "@pureform/theme";
@@ -35,7 +35,9 @@ const { tokens, ref } = componentTokens("dialog", {
     maxWidth: px(560),
 });
 
-export const dialog = defineSlotComponent({
+const pf = typed();
+
+export const dialog = pf.slotComponent({
     name: "dialog",
     $meta: {
         description:
@@ -44,7 +46,8 @@ export const dialog = defineSlotComponent({
     tokens,
     slots: ["root", "icon", "headline", "body", "actions"],
     structure: { root: ["icon", "headline", "body", "actions"] },
-    recipe: {
+    variants: { icon: ["true", "false"] },
+    recipe: () => ({
         base: {
             root: {
                 ...surface(ref("container"), ref("bodyColor"), "level3"),
@@ -88,5 +91,5 @@ export const dialog = defineSlotComponent({
             },
         },
         defaultVariants: { icon: "false" },
-    },
+    }),
 });

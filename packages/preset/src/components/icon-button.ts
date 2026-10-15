@@ -8,7 +8,7 @@
 //     <span class={outline} />
 //   </button>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { px, add } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
@@ -62,13 +62,15 @@ const size = (
     root: { width: dense(ref(token)), height: dense(ref(token)) },
 });
 
+const pf = typed();
+
 /** Build the iconButton with a `color` variant per group in `groups`. */
 export const createIconButton = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
     shapes: Shapes = DEFAULT_SHAPES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "iconButton",
         $meta: {
             description:
@@ -80,7 +82,14 @@ export const createIconButton = (
             root: ["touchTarget", "container", "outline"],
             container: ["icon"],
         },
-        recipe: {
+        variants: {
+            color: groups,
+            variant: Object.keys(FILLS),
+            shape: ["none", ...Object.keys(shapes)],
+            size: ["small", "medium", "large"],
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: () => ({
             base: {
                 root: {
                     ...pressableRoot,
@@ -140,7 +149,7 @@ export const createIconButton = (
                 density: "inherit",
                 shape: "none",
             },
-        },
+        }),
     });
 
 export const iconButton = createIconButton();

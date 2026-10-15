@@ -15,7 +15,7 @@
 // Mark the chosen item with `aria-selected` or `data-selected`, and an unavailable one with
 // `disabled` or `aria-disabled`.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
@@ -31,6 +31,8 @@ import {
     DEFAULT_DENSITIES,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
+
+const pf = typed();
 
 const { tokens, ref } = rowTokens("menu", {
     container: sys("surfaceContainer"),
@@ -51,7 +53,7 @@ export const createMenu = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "menu",
         $meta: {
             description:
@@ -75,7 +77,11 @@ export const createMenu = (
                 "itemTrailingText",
             ],
         },
-        recipe: {
+        variants: {
+            density: ["inherit", ...Object.keys(densities)],
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     ...surface(ref("container"), ref("content"), "level2"),
@@ -121,7 +127,7 @@ export const createMenu = (
                 }),
             },
             defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
-        },
+        }),
     });
 
 export const menu = createMenu();

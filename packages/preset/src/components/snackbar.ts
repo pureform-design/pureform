@@ -10,7 +10,7 @@
 //     <button class={close} aria-label="Dismiss">×</button>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     center,
     flex,
@@ -44,7 +44,9 @@ const { tokens, ref } = componentTokens("snackbar", {
     iconSize: sizeToken("iconMedium"),
 });
 
-export const snackbar = defineSlotComponent({
+const pf = typed();
+
+export const snackbar = pf.slotComponent({
     name: "snackbar",
     $meta: {
         description:
@@ -53,7 +55,7 @@ export const snackbar = defineSlotComponent({
     tokens,
     slots: ["root", "supportingText", "action", "close"],
     structure: { root: ["supportingText", "action", "close"] },
-    recipe: {
+    recipe: () => ({
         base: {
             root: {
                 ...surface(ref("container"), ref("content"), "level3"),
@@ -95,5 +97,5 @@ export const snackbar = defineSlotComponent({
                 justifyContent: center,
             },
         },
-    },
+    }),
 });

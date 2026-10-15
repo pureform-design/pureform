@@ -9,7 +9,7 @@
 //     <span class={ring}><span class={dot} /></span>
 //   </span>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     center,
@@ -54,6 +54,8 @@ import {
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
 
+const pf = typed();
+
 const { tokens, ref } = componentTokens("radio", {
     size: sizeToken("controlMedium"),
     ringSize: px(20),
@@ -84,7 +86,7 @@ export const createRadio = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "radio",
         $meta: {
             description:
@@ -96,7 +98,11 @@ export const createRadio = (
             root: ["touchTarget", "input", "ring"],
             ring: ["dot"],
         },
-        recipe: {
+        variants: {
+            density: ["inherit", ...Object.keys(densities)],
+            color: groups,
+        },
+        recipe: () => ({
             base: mergeSlots(
                 {
                     root: {
@@ -141,7 +147,7 @@ export const createRadio = (
                 color: colorVariant(groups, (g) => colored(g.main)),
             },
             defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
-        },
+        }),
     });
 
 export const radio = createRadio();

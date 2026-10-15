@@ -15,7 +15,7 @@
 // Set `interactive` when the item is clickable (a button or link, or `tabindex`); it then takes
 // a state layer and the focus ring. Mark it selected with `aria-selected` or `data-selected`.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { spacing, textStyle } from "@pureform/theme";
 
@@ -31,6 +31,8 @@ import {
     DEFAULT_DENSITIES,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
+
+const pf = typed();
 
 const { tokens, ref } = rowTokens("listItem", {
     paddingInline: spacing("4"),
@@ -60,7 +62,7 @@ export const createListItem = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "listItem",
         $meta: {
             description:
@@ -81,7 +83,13 @@ export const createListItem = (
             root: ["leading", "content", "trailing", "trailingText"],
             content: ["overline", "headline", "supportingText"],
         },
-        recipe: {
+        variants: {
+            lines: ["one", "two", "three"],
+            interactive: ["true", "false"],
+            density: ["inherit", ...Object.keys(densities)],
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     ...parts.row,
@@ -142,7 +150,7 @@ export const createListItem = (
                 ...groups
                     .filter((group) => group !== DEFAULT_GROUP)
                     .map((group) => ({
-                        match: { interactive: "true", color: group },
+                        match: { interactive: "true" as const, color: group },
                         style: {
                             root: rowGroupColors(ref, "root", groupRoles(group))
                                 .interactive,
@@ -160,7 +168,7 @@ export const createListItem = (
                 color: DEFAULT_GROUP,
                 density: "inherit",
             },
-        },
+        }),
     });
 
 export const listItem = createListItem();

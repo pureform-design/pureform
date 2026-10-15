@@ -12,11 +12,13 @@
 //     <div class={actions}>…</div>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { column, end, flex, px, row } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
 import { componentTokens, surface, sys } from "./shared";
+
+const pf = typed();
 
 const { tokens, ref } = componentTokens("tooltip", {
     container: sys("inverseSurface"),
@@ -31,7 +33,7 @@ const { tokens, ref } = componentTokens("tooltip", {
     richMaxWidth: px(320),
 });
 
-export const tooltip = defineSlotComponent({
+export const tooltip = pf.slotComponent({
     name: "tooltip",
     $meta: {
         description:
@@ -40,7 +42,8 @@ export const tooltip = defineSlotComponent({
     tokens,
     slots: ["root", "subhead", "supportingText", "actions"],
     structure: { root: ["subhead", "supportingText", "actions"] },
-    recipe: {
+    variants: { variant: ["plain", "rich"] },
+    recipe: () => ({
         base: {
             root: {
                 display: flex,
@@ -92,5 +95,5 @@ export const tooltip = defineSlotComponent({
             },
         },
         defaultVariants: { variant: "plain" },
-    },
+    }),
 });

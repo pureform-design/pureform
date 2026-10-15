@@ -11,7 +11,7 @@
 //     </a>
 //   </nav>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { center, column, flex, pct, px } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
@@ -24,6 +24,8 @@ import {
 } from "./navigation";
 import { COLOR_GROUPS, DEFAULT_GROUP, colorVariant, sys } from "./shared";
 import type { ColorGroups } from "./shared";
+
+const pf = typed();
 
 const { tokens, ref } = navTokens("navigationRail", {
     container: sys("surface"),
@@ -38,7 +40,7 @@ const parts = navParts(ref, ref("indicatorWidth"));
 /** Build the navigation rail with a `color` variant per group in `groups`. A group fills the
  *  current destination's pill with its container. */
 export const createNavigationRail = (groups: ColorGroups = COLOR_GROUPS) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "navigationRail",
         $meta: {
             description:
@@ -47,7 +49,10 @@ export const createNavigationRail = (groups: ColorGroups = COLOR_GROUPS) =>
         tokens,
         slots: [...NAV_SLOTS],
         structure: NAV_STRUCTURE,
-        recipe: {
+        variants: {
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     display: flex,
@@ -79,7 +84,7 @@ export const createNavigationRail = (groups: ColorGroups = COLOR_GROUPS) =>
                 ),
             },
             defaultVariants: { color: DEFAULT_GROUP },
-        },
+        }),
     });
 
 export const navigationRail = createNavigationRail();

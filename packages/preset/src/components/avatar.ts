@@ -5,7 +5,7 @@
 //   <img class={avatar()} src="…" alt="Ada Lovelace" />
 //   <span class={avatar({ shape: "cookie9Sided" })} role="img" aria-label="Ada Lovelace">AL</span>
 
-import { defineComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { center, cover, inlineFlex, px, unitless } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, textStyle } from "@pureform/theme";
@@ -40,20 +40,27 @@ const sized = (
     textStyle: textStyle(style),
 });
 
+const pf = typed();
+
 /** Build the avatar with a `color` variant per group in `groups`, and a `shape` variant per
  *  shape in `shapes`. */
 export const createAvatar = (
     groups: ColorGroups = COLOR_GROUPS,
     shapes: Shapes = DEFAULT_SHAPES,
 ) =>
-    defineComponent({
+    pf.component({
         name: "avatar",
         $meta: {
             description:
                 "Avatar: a picture (style the img itself), initials, or an icon, in a color group's container. Give it alt text or an aria-label. shape clips it to one of the theme's shapes.",
         },
         tokens,
-        recipe: {
+        variants: {
+            size: ["small", "medium", "large"],
+            color: groups,
+            shape: ["none", ...Object.keys(shapes)],
+        },
+        recipe: () => ({
             base: {
                 display: inlineFlex,
                 alignItems: center,
@@ -81,7 +88,7 @@ export const createAvatar = (
                 color: DEFAULT_GROUP,
                 shape: "none",
             },
-        },
+        }),
     });
 
 export const avatar = createAvatar();

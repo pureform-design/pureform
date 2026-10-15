@@ -15,7 +15,7 @@
 //     </span>
 //   </span>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     center,
@@ -122,12 +122,14 @@ const mark = {
     pointerEvents: none,
 } as const;
 
+const pf = typed();
+
 /** Build the checkbox with a `color` variant per group in `groups`. */
 export const createCheckbox = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "checkbox",
         $meta: {
             description:
@@ -146,7 +148,11 @@ export const createCheckbox = (
             root: ["touchTarget", "input", "box"],
             box: ["checkIcon", "indeterminateIcon"],
         },
-        recipe: {
+        variants: {
+            density: ["inherit", ...Object.keys(densities)],
+            color: groups,
+        },
+        recipe: () => ({
             base: mergeSlots(
                 {
                     root: {
@@ -222,7 +228,7 @@ export const createCheckbox = (
                 ),
             },
             defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
-        },
+        }),
     });
 
 export const checkbox = createCheckbox();

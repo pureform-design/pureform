@@ -14,7 +14,7 @@
 //     <span class={startHalf}><span class={startArc} /></span>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     add,
@@ -50,6 +50,8 @@ import {
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
+const pf = typed();
+
 /** The keyframes the progress indicators animate with; `pureform()` adds them to the
  *  config. */
 export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
@@ -76,7 +78,7 @@ const linear = componentTokens("linearProgress", {
 /** Build the linear progress indicator with a `color` variant per group in `groups`. */
 export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
     const { ref } = linear;
-    return defineSlotComponent({
+    return pf.slotComponent({
         name: "linearProgress",
         $meta: {
             description:
@@ -85,7 +87,11 @@ export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         tokens: linear.tokens,
         slots: ["root", "indicator"],
         structure: { root: ["indicator"] },
-        recipe: {
+        variants: {
+            indeterminate: ["true", "false"],
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     position: relative,
@@ -127,7 +133,7 @@ export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                 })),
             },
             defaultVariants: { indeterminate: "false", color: DEFAULT_GROUP },
-        },
+        }),
     });
 };
 
@@ -180,7 +186,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         transition: tweens("transform"),
     });
 
-    return defineSlotComponent({
+    return pf.slotComponent({
         name: "circularProgress",
         $meta: {
             description:
@@ -193,7 +199,11 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
             endHalf: ["endArc"],
             startHalf: ["startArc"],
         },
-        recipe: {
+        variants: {
+            indeterminate: ["true", "false"],
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     position: relative,
@@ -242,7 +252,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                 }),
             },
             defaultVariants: { indeterminate: "false", color: DEFAULT_GROUP },
-        },
+        }),
     });
 };
 

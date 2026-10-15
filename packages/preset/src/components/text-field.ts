@@ -18,7 +18,7 @@
 // Mark an error with `aria-invalid="true"` on the input. The container reads its state from
 // the input, and the label, icons, and supporting text follow it.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { pct } from "@pureform/core/ast";
 
 import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
@@ -33,6 +33,8 @@ const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
     density: true,
 });
 
+const pf = typed();
+
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
 export const createTextField = (
@@ -41,7 +43,7 @@ export const createTextField = (
 ) => {
     const color = colors(groups);
     const density = densityParts(densities);
-    return defineSlotComponent({
+    return pf.slotComponent({
         name: "textField",
         $meta: {
             description:
@@ -50,7 +52,14 @@ export const createTextField = (
         tokens,
         slots: [...FIELD_SLOTS],
         structure: FIELD_STRUCTURE,
-        recipe: {
+        variants: {
+            variant: ["filled", "outlined"],
+            color: groups,
+            leadingIcon: ["true", "false"],
+            trailingIcon: ["true", "false"],
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: () => ({
             base: {
                 ...base,
                 ...icons.base,
@@ -74,7 +83,7 @@ export const createTextField = (
                 ...icons.defaultVariants,
                 ...density.defaultVariants,
             },
-        },
+        }),
     });
 };
 

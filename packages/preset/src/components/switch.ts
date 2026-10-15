@@ -13,7 +13,7 @@
 //     </span>
 //   </span>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     center,
@@ -55,6 +55,8 @@ import {
     focusRing,
 } from "./shared";
 import type { ColorGroups } from "./shared";
+
+const pf = typed();
 
 // Named switchControl, not switch: Panda names the generated recipe after the component, and
 // `switch` is a reserved word.
@@ -124,7 +126,7 @@ const colored = (c: SwitchColors) => ({
 
 /** Build the switch with a `color` variant per group in `groups`. */
 export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "switchControl",
         $meta: {
             description:
@@ -145,7 +147,8 @@ export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
             track: ["stateLayer", "handle"],
             handle: ["icon"],
         },
-        recipe: {
+        variants: { color: groups },
+        recipe: () => ({
             base: mergeSlots(
                 {
                     root: {
@@ -233,7 +236,7 @@ export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
                 ),
             },
             defaultVariants: { color: DEFAULT_GROUP },
-        },
+        }),
     });
 
 export const switchControl = createSwitch();

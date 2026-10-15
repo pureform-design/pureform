@@ -13,7 +13,7 @@
 //     <input class={input} type="range" aria-label="Volume" />
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     center,
@@ -102,9 +102,11 @@ const colored = (active: ColorValue) => ({
     },
 });
 
+const pf = typed();
+
 /** Build the slider with a `color` variant per group in `groups`. */
 export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "slider",
         $meta: {
             description:
@@ -122,7 +124,8 @@ export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
         structure: {
             root: ["track", "activeTrack", "stateLayer", "handle", "input"],
         },
-        recipe: {
+        variants: { color: groups },
+        recipe: () => ({
             base: mergeSlots(
                 {
                     root: {
@@ -164,7 +167,7 @@ export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
                 color: colorVariant(groups, (g) => colored(g.main)),
             },
             defaultVariants: { color: DEFAULT_GROUP },
-        },
+        }),
     });
 
 export const slider = createSlider();

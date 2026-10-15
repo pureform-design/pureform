@@ -352,13 +352,13 @@ export const fieldParts = (
                 const focus = groupRoles(group).main;
                 return [
                     {
-                        match: { variant: "filled", color: group },
+                        match: { variant: "filled" as const, color: group },
                         style: {
                             container: { boxShadow: indicatorShadow(focus) },
                         },
                     },
                     {
-                        match: { variant: "outlined", color: group },
+                        match: { variant: "outlined" as const, color: group },
                         style: {
                             container: { outlineColor: strokeColor(focus) },
                         },
@@ -417,7 +417,10 @@ export const fieldParts = (
         // An outlined label floats onto the border at the usual inset, clear of the icon.
         compoundVariants: [
             {
-                match: { variant: "outlined", leadingIcon: "true" },
+                match: {
+                    variant: "outlined" as const,
+                    leadingIcon: "true" as const,
+                },
                 style: {
                     label: {
                         insetInlineStart: floated(
@@ -428,7 +431,10 @@ export const fieldParts = (
                 },
             },
         ],
-        defaultVariants: { leadingIcon: "false", trailingIcon: "false" },
+        defaultVariants: {
+            leadingIcon: "false" as const,
+            trailingIcon: "false" as const,
+        },
     };
 
     // The density variant over the given steps, and a compound per fill and step restating the
@@ -443,7 +449,7 @@ export const fieldParts = (
                 container: { height: add(ref("height"), offset) },
             })),
         ),
-        defaultVariants: { density: "inherit" },
+        defaultVariants: { density: "inherit" as const },
     });
 
     return { base, variant, colors, icons, densityParts };

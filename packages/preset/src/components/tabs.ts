@@ -12,7 +12,7 @@
 //     </button>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     column,
@@ -38,6 +38,8 @@ import {
     sys,
 } from "./shared";
 import type { ColorGroups } from "./shared";
+
+const pf = typed();
 
 const { tokens, ref } = componentTokens("tabs", {
     container: sys("surface"),
@@ -77,7 +79,7 @@ const tabColors = (active: ColorValue) => ({
 /** Build the tabs with a `color` variant per group in `groups`. A group colors the indicator
  *  and a primary tab's active label and icon; a secondary tab's active label stays neutral. */
 export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "tabs",
         $meta: {
             description:
@@ -89,7 +91,12 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
             root: ["tab"],
             tab: ["icon", "label", "indicator"],
         },
-        recipe: {
+        variants: {
+            variant: ["primary", "secondary"],
+            icon: ["true", "false"],
+            color: groups,
+        },
+        recipe: () => ({
             base: {
                 root: {
                     display: flex,
@@ -167,7 +174,7 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
                 ...groups
                     .filter((group) => group !== DEFAULT_GROUP)
                     .map((group) => ({
-                        match: { variant: "secondary", color: group },
+                        match: { variant: "secondary" as const, color: group },
                         style: { tab: tabColors(ref("secondaryActiveColor")) },
                     })),
                 {
@@ -186,7 +193,7 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
                 icon: "false",
                 color: DEFAULT_GROUP,
             },
-        },
+        }),
     });
 
 export const tabs = createTabs();

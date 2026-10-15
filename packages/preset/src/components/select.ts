@@ -15,7 +15,7 @@
 //     <span class={supportingText}>Helper text</span>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     numeric,
     pct,
@@ -46,6 +46,8 @@ const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
 
 const EXPANDED = slot("container", "expanded");
 
+const pf = typed();
+
 /** Build the select with a `color` variant per group in `groups`, setting its focus color. */
 export const createSelect = (
     groups: ColorGroups = COLOR_GROUPS,
@@ -53,7 +55,7 @@ export const createSelect = (
 ) => {
     const color = colors(groups);
     const density = densityParts(densities);
-    return defineSlotComponent({
+    return pf.slotComponent({
         name: "select",
         $meta: {
             description:
@@ -62,7 +64,14 @@ export const createSelect = (
         tokens,
         slots: [...FIELD_SLOTS],
         structure: FIELD_STRUCTURE,
-        recipe: {
+        variants: {
+            variant: ["filled", "outlined"],
+            color: groups,
+            leadingIcon: ["true", "false"],
+            trailingIcon: ["true", "false"],
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: () => ({
             base: {
                 ...base,
                 ...icons.base,
@@ -102,7 +111,7 @@ export const createSelect = (
                 ...density.defaultVariants,
                 trailingIcon: "true",
             },
-        },
+        }),
     });
 };
 

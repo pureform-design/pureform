@@ -10,7 +10,7 @@
 // `opacity` for the fade. The layer never animates either, but `ripple()` reads the computed
 // transition at press time, so the motion tokens (or the component tokens) time every ripple.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     absolute,
     colorMix,
@@ -39,7 +39,9 @@ const { tokens, ref } = componentTokens("ripple", {
     easing: easing("standard"),
 });
 
-export const ripple = defineSlotComponent({
+const pf = typed();
+
+export const ripple = pf.slotComponent({
     name: "ripple",
     $meta: {
         description:
@@ -48,7 +50,7 @@ export const ripple = defineSlotComponent({
     tokens,
     slots: ["root", "ripple"],
     structure: { root: ["ripple"] },
-    recipe: {
+    recipe: () => ({
         base: {
             root: {
                 position: absolute,
@@ -84,5 +86,5 @@ export const ripple = defineSlotComponent({
                 ),
             },
         },
-    },
+    }),
 });

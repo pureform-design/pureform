@@ -11,7 +11,7 @@
 //     <span class={container}><span class={icon}>…</span><span class={label}>…</span></span>
 //   </button>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { none, px } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -78,12 +78,14 @@ const fabSize = (
 
 const elevation = shapedElevationLevels("level3", "level4");
 
+const pf = typed();
+
 /** Build the FAB with a `color` variant per group in `groups`. */
 export const createFab = (
     groups: ColorGroups = COLOR_GROUPS,
     shapes: Shapes = DEFAULT_SHAPES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "fab",
         $meta: {
             description:
@@ -95,7 +97,14 @@ export const createFab = (
             root: ["touchTarget", "container"],
             container: ["icon", "label"],
         },
-        recipe: {
+        variants: {
+            color: groups,
+            variant: Object.keys(FILLS),
+            size: ["small", "medium", "large"],
+            extended: ["true", "false"],
+            shape: ["none", ...Object.keys(shapes)],
+        },
+        recipe: () => ({
             base: {
                 root: {
                     ...pressableRoot,
@@ -154,7 +163,7 @@ export const createFab = (
                     }),
                 ),
                 ...(["small", "large"] as const).map((size) => ({
-                    match: { size, extended: "false" },
+                    match: { size, extended: "false" as const },
                     style: {
                         root: {
                             width: ref(
@@ -171,7 +180,7 @@ export const createFab = (
                 extended: "false",
                 shape: "none",
             },
-        },
+        }),
     });
 
 export const fab = createFab();

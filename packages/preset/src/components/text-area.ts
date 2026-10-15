@@ -13,7 +13,7 @@
 //     <span class={supportingText}>Helper or error text</span>
 //   </div>
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     add,
     content,
@@ -83,6 +83,8 @@ const sized = (offset: NumericValue) => {
 };
 const themeSized = sized(THEME_DENSITY);
 
+const pf = typed();
+
 /** Build the text area with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
 export const createTextArea = (
@@ -90,7 +92,7 @@ export const createTextArea = (
     densities: Densities = DEFAULT_DENSITIES,
 ) => {
     const color = colors(groups);
-    return defineSlotComponent({
+    return pf.slotComponent({
         name: "textArea",
         $meta: {
             description:
@@ -99,7 +101,15 @@ export const createTextArea = (
         tokens,
         slots: [...FIELD_SLOTS],
         structure: FIELD_STRUCTURE,
-        recipe: {
+        variants: {
+            color: groups,
+            leadingIcon: ["true", "false"],
+            trailingIcon: ["true", "false"],
+            autoGrow: ["true", "false"],
+            variant: ["filled", "outlined"],
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: () => ({
             base: {
                 ...base,
                 ...icons.base,
@@ -170,7 +180,7 @@ export const createTextArea = (
                 ...icons.defaultVariants,
                 density: "inherit",
             },
-        },
+        }),
     });
 };
 

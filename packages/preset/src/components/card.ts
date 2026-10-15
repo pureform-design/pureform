@@ -4,7 +4,7 @@
 // takes a state layer, lifts on hover, and dims when disabled. Render the touch target slot in
 // an interactive card so even a small card meets the Material minimum hit area.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import {
     colorMix,
     none,
@@ -75,7 +75,7 @@ const fillVariant = (fill: CardFill): { root: StyleMap } => ({
 
 // Interactive styling lives in compound variants because the container differs per fill.
 const interactive = (fill: CardFill) => ({
-    match: { interactive: "true", variant: fill },
+    match: { interactive: "true" as const, variant: fill },
     style: {
         root: {
             backgroundColor: stateLayer({ base: CONTAINER[fill], content }),
@@ -98,7 +98,9 @@ const interactive = (fill: CardFill) => ({
     },
 });
 
-export const card = defineSlotComponent({
+const pf = typed();
+
+export const card = pf.slotComponent({
     name: "card",
     $meta: {
         description:
@@ -107,7 +109,11 @@ export const card = defineSlotComponent({
     tokens,
     slots: ["root", "touchTarget"],
     structure: { root: ["touchTarget"] },
-    recipe: {
+    variants: {
+        variant: ["elevated", "filled", "outlined"],
+        interactive: ["true", "false"],
+    },
+    recipe: () => ({
         base: {
             root: {
                 ...focusRing(),
@@ -144,5 +150,5 @@ export const card = defineSlotComponent({
             interactive("outlined"),
         ],
         defaultVariants: { variant: "elevated", interactive: "false" },
-    },
+    }),
 });
