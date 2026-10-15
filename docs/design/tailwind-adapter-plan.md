@@ -1,6 +1,6 @@
 # Tailwind adapter plan
 
-Status: planned.
+Status: implemented.
 
 An adapter that brings a pureform config into Tailwind v4: the tokens become Tailwind's theme, so
 apps write `bg-primary rounded-large` with pureform's values, and the components arrive as
@@ -80,18 +80,22 @@ writing. That moves into a helper both use, rather than being copied.
 }
 ```
 
-- **Token names follow Tailwind's namespaces** (`--color-*`, `--radius-*`, `--text-*`,
-  `--font-*`, `--shadow-*`, `--breakpoint-*`, `--ease-*`). The component CSS reads the same
-  variables through a `tokenRef` hook, as the Panda adapter does, so there's one set of
-  variables.
+- **The theme references pureform's vars.** `@theme inline` maps Tailwind's namespaces
+  (`--color-*`, `--radius-*`, `--spacing-*`, `--text-*`, `--font-*`, `--shadow-*`,
+  `--breakpoint-*`, `--ease-*`) to the CSS adapter's vars (`--color-primary:
+var(--colors-primary)`), and utilities read those directly. There's one set of variables, and
+  no `tokenRef` change was needed. Only semantic colors map by default; `palette` adds the raw
+  palette. Spacing's vars already have Tailwind's names, so they go in a plain `@theme` by value
+  instead of referencing themselves. Breakpoints are values too, since media queries can't read
+  vars.
 - **Tokens with no Tailwind namespace** (component tokens, state layer opacities, motion
   durations) stay as plain custom properties under `:root`, not `@theme`, so they don't create
   stray utilities.
 - **Dark and named themes** are variable overrides in plain CSS: dark under `.dark` and the
   `prefers-color-scheme` query with `:root:not(.light)`, themes under the configurable theme
   attribute, as in the CSS adapter.
-- **Variants:** `dark` matches pureform's class, and each named theme can add one
-  (`teal:bg-primary`). Breakpoints come from `@theme`.
+- **Variants:** `dark` and `light` match pureform's scheme scopes, and each named theme gets
+  `theme-<name>` (`themeVariant` renames it). Breakpoints come from `@theme`.
 - **Reset:** Tailwind's preflight stays. The CSS adapter's reset isn't included.
 
 ## Options
@@ -99,7 +103,9 @@ writing. That moves into a helper both use, rather than being copied.
 - `format`: `"css"` only for now. The type is a union so a `"plugin"` mode can be added without
   breaking callers.
 - `prefix`, `themeAttribute`: as in the CSS adapter.
-- `theme`: which token groups go into `@theme`, defaulting to all that map to a namespace.
+- `palette`: also map the raw color palette.
+- `replace`: clear Tailwind's defaults in each namespace pureform fills.
+- `themeVariant`: the variant name for a named theme.
 
 ## Vite plugin
 
@@ -128,7 +134,8 @@ plugins: [
   scopes, and the nested layers survive.
 - **Precedence test:** a utility overrides a component property, and compounds beat variants
   beat base.
-- **Parity e2e:** the existing comparison, run with the Tailwind output against the Panda preset.
+- **Parity e2e:** the existing comparison, run with the Tailwind output against the Panda preset,
+  through Tailwind's compiler with its theme and utilities but not its preflight.
 
 ## Steps
 
@@ -136,5 +143,5 @@ plugins: [
 2. `toTailwind` and the theme mapping, with the `tokenRef` hook.
 3. `tailwindCss` writer and unit tests against Tailwind's compiler.
 4. The Vite plugin and `generate`.
-5. Parity e2e and a section in the CSS demo, or a small Tailwind demo.
+5. Parity e2e and a small Tailwind demo (`apps/tailwind-demo`).
 6. Docs in the design doc's adapter section.

@@ -2646,6 +2646,26 @@ setting one property at equal specificity leave the winner to rule order, which 
 needn't share, so a component must not do that: the FAB's size radius moved into a compound
 variant for that reason.
 
+### 5.2 The Tailwind adapter
+
+`@pureform/tailwind-adapter` targets Tailwind v4 and builds on the plain CSS adapter. Its
+stylesheet is imported after `tailwindcss`:
+
+- **Tokens** become Tailwind theme variables in `@theme inline` that reference pureform's vars
+  (`--color-primary: var(--colors-primary)`), so utilities like `bg-primary`, `rounded-large`,
+  and `text-body-large` read pureform's values, and dark and named themes switch them along
+  with the components. Spacing already uses Tailwind's var names, so it is declared by value
+  in a plain `@theme`; pureform's own rule still sets it at runtime.
+- **Variants:** `dark`, `light`, and `theme-<name>` match the scopes the tokens use.
+- **Components** are the CSS adapter's stylesheet inside Tailwind's `components` layer, so a
+  utility overrides a component style without `!important` or class merging.
+- **Delivery** is a CSS file only. Tailwind's plugin API treats components as utilities found
+  by scanning source files and drops nested layers, so it can't keep components below
+  utilities. A Vite plugin writes the file before Tailwind's plugin reads it, so it can be
+  gitignored, and serves the class name functions as the CSS adapter's plugin does.
+
+The parity test runs every scenario for this adapter too, through Tailwind's own compiler.
+
 ---
 
 ## 6. Runtime overriding and customization
