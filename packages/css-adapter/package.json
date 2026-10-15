@@ -47,7 +47,8 @@
                 "development": "./src/vite.ts",
                 "default": "./dist/vite.mjs"
             }
-        }
+        },
+        "./reset.css": "./reset.css"
     },
     "dependencies": {
         "@pureform/core": "catalog:",
