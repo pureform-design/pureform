@@ -25,6 +25,8 @@ import {
 } from "./shaped";
 import type { Shapes } from "./shaped";
 import {
+    entriesOf,
+    keysOf,
     lower,
     COLOR_GROUPS,
     colorVariants,
@@ -37,11 +39,11 @@ import {
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
-const FILLS: Record<string, Fill> = {
+const FILLS = {
     tonal: "tonal",
     filled: "filled",
     surface: "elevated",
-};
+} satisfies Record<string, Fill>;
 
 const { tokens, ref } = componentTokens("fab", {
     sizeSmall: px(40),
@@ -97,7 +99,7 @@ export const createFab = (
         },
         variants: {
             color: groups,
-            variant: Object.keys(FILLS),
+            variant: keysOf(FILLS),
             size: ["small", "medium", "large"],
             extended: ["true", "false"],
             shape: ["none", ...Object.keys(shapes)],
@@ -146,7 +148,7 @@ export const createFab = (
                 shape: shapeVariant(shapes, { radius: ref("radiusMedium") }),
             },
             compoundVariants: [
-                ...Object.entries(FILLS).flatMap(([variant, fill]) =>
+                ...entriesOf(FILLS).flatMap(([variant, fill]) =>
                     groups.map((color) => {
                         const colors = fillColors(fill, color);
                         // Material's surface FAB sits on the high surface container.

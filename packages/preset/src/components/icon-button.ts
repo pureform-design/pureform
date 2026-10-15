@@ -24,6 +24,8 @@ import {
 } from "./shaped";
 import type { Shapes } from "./shaped";
 import {
+    entriesOf,
+    keysOf,
     COLOR_GROUPS,
     colorVariants,
     componentTokens,
@@ -39,13 +41,13 @@ import {
 } from "./shared";
 import type { ColorGroups, Fill, Densities } from "./shared";
 
-const FILLS: Record<string, Fill> = {
+const FILLS = {
     filled: "filled",
     tonal: "tonal",
     outlined: "outlined",
     standard: "text",
     elevated: "elevated",
-};
+} satisfies Record<string, Fill>;
 
 const { tokens, ref } = componentTokens("iconButton", {
     radius: radius("full"),
@@ -85,7 +87,7 @@ export const createIconButton = (
         },
         variants: {
             color: groups,
-            variant: Object.keys(FILLS),
+            variant: keysOf(FILLS),
             shape: ["none", ...Object.keys(shapes)],
             size: ["small", "medium", "large"],
             density: ["inherit", ...Object.keys(densities)],
@@ -126,7 +128,7 @@ export const createIconButton = (
                 density: densityMarkers(densities),
             },
             compoundVariants: [
-                ...Object.entries(FILLS).flatMap(([variant, fill]) =>
+                ...entriesOf(FILLS).flatMap(([variant, fill]) =>
                     groups.map((color) => ({
                         match: { color, variant },
                         style: shapedColors(fill, color),

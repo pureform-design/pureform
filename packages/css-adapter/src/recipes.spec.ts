@@ -61,6 +61,8 @@ describe("recipes", () => {
     it("types selections and slots from the typed specs", () => {
         // @ts-expect-error a value the variant doesn't have
         button({ size: "huge" });
+        // @ts-expect-error a fill the button doesn't have
+        button({ variant: "glossy" });
         // @ts-expect-error a group the component doesn't have
         button({ shade: "dark" });
         expectTypeOf(button()).toEqualTypeOf<

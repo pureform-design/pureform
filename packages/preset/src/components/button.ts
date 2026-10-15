@@ -9,6 +9,7 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import {
+    keysOf,
     COLOR_GROUPS,
     colorCompounds,
     colorVariants,
@@ -26,13 +27,13 @@ import {
 } from "./shared";
 import type { ColorGroups, Fill, Densities } from "./shared";
 
-const FILLS: Record<string, Fill> = {
+const FILLS = {
     filled: "filled",
     tonal: "tonal",
     outlined: "outlined",
     text: "text",
     elevated: "elevated",
-};
+} satisfies Record<string, Fill>;
 
 const { tokens } = componentTokens("button", {
     radius: radius("full"),
@@ -69,7 +70,7 @@ export const createButton = (
         structure: { root: ["touchTarget", "icon", "label"] },
         variants: {
             color: groups,
-            variant: Object.keys(FILLS),
+            variant: keysOf(FILLS),
             size: ["small", "medium", "large"],
             density: ["inherit", ...Object.keys(densities)],
         },

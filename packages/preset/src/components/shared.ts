@@ -479,6 +479,14 @@ export const densityMarkers = (
         ["inherit", ...Object.keys(densities)].map((name) => [name, {}]),
     );
 
+/** An object's keys, typed as its declared names rather than `string`. */
+export const keysOf = <T extends object>(object: T) =>
+    Object.keys(object) as (keyof T & string)[];
+
+/** An object's entries, keyed by its declared names rather than `string`. */
+export const entriesOf = <T extends object>(object: T) =>
+    Object.entries(object) as [keyof T & string, T[keyof T]][];
+
 /** A name in lower case, typed as such, for a variant value made from a token suffix. */
 export const lower = <S extends string>(name: S) =>
     name.toLowerCase() as Lowercase<S>;
