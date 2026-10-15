@@ -46,6 +46,15 @@ const FIELD_PAIRS = [
     pair(token("outlineColor"), SURFACE, UI_CONTRAST),
 ];
 
+// A list or menu row: text on its container, selected or not.
+const ROW_PAIRS = [
+    pair(token("content"), token("container"), TEXT_CONTRAST),
+    pair(token("supportingColor"), token("container"), TEXT_CONTRAST),
+    pair(token("trailingColor"), token("container"), TEXT_CONTRAST),
+    pair(token("iconColor"), token("container"), UI_CONTRAST),
+    pair(token("selectedContent"), token("selectedContainer"), TEXT_CONTRAST),
+];
+
 /** The pairs each component draws, by component name. */
 export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     chip: [
@@ -57,6 +66,19 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
             TEXT_CONTRAST,
         ),
         pair(token("iconColor"), SURFACE, UI_CONTRAST),
+    ],
+    listItem: ROW_PAIRS,
+    menu: ROW_PAIRS,
+    tabs: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("activeColor"), token("container"), TEXT_CONTRAST),
+        pair(token("secondaryActiveColor"), token("container"), TEXT_CONTRAST),
+        pair(token("indicatorColor"), token("container"), UI_CONTRAST),
+    ],
+    dialog: [
+        pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
+        pair(token("bodyColor"), token("container"), TEXT_CONTRAST),
+        pair(token("iconColor"), token("container"), UI_CONTRAST),
     ],
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,

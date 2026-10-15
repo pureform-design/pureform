@@ -119,3 +119,35 @@ describe("focus", () => {
         });
     });
 });
+
+// Rows and tabs span their container and are at least 48px tall, so they need no touch target
+// slot; their focus ring sits on the item rather than the root.
+const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
+    ["menu", (s) => s.recipe.base.item, "itemHeight"],
+    ["tabs", (s) => s.recipe.base.tab, "height"],
+    [
+        "listItem",
+        (s) =>
+            (s.recipe.variants?.interactive?.true as { root?: unknown })?.root,
+        "heightOne",
+    ],
+];
+
+describe("items", () => {
+    it.each(ITEMS)("%s's item shows the focus ring", (name, item) => {
+        const style = item(slotted(name)) as Record<string, unknown>;
+        expect(style.outlineWidth).toEqual({
+            type: "numeric",
+            value: 3,
+            unit: "px",
+        });
+    });
+
+    it.each(ITEMS)("%s's item is at least 44px tall", (name, _, token) => {
+        const node = slotted(name).tokens?.[token] as {
+            default?: { value: number; unit: string };
+        };
+        expect(node.default?.unit).toBe("px");
+        expect(node.default?.value).toBeGreaterThanOrEqual(44);
+    });
+});

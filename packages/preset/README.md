@@ -115,6 +115,68 @@ keyboard, and screen readers work unchanged. `color` sets the checked colors.
 </label>
 ```
 
+## Lists and menus
+
+List items and menu items share one row: an optional leading icon, the text, and an optional
+trailing icon or text. Mark a selected row with `aria-selected="true"`.
+
+```html
+<li class="{root}" tabindex="0">
+    <span class="{leading}">★</span>
+    <div class="{content}">
+        <span class="{overline}">Overline</span>
+        <span class="{headline}">Headline</span>
+        <span class="{supportingText}">Supporting text</span>
+    </div>
+    <span class="{trailingText}">100+</span>
+</li>
+
+<div class="{root}" role="menu">
+    <button class="{item}" role="menuitem">
+        <span class="{itemLeading}">✂</span>
+        <span class="{itemLabel}">Cut</span>
+        <span class="{itemTrailingText}">⌘X</span>
+    </button>
+    <hr class="{separator()}" />
+</div>
+```
+
+- `listItem`: `lines` is `one`, `two`, or `three`. Set `interactive` when the item is
+  clickable; it then takes a state layer and the focus ring.
+- `menu`: items are always interactive. Separate groups with the `separator` component.
+
+## Tabs
+
+Mark the current tab with `aria-selected="true"`. `variant` is `primary` or `secondary`; turn
+on `icon` when the tabs have icons.
+
+```html
+<div class="{root}" role="tablist">
+    <button class="{tab}" role="tab" aria-selected="true">
+        <span class="{icon}">★</span>
+        <span class="{label}">Flights</span>
+        <span class="{indicator}"></span>
+    </button>
+</div>
+```
+
+## Dialog
+
+Put the text buttons in the actions, the confirming one last. Turn on `icon` when you render
+one, so the icon and headline center.
+
+```html
+<div class="{root}" role="dialog" aria-labelledby="title">
+    <span class="{icon}">⚠</span>
+    <h2 class="{headline}" id="title">Discard draft?</h2>
+    <p class="{body}">…</p>
+    <div class="{actions}">…</div>
+</div>
+```
+
+The dialog doesn't trap focus or dim the page by itself. Use a native `<dialog>` (which traps
+focus), or put the `scrim` component behind it.
+
 ## Surfaces
 
 - `card`: `variant` is `elevated`, `filled`, or `outlined`. Set `interactive` when the whole
