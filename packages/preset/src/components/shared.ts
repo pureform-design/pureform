@@ -48,6 +48,10 @@ import {
 
 import { stateLayer } from "../state-layer";
 
+/** The corners of a shape Material draws as a circle, such as a radio's dot or a handle: a
+ *  circle whatever the theme's corners, which a full radius follows. */
+export const circle = pct(50);
+
 /** The Material color groups a component can be tinted with through its `color` variant. */
 export const COLOR_GROUPS = [
     "primary",

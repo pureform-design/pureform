@@ -25,7 +25,7 @@ import {
     add,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
-import { radius, size as sizeToken } from "@pureform/theme";
+import { size as sizeToken } from "@pureform/theme";
 
 import {
     CONTROL_CHECKED,
@@ -51,6 +51,7 @@ import {
     dense,
     densityVariant,
     DEFAULT_DENSITIES,
+    circle,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
 
@@ -109,7 +110,7 @@ export const createRadio = (
                         ...focusRing(CONTROL_FOCUS),
                         ...controlRoot(dense(ref("size"))),
                         transition: stateTransition,
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         cursor: pointer,
                     },
                     touchTarget: controlTouchTarget,
@@ -122,7 +123,7 @@ export const createRadio = (
                         justifyContent: center,
                         width: ref("ringSize"),
                         height: ref("ringSize"),
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         borderStyle: solid,
                         borderWidth: ref("borderWidth"),
                         pointerEvents: none,
@@ -130,7 +131,7 @@ export const createRadio = (
                     dot: {
                         width: ref("dotSize"),
                         height: ref("dotSize"),
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         transform: when()
                             .on(CONTROL_CHECKED, transform(scale(unitless(1))))
                             .else(transform(scale(unitless(0)))),

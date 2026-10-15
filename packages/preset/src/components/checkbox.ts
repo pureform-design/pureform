@@ -35,7 +35,7 @@ import {
     add,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
-import { radius, size as sizeToken } from "@pureform/theme";
+import { size as sizeToken } from "@pureform/theme";
 
 import {
     CONTROL_CHECKED,
@@ -60,6 +60,7 @@ import {
     dense,
     densityVariant,
     DEFAULT_DENSITIES,
+    circle,
 } from "./shared";
 import type { ColorGroups, Densities } from "./shared";
 
@@ -159,7 +160,7 @@ export const createCheckbox = (
                         ...focusRing(CONTROL_FOCUS),
                         ...controlRoot(dense(ref("size"))),
                         transition: stateTransition,
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         cursor: pointer,
                     },
                     touchTarget: controlTouchTarget,

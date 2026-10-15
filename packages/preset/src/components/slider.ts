@@ -46,6 +46,7 @@ import {
     slotStateLayer,
     sys,
     tweens,
+    circle,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -78,7 +79,7 @@ const atValue = (size: ReturnType<typeof ref>) => ({
     transform: transform(translateY(pct(-50))),
     width: size,
     height: size,
-    borderRadius: radius("full"),
+    borderRadius: circle,
     pointerEvents: none,
     transition: follows("insetInlineStart"),
 });

@@ -47,6 +47,7 @@ import {
     componentTokens,
     sys,
     tweens,
+    circle,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -172,8 +173,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         [`insetInline${side}`]: px(0),
         width: pct(200),
         height: pct(100),
-        // A circle, whatever the theme's corners, which a full radius follows.
-        borderRadius: pct(50),
+        borderRadius: circle,
         borderStyle: solid,
         borderWidth: ref("thickness"),
         borderColor: transparent,
@@ -210,7 +210,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                     position: relative,
                     width: ref("size"),
                     height: ref("size"),
-                    borderRadius: pct(50),
+                    borderRadius: circle,
                 },
                 // The end half shows the first 50%, the start half the rest.
                 endHalf: half("End"),

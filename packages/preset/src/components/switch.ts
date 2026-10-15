@@ -53,6 +53,7 @@ import {
     sys,
     tweens,
     focusRing,
+    circle,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -180,7 +181,7 @@ export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
                         transform: centered,
                         width: ref("stateLayerSize"),
                         height: ref("stateLayerSize"),
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         pointerEvents: none,
                         transition: tweens("left", "backgroundColor"),
                     },
@@ -192,7 +193,7 @@ export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
                         display: inlineFlex,
                         alignItems: center,
                         justifyContent: center,
-                        borderRadius: radius("full"),
+                        borderRadius: circle,
                         pointerEvents: none,
                         width: when()
                             .on(CONTROL_CHECKED, ref("handleSizeChecked"))
