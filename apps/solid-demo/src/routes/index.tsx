@@ -1,4 +1,13 @@
-import { button, card, chip, fab, iconButton, scrim, text } from "$recipes";
+import {
+    button,
+    card,
+    chip,
+    fab,
+    iconButton,
+    scrim,
+    text,
+    textField,
+} from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
 import { createSignal } from "solid-js";
 import { For } from "solid-js";
@@ -27,6 +36,43 @@ const THEMES = [undefined, "teal", "sharp"] as const;
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={{ ...row, "align-items": "flex-start" }}>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => (
+                        <For each={[false, true]}>
+                            {(invalid) => {
+                                const t = textField({ variant });
+                                const id = `${variant}-${invalid ? "error" : "ok"}`;
+                                return (
+                                    <div
+                                        class={t.root}
+                                        style={{ width: "240px" }}
+                                    >
+                                        <div class={t.container}>
+                                            <input
+                                                class={t.input}
+                                                id={id}
+                                                placeholder=" "
+                                                aria-invalid={
+                                                    invalid ? "true" : undefined
+                                                }
+                                            />
+                                            <label class={t.label} for={id}>
+                                                {`${variant} field`}
+                                            </label>
+                                        </div>
+                                        <span class={t.supportingText}>
+                                            {invalid
+                                                ? "Something is wrong"
+                                                : "Supporting text"}
+                                        </span>
+                                    </div>
+                                );
+                            }}
+                        </For>
+                    )}
+                </For>
+            </section>
             <section style={{ ...row, "align-items": "center" }}>
                 <For each={["small", "medium", "large"] as const}>
                     {(size) => {

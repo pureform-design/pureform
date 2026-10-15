@@ -41,6 +41,7 @@ export default defineConfig({
             ripple: ["*"],
             fab: ["*"],
             chip: ["*"],
+            textField: ["*"],
             text: ["*"],
         },
     },
