@@ -5,6 +5,8 @@ import { configWith } from "../__fixtures__/config";
 import { dialog } from "./dialog";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
+import { navigationBar } from "./navigation-bar";
+import { navigationRail } from "./navigation-rail";
 import { searchBar } from "./search-bar";
 import { tabs } from "./tabs";
 
@@ -14,6 +16,8 @@ describe.each([
     ["tabs", tabs],
     ["dialog", dialog],
     ["searchBar", searchBar],
+    ["navigationBar", navigationBar],
+    ["navigationRail", navigationRail],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();
@@ -54,5 +58,17 @@ describe("searchBar", () => {
         expect(css?.base?.input?.["&::placeholder"]).toEqual({
             color: "var(--components-searchBar-placeholderColor, token(colors.onSurfaceVariant))",
         });
+    });
+});
+
+describe("navigation", () => {
+    it("fills the current destination's pill, read from the item", () => {
+        const css = JSON.stringify(
+            compilePreset(configWith(navigationBar)).theme?.slotRecipes
+                ?.navigationBar?.base?.indicator,
+        );
+        expect(css).toContain(".navigationBar__item:is(");
+        expect(css).toContain("aria-current");
+        expect(css).toContain("secondaryContainer");
     });
 });

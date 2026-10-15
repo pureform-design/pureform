@@ -51,6 +51,8 @@ import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createListItem } from "./components/list-item";
 import { createMenu } from "./components/menu";
+import { createNavigationBar } from "./components/navigation-bar";
+import { createNavigationRail } from "./components/navigation-rail";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
@@ -280,6 +282,8 @@ export const pureform = <
         listItem: createListItem(theme.color.groups),
         menu: createMenu(theme.color.groups),
         tabs: createTabs(theme.color.groups),
+        navigationBar: createNavigationBar(theme.color.groups),
+        navigationRail: createNavigationRail(theme.color.groups),
         dialog,
         card,
         scrim,

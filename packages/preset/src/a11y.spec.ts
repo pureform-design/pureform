@@ -120,12 +120,14 @@ describe("focus", () => {
     });
 });
 
-// Rows, tabs, and the search bar span their container and are at least 48px tall, so they need no touch target
+// Rows, tabs, navigation, and the search bar span their container and are at least 48px tall, so they need no touch target
 // slot; their focus ring sits on the item rather than the root.
 const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
     ["menu", (s) => s.recipe.base.item, "itemHeight"],
     ["tabs", (s) => s.recipe.base.tab, "height"],
     ["searchBar", (s) => s.recipe.base.root, "height"],
+    ["navigationBar", (s) => s.recipe.base.item, "height"],
+    ["navigationRail", (s) => s.recipe.base.item, "itemHeight"],
     [
         "listItem",
         (s) =>

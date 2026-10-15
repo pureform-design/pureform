@@ -4,6 +4,8 @@ import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
 import { createListItem } from "./list-item";
 import { createMenu } from "./menu";
+import { createNavigationBar } from "./navigation-bar";
+import { createNavigationRail } from "./navigation-rail";
 import { createRadio } from "./radio";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
@@ -23,6 +25,8 @@ describe.each([
     ["listItem", createListItem],
     ["menu", createMenu],
     ["tabs", createTabs],
+    ["navigationBar", createNavigationBar],
+    ["navigationRail", createNavigationRail],
 ] as const)("%s color", (_, create) => {
     const spec = create(GROUPS);
 

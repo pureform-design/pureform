@@ -55,6 +55,15 @@ const ROW_PAIRS = [
     pair(token("selectedContent"), token("selectedContainer"), TEXT_CONTRAST),
 ];
 
+// A navigation destination: its label on the container, and its icon on the pill or the
+// container.
+const NAV_PAIRS = [
+    pair(token("labelColor"), token("container"), TEXT_CONTRAST),
+    pair(token("activeLabelColor"), token("container"), TEXT_CONTRAST),
+    pair(token("iconColor"), token("container"), UI_CONTRAST),
+    pair(token("activeIconColor"), token("indicatorColor"), UI_CONTRAST),
+];
+
 /** The pairs each component draws, by component name. */
 export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     chip: [
@@ -86,6 +95,8 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("leadingColor"), token("container"), UI_CONTRAST),
         pair(token("trailingColor"), token("container"), UI_CONTRAST),
     ],
+    navigationBar: NAV_PAIRS,
+    navigationRail: NAV_PAIRS,
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,
     supportingText: [
