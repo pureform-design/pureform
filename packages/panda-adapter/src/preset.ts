@@ -5,6 +5,8 @@ import { tokenValue, validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 
+import { compileNodeToCSS } from "./compile-node";
+import { varName } from "./css";
 import type { CompileCtx, CompileOptions } from "./options";
 import { compileRecipes } from "./recipes";
 import {
@@ -95,6 +97,27 @@ const compileThemeOverride = (override: ThemeOverride, ctx: CompileCtx) => {
     };
 };
 
+// Panda themes carry tokens only, so a theme's component token overrides become the
+// components' vars, set under the theme's selector, which is where Panda applies the theme.
+const themeComponentVars = (config: CoreConfig, ctx: CompileCtx) => {
+    const rules: Record<string, Record<string, string>> = {};
+    for (const [name, override] of Object.entries(config.themes ?? {})) {
+        const vars: Record<string, string> = {};
+        for (const [component, { tokens = {} }] of Object.entries(
+            override.components ?? {},
+        )) {
+            for (const [token, entry] of Object.entries(tokens)) {
+                vars[varName(["components", component, token], ctx.prefix)] =
+                    compileNodeToCSS(tokenValue(entry) as ValueNode, ctx);
+            }
+        }
+        if (Object.keys(vars).length > 0) {
+            rules[`[data-panda-theme=${name}]`] = vars;
+        }
+    }
+    return Object.keys(rules).length > 0 ? rules : undefined;
+};
+
 const defined = <T extends Record<string, unknown>>(obj: T): Partial<T> =>
     Object.fromEntries(
         Object.entries(obj).filter(([, v]) => v !== undefined),
@@ -137,7 +160,13 @@ export const compilePreset = (
             slotRecipes,
         }),
         conditions: { extend: COLOR_SCHEME_CONDITIONS },
-        globalCss: colorSchemeCss(config),
+        globalCss: (() => {
+            const css = {
+                ...colorSchemeCss(config),
+                ...themeComponentVars(config, ctx),
+            };
+            return Object.keys(css).length > 0 ? css : undefined;
+        })(),
         utilities: compileUtilities(ctx),
         themes,
     }) as unknown as Preset;

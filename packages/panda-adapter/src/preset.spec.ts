@@ -213,3 +213,36 @@ describe("compilePreset (themes)", () => {
         });
     });
 });
+
+describe("compilePreset (theme component tokens)", () => {
+    it("sets a theme's component token overrides under its selector", () => {
+        const preset = compilePreset({
+            ...buttonConfig,
+            themes: {
+                brand: {
+                    components: { button: { tokens: { radius: px(2) } } },
+                },
+            },
+        });
+        expect(obj(preset.globalCss)["[data-panda-theme=brand]"]).toEqual({
+            "--components-button-radius": "2px",
+        });
+    });
+
+    it("applies the var prefix", () => {
+        const preset = compilePreset(
+            {
+                ...buttonConfig,
+                themes: {
+                    brand: {
+                        components: { button: { tokens: { radius: px(2) } } },
+                    },
+                },
+            },
+            { prefix: "pf" },
+        );
+        expect(obj(preset.globalCss)["[data-panda-theme=brand]"]).toEqual({
+            "--pf-components-button-radius": "2px",
+        });
+    });
+});
