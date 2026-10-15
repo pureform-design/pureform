@@ -1,10 +1,10 @@
-// Plain CSS has no text styles or utilities, so a style map's `textStyle` and `apply` are
-// written out in place: the text style's properties, and each utility's styles for its value.
-// They come first, so the map's own properties win, as they do in Panda.
+// Targets without text styles or utilities (plain CSS, React Native) write a style map's
+// `textStyle` and `apply` out in place: the text style's properties, and each utility's styles
+// for its value. They come first, so the map's own properties win, as they do in Panda.
 
-import { alias, literal } from "@pureform/core/ast";
-import type { StyleMap, ValueNode } from "@pureform/core/ast";
-import type { CoreConfig, UtilityDef } from "@pureform/core/types";
+import { alias, literal } from "./ast";
+import type { StyleMap, ValueNode } from "./ast";
+import type { CoreConfig, UtilityDef } from "./types";
 
 type ApplyArg = string | ValueNode | Record<string, ValueNode> | ValueNode[];
 type States = NonNullable<StyleMap["states"]>;

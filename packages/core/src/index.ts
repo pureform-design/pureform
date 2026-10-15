@@ -2,6 +2,7 @@
 // and helper constructors are under the `./ast` entry point, and the schema types under
 // `./types`.
 export * from "./define";
+export { inlineStyles, mergeStyles } from "./inline";
 export * from "./path";
 export * from "./typed";
 export type * from "./types";

@@ -2,7 +2,7 @@
 // attribute, keyframes, and each component's classes, in cascade layers that give recipes the
 // same precedence as in Panda: base, then variants, then compound variants.
 
-import { tokenValue, validateConfig } from "@pureform/core";
+import { inlineStyles, tokenValue, validateConfig } from "@pureform/core";
 import type { StyleMap, ValueNode } from "@pureform/core/ast";
 import type {
     AnyComponentSpec,
@@ -22,7 +22,6 @@ import {
 } from "@pureform/css-lowering";
 import type { LowerCtx } from "@pureform/css-lowering";
 
-import { inlineStyles } from "./inline";
 import { className, cssContext } from "./options";
 import type { CssOptions } from "./options";
 import { ROOT_SCHEMES, addStyle, block, printRule } from "./serialize";
