@@ -1,5 +1,6 @@
 import {
     avatar,
+    media,
     button,
     card,
     checkbox,
@@ -775,6 +776,26 @@ function IndexRoute() {
                         src={PORTRAIT}
                         alt="A landscape, cropped to fill the avatar"
                     />
+                </div>
+                <div style={{ ...row, "align-items": "flex-start" }}>
+                    <For
+                        each={
+                            [
+                                ["landscape", "none"],
+                                ["square", "cookie9Sided"],
+                                ["portrait", "arch"],
+                            ] as const
+                        }
+                    >
+                        {([aspect, shape]) => (
+                            <img
+                                class={media({ aspect, shape })}
+                                style={{ width: "144px" }}
+                                src={PORTRAIT}
+                                alt=""
+                            />
+                        )}
+                    </For>
                 </div>
             </section>
 
