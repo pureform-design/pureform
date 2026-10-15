@@ -73,9 +73,6 @@
     "packages/js-effects": {
       "name": "@pureform/js-effects",
       "version": "0.0.0-semantically-released",
-      "dependencies": {
-        "@pureform/material": "catalog:",
-      },
       "devDependencies": {
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",

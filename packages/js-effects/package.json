@@ -16,9 +16,6 @@
             }
         }
     },
-    "dependencies": {
-        "@pureform/material": "catalog:"
-    },
     "devDependencies": {
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",

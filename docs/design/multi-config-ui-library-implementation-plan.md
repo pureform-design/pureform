@@ -73,7 +73,7 @@ stops at Layer 2.
 @pureform/preset ────────────────────────────────────┘
   (also ► @pureform/theme)
 
-@pureform/js-effects  (DOM only; its declared @pureform/material dependency is unused)
+@pureform/js-effects  (DOM only, no pureform dependencies)
 ```
 
 As built: `@pureform/dtcg` is not started. The demo app compiles `pureform()` from
