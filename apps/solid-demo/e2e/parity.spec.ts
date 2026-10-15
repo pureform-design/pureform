@@ -1,5 +1,6 @@
-// Parity between the adapters: the same markup, styled once by the Panda preset and once by the
-// plain CSS adapter's stylesheet for the same config, must compute the same styles. Both pages
+// Parity between the adapters: the same markup, styled once by the Panda preset and once by
+// each other adapter's stylesheet for the same config (plain CSS, and Tailwind through its own
+// compiler), must compute the same styles. Both pages
 // keep Panda's reset and base layers (the app's global styles), so only the components' own
 // styles differ. Custom properties are left out: Panda's own preset adds tokens of its own, and
 // what matters is the values they resolve to.
@@ -12,6 +13,8 @@ import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { compileCss, manifestOf, recipes } from "@pureform/css-adapter";
 import type { RecipeManifest } from "@pureform/css-adapter";
+import { compileTailwind } from "@pureform/tailwind-adapter";
+import { compile } from "@tailwindcss/node";
 
 import { pureformConfig } from "../panda.pureform";
 
@@ -207,10 +210,24 @@ const SCENARIOS: Scenario[] = [
 let pandaCss = "";
 let fromPanda: Classes = [];
 const fromPlain = plainClasses();
-const plainCss = compileCss(pureformConfig, {
-    prefix: PREFIX,
-    themeAttribute: THEME_ATTRIBUTE,
-});
+const OPTIONS = { prefix: PREFIX, themeAttribute: THEME_ATTRIBUTE };
+
+// Each adapter's stylesheet, over Panda's reset and base layers. Tailwind's own preflight is
+// left out, so only its theme and the adapter's components apply.
+const adapters: Record<string, () => Promise<string>> = {
+    CSS: async () => compileCss(pureformConfig, OPTIONS),
+    Tailwind: async () => {
+        const compiler = await compile(
+            `@layer theme, base, components, utilities;
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities);
+${compileTailwind(pureformConfig, OPTIONS)}`,
+            { base: import.meta.dirname, onDependency: () => {} },
+        );
+        return compiler.build([]);
+    },
+};
+const adapterCss: Record<string, string> = {};
 
 test.beforeAll(async ({ browser }) => {
     const page = await browser.newPage();
@@ -228,10 +245,15 @@ test.beforeAll(async ({ browser }) => {
     );
     fromPanda = await pandaClasses(page);
     await page.close();
+    for (const [name, css] of Object.entries(adapters)) {
+        adapterCss[name] = await css();
+    }
 });
 
-for (const scenario of SCENARIOS) {
-    test(`the CSS adapter matches the Panda preset: ${scenario.name}`, async ({
+for (const [adapter, scenario] of Object.keys(adapters).flatMap((name) =>
+    SCENARIOS.map((s) => [name, s] as const),
+)) {
+    test(`the ${adapter} adapter matches the Panda preset: ${scenario.name}`, async ({
         browser,
     }) => {
         test.setTimeout(120_000);
@@ -246,7 +268,7 @@ for (const scenario of SCENARIOS) {
             "reset",
             "base",
         ]);
-        await plainPage.addStyleTag({ content: plainCss });
+        await plainPage.addStyleTag({ content: adapterCss[adapter]! });
         const plain = await computed(plainPage);
 
         const differences: string[] = [];
