@@ -54,6 +54,10 @@ describe("lowerRn values", () => {
             alignItems: center,
             paddingInlineStart: alias("tokens", "spacing", "2"),
             paddingBlockEnd: px(4),
+            borderStartStartRadius: px(4),
+            borderStartEndRadius: px(5),
+            borderEndStartRadius: px(6),
+            borderEndEndRadius: px(7),
         } as StyleMap);
         expect(rules).toEqual([
             {
@@ -70,6 +74,10 @@ describe("lowerRn values", () => {
                     alignItems: "center",
                     paddingStart: { $ref: "spacing.2" },
                     paddingBottom: 4,
+                    borderTopStartRadius: 4,
+                    borderTopEndRadius: 5,
+                    borderBottomStartRadius: 6,
+                    borderBottomEndRadius: 7,
                 },
             },
         ]);
