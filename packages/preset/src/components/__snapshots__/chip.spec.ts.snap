@@ -167,19 +167,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "elevated",
     },
     {
-      "color": "positive",
+      "color": "success",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateHover))",
-              "base": "token(colors.positiveContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "base": "token(colors.successContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onPositiveContainer)",
+            "color": "token(colors.onSuccessContainer)",
           },
           "_disabled": {
             "backgroundColor": "transparent",
@@ -191,19 +191,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "outlined",
     },
     {
-      "color": "positive",
+      "color": "success",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.positiveContainer), token(colors.onPositiveContainer) token(opacity.stateHover))",
-              "base": "token(colors.positiveContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "base": "token(colors.successContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onPositiveContainer)",
+            "color": "token(colors.onSuccessContainer)",
           },
           "_disabled": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
@@ -219,19 +219,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "elevated",
     },
     {
-      "color": "notice",
+      "color": "warning",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateHover))",
-              "base": "token(colors.noticeContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "base": "token(colors.warningContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onNoticeContainer)",
+            "color": "token(colors.onWarningContainer)",
           },
           "_disabled": {
             "backgroundColor": "transparent",
@@ -243,19 +243,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "outlined",
     },
     {
-      "color": "notice",
+      "color": "warning",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.noticeContainer), token(colors.onNoticeContainer) token(opacity.stateHover))",
-              "base": "token(colors.noticeContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "base": "token(colors.warningContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onNoticeContainer)",
+            "color": "token(colors.onWarningContainer)",
           },
           "_disabled": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
@@ -271,19 +271,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "elevated",
     },
     {
-      "color": "negative",
+      "color": "error",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateHover))",
-              "base": "token(colors.negativeContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "base": "token(colors.errorContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onNegativeContainer)",
+            "color": "token(colors.onErrorContainer)",
           },
           "_disabled": {
             "backgroundColor": "transparent",
@@ -295,19 +295,19 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "variant": "outlined",
     },
     {
-      "color": "negative",
+      "color": "error",
       "css": {
         "root": {
           "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.negativeContainer), token(colors.onNegativeContainer) token(opacity.stateHover))",
-              "base": "token(colors.negativeContainer)",
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "base": "token(colors.errorContainer)",
             },
             "borderColor": "transparent",
-            "color": "token(colors.onNegativeContainer)",
+            "color": "token(colors.onErrorContainer)",
           },
           "_disabled": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
@@ -390,38 +390,20 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
   ],
   "variants": {
     "color": {
+      "error": {
+        "icon": {
+          "color": {
+            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-chip-iconColor, token(colors.primary))",
+          },
+        },
+      },
       "info": {
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
-        },
-      },
-      "negative": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onNegativeContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
-        },
-      },
-      "notice": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onNoticeContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
-        },
-      },
-      "positive": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onPositiveContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -436,11 +418,29 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "success": {
+        "icon": {
+          "color": {
+            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-chip-iconColor, token(colors.primary))",
+          },
+        },
+      },
       "tertiary": {
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-chip-iconColor, token(colors.primary))",
+          },
+        },
+      },
+      "warning": {
+        "icon": {
+          "color": {
+            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },

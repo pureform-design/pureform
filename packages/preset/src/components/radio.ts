@@ -57,7 +57,7 @@ const { tokens, ref } = componentTokens("radio", {
     borderWidth: px(2),
     borderColor: sys("onSurfaceVariant"),
     checkedColor: sys("primary"),
-    errorColor: sys("negative"),
+    errorColor: sys("error"),
 });
 
 // The ring and the dot share one color: the group's once checked.

@@ -1,7 +1,7 @@
 // The pureform supporting text: the small helper or error line under a control.
 //
-// `tone` sets its color: `error` for an error, or any color group (`positive` for a saved
-// state, `notice` for a warning, and so on). Whoever knows the state sets it, the same way on
+// `tone` sets its color: any color group, such as `error` for an error, `success` for a saved
+// state, or `warning` for a warning. Whoever knows the state sets it, the same way on
 // every target. Inside a text field, use its own supporting text slot, which follows the
 // field's state and shares this style.
 
@@ -24,17 +24,17 @@ export const supportingTextStyle: StyleMap = {
 
 const { tokens, ref } = componentTokens("supportingText", {
     color: sys("onSurfaceVariant"),
-    errorColor: colorRole("negative"),
+    errorColor: colorRole("error"),
 });
 
-/** Build the supporting text with a `tone` per group in `groups`, plus `neutral` and
- *  `error`. */
+/** Build the supporting text with `neutral` and a `tone` per group in `groups`. `error` reads
+ *  the `errorColor` token, so it can be restyled on its own. */
 export const createSupportingText = (groups: ColorGroups = COLOR_GROUPS) =>
     defineComponent({
         name: "supportingText",
         $meta: {
             description:
-                "Helper or error text under a control. tone sets its color: error, or any color group.",
+                "Helper or error text under a control. tone sets its color: any color group, such as error.",
         },
         tokens,
         recipe: {
@@ -44,7 +44,9 @@ export const createSupportingText = (groups: ColorGroups = COLOR_GROUPS) =>
                     neutral: {},
                     error: { color: ref("errorColor") },
                     ...Object.fromEntries(
-                        groups.map((group) => [group, { color: sys(group) }]),
+                        groups
+                            .filter((group) => group !== "error")
+                            .map((group) => [group, { color: sys(group) }]),
                     ),
                 },
             },

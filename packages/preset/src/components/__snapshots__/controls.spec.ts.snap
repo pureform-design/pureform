@@ -10,15 +10,15 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-checkedColor, token(colors.primary))",
-        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
+        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
         "base": "transparent",
       },
       "borderColor": {
         ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "transparent",
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "transparent",
-        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
+        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorColor, token(colors.error))",
         "base": "var(--components-checkbox-borderColor, token(colors.onSurfaceVariant))",
       },
       "borderRadius": "var(--components-checkbox-boxRadius, 2px)",
@@ -39,7 +39,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
         "base": "var(--components-checkbox-iconColor, token(colors.onPrimary))",
       },
       "display": "inline-flex",
@@ -60,7 +60,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+        ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
         "base": "var(--components-checkbox-iconColor, token(colors.onPrimary))",
       },
       "display": "inline-flex",
@@ -145,6 +145,45 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
   ],
   "variants": {
     "color": {
+      "error": {
+        "box": {
+          "backgroundColor": {
+            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.error)",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.error)",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            "base": "transparent",
+          },
+        },
+        "checkIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onError)",
+          },
+        },
+        "indeterminateIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onError)",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
       "info": {
         "box": {
           "backgroundColor": {
@@ -152,22 +191,22 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.info)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
             "base": "transparent",
           },
         },
         "checkIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onInfo)",
           },
         },
         "indeterminateIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onInfo)",
           },
         },
@@ -184,123 +223,6 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
-      "negative": {
-        "box": {
-          "backgroundColor": {
-            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.negative)",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.negative)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            "base": "transparent",
-          },
-        },
-        "checkIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onNegative)",
-          },
-        },
-        "indeterminateIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onNegative)",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
-      "notice": {
-        "box": {
-          "backgroundColor": {
-            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.notice)",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.notice)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            "base": "transparent",
-          },
-        },
-        "checkIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onNotice)",
-          },
-        },
-        "indeterminateIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onNotice)",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
-      "positive": {
-        "box": {
-          "backgroundColor": {
-            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.positive)",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.positive)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            "base": "transparent",
-          },
-        },
-        "checkIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onPositive)",
-          },
-        },
-        "indeterminateIcon": {
-          "color": {
-            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
-            "base": "token(colors.onPositive)",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
       "primary": {},
       "secondary": {
         "box": {
@@ -309,22 +231,22 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.secondary)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
             "base": "transparent",
           },
         },
         "checkIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSecondary)",
           },
         },
         "indeterminateIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSecondary)",
           },
         },
@@ -341,6 +263,45 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "success": {
+        "box": {
+          "backgroundColor": {
+            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.success)",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.success)",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            "base": "transparent",
+          },
+        },
+        "checkIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onSuccess)",
+          },
+        },
+        "indeterminateIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onSuccess)",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
       "tertiary": {
         "box": {
           "backgroundColor": {
@@ -348,22 +309,22 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.tertiary)",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.negative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
             "base": "transparent",
           },
         },
         "checkIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onTertiary)",
           },
         },
         "indeterminateIcon": {
           "color": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
-            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onNegative))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onTertiary)",
           },
         },
@@ -373,6 +334,45 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "warning": {
+        "box": {
+          "backgroundColor": {
+            ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.warning)",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "token(colors.warning)",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "var(--components-checkbox-errorColor, token(colors.error))",
+            "base": "transparent",
+          },
+        },
+        "checkIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onWarning)",
+          },
+        },
+        "indeterminateIcon": {
+          "color": {
+            ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
+            ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
+            "base": "token(colors.onWarning)",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
             "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
             "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
             "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
@@ -392,7 +392,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
       "backgroundColor": {
         ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-radio-checkedColor, token(colors.primary))",
         ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+        ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
         "base": "var(--components-radio-checkedColor, token(colors.primary))",
       },
       "borderRadius": "token(radii.full)",
@@ -421,7 +421,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
       "borderColor": {
         ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-radio-checkedColor, token(colors.primary))",
         ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+        ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
         "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
       },
       "borderRadius": "token(radii.full)",
@@ -497,12 +497,42 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
   ],
   "variants": {
     "color": {
+      "error": {
+        "dot": {
+          "backgroundColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.error)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "token(colors.error)",
+          },
+        },
+        "ring": {
+          "borderColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.error)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
       "info": {
         "dot": {
           "backgroundColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.info)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "token(colors.info)",
           },
         },
@@ -510,7 +540,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           "borderColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.info)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -527,103 +557,13 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
-      "negative": {
-        "dot": {
-          "backgroundColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.negative)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "token(colors.negative)",
-          },
-        },
-        "ring": {
-          "borderColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.negative)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
-      "notice": {
-        "dot": {
-          "backgroundColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.notice)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "token(colors.notice)",
-          },
-        },
-        "ring": {
-          "borderColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.notice)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
-      "positive": {
-        "dot": {
-          "backgroundColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.positive)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "token(colors.positive)",
-          },
-        },
-        "ring": {
-          "borderColor": {
-            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.positive)",
-            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
-            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
-          },
-        },
-        "root": {
-          "backgroundColor": {
-            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.statePressed))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateFocus))",
-            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateHover))",
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
-            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-      },
       "primary": {},
       "secondary": {
         "dot": {
           "backgroundColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.secondary)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "token(colors.secondary)",
           },
         },
@@ -631,7 +571,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           "borderColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.secondary)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -648,12 +588,42 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "success": {
+        "dot": {
+          "backgroundColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.success)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "token(colors.success)",
+          },
+        },
+        "ring": {
+          "borderColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.success)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
       "tertiary": {
         "dot": {
           "backgroundColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.tertiary)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "token(colors.tertiary)",
           },
         },
@@ -661,7 +631,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           "borderColor": {
             ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.tertiary)",
             ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.negative))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
             "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -671,6 +641,36 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
             "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+      },
+      "warning": {
+        "dot": {
+          "backgroundColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.warning)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "token(colors.warning)",
+          },
+        },
+        "ring": {
+          "borderColor": {
+            ".radio__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.warning)",
+            ".radio__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".radio__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-radio-errorColor, token(colors.error))",
+            "base": "var(--components-radio-borderColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "backgroundColor": {
+            "&:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
+            "&:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
             "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "transparent",
             "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
             "&:is(:hover, [data-hover])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
@@ -837,6 +837,45 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
   ],
   "variants": {
     "color": {
+      "error": {
+        "handle": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onError)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.errorContainer)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
+            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
+          },
+        },
+        "icon": {
+          "color": "token(colors.onErrorContainer)",
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+        "track": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.error)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
+          },
+          "outlineColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.error)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
+          },
+        },
+      },
       "info": {
         "handle": {
           "backgroundColor": {
@@ -871,123 +910,6 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
           "outlineColor": {
             ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.info)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
-          },
-        },
-      },
-      "negative": {
-        "handle": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onNegative)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.negativeContainer)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
-            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
-          },
-        },
-        "icon": {
-          "color": "token(colors.onNegativeContainer)",
-        },
-        "stateLayer": {
-          "backgroundColor": {
-            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateFocus))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateHover))",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-        "track": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.negative)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
-          },
-          "outlineColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.negative)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
-          },
-        },
-      },
-      "notice": {
-        "handle": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onNotice)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.noticeContainer)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
-            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
-          },
-        },
-        "icon": {
-          "color": "token(colors.onNoticeContainer)",
-        },
-        "stateLayer": {
-          "backgroundColor": {
-            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateFocus))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateHover))",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-        "track": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.notice)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
-          },
-          "outlineColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.notice)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
-          },
-        },
-      },
-      "positive": {
-        "handle": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onPositive)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.positiveContainer)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
-            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
-          },
-        },
-        "icon": {
-          "color": "token(colors.onPositiveContainer)",
-        },
-        "stateLayer": {
-          "backgroundColor": {
-            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.statePressed))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateFocus))",
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateHover))",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
-            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-        },
-        "track": {
-          "backgroundColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.positive)",
-            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
-          },
-          "outlineColor": {
-            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.positive)",
             ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
           },
@@ -1033,6 +955,45 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "success": {
+        "handle": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onSuccess)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.successContainer)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
+            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
+          },
+        },
+        "icon": {
+          "color": "token(colors.onSuccessContainer)",
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+        "track": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.success)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
+          },
+          "outlineColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.success)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
+          },
+        },
+      },
       "tertiary": {
         "handle": {
           "backgroundColor": {
@@ -1067,6 +1028,45 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
           "outlineColor": {
             ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.tertiary)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "warning": {
+        "handle": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.onWarning)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.surface)",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "token(colors.warningContainer)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
+            "base": "var(--components-switchControl-handleColor, token(colors.outline))",
+          },
+        },
+        "icon": {
+          "color": "token(colors.onWarningContainer)",
+        },
+        "stateLayer": {
+          "backgroundColor": {
+            ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]):is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+            ".switchControl__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateFocus))",
+            ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+        },
+        "track": {
+          "backgroundColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.warning)",
+            ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-switchControl-trackColor, token(colors.surfaceContainerHighest))",
+          },
+          "outlineColor": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "token(colors.warning)",
             ".switchControl__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "base": "var(--components-switchControl-outlineColor, token(colors.outline))",
           },

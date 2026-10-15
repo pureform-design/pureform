@@ -8,7 +8,7 @@ import { createSwitch } from "./switch";
 import { createTextArea } from "./text-area";
 import { createTextField } from "./text-field";
 
-const GROUPS = ["primary", "negative", "brand"];
+const GROUPS = ["primary", "tertiary", "brand"];
 
 describe.each([
     ["checkbox", createCheckbox],
@@ -35,7 +35,7 @@ describe.each([
             ),
         ]);
         expect(brand).toContain('"brand');
-        expect(brand).not.toContain('"negative');
+        expect(brand).not.toContain('"tertiary');
     });
 });
 

@@ -15,17 +15,11 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
   "variants": {
     "color": {
       "current": {},
+      "error": {
+        "color": "token(colors.error)",
+      },
       "info": {
         "color": "token(colors.info)",
-      },
-      "negative": {
-        "color": "token(colors.negative)",
-      },
-      "notice": {
-        "color": "token(colors.notice)",
-      },
-      "positive": {
-        "color": "token(colors.positive)",
       },
       "primary": {
         "color": "token(colors.primary)",
@@ -33,8 +27,14 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
       "secondary": {
         "color": "token(colors.secondary)",
       },
+      "success": {
+        "color": "token(colors.success)",
+      },
       "tertiary": {
         "color": "token(colors.tertiary)",
+      },
+      "warning": {
+        "color": "token(colors.warning)",
       },
     },
     "size": {

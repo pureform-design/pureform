@@ -20,7 +20,7 @@ describe("supportingText", () => {
 
     it("takes the error color from its tone", () => {
         expect(compiled()?.variants?.tone?.error).toEqual({
-            color: "var(--components-supportingText-errorColor, token(colors.negative))",
+            color: "var(--components-supportingText-errorColor, token(colors.error))",
         });
     });
 

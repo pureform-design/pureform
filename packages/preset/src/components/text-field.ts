@@ -68,7 +68,7 @@ const icon = (side: "Start" | "End"): StyleMap => ({
 });
 
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
- *  color. Errors keep the negative color. */
+ *  color. Errors keep the error color. */
 export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
     const color = colors(groups);
     return defineSlotComponent({

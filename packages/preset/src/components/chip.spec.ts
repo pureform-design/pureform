@@ -48,10 +48,10 @@ describe("chip", () => {
 
 describe("chip color", () => {
     it("colors a selected chip with its group's container", () => {
-        const negative = compiled()?.compoundVariants?.find(
-            (c) => c.color === "negative" && c.variant === "outlined",
+        const error = compiled()?.compoundVariants?.find(
+            (c) => c.color === "error" && c.variant === "outlined",
         );
-        expect(JSON.stringify(negative?.css)).toContain("negativeContainer");
-        expect(JSON.stringify(negative?.css)).toContain("onNegativeContainer");
+        expect(JSON.stringify(error?.css)).toContain("errorContainer");
+        expect(JSON.stringify(error?.css)).toContain("onErrorContainer");
     });
 });

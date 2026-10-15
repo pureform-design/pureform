@@ -63,7 +63,7 @@ export const FIELD_TOKENS = {
     outlineColor: sys("outline"),
     hoverColor: sys("onSurface"),
     focusColor: sys("primary"),
-    errorColor: colorRole("negative"),
+    errorColor: colorRole("error"),
     labelColor: sys("onSurfaceVariant"),
     inputColor: sys("onSurface"),
     supportingColor: sys("onSurfaceVariant"),

@@ -63,8 +63,8 @@ const { tokens, ref } = componentTokens("checkbox", {
     borderColor: sys("onSurfaceVariant"),
     checkedColor: sys("primary"),
     iconColor: sys("onPrimary"),
-    errorColor: sys("negative"),
-    errorIconColor: sys("onNegative"),
+    errorColor: sys("error"),
+    errorIconColor: sys("onError"),
     disabledIconColor: sys("surface"),
 });
 
