@@ -16,8 +16,25 @@ interface Track {
     from: Concrete;
     to: Concrete;
     at: number;
-    animation?: Animated.CompositeAnimation;
+    animation?: Animated.CompositeAnimation | undefined;
 }
+
+// A change waiting to start once the render commits.
+interface Pending {
+    track: Track;
+    transition: Transition;
+    previous: Animated.CompositeAnimation | undefined;
+    previousProgress: Animated.Value;
+}
+
+// A progress value whose listener keeps its track's `at` current, for interruptions.
+const progressOf = (start: number, track: () => Track): Animated.Value => {
+    const progress = new Animated.Value(start);
+    progress.addListener(({ value }) => {
+        if (track().progress === progress) track().at = value;
+    });
+    return progress;
+};
 
 const curve = (easing: string) => {
     const points = easingPoints(easing);
@@ -36,7 +53,7 @@ export const useAnimatedRecipe = (
         state,
     );
     const tracks = useRef(new Map<string, Track>());
-    const pending = useRef<[Track, Transition][]>([]);
+    const pending = useRef<Pending[]>([]);
 
     const out: Record<string, Record<string, unknown>> = {};
     for (const [slot, style] of Object.entries(styles)) {
@@ -49,20 +66,30 @@ export const useAnimatedRecipe = (
             const to = animatable(target);
             let track = tracks.current.get(key);
             if (!track) {
-                const progress = new Animated.Value(1);
-                track = { progress, from: to, to, at: 1 };
-                progress.addListener(({ value }) => {
-                    track!.at = value;
-                });
+                track = {
+                    progress: progressOf(1, () => track!),
+                    from: to,
+                    to,
+                    at: 1,
+                };
                 tracks.current.set(key, track);
             } else if (track.to !== to) {
-                // Start from what's on screen, so an interrupted change doesn't jump.
-                track.animation?.stop();
-                track.from = blend(track.from, track.to, track.at);
-                track.to = to;
-                track.at = 0;
-                track.progress.setValue(0);
-                pending.current.push([track, transition]);
+                // Start from what's on screen, so an interrupted change doesn't jump. A live
+                // animated value can't change during render (the views bound to it would
+                // update mid-render), so the change gets a new one, started after render, and
+                // the old one stops then.
+                const current = track;
+                pending.current.push({
+                    track: current,
+                    transition,
+                    previous: current.animation,
+                    previousProgress: current.progress,
+                });
+                current.from = blend(current.from, current.to, current.at);
+                current.to = to;
+                current.at = 0;
+                current.progress = progressOf(0, () => current);
+                current.animation = undefined;
             }
             if (interpolates(track.from, track.to)) {
                 animated[transition.property] = track.progress.interpolate({
@@ -76,7 +103,14 @@ export const useAnimatedRecipe = (
     }
 
     useLayoutEffect(() => {
-        for (const [track, transition] of pending.current.splice(0)) {
+        for (const {
+            track,
+            transition,
+            previous,
+            previousProgress,
+        } of pending.current.splice(0)) {
+            previous?.stop();
+            previousProgress.removeAllListeners();
             track.animation = Animated.timing(track.progress, {
                 toValue: 1,
                 duration: transition.duration,
