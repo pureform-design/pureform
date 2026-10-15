@@ -68,7 +68,9 @@ describe("slot conditions", () => {
 
     it("nests a case that needs every condition under the shorter one's base", () => {
         const color = recipe().base.label?.color as Record<string, unknown>;
-        expect(color[`.field__root${INVALID}${INVALID}${INVALID} &`]).toEqual({
+        expect(
+            color[`.field__root${INVALID}${INVALID}${INVALID}${INVALID} &`],
+        ).toEqual({
             base: "rgb(51 51 51)",
             [`.field__container${FOCUS}${FOCUS} &`]: "rgb(68 68 68)",
         });
@@ -79,5 +81,40 @@ describe("slot conditions", () => {
         expect(color).toHaveProperty([
             `.pf-field__container${FOCUS}${FOCUS} &`,
         ]);
+    });
+});
+
+describe("selected and pressed slot states", () => {
+    const chipLike = defineConfig({
+        tokens: {},
+        semanticTokens: {},
+        components: {
+            chipLike: defineSlotComponent({
+                name: "chipLike",
+                slots: ["root", "icon"],
+                structure: { root: ["icon"] },
+                recipe: {
+                    base: {
+                        icon: {
+                            color: when()
+                                .on(slot("root", "selected"), hex("#111"))
+                                .on(slot("root", "pressed"), hex("#222"))
+                                .else(hex("#000")),
+                        },
+                    },
+                },
+            }),
+        },
+    });
+
+    it("matches toggles and presses on the named slot", () => {
+        const recipes = compilePreset(chipLike).theme?.slotRecipes as Slots;
+        expect(recipes.chipLike?.base.icon?.color).toEqual({
+            base: "rgb(0 0 0)",
+            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [aria-checked=true], [data-selected]) &":
+                "rgb(17 17 17)",
+            ".chipLike__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &":
+                "rgb(34 34 34)",
+        });
     });
 });

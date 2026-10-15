@@ -59,7 +59,8 @@ const MEDIA_RULE: Record<string, string> = {
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
 // Repeating raises specificity, so a later state wins wherever Panda orders the rules: hover,
-// then focus, then invalid, then disabled. Each also takes a data attribute, for custom
+// filled, and selected, then focus, then pressed, then invalid, then disabled. Selected
+// combines with the later states through an AND case rather than outranking them. Each also takes a data attribute, for custom
 // controls and native-like bindings that set the state by hand.
 const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
     hover: { match: ":hover, [data-hover]", rank: 1 },
@@ -67,16 +68,21 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
         match: ":is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]",
         rank: 1,
     },
+    selected: {
+        match: "[aria-selected=true], [aria-pressed=true], [aria-checked=true], [data-selected]",
+        rank: 1,
+    },
     focusWithin: { match: ":focus-within, [data-focused]", rank: 2 },
     focusVisibleWithin: {
         match: ":focus-visible, :has(:focus-visible), [data-focus-visible]",
         rank: 2,
     },
+    pressed: { match: ":active, [data-pressed]", rank: 3 },
     invalid: {
         match: "[aria-invalid=true], :has([aria-invalid=true]), [data-invalid]",
-        rank: 3,
+        rank: 4,
     },
-    disabled: { match: ":disabled, :has(:disabled), [data-disabled]", rank: 4 },
+    disabled: { match: ":disabled, :has(:disabled), [data-disabled]", rank: 5 },
 };
 
 // The selector for a slot state: on the styled slot itself, or on an ancestor slot's class.
