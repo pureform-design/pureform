@@ -172,7 +172,8 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         [`insetInline${side}`]: px(0),
         width: pct(200),
         height: pct(100),
-        borderRadius: radius("full"),
+        // A circle, whatever the theme's corners, which a full radius follows.
+        borderRadius: pct(50),
         borderStyle: solid,
         borderWidth: ref("thickness"),
         borderColor: transparent,
@@ -209,7 +210,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                     position: relative,
                     width: ref("size"),
                     height: ref("size"),
-                    borderRadius: radius("full"),
+                    borderRadius: pct(50),
                 },
                 // The end half shows the first 50%, the start half the rest.
                 endHalf: half("End"),
