@@ -88,6 +88,7 @@ function Page(props: { controls: ReactNode }) {
     const [checked, setChecked] = useState(true);
     const [on, setOn] = useState(true);
     const [size, setSize] = useState("medium");
+    const [fit, setFit] = useState("Medium");
     const [item, setItem] = useState(0);
     const [progress, setProgress] = useState<number | undefined>(40);
     const [name, setName] = useState("");
@@ -292,8 +293,10 @@ function Page(props: { controls: ReactNode }) {
                     <View style={styles.field}>
                         <Select
                             label="Size"
-                            value="Medium"
-                            supportingText="Focus to open"
+                            value={fit}
+                            options={["Small", "Medium", "Large"]}
+                            onChange={setFit}
+                            supportingText="Pick a size"
                         />
                     </View>
                     <View style={styles.field}>

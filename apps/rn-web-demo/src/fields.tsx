@@ -5,9 +5,18 @@
 import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
 import { pressableState, useRecipe } from "@pureform/rn-adapter/react";
 import { useRef, useState } from "react";
-import { Animated, TextInput } from "react-native";
+import type { Ref } from "react";
+import {
+    Animated,
+    Modal,
+    Pressable,
+    StyleSheet,
+    TextInput,
+    View,
+} from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
+import { Menu } from "./navigation";
 import {
     AnimatedPressable,
     Glyph,
@@ -18,6 +27,18 @@ import {
 } from "./parts";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
+
+// A view, read for where it sits on screen.
+interface Measurable {
+    measureInWindow: (
+        done: (
+            left: number,
+            top: number,
+            width: number,
+            height: number,
+        ) => void,
+    ) => void;
+}
 
 interface FieldProps {
     label: string;
@@ -35,9 +56,13 @@ function Field(
     props: FieldProps & {
         name: "textField" | "textArea" | "select";
         lines?: number;
+        /** A select's menu is open: the field shows focus and turns its arrow. */
+        expanded?: boolean;
+        container?: Ref<Measurable>;
     },
 ) {
-    const [focused, setFocused] = useState(false);
+    const [ownFocus, setFocused] = useState(false);
+    const focused = ownFocus || (props.expanded ?? false);
     const s = useAnimatedRecipe(
         props.name,
         {
@@ -51,12 +76,15 @@ function Field(
             filled: props.value !== "",
             invalid: props.invalid ?? false,
             disabled: props.disabled ?? false,
-            expanded: props.name === "select" && focused,
+            expanded: props.expanded ?? false,
         },
     );
     return (
         <Animated.View style={aview(s.root)}>
-            <Animated.View style={aview(s.container)}>
+            <Animated.View
+                ref={props.container as never}
+                style={aview(s.container)}
+            >
                 {props.leading && (
                     <Animated.View style={aview(s.leadingIcon)}>
                         <Glyph style={s.leadingIcon} glyph={props.leading} />
@@ -109,9 +137,69 @@ export const TextArea = (props: FieldProps & { lines?: number }) => (
 
 /** A select: a read-only field whose trailing arrow turns while it has focus, standing in
  *  for an open menu. */
-export const Select = (props: Omit<FieldProps, "trailing" | "onChange">) => (
-    <Field {...props} name="select" trailing="▾" onChange={() => {}} />
-);
+/** A select: pressing the field opens a menu of its options below it, over the page, and
+ *  choosing one closes it. The arrow turns while it's open. */
+export function Select(
+    props: Omit<FieldProps, "trailing" | "onChange"> & {
+        options: string[];
+        onChange: (value: string) => void;
+    },
+) {
+    const { options, onChange, ...field } = props;
+    const [menu, setMenu] = useState<{
+        left: number;
+        top: number;
+        width: number;
+    }>();
+    const container = useRef<Measurable>(null);
+    const open = () =>
+        container.current?.measureInWindow((left, top, width, height) =>
+            setMenu({ left, top: top + height, width }),
+        );
+    return (
+        <View>
+            <Field
+                {...field}
+                name="select"
+                trailing="▾"
+                onChange={() => {}}
+                expanded={menu !== undefined}
+                container={container}
+            />
+            <Pressable
+                role="combobox"
+                aria-label={props.label}
+                aria-expanded={menu !== undefined}
+                disabled={props.disabled}
+                onPress={open}
+                style={StyleSheet.absoluteFill}
+            />
+            <Modal
+                transparent
+                visible={menu !== undefined}
+                onRequestClose={() => setMenu(undefined)}
+            >
+                <Pressable
+                    aria-label="Close"
+                    style={StyleSheet.absoluteFill}
+                    onPress={() => setMenu(undefined)}
+                />
+                {menu && (
+                    <View style={{ position: "absolute", ...menu }}>
+                        <Menu
+                            items={options.map((label) => ({ label }))}
+                            value={options.indexOf(props.value)}
+                            onChange={(index) => {
+                                onChange(options[index]!);
+                                setMenu(undefined);
+                            }}
+                        />
+                    </View>
+                )}
+            </Modal>
+        </View>
+    );
+}
 
 export function SearchBar(props: {
     value: string;
