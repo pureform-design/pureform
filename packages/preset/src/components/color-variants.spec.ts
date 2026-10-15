@@ -2,9 +2,12 @@ import { describe, expect, it } from "vitest";
 
 import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
+import { createListItem } from "./list-item";
+import { createMenu } from "./menu";
 import { createRadio } from "./radio";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
+import { createTabs } from "./tabs";
 import { createTextArea } from "./text-area";
 import { createTextField } from "./text-field";
 
@@ -17,6 +20,9 @@ describe.each([
     ["chip", createChip],
     ["textField", createTextField],
     ["textArea", createTextArea],
+    ["listItem", createListItem],
+    ["menu", createMenu],
+    ["tabs", createTabs],
 ] as const)("%s color", (_, create) => {
     const spec = create(GROUPS);
 

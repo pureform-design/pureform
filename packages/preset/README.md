@@ -144,11 +144,13 @@ trailing icon or text. Mark a selected row with `aria-selected="true"`.
 - `listItem`: `lines` is `one`, `two`, or `three`. Set `interactive` when the item is
   clickable; it then takes a state layer and the focus ring.
 - `menu`: items are always interactive. Separate groups with the `separator` component.
+- `color` (both): a group's container fills the selected row. With no color, a selected row
+  keeps Material's secondary container.
 
 ## Tabs
 
 Mark the current tab with `aria-selected="true"`. `variant` is `primary` or `secondary`; turn
-on `icon` when the tabs have icons.
+on `icon` when the tabs have icons. `color` sets the indicator and a primary tab's active label.
 
 ```html
 <div class="{root}" role="tablist">

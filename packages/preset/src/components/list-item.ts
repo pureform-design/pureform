@@ -19,7 +19,14 @@ import { defineSlotComponent } from "@pureform/core";
 import { column, flex, pct, px, start } from "@pureform/core/ast";
 import { spacing, textStyle } from "@pureform/theme";
 
-import { rowParts, rowTokens } from "./list";
+import { rowGroupColors, rowParts, rowTokens } from "./list";
+import {
+    COLOR_GROUPS,
+    DEFAULT_GROUP,
+    colorVariant,
+    groupRoles,
+} from "./shared";
+import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = rowTokens("listItem", {
     paddingInline: spacing("4"),
@@ -35,71 +42,101 @@ const lines = (height: "heightOne" | "heightTwo" | "heightThree") => ({
     root: { minHeight: ref(height) },
 });
 
-export const listItem = defineSlotComponent({
-    name: "listItem",
-    $meta: {
-        description:
-            "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or data-selected.",
-    },
-    tokens,
-    slots: [
-        "root",
-        "leading",
-        "content",
-        "overline",
-        "headline",
-        "supportingText",
-        "trailing",
-        "trailingText",
-    ],
-    structure: {
-        root: ["leading", "content", "trailing", "trailingText"],
-        content: ["overline", "headline", "supportingText"],
-    },
-    recipe: {
-        base: {
-            root: {
-                ...parts.row,
-                gap: ref("gap"),
-                paddingInlineStart: ref("paddingInline"),
-                paddingInlineEnd: ref("paddingInline"),
-                paddingBlockStart: spacing("2"),
-                paddingBlockEnd: spacing("2"),
-            },
-            leading: parts.leading,
-            content: {
-                display: flex,
-                flexDirection: column,
-                width: pct(100),
-            },
-            overline: {
-                textStyle: textStyle("labelSmall"),
-                color: parts.supportingText.color,
-            },
-            headline: { textStyle: textStyle("bodyLarge") },
-            supportingText: parts.supportingText,
-            trailing: parts.trailing,
-            trailingText: parts.trailingText("labelSmall"),
+/** Build the list item with a `color` variant per group in `groups`. A group colors the
+ *  selected item and its parts with the group's container; at rest, every item is neutral. */
+export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
+    defineSlotComponent({
+        name: "listItem",
+        $meta: {
+            description:
+                "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or data-selected.",
         },
-        variants: {
-            lines: {
-                one: lines("heightOne"),
-                two: lines("heightTwo"),
-                // Material tops the leading and trailing parts in a three-line item.
-                three: {
-                    root: {
-                        minHeight: ref("heightThree"),
-                        alignItems: start,
-                        paddingBlockStart: spacing("3"),
-                        paddingBlockEnd: spacing("3"),
+        tokens,
+        slots: [
+            "root",
+            "leading",
+            "content",
+            "overline",
+            "headline",
+            "supportingText",
+            "trailing",
+            "trailingText",
+        ],
+        structure: {
+            root: ["leading", "content", "trailing", "trailingText"],
+            content: ["overline", "headline", "supportingText"],
+        },
+        recipe: {
+            base: {
+                root: {
+                    ...parts.row,
+                    gap: ref("gap"),
+                    paddingInlineStart: ref("paddingInline"),
+                    paddingInlineEnd: ref("paddingInline"),
+                    paddingBlockStart: spacing("2"),
+                    paddingBlockEnd: spacing("2"),
+                },
+                leading: parts.leading,
+                content: {
+                    display: flex,
+                    flexDirection: column,
+                    width: pct(100),
+                },
+                overline: {
+                    textStyle: textStyle("labelSmall"),
+                    color: parts.supportingText.color,
+                },
+                headline: { textStyle: textStyle("bodyLarge") },
+                supportingText: parts.supportingText,
+                trailing: parts.trailing,
+                trailingText: parts.trailingText("labelSmall"),
+            },
+            variants: {
+                lines: {
+                    one: lines("heightOne"),
+                    two: lines("heightTwo"),
+                    // Material tops the leading and trailing parts in a three-line item.
+                    three: {
+                        root: {
+                            minHeight: ref("heightThree"),
+                            alignItems: start,
+                            paddingBlockStart: spacing("3"),
+                            paddingBlockEnd: spacing("3"),
+                        },
                     },
                 },
+                interactive: {
+                    true: { root: parts.interactive },
+                    false: {},
+                },
+                color: colorVariant(groups, (g) => {
+                    const c = rowGroupColors(ref, "root", g);
+                    return {
+                        root: c.row,
+                        leading: c.leading,
+                        trailing: c.trailing,
+                        overline: c.supportingText,
+                        supportingText: c.supportingText,
+                    };
+                }),
             },
-            interactive: {
-                true: { root: parts.interactive },
-                false: {},
+            // An interactive item's selected colors sit in the interactive variant, so a compound
+            // variant per group replaces them in the later layer.
+            compoundVariants: groups
+                .filter((group) => group !== DEFAULT_GROUP)
+                .map((group) => ({
+                    match: { interactive: "true", color: group },
+                    style: {
+                        root: rowGroupColors(ref, "root", groupRoles(group))
+                            .interactive,
+                    },
+                })),
+            defaultVariants: {
+                lines: "one",
+                interactive: "false",
+                color: DEFAULT_GROUP,
             },
         },
-        defaultVariants: { lines: "one", interactive: "false" },
-    },
-});
+    });
+
+export const listItem = createListItem();

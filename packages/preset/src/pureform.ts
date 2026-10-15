@@ -49,15 +49,15 @@ import { dialog } from "./components/dialog";
 import { createFab } from "./components/fab";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
-import { listItem } from "./components/list-item";
-import { menu } from "./components/menu";
+import { createListItem } from "./components/list-item";
+import { createMenu } from "./components/menu";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { separator } from "./components/separator";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
-import { tabs } from "./components/tabs";
+import { createTabs } from "./components/tabs";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
@@ -275,9 +275,9 @@ export const pureform = <
         radio: createRadio(theme.color.groups),
         switchControl: createSwitch(theme.color.groups),
         separator,
-        listItem,
-        menu,
-        tabs,
+        listItem: createListItem(theme.color.groups),
+        menu: createMenu(theme.color.groups),
+        tabs: createTabs(theme.color.groups),
         dialog,
         card,
         scrim,

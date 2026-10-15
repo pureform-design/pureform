@@ -167,8 +167,118 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
   },
   "className": "listItem",
-  "compoundVariants": [],
+  "compoundVariants": [
+    {
+      "color": "secondary",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
+              "base": "token(colors.secondaryContainer)",
+            },
+            "color": "token(colors.onSecondaryContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+    {
+      "color": "tertiary",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
+              "base": "token(colors.tertiaryContainer)",
+            },
+            "color": "token(colors.onTertiaryContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+    {
+      "color": "success",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "base": "token(colors.successContainer)",
+            },
+            "color": "token(colors.onSuccessContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+    {
+      "color": "warning",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "base": "token(colors.warningContainer)",
+            },
+            "color": "token(colors.onWarningContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+    {
+      "color": "error",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "base": "token(colors.errorContainer)",
+            },
+            "color": "token(colors.onErrorContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+    {
+      "color": "info",
+      "css": {
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
+              "base": "token(colors.infoContainer)",
+            },
+            "color": "token(colors.onInfoContainer)",
+          },
+        },
+      },
+      "interactive": true,
+    },
+  ],
   "defaultVariants": {
+    "color": "primary",
     "interactive": false,
     "lines": "one",
   },
@@ -186,6 +296,225 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "trailingText",
   ],
   "variants": {
+    "color": {
+      "error": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.errorContainer)",
+            "color": "token(colors.onErrorContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "info": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.infoContainer)",
+            "color": "token(colors.onInfoContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.secondaryContainer)",
+            "color": "token(colors.onSecondaryContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "success": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.successContainer)",
+            "color": "token(colors.onSuccessContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "tertiary": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.tertiaryContainer)",
+            "color": "token(colors.onTertiaryContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "warning": {
+        "leading": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "overline": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "root": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": "token(colors.warningContainer)",
+            "color": "token(colors.onWarningContainer)",
+          },
+        },
+        "supportingText": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "trailing": {
+          "color": {
+            ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+    },
     "interactive": {
       "false": {},
       "true": {
@@ -353,7 +682,9 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
   },
   "className": "menu",
   "compoundVariants": [],
-  "defaultVariants": {},
+  "defaultVariants": {
+    "color": "primary",
+  },
   "jsx": [
     "Menu",
   ],
@@ -365,7 +696,179 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "itemTrailing",
     "itemTrailingText",
   ],
-  "variants": {},
+  "variants": {
+    "color": {
+      "error": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "base": "token(colors.errorContainer)",
+            },
+            "color": "token(colors.onErrorContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "info": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
+              "base": "token(colors.infoContainer)",
+            },
+            "color": "token(colors.onInfoContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
+              "base": "token(colors.secondaryContainer)",
+            },
+            "color": "token(colors.onSecondaryContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "success": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "base": "token(colors.successContainer)",
+            },
+            "color": "token(colors.onSuccessContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "tertiary": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
+              "base": "token(colors.tertiaryContainer)",
+            },
+            "color": "token(colors.onTertiaryContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "warning": {
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "base": "token(colors.warningContainer)",
+            },
+            "color": "token(colors.onWarningContainer)",
+          },
+        },
+        "itemLeading": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "itemTrailing": {
+          "color": {
+            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+    },
+  },
 }
 `;
 
@@ -455,6 +958,162 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
   "className": "tabs",
   "compoundVariants": [
     {
+      "color": "secondary",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
+      "color": "tertiary",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
+      "color": "success",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
+      "color": "warning",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
+      "color": "error",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
+      "color": "info",
+      "css": {
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "variant": "secondary",
+    },
+    {
       "css": {
         "tab": {
           "flexDirection": "column",
@@ -467,6 +1126,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     },
   ],
   "defaultVariants": {
+    "color": "primary",
     "icon": false,
     "variant": "primary",
   },
@@ -481,6 +1141,159 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     "indicator",
   ],
   "variants": {
+    "color": {
+      "error": {
+        "indicator": {
+          "backgroundColor": "token(colors.error)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.error)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "info": {
+        "indicator": {
+          "backgroundColor": "token(colors.info)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.info)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "indicator": {
+          "backgroundColor": "token(colors.secondary)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.secondary)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "success": {
+        "indicator": {
+          "backgroundColor": "token(colors.success)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.success)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "tertiary": {
+        "indicator": {
+          "backgroundColor": "token(colors.tertiary)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.tertiary)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+      "warning": {
+        "indicator": {
+          "backgroundColor": "token(colors.warning)",
+        },
+        "tab": {
+          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.stateHover))",
+              "base": "var(--components-tabs-container, token(colors.surface))",
+            },
+            "color": "token(colors.warning)",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-tabs-container, token(colors.surface))",
+          },
+          "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+    },
     "icon": {
       "false": {},
       "true": {},

@@ -54,11 +54,21 @@ export const rowTokens = <K extends string = never>(
     extra: Record<K, ValueNode> = {} as Record<K, ValueNode>,
 ) => componentTokens<RowToken | K>(name, { ...ROW_TOKENS, ...extra });
 
+/** The colors a selected row takes: its tokens by default, or a color group's container. */
+export interface RowSelected {
+    container: ColorValue;
+    content: ColorValue;
+}
+
 /** The styles of a row's parts, over its tokens. `rowSlot` names the row's slot, which the
  *  parts read their state from. */
 export const rowParts = (
     ref: (token: RowToken) => AliasNode,
     rowSlot: string,
+    selectedColors: RowSelected = {
+        container: ref("selectedContainer"),
+        content: ref("selectedContent"),
+    },
 ) => {
     const selected = slot(rowSlot, "selected");
     const disabled = slot(rowSlot, "disabled");
@@ -66,7 +76,7 @@ export const rowParts = (
     // A part's color: its own at rest, the selected content once selected, dimmed if disabled.
     const partColor = (rest: ColorValue) =>
         when()
-            .on(selected, ref("selectedContent"))
+            .on(selected, selectedColors.content)
             .on(disabled, disabledColor("disabledContent"))
             .else(rest);
 
@@ -80,8 +90,8 @@ export const rowParts = (
         color: ref("content"),
         states: {
             selected: {
-                backgroundColor: ref("selectedContainer"),
-                color: ref("selectedContent"),
+                backgroundColor: selectedColors.container,
+                color: selectedColors.content,
             },
             disabled: { color: disabledColor("disabledContent") },
         },
@@ -98,10 +108,10 @@ export const rowParts = (
         states: {
             selected: {
                 backgroundColor: stateLayer({
-                    base: ref("selectedContainer"),
-                    content: ref("selectedContent"),
+                    base: selectedColors.container,
+                    content: selectedColors.content,
                 }),
-                color: ref("selectedContent"),
+                color: selectedColors.content,
             },
             disabled: {
                 pointerEvents: none,
@@ -133,4 +143,28 @@ export const rowParts = (
             color: partColor(ref("supportingColor")),
         } satisfies StyleMap,
     };
+};
+
+/** A row's colors in a color group: the selected container and content, on the row and its
+ *  parts. */
+export const rowGroupColors = (
+    ref: (token: RowToken) => AliasNode,
+    rowSlot: string,
+    group: { container: ColorValue; onContainer: ColorValue },
+) => {
+    const p = rowParts(ref, rowSlot, {
+        container: group.container,
+        content: group.onContainer,
+    });
+    const color = (style: StyleMap): StyleMap =>
+        style.color === undefined ? {} : { color: style.color };
+    return {
+        row: { states: { selected: p.row.states?.selected ?? {} } },
+        interactive: {
+            states: { selected: p.interactive.states?.selected ?? {} },
+        },
+        leading: color(p.leading),
+        trailing: color(p.trailing),
+        supportingText: color(p.supportingText),
+    } satisfies Record<string, StyleMap>;
 };
