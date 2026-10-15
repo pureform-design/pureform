@@ -153,8 +153,11 @@ function createPredicateFromDependencyOption(
     dependencies: Record<string, string>,
 ) {
     if (typeof option === "boolean") {
-        const keys = new Set(Object.keys(dependencies));
-        return (id: string) => option && keys.has(id);
+        const keys = Object.keys(dependencies);
+        // A dependency's subpaths (`pkg/sub`) are the dependency too.
+        return (id: string) =>
+            option &&
+            keys.some((key) => id === key || id.startsWith(`${key}/`));
     }
 
     if (Array.isArray(option)) {
