@@ -46,13 +46,48 @@ export interface Animation {
     }[];
 }
 
+/** A slot's clip shape, which selection returns beside its style for an SVG to draw. */
+export const SHAPE = "clipPath";
+
+/** A point of a shape: its coordinates, which may mix pixels and percentages of the box. */
+export type ShapePoint = [x: Value, y: Value];
+
+/** A shape's closed contours, as the core's shape nodes give them. */
+export interface ShapeValue {
+    fillRule?: "evenodd";
+    contours: {
+        from: ShapePoint;
+        segments: (
+            | { op: "line"; to: ShapePoint }
+            | { op: "curve"; to: ShapePoint; c1: ShapePoint; c2: ShapePoint }
+        )[];
+    }[];
+}
+
+/** A linear or radial gradient. A stop's position may mix pixels and percentages of the
+ *  gradient's length, so it's placed once the box's size is known. */
+export interface GradientValue {
+    kind: "linear" | "radial";
+    /** A linear gradient's direction, in degrees: 180 runs top to bottom, as in CSS. */
+    angle?: Value;
+    /** How far a radial gradient reaches. */
+    extent?:
+        | "closest-side"
+        | "closest-corner"
+        | "farthest-side"
+        | "farthest-corner";
+    stops: { color: Value; at?: Value }[];
+}
+
 export type Expr =
     | { $ref: string }
     | { $dyn: string; default?: Value }
     | { $mix: [base: Value, over: Value, amount: Value]; space?: MixSpace }
     | { $calc: "+" | "-" | "*" | "/"; args: Value[] }
     | { $math: "min" | "max" | "clamp"; args: Value[] }
-    | { $shadow: ShadowLayer[] };
+    | { $shadow: ShadowLayer[] }
+    | { $shape: ShapeValue }
+    | { $gradient: GradientValue };
 
 export interface ShadowLayer {
     x: Value;
@@ -185,6 +220,21 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
         );
     }
     const concrete = (v: Value) => evaluate(v, theme) as Concrete;
+    // Shapes and gradients keep their arithmetic, since percentages wait for the box: only
+    // their tokens are read, and the result is a plain object, no longer an expression.
+    if ("$shape" in value)
+        return tokensIn(value.$shape as unknown as Value, theme);
+    if ("$gradient" in value) {
+        const { stops, angle, ...rest } = value.$gradient;
+        return {
+            ...rest,
+            ...(angle === undefined ? {} : { angle: concrete(angle) }),
+            stops: stops.map(({ color, at }) => ({
+                color: deferred(color, theme),
+                ...(at === undefined ? {} : { at: tokensIn(at, theme) }),
+            })),
+        } as Value;
+    }
     if ("$ref" in value) {
         const found = theme[value.$ref];
         if (found === undefined)
@@ -248,6 +298,68 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
                 .join(" "),
         )
         .join(", ");
+};
+
+const CURRENT = "currentColor";
+
+const mentions = (value: Value, what: string): boolean =>
+    value === what ||
+    (typeof value === "object" &&
+        Object.values(value).some((v) => mentions(v as Value, what)));
+
+// A color, or, where it mixes with the current color, the mix with its tokens read, for
+// `colorWith` to finish where the current color is known.
+const deferred = (value: Value, theme: ThemeValues): Value => {
+    const read = tokensIn(value, theme);
+    return mentions(read, CURRENT) ? read : evaluate(read, theme);
+};
+
+/** A color that may mix with the current color, given it. */
+export const colorWith = (value: Value, current: string): string => {
+    const swap = (v: Value): Value =>
+        v === CURRENT
+            ? current
+            : typeof v !== "object"
+              ? v
+              : Array.isArray(v)
+                ? v.map(swap)
+                : Object.fromEntries(
+                      Object.entries(v).map(([key, inner]) => [
+                          key,
+                          swap(inner),
+                      ]),
+                  );
+    return String(evaluate(swap(value), {}));
+};
+
+// A value with its tokens read and its arithmetic kept.
+const tokensIn = (value: Value, theme: ThemeValues): Value => {
+    if (typeof value !== "object") return value;
+    if (Array.isArray(value)) return value.map((v) => tokensIn(v, theme));
+    if ("$ref" in value || "$dyn" in value) return evaluate(value, theme);
+    return Object.fromEntries(
+        Object.entries(value).map(([key, v]) => [key, tokensIn(v, theme)]),
+    );
+};
+
+/** A length that may mix pixels and percentages (of `size`), in pixels. */
+export const pixels = (value: Value, size: number): number => {
+    const sized = (v: Value): Value => {
+        if (typeof v === "string" && v.endsWith("%")) {
+            return (Number.parseFloat(v) / 100) * size;
+        }
+        if (isPercentOffset(v)) return (v.percent / 100) * size + v.offset;
+        if (typeof v !== "object") return v;
+        if (Array.isArray(v)) return v.map(sized);
+        return Object.fromEntries(
+            Object.entries(v).map(([key, inner]) => [key, sized(inner)]),
+        );
+    };
+    const out = evaluate(sized(value), {});
+    const n = typeof out === "number" ? out : Number.parseFloat(String(out));
+    if (Number.isNaN(n))
+        throw new Error(`not a length: ${JSON.stringify(value)}`);
+    return n;
 };
 
 /** The tokens and component tokens a value reads. */

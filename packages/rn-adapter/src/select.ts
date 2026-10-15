@@ -7,8 +7,14 @@
 
 import type { ComponentStyles } from "./lower";
 import { compositeOver, formatColor, parseColor } from "./rgba";
-import { ANIMATION, TINT, TRANSITION, isPercentOffset } from "./values";
-import type { Animation, Transition, Value } from "./values";
+import { ANIMATION, SHAPE, TINT, TRANSITION, isPercentOffset } from "./values";
+import type {
+    Animation,
+    GradientValue,
+    ShapeValue,
+    Transition,
+    Value,
+} from "./values";
 
 /** A component's state. Pressable reports the interaction states, props the rest. */
 export interface State {
@@ -32,6 +38,18 @@ export interface State {
     scheme?: "light" | "dark";
     /** The window's width, for viewport conditions. Without it, none of them hold. */
     width?: number;
+    /** Whether the app draws with SVG, for shapes and gradients. Without it, components take
+     *  their rounded fallback and gradients drop. */
+    svg?: boolean;
+}
+
+/** What a slot draws with SVG, under its content: its fill color clipped to its shape, where
+ *  it has one, and a gradient over it. */
+export interface Drawing {
+    shape?: ShapeValue;
+    /** The fill under the gradient, moved off the view's background to follow the shape. */
+    fill?: string;
+    gradient?: GradientValue;
 }
 
 export type Style = Record<string, Value>;
@@ -163,6 +181,8 @@ export interface Selected {
     animations: Record<string, Animation>;
     /** Each slot's parent slot, where it has one. */
     parents: Record<string, string>;
+    /** What each slot draws with SVG, where it draws anything. Only with the `svg` state. */
+    drawings: Record<string, Drawing>;
 }
 
 /** A component's style per slot (or its one style under `""`, without slots) for variants and
@@ -241,6 +261,7 @@ export const selectWithTransitions = (
         if (!children.has(slot)) visit(slot);
     const transitions: Record<string, Transition[]> = {};
     const animations: Record<string, Animation> = {};
+    const drawings: Record<string, Drawing> = {};
     for (const [slot, style] of Object.entries(styles)) {
         const own = style[TRANSITION];
         delete style[TRANSITION];
@@ -256,7 +277,26 @@ export const selectWithTransitions = (
         transitions[slot] = Array.isArray(own)
             ? (own as unknown as Transition[])
             : [];
+        const shape = style[SHAPE] as ShapeValue | undefined;
+        delete style[SHAPE];
+        const tint = style[TINT];
+        const gradient =
+            typeof tint === "object" && tint !== null && "stops" in tint
+                ? (tint as unknown as GradientValue)
+                : undefined;
+        if (gradient) delete style[TINT];
         settle(style);
+        if (state.svg && (shape || gradient)) {
+            const drawing: Drawing = {};
+            if (shape) {
+                drawing.shape = shape;
+                const fill = style.backgroundColor;
+                if (typeof fill === "string") drawing.fill = fill;
+                delete style.backgroundColor;
+            }
+            if (gradient) drawing.gradient = gradient;
+            drawings[slot] = drawing;
+        }
     }
     const parents: Record<string, string> = {};
     for (const [parent, children] of Object.entries(
@@ -264,5 +304,5 @@ export const selectWithTransitions = (
     )) {
         for (const child of children) parents[child] = parent;
     }
-    return { styles, transitions, animations, parents };
+    return { styles, transitions, animations, parents, drawings };
 };

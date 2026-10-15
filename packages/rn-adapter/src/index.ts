@@ -26,7 +26,7 @@ export type {
     Templates,
 } from "./resolve";
 export { select, selectWithTransitions } from "./select";
-export type { Selected, State, Style } from "./select";
+export type { Drawing, Selected, State, Style } from "./select";
 export { resolveTheme } from "./theme";
 export type { Scheme, ThemeOptions } from "./theme";
 export { dependencies, evaluate, isExpr } from "./values";

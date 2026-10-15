@@ -125,12 +125,11 @@ const RENAMED: Record<string, RnStyleKey> = {
     maxBlockSize: "maxHeight",
 };
 
-/** Properties with no React Native style: motion belongs to the components, shapes need SVG,
- *  and the rest are web-only. They're dropped without a diagnostic. */
+/** Properties with no React Native style: motion belongs to the components, and the rest are
+ *  web-only. They're dropped without a diagnostic. */
 const DROPPED = new Set([
     "transition",
     "animation",
-    "clipPath",
     "cornerShape",
     "resize",
     "fieldSizing",

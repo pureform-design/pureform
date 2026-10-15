@@ -22,7 +22,7 @@ import { PERCENT_OK, rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
 import { MIX_SPACES } from "./spaces";
 import type { MixSpace } from "./spaces";
-import { ANIMATION, TINT, TRANSITION } from "./values";
+import { ANIMATION, SHAPE, TINT, TRANSITION } from "./values";
 import type { Value } from "./values";
 
 /** Options for lowering. */
@@ -99,8 +99,9 @@ const SLOT_STATE: Record<string, string> = {
     focusVisibleWithin: "focusVisible",
 };
 
-// Features React Native never has, so their cases never apply.
-const NEVER = new Set(["clipShape", "cornerShape"]);
+// Features React Native never has, so their cases never apply. Clipping to a shape is the
+// `svg` state's, which an app turns on when it draws with SVG.
+const NEVER = new Set(["cornerShape"]);
 
 /** A condition as states, `null` when it never holds, or `[]` when it always does. */
 const conditionStates = (
@@ -109,6 +110,8 @@ const conditionStates = (
 ): { when: string[]; specificity: number } | null => {
     if (typeof condition === "string") {
         if (NEVER.has(condition)) return null;
+        // A feature query adds no specificity in CSS.
+        if (condition === "clipShape") return { when: ["svg"], specificity: 0 };
         if (ctx.scheme && (condition === "dark" || condition === "light")) {
             return condition === ctx.scheme
                 ? { when: [], specificity: 0 }
@@ -445,7 +448,7 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         }
         case "gradient": {
             // A gradient of one color is a layer of that color, as Material paints elevation
-            // tints, which the background color can take.
+            // tints, which the background color can take. Others are drawn with SVG.
             const [first, ...rest] = node.stops;
             const same = JSON.stringify(first?.color);
             if (
@@ -455,8 +458,78 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
             ) {
                 return lowerNode(first.color, ctx);
             }
-            throw new Unsupported(
-                "no React Native gradients; only one-color layers",
+            if (node.kind === "conic") {
+                throw new Unsupported("no conic gradients, even with SVG");
+            }
+            const { kind, extent } = node;
+            const parts: ValueNode[] = [
+                ...(node.angle ? [node.angle] : []),
+                ...node.stops.flatMap((stop) => [
+                    stop.color,
+                    ...(stop.position ? [stop.position] : []),
+                ]),
+            ];
+            return product(
+                parts.map((n) => lowerNode(n, ctx)),
+                (values) => {
+                    let i = 0;
+                    const angle = node.angle ? values[i++] : undefined;
+                    return {
+                        $gradient: {
+                            kind,
+                            ...(angle === undefined ? {} : { angle }),
+                            ...(extent ? { extent } : {}),
+                            stops: node.stops.map((stop) => ({
+                                color: values[i++]!,
+                                ...(stop.position ? { at: values[i++]! } : {}),
+                            })),
+                        },
+                    };
+                },
+            );
+        }
+        case "shape": {
+            const points = node.contours.flatMap((contour) => [
+                contour.from,
+                ...contour.segments.flatMap((segment) =>
+                    segment.op === "line"
+                        ? [segment.to]
+                        : [segment.c1, segment.c2, segment.to],
+                ),
+            ]);
+            return product(
+                points.flat().map((n) => lowerNode(n as ValueNode, ctx)),
+                (values) => {
+                    let i = 0;
+                    const point = (): [Value, Value] => [
+                        values[i++]!,
+                        values[i++]!,
+                    ];
+                    return {
+                        $shape: {
+                            ...(node.fillRule === "evenodd"
+                                ? { fillRule: "evenodd" as const }
+                                : {}),
+                            contours: node.contours.map((contour) => ({
+                                from: point(),
+                                segments: contour.segments.map((segment) => {
+                                    if (segment.op === "line") {
+                                        return {
+                                            op: "line" as const,
+                                            to: point(),
+                                        };
+                                    }
+                                    const [c1, c2, to] = [
+                                        point(),
+                                        point(),
+                                        point(),
+                                    ];
+                                    return { op: "curve" as const, c1, c2, to };
+                                }),
+                            })),
+                        },
+                    };
+                },
             );
         }
         case "easing":
@@ -590,7 +663,9 @@ const lowerStyle = (
                     ? ANIMATION
                     : property === "filter"
                       ? "boxShadow"
-                      : rnProperty(property);
+                      : property === "clipPath"
+                        ? SHAPE
+                        : rnProperty(property);
         if (rn === null) continue;
         if (rn === undefined) {
             diagnostics.add(
@@ -606,6 +681,7 @@ const lowerStyle = (
                 // A percentage React Native would ignore on the device.
                 if (
                     rn !== TINT &&
+                    rn !== SHAPE &&
                     rn !== TRANSITION &&
                     rn !== ANIMATION &&
                     !PERCENT_OK.has(rn) &&

@@ -6,6 +6,7 @@ import {
     colorMix,
     dynamic,
     inlineFlex,
+    conicGradient,
     linearGradient,
     oklch,
     pct,
@@ -379,12 +380,13 @@ describe("lowerRn conditions", () => {
         ]);
     });
 
-    it("takes the fallback where React Native can't clip to a shape", () => {
+    it("clips to a shape under the svg state, and takes the fallback without it", () => {
         const { rules } = rulesOf({
             borderRadius: when("clipShape", px(0), px(12)),
         } as StyleMap);
         expect(rules).toEqual([
             { when: [], specificity: 0, style: { borderRadius: 12 } },
+            { when: ["svg"], specificity: 0, style: { borderRadius: 0 } },
         ]);
     });
 
@@ -461,7 +463,7 @@ describe("lowerRn diagnostics", () => {
                 px(10),
                 px(5),
             ),
-            backgroundImage: linearGradient([
+            backgroundImage: conicGradient([
                 stop(rgb(0, 0, 0)),
                 stop(rgb(9, 9, 9)),
             ]),
@@ -470,7 +472,7 @@ describe("lowerRn diagnostics", () => {
         expect(rules).toEqual([]);
         expect(diagnostics).toEqual([
             "box: width: no React Native equivalent for a containerSize condition",
-            "box: backgroundImage: no React Native gradients; only one-color layers",
+            "box: backgroundImage: no conic gradients, even with SVG",
             'box: no React Native property for "gridTemplateColumns"',
         ]);
     });
