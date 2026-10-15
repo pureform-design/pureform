@@ -1,4 +1,5 @@
 import {
+    avatar,
     button,
     card,
     checkbox,
@@ -40,6 +41,11 @@ export const Route = createFileRoute("/")({
 });
 
 const FILLS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
+// A wide picture, so the avatar shows it cropped to fill.
+const PORTRAIT = `data:image/svg+xml,${encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="60"><rect width="120" height="60" fill="#7aa6c2"/><circle cx="90" cy="18" r="10" fill="#f4d35e"/><path d="M0 60 40 22l30 30 20-14 30 22z" fill="#386641"/></svg>',
+)}`;
+
 const ICON_FILLS = [
     "filled",
     "tonal",
@@ -713,6 +719,35 @@ function IndexRoute() {
                             );
                         }}
                     </For>
+                </div>
+
+                <div style={{ ...row, "align-items": "center" }}>
+                    <For
+                        each={
+                            [
+                                ["small", "none", "primary"],
+                                ["medium", "circle", "secondary"],
+                                ["medium", "cookie9Sided", "tertiary"],
+                                ["large", "clover4Leaf", "success"],
+                                ["large", "arch", "warning"],
+                            ] as const
+                        }
+                    >
+                        {([size, shape, color]) => (
+                            <span
+                                class={avatar({ size, shape, color })}
+                                role="img"
+                                aria-label="Ada Lovelace"
+                            >
+                                AL
+                            </span>
+                        )}
+                    </For>
+                    <img
+                        class={avatar({ size: "large", shape: "sunny" })}
+                        src={PORTRAIT}
+                        alt="A landscape, cropped to fill the avatar"
+                    />
                 </div>
             </section>
 

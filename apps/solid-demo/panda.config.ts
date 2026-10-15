@@ -40,6 +40,7 @@ export default defineConfig({
             scrim: ["*"],
             ripple: ["*"],
             fab: ["*"],
+            avatar: ["*"],
             chip: ["*"],
             textField: ["*"],
             textArea: ["*"],
