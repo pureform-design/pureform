@@ -2375,8 +2375,13 @@ const button = pf.slotComponent({
 - **Compatibility.** The helpers build the same nodes and specs as the untyped API, which stays
   where it is; `@pureform/core/raw` and `@pureform/core/ast/raw` re-export it for files that opt
   out explicitly. `dynamic()` stays untyped, since its path names a new runtime var rather than
-  pointing into the config. Names known only at runtime, such as a theme's color groups, are
-  plain strings.
+  pointing into the config.
+- **Themes.** `ThemeVocabulary` types a resolved theme's config by its contract roles (color
+  roles from its groups, radii, spacing, sizes, text styles, durations, easings, elevation
+  levels), so `typed(theme.config)` and `typed(pureform(...))` offer them, custom color groups
+  and text styles included. A provider's extra names stay readable through each tier's index
+  signature, which `typed()` ignores when declared names exist.
+- **Preset.** Every preset component is authored with `typed()`.
 
 ---
 
