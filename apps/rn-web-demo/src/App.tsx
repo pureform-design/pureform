@@ -69,7 +69,7 @@ function Page(props: { controls: ReactNode }) {
     const [on, setOn] = useState(true);
     const [size, setSize] = useState("medium");
     const [item, setItem] = useState(0);
-    const [progress, setProgress] = useState(40);
+    const [progress, setProgress] = useState<number | undefined>(40);
     return (
         <ScrollView
             style={{
@@ -215,6 +215,11 @@ function Page(props: { controls: ReactNode }) {
                             onPress={() => setProgress(value)}
                         />
                     ))}
+                    <Chip
+                        label="indeterminate"
+                        selected={progress === undefined}
+                        onPress={() => setProgress(undefined)}
+                    />
                 </View>
             </Section>
             <Section title="Media and scrim">

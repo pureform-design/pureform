@@ -403,13 +403,20 @@ export function Separator(props: { inset?: "none" | "start" | "middle" }) {
     return <View role="separator" style={view(s[""])} />;
 }
 
-export function LinearProgress(props: { value: number; color?: Group }) {
+/** A progress indicator, indeterminate without a value. */
+export function LinearProgress(props: {
+    value?: number | undefined;
+    color?: Group;
+}) {
     const s = useAnimatedRecipe(
         "linearProgress",
-        { color: props.color },
+        {
+            color: props.color,
+            indeterminate: props.value === undefined ? "true" : "false",
+        },
         {},
         {
-            "components.linearProgress.value": props.value,
+            "components.linearProgress.value": props.value ?? 0,
         },
     );
     return (
@@ -423,13 +430,19 @@ export function LinearProgress(props: { value: number; color?: Group }) {
     );
 }
 
-export function CircularProgress(props: { value: number; color?: Group }) {
+export function CircularProgress(props: {
+    value?: number | undefined;
+    color?: Group;
+}) {
     const s = useAnimatedRecipe(
         "circularProgress",
-        { color: props.color },
+        {
+            color: props.color,
+            indeterminate: props.value === undefined ? "true" : "false",
+        },
         {},
         {
-            "components.circularProgress.value": props.value,
+            "components.circularProgress.value": props.value ?? 0,
         },
     );
     return (
