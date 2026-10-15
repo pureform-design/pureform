@@ -161,6 +161,8 @@ export interface Selected {
     transitions: Record<string, Transition[]>;
     /** Each slot's keyframe animation, where it has one. */
     animations: Record<string, Animation>;
+    /** Each slot's parent slot, where it has one. */
+    parents: Record<string, string>;
 }
 
 /** A component's style per slot (or its one style under `""`, without slots) for variants and
@@ -256,5 +258,11 @@ export const selectWithTransitions = (
             : [];
         settle(style);
     }
-    return { styles, transitions, animations };
+    const parents: Record<string, string> = {};
+    for (const [parent, children] of Object.entries(
+        component.structure ?? {},
+    )) {
+        for (const child of children) parents[child] = parent;
+    }
+    return { styles, transitions, animations, parents };
 };

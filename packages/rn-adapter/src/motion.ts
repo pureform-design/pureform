@@ -163,3 +163,36 @@ export const channels = (
     }
     return out;
 };
+
+// The properties whose percentages are of the parent's height; the rest are of its width.
+const VERTICAL = new Set(["top", "bottom", "height", "minHeight", "maxHeight"]);
+
+const PERCENT = /^(-?[\d.]+)%$/;
+
+/** The two ends of a move in one unit, where one is a percentage and the other pixels: the
+ *  percentage resolved against the parent's size when it's known, as CSS does, or a zero
+ *  read as `0%`. Animated can't move between the two otherwise, and the value would jump. */
+export const sameUnits = (
+    property: string,
+    from: Concrete,
+    to: Concrete,
+    parent: { width?: unknown; height?: unknown } | undefined,
+): [Concrete, Concrete] => {
+    const percent = (v: Concrete) =>
+        typeof v === "string" ? PERCENT.exec(v) : null;
+    const [a, b] = [percent(from), percent(to)];
+    if (!a === !b || (a ? typeof to !== "number" : typeof from !== "number")) {
+        return [from, to];
+    }
+    const base = VERTICAL.has(property) ? parent?.height : parent?.width;
+    const resolve = (v: Concrete) => {
+        const match = percent(v);
+        return match && typeof base === "number"
+            ? (Number(match[1]) / 100) * base
+            : v;
+    };
+    if (typeof base === "number") return [resolve(from), resolve(to)];
+    if (from === 0) return ["0%", to];
+    if (to === 0) return [from, "0%"];
+    return [from, to];
+};

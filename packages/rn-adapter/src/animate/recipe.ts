@@ -16,18 +16,21 @@ export const useAnimatedRecipe = (
     state: State = {},
     tokens?: ThemeValues,
 ): Record<string, Record<string, unknown>> => {
-    const { styles, transitions, animations } = useRecipeWithTransitions(
-        name,
-        variants,
-        state,
-        tokens,
-    );
+    const { styles, transitions, animations, parents } =
+        useRecipeWithTransitions(name, variants, state, tokens);
     const transition = useTransitions();
     const keyframes = useKeyframes();
     const out: Record<string, Record<string, unknown>> = {};
     for (const [slot, style] of Object.entries(styles)) {
         const animated: Record<string, unknown> = { ...style };
-        transition(slot, style, transitions[slot] ?? [], animated);
+        const parent = parents[slot];
+        transition(
+            slot,
+            style,
+            transitions[slot] ?? [],
+            animated,
+            parent === undefined ? undefined : styles[parent],
+        );
         keyframes(slot, style, animations[slot], animated);
         out[slot] = animated;
     }

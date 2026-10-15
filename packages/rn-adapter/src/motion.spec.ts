@@ -6,6 +6,7 @@ import {
     channels,
     easingPoints,
     interpolates,
+    sameUnits,
     stops,
 } from "./motion";
 
@@ -145,5 +146,22 @@ describe("channels", () => {
                 outputRange: [0, 1, 0],
             },
         ]);
+    });
+});
+
+describe("sameUnits", () => {
+    it("resolves a percentage against the parent's size, by the property's axis", () => {
+        expect(sameUnits("top", "50%", 0, { width: 300, height: 56 })).toEqual([
+            28, 0,
+        ]);
+        expect(
+            sameUnits("start", 16, "50%", { width: 300, height: 56 }),
+        ).toEqual([16, 150]);
+    });
+
+    it("reads a zero as 0% without the parent's size, and leaves the rest", () => {
+        expect(sameUnits("top", "50%", 0, undefined)).toEqual(["50%", "0%"]);
+        expect(sameUnits("top", "50%", 8, {})).toEqual(["50%", 8]);
+        expect(sameUnits("top", 4, 8, undefined)).toEqual([4, 8]);
     });
 });

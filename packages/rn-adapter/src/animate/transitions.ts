@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Animated } from "react-native";
 
-import { animatable, blend, interpolates, stops } from "../motion";
+import { animatable, blend, interpolates, sameUnits, stops } from "../motion";
 import type { Style } from "../select";
 import type { Concrete, Transition } from "../values";
 import { curve } from "./curve";
@@ -47,6 +47,7 @@ export const useTransitions = () => {
         key: string,
         target: Concrete,
         transition: Transition,
+        parent: Style | undefined,
     ): unknown => {
         const to = animatable(target);
         let track = tracks.current.get(key);
@@ -73,8 +74,14 @@ export const useTransitions = () => {
             current.progress = progressOf(0, () => current);
             current.animation = undefined;
         }
-        if (!interpolates(track.from, track.to)) return target;
-        const { inputRange, outputRange } = stops(track.from, track.to);
+        const [from, end] = sameUnits(
+            transition.property,
+            track.from,
+            track.to,
+            parent,
+        );
+        if (!interpolates(from, end)) return target;
+        const { inputRange, outputRange } = stops(from, end);
         return track.progress.interpolate({
             inputRange,
             // Both numbers or both strings, which `interpolates` checked.
@@ -118,12 +125,30 @@ export const useTransitions = () => {
         style: Style,
         transitions: readonly Transition[],
         animated: Record<string, unknown>,
+        /** The parent slot's style, for percentages that move to or from pixels. */
+        parent?: Style,
     ) => {
+        // A property out from under its transition (a slider's handle while it's dragged)
+        // forgets where it was, so when the transition returns it starts from where it is.
+        const moving = new Set(transitions.map((t) => `${slot}.${t.property}`));
+        for (const [key, track] of tracks.current) {
+            if (!key.startsWith(`${slot}.`)) continue;
+            const property = key.slice(slot.length + 1).split(".")[0]!;
+            if (moving.has(`${slot}.${property}`)) continue;
+            track.animation?.stop();
+            track.progress.removeAllListeners();
+            tracks.current.delete(key);
+        }
         for (const transition of transitions) {
             const target = style[transition.property];
             const key = `${slot}.${transition.property}`;
             if (typeof target === "number" || typeof target === "string") {
-                animated[transition.property] = drive(key, target, transition);
+                animated[transition.property] = drive(
+                    key,
+                    target,
+                    transition,
+                    parent,
+                );
             } else if (
                 transition.property === "transform" &&
                 Array.isArray(target)
@@ -138,6 +163,7 @@ export const useTransitions = () => {
                                     `${key}.${index}.${name}`,
                                     value,
                                     transition,
+                                    parent,
                                 ),
                             ]),
                         ),
