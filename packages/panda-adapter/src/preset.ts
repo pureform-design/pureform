@@ -1,10 +1,10 @@
 // Assemble a Panda preset from a CoreConfig.
 
 import type { Preset } from "@pandacss/types";
-import { tokenValue, validateConfig } from "@pureform/core";
+import { validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
-import { compileNodeToCSS, varName } from "@pureform/css-lowering";
+import { componentTokenVars, usesColorScheme } from "@pureform/css-lowering";
 
 import { pandaContext, tokenCurly } from "./options";
 import type { CompileCtx, CompileOptions } from "./options";
@@ -58,22 +58,10 @@ const COLOR_SCHEME_CONDITIONS = {
     },
 };
 
-const hasDarkCase = (node: ValueNode): boolean =>
-    node.type === "conditional" &&
-    node.cases.some((c) =>
-        (Array.isArray(c.on) ? c.on : [c.on]).some(
-            (on) => on === "dark" || on === "light",
-        ),
-    );
-
 // Tell the browser which schemes the page supports, so its own controls and scrollbars match.
 // Only emitted when some semantic token actually varies by scheme.
 const colorSchemeCss = (config: CoreConfig) =>
-    Object.values(config.semanticTokens).some((group) =>
-        Object.values(group).some((entry) =>
-            hasDarkCase(tokenValue(entry) as ValueNode),
-        ),
-    )
+    usesColorScheme(config)
         ? {
               ":root": { colorScheme: "light dark" },
               ":root.light": { colorScheme: "light" },
@@ -102,15 +90,7 @@ const compileThemeOverride = (override: ThemeOverride, ctx: CompileCtx) => {
 const themeComponentVars = (config: CoreConfig, ctx: CompileCtx) => {
     const rules: Record<string, Record<string, string>> = {};
     for (const [name, override] of Object.entries(config.themes ?? {})) {
-        const vars: Record<string, string> = {};
-        for (const [component, { tokens = {} }] of Object.entries(
-            override.components ?? {},
-        )) {
-            for (const [token, entry] of Object.entries(tokens)) {
-                vars[varName(["components", component, token], ctx.prefix)] =
-                    compileNodeToCSS(tokenValue(entry) as ValueNode, ctx);
-            }
-        }
+        const vars = componentTokenVars(override, ctx);
         if (Object.keys(vars).length > 0) {
             rules[`[data-panda-theme=${name}]`] = vars;
         }
