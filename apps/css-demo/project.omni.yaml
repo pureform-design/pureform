@@ -1,0 +1,35 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/css-demo"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-app.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/css-adapter"
+    - "@pureform/material"
+    - "@pureform/preset"
+
+tasks:
+  test:unit:
+    enabled: false
+
+  test:integration:
+    enabled: false
+
+  test:e2e:
+    enabled: false
+
+  test:
+    enabled: true
+
+  build:
+    enabled: true
+
+  publish:
+    enabled: false
+
+meta:
+  publish: false

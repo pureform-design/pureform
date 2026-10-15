@@ -1,0 +1,22 @@
+{
+    "name": "@pureform/css-demo",
+    "version": "0.0.0-semantically-released",
+    "description": "pureform styled by the plain CSS adapter",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/material": "catalog:",
+        "@pureform/preset": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:"
+    }
+}
