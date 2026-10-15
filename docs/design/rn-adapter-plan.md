@@ -238,8 +238,10 @@ overrides the primary color in either mode.
 - **Every component but the ripple** passes parity, and the demo shows them all. A sum of a
   percentage and pixels, as the slider positions its handle, puts the pixels on the inset's
   margin. Percentages are reported where React Native takes none.
-- **Not yet:** the ripple, shapes, and multi-color gradients, which need SVG or a gradient
-  package; container queries; and running on a device.
+- **Ripples:** `useRipple` grows and fades press ripples as the web's `ripple()` does, timed by
+  the ripple component's transition. They're solid discs: the soft edge needs SVG.
+- **Not yet:** shapes and multi-color gradients, and the ripple's soft edge, which need SVG
+  or a gradient package; container queries; and running on a device.
 
 ## State transitions
 
