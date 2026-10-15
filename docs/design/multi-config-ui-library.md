@@ -2039,6 +2039,56 @@ becomes `{ base: <a>, _hover: <b>, _dark: <c> }`. So §5's single-string `compil
 gains a sibling that emits this object (AND-lists nest the keys, and `rawCondition`
 registers or inlines its per-target selector). This resolves open question #8.
 
+**Slot conditions: one part styled by another's state.** **[DECIDED]** A slotted component's
+parts often follow each other: a text field's label floats when the container holds focus or
+a value, and its supporting text turns red when the field is invalid. `slot(name, state)` is
+a condition on a state of one of the component's slots:
+
+```ts
+defineSlotComponent({
+    name: "textField",
+    slots: ["root", "container", "input", "label", "supportingText"],
+    // How the slots nest: each slot maps to the slots directly inside it, in order.
+    structure: {
+        root: ["container", "supportingText"],
+        container: ["input", "label"],
+    },
+    recipe: {
+        base: {
+            label: {
+                color: when()
+                    .on(slot("container", "focusWithin"), ref("focusColor"))
+                    .on(slot("container", "invalid"), ref("errorColor"))
+                    .else(ref("labelColor")),
+            },
+        },
+    },
+});
+```
+
+- **States.** `hover`, `focusWithin`, `focusVisibleWithin`, `filled`, `invalid`, `disabled`.
+  Each describes the slot's element together with what it contains, so a container is
+  `invalid` when an input inside it is.
+- **Rules.** A slot can always read its own state. Reading another slot needs `structure`, and
+  that slot must be an ancestor there; `validateConfig` rejects anything else, and a slot
+  condition outside a slotted component. `defineSlotComponent` types `structure` against the
+  declared slots.
+- **Web.** The slot's own state lowers onto itself (`&:is(:focus-within, [data-focused])`),
+  an ancestor's onto that slot's class (`.textField__container:is(...) &`). Each state also
+  matches a data attribute (`data-hover`, `data-focused`, `data-focus-visible`, `data-filled`,
+  `data-invalid`, `data-disabled`) for custom controls. The adapter ranks the states by
+  repeating the selector, so hover, focus, invalid, and disabled win in that order wherever
+  Panda places the rules. `compilePreset` takes `pandaPrefix` when the Panda config prefixes
+  class names.
+- **Native.** React Native has no selectors or cascade, so nothing is discovered from the
+  markup. A binding owns the component's state (a `TextInput`'s focus and value, props for
+  `invalid` and `disabled`) and passes it to every slot, the way it already supplies `hover`
+  and `pressed`. `structure` tells it which slots exist and how they nest, and could let a
+  renderer build the markup.
+- **Not for loose parts.** A standalone part beside some other control, such as standalone
+  supporting text, cannot know that control's state on every target, so it takes a variant
+  (`tone: "error"`) that the app sets.
+
 ### 4.6 Typefaces and typography **[DECIDED]**
 
 Three separate concerns, each with a different platform answer:
