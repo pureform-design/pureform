@@ -21,6 +21,17 @@ export const COMPONENTS = [
     "switchControl",
     "text",
     "avatar",
+    "icon",
+    "iconButton",
+    "fab",
+    "separator",
+    "listItem",
+    "linearProgress",
+    "circularProgress",
+    "radio",
+    "scrim",
+    "supportingText",
+    "media",
 ];
 
 /** Brand colors the demo can switch to at runtime, as seeds for Material's primary family. */

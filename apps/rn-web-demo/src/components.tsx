@@ -1,4 +1,4 @@
-// The core set as React Native components, styled by the adapter. Each tracks its interaction
+// The components the adapter covers, as React Native components, styled by the adapter. Each tracks its interaction
 // state, asks for its slots' styles, and lays the slots out as the web markup does. The
 // interactive ones animate their state changes.
 
@@ -11,8 +11,8 @@ import {
 } from "@pureform/rn-adapter/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Animated, Pressable, Text, View } from "react-native";
-import type { TextStyle, ViewStyle } from "react-native";
+import { Animated, Image, Pressable, Text, View } from "react-native";
+import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
 // The adapter's styles are checked against React Native's types when lowered.
 const view = (style: Style | undefined) => style as ViewStyle;
@@ -215,5 +215,267 @@ export function Avatar(props: {
         <View role="img" aria-label={props.initials} style={view(s[""])}>
             <Text style={text(ownText(s[""]))}>{props.initials}</Text>
         </View>
+    );
+}
+
+type Group = Color | "success" | "warning" | "info";
+
+/** A glyph standing in for an icon, in an icon slot's type and color. */
+const Glyph = (props: { style: Animatable; glyph: string }) => (
+    <Animated.Text
+        selectable={false}
+        style={atext(ownText(props.style as Style))}
+    >
+        {props.glyph}
+    </Animated.Text>
+);
+
+export function Icon(props: {
+    glyph: string;
+    size?: "small" | "medium" | "large";
+    color?: Group;
+}) {
+    const s = useRecipe("icon", { size: props.size, color: props.color });
+    const tokens = useTokens();
+    return (
+        <View role="img" style={view(s[""])}>
+            <Text
+                selectable={false}
+                style={[
+                    { color: String(tokens["colors.onSurface"]) },
+                    text(ownText(s[""])),
+                ]}
+            >
+                {props.glyph}
+            </Text>
+        </View>
+    );
+}
+
+export function IconButton(props: {
+    glyph: string;
+    label: string;
+    variant?: "filled" | "tonal" | "outlined" | "standard" | "elevated";
+    size?: "small" | "medium" | "large";
+    disabled?: boolean;
+}) {
+    const { state, handlers } = usePress({ disabled: props.disabled ?? false });
+    const s = useAnimatedRecipe(
+        "iconButton",
+        { variant: props.variant, size: props.size },
+        state,
+    );
+    return (
+        <AnimatedPressable
+            {...handlers}
+            role="button"
+            aria-label={props.label}
+            disabled={props.disabled}
+            style={aview({ ...s.root, ...unselectable })}
+        >
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.View style={aview(s.container)}>
+                <Animated.View style={aview(s.icon)}>
+                    <Glyph style={s.icon} glyph={props.glyph} />
+                </Animated.View>
+            </Animated.View>
+            {props.variant === "outlined" && (
+                <Animated.View pointerEvents="none" style={aview(s.outline)} />
+            )}
+        </AnimatedPressable>
+    );
+}
+
+export function Fab(props: {
+    glyph: string;
+    label?: string;
+    variant?: "tonal" | "filled" | "surface";
+    size?: "small" | "medium" | "large";
+}) {
+    const { state, handlers } = usePress({});
+    const s = useAnimatedRecipe(
+        "fab",
+        {
+            variant: props.variant,
+            size: props.size,
+            extended: props.label ? "true" : "false",
+        },
+        state,
+    );
+    return (
+        <AnimatedPressable
+            {...handlers}
+            role="button"
+            aria-label={props.label ?? props.glyph}
+            style={aview({ ...s.root, ...unselectable })}
+        >
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.View style={aview(s.container)}>
+                <Animated.View style={aview(s.icon)}>
+                    <Glyph style={s.icon} glyph={props.glyph} />
+                </Animated.View>
+                {props.label && (
+                    <Animated.Text selectable={false} style={atext(s.label)}>
+                        {props.label}
+                    </Animated.Text>
+                )}
+            </Animated.View>
+        </AnimatedPressable>
+    );
+}
+
+export function Radio(props: {
+    checked: boolean;
+    onChange: () => void;
+    label: string;
+}) {
+    const { state, handlers } = usePress({ checked: props.checked });
+    const s = useAnimatedRecipe("radio", {}, state);
+    return (
+        <AnimatedPressable
+            {...handlers}
+            role="radio"
+            aria-checked={props.checked}
+            aria-label={props.label}
+            onPress={props.onChange}
+            style={aview({ ...s.root, ...unselectable })}
+        >
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.View style={aview(s.ring)}>
+                <Animated.View style={aview(s.dot)} />
+            </Animated.View>
+        </AnimatedPressable>
+    );
+}
+
+export function ListItem(props: {
+    headline: string;
+    overline?: string;
+    supportingText?: string;
+    leading?: string;
+    trailingText?: string;
+    selected?: boolean;
+    onPress?: () => void;
+}) {
+    const interactive = props.onPress !== undefined;
+    const { state, handlers } = usePress({ selected: props.selected ?? false });
+    const lines =
+        props.overline && props.supportingText
+            ? "three"
+            : props.overline || props.supportingText
+              ? "two"
+              : "one";
+    const s = useAnimatedRecipe(
+        "listItem",
+        { lines, interactive: interactive ? "true" : "false" },
+        interactive ? state : {},
+    );
+    const line = (slot: string, value: string | undefined) =>
+        value !== undefined && (
+            <Animated.Text selectable={false} style={atext(s[slot])}>
+                {value}
+            </Animated.Text>
+        );
+    return (
+        <AnimatedPressable
+            {...(interactive ? handlers : {})}
+            role={interactive ? "button" : "listitem"}
+            {...(interactive ? { onPress: props.onPress } : { disabled: true })}
+            style={aview({ ...s.root, ...unselectable })}
+        >
+            {props.leading && (
+                <Animated.View style={aview(s.leading)}>
+                    <Glyph style={s.leading} glyph={props.leading} />
+                </Animated.View>
+            )}
+            <Animated.View style={aview(s.content)}>
+                {line("overline", props.overline)}
+                {line("headline", props.headline)}
+                {line("supportingText", props.supportingText)}
+            </Animated.View>
+            {line("trailingText", props.trailingText)}
+        </AnimatedPressable>
+    );
+}
+
+export function Separator(props: { inset?: "none" | "start" | "middle" }) {
+    const s = useRecipe("separator", { inset: props.inset });
+    return <View role="separator" style={view(s[""])} />;
+}
+
+export function LinearProgress(props: { value: number; color?: Group }) {
+    const s = useAnimatedRecipe(
+        "linearProgress",
+        { color: props.color },
+        {},
+        {
+            "components.linearProgress.value": props.value,
+        },
+    );
+    return (
+        <Animated.View
+            role="progressbar"
+            aria-valuenow={props.value}
+            style={aview(s.root)}
+        >
+            <Animated.View style={aview(s.indicator)} />
+        </Animated.View>
+    );
+}
+
+export function CircularProgress(props: { value: number; color?: Group }) {
+    const s = useAnimatedRecipe(
+        "circularProgress",
+        { color: props.color },
+        {},
+        {
+            "components.circularProgress.value": props.value,
+        },
+    );
+    return (
+        <Animated.View
+            role="progressbar"
+            aria-valuenow={props.value}
+            style={aview(s.root)}
+        >
+            <Animated.View style={aview(s.endHalf)}>
+                <Animated.View style={aview(s.endArc)} />
+            </Animated.View>
+            <Animated.View style={aview(s.startHalf)}>
+                <Animated.View style={aview(s.startArc)} />
+            </Animated.View>
+        </Animated.View>
+    );
+}
+
+export function SupportingText(props: {
+    tone?: "neutral" | "error" | "success" | "warning";
+    children: ReactNode;
+}) {
+    const s = useRecipe("supportingText", { tone: props.tone });
+    return <Text style={text(s[""])}>{props.children}</Text>;
+}
+
+/** A layer dimming what sits behind it, over the whole of its parent. */
+export function Scrim() {
+    const s = useRecipe("scrim");
+    return <View pointerEvents="none" style={view(s.root)} />;
+}
+
+// A picture to show in media: a gradient drawn as an svg, so the demo needs no network. React
+// Native Web escapes inline svg markup itself, so it goes in as is.
+const PICTURE = `data:image/svg+xml;utf8,${'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><defs><linearGradient id="g" x2="1" y2="1"><stop offset="0" stop-color="#6750A4"/><stop offset="1" stop-color="#7D5260"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/><circle cx="3" cy="0.9" r="0.45" fill="#FFD8E4"/></svg>'}`;
+
+export function Media(props: { aspect?: "square" | "landscape" | "portrait" }) {
+    const { objectFit, ...style } = useRecipe("media", {
+        aspect: props.aspect,
+    })[""]!;
+    return (
+        <Image
+            source={{ uri: PICTURE }}
+            accessibilityLabel=""
+            resizeMode={objectFit === "contain" ? "contain" : "cover"}
+            style={style as ImageStyle}
+        />
     );
 }

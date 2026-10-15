@@ -1,10 +1,10 @@
-// The demo page: the core set in light and dark, the base and teal themes, precomputed or
+// The demo page: the components the adapter covers in light and dark, the base and teal themes, precomputed or
 // runtime styles, and a brand color overriding the primary family per scheme, which
 // recomputes the state layers mixed over it in either mode.
 
 import type { Overrides } from "@pureform/rn-adapter";
 import { PureformProvider, useTokens } from "@pureform/rn-adapter/react";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
 import { brands, precomputed, runtime } from "virtual:pureform-rn";
@@ -15,6 +15,17 @@ import {
     Card,
     Checkbox,
     Chip,
+    CircularProgress,
+    Fab,
+    Icon,
+    IconButton,
+    LinearProgress,
+    ListItem,
+    Media,
+    Radio,
+    Scrim,
+    Separator,
+    SupportingText,
     Switch,
     Type,
 } from "./components";
@@ -56,6 +67,9 @@ function Page(props: { controls: ReactNode }) {
     const tokens = useTokens();
     const [checked, setChecked] = useState(true);
     const [on, setOn] = useState(true);
+    const [size, setSize] = useState("medium");
+    const [item, setItem] = useState(0);
+    const [progress, setProgress] = useState(40);
     return (
         <ScrollView
             style={{
@@ -101,6 +115,121 @@ function Page(props: { controls: ReactNode }) {
                         onChange={setChecked}
                     />
                     <Switch label="switch" checked={on} onChange={setOn} />
+                    {["small", "medium", "large"].map((option) => (
+                        <Radio
+                            key={option}
+                            label={option}
+                            checked={size === option}
+                            onChange={() => setSize(option)}
+                        />
+                    ))}
+                </View>
+                <SupportingText>Pick a size.</SupportingText>
+                <SupportingText tone="error">
+                    Something went wrong.
+                </SupportingText>
+            </Section>
+            <Section title="Icons and icon buttons">
+                <View style={styles.row}>
+                    {(["small", "medium", "large"] as const).map((size) => (
+                        <Icon key={size} size={size} glyph="★" />
+                    ))}
+                    <Icon glyph="♥" color="error" />
+                    {(
+                        [
+                            "standard",
+                            "filled",
+                            "tonal",
+                            "outlined",
+                            "elevated",
+                        ] as const
+                    ).map((variant) => (
+                        <IconButton
+                            key={variant}
+                            variant={variant}
+                            label={variant}
+                            glyph="✎"
+                        />
+                    ))}
+                    <IconButton
+                        label="disabled"
+                        glyph="✎"
+                        variant="filled"
+                        disabled
+                    />
+                </View>
+            </Section>
+            <Section title="Floating action buttons">
+                <View style={styles.row}>
+                    {(["small", "medium", "large"] as const).map((size) => (
+                        <Fab key={size} size={size} glyph="+" />
+                    ))}
+                    <Fab glyph="+" variant="filled" />
+                    <Fab glyph="+" variant="surface" />
+                    <Fab glyph="✎" label="Compose" />
+                </View>
+            </Section>
+            <Section title="Lists">
+                <View style={styles.list}>
+                    {[
+                        {
+                            headline: "One line",
+                            leading: "★",
+                            trailingText: "100+",
+                        },
+                        {
+                            headline: "Two lines",
+                            supportingText: "Supporting text",
+                            leading: "♥",
+                        },
+                        {
+                            headline: "Three lines",
+                            overline: "Overline",
+                            supportingText: "Supporting text that runs on",
+                            leading: "✉",
+                        },
+                    ].map((props, index) => (
+                        <Fragment key={props.headline}>
+                            {index > 0 && <Separator inset="start" />}
+                            <ListItem
+                                {...props}
+                                selected={item === index}
+                                onPress={() => setItem(index)}
+                            />
+                        </Fragment>
+                    ))}
+                </View>
+            </Section>
+            <Section title="Progress">
+                <View style={styles.row}>
+                    <View style={styles.bar}>
+                        <LinearProgress value={progress} />
+                    </View>
+                    <CircularProgress value={progress} />
+                    <CircularProgress value={progress} color="tertiary" />
+                    {[10, 40, 75, 100].map((value) => (
+                        <Chip
+                            key={value}
+                            label={`${value}%`}
+                            selected={progress === value}
+                            onPress={() => setProgress(value)}
+                        />
+                    ))}
+                </View>
+            </Section>
+            <Section title="Media and scrim">
+                <View style={styles.row}>
+                    {(["landscape", "square", "portrait"] as const).map(
+                        (aspect) => (
+                            <View key={aspect} style={styles.media}>
+                                <Media aspect={aspect} />
+                            </View>
+                        ),
+                    )}
+                    <View style={[styles.media, styles.clip]}>
+                        <Media aspect="landscape" />
+                        <Scrim />
+                    </View>
                 </View>
             </Section>
             <Section title="Cards and avatars">
@@ -186,4 +315,9 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     card: { padding: 16, gap: 8, width: 220 },
+    list: { width: 360 },
+    bar: { width: 240 },
+    media: { width: 160, position: "relative" },
+    // The scrim dims the picture, so it takes the picture's corners.
+    clip: { overflow: "hidden", borderRadius: 12 },
 });
