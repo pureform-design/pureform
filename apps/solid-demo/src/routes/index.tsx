@@ -303,6 +303,36 @@ function IndexRoute() {
                         );
                     }}
                 </For>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = textArea({
+                            variant,
+                            leadingIcon: true,
+                            trailingIcon: true,
+                        });
+                        const id = `area-icon-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <span class={t.leadingIcon}>✎</span>
+                                    <textarea
+                                        class={t.input}
+                                        id={id}
+                                        placeholder=" "
+                                        rows={3}
+                                    />
+                                    <label class={t.label} for={id}>
+                                        {`${variant} with icons`}
+                                    </label>
+                                    <span class={t.trailingIcon}>×</span>
+                                </div>
+                                <span class={t.supportingText}>
+                                    Icons stay centered
+                                </span>
+                            </div>
+                        );
+                    }}
+                </For>
                 {(() => {
                     const t = textArea({ autoGrow: true });
                     return (
