@@ -13,6 +13,7 @@ import type { ThemeValues } from "./values";
 
 interface Context {
     resolved: Resolved;
+    tokens: ThemeValues;
     scheme: Scheme;
 }
 
@@ -25,7 +26,8 @@ export interface PureformProviderProps {
     /** A named theme. Default the base theme. */
     theme?: string;
     /** Token or component token values to override, by key: `colors.primary`,
-     *  `components.button.container`. */
+     *  `components.button.container`. Colors are `rgb()`/`rgba()` or hex, which mixes read
+     *  without a color library. */
     overrides?: ThemeValues;
     children?: ReactNode;
 }
@@ -40,9 +42,27 @@ export const PureformProvider = (props: PureformProviderProps) => {
         // oxlint-disable-next-line react-hooks/exhaustive-deps
         [styles, key, overrideKey],
     );
-    const value = useMemo(() => ({ resolved, scheme }), [resolved, scheme]);
+    const tokens = useMemo(
+        () => ({ ...styles.themes[key], ...overrides }),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [styles, key, overrideKey],
+    );
+    const value = useMemo(
+        () => ({ resolved, tokens, scheme }),
+        [resolved, tokens, scheme],
+    );
     return createElement(PureformContext.Provider, { value }, props.children);
 };
+
+const useContextOrThrow = (hook: string): Context => {
+    const context = useContext(PureformContext);
+    if (!context) throw new Error(`${hook} needs a PureformProvider`);
+    return context;
+};
+
+/** The theme's token values, with overrides, by key: `colors.surface`, `spacing.4`. */
+export const useTokens = (): ThemeValues =>
+    useContextOrThrow("useTokens").tokens;
 
 /** A component's styles per slot, or its one style under `""` without slots. */
 export const useRecipe = (
@@ -50,8 +70,7 @@ export const useRecipe = (
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
 ): Record<string, Style> => {
-    const context = useContext(PureformContext);
-    if (!context) throw new Error("useRecipe needs a PureformProvider");
+    const context = useContextOrThrow("useRecipe");
     const component = context.resolved[name];
     if (!component) throw new Error(`no styles for component "${name}"`);
     const variantKey = JSON.stringify(variants);

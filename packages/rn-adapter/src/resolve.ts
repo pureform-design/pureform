@@ -6,7 +6,7 @@
 import type { ComponentStyles } from "./lower";
 import type { Scheme } from "./theme";
 import { evaluate, isExpr } from "./values";
-import type { Concrete, ThemeValues, Value } from "./values";
+import type { ThemeValues, Value } from "./values";
 
 export type Templates = Record<string, ComponentStyles>;
 export type Resolved = Record<string, ComponentStyles<Value>>;
@@ -62,18 +62,35 @@ export interface RuntimeStyles {
     themes: Record<string, ThemeValues>;
 }
 
-/** Styles resolved for each theme, with what an override needs to recompute them. */
+/** Styles resolved ahead of time. The components' structure is shared: each value that reads
+ *  the theme stays a template there, and each theme has those values resolved, in the order a
+ *  walk of the structure meets them. An override recomputes the values that read it. */
 export interface PrecomputedStyles {
     mode: "precomputed";
-    sets: Record<string, Resolved>;
+    templates: Templates;
     themes: Record<string, ThemeValues>;
-    /** Every value that reads the theme: where it is, and its template. */
-    templates: [path: [string, number, number, string], template: Value][];
-    /** The indices into `templates` of the values reading each token. */
+    /** Each theme's resolved values, by theme key. */
+    values: Record<string, Value[]>;
+    /** The positions in `values` of those reading each token. */
     dependents: Record<string, number[]>;
 }
 
 export type Styles = RuntimeStyles | PrecomputedStyles;
+
+/** The templates that read the theme, in walk order. */
+export const themeTemplates = (templates: Templates): Value[] => {
+    const found: Value[] = [];
+    mapValues(templates, (value) => {
+        if (readsTheme(value)) found.push(value);
+        return value;
+    });
+    return found;
+};
+
+const cache = new WeakMap<
+    Styles,
+    { templates: Value[]; sets: Map<string, Resolved> }
+>();
 
 /** A theme's styles with runtime overrides of token or component token values applied. */
 export const stylesFor = (
@@ -85,20 +102,27 @@ export const stylesFor = (
     if (!base) throw new Error(`no styles for theme "${key}"`);
     const theme = { ...base, ...overrides };
     if (styles.mode === "runtime") return resolve(styles.templates, theme);
-    const set = styles.sets[key]!;
+    let cached = cache.get(styles);
+    if (!cached) {
+        cached = {
+            templates: themeTemplates(styles.templates),
+            sets: new Map(),
+        };
+        cache.set(styles, cached);
+    }
     const affected = new Set(
         Object.keys(overrides).flatMap((k) => styles.dependents[k] ?? []),
     );
-    if (affected.size === 0) return set;
-    // Copy only the components the overrides reach, then recompute their values.
-    const out: Resolved = { ...set };
+    if (affected.size === 0 && cached.sets.has(key))
+        return cached.sets.get(key)!;
+    const values = [...styles.values[key]!];
     for (const index of affected) {
-        const [[name, e, r, property], template] = styles.templates[index]!;
-        if (out[name] === set[name]) out[name] = structuredClone(set[name]!);
-        out[name]!.entries[e]!.rules[r]!.style[property] = evaluate(
-            template,
-            theme,
-        ) as Concrete;
+        values[index] = evaluate(cached.templates[index]!, theme);
     }
-    return out;
+    let i = 0;
+    const set = mapValues(styles.templates, (value) =>
+        readsTheme(value) ? values[i++]! : value,
+    );
+    if (affected.size === 0) cached.sets.set(key, set);
+    return set;
 };

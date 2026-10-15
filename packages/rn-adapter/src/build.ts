@@ -5,11 +5,11 @@ import type { CoreConfig } from "@pureform/core/types";
 
 import { lowerRn } from "./lower";
 import type { RnOptions } from "./lower";
-import { mapValues, readsTheme, resolve, themeKey } from "./resolve";
+import { themeKey, themeTemplates } from "./resolve";
 import type { PrecomputedStyles, RuntimeStyles } from "./resolve";
 import { resolveTheme } from "./theme";
 import type { Scheme } from "./theme";
-import { dependencies } from "./values";
+import { dependencies, evaluate } from "./values";
 import type { ThemeValues } from "./values";
 
 export interface BuildOptions extends RnOptions {
@@ -53,25 +53,23 @@ export const precompute = (
 ): PrecomputedStyles => {
     const templates = lowerRn(config, options).components;
     const themes = themeValues(config, options);
-    const found: PrecomputedStyles["templates"] = [];
+    const found = themeTemplates(templates);
     const dependents: Record<string, number[]> = {};
-    mapValues(templates, (value, path) => {
-        if (!readsTheme(value)) return value;
-        for (const key of dependencies(value))
-            (dependents[key] ??= []).push(found.length);
-        found.push([path, value]);
-        return value;
+    found.forEach((template, index) => {
+        for (const key of dependencies(template)) {
+            (dependents[key] ??= []).push(index);
+        }
     });
     return {
         mode: "precomputed",
-        sets: Object.fromEntries(
+        templates,
+        themes,
+        values: Object.fromEntries(
             Object.entries(themes).map(([key, theme]) => [
                 key,
-                resolve(templates, theme),
+                found.map((template) => evaluate(template, theme)),
             ]),
         ),
-        themes,
-        templates: found,
         dependents,
     };
 };

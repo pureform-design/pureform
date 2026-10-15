@@ -219,7 +219,7 @@ describe("theme modes", () => {
     it("leave what an override doesn't reach alone", () => {
         const key = themeKey(undefined, "light");
         expect(stylesFor(precomputed, key, { "colors.unused": "red" })).toBe(
-            precomputed.sets[key],
+            stylesFor(precomputed, key),
         );
         expect(precomputed.dependents["spacing.2"]).toHaveLength(1);
     });

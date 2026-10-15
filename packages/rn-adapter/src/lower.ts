@@ -29,6 +29,9 @@ export interface RnOptions {
     remBase?: number;
     /** Only these components. Default all. */
     components?: string[];
+    /** A font family's first entry, as React Native needs, or the whole stack, which React
+     *  Native Web passes to CSS. Default `first`. */
+    fontStack?: "first" | "all";
 }
 
 /** A style rule: when its states all hold, its style applies, in order of specificity. */
@@ -82,6 +85,7 @@ interface Ctx {
     scheme?: "light" | "dark";
     /** The CSS property being lowered, for keywords. */
     property?: string;
+    fontStack: "first" | "all";
 }
 
 class Unsupported extends Error {}
@@ -222,7 +226,15 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
             return plain(value);
         }
         case "fontFamily":
-            return plain(node.stack[0] ?? node.generic ?? "System");
+            return plain(
+                ctx.fontStack === "all"
+                    ? [...node.stack, ...(node.generic ? [node.generic] : [])]
+                          .map((name) =>
+                              /[\s"]/.test(name) ? JSON.stringify(name) : name,
+                          )
+                          .join(", ")
+                    : (node.stack[0] ?? node.generic ?? "System"),
+            );
         case "alias": {
             const key = refKey(node.path);
             if (key) return plain({ $ref: key });
@@ -347,6 +359,7 @@ export const lowerToken = (
         config,
         target: options.target ?? "rn",
         remBase: options.remBase ?? 16,
+        fontStack: options.fontStack ?? "first",
         scheme,
     })[0]!.value;
 
@@ -521,6 +534,7 @@ export const lowerRn = (
         config,
         target: options.target ?? "rn",
         remBase: options.remBase ?? 16,
+        fontStack: options.fontStack ?? "first",
     };
     const diagnostics = new Set<string>();
     const names = options.components ?? Object.keys(config.components);

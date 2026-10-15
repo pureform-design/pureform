@@ -12,7 +12,10 @@ import type { Concrete, ThemeValues } from "./values";
 
 export type Scheme = "light" | "dark";
 
-export interface ThemeOptions extends Pick<RnOptions, "target" | "remBase"> {
+export interface ThemeOptions extends Pick<
+    RnOptions,
+    "target" | "remBase" | "fontStack"
+> {
     scheme: Scheme;
     /** A named theme from `config.themes`. Default none, the base theme. */
     theme?: string;

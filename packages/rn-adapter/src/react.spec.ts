@@ -4,7 +4,12 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { precompute, runtimeStyles } from "./build";
-import { PureformProvider, pressableState, useRecipe } from "./react";
+import {
+    PureformProvider,
+    pressableState,
+    useRecipe,
+    useTokens,
+} from "./react";
 import type { Styles } from "./resolve";
 import type { State } from "./select";
 
@@ -70,6 +75,23 @@ describe("PureformProvider and useRecipe", () => {
             { disabled: true },
         );
         expect(disabled.pointerEvents).toBe("none");
+    });
+
+    it("give the theme's tokens, with overrides", () => {
+        const Probe = () =>
+            createElement("i", null, String(useTokens()["colors.primary"]));
+        const html = renderToString(
+            createElement(
+                PureformProvider,
+                {
+                    styles: precomputed,
+                    scheme: "light",
+                    overrides: { "colors.primary": "rgba(255, 0, 0, 1)" },
+                },
+                createElement(Probe),
+            ),
+        );
+        expect(html).toBe("<i>rgba(255, 0, 0, 1)</i>");
     });
 
     it("need a provider", () => {

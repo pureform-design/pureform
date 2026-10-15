@@ -101,6 +101,25 @@ describe("lowerRn values", () => {
         });
     });
 
+    it("takes a font stack's first family, or all of it for React Native Web", () => {
+        const fonts = {
+            fontFamily: {
+                type: "fontFamily",
+                stack: ["Google Sans", "Roboto"],
+                generic: "sans-serif",
+            },
+        } as unknown as StyleMap;
+        const first = lowerRn(configWith(fonts)).components.box!;
+        const all = lowerRn(configWith(fonts), { fontStack: "all" }).components
+            .box!;
+        expect(first.entries[0]!.rules[0]!.style.fontFamily).toBe(
+            "Google Sans",
+        );
+        expect(all.entries[0]!.rules[0]!.style.fontFamily).toBe(
+            '"Google Sans", Roboto, sans-serif',
+        );
+    });
+
     it("marks a unitless line height to multiply the font size", () => {
         const { rules } = rulesOf({ lineHeight: unitless(1.5) } as StyleMap);
         expect(rules[0]!.style).toEqual({ lineHeight: "1.5x" });
