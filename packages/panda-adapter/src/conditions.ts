@@ -33,6 +33,10 @@ const CONDITION_KEY: Record<string, string> = {
     checked: "_checked",
     invalid: "_invalid",
     readOnly: "_readOnly",
+    // An input or textarea with a value, or an element containing one, or anything marked
+    // `data-filled`. CSS sees a value through `:placeholder-shown`, so the input needs a
+    // placeholder (a single space works when none should show).
+    filled: "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])",
     dark: "_dark",
     light: "_light",
     ltr: "_ltr",

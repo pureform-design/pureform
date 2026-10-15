@@ -234,6 +234,15 @@ describe("compileValue conditionals", () => {
             "&[data-dragging][data-dragging]": "0.16",
         });
     });
+
+    it("lowers filled to an input with a value, its container, or data-filled", () => {
+        const node = when("filled", unitless(1), unitless(0));
+        expect(compileValue(node, ctx())).toEqual({
+            base: "0",
+            "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])":
+                "1",
+        });
+    });
 });
 
 describe("compileStyleMap layout and interaction properties", () => {
