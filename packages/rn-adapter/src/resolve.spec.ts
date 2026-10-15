@@ -18,7 +18,7 @@ import { describe, expect, it } from "vitest";
 import { precompute, runtimeStyles } from "./build";
 import { lowerRn } from "./lower";
 import { overridesFor, resolve, stylesFor, themeKey } from "./resolve";
-import { select } from "./select";
+import { select, selectWithTransitions } from "./select";
 import { resolveTheme } from "./theme";
 import { evaluate } from "./values";
 
@@ -174,6 +174,48 @@ describe("select", () => {
         expect(root!.backgroundColor).toBe("rgba(178, 153, 203, 1)");
         expect(root!.outlineWidth).toBe(0);
         expect(root!.outlineStyle).toBeUndefined();
+    });
+});
+
+describe("selectWithTransitions", () => {
+    it("returns transitions beside the styles, not in them", () => {
+        const motion = lowerRn({
+            ...config,
+            components: {
+                box: {
+                    kind: "component",
+                    name: "box",
+                    recipe: {
+                        base: {
+                            color: rgb(0, 0, 0),
+                            transition: {
+                                type: "transition",
+                                parts: [
+                                    {
+                                        property: "color",
+                                        duration: {
+                                            type: "numeric",
+                                            value: 100,
+                                            unit: "ms",
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                },
+            },
+        } as unknown as CoreConfig).components.box!;
+        const { styles, transitions } = selectWithTransitions(motion);
+        expect(styles[""]).toEqual({ color: "rgba(0, 0, 0, 1)" });
+        expect(transitions[""]).toEqual([
+            {
+                property: "color",
+                duration: 100,
+                easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                delay: 0,
+            },
+        ]);
     });
 });
 

@@ -13,6 +13,18 @@ export type Concrete = number | string;
  *  Native's stand-in for a one-color background image. */
 export const TINT = "backgroundTint";
 
+/** A style's transitions, which selection returns beside the style rather than in it. */
+export const TRANSITION = "transition";
+
+/** How one property moves to a new value: React Native's name for it, milliseconds, and a
+ *  `cubic-bezier(...)` or `linear` curve. */
+export interface Transition {
+    property: string;
+    duration: number;
+    easing: string;
+    delay: number;
+}
+
 export type Expr =
     | { $ref: string }
     | { $dyn: string; default?: Value }

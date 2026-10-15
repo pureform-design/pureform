@@ -19,7 +19,7 @@ import {
     viewportSize,
     when,
 } from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
+import type { StyleMap, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { pureform } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
@@ -136,6 +136,72 @@ describe("lowerRn values", () => {
     });
 });
 
+describe("lowerRn transitions", () => {
+    it("lowers durations to milliseconds and easings to curves, with reduced motion a state", () => {
+        const motion = {
+            type: "transition",
+            parts: [
+                {
+                    property: "backgroundColor",
+                    duration: { type: "numeric", value: 0.2, unit: "s" },
+                    easing: {
+                        type: "easing",
+                        kind: "keyword",
+                        name: "easeOut",
+                    },
+                },
+                {
+                    property: "paddingInlineStart",
+                    duration: { type: "numeric", value: 90, unit: "ms" },
+                    easing: {
+                        type: "easing",
+                        kind: "steps",
+                        steps: { count: 2 },
+                    },
+                },
+                {
+                    property: "clipPath",
+                    duration: { type: "numeric", value: 1, unit: "ms" },
+                },
+            ],
+        };
+        const { rules } = rulesOf({
+            transition: when(
+                "reducedMotion",
+                { type: "keyword", value: "none" },
+                motion as unknown as ValueNode,
+            ),
+        } as unknown as StyleMap);
+        expect(rules).toEqual([
+            {
+                when: [],
+                specificity: 0,
+                style: {
+                    transition: [
+                        {
+                            property: "backgroundColor",
+                            duration: 200,
+                            easing: "cubic-bezier(0, 0, 0.58, 1)",
+                            delay: 0,
+                        },
+                        {
+                            property: "paddingStart",
+                            duration: 90,
+                            easing: "linear",
+                            delay: 0,
+                        },
+                    ],
+                },
+            },
+            {
+                when: ["reducedMotion"],
+                specificity: 1,
+                style: { transition: "none" },
+            },
+        ]);
+    });
+});
+
 describe("lowerRn conditions", () => {
     it("turns a conditional inside out, a rule per case in order", () => {
         const { rules } = rulesOf({
@@ -196,7 +262,6 @@ describe("lowerRn diagnostics", () => {
                 stop(rgb(0, 0, 0)),
                 stop(rgb(9, 9, 9)),
             ]),
-            transition: { type: "transition", parts: [] },
             gridTemplateColumns: px(1),
         } as unknown as StyleMap);
         expect(rules).toEqual([]);

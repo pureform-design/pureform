@@ -11,6 +11,7 @@ export default createConfig({
                 entry: {
                     index: "src/index.ts",
                     react: "src/react.ts",
+                    animated: "src/animated.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

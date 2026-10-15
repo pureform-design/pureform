@@ -6,8 +6,8 @@ import type { ReactNode } from "react";
 
 import { overridesFor, stylesFor, themeKey } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
-import { select } from "./select";
-import type { State, Style } from "./select";
+import { selectWithTransitions } from "./select";
+import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
 import type { ThemeValues } from "./values";
 
@@ -15,6 +15,7 @@ interface Context {
     resolved: Resolved;
     tokens: ThemeValues;
     scheme: Scheme;
+    reducedMotion: boolean;
 }
 
 const PureformContext = createContext<Context | undefined>(undefined);
@@ -25,6 +26,9 @@ export interface PureformProviderProps {
     scheme: Scheme;
     /** A named theme. Default the base theme. */
     theme?: string;
+    /** Whether to take the reduced motion styles, as an app reads from `AccessibilityInfo`.
+     *  Default `false`. */
+    reducedMotion?: boolean;
     /** Token or component token values to override, by key: `colors.primary`,
      *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
      *  `rgb()`/`rgba()` or hex, which mixes read without a color library. */
@@ -48,9 +52,10 @@ export const PureformProvider = (props: PureformProviderProps) => {
         // oxlint-disable-next-line react-hooks/exhaustive-deps
         [styles, key, overrideKey],
     );
+    const reducedMotion = props.reducedMotion ?? false;
     const value = useMemo(
-        () => ({ resolved, tokens, scheme }),
-        [resolved, tokens, scheme],
+        () => ({ resolved, tokens, scheme, reducedMotion }),
+        [resolved, tokens, scheme, reducedMotion],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
 };
@@ -65,23 +70,42 @@ const useContextOrThrow = (hook: string): Context => {
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
 
-/** A component's styles per slot, or its one style under `""` without slots. */
-export const useRecipe = (
+/** A component's styles per slot, and each slot's transitions, for its variants and state. */
+export const useRecipeWithTransitions = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
-): Record<string, Style> => {
+): Selected => {
     const context = useContextOrThrow("useRecipe");
     const component = context.resolved[name];
     if (!component) throw new Error(`no styles for component "${name}"`);
     const variantKey = JSON.stringify(variants);
     const stateKey = JSON.stringify(state);
     return useMemo(
-        () => select(component, variants, { scheme: context.scheme, ...state }),
+        () =>
+            selectWithTransitions(component, variants, {
+                scheme: context.scheme,
+                reducedMotion: context.reducedMotion,
+                ...state,
+            }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
-        [component, context.scheme, variantKey, stateKey],
+        [
+            component,
+            context.scheme,
+            context.reducedMotion,
+            variantKey,
+            stateKey,
+        ],
     );
 };
+
+/** A component's styles per slot, or its one style under `""` without slots. */
+export const useRecipe = (
+    name: string,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+): Record<string, Style> =>
+    useRecipeWithTransitions(name, variants, state).styles;
 
 /** A component's state from Pressable's callback state and its own props. Focus counts as
  *  visible focus, since Pressable doesn't tell keyboard focus apart. */

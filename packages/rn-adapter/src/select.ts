@@ -7,8 +7,8 @@
 
 import type { ComponentStyles } from "./lower";
 import { compositeOver, formatColor, parseColor } from "./rgba";
-import { TINT } from "./values";
-import type { Value } from "./values";
+import { TINT, TRANSITION } from "./values";
+import type { Transition, Value } from "./values";
 
 /** A component's state. Pressable reports the interaction states, props the rest. */
 export interface State {
@@ -92,12 +92,27 @@ const settle = (style: Style): Style => {
     return style;
 };
 
-/** A component's style per slot (or its one style, without slots) for variants and state. */
+/** A component's styles per slot for variants and state, and each slot's transitions. */
+export interface Selected {
+    styles: Record<string, Style>;
+    transitions: Record<string, Transition[]>;
+}
+
+/** A component's style per slot (or its one style under `""`, without slots) for variants and
+ *  state. */
 export const select = (
     component: ComponentStyles<Value>,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
-): Record<string, Style> => {
+): Record<string, Style> =>
+    selectWithTransitions(component, variants, state).styles;
+
+/** As `select`, with each slot's transitions beside its style. */
+export const selectWithTransitions = (
+    component: ComponentStyles<Value>,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+): Selected => {
     const chosen: Record<string, string> = { ...component.defaultVariants };
     for (const [group, value] of Object.entries(variants)) {
         if (value !== undefined) chosen[group] = String(value);
@@ -148,6 +163,14 @@ export const select = (
     };
     for (const slot of Object.keys(styles))
         if (!children.has(slot)) visit(slot);
-    for (const style of Object.values(styles)) settle(style);
-    return styles;
+    const transitions: Record<string, Transition[]> = {};
+    for (const [slot, style] of Object.entries(styles)) {
+        const own = style[TRANSITION];
+        delete style[TRANSITION];
+        transitions[slot] = Array.isArray(own)
+            ? (own as unknown as Transition[])
+            : [];
+        settle(style);
+    }
+    return { styles, transitions };
 };

@@ -19,9 +19,9 @@ export type {
     Styles,
     Templates,
 } from "./resolve";
-export { select } from "./select";
-export type { State, Style } from "./select";
+export { select, selectWithTransitions } from "./select";
+export type { Selected, State, Style } from "./select";
 export { resolveTheme } from "./theme";
 export type { Scheme, ThemeOptions } from "./theme";
 export { dependencies, evaluate, isExpr } from "./values";
-export type { Concrete, Expr, ThemeValues, Value } from "./values";
+export type { Concrete, Expr, ThemeValues, Transition, Value } from "./values";

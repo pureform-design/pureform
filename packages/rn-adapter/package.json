@@ -25,6 +25,17 @@
                 "development": "./src/react.ts",
                 "default": "./dist/react.mjs"
             }
+        },
+        "./animated": {
+            "types": "./dist/animated.d.ts",
+            "import": {
+                "development": "./src/animated.ts",
+                "default": "./dist/animated.mjs"
+            },
+            "require": {
+                "development": "./src/animated.ts",
+                "default": "./dist/animated.mjs"
+            }
         }
     },
     "dependencies": {
@@ -48,10 +59,14 @@
         "vitest": "catalog:"
     },
     "peerDependencies": {
-        "react": "catalog:"
+        "react": "catalog:",
+        "react-native": "catalog:"
     },
     "peerDependenciesMeta": {
         "react": {
+            "optional": true
+        },
+        "react-native": {
             "optional": true
         }
     }

@@ -10,6 +10,7 @@ import { getByPath, inlineStyles, tokenValue } from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
+    EasingNode,
     StyleMap,
     ValueNode,
 } from "@pureform/core/ast";
@@ -18,7 +19,7 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import { colorNodeRgba } from "./color";
 import { rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
-import { TINT } from "./values";
+import { TINT, TRANSITION } from "./values";
 import type { Value } from "./values";
 
 /** Options for lowering. */
@@ -205,9 +206,31 @@ const lowerNumeric = (value: number, unit: string, ctx: Ctx): Value => {
         case "rem":
         case "em":
             return value * ctx.remBase;
+        // Durations are milliseconds, as Animated takes them.
+        case "ms":
+            return value;
+        case "s":
+            return value * 1000;
         default:
             return `${value}${unit}`;
     }
+};
+
+// CSS's named curves, as cubic Béziers.
+const EASINGS: Record<string, [number, number, number, number]> = {
+    linear: [0, 0, 1, 1],
+    ease: [0.25, 0.1, 0.25, 1],
+    easeIn: [0.42, 0, 1, 1],
+    easeOut: [0, 0, 0.58, 1],
+    easeInOut: [0.42, 0, 0.58, 1],
+};
+
+/** An easing as `cubic-bezier(...)`, or `linear` for steps, which Animated has no curve for. */
+const easingCurve = (node: EasingNode): string => {
+    if (node.kind === "steps") return "linear";
+    const points =
+        node.kind === "cubicBezier" ? node.points : EASINGS[node.name]!;
+    return `cubic-bezier(${points.join(", ")})`;
 };
 
 /** Lower a value node to its cased values. */
@@ -341,6 +364,34 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 "no React Native gradients; only one-color layers",
             );
         }
+        case "easing":
+            return plain(easingCurve(node));
+        case "transition": {
+            const parts = node.parts.flatMap((part) => {
+                const property = rnProperty(part.property);
+                return property ? [{ part, property }] : [];
+            });
+            const zero = { type: "numeric", value: 0, unit: "ms" } as const;
+            const fields = parts.flatMap(({ part }) => [
+                part.duration,
+                part.easing ?? {
+                    type: "easing",
+                    kind: "keyword",
+                    name: "ease",
+                },
+                part.delay ?? zero,
+            ]);
+            return product(
+                fields.map((n) => lowerNode(n as ValueNode, ctx)),
+                (values) =>
+                    parts.map(({ property }, i) => ({
+                        property,
+                        duration: values[i * 3]!,
+                        easing: values[i * 3 + 1]!,
+                        delay: values[i * 3 + 2]!,
+                    })),
+            );
+        }
         default:
             throw new Unsupported(
                 `no React Native equivalent for a ${node.type} value`,
@@ -399,7 +450,12 @@ const lowerStyle = (
     };
     for (const [property, node] of Object.entries(own)) {
         if (node === undefined) continue;
-        const rn = property === "backgroundImage" ? TINT : rnProperty(property);
+        const rn =
+            property === "backgroundImage"
+                ? TINT
+                : property === "transition"
+                  ? TRANSITION
+                  : rnProperty(property);
         if (rn === null) continue;
         if (rn === undefined) {
             diagnostics.add(
