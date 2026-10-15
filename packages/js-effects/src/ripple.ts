@@ -124,6 +124,9 @@ export type RippleOptions = {
     /** Fixed timing. Default: read from the layer's transition (the preset's ripple layer
      *  declares the motion tokens there), falling back to Material's ripple timing. */
     timing?: Partial<RippleTiming>;
+    /** Skip ripples when the user prefers reduced motion; the pressed state layer still
+     *  shows the press. Default `true`. */
+    respectReducedMotion?: boolean;
     /** Tuning for the `ink-sparkle` variant. */
     sparkle?: SparkleOptions;
 };
@@ -398,6 +401,12 @@ export function ripple(container: HTMLElement, options: RippleOptions = {}) {
         const layer = layerOf();
         if (!layer) return;
         end();
+        if (
+            options.respectReducedMotion !== false &&
+            globalThis.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ) {
+            return;
+        }
 
         const rect = layer.getBoundingClientRect();
         const geometry = rippleGeometry(

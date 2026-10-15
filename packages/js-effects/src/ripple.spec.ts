@@ -145,6 +145,25 @@ afterEach(() => {
 });
 
 describe("ripple", () => {
+    it("skips ripples under reduced motion unless told not to", () => {
+        vi.stubGlobal("matchMedia", (query: string) => ({
+            matches: query === "(prefers-reduced-motion: reduce)",
+        }));
+        try {
+            const { container, layer } = surface();
+            const detach = ripple(container);
+            container.dispatchEvent(pointer("pointerdown"));
+            expect(layer.querySelector("[data-ripple]")).toBeNull();
+            detach();
+
+            ripple(container, { respectReducedMotion: false });
+            container.dispatchEvent(pointer("pointerdown"));
+            expect(layer.querySelector("[data-ripple]")).not.toBeNull();
+        } finally {
+            vi.unstubAllGlobals();
+        }
+    });
+
     it("grows a ripple from the press point while held", () => {
         const { container, layer } = surface();
         ripple(container, { class: "a b" });
