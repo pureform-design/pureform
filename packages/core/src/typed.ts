@@ -104,6 +104,46 @@ export type AliasPath<C> =
     | OneLevel<"textStyles", Field<C, "textStyles">>
     | ComponentPaths<Field<C, "components">>;
 
+// The alias roots, by how many names follow them.
+type NestedRoot = "tokens" | "semanticTokens" | "components";
+type FlatRoot = "fonts" | "durations" | "easings" | "zIndices" | "textStyles";
+
+/** The alias roots the config has. */
+export type AliasRoot<C> = Extract<NestedRoot | FlatRoot, Keys<C>>;
+
+/** The names that can follow an alias root. */
+export type AliasSecond<C, A> = A extends string ? Keys<Field<C, A>> : never;
+
+/** The names that can follow an alias root and a second name: a token under a tier, or a
+ *  component's token. Flat roots take none. */
+export type AliasThird<C, A, B> = A extends "components"
+    ? B extends string
+        ? Keys<
+              Field<C, "components">[B & keyof Field<C, "components">] extends {
+                  tokens?: infer K;
+              }
+                  ? NonNullable<K>
+                  : never
+          >
+        : never
+    : A extends NestedRoot
+      ? B extends string
+          ? Keys<Field<C, A>[B & keyof Field<C, A>]>
+          : never
+      : never;
+
+/** A reference into the config. Each name is its own type parameter, inferred from the ones
+ *  before it, so an editor narrows each name's suggestions by the names already written. */
+export type AliasFn<C> = <
+    const A extends AliasRoot<C>,
+    const B extends AliasSecond<C, A>,
+    const Z extends AliasThird<C, A, B>,
+>(
+    root: A,
+    name: B,
+    ...rest: A extends NestedRoot ? [token: Z] : []
+) => AliasNode;
+
 /** A breakpoint name in the config. */
 export type BreakpointName<C> = Keys<Field<C, "breakpoints">>;
 
@@ -135,7 +175,7 @@ type Variants<V extends VariantValues, Style> = {
 /** The helpers a typed recipe receives. */
 export interface RecipeHelpers<C, T extends string> {
     /** A reference into the config. */
-    alias: <const P extends AliasPath<C>>(...path: P) => AliasNode;
+    alias: AliasFn<C>;
     /** One of this component's own tokens. */
     token: (name: T) => AliasNode;
 }
@@ -238,8 +278,7 @@ const definedOnly = <T extends object>(object: T): T =>
  *  names you reference: tokens, utilities, breakpoints, components), or nothing to use the
  *  registered one. */
 export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
-    const alias = <const P extends AliasPath<C>>(...path: P): AliasNode =>
-        rawAlias(...(path as unknown as string[]));
+    const alias: AliasFn<C> = (...path: string[]) => rawAlias(...path);
 
     return {
         /** A reference into the config: each segment autocompletes from the one before. */

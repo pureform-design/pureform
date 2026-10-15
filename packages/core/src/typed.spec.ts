@@ -48,6 +48,19 @@ describe("typed alias", () => {
         pf.alias("tokens", "radii", "full");
         // @ts-expect-error too short a path
         pf.alias("tokens", "colors");
+        // @ts-expect-error a name from another tier
+        pf.alias("tokens", "colors", "4");
+        // @ts-expect-error a root the config doesn't have
+        pf.alias("durations", "short1");
+    });
+
+    it("takes one name under a flat root, and no more", () => {
+        expect(pf.alias("textStyles", "body").path).toEqual([
+            "textStyles",
+            "body",
+        ]);
+        // @ts-expect-error a flat root takes one name
+        pf.alias("textStyles", "body", "extra");
     });
 
     it("takes any name under a known root with no config", () => {
