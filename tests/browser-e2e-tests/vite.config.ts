@@ -27,6 +27,8 @@ export default createConfig({
             alias: [
                 { find: /^\$(.*)$/, replacement: `${demo}styled-system/$1` },
                 { find: /^#(.*)$/, replacement: `${demo}src/$1` },
+                // React Native components render through React Native Web.
+                { find: /^react-native$/, replacement: "react-native-web" },
             ],
             dedupe: ["solid-js", "@solidjs/web"],
         },

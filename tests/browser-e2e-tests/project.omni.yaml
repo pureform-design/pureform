@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/vitest-config"
     - "@pureform/css-adapter"
     - "@pureform/tailwind-adapter"
+    - "@pureform/rn-adapter"
     - "@pureform/site"
 
 cache:

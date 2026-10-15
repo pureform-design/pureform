@@ -3,11 +3,14 @@
 
 import { compileCss } from "@pureform/css-adapter";
 import type { CssOptions } from "@pureform/css-adapter";
+import { precompute } from "@pureform/rn-adapter";
+import type { PrecomputedStyles } from "@pureform/rn-adapter";
 import { compileTailwind } from "@pureform/tailwind-adapter";
 import { compile } from "@tailwindcss/node";
 import type { BrowserCommand } from "vitest/node";
 
 import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { RN_COMPONENTS } from "./rn-components";
 
 /** The options both adapters take here. */
 export type AdapterOptions = Pick<CssOptions, "prefix" | "themeAttribute">;
@@ -36,7 +39,10 @@ const adapterCss: BrowserCommand<
     [adapter: Adapter, options: AdapterOptions]
 > = (_context, adapter, options) => ADAPTERS[adapter](options);
 
-export const commands = { adapterCss };
+const rnStyles: BrowserCommand<[]> = () =>
+    precompute(pureformConfig, { components: RN_COMPONENTS, fontStack: "all" });
+
+export const commands = { adapterCss, rnStyles };
 
 declare module "vitest/browser" {
     interface BrowserCommands {
@@ -45,5 +51,7 @@ declare module "vitest/browser" {
             adapter: Adapter,
             options: AdapterOptions,
         ) => Promise<string>;
+        /** The React Native adapter's precomputed styles for the demo's config. */
+        rnStyles: () => Promise<PrecomputedStyles>;
     }
 }
