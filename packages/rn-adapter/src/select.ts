@@ -58,7 +58,8 @@ const activeStates = (state: State): Set<string> => {
 };
 
 // Turn what CSS reads differently into React Native's terms: `none` line styles (no line),
-// a tint layered over the background, a line height relative to the font size, and no shadow.
+// a tint layered over the background, a line height relative to the font size, no shadow,
+// a flex box's direction, and an outline over its neighbors.
 const settle = (style: Style): Style => {
     const tint = style[TINT];
     if (typeof tint === "string") {
@@ -80,6 +81,12 @@ const settle = (style: Style): Style => {
         }
     }
     if (style.boxShadow === "none") delete style.boxShadow;
+    // A CSS flex box runs in a row unless told otherwise, and React Native's in a column.
+    // Only a slot that asks for flex gets the row: CSS stacks a block's children, as React
+    // Native's column does.
+    if (style.display === "flex" && style.flexDirection === undefined) {
+        style.flexDirection = "row";
+    }
     for (const [line, width] of [
         ["outlineStyle", "outlineWidth"],
         ["borderStyle", "borderWidth"],
@@ -88,6 +95,16 @@ const settle = (style: Style): Style => {
             delete style[line];
             style[width] = 0;
         }
+    }
+    // CSS paints outlines over everything beside them, and React Native Web layers each view
+    // over the ones before it, which would cover a focus ring's far side.
+    if (
+        style.outlineStyle !== undefined &&
+        typeof style.outlineWidth === "number" &&
+        style.outlineWidth > 0 &&
+        style.zIndex === undefined
+    ) {
+        style.zIndex = 1;
     }
     return style;
 };
@@ -150,6 +167,14 @@ export const selectWithTransitions = (
     const visit = (slot: string) => {
         for (const child of structure[slot] ?? []) {
             const own = styles[child]!;
+            // A CSS flex item shrinks to fit unless told otherwise, and React Native's doesn't.
+            if (
+                styles[slot]!.display === "flex" &&
+                own.flexShrink === undefined &&
+                own.flex === undefined
+            ) {
+                own.flexShrink = 1;
+            }
             for (const property of INHERITED) {
                 if (
                     own[property] === undefined &&

@@ -12,6 +12,7 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
+import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
@@ -174,6 +175,102 @@ describe("select", () => {
         expect(root!.backgroundColor).toBe("rgba(178, 153, 203, 1)");
         expect(root!.outlineWidth).toBe(0);
         expect(root!.outlineStyle).toBeUndefined();
+        expect(root!.zIndex).toBeUndefined();
+    });
+});
+
+describe("flex direction", () => {
+    it("runs a flex box in a row as CSS does, unless it says otherwise", () => {
+        const kw = (value: string) => ({ type: "keyword", value });
+        const box = lowerRn({
+            ...config,
+            components: {
+                box: {
+                    kind: "component",
+                    name: "box",
+                    recipe: {
+                        base: { display: kw("flex") },
+                        variants: {
+                            dir: {
+                                column: { flexDirection: kw("column") },
+                                none: {},
+                            },
+                        },
+                    },
+                },
+                block: {
+                    kind: "component",
+                    name: "block",
+                    recipe: { base: { width: px(1) } },
+                },
+            },
+        } as unknown as CoreConfig).components;
+        expect(select(box.box!, { dir: "none" })[""]!.flexDirection).toBe(
+            "row",
+        );
+        expect(select(box.box!, { dir: "column" })[""]!.flexDirection).toBe(
+            "column",
+        );
+        expect(select(box.block!)[""]!.flexDirection).toBeUndefined();
+    });
+
+    it("lets a flex box's slots shrink, as CSS's flex items do", () => {
+        const kw = (value: string) => ({ type: "keyword", value });
+        const row = lowerRn({
+            ...config,
+            components: {
+                row: {
+                    kind: "slotComponent",
+                    name: "row",
+                    slots: ["root", "text", "fixed"],
+                    structure: { root: ["text", "fixed"] },
+                    recipe: {
+                        base: {
+                            root: { display: kw("flex") },
+                            text: { width: pct(100) },
+                            fixed: {
+                                flexShrink: {
+                                    type: "numeric",
+                                    value: 0,
+                                    unit: "none",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        } as unknown as CoreConfig).components.row!;
+        const styles = select(row);
+        expect(styles.text!.flexShrink).toBe(1);
+        expect(styles.fixed!.flexShrink).toBe(0);
+        expect(styles.root!.flexShrink).toBeUndefined();
+    });
+});
+
+describe("outlines", () => {
+    it("lift a slot drawing one over its neighbors, as CSS paints outlines last", () => {
+        const kw = (value: string) => ({ type: "keyword", value }) as ValueNode;
+        const ring = lowerRn({
+            ...config,
+            components: {
+                ring: {
+                    kind: "component",
+                    name: "ring",
+                    recipe: {
+                        base: {
+                            outlineStyle: when(
+                                "focusVisible",
+                                kw("solid"),
+                                kw("none"),
+                            ),
+                            outlineWidth: px(3),
+                        },
+                    },
+                },
+            },
+        } as unknown as CoreConfig).components.ring!;
+        expect(select(ring, {}, { focusVisible: true })[""]!.zIndex).toBe(1);
+        expect(select(ring)[""]!.zIndex).toBeUndefined();
     });
 });
 
