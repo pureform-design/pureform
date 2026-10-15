@@ -271,6 +271,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     },
   ],
   "defaultVariants": {
+    "autoGrow": false,
     "color": "primary",
     "variant": "filled",
   },
@@ -285,6 +286,15 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     "supportingText",
   ],
   "variants": {
+    "autoGrow": {
+      "false": {},
+      "true": {
+        "input": {
+          "fieldSizing": "content",
+          "resize": "none",
+        },
+      },
+    },
     "color": {
       "info": {
         "label": {

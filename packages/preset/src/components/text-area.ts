@@ -3,7 +3,7 @@
 // It shares the text field's container, label, states, and supporting text, and differs in
 // size: the container grows with the text area instead of keeping one height, the text area
 // resizes vertically, and the label rests on the first line. Set the visible lines with the
-// textarea's `rows`.
+// textarea's `rows`, or turn on `autoGrow` to grow it with the text.
 //
 //   <div class={root}>
 //     <div class={container}>
@@ -14,7 +14,15 @@
 //   </div>
 
 import { defineSlotComponent } from "@pureform/core";
-import { flex, mul, px, unitless, vertical } from "@pureform/core/ast";
+import {
+    content,
+    flex,
+    mul,
+    none,
+    px,
+    unitless,
+    vertical,
+} from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
 import { FIELD_SLOTS, fieldParts, fieldTokens } from "./field";
@@ -37,7 +45,7 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
         name: "textArea",
         $meta: {
             description:
-                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid.",
+                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text.",
         },
         tokens,
         slots: [...FIELD_SLOTS],
@@ -59,6 +67,12 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
             // label's room is a margin outside the scroll area instead.
             variants: {
                 color: color.color,
+                // Grow with the text instead of scrolling. Browsers without field-sizing keep
+                // the rows' height.
+                autoGrow: {
+                    true: { input: { fieldSizing: content, resize: none } },
+                    false: {},
+                },
                 variant: {
                     filled: {
                         ...variant.filled,
@@ -79,7 +93,11 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
                 },
             },
             compoundVariants: color.compoundVariants,
-            defaultVariants: { variant: "filled", color: DEFAULT_GROUP },
+            defaultVariants: {
+                variant: "filled",
+                color: DEFAULT_GROUP,
+                autoGrow: "false",
+            },
         },
     });
 };
