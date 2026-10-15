@@ -343,8 +343,14 @@ export type InteractionCondition =
     | "dragged"
     | "disabled";
 
-/** Form / selectable-control states. */
-export type FormCondition = "selected" | "checked" | "invalid" | "readOnly";
+/** Form / selectable-control states. `filled` is a text input holding a value, or an element
+ *  containing one, for example to float a text field's label. */
+export type FormCondition =
+    | "selected"
+    | "checked"
+    | "invalid"
+    | "readOnly"
+    | "filled";
 
 /** Color-scheme states (lower to `prefers-color-scheme` or `[data-theme]`). */
 export type ColorSchemeCondition = "dark" | "light";
