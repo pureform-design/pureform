@@ -24,6 +24,7 @@ const SECTIONS = [
     "tabs",
     "row-colors",
     "search-and-feedback",
+    "select",
     "progress",
     "navigation",
 ];

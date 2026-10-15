@@ -51,6 +51,7 @@ export default defineConfig({
             text: ["*"],
             icon: ["*"],
             searchBar: ["*"],
+            select: ["*"],
             snackbar: ["*"],
             tooltip: ["*"],
             slider: ["*"],

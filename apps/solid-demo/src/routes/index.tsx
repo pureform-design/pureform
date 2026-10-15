@@ -8,6 +8,7 @@ import {
     navigationBar,
     navigationRail,
     searchBar,
+    select,
     slider,
     snackbar,
     tooltip,
@@ -841,6 +842,88 @@ function IndexRoute() {
                         </button>
                     </div>
                 </div>
+            </section>
+            <section
+                data-section="select"
+                style={{
+                    ...row,
+                    "align-items": "flex-start",
+                    "min-height": "220px",
+                }}
+            >
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const [open, setOpen] = createSignal(false);
+                        const [choice, setChoice] = createSignal("Medium");
+                        const s = select({ variant });
+                        const m = menu();
+                        const id = `select-${variant}`;
+                        return (
+                            <div
+                                style={{ position: "relative", width: "220px" }}
+                            >
+                                <div class={s.root}>
+                                    <div class={s.container}>
+                                        <input
+                                            class={s.input}
+                                            id={id}
+                                            role="combobox"
+                                            aria-expanded={
+                                                open() ? "true" : "false"
+                                            }
+                                            aria-controls={`${id}-menu`}
+                                            readonly
+                                            placeholder=" "
+                                            value={choice()}
+                                            onClick={() => setOpen(!open())}
+                                        />
+                                        <label class={s.label} for={id}>
+                                            {`${variant} select`}
+                                        </label>
+                                        <span class={s.trailingIcon}>▾</span>
+                                    </div>
+                                </div>
+                                {open() && (
+                                    <div
+                                        class={m.root}
+                                        role="listbox"
+                                        id={`${id}-menu`}
+                                        style={{
+                                            position: "absolute",
+                                            "z-index": "1",
+                                            width: "100%",
+                                        }}
+                                    >
+                                        <For
+                                            each={["Small", "Medium", "Large"]}
+                                        >
+                                            {(option) => (
+                                                <button
+                                                    class={m.item}
+                                                    role="option"
+                                                    type="button"
+                                                    aria-selected={
+                                                        choice() === option
+                                                            ? "true"
+                                                            : "false"
+                                                    }
+                                                    onClick={() => {
+                                                        setChoice(option);
+                                                        setOpen(false);
+                                                    }}
+                                                >
+                                                    <span class={m.itemLabel}>
+                                                        {option}
+                                                    </span>
+                                                </button>
+                                            )}
+                                        </For>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    }}
+                </For>
             </section>
             <section
                 data-section="progress"
