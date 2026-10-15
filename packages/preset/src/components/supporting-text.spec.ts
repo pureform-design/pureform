@@ -12,13 +12,10 @@ describe("supportingText", () => {
         expect(() => configWith(supportingText)).not.toThrow();
     });
 
-    it("follows an invalid input in its parent", () => {
-        const base = compiled()?.base as Record<string, Record<string, string>>;
-        const color = base.color;
-        expect(color?.base).toContain("components-supportingText-color");
-        expect(
-            color?.[":has([aria-invalid=true][aria-invalid=true]) > &"],
-        ).toContain("components-supportingText-errorColor");
+    it("keeps one color, whatever its parent holds", () => {
+        expect(compiled()?.base).toMatchObject({
+            color: "var(--components-supportingText-color, token(colors.onSurfaceVariant))",
+        });
     });
 
     it("takes the error color from its tone", () => {

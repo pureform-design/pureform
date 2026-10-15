@@ -26,7 +26,7 @@ import {
     none,
     pct,
     px,
-    rawCondition,
+    slot,
     relative,
     shadow,
     solid,
@@ -55,7 +55,7 @@ import {
 } from "@pureform/theme";
 
 import { componentTokens, disabledColor, stateTransition, sys } from "./shared";
-import { INVALID_INPUT, supportingTextStyle } from "./supporting-text";
+import { supportingTextStyle } from "./supporting-text";
 
 const { tokens, ref } = componentTokens("textField", {
     height: px(56),
@@ -76,36 +76,25 @@ const { tokens, ref } = componentTokens("textField", {
     iconSize: sizeToken("iconMedium"),
 });
 
-const css = (selector: string) => rawCondition({ css: selector });
+// States of the container, read from the input inside it. The adapter ranks them, so a later
+// state wins: hover, then focus, then invalid, then disabled.
+const HOVER = slot("container", "hover");
+const FOCUSED = slot("container", "focusWithin");
+const FILLED = slot("container", "filled");
+const INVALID = slot("container", "invalid");
+const DISABLED = slot("container", "disabled");
 
-// States of the container, read from the input inside it. Focus repeats its pseudo-class so
-// it outranks hover, and the error selectors repeat the attribute so they outrank focus,
-// wherever Panda orders the rules.
-const INVALID = INVALID_INPUT;
-const FOCUSED = css("&:focus-within:focus-within");
-const ERRORED = css(`&:has(${INVALID})`);
-const ERRORED_FOCUSED = css(`&:has(${INVALID}):focus-within`);
-const DISABLED = css("&:has(:disabled)");
-
-// States of the container, from the label (its child) or the supporting text (the root's).
-const PARENT_FLOATED = css(
-    ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &",
-);
-const PARENT_FOCUSED = css(":focus-within > &");
-const PARENT_ERRORED = css(`:has(${INVALID}) > &`);
-const PARENT_DISABLED = css(":has(:disabled) > &");
-
-// A value per container state, the later ones winning.
+// A value per container state.
 const byState = <T extends ValueNode>(
     rest: T,
     states: { hover?: T; focus: T; error: T; errorFocus: T; disabled: T },
 ) => {
     const builder = when();
-    if (states.hover) builder.on("hover", states.hover);
+    if (states.hover) builder.on(HOVER, states.hover);
     return builder
         .on(FOCUSED, states.focus)
-        .on(ERRORED, states.error)
-        .on(ERRORED_FOCUSED, states.errorFocus)
+        .on(INVALID, states.error)
+        .on([INVALID, FOCUSED], states.errorFocus)
         .on(DISABLED, states.disabled)
         .else(rest);
 };
@@ -173,12 +162,12 @@ const outlined: StyleMap = {
 
 // A label value: resting in the middle, or floated by focus or a value.
 const floated = (rest: ValueNode, float: ValueNode) =>
-    when().on(PARENT_FLOATED, float).else(rest);
+    when().on(FILLED, float).on(FOCUSED, float).else(rest);
 
 const labelColor = when()
-    .on(PARENT_FOCUSED, ref("focusColor"))
-    .on(PARENT_ERRORED, ref("errorColor"))
-    .on(PARENT_DISABLED, disabledColor("disabledContent"))
+    .on(FOCUSED, ref("focusColor"))
+    .on(INVALID, ref("errorColor"))
+    .on(DISABLED, disabledColor("disabledContent"))
     .else(ref("labelColor"));
 
 const smallText = {
@@ -231,6 +220,10 @@ export const textField = defineSlotComponent({
     },
     tokens,
     slots: ["root", "container", "input", "label", "supportingText"],
+    structure: {
+        root: ["container", "supportingText"],
+        container: ["input", "label"],
+    },
     recipe: {
         base: {
             root: { display: flex, flexDirection: column },
@@ -263,10 +256,14 @@ export const textField = defineSlotComponent({
                 transition: labelTransition,
             },
             supportingText: {
-                ...supportingTextStyle({
-                    rest: ref("supportingColor"),
-                    error: ref("errorColor"),
-                }),
+                ...supportingTextStyle,
+                color: when()
+                    .on(slot("root", "invalid"), ref("errorColor"))
+                    .on(
+                        slot("root", "disabled"),
+                        disabledColor("disabledContent"),
+                    )
+                    .else(ref("supportingColor")),
                 paddingInlineStart: ref("paddingInline"),
                 paddingInlineEnd: ref("paddingInline"),
             },
