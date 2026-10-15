@@ -7,8 +7,8 @@ import type { ComponentStyles } from "./lower";
 import { formatColor } from "./rgba";
 import { readColorFunction } from "./spaces";
 import type { Scheme } from "./theme";
-import { evaluate, isExpr } from "./values";
-import type { ThemeValues, Value } from "./values";
+import { dependencies, evaluate, isExpr } from "./values";
+import type { Concrete, ThemeValues, Value } from "./values";
 
 export type Templates = Record<string, ComponentStyles>;
 export type Resolved = Record<string, ComponentStyles<Value>>;
@@ -62,6 +62,8 @@ export interface RuntimeStyles {
     mode: "runtime";
     templates: Templates;
     themes: Record<string, ThemeValues>;
+    /** Each theme's formulas for the tokens that read others, by theme key. */
+    formulas?: Record<string, Record<string, Value>>;
 }
 
 /** Styles resolved ahead of time. The components' structure is shared: each value that reads
@@ -71,6 +73,8 @@ export interface PrecomputedStyles {
     mode: "precomputed";
     templates: Templates;
     themes: Record<string, ThemeValues>;
+    /** Each theme's formulas for the tokens that read others, by theme key. */
+    formulas?: Record<string, Record<string, Value>>;
     /** Each theme's resolved values, by theme key. */
     values: Record<string, Value[]>;
     /** The positions in `values` of those reading each token. */
@@ -130,12 +134,47 @@ export const overridesFor = (
     return out ?? values;
 };
 
-/** A theme's styles with runtime overrides of token or component token values applied. */
+/** Overrides with the tokens derived from them recomputed: a token whose formula reads an
+ *  overridden one, directly or through others, takes its new value. One given outright stays
+ *  as given. */
+export const withDerived = (
+    styles: Styles,
+    key: string,
+    overrides: ThemeValues,
+): ThemeValues => {
+    const formulas = styles.formulas?.[key];
+    if (!formulas || Object.keys(overrides).length === 0) return overrides;
+    const theme: ThemeValues = { ...styles.themes[key], ...overrides };
+    const out: ThemeValues = { ...overrides };
+    const changed = new Set(Object.keys(overrides));
+    const reads = Object.entries(formulas).map(
+        ([token, formula]) =>
+            [token, formula, [...dependencies(formula)]] as const,
+    );
+    // Formulas are few and shallow, so a pass until nothing changes is enough.
+    for (let again = true; again;) {
+        again = false;
+        for (const [token, formula, keys] of reads) {
+            if (token in overrides || !keys.some((k) => changed.has(k)))
+                continue;
+            const value = evaluate(formula, theme) as Concrete;
+            if (theme[token] === value) continue;
+            theme[token] = out[token] = value;
+            if (!changed.has(token)) again = true;
+            changed.add(token);
+        }
+    }
+    return out;
+};
+
+/** A theme's styles with runtime overrides of token or component token values applied, and
+ *  the tokens derived from them recomputed. */
 export const stylesFor = (
     styles: Styles,
     key: string,
-    overrides: ThemeValues = {},
+    given: ThemeValues = {},
 ): Resolved => {
+    const overrides = withDerived(styles, key, given);
     const base = styles.themes[key];
     if (!base) throw new Error(`no styles for theme "${key}"`);
     const theme = { ...base, ...overrides };

@@ -7,8 +7,8 @@ import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 
 import { lowerToken, refKey } from "./lower";
 import type { RnOptions } from "./lower";
-import { evaluate } from "./values";
-import type { Concrete, ThemeValues } from "./values";
+import { dependencies, evaluate } from "./values";
+import type { Concrete, ThemeValues, Value } from "./values";
 
 export type Scheme = "light" | "dark";
 
@@ -74,6 +74,9 @@ const tokenNodes = (
 export const resolveTheme = (
     config: CoreConfig,
     options: ThemeOptions,
+    /** Filled with the formula of each token that reads others, by key, so an override of
+     *  what it reads can recompute it. */
+    formulas?: Record<string, Value>,
 ): ThemeValues => {
     const override = options.theme ? config.themes?.[options.theme] : undefined;
     if (options.theme && !override)
@@ -89,10 +92,11 @@ export const resolveTheme = (
             throw new Error(`token "${key}" refers to itself`);
         pending.add(key);
         try {
-            const value = evaluate(
-                lowerToken(node, config, options.scheme, options),
-                theme,
-            );
+            const template = lowerToken(node, config, options.scheme, options);
+            const value = evaluate(template, theme);
+            if (formulas && dependencies(template).size > 0) {
+                formulas[key] = template;
+            }
             if (typeof value === "number" || typeof value === "string")
                 values[key] = value;
             return values[key];

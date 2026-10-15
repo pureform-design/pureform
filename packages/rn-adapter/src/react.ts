@@ -4,7 +4,7 @@
 import { createContext, createElement, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
 
-import { overridesFor, stylesFor, themeKey } from "./resolve";
+import { overridesFor, stylesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
 import type { Selected, State, Style } from "./select";
@@ -51,7 +51,10 @@ export const PureformProvider = (props: PureformProviderProps) => {
         [styles, key, overrideKey],
     );
     const tokens = useMemo(
-        () => ({ ...styles.themes[key], ...overrides }),
+        () => ({
+            ...styles.themes[key],
+            ...withDerived(styles, key, overrides),
+        }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
         [styles, key, overrideKey],
     );

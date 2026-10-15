@@ -10,7 +10,7 @@ import type { PrecomputedStyles, RuntimeStyles } from "./resolve";
 import { resolveTheme } from "./theme";
 import type { Scheme } from "./theme";
 import { dependencies, evaluate } from "./values";
-import type { ThemeValues } from "./values";
+import type { ThemeValues, Value } from "./values";
 
 export interface BuildOptions extends RnOptions {
     /** Named themes to include besides the base. Default all of the config's. */
@@ -21,19 +21,21 @@ export interface BuildOptions extends RnOptions {
 
 const themeValues = (config: CoreConfig, options: BuildOptions) => {
     const themes: Record<string, ThemeValues> = {};
+    const formulas: Record<string, Record<string, Value>> = {};
     for (const theme of [
         undefined,
         ...(options.themes ?? Object.keys(config.themes ?? {})),
     ]) {
         for (const scheme of options.schemes ?? (["light", "dark"] as const)) {
-            themes[themeKey(theme, scheme)] = resolveTheme(config, {
-                ...options,
-                scheme,
-                ...(theme ? { theme } : {}),
-            });
+            const key = themeKey(theme, scheme);
+            themes[key] = resolveTheme(
+                config,
+                { ...options, scheme, ...(theme ? { theme } : {}) },
+                (formulas[key] = {}),
+            );
         }
     }
-    return themes;
+    return { themes, formulas };
 };
 
 /** Templates and theme values, resolved when the app picks a theme. */
@@ -43,7 +45,7 @@ export const runtimeStyles = (
 ): RuntimeStyles => ({
     mode: "runtime",
     templates: lowerRn(config, options).components,
-    themes: themeValues(config, options),
+    ...themeValues(config, options),
 });
 
 /** Styles resolved ahead of time for every theme and scheme. */
@@ -52,7 +54,7 @@ export const precompute = (
     options: BuildOptions = {},
 ): PrecomputedStyles => {
     const templates = lowerRn(config, options).components;
-    const themes = themeValues(config, options);
+    const { themes, formulas } = themeValues(config, options);
     const found = themeTemplates(templates);
     const dependents: Record<string, number[]> = {};
     found.forEach((template, index) => {
@@ -64,6 +66,7 @@ export const precompute = (
         mode: "precomputed",
         templates,
         themes,
+        formulas,
         values: Object.fromEntries(
             Object.entries(themes).map(([key, theme]) => [
                 key,

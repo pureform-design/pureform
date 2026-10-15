@@ -18,7 +18,13 @@ import { describe, expect, it } from "vitest";
 
 import { precompute, runtimeStyles } from "./build";
 import { lowerRn } from "./lower";
-import { overridesFor, resolve, stylesFor, themeKey } from "./resolve";
+import {
+    overridesFor,
+    resolve,
+    stylesFor,
+    themeKey,
+    withDerived,
+} from "./resolve";
 import { select, selectWithTransitions } from "./select";
 import { resolveTheme } from "./theme";
 import { evaluate } from "./values";
@@ -271,6 +277,34 @@ describe("outlines", () => {
         } as unknown as CoreConfig).components.ring!;
         expect(select(ring, {}, { focusVisible: true })[""]!.zIndex).toBe(1);
         expect(select(ring)[""]!.zIndex).toBeUndefined();
+    });
+});
+
+describe("withDerived", () => {
+    it("recomputes the tokens derived from an override, in either mode", () => {
+        const violet = { "colors.violet": "rgba(200, 0, 0, 1)" };
+        for (const styles of [
+            precompute(config, { schemes: ["light"] }),
+            runtimeStyles(config, { schemes: ["light"] }),
+        ]) {
+            expect(withDerived(styles, "base:light", violet)).toEqual({
+                ...violet,
+                "colors.primary": "rgba(200, 0, 0, 1)",
+            });
+            const root = select(
+                stylesFor(styles, "base:light", violet).button!,
+            ).root!;
+            expect(root.backgroundColor).toBe("rgba(200, 0, 0, 1)");
+        }
+    });
+
+    it("keeps a token given outright", () => {
+        const styles = precompute(config, { schemes: ["light"] });
+        const given = {
+            "colors.violet": "rgba(200, 0, 0, 1)",
+            "colors.primary": "rgba(0, 0, 200, 1)",
+        };
+        expect(withDerived(styles, "base:light", given)).toEqual(given);
     });
 });
 
