@@ -434,6 +434,25 @@ describe("lowerRn viewport conditions", () => {
     });
 });
 
+describe("lowerRn percentages", () => {
+    it("keeps them where React Native takes them, and reports the rest", () => {
+        const { rules, diagnostics } = rulesOf({
+            width: pct(50),
+            borderTopLeftRadius: pct(50),
+            fontSize: pct(120),
+            borderWidth: pct(10),
+        } as unknown as StyleMap);
+        expect(rules[0]!.style).toEqual({
+            width: "50%",
+            borderTopLeftRadius: "50%",
+        });
+        expect(diagnostics).toEqual([
+            "box: fontSize: React Native takes no percentage for fontSize",
+            "box: borderWidth: React Native takes no percentage for borderWidth",
+        ]);
+    });
+});
+
 describe("lowerRn diagnostics", () => {
     it("drops what React Native can't do, and says so", () => {
         const { rules, diagnostics } = rulesOf({

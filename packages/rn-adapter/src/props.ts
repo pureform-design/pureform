@@ -197,3 +197,51 @@ export const rnKeyword = (property: string, keyword: string): string | null => {
             return keyword;
     }
 };
+
+/** The React Native properties that take a percentage of the parent's size: sizes, insets,
+ *  margins, padding, gaps, flex basis, and corner radii. Transforms take them too, inside
+ *  their steps. */
+export const PERCENT_OK = new Set<string>([
+    "width",
+    "height",
+    "minWidth",
+    "maxWidth",
+    "minHeight",
+    "maxHeight",
+    "flexBasis",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "start",
+    "end",
+    "inset",
+    "gap",
+    "rowGap",
+    "columnGap",
+    ...["margin", "padding"].flatMap((box) =>
+        [
+            "",
+            "Top",
+            "Right",
+            "Bottom",
+            "Left",
+            "Start",
+            "End",
+            "Horizontal",
+            "Vertical",
+        ].map((side) => `${box}${side}`),
+    ),
+    ...[
+        "",
+        "TopLeft",
+        "TopRight",
+        "BottomLeft",
+        "BottomRight",
+        "TopStart",
+        "TopEnd",
+        "BottomStart",
+        "BottomEnd",
+    ].map((corner) => `border${corner}Radius`),
+    "transform",
+]);

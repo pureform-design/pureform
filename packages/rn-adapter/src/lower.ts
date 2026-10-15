@@ -18,7 +18,7 @@ import type {
 import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 
 import { colorNodeRgba } from "./color";
-import { rnKeyword, rnProperty } from "./props";
+import { PERCENT_OK, rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
 import { MIX_SPACES } from "./spaces";
 import type { MixSpace } from "./spaces";
@@ -304,6 +304,15 @@ const keyframes = (name: string, ctx: Ctx): Value => {
         })
         .sort((a, b) => a.offset - b.offset);
 };
+
+const hasPercent = (value: Value): boolean =>
+    typeof value === "string"
+        ? /^-?[\d.]+%$/.test(value)
+        : typeof value === "object" &&
+          value !== null &&
+          // A mix's amount is a share, not a length.
+          !("$mix" in value) &&
+          Object.values(value).some((v) => hasPercent(v as Value));
 
 /** Lower a value node to its cased values. */
 export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
@@ -594,6 +603,18 @@ const lowerStyle = (
                 ...ctx,
                 property,
             })) {
+                // A percentage React Native would ignore on the device.
+                if (
+                    rn !== TINT &&
+                    rn !== TRANSITION &&
+                    rn !== ANIMATION &&
+                    !PERCENT_OK.has(rn) &&
+                    hasPercent(entry.value)
+                ) {
+                    throw new Unsupported(
+                        `React Native takes no percentage for ${rn}`,
+                    );
+                }
                 rules.add(
                     [...new Set([...when, ...entry.when])],
                     specificity + entry.specificity,
