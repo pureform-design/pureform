@@ -376,10 +376,16 @@ function TokensRoute() {
                                     aria-label={variant}
                                 >
                                     <span class={b.touchTarget} />
-                                    <Ripple centered />
-                                    <svg class={b.icon} viewBox="0 0 24 24">
-                                        <path fill="currentColor" d={STAR} />
-                                    </svg>
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d={STAR}
+                                            />
+                                        </svg>
+                                    </span>
+                                    <span class={b.outline} />
                                 </button>
                             );
                         }}

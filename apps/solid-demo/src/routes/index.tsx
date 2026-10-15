@@ -28,6 +28,8 @@ import {
     textArea,
     textField,
 } from "$recipes";
+import { MATERIAL_SHAPES } from "@pureform/preset";
+import type { MaterialShape } from "@pureform/preset";
 import { createFileRoute } from "@tanstack/solid-router";
 import { createSignal, For } from "solid-js";
 
@@ -394,8 +396,10 @@ function IndexRoute() {
                                 aria-label={`${size} FAB`}
                             >
                                 <span class={f.touchTarget} />
-                                <Ripple />
-                                <span class={f.icon}>+</span>
+                                <span class={f.container}>
+                                    <Ripple />
+                                    <span class={f.icon}>+</span>
+                                </span>
                             </button>
                         );
                     }}
@@ -406,9 +410,11 @@ function IndexRoute() {
                         return (
                             <button class={f.root} type="button">
                                 <span class={f.touchTarget} />
-                                <Ripple />
-                                <span class={f.label}>
-                                    {`${variant} FAB`.toUpperCase()}
+                                <span class={f.container}>
+                                    <Ripple />
+                                    <span class={f.label}>
+                                        {`${variant} FAB`.toUpperCase()}
+                                    </span>
                                 </span>
                             </button>
                         );
@@ -625,6 +631,91 @@ function IndexRoute() {
                 </button>
             </section>
 
+            <section data-section="shapes">
+                <div style={{ ...row, "max-width": "760px" }}>
+                    <For each={Object.keys(MATERIAL_SHAPES) as MaterialShape[]}>
+                        {(shape) => {
+                            const b = iconButton({
+                                variant: "tonal",
+                                size: "large",
+                                shape,
+                            });
+                            return (
+                                <button
+                                    class={b.root}
+                                    type="button"
+                                    aria-label={shape}
+                                    title={shape}
+                                >
+                                    <span class={b.touchTarget} />
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                            />
+                                        </svg>
+                                    </span>
+                                </button>
+                            );
+                        }}
+                    </For>
+                </div>
+                <div style={{ ...row, "align-items": "center" }}>
+                    <For each={ICON_FILLS}>
+                        {(variant) => {
+                            const b = iconButton({
+                                variant,
+                                size: "large",
+                                shape: "cookie9Sided",
+                            });
+                            return (
+                                <button
+                                    class={b.root}
+                                    type="button"
+                                    aria-label={`${variant} cookie`}
+                                >
+                                    <span class={b.touchTarget} />
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                            />
+                                        </svg>
+                                    </span>
+                                    <span class={b.outline} />
+                                </button>
+                            );
+                        }}
+                    </For>
+                    <For each={["medium", "large"] as const}>
+                        {(size) => {
+                            const f = fab({
+                                size,
+                                shape:
+                                    size === "large" ? "sunny" : "cookie4Sided",
+                            });
+                            return (
+                                <button
+                                    class={f.root}
+                                    type="button"
+                                    aria-label={`${size} shaped FAB`}
+                                >
+                                    <span class={f.touchTarget} />
+                                    <span class={f.container}>
+                                        <Ripple />
+                                        <span class={f.icon}>+</span>
+                                    </span>
+                                </button>
+                            );
+                        }}
+                    </For>
+                </div>
+            </section>
+
             <section data-section="icon-buttons" style={row}>
                 <For each={ICON_FILLS}>
                     {(variant) => {
@@ -636,25 +727,31 @@ function IndexRoute() {
                                 aria-label={variant}
                             >
                                 <span class={b.touchTarget} />
-                                <Ripple centered />
-                                <svg class={b.icon} viewBox="0 0 24 24">
-                                    <path
-                                        fill="currentColor"
-                                        d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                                    />
-                                </svg>
+                                <span class={b.container}>
+                                    <Ripple centered />
+                                    <svg class={b.icon} viewBox="0 0 24 24">
+                                        <path
+                                            fill="currentColor"
+                                            d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                        />
+                                    </svg>
+                                </span>
+                                <span class={b.outline} />
                             </button>
                         );
                     }}
                 </For>
                 <button class={iconButton().root} type="button" disabled>
                     <span class={iconButton().touchTarget} />
-                    <svg class={iconButton().icon} viewBox="0 0 24 24">
-                        <path
-                            fill="currentColor"
-                            d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
-                        />
-                    </svg>
+                    <span class={iconButton().container}>
+                        <svg class={iconButton().icon} viewBox="0 0 24 24">
+                            <path
+                                fill="currentColor"
+                                d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                            />
+                        </svg>
+                    </span>
+                    <span class={iconButton().outline} />
                 </button>
             </section>
 

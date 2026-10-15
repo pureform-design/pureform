@@ -20,6 +20,7 @@ const SECTIONS = [
     "icon-fields-and-areas",
     "icons",
     "fabs",
+    "shapes",
     "chips",
     "lists",
     "tabs",

@@ -2314,6 +2314,18 @@ CSS var, so each step restates the sized properties at its offset; where those p
 come from another variant (a button's `size`, a list item's `lines`, a field's fill), compound
 variants restate them per value instead.
 
+**Shapes.** Core draws a shape as contours of lines and cubic curves in a unit square, plain
+numbers any target can draw, with builders for Material's model (`roundedPolygon`, `star`,
+`circle`, `normalize`). `clipShape` fits one to a box, by stretching, containing at a size, or
+fixing its features' distance from the nearer edge, as a `shape` node that Panda lowers to
+CSS `shape()`; `outlineShape` makes an even-odd ring to stroke it. A clip cuts away the focus
+ring, shadow, and hit area, so a shaped component clips a `container` slot inside its root:
+the root keeps the ring and touch target and casts elevation through `filterElevation` (drop
+shadows), and an `outline` slot clipped to the ring strokes outlined styles. Where `shape()`
+is unsupported, the `clipShape` condition keeps the rounded corners. The preset ships
+Material's expressive shapes as `MATERIAL_SHAPES`, and `pureform({ shapes })` sets the `shape`
+variant of the icon button and FAB.
+
 **Accessibility.** Every interactive component draws `focusRing()`: a 3px secondary outline,
 offset 2px, on keyboard focus. Its touch target reaches the theme's `touchTarget` size.
 Selection controls lay a native input over the control, so forms, the keyboard, and screen
