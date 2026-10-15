@@ -10,8 +10,7 @@
         "start": "node --env-file-if-exists=.env dist/server/node.js",
         "serve": "vite preview",
         "test": "vitest",
-        "lint": "oxlint src",
-        "test:visual": "playwright test"
+        "lint": "oxlint src"
     },
     "dependencies": {
         "@pureform/core": "catalog:",
@@ -34,9 +33,6 @@
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
-        "@playwright/test": "catalog:",
-        "@pureform/css-adapter": "catalog:",
-        "@pureform/tailwind-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
@@ -44,7 +40,6 @@
         "@solidjs/start-devtools": "catalog:",
         "@solidjs/testing-library": "catalog:",
         "@solidjs/vite-plugin": "catalog:",
-        "@tailwindcss/node": "catalog:",
         "@tanstack/router-plugin": "catalog:",
         "@testing-library/jest-dom": "catalog:",
         "@types/node": "catalog:",
@@ -52,7 +47,6 @@
         "filesystem-routing": "catalog:",
         "jsdom": "catalog:",
         "oxlint": "catalog:",
-        "tailwindcss": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

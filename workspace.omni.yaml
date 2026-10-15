@@ -5,6 +5,7 @@ ui: auto
 projects:
   - packages/**
   - apps/**
+  - tests/**
 
 generators:
   - source: local

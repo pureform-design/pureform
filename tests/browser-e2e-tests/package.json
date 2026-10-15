@@ -1,0 +1,26 @@
+{
+    "name": "@pureform/browser-e2e-tests",
+    "version": "0.0.0-semantically-released",
+    "private": true,
+    "description": "Browser tests over the demo and the adapters",
+    "type": "module",
+    "devDependencies": {
+        "@pandacss/vite": "catalog:",
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/tailwind-adapter": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@solidjs/vite-plugin": "catalog:",
+        "@solidjs/web": "catalog:",
+        "@tailwindcss/node": "catalog:",
+        "@types/node": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "solid-js": "catalog:",
+        "tailwindcss": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

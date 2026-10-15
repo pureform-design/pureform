@@ -91,6 +91,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/browser-e2e-tests"]
+path = "tests/browser-e2e-tests"
+include = [
+    "tests/browser-e2e-tests/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
