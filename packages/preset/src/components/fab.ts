@@ -14,6 +14,7 @@ import {
     px,
     relative,
     row,
+    unitless,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -60,7 +61,11 @@ const fabSize = (s: Size): { root: StyleMap; icon: StyleMap } => ({
     },
     icon:
         s === "Large"
-            ? { width: ref("iconSizeLarge"), height: ref("iconSizeLarge") }
+            ? {
+                  width: ref("iconSizeLarge"),
+                  height: ref("iconSizeLarge"),
+                  fontSize: ref("iconSizeLarge"),
+              }
             : {},
 });
 
@@ -95,7 +100,16 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
                         },
                     },
                 },
-                icon: { width: ref("iconSize"), height: ref("iconSize") },
+                // Centered, and sized for a glyph icon as well as an svg.
+                icon: {
+                    display: inlineFlex,
+                    alignItems: center,
+                    justifyContent: center,
+                    width: ref("iconSize"),
+                    height: ref("iconSize"),
+                    fontSize: ref("iconSize"),
+                    lineHeight: unitless(1),
+                },
                 label: { textStyle: textStyle("labelLarge") },
                 touchTarget,
             },

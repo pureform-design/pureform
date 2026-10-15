@@ -4,7 +4,12 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-fab-iconSize, token(sizes.iconMedium))",
       "height": "var(--components-fab-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
       "width": "var(--components-fab-iconSize, token(sizes.iconMedium))",
     },
     "label": {
@@ -537,6 +542,7 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     "size": {
       "large": {
         "icon": {
+          "fontSize": "var(--components-fab-iconSizeLarge, 36px)",
           "height": "var(--components-fab-iconSizeLarge, 36px)",
           "width": "var(--components-fab-iconSizeLarge, 36px)",
         },
