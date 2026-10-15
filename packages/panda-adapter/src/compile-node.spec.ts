@@ -31,6 +31,7 @@ import {
     transparent,
     tween,
     unitless,
+    vertical,
     when,
 } from "@pureform/core/ast";
 import {
@@ -241,6 +242,14 @@ describe("compileValue conditionals", () => {
             base: "0",
             "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])":
                 "1",
+        });
+    });
+});
+
+describe("compileStyleMap resize", () => {
+    it("passes the resize keyword through", () => {
+        expect(compileStyleMap({ resize: vertical }, ctx())).toEqual({
+            resize: "vertical",
         });
     });
 });
