@@ -142,3 +142,7 @@ values refer to.
   its subtree.
 - **Dark values:** pass `requireDark: true` to `pureform()` or `resolveTheme()` to reject color
   roles with no dark value.
+- **Contrast:** pass `requireContrast: 4.5` (WCAG AA) to `pureform()` or `resolveTheme()` to
+  reject a content role that falls below that ratio against the role it sits on, in light and
+  dark, for the base theme and every named theme. `contrastFailures(color, ratio)` returns the
+  failing pairs instead of throwing.

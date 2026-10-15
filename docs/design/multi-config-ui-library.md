@@ -2066,9 +2066,11 @@ defineSlotComponent({
 });
 ```
 
-- **States.** `hover`, `focusWithin`, `focusVisibleWithin`, `filled`, `invalid`, `disabled`.
-  Each describes the slot's element together with what it contains, so a container is
-  `invalid` when an input inside it is.
+- **States.** `hover`, `focusWithin`, `focusVisibleWithin`, `pressed`, `filled`, `selected`,
+  `checked`, `indeterminate`, `invalid`, `disabled`. Each describes the slot's element together
+  with what it contains, so a container is `invalid` when an input inside it is, and a
+  checkbox's root is `checked` when its native input is. `selected` (`aria-selected`,
+  `aria-pressed`) is separate from `checked` (`:checked`, `aria-checked`).
 - **Rules.** A slot can always read its own state. Reading another slot needs `structure`, and
   that slot must be an ancestor there; `validateConfig` rejects anything else, and a slot
   condition outside a slotted component. `defineSlotComponent` types `structure` against the
@@ -2076,9 +2078,13 @@ defineSlotComponent({
 - **Web.** The slot's own state lowers onto itself (`&:is(:focus-within, [data-focused])`),
   an ancestor's onto that slot's class (`.textField__container:is(...) &`). Each state also
   matches a data attribute (`data-hover`, `data-focused`, `data-focus-visible`, `data-filled`,
-  `data-invalid`, `data-disabled`) for custom controls. The adapter ranks the states by
-  repeating the selector, so hover, focus, invalid, and disabled win in that order wherever
-  Panda places the rules. `compilePreset` takes `pandaPrefix` when the Panda config prefixes
+  `data-invalid`, `data-disabled`, and so on) for custom controls. The adapter ranks the
+  states by repeating the selector, so wherever Panda places the rules, later ranks win:
+  hover, filled, selected, and checked; then indeterminate and the focus states; then
+  pressed; then invalid; then disabled.
+- **AND.** An array of conditions in one case means all of them. The slot conditions in a case
+  join into one selector: states of the same slot on one element, ancestors outermost first.
+  Write "or" as separate cases with the same value. `compilePreset` takes `pandaPrefix` when the Panda config prefixes
   class names.
 - **Native.** React Native has no selectors or cascade, so nothing is discovered from the
   markup. A binding owns the component's state (a `TextInput`'s focus and value, props for
@@ -2210,7 +2216,9 @@ tokens.
 name or a wrong kind of value fails to compile, with the error on the offending line.
 `resolveTheme` repeats both checks at runtime for plain JavaScript and casts, naming the
 provider, the slot, and what was wrong: `shape provider "brand" gives radius "small" a color
-value, not a length`. `requireDark` adds a check that every color role has a dark value.
+value, not a length`. `requireDark` adds a check that every color role has a dark value. `requireContrast: 4.5` adds a check that every content role reaches that WCAG
+ratio against the role it sits on, in light and dark, for the base theme and every named
+theme.
 
 **Resolution order.** Domains resolve in a fixed order (color, typography, shape, layout,
 state, motion, elevation), and each provider receives the contracts resolved before it. That
@@ -2246,6 +2254,54 @@ pureform({
     themes: { compact: { layout: materialLayout({ grid: 3 }) } },
 });
 ```
+
+### 4.9 Preset components (`@pureform/preset`) **[DECIDED]**
+
+`pureform()` ships Material's components as core specs: `button`, `iconButton`, `fab`, `chip`,
+`textField`, `textArea`, `supportingText`, `checkbox`, `radio`, `switchControl`, `separator`,
+`card`, `scrim`, `ripple`, `icon`, `touchTarget`, and `text`. A component's name is its
+generated export, so it avoids reserved words (`switchControl`) and Panda's own patterns
+(`separator`, not `divider`).
+
+**Tokens.** Each component declares its own tokens through `componentTokens`, each an
+overridable `--components-<name>-<token>` var whose default reads the theme. Its recipe reads
+them through `ref(token)`, so an app restyles one component at runtime without a rebuild.
+
+**Color variants.** A component that takes a color group is built by `createX(groups)`, and
+`pureform()` passes the theme's groups, custom ones included. Two patterns:
+
+- **Fills** (button, icon button, FAB): an empty `color` entry per group, and a compound
+  variant per fill and group that sets the colors, since they depend on both.
+- **States** (checkbox, radio, switch, text inputs, chip): the base draws the default group
+  through the tokens, and its `color` entry stays empty; every other group rebuilds only the
+  properties that depend on the group, each with its full condition list, so error and
+  disabled still win. Where those properties sit in another variant (a text field's fill), a
+  compound variant replaces them in the later layer.
+
+Standalone `supportingText` and `icon` take a group through `tone` and `color`.
+
+**Shared parts, and parts as components.** Parts that repeat across components live in
+`components/shared.ts` and friends, and where a part is useful alone, it is also a component
+that shares the same style:
+
+| Part                    | Shared as                                     | Also a component |
+| ----------------------- | --------------------------------------------- | ---------------- |
+| Icon slot               | `iconBox(size)`                               | `icon`           |
+| Touch target slot       | `touchTarget`                                 | `touchTarget`    |
+| Supporting text         | `supportingTextStyle`                         | `supportingText` |
+| Pressable root          | `pressableRoot`                               |                  |
+| Focus indicator         | `focusRing(condition)`                        |                  |
+| Selection control parts | `control.ts`: native input, state layer, root |                  |
+| Text input parts        | `field.ts`: container, label, states, colors  |                  |
+
+A new component looks for these first, and extracts anything it would otherwise repeat.
+
+**Accessibility.** Every interactive component draws `focusRing()`: a 3px secondary outline,
+offset 2px, on keyboard focus. Its touch target reaches the theme's `touchTarget` size.
+Selection controls lay a native input over the control, so forms, the keyboard, and screen
+readers work unchanged. The preset's tests check each component's color pairs (4.5:1 for
+text, 3:1 for the parts that identify a control), every color group in light and dark, the
+touch targets, and the focus ring.
 
 ---
 
