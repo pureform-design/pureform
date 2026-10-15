@@ -146,3 +146,6 @@ values refer to.
   reject a content role that falls below that ratio against the role it sits on, in light and
   dark, for the base theme and every named theme. `contrastFailures(color, ratio)` returns the
   failing pairs instead of throwing.
+- **Density:** `gridLayout({ density })` (and `materialLayout`) takes `0` to `-3` and emits the
+  `densityOffset` size, one grid unit off per step, which dense components add to their
+  heights. Set it in a named theme to make a subtree denser.

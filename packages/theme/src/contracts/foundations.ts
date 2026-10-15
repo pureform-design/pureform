@@ -72,7 +72,8 @@ export const SPACING_STEPS = [
 export type SpacingStep = (typeof SPACING_STEPS)[number];
 
 /** Component dimensions. `touchTarget` is the minimum interactive area, whatever the visible
- *  size. */
+ *  size. `densityOffset` is what density takes off a dense component's height: zero at the
+ *  default density, negative when denser. */
 export const SIZE_ROLES = [
     "iconSmall",
     "iconMedium",
@@ -80,9 +81,16 @@ export const SIZE_ROLES = [
     "controlMedium",
     "controlLarge",
     "touchTarget",
+    "densityOffset",
 ] as const;
 
 export type SizeRole = (typeof SIZE_ROLES)[number];
+
+/** Material's density steps: 0 is the default, and each step down takes one grid unit off a
+ *  dense component's height. */
+export const DENSITY_STEPS = [0, -1, -2, -3] as const;
+
+export type DensityStep = (typeof DENSITY_STEPS)[number];
 
 export interface LayoutContract {
     spacing: Record<SpacingStep, NumericScalarNode> &

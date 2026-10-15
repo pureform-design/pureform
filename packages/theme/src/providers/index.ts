@@ -21,6 +21,7 @@ import {
     SPACING_STEPS,
 } from "../contracts/foundations";
 import type {
+    DensityStep,
     ElevationLevel,
     ShapeRole,
     SizeRole,
@@ -216,22 +217,32 @@ export interface GridLayoutOptions {
     /** The grid unit, in px. Spacing step `"n"` is `n` units. Default `4`. */
     grid?: number;
     /** Component sizes, in px. */
-    sizes: Record<SizeRole, number> & Record<string, number>;
+    sizes: Record<Exclude<SizeRole, "densityOffset">, number> &
+        Record<string, number>;
+    /** How dense components are: `0` (the default) to `-3`, one grid unit off a dense
+     *  component's height per step. */
+    density?: DensityStep;
 }
 
-/** Spacing on a grid of the given unit, with the given component sizes. */
+/** Spacing on a grid of the given unit, with the given component sizes and density. */
 export const gridLayout = ({
     grid = 4,
     sizes,
+    density = 0,
 }: GridLayoutOptions): LayoutProvider =>
     defineProvider({
         domain: "layout",
         name: "grid",
         generate: () => ({
             spacing: byName(SPACING_STEPS, (step) => px(Number(step) * grid)),
-            sizes: Object.fromEntries(
-                Object.entries(sizes).map(([name, value]) => [name, px(value)]),
-            ) as Record<SizeRole, NumericScalarNode>,
+            sizes: Object.fromEntries([
+                ...Object.entries(sizes).map(([name, value]) => [
+                    name,
+                    px(value),
+                ]),
+                // `|| 0` keeps the default from being -0.
+                ["densityOffset", px(density * grid || 0)],
+            ]) as Record<SizeRole, NumericScalarNode>,
         }),
     });
 

@@ -135,6 +135,23 @@ describe("gridLayout", () => {
         expect(layout.spacing["4"]).toEqual(px(32));
         expect(config.tokens.sizes?.touchTarget).toEqual(px(44));
         expect(config.tokens.spacing?.["16"]).toEqual(px(128));
+        expect(config.tokens.sizes?.densityOffset).toEqual(px(0));
+    });
+
+    it("takes a grid unit off per density step", () => {
+        const sizes = {
+            iconSmall: 16,
+            iconMedium: 20,
+            controlSmall: 28,
+            controlMedium: 36,
+            controlLarge: 44,
+            touchTarget: 44,
+        };
+        const { config } = resolveTheme({
+            ...providers(),
+            layout: gridLayout({ grid: 4, sizes, density: -2 }),
+        });
+        expect(config.tokens.sizes?.densityOffset).toEqual(px(-8));
     });
 });
 
