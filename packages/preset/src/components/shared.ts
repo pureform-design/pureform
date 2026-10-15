@@ -349,3 +349,15 @@ export const pressableRoot: StyleMap = {
     cursor: pointer,
     states: { disabled: { pointerEvents: none } },
 };
+
+/** A Material surface: a container color, the content color drawn on it, and an elevation
+ *  level. Card, menu, and dialog are surfaces. */
+export const surface = (
+    container: ColorValue,
+    content: ColorValue,
+    level: string,
+): StyleMap => ({
+    backgroundColor: container,
+    color: content,
+    apply: { shadowElevation: level },
+});

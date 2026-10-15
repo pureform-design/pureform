@@ -20,6 +20,7 @@ import { stateLayer } from "../state-layer";
 import {
     componentTokens,
     disabledColor,
+    surface,
     sys,
     touchTarget,
     stateTransition,
@@ -61,8 +62,7 @@ const content = ref("content");
 
 const fillVariant = (fill: CardFill): { root: StyleMap } => ({
     root: {
-        backgroundColor: CONTAINER[fill],
-        apply: { shadowElevation: RESTING[fill] },
+        ...surface(CONTAINER[fill], content, RESTING[fill]),
         ...(fill === "outlined"
             ? {
                   borderWidth: ref("outlineWidth"),
