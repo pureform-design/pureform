@@ -207,9 +207,29 @@ overrides the primary color in either mode.
   it to CSS. Native takes the first family.
 - **`useTokens`** gives the theme's token values, for app styles such as a page background.
   Without CSS inheritance from the page, text outside a component takes its color from there.
-- **Parity:** the browser tests compare 5,843 properties across every variant value at rest,
-  and 394 per state, scheme, and theme scenario. All match except the radii of shape variants,
-  which clip on the web and fall back to rounded corners here.
+- **Covered components:** button, card, chip, checkbox, switch, text, avatar, icon, icon
+  button, FAB, separator, list item, linear and circular progress, radio, scrim, supporting
+  text, and media. On the full preset, the only diagnostic left is the ripple's gradient.
+- **CSS's defaults:** a slot asking for flex runs in a row unless it names a direction; a flex
+  box's slots shrink to fit; and a slot drawing an outline lifts over its neighbors, as CSS
+  paints outlines last.
+- **Drop shadow filters** become box shadows, since shapes fall back to rounded boxes.
+- **Raw rules** for other targets add nothing; ones for React Native are reported.
+- **Color mixes** run in srgb, hsl, oklab, oklch, lab, lch, and display-p3, in plain math that
+  matches Chromium's `color-mix()`; HCT is reported. Override colors may use any of CSS's color
+  functions, written as `rgba()` as they come in.
+- **Units in calc:** sums and comparisons keep one unit, a product at most one, so a value
+  times 1% is a percentage and an angle sum stays in degrees. Percentages can't meet pixels.
+- **Per-instance tokens:** `useRecipe` and `useAnimatedRecipe` take token values for one
+  instance, such as a progress indicator's value.
+- **Animated colors** blend premultiplied, through eight stops, so fades don't dip through gray.
+- **Parity:** the browser tests compare every slot of the covered components across every
+  variant value at rest, and per state, scheme, and theme scenario. All match except the radii
+  and outline rings of shape variants, which clip on the web and fall back to rounded corners
+  and borders here.
+- **Not yet:** indeterminate progress (keyframe animations are dropped), text fields, menus,
+  dialogs, navigation, tabs, slider, and ripple; shapes and multi-color gradients; viewport
+  conditions; and running on a device.
 
 ## State transitions
 
