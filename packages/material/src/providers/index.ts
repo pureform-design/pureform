@@ -7,6 +7,7 @@
 import { cubicBezier, numeric, pct, px } from "@pureform/core/ast";
 import type {
     ColorNode,
+    CornerShapeKeyword,
     EasingNode,
     NumericScalarNode,
 } from "@pureform/core/ast";
@@ -113,14 +114,19 @@ export const MATERIAL_RADII: Record<ShapeRole, number> = {
     full: 9999,
 };
 
-/** Material's shape scale. `radii` changes or adds radii, in px. */
+/** Material's shape scale. `radii` changes or adds radii, in px; `corner` sets how corners
+ *  curve, for example `squircle`. */
 export const materialShape = (
     radii: Partial<Record<ShapeRole, number>> & Record<string, number> = {},
+    { corner }: { corner?: CornerShapeKeyword } = {},
 ): ShapeProvider =>
     defineProvider({
         domain: "shape",
         name: "material",
-        generate: () => ({ radii: toPx({ ...MATERIAL_RADII, ...radii }) }),
+        generate: () => ({
+            radii: toPx({ ...MATERIAL_RADII, ...radii }),
+            ...(corner ? { corner } : {}),
+        }),
     });
 
 /** Material's component sizes, in px. */
