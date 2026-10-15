@@ -53,6 +53,7 @@ import { createFab } from "./components/fab";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createListItem } from "./components/list-item";
+import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
@@ -126,7 +127,7 @@ export interface PureformOptions<
      *  (4.5:1 for text, 3:1 for control parts), and every color group as the color variants
      *  use it, in light and dark, for the base theme and every named theme. */
     requireComponentContrast?: boolean;
-    /** The shapes the icon button, FAB, and avatar offer as their `shape` variant, by name. Default
+    /** The shapes the icon button, FAB, avatar, and media offer as their `shape` variant, by name. Default
      *  `MATERIAL_SHAPES`. Draw your own with core's shape builder (`defineShape`,
      *  `roundedPolygon`, `star`), and choose how each fits its box with `fitted`. */
     shapes?: Shapes;
@@ -256,6 +257,7 @@ const defaultComponents = (
         iconButton: createIconButton(theme.color.groups, densities, shapes),
         fab: createFab(theme.color.groups, shapes),
         avatar: createAvatar(theme.color.groups, shapes),
+        media: createMedia(shapes),
         chip: createChip(theme.color.groups, densities),
         textField: createTextField(theme.color.groups, densities),
         textArea: createTextArea(theme.color.groups, densities),

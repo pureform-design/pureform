@@ -101,7 +101,7 @@ target first, and render the icon slot only when there is an icon.
 
 ## Shapes
 
-`iconButton`, `fab`, and `avatar` take `shape`: `none` (the default, rounded corners) or one of
+`iconButton`, `fab`, `avatar`, and `media` take `shape`: `none` (the default, rounded corners) or one of
 the theme's shapes, which clips the container to it.
 
 ```ts
@@ -191,6 +191,24 @@ directly.
     aria-label="Ada Lovelace"
     >AL</span
 >
+```
+
+### Media
+
+`media` is a picture or video that fills its container's width, cropped to fill, at an
+`aspect` of `auto` (the default, the content's own), `square`, `landscape` (16:9), or
+`portrait` (3:4). Put it in a card or a list item to give it artwork: the media takes the
+shape, while the card stays rectangular and its text unclipped. A shape stretches to the
+media's aspect; to keep its proportions, pass the shape with a `contain` fit in
+`pureform({ shapes })`.
+
+```html
+<img class="{media({ aspect: 'landscape' })}" src="…" alt="" />
+<img
+    class="{media({ aspect: 'square', shape: 'cookie9Sided' })}"
+    src="…"
+    alt="Album art"
+/>
 ```
 
 ### Corner shape
