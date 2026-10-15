@@ -96,6 +96,10 @@ export interface ComponentSpec extends BaseComponentSpec {
 export interface SlottedComponentSpec extends BaseComponentSpec {
     kind: "slotComponent";
     slots: string[];
+    /** How the slots nest in the markup: each slot maps to the slots directly inside it, in
+     *  order. Optional; a slot can only read another slot's state (`slot(name, state)`) when
+     *  that slot is its ancestor here. A renderer can also build the markup from it. */
+    structure?: Record<string, string[]>;
     recipe: {
         /** slot to styles. */
         base: Record<string, StyleMap>;

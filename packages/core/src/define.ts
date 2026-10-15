@@ -27,9 +27,14 @@ export const defineComponent = (
 
 /** Multi-slot component; the Panda adapter emits a `defineSlotRecipe`. Injects
  *  `kind: "slotComponent"`. */
-export const defineSlotComponent = (
-    spec: Omit<SlottedComponentSpec, "kind">,
-): SlottedComponentSpec => ({ kind: "slotComponent", ...spec });
+export const defineSlotComponent = <const S extends string>(
+    spec: Omit<SlottedComponentSpec, "kind" | "slots" | "structure"> & {
+        slots: S[];
+        /** How the slots nest; keys and children must be declared slots. */
+        structure?: { [K in NoInfer<S>]?: NoInfer<S>[] };
+    },
+): SlottedComponentSpec =>
+    ({ kind: "slotComponent", ...spec }) as SlottedComponentSpec;
 
 /** Fixed named-step utility (lowering to a Panda enum `utilities`). Injects `kind: "static"`. */
 export const defineStaticUtility = (

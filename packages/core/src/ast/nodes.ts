@@ -443,8 +443,33 @@ export interface ContainerSizeCondition {
     container?: string; // named container; omit for the nearest
 }
 
+/** A state of one of the component's slots, which any slot inside it can style by. A slot can
+ *  read its own state; reading another slot's needs the component to declare `structure`,
+ *  and that slot must be an ancestor there. The web lowers it to selectors on the slot's
+ *  element (`:focus-within`, `:has(...)`); a native binding passes the component's state to
+ *  each slot. Each state can also be set by hand with a data attribute on the slot:
+ *  `data-hover`, `data-focused`, `data-focus-visible`, `data-filled`, `data-invalid`,
+ *  `data-disabled`. */
+export interface SlotCondition {
+    type: "slot";
+    slot: string;
+    state: SlotState;
+}
+
+/** The slot states. Each describes the slot's element together with what it contains:
+ *  `focusWithin` is focus on it or inside it, `filled` is a text input inside holding a value,
+ *  `invalid` an input inside marked invalid, `disabled` a disabled control inside. */
+export type SlotState =
+    | "hover"
+    | "focusWithin"
+    | "focusVisibleWithin"
+    | "filled"
+    | "invalid"
+    | "disabled";
+
 export type Condition =
     | PortableCondition
+    | SlotCondition
     | ViewportBreakpointCondition
     | ViewportSizeCondition
     | ContainerBreakpointCondition

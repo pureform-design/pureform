@@ -7,6 +7,8 @@ import type {
     ContainerSizeCondition,
     NumericScalarNode,
     RawCondition,
+    SlotCondition,
+    SlotState,
     ValueNode,
     ViewportBreakpointCondition,
     ViewportSizeCondition,
@@ -95,4 +97,12 @@ export const containerSize = (opts: {
 export const rawCondition = (by: Record<string, string>): RawCondition => ({
     type: "rawCondition",
     by,
+});
+
+/** A state of the slot `name` in the same component, for example
+ *  `slot("container", "focusWithin")`. See `SlotCondition`. */
+export const slot = (name: string, state: SlotState): SlotCondition => ({
+    type: "slot",
+    slot: name,
+    state,
 });

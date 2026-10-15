@@ -35,6 +35,15 @@ export class UtilityRefError extends Error {
     }
 }
 
+/** Thrown when a slot condition names an unknown slot, or a slot it cannot read: one that is
+ *  not its ancestor in the component's `structure`. */
+export class SlotConditionError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "SlotConditionError";
+    }
+}
+
 const isRecord = (v: unknown): v is Record<string, unknown> =>
     v !== null && typeof v === "object" && !Array.isArray(v);
 
@@ -168,6 +177,97 @@ const validateApply = (
     }
 };
 
+// Each slot's ancestors in a component's structure, nearest first.
+const ancestorsOf = (
+    structure: Record<string, string[]>,
+): Map<string, string[]> => {
+    const parent = new Map<string, string>();
+    for (const [outer, inner] of Object.entries(structure)) {
+        for (const child of inner) parent.set(child, outer);
+    }
+    const out = new Map<string, string[]>();
+    for (const child of parent.keys()) {
+        const chain: string[] = [];
+        for (let p = parent.get(child); p !== undefined; p = parent.get(p)) {
+            if (chain.includes(p)) break;
+            chain.push(p);
+        }
+        out.set(child, chain);
+    }
+    return out;
+};
+
+// Check every slot condition: in a slotted component, naming a declared slot that is the
+// styled slot itself or one of its ancestors.
+const validateSlotConditions = (config: CoreConfig): void => {
+    const checked = new Set<unknown>();
+    for (const [name, spec] of Object.entries(config.components)) {
+        if (spec.kind !== "slotComponent") continue;
+        const slots = new Set(spec.slots);
+        const structure = spec.structure ?? {};
+        for (const [outer, inner] of Object.entries(structure)) {
+            for (const slot of [outer, ...inner]) {
+                if (!slots.has(slot)) {
+                    throw new SlotConditionError(
+                        `${name} structure names unknown slot "${slot}"; expected one of ${spec.slots.join(", ")}`,
+                    );
+                }
+            }
+        }
+        const ancestors = ancestorsOf(structure);
+        const check = (styled: string, style: unknown) =>
+            walk(
+                style,
+                (node) => {
+                    if (node.type !== "slot") return;
+                    checked.add(node);
+                    const target = node.slot as string;
+                    if (!slots.has(target)) {
+                        throw new SlotConditionError(
+                            `${name} slot "${styled}" reads unknown slot "${target}"; expected one of ${spec.slots.join(", ")}`,
+                        );
+                    }
+                    if (target === styled) return;
+                    if (!spec.structure) {
+                        throw new SlotConditionError(
+                            `${name} slot "${styled}" reads slot "${target}"; declare structure to read another slot's state`,
+                        );
+                    }
+                    if (!ancestors.get(styled)?.includes(target)) {
+                        throw new SlotConditionError(
+                            `${name} slot "${styled}" reads slot("${target}", …), which is not its ancestor in structure`,
+                        );
+                    }
+                },
+                () => {},
+            );
+        const { base, variants, compoundVariants } = spec.recipe;
+        const bySlot = [
+            base,
+            ...Object.values(variants ?? {}).flatMap((group) =>
+                Object.values(group),
+            ),
+            ...(compoundVariants ?? []).map((c) => c.style),
+        ];
+        for (const styles of bySlot) {
+            for (const [styled, style] of Object.entries(styles)) {
+                check(styled, style);
+            }
+        }
+    }
+    walk(
+        config,
+        (node) => {
+            if (node.type === "slot" && !checked.has(node)) {
+                throw new SlotConditionError(
+                    `slot("${String(node.slot)}", "${String(node.state)}") is only valid inside a slotted component's recipe`,
+                );
+            }
+        },
+        () => {},
+    );
+};
+
 /** Run the hard-error pass. Throws on the first problem; returns normally when the config is
  *  valid. */
 export const validateConfig = (config: CoreConfig): void => {
@@ -180,4 +280,5 @@ export const validateConfig = (config: CoreConfig): void => {
         },
         (apply) => validateApply(config, apply),
     );
+    validateSlotConditions(config);
 };
