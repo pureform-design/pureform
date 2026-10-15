@@ -144,6 +144,25 @@ describe("lowerRn values", () => {
     });
 });
 
+describe("lowerRn raw rules", () => {
+    it("skips other targets' raw rules, and reports its own", () => {
+        const raw = (target: string) =>
+            rulesOf({
+                width: px(1),
+                rawRules: {
+                    [target]: { "&::placeholder": { color: rgb(0, 0, 0) } },
+                },
+            } as unknown as StyleMap);
+        expect(raw("css")).toEqual({
+            rules: [{ when: [], specificity: 0, style: { width: 1 } }],
+            diagnostics: [],
+        });
+        expect(raw("rn").diagnostics).toEqual([
+            'box: raw rules for "rn" aren\'t supported',
+        ]);
+    });
+});
+
 describe("lowerRn filters", () => {
     it("casts drop shadows as box shadows, and reports other filters", () => {
         const layer = { x: px(0), y: px(2), blur: px(4), color: rgb(0, 0, 0) };

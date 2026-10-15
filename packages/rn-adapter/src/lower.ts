@@ -461,6 +461,15 @@ const lowerStyle = (
     };
     for (const [property, node] of Object.entries(own)) {
         if (node === undefined) continue;
+        // Raw rules are keyed by target, and other targets' rules add nothing here.
+        if (property === "rawRules") {
+            if ((node as Record<string, unknown>)[ctx.target]) {
+                diagnostics.add(
+                    `${where}: raw rules for "${ctx.target}" aren't supported`,
+                );
+            }
+            continue;
+        }
         const rn =
             property === "backgroundImage"
                 ? TINT
