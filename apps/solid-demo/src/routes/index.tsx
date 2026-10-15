@@ -39,12 +39,7 @@ function IndexRoute() {
                             >
                                 <span class={f.touchTarget} />
                                 <Ripple />
-                                <span
-                                    class={f.icon}
-                                    style={{ "font-size": "inherit" }}
-                                >
-                                    +
-                                </span>
+                                <span class={f.icon}>+</span>
                             </button>
                         );
                     }}
