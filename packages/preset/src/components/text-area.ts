@@ -25,7 +25,7 @@ import {
 } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
-import { FIELD_SLOTS, fieldParts, fieldTokens } from "./field";
+import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
 import { COLOR_GROUPS, DEFAULT_GROUP } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -33,8 +33,9 @@ const { tokens, ref } = fieldTokens("textArea");
 
 // The first line's center: half the single-line height, so the label rests where a text
 // field's would.
-const { base, variant, colors } = fieldParts(ref, {
+const { base, variant, colors, icons } = fieldParts(ref, {
     labelRest: mul(ref("height"), unitless(0.5)),
+    iconRoom: "container",
 });
 
 /** Build the text area with a `color` variant per group in `groups`, setting its focus
@@ -45,17 +46,15 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
         name: "textArea",
         $meta: {
             description:
-                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text.",
+                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one.",
         },
         tokens,
         slots: [...FIELD_SLOTS],
-        structure: {
-            root: ["container", "supportingText"],
-            container: ["input", "label"],
-        },
+        structure: FIELD_STRUCTURE,
         recipe: {
             base: {
                 ...base,
+                ...icons.base,
                 container: {
                     ...base.container,
                     display: flex,
@@ -67,6 +66,7 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
             // label's room is a margin outside the scroll area instead.
             variants: {
                 color: color.color,
+                ...icons.variants,
                 // Grow with the text instead of scrolling. Browsers without field-sizing keep
                 // the rows' height.
                 autoGrow: {
@@ -92,11 +92,15 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
                     },
                 },
             },
-            compoundVariants: color.compoundVariants,
+            compoundVariants: [
+                ...color.compoundVariants,
+                ...icons.compoundVariants,
+            ],
             defaultVariants: {
                 variant: "filled",
                 color: DEFAULT_GROUP,
                 autoGrow: "false",
+                ...icons.defaultVariants,
             },
         },
     });

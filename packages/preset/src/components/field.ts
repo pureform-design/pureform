@@ -8,6 +8,7 @@
 import {
     absolute,
     alias,
+    sub,
     column,
     flex,
     mul,
@@ -41,6 +42,7 @@ import {
 
 import {
     DEFAULT_GROUP,
+    iconBox,
     colorVariant,
     componentTokens,
     groupRoles,
@@ -70,6 +72,10 @@ export const FIELD_TOKENS = {
     indicatorWidth: px(1),
     focusIndicatorWidth: px(2),
     iconSize: sizeToken("iconMedium"),
+    iconInset: spacing("3"),
+    iconColor: sys("onSurfaceVariant"),
+    // The icon inset, the icon, and the gap before the text.
+    textInsetWithIcon: px(52),
 } satisfies Record<string, ValueNode>;
 
 export type FieldToken = keyof typeof FIELD_TOKENS;
@@ -80,14 +86,25 @@ export const fieldTokens = <K extends string = never>(
     extra: Record<K, ValueNode> = {} as Record<K, ValueNode>,
 ) => componentTokens<FieldToken | K>(name, { ...FIELD_TOKENS, ...extra });
 
-/** The slot nesting every text input shares; a component adds slots to the container. */
+/** The slots every text input has, in markup order. */
 export const FIELD_SLOTS = [
     "root",
     "container",
+    "leadingIcon",
     "input",
     "label",
+    "trailingIcon",
     "supportingText",
 ] as const;
+
+/** How the slots nest: the container holds the optional icons around the input and label. */
+export const FIELD_STRUCTURE: {
+    root: (typeof FIELD_SLOTS)[number][];
+    container: (typeof FIELD_SLOTS)[number][];
+} = {
+    root: ["container", "supportingText"],
+    container: ["leadingIcon", "input", "label", "trailingIcon"],
+};
 
 // The container's states, read from the input inside it. The adapter ranks them, so a later
 // state wins: hover, then focus, then invalid, then disabled.
@@ -152,12 +169,15 @@ const indicator = (width: NumericValue, color: ColorValue) =>
 export interface FieldOptions {
     /** Where the label's center rests before it floats, from the top of the container. */
     labelRest: NumericValue;
+    /** How the text makes room for an icon: `input` pads the input, and `container` pads the
+     *  container, so a textarea's scrollbar and resize handle stay clear of the icons. */
+    iconRoom: "input" | "container";
 }
 
 /** The shared slot styles and variants of a text input, over its tokens. */
 export const fieldParts = (
     ref: (token: FieldToken) => AliasNode,
-    { labelRest }: FieldOptions,
+    { labelRest, iconRoom }: FieldOptions,
 ) => {
     // The filled indicator and outlined stroke, in a given focus color.
     const indicatorShadow = (focus: ColorValue) =>
@@ -330,5 +350,69 @@ export const fieldParts = (
             }),
     });
 
-    return { base, variant, colors };
+    // Icons sit centered on the container's height, at either end, as in Material's own text
+    // field; the text and the resting label move in past them.
+    const icon = (side: "Start" | "End"): StyleMap => ({
+        position: absolute,
+        top: pct(50),
+        transform: transform(translateY(pct(-50))),
+        [`insetInline${side}`]: ref("iconInset"),
+        ...iconBox(ref("iconSize")),
+        color: when()
+            .on(DISABLED, disabledColor("disabledContent"))
+            .else(ref("iconColor")),
+    });
+
+    const room = (side: "Start" | "End"): Record<string, StyleMap> =>
+        iconRoom === "input"
+            ? { input: { [`paddingInline${side}`]: ref("textInsetWithIcon") } }
+            : {
+                  container: {
+                      [`paddingInline${side}`]: sub(
+                          ref("textInsetWithIcon"),
+                          ref("paddingInline"),
+                      ),
+                  },
+              };
+
+    const icons = {
+        base: {
+            leadingIcon: icon("Start"),
+            // Material turns the trailing icon to the error color with the field.
+            trailingIcon: {
+                ...icon("End"),
+                color: when()
+                    .on(INVALID, ref("errorColor"))
+                    .on(DISABLED, disabledColor("disabledContent"))
+                    .else(ref("iconColor")),
+            },
+        } satisfies Record<string, StyleMap>,
+        variants: {
+            leadingIcon: {
+                true: {
+                    ...room("Start"),
+                    label: { insetInlineStart: ref("textInsetWithIcon") },
+                },
+                false: {},
+            },
+            trailingIcon: { true: room("End"), false: {} },
+        },
+        // An outlined label floats onto the border at the usual inset, clear of the icon.
+        compoundVariants: [
+            {
+                match: { variant: "outlined", leadingIcon: "true" },
+                style: {
+                    label: {
+                        insetInlineStart: floated(
+                            ref("textInsetWithIcon"),
+                            ref("paddingInline"),
+                        ),
+                    },
+                },
+            },
+        ],
+        defaultVariants: { leadingIcon: "false", trailingIcon: "false" },
+    };
+
+    return { base, variant, colors, icons };
 };

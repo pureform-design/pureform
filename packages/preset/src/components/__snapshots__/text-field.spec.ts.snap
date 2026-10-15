@@ -331,11 +331,11 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
   "slots": [
     "root",
     "container",
+    "leadingIcon",
     "input",
     "label",
-    "supportingText",
-    "leadingIcon",
     "trailingIcon",
+    "supportingText",
   ],
   "variants": {
     "color": {

@@ -19,52 +19,17 @@
 // the input, and the label, icons, and supporting text follow it.
 
 import { defineSlotComponent } from "@pureform/core";
-import {
-    absolute,
-    pct,
-    px,
-    transform,
-    translateY,
-    when,
-} from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
-import { spacing } from "@pureform/theme";
+import { pct } from "@pureform/core/ast";
 
-import {
-    DISABLED,
-    FIELD_SLOTS,
-    INVALID,
-    fieldParts,
-    fieldTokens,
-    floated,
-} from "./field";
-import {
-    COLOR_GROUPS,
-    DEFAULT_GROUP,
-    disabledColor,
-    sys,
-    iconBox,
-} from "./shared";
+import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
+import { COLOR_GROUPS, DEFAULT_GROUP } from "./shared";
 import type { ColorGroups } from "./shared";
 
-const { tokens, ref } = fieldTokens("textField", {
-    iconInset: spacing("3"),
-    iconColor: sys("onSurfaceVariant"),
-    // The icon inset, the icon, and the gap before the text.
-    textInsetWithIcon: px(52),
-});
+const { tokens, ref } = fieldTokens("textField");
 
-const { base, variant, colors } = fieldParts(ref, { labelRest: pct(50) });
-
-const icon = (side: "Start" | "End"): StyleMap => ({
-    position: absolute,
-    top: pct(50),
-    transform: transform(translateY(pct(-50))),
-    [`insetInline${side}`]: ref("iconInset"),
-    ...iconBox(ref("iconSize")),
-    color: when()
-        .on(DISABLED, disabledColor("disabledContent"))
-        .else(ref("iconColor")),
+const { base, variant, colors, icons } = fieldParts(ref, {
+    labelRest: pct(50),
+    iconRoom: "input",
 });
 
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
@@ -78,63 +43,28 @@ export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
                 "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
         },
         tokens,
-        slots: [...FIELD_SLOTS, "leadingIcon", "trailingIcon"],
-        structure: {
-            root: ["container", "supportingText"],
-            container: ["leadingIcon", "input", "label", "trailingIcon"],
-        },
+        slots: [...FIELD_SLOTS],
+        structure: FIELD_STRUCTURE,
         recipe: {
             base: {
                 ...base,
+                ...icons.base,
                 container: { ...base.container, height: ref("height") },
                 input: { ...base.input, height: pct(100) },
-                leadingIcon: icon("Start"),
-                // Material turns the trailing icon to the error color with the field.
-                trailingIcon: {
-                    ...icon("End"),
-                    color: when()
-                        .on(INVALID, ref("errorColor"))
-                        .on(DISABLED, disabledColor("disabledContent"))
-                        .else(ref("iconColor")),
-                },
             },
             variants: {
                 variant,
                 color: color.color,
-                leadingIcon: {
-                    true: {
-                        input: { paddingInlineStart: ref("textInsetWithIcon") },
-                        label: { insetInlineStart: ref("textInsetWithIcon") },
-                    },
-                    false: {},
-                },
-                trailingIcon: {
-                    true: {
-                        input: { paddingInlineEnd: ref("textInsetWithIcon") },
-                    },
-                    false: {},
-                },
+                ...icons.variants,
             },
-            // An outlined label floats onto the border at the usual inset, clear of the icon.
             compoundVariants: [
                 ...color.compoundVariants,
-                {
-                    match: { variant: "outlined", leadingIcon: "true" },
-                    style: {
-                        label: {
-                            insetInlineStart: floated(
-                                ref("textInsetWithIcon"),
-                                ref("paddingInline"),
-                            ),
-                        },
-                    },
-                },
+                ...icons.compoundVariants,
             ],
             defaultVariants: {
                 color: DEFAULT_GROUP,
                 variant: "filled",
-                leadingIcon: "false",
-                trailingIcon: "false",
+                ...icons.defaultVariants,
             },
         },
     });

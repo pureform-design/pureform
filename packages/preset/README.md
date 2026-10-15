@@ -78,8 +78,10 @@ input; the label, icons, and supporting text follow it.
 ```
 
 - `variant` is `filled` or `outlined`; `color` sets the focus color.
-- `textField`: turn on `leadingIcon` or `trailingIcon` when you render one.
+- Turn on `leadingIcon` or `trailingIcon` when you render one. The icons stay centered on the
+  container's height, as in Material's own text field.
 - `textArea`: use a `<textarea>` with `rows`, or turn on `autoGrow` to grow it with the text.
+  The textarea sits between its icons, so its scrollbar and resize handle stay clear of them.
 
 ## Selection controls
 
