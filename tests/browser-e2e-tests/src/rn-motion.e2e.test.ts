@@ -92,3 +92,39 @@ describe("useAnimatedRecipe", () => {
         expect(background()).toBe(now);
     });
 });
+
+const Spinner = () => {
+    const slots = useAnimatedRecipe("circularProgress", {
+        indeterminate: "true",
+    });
+    return createElement(Animated.View, {
+        testID: "root",
+        style: slots.root as never,
+    });
+};
+
+describe("keyframe animations", () => {
+    it("turn an indeterminate circular progress indicator", async () => {
+        host = document.createElement("div");
+        document.body.append(host);
+        root = createRoot(host);
+        flushSync(() =>
+            root!.render(
+                createElement(
+                    PureformProvider,
+                    { styles, scheme: "light" },
+                    createElement(Spinner),
+                ),
+            ),
+        );
+        const transform = () =>
+            getComputedStyle(document.querySelector('[data-testid="root"]')!)
+                .transform;
+        const seen = new Set<string>();
+        for (let i = 0; i < 6; i++) {
+            seen.add(transform());
+            await wait(70);
+        }
+        expect(seen.size).toBeGreaterThan(3);
+    });
+});
