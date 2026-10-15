@@ -6,6 +6,7 @@ import {
     channels,
     easingPoints,
     interpolates,
+    rippleGeometry,
     stops,
 } from "./motion";
 
@@ -145,5 +146,19 @@ describe("channels", () => {
                 outputRange: [0, 1, 0],
             },
         ]);
+    });
+});
+
+describe("rippleGeometry", () => {
+    it("starts at the press point and grows to cover the surface from its center", () => {
+        const { size, scale, start, end } = rippleGeometry(
+            { width: 100, height: 40 },
+            { x: 10, y: 10 },
+        );
+        expect(size).toBe(20);
+        expect(start).toEqual({ x: 0, y: 0 });
+        expect(end).toEqual({ x: 40, y: 10 });
+        // Past the farthest corner from the center, with the soft edge.
+        expect((size * scale) / 2).toBeGreaterThan(Math.hypot(50, 20));
     });
 });

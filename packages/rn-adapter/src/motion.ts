@@ -163,3 +163,31 @@ export const channels = (
     }
     return out;
 };
+
+// Material's ripple, as the web's ripple() draws it: the starting circle is a fifth of the
+// longer side, and it grows to cover the farthest corner, plus a soft edge.
+const INITIAL_ORIGIN_SCALE = 0.2;
+const PADDING = 10;
+const SOFT_EDGE_MINIMUM_SIZE = 75;
+const SOFT_EDGE_CONTAINER_RATIO = 0.35;
+
+/** One ripple in a surface of the given size, pressed at `origin`: its starting diameter, the
+ *  factor it grows by, and its top left corner at the press point and at the center. */
+export const rippleGeometry = (
+    surface: { width: number; height: number },
+    origin: { x: number; y: number },
+) => {
+    const { width, height } = surface;
+    const longer = Math.max(width, height);
+    const softEdge = Math.max(
+        SOFT_EDGE_CONTAINER_RATIO * longer,
+        SOFT_EDGE_MINIMUM_SIZE,
+    );
+    const size = Math.max(Math.floor(longer * INITIAL_ORIGIN_SCALE), 1);
+    return {
+        size,
+        scale: (Math.hypot(width, height) + PADDING + softEdge) / size,
+        start: { x: origin.x - size / 2, y: origin.y - size / 2 },
+        end: { x: (width - size) / 2, y: (height - size) / 2 },
+    };
+};

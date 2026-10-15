@@ -2,7 +2,13 @@
 // value through React Native's Animated, which React Native Web runs too. Pass the slots'
 // styles to `Animated.View` and `Animated.Text`.
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import {
+    createElement,
+    useEffect,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from "react";
 import { Animated, Easing } from "react-native";
 
 import {
@@ -11,9 +17,10 @@ import {
     channels,
     easingPoints,
     interpolates,
+    rippleGeometry,
     stops,
 } from "./motion";
-import { useRecipeWithTransitions } from "./react";
+import { useReducedMotion, useRecipeWithTransitions, useTokens } from "./react";
 import type { State, Style } from "./select";
 import type { Animation, Concrete, ThemeValues, Transition } from "./values";
 
@@ -262,3 +269,154 @@ export const useAnimatedRecipe = (
 };
 
 export type { State, Style };
+
+// Material's ripple timing, where the ripple component declares none.
+const GROW_MS = 450;
+const FADE_MS = 375;
+const GROW_EASING = "cubic-bezier(0.2, 0, 0, 1)";
+const PRESSED_OPACITY = 0.1;
+
+interface Ripple {
+    id: number;
+    geometry: ReturnType<typeof rippleGeometry>;
+    grow: Animated.Value;
+    fade: Animated.Value;
+}
+
+interface Measurable {
+    measure: (
+        done: (
+            x: number,
+            y: number,
+            width: number,
+            height: number,
+            left: number,
+            top: number,
+        ) => void,
+    ) => void;
+}
+
+/** Press ripples for a surface, as the web's ripple() draws them: each grows from the press
+ *  point toward the center while the press lasts, and fades on release, though not before
+ *  half its grow. Spread `handlers` on the pressable and render `layer` inside it, last. The
+ *  ripple takes `color` at the ripple's opacity token, and the surface's corner `radius`.
+ *  Under reduced motion nothing ripples, and the pressed state layer shows the press. */
+export const useRipple = (options: {
+    color: string;
+    radius?: number | string;
+    /** Grow from the center, as icon buttons do. */
+    centered?: boolean;
+    disabled?: boolean;
+}) => {
+    const { styles, transitions } = useRecipeWithTransitions("ripple");
+    const tokens = useTokens();
+    const reducedMotion = useReducedMotion();
+    const [ripples, setRipples] = useState<Ripple[]>([]);
+    const layer = useRef<Measurable>(null);
+    const held = useRef<{ ripple: Ripple; at: number } | undefined>(undefined);
+    const ids = useRef(0);
+
+    const timing = (property: string) =>
+        transitions.root?.find((t) => t.property === property);
+    const grow = timing("transform");
+    const fade = timing("opacity");
+    const growMs = grow?.duration || GROW_MS;
+    const fadeMs = fade?.duration || FADE_MS;
+    const opacity = tokens["components.ripple.opacity"];
+    const color = blend(
+        "transparent",
+        animatable(options.color),
+        typeof opacity === "number" ? opacity : PRESSED_OPACITY,
+    );
+
+    const release = () => {
+        const press = held.current;
+        held.current = undefined;
+        if (!press) return;
+        const waited = Date.now() - press.at;
+        Animated.timing(press.ripple.fade, {
+            toValue: 0,
+            duration: fadeMs,
+            delay: Math.max(growMs / 2 - waited, 0),
+            easing: Easing.linear,
+            useNativeDriver: false,
+        }).start(() =>
+            setRipples((list) => list.filter((r) => r !== press.ripple)),
+        );
+    };
+
+    const handlers = {
+        onPressIn: (event: {
+            nativeEvent: { pageX: number; pageY: number };
+        }) => {
+            if (options.disabled || reducedMotion || !layer.current) return;
+            const { pageX, pageY } = event.nativeEvent;
+            layer.current.measure((_x, _y, width, height, left, top) => {
+                const origin = options.centered
+                    ? { x: width / 2, y: height / 2 }
+                    : { x: pageX - left, y: pageY - top };
+                const ripple: Ripple = {
+                    id: ids.current++,
+                    geometry: rippleGeometry({ width, height }, origin),
+                    grow: new Animated.Value(0),
+                    fade: new Animated.Value(1),
+                };
+                release();
+                held.current = { ripple, at: Date.now() };
+                setRipples((list) => [...list, ripple]);
+                Animated.timing(ripple.grow, {
+                    toValue: 1,
+                    duration: growMs,
+                    easing: curve(grow?.easing ?? GROW_EASING),
+                    useNativeDriver: false,
+                }).start();
+            });
+        },
+        onPressOut: release,
+    };
+
+    const { borderRadius: _inherit, ...root } = styles.root ?? {};
+    const layerElement = createElement(
+        Animated.View,
+        {
+            ref: layer as never,
+            pointerEvents: "none",
+            style: {
+                ...root,
+                ...(options.radius === undefined
+                    ? {}
+                    : { borderRadius: options.radius }),
+            },
+        },
+        ...ripples.map(({ id, geometry, grow: g, fade: f }) =>
+            createElement(Animated.View, {
+                key: id,
+                style: {
+                    position: "absolute",
+                    width: geometry.size,
+                    height: geometry.size,
+                    borderRadius: geometry.size / 2,
+                    backgroundColor: color,
+                    left: g.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [geometry.start.x, geometry.end.x],
+                    }),
+                    top: g.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: [geometry.start.y, geometry.end.y],
+                    }),
+                    opacity: f,
+                    transform: [
+                        {
+                            scale: g.interpolate({
+                                inputRange: [0, 1],
+                                outputRange: [1, geometry.scale],
+                            }),
+                        },
+                    ],
+                },
+            }),
+        ),
+    );
+    return { handlers, layer: layerElement };
+};

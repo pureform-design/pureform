@@ -86,6 +86,10 @@ const useContextOrThrow = (hook: string): Context => {
     return context;
 };
 
+/** Whether the provider asks for reduced motion. */
+export const useReducedMotion = (): boolean =>
+    useContextOrThrow("useReducedMotion").reducedMotion;
+
 /** The theme's token values, with overrides, by key: `colors.surface`, `spacing.4`. */
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
