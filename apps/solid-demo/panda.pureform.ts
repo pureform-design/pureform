@@ -47,7 +47,7 @@ const config = pureform({
     themes: {
         teal: {
             color: materialColor({ seed: "#006A60" }),
-            shape: materialShape({ full: 12 }),
+            shape: materialShape({ full: 12 }, { corner: "squircle" }),
         },
         sharp: { shape: roundedShape({ base: 0 }) },
         dense: {
