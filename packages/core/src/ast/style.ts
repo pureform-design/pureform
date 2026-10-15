@@ -10,6 +10,7 @@ import type {
     ColorKeyword,
     CursorKeyword,
     ResizeKeyword,
+    FieldSizingKeyword,
     DisplayKeyword,
     FlexDirectionKeyword,
     KeywordNode,
@@ -148,6 +149,7 @@ export interface StyleMap {
     // interaction / motion
     cursor?: Keyword<CursorKeyword>;
     resize?: Keyword<ResizeKeyword>;
+    fieldSizing?: Keyword<FieldSizingKeyword>;
     pointerEvents?: Keyword<PointerEventsKeyword>;
     transition?: Transition;
     transitionTimingFunction?: Easing;

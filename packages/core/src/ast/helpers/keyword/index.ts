@@ -10,6 +10,7 @@ export * from "./lineStyle";
 export * from "./textAlign";
 export * from "./cursor";
 export * from "./resize";
+export * from "./field-sizing";
 export * from "./overflow";
 export * from "./color";
 export * from "./common";
