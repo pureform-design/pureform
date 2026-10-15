@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "types": ["vite/client"],
+        "noEmit": true
+    },
+    "include": ["src"]
+}

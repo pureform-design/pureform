@@ -77,6 +77,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/tailwind-demo"]
+path = "apps/tailwind-demo"
+include = [
+    "apps/tailwind-demo/**",
+]
+public_api = false
+
 [monorepo.packages."@pureform/tailwind-adapter"]
 path = "packages/tailwind-adapter"
 include = [

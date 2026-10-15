@@ -1,0 +1,25 @@
+{
+    "name": "@pureform/tailwind-demo",
+    "version": "0.0.0-semantically-released",
+    "description": "pureform with Tailwind v4, through the Tailwind adapter",
+    "type": "module",
+    "scripts": {
+        "dev": "vite",
+        "build": "vite build",
+        "preview": "vite preview"
+    },
+    "dependencies": {
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/material": "catalog:",
+        "@pureform/preset": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tailwind-adapter": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@tailwindcss/vite": "catalog:",
+        "tailwindcss": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:"
+    }
+}
