@@ -211,6 +211,62 @@ overrides the primary color in either mode.
   and 394 per state, scheme, and theme scenario. All match except the radii of shape variants,
   which clip on the web and fall back to rounded corners here.
 
+## Next: state transitions
+
+Status: planned. The proof of concept drops `transition`, so state changes snap. The preset's
+transitions already say what should move: every core component's colors (`backgroundColor`,
+`color`, `borderColor`, `outlineColor`) over `short3` on the standard curve, `boxShadow` over
+`medium1`, and the switch handle's `left`, `width`, and `height`. All of it is off under
+reduced motion.
+
+### Lowering
+
+- A `transition` lowers to transition data under an internal style key, as tints do: per
+  property, its React Native name, a duration in milliseconds, an easing, and a delay. It
+  goes through the same rules as any value, so the reduced motion case becomes a state, and a
+  state can change what moves.
+- Durations lower to numbers of milliseconds (`ms` as is, `s` times 1000), including duration
+  tokens, which today resolve to `"150ms"` strings.
+- Easings lower to cubic Bézier points: `cubicBezier` as is, and the keywords to CSS's
+  definitions (`ease` is `0.25, 0.1, 0.25, 1`, and so on). `steps` has no equivalent in
+  `Animated` and is linear.
+- Selection keeps the transitions out of the style and returns them beside it, per slot.
+
+### Animating
+
+A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of React Native:
+
+- `useAnimatedRecipe(name, variants, state)` returns per slot a style in which each property
+  with a transition is an animated value, to pass to `Animated.View` and `Animated.Text`.
+- Each such property has an `Animated.Value` for progress, driven by `Animated.timing` with
+  `Easing.bezier` and the transition's duration, from the value it's showing to the new one.
+  Colors interpolate through `rgba()` strings, which `Animated` supports, and numbers directly.
+- An interrupted change (pressing during a hover fade) starts from the value on screen: the
+  hook tracks progress and blends the old pair to find it, with the adapter's mixer for colors.
+- What can't interpolate (a shadow with a different number of layers, a keyword) switches at
+  the end of its duration, as CSS does for discrete properties.
+- Reduced motion: the provider takes a `reducedMotion` flag (an app reads it from
+  `AccessibilityInfo`), which selects the reduced case, so nothing animates.
+- `Animated` works on React Native Web too. A Reanimated binding can come later behind the same
+  transition data, for animations on the UI thread.
+
+### Demo and verification
+
+- The demo's components switch to `Animated.View` and `Animated.Text` through the new hook, and
+  a toggle turns reduced motion on.
+- Unit tests: transition lowering, durations, easings, and the reduced case; the hook's
+  interpolation and interruption with a fake clock.
+- Browser tests: mid-transition, a hovered button's background lies between its rest and hover
+  colors, and at the end equals the hover color; under reduced motion it changes at once. The
+  parity tests keep comparing end states.
+
+### Steps
+
+1. Lower transitions, durations, and easings; return them from selection.
+2. The `animated` entry: `useAnimatedRecipe`, interpolation, interruption, reduced motion.
+3. The demo on animated components.
+4. Unit and browser tests.
+
 ## Steps
 
 1. Move `inlineStyles` to the core.
