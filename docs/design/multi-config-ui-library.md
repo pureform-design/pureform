@@ -2273,7 +2273,7 @@ them through `ref(token)`, so an app restyles one component at runtime without a
 
 - **Fills** (button, icon button, FAB): an empty `color` entry per group, and a compound
   variant per fill and group that sets the colors, since they depend on both.
-- **States** (checkbox, radio, switch, text inputs, chip): the base draws the default group
+- **States** (checkbox, radio, switch, text inputs, chip, list item, menu, tabs): the base draws the default group
   through the tokens, and its `color` entry stays empty; every other group rebuilds only the
   properties that depend on the group, each with its full condition list, so error and
   disabled still win. Where those properties sit in another variant (a text field's fill), a

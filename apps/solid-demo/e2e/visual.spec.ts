@@ -22,6 +22,7 @@ const SECTIONS = [
     "chips",
     "lists",
     "tabs",
+    "row-colors",
 ];
 
 const open = async (page: Page) => {

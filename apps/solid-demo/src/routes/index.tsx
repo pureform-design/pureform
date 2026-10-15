@@ -683,6 +683,79 @@ function IndexRoute() {
                     }}
                 </For>
             </section>
+            <section
+                data-section="row-colors"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={["error", "success", "tertiary"] as const}>
+                    {(color) => {
+                        const l = listItem({ color, interactive: true });
+                        const m = menu({ color });
+                        const t = tabs({ color });
+                        const s = tabs({ color, variant: "secondary" });
+                        return (
+                            <div
+                                style={{
+                                    display: "grid",
+                                    gap: "8px",
+                                    width: "240px",
+                                }}
+                            >
+                                <div
+                                    class={l.root}
+                                    tabindex="0"
+                                    aria-selected="true"
+                                    id={`list-${color}`}
+                                >
+                                    <span class={l.leading}>★</span>
+                                    <div class={l.content}>
+                                        <span class={l.headline}>{color}</span>
+                                        <span class={l.supportingText}>
+                                            Selected
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class={m.root} role="menu">
+                                    <button
+                                        class={m.item}
+                                        role="menuitem"
+                                        type="button"
+                                        aria-selected="true"
+                                        id={`menu-${color}`}
+                                    >
+                                        <span class={m.itemLeading}>✓</span>
+                                        <span class={m.itemLabel}>{color}</span>
+                                    </button>
+                                </div>
+                                <For each={[t, s]}>
+                                    {(x) => (
+                                        <div class={x.root} role="tablist">
+                                            <button
+                                                class={x.tab}
+                                                role="tab"
+                                                type="button"
+                                                aria-selected="true"
+                                            >
+                                                <span class={x.label}>On</span>
+                                                <span class={x.indicator} />
+                                            </button>
+                                            <button
+                                                class={x.tab}
+                                                role="tab"
+                                                type="button"
+                                                aria-selected="false"
+                                            >
+                                                <span class={x.label}>Off</span>
+                                                <span class={x.indicator} />
+                                            </button>
+                                        </div>
+                                    )}
+                                </For>
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
             <section data-section="cards" style={row}>
                 <For each={CARD_FILLS}>
                     {(variant) => (
