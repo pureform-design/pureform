@@ -3,7 +3,7 @@
 // a filled input.
 
 import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
-import { pressableState } from "@pureform/rn-adapter/react";
+import { pressableState, useRecipe } from "@pureform/rn-adapter/react";
 import { useRef, useState } from "react";
 import { Animated, TextInput } from "react-native";
 import type { GestureResponderEvent } from "react-native";
@@ -15,24 +15,9 @@ import {
     atext,
     unselectable,
     usePress,
-} from "./components";
+} from "./parts";
 
 const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
-
-const TEXT_STYLE = [
-    "color",
-    "fontFamily",
-    "fontSize",
-    "fontWeight",
-    "lineHeight",
-    "letterSpacing",
-];
-
-// A slot's text style, for the text inside it.
-const textOf = (style: Record<string, unknown> | undefined) =>
-    Object.fromEntries(
-        Object.entries(style ?? {}).filter(([key]) => TEXT_STYLE.includes(key)),
-    );
 
 interface FieldProps {
     label: string;
@@ -134,16 +119,15 @@ export function SearchBar(props: {
 }) {
     const [focused, setFocused] = useState(false);
     const { state, handlers } = usePress({});
-    const s = useAnimatedRecipe(
-        "searchBar",
-        {},
-        {
-            ...state,
-            focus: focused,
-            focusVisible: focused,
-            filled: props.value !== "",
-        },
-    );
+    const searchState = {
+        ...state,
+        focus: focused,
+        focusVisible: focused,
+        filled: props.value !== "",
+    };
+    const s = useAnimatedRecipe("searchBar", {}, searchState);
+    // A placeholder's color is a prop, so it takes the plain value rather than an animated one.
+    const placeholder = useRecipe("searchBar", {}, searchState).input?.color;
     return (
         <AnimatedPressable
             {...handlers}
@@ -160,7 +144,7 @@ export function SearchBar(props: {
                 onFocus={() => setFocused(true)}
                 onBlur={() => setFocused(false)}
                 placeholder="Search"
-                placeholderTextColor={String(textOf(s.input).color ?? "")}
+                placeholderTextColor={String(placeholder ?? "")}
                 aria-label="Search"
                 style={atext(s.input)}
             />

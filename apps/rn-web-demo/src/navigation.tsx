@@ -5,9 +5,9 @@ import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 
+import { Button } from "./components";
 import {
     AnimatedPressable,
-    Button,
     Glyph,
     aview,
     atext,
@@ -15,7 +15,7 @@ import {
     useInk,
     usePress,
     withInk,
-} from "./components";
+} from "./parts";
 
 interface Destination {
     label: string;

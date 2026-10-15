@@ -1,92 +1,27 @@
-// The components the adapter covers, as React Native components, styled by the adapter. Each tracks its interaction
-// state, asks for its slots' styles, and lays the slots out as the web markup does. The
-// interactive ones animate their state changes.
+// The components the adapter covers, as React Native components, styled by the adapter. Each
+// tracks its interaction state, asks for its slots' styles, and lays the slots out as the web
+// markup does. The interactive ones animate their state changes and ripple when pressed.
 
-import type { State, Style } from "@pureform/rn-adapter";
-import { useAnimatedRecipe, useRipple } from "@pureform/rn-adapter/animated";
-import {
-    pressableState,
-    useRecipe,
-    useTokens,
-} from "@pureform/rn-adapter/react";
-import { useState } from "react";
+import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
+import { useRecipe, useTokens } from "@pureform/rn-adapter/react";
 import type { ReactNode } from "react";
-import { Animated, Image, Pressable, Text, View } from "react-native";
-import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
+import { Animated, Image, Text, View } from "react-native";
+import type { ImageStyle } from "react-native";
 
-// The adapter's styles are checked against React Native's types when lowered.
-export const view = (style: Style | undefined) => style as ViewStyle;
-export const text = (style: Style | undefined) => style as TextStyle;
-
-// Animated styles hold animated values where a property transitions.
-export type Animatable = Record<string, unknown> | undefined;
-export const aview = (style: Animatable) =>
-    style as Animated.WithAnimatedValue<ViewStyle>;
-export const atext = (style: Animatable) =>
-    style as Animated.WithAnimatedValue<TextStyle>;
-
-export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
-
-// Controls aren't text to select. Native text isn't selectable unless asked, but React Native
-// Web's is, and a drag across a control would select its parts.
-export const unselectable = { userSelect: "none" } as const;
-
-/** Pressable's interaction state, as handlers to spread on it. */
-export const usePress = (
-    own: Omit<State, "pressed" | "hover" | "focus" | "focusVisible" | "active">,
-) => {
-    const [pressed, setPressed] = useState(false);
-    const [hovered, setHovered] = useState(false);
-    const [focused, setFocused] = useState(false);
-    return {
-        state: pressableState({ pressed, hovered, focused }, own),
-        handlers: {
-            onPressIn: () => setPressed(true),
-            onPressOut: () => setPressed(false),
-            onHoverIn: () => setHovered(true),
-            onHoverOut: () => setHovered(false),
-            onFocus: () => setFocused(true),
-            onBlur: () => setFocused(false),
-        },
-    };
-};
-
-/** Press ripples for a component, in the content color and corners of one of its slots. */
-export const useInk = (
-    name: string,
-    variants: Record<string, string | undefined>,
-    state: State,
-    options: { slot?: string; centered?: boolean; disabled?: boolean } = {},
-) => {
-    const own = useRecipe(name, variants, state)[options.slot ?? "root"];
-    const radius = own?.borderRadius;
-    return useRipple({
-        color: String(own?.color ?? "rgb(0, 0, 0)"),
-        ...(typeof radius === "number" || typeof radius === "string"
-            ? { radius }
-            : {}),
-        ...(options.centered ? { centered: true } : {}),
-        ...(options.disabled ? { disabled: true } : {}),
-    });
-};
-
-/** Pressable handlers with a ripple's added. */
-export const withInk = (
-    handlers: ReturnType<typeof usePress>["handlers"],
-    ink: ReturnType<typeof useRipple>,
-) => ({
-    ...handlers,
-    onPressIn: (event: { nativeEvent: { pageX: number; pageY: number } }) => {
-        handlers.onPressIn();
-        ink.handlers.onPressIn(event);
-    },
-    onPressOut: () => {
-        handlers.onPressOut();
-        ink.handlers.onPressOut();
-    },
-});
-
-export type Color = "primary" | "secondary" | "tertiary" | "error";
+import {
+    AnimatedPressable,
+    Glyph,
+    aview,
+    atext,
+    ownText,
+    text,
+    unselectable,
+    useInk,
+    usePress,
+    view,
+    withInk,
+} from "./parts";
+import type { Color, Group } from "./parts";
 
 export function Button(props: {
     label: string;
@@ -235,20 +170,6 @@ export function Type(props: { style: TextStyleName; children: ReactNode }) {
     );
 }
 
-// Text properties a component sets on itself, for its own text, since a View passes none down.
-const TEXT = [
-    "color",
-    "fontFamily",
-    "fontSize",
-    "fontWeight",
-    "lineHeight",
-    "letterSpacing",
-];
-export const ownText = (style: Style | undefined) =>
-    Object.fromEntries(
-        Object.entries(style ?? {}).filter(([key]) => TEXT.includes(key)),
-    );
-
 export function Avatar(props: {
     initials: string;
     size?: "small" | "medium" | "large";
@@ -261,18 +182,6 @@ export function Avatar(props: {
         </View>
     );
 }
-
-export type Group = Color | "success" | "warning" | "info";
-
-/** A glyph standing in for an icon, in an icon slot's type and color. */
-export const Glyph = (props: { style: Animatable; glyph: string }) => (
-    <Animated.Text
-        selectable={false}
-        style={atext(ownText(props.style as Style))}
-    >
-        {props.glyph}
-    </Animated.Text>
-);
 
 export function Icon(props: {
     glyph: string;
