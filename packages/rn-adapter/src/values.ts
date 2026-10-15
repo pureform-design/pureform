@@ -5,7 +5,9 @@
 // arrays and objects (a transform list) hold values too. Everything is JSON, so templates and
 // precomputed styles can be written to a module.
 
-import { formatColor, mixSrgb, parseColor } from "./rgba";
+import { formatColor, parseColor } from "./rgba";
+import { mixIn } from "./spaces";
+import type { MixSpace } from "./spaces";
 
 export type Concrete = number | string;
 
@@ -28,7 +30,7 @@ export interface Transition {
 export type Expr =
     | { $ref: string }
     | { $dyn: string; default?: Value }
-    | { $mix: [base: Value, over: Value, amount: Value] }
+    | { $mix: [base: Value, over: Value, amount: Value]; space?: MixSpace }
     | { $calc: "+" | "-" | "*" | "/"; args: Value[] }
     | { $math: "min" | "max" | "clamp"; args: Value[] }
     | { $shadow: ShadowLayer[] };
@@ -102,7 +104,8 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
     if ("$mix" in value) {
         const [base, over, amount] = value.$mix;
         return formatColor(
-            mixSrgb(
+            mixIn(
+                value.space ?? "srgb",
                 parseColor(String(concrete(base))),
                 parseColor(String(concrete(over))),
                 share(concrete(amount)),

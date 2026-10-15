@@ -144,6 +144,29 @@ describe("lowerRn values", () => {
     });
 });
 
+describe("lowerRn mixes", () => {
+    it("keeps the space of a mix outside sRGB, and reports HCT", () => {
+        const mix = (space: string) => ({
+            type: "colorMix",
+            space,
+            base: rgb(0, 0, 0),
+            with: rgb(255, 255, 255),
+            amount: pct(50),
+        });
+        const { rules, diagnostics } = rulesOf({
+            color: mix("oklch"),
+            borderColor: mix("hct"),
+        } as unknown as StyleMap);
+        expect(rules[0]!.style).toEqual({
+            color: {
+                $mix: ["rgba(0, 0, 0, 1)", "rgba(255, 255, 255, 1)", "50%"],
+                space: "oklch",
+            },
+        });
+        expect(diagnostics).toEqual(["box: borderColor: mixing in hct"]);
+    });
+});
+
 describe("lowerRn raw rules", () => {
     it("skips other targets' raw rules, and reports its own", () => {
         const raw = (target: string) =>

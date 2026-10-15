@@ -19,6 +19,8 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import { colorNodeRgba } from "./color";
 import { rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
+import { MIX_SPACES } from "./spaces";
+import type { MixSpace } from "./spaces";
 import { TINT, TRANSITION } from "./values";
 import type { Value } from "./values";
 
@@ -283,16 +285,19 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         case "conditional":
             return conditional(node, ctx);
         case "colorMix":
-            if (node.space !== "srgb") {
-                throw new Unsupported(
-                    `mixing in ${node.space}; only srgb mixes for now`,
-                );
+            if (!(MIX_SPACES as readonly string[]).includes(node.space)) {
+                throw new Unsupported(`mixing in ${node.space}`);
             }
             return product(
                 [node.base, node.with, node.amount].map((n) =>
                     lowerNode(n, ctx),
                 ),
-                ([base, over, amount]) => ({ $mix: [base!, over!, amount!] }),
+                ([base, over, amount]) => ({
+                    $mix: [base!, over!, amount!],
+                    ...(node.space === "srgb"
+                        ? {}
+                        : { space: node.space as MixSpace }),
+                }),
             );
         case "calc":
             return product(
