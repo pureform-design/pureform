@@ -26,6 +26,7 @@ import {
     touchTarget,
     stateTransition,
     focusRing,
+    iconBox,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -89,10 +90,7 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     states: { disabled: { pointerEvents: none } },
                 },
                 label: { textStyle: textStyle("labelLarge") },
-                icon: {
-                    width: ref("iconSize"),
-                    height: ref("iconSize"),
-                },
+                icon: iconBox(ref("iconSize")),
                 touchTarget,
             },
             variants: {

@@ -33,6 +33,7 @@ import {
     sys,
     touchTarget,
     focusRing,
+    iconBox,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -152,8 +153,7 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
                     states: { disabled: { pointerEvents: none } },
                 },
                 icon: {
-                    width: ref("iconSize"),
-                    height: ref("iconSize"),
+                    ...iconBox(ref("iconSize")),
                     color: iconColor(ref("selectedContent")),
                 },
                 label: { textStyle: textStyle("labelLarge") },

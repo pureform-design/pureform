@@ -21,8 +21,6 @@
 import { defineSlotComponent } from "@pureform/core";
 import {
     absolute,
-    center,
-    flex,
     pct,
     px,
     transform,
@@ -40,7 +38,13 @@ import {
     fieldTokens,
     floated,
 } from "./field";
-import { COLOR_GROUPS, DEFAULT_GROUP, disabledColor, sys } from "./shared";
+import {
+    COLOR_GROUPS,
+    DEFAULT_GROUP,
+    disabledColor,
+    sys,
+    iconBox,
+} from "./shared";
 import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField", {
@@ -57,12 +61,7 @@ const icon = (side: "Start" | "End"): StyleMap => ({
     top: pct(50),
     transform: transform(translateY(pct(-50))),
     [`insetInline${side}`]: ref("iconInset"),
-    display: flex,
-    alignItems: center,
-    justifyContent: center,
-    width: ref("iconSize"),
-    height: ref("iconSize"),
-    fontSize: ref("iconSize"),
+    ...iconBox(ref("iconSize")),
     color: when()
         .on(DISABLED, disabledColor("disabledContent"))
         .else(ref("iconColor")),

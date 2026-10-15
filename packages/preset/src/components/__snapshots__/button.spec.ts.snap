@@ -4,7 +4,13 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-button-iconSize, token(sizes.iconSmall))",
       "height": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-button-iconSize, token(sizes.iconSmall))",
       "width": "var(--components-button-iconSize, token(sizes.iconSmall))",
     },
     "label": {

@@ -2,6 +2,9 @@
 
 import {
     absolute,
+    center,
+    inlineFlex,
+    unitless,
     alias,
     colorMix,
     dynamic,
@@ -314,3 +317,16 @@ export const mergeSlots = (
     }
     return out;
 };
+
+/** An icon slot of the given size: a box that centers its content, and sets the font size so
+ *  a glyph or icon-font icon fills it like an svg would. */
+export const iconBox = (size: NonNullable<StyleMap["width"]>): StyleMap => ({
+    display: inlineFlex,
+    alignItems: center,
+    justifyContent: center,
+    minWidth: size,
+    width: size,
+    height: size,
+    fontSize: size,
+    lineHeight: unitless(1),
+});

@@ -14,7 +14,6 @@ import {
     px,
     relative,
     row,
-    unitless,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -30,6 +29,7 @@ import {
     sys,
     touchTarget,
     focusRing,
+    iconBox,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -103,16 +103,7 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
                         },
                     },
                 },
-                // Centered, and sized for a glyph icon as well as an svg.
-                icon: {
-                    display: inlineFlex,
-                    alignItems: center,
-                    justifyContent: center,
-                    width: ref("iconSize"),
-                    height: ref("iconSize"),
-                    fontSize: ref("iconSize"),
-                    lineHeight: unitless(1),
-                },
+                icon: iconBox(ref("iconSize")),
                 label: { textStyle: textStyle("labelLarge") },
                 touchTarget,
             },
