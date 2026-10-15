@@ -19,6 +19,7 @@ import {
     pct,
     platform,
     px,
+    auto,
     rgb,
     rotate,
     shadow,
@@ -252,6 +253,38 @@ describe("compileValue conditionals", () => {
             base: "0",
             "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])":
                 "1",
+        });
+    });
+});
+
+describe("compileStyleMap flex items, auto margins, and side borders", () => {
+    it("passes flexGrow and flexShrink through as numbers", () => {
+        expect(
+            compileStyleMap(
+                { flexGrow: unitless(1), flexShrink: unitless(0) },
+                ctx(),
+            ),
+        ).toEqual({ flexGrow: "1", flexShrink: "0" });
+    });
+
+    it("lowers an auto margin", () => {
+        expect(compileStyleMap({ marginInlineStart: auto }, ctx())).toEqual({
+            marginInlineStart: "auto",
+        });
+    });
+
+    it("lowers one side's border", () => {
+        expect(
+            compileStyleMap(
+                {
+                    borderBlockEndWidth: px(1),
+                    borderBlockEndColor: transparent,
+                },
+                ctx(),
+            ),
+        ).toEqual({
+            borderBlockEndWidth: "1px",
+            borderBlockEndColor: "transparent",
         });
     });
 });
