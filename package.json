@@ -43,6 +43,7 @@
         "@pureform/css-lowering": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
+        "@pureform/rn-adapter": "workspace:^",
         "@pureform/preset": "workspace:^",
         "typescript": "^7.0.2",
         "@typescript/typescript6": "^6.0.2",
@@ -78,6 +79,13 @@
         "jsdom": "^25.0.1",
         "@material/material-color-utilities": "npm:@poupe/material-color-utilities@^0.4.1",
         "chroma-js": "^3.2.0",
+        "react": "^19.3.1",
+        "react-dom": "^19.3.1",
+        "@types/react": "^19.3.0",
+        "@types/react-dom": "^19.2.0",
+        "react-native": "^0.88.0",
+        "react-native-web": "^0.21.4",
+        "@vitejs/plugin-react": "^6.1.2",
         "@types/chroma-js": "^3.1.2"
     }
 }

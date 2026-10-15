@@ -1,0 +1,58 @@
+{
+    "name": "@pureform/rn-adapter",
+    "version": "0.0.0-semantically-released",
+    "description": "Compiles a pureform CoreConfig to React Native styles",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./react": {
+            "types": "./dist/react.d.ts",
+            "import": {
+                "development": "./src/react.ts",
+                "default": "./dist/react.mjs"
+            },
+            "require": {
+                "development": "./src/react.ts",
+                "default": "./dist/react.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:",
+        "chroma-js": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/material": "catalog:",
+        "@pureform/preset": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/chroma-js": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-native": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "react": "catalog:"
+    },
+    "peerDependenciesMeta": {
+        "react": {
+            "optional": true
+        }
+    }
+}

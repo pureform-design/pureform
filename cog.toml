@@ -98,6 +98,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/rn-adapter"]
+path = "packages/rn-adapter"
+include = [
+    "packages/rn-adapter/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
