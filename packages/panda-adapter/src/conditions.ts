@@ -61,6 +61,8 @@ const MEDIA_RULE: Record<string, string> = {
     portrait: "@media (orientation: portrait)",
     touch: "@media (pointer: coarse)",
     mouse: "@media (pointer: fine)",
+    clipShape: "@supports (clip-path: shape(from 0 0, line to 0 0))",
+    cornerShape: "@supports (corner-shape: squircle)",
 };
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.

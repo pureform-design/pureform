@@ -39,7 +39,10 @@ import {
 import {
     absolute,
     blur,
+    defineShape,
+    dropShadow,
     filter,
+    outlineShape,
     hidden,
     none,
     rowReverse,
@@ -368,5 +371,42 @@ describe("compileNodeToCSS radial gradients", () => {
         expect(
             compileNodeToCSS(radialGradient([stop(hex("#000000"))]), ctx()),
         ).toBe("radial-gradient(rgb(0 0 0))");
+    });
+});
+
+describe("shapes and drop shadows", () => {
+    it("lowers a drop shadow filter, dropping spread", () => {
+        expect(
+            compileNodeToCSS(
+                filter(
+                    dropShadow({
+                        x: px(0),
+                        y: px(1),
+                        blur: px(3),
+                        spread: px(1),
+                        color: hex("#000000"),
+                    }),
+                ),
+                ctx(),
+            ),
+        ).toBe("drop-shadow(0px 1px 3px rgb(0 0 0))");
+    });
+
+    it("lowers a shape to shape(), each contour closed", () => {
+        const ring = outlineShape(
+            defineShape({
+                from: [0, 0],
+                segments: [
+                    { op: "line", to: [1, 0] },
+                    { op: "curve", to: [0, 1], c1: [1, 1], c2: [1, 1] },
+                ],
+            }),
+            px(2),
+        );
+        expect(compileNodeToCSS(ring, ctx())).toBe(
+            "shape(evenodd from 0% 0%, line to 100% 0%, curve to 0% 100% with 100% 100% / 100% 100%, close, " +
+                "move to calc(0% + 2px) calc(0% + 2px), line to calc(100% + -2px) calc(0% + 2px), " +
+                "curve to calc(0% + 2px) calc(100% + -2px) with calc(100% + -2px) calc(100% + -2px) / calc(100% + -2px) calc(100% + -2px), close)",
+        );
     });
 });

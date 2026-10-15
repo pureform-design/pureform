@@ -107,11 +107,29 @@ export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
                 .join(" ");
         case "filter":
             return node.fns
-                .map(
-                    (f) =>
-                        `${f.fn}(${f.args.map((a) => compileNodeToCSS(a, ctx)).join(" ")})`,
+                .map((f) =>
+                    f.fn === "dropShadow"
+                        ? `drop-shadow(${[f.layer.x, f.layer.y, f.layer.blur, f.layer.color].map((a) => compileNodeToCSS(a, ctx)).join(" ")})`
+                        : `${f.fn}(${f.args.map((a) => compileNodeToCSS(a, ctx)).join(" ")})`,
                 )
                 .join(" ");
+        case "shape": {
+            const point = ([x, y]: readonly [ValueNode, ValueNode]) =>
+                `${compileNodeToCSS(x, ctx)} ${compileNodeToCSS(y, ctx)}`;
+            const contours = node.contours.map((contour, index) =>
+                [
+                    `${index === 0 ? "from" : "move to"} ${point(contour.from)}`,
+                    ...contour.segments.map((segment) =>
+                        segment.op === "line"
+                            ? `line to ${point(segment.to)}`
+                            : `curve to ${point(segment.to)} with ${point(segment.c1)} / ${point(segment.c2)}`,
+                    ),
+                    "close",
+                ].join(", "),
+            );
+            const rule = node.fillRule === "evenodd" ? "evenodd " : "";
+            return `shape(${rule}${contours.join(", ")})`;
+        }
         case "transition":
             return node.parts
                 .map((p) =>
