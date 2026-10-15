@@ -10,6 +10,7 @@ import { getByPath, inlineStyles, tokenValue } from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
+    NumericScalarNode,
     EasingNode,
     StyleMap,
     ValueNode,
@@ -120,6 +121,42 @@ const conditionStates = (
             when: [SLOT_STATE[condition.state] ?? condition.state],
             specificity: 2,
         };
+    }
+    if (
+        condition.type === "viewportSize" ||
+        condition.type === "viewportBreakpoint"
+    ) {
+        const px = (node: NumericScalarNode | undefined) => {
+            if (!node) return undefined;
+            const value = lowerNode(node, { ...ctx, property: "width" })[0]!
+                .value;
+            if (typeof value !== "number") {
+                throw new Unsupported(`a viewport bound of "${String(value)}"`);
+            }
+            return value;
+        };
+        const breakpoint = (name: string | undefined) => {
+            if (name === undefined) return undefined;
+            const node = ctx.config.breakpoints?.[name];
+            if (!node) throw new Unsupported(`no breakpoint named "${name}"`);
+            return px(node);
+        };
+        // Media queries add no specificity in CSS: a later rule wins, as cases follow the base.
+        const when =
+            condition.type === "viewportSize"
+                ? [
+                      ...(condition.min ? [`width>=${px(condition.min)}`] : []),
+                      ...(condition.max ? [`width<=${px(condition.max)}`] : []),
+                  ]
+                : [
+                      ...(condition.from
+                          ? [`width>=${breakpoint(condition.from)}`]
+                          : []),
+                      ...(condition.until
+                          ? [`width<${breakpoint(condition.until)}`]
+                          : []),
+                  ];
+        return { when, specificity: 0 };
     }
     throw new Unsupported(
         `no React Native equivalent for a ${condition.type} condition`,

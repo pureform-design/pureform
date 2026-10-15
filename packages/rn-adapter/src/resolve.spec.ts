@@ -308,6 +308,33 @@ describe("withDerived", () => {
     });
 });
 
+describe("viewport conditions", () => {
+    it("hold by the window's width, and not without one", () => {
+        const box = lowerRn({
+            ...config,
+            breakpoints: { md: px(768) },
+            components: {
+                box: {
+                    kind: "component",
+                    name: "box",
+                    recipe: {
+                        base: {
+                            width: when(
+                                { type: "viewportBreakpoint", from: "md" },
+                                px(10),
+                                px(5),
+                            ),
+                        },
+                    },
+                },
+            },
+        } as unknown as CoreConfig).components.box!;
+        expect(select(box, {}, { width: 800 })[""]!.width).toBe(10);
+        expect(select(box, {}, { width: 700 })[""]!.width).toBe(5);
+        expect(select(box)[""]!.width).toBe(5);
+    });
+});
+
 describe("evaluate with units", () => {
     it("carries a unit through calc and min/max, and refuses to mix units", () => {
         const theme = { value: 40 };

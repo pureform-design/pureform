@@ -16,6 +16,7 @@ import {
     spaceBetween,
     stop,
     unitless,
+    viewportBreakpoint,
     viewportSize,
     when,
 } from "@pureform/core/ast";
@@ -395,10 +396,52 @@ describe("lowerRn conditions", () => {
     });
 });
 
+describe("lowerRn viewport conditions", () => {
+    it("bounds the window's width, by size or breakpoint", () => {
+        const { rules } = rulesOf(
+            {
+                width: when(
+                    viewportSize({ min: px(600), max: px(900) }),
+                    px(10),
+                    px(5),
+                ),
+                height: when(
+                    viewportBreakpoint({ from: "md", until: "lg" }),
+                    px(2),
+                    px(1),
+                ),
+            } as StyleMap,
+            {
+                breakpoints: {
+                    md: px(768),
+                    lg: { type: "numeric", value: 64, unit: "rem" },
+                },
+            },
+        );
+        expect(rules).toEqual([
+            { when: [], specificity: 0, style: { width: 5, height: 1 } },
+            {
+                when: ["width<=900", "width>=600"],
+                specificity: 0,
+                style: { width: 10 },
+            },
+            {
+                when: ["width<1024", "width>=768"],
+                specificity: 0,
+                style: { height: 2 },
+            },
+        ]);
+    });
+});
+
 describe("lowerRn diagnostics", () => {
     it("drops what React Native can't do, and says so", () => {
         const { rules, diagnostics } = rulesOf({
-            width: when(viewportSize({ min: px(600) }), px(10), px(5)),
+            width: when(
+                { type: "containerSize", min: px(600) } as never,
+                px(10),
+                px(5),
+            ),
             backgroundImage: linearGradient([
                 stop(rgb(0, 0, 0)),
                 stop(rgb(9, 9, 9)),
@@ -407,7 +450,7 @@ describe("lowerRn diagnostics", () => {
         } as unknown as StyleMap);
         expect(rules).toEqual([]);
         expect(diagnostics).toEqual([
-            "box: width: no React Native equivalent for a viewportSize condition",
+            "box: width: no React Native equivalent for a containerSize condition",
             "box: backgroundImage: no React Native gradients; only one-color layers",
             'box: no React Native property for "gridTemplateColumns"',
         ]);

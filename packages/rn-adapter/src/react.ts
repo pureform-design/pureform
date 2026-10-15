@@ -19,6 +19,7 @@ interface Context {
     tokens: ThemeValues;
     scheme: Scheme;
     reducedMotion: boolean;
+    width: number | undefined;
 }
 
 const PureformContext = createContext<Context | undefined>(undefined);
@@ -32,6 +33,9 @@ export interface PureformProviderProps {
     /** Whether to take the reduced motion styles, as an app reads from `AccessibilityInfo`.
      *  Default `false`. */
     reducedMotion?: boolean;
+    /** The window's width, for viewport conditions, as an app reads it from
+     *  `useWindowDimensions`. Without it, none of them hold. */
+    width?: number;
     /** Token or component token values to override, by key: `colors.primary`,
      *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
      *  hex or any of CSS's color functions but `hwb()` and `color-mix()`. */
@@ -68,9 +72,10 @@ export const PureformProvider = (props: PureformProviderProps) => {
             tokens,
             scheme,
             reducedMotion,
+            width: props.width,
         }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
-        [resolved, tokens, scheme, reducedMotion],
+        [resolved, tokens, scheme, reducedMotion, props.width],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
 };
@@ -116,6 +121,9 @@ export const useRecipeWithTransitions = (
             selectWithTransitions(component, variants, {
                 scheme: context.scheme,
                 reducedMotion: context.reducedMotion,
+                ...(context.width === undefined
+                    ? {}
+                    : { width: context.width }),
                 ...state,
             }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -123,6 +131,7 @@ export const useRecipeWithTransitions = (
             component,
             context.scheme,
             context.reducedMotion,
+            context.width,
             variantKey,
             stateKey,
         ],

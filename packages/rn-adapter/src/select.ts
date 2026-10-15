@@ -30,6 +30,8 @@ export interface State {
     rtl?: boolean;
     /** The color scheme, for styles that switch on it rather than through tokens. */
     scheme?: "light" | "dark";
+    /** The window's width, for viewport conditions. Without it, none of them hold. */
+    width?: number;
 }
 
 export type Style = Record<string, Value>;
@@ -55,6 +57,25 @@ const activeStates = (state: State): Set<string> => {
     if (state.scheme) active.add(state.scheme);
     if (state.rtl !== undefined) active.add(state.rtl ? "rtl" : "ltr");
     return active;
+};
+
+const WIDTH = /^width(>=|<=|<)(-?[\d.]+)$/;
+
+// Whether a state holds: one of the component's, or a bound on the window's width.
+const holds = (
+    name: string,
+    active: Set<string>,
+    width: number | undefined,
+) => {
+    const bound = WIDTH.exec(name);
+    if (!bound) return active.has(name);
+    if (width === undefined) return false;
+    const n = Number(bound[2]);
+    return bound[1] === ">="
+        ? width >= n
+        : bound[1] === "<="
+          ? width <= n
+          : width < n;
 };
 
 // Turn what CSS reads differently into React Native's terms: `none` line styles (no line),
@@ -149,7 +170,8 @@ export const selectWithTransitions = (
                 continue;
             const list = bySlot.get(entry.slot) ?? [];
             for (const rule of entry.rules) {
-                if (rule.when.every((s) => active.has(s))) list.push(rule);
+                if (rule.when.every((s) => holds(s, active, state.width)))
+                    list.push(rule);
             }
             bySlot.set(entry.slot, list);
         }
