@@ -2,6 +2,9 @@
 
 import {
     absolute,
+    pointer,
+    relative,
+    row,
     center,
     inlineFlex,
     unitless,
@@ -330,3 +333,19 @@ export const iconBox = (size: NonNullable<StyleMap["width"]>): StyleMap => ({
     fontSize: size,
     lineHeight: unitless(1),
 });
+
+/** The root every pressable component shares: the focus ring and state transition, a
+ *  positioned inline row that centers its content (the touch target sits over it), no border,
+ *  a pointer, and no clicks while disabled. */
+export const pressableRoot: StyleMap = {
+    ...focusRing(),
+    transition: stateTransition,
+    position: relative,
+    display: inlineFlex,
+    flexDirection: row,
+    alignItems: center,
+    justifyContent: center,
+    borderWidth: px(0),
+    cursor: pointer,
+    states: { disabled: { pointerEvents: none } },
+};

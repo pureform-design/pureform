@@ -23,6 +23,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "borderWidth": "0px",
         "cursor": "pointer",
         "display": "inline-flex",
+        "flexDirection": "row",
         "justifyContent": "center",
         "outlineColor": "token(colors.secondary)",
         "outlineOffset": "2px",

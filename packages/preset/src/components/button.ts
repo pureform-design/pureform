@@ -4,15 +4,7 @@
 // there is one; the root's gap spaces it from the label.
 
 import { defineSlotComponent } from "@pureform/core";
-import {
-    center,
-    inlineFlex,
-    none,
-    pointer,
-    px,
-    relative,
-    row,
-} from "@pureform/core/ast";
+import { px } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -24,9 +16,8 @@ import {
     fillVariant,
     sys,
     touchTarget,
-    stateTransition,
-    focusRing,
     iconBox,
+    pressableRoot,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -76,18 +67,9 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
-                    ...focusRing(),
-                    transition: stateTransition,
-                    position: relative,
-                    display: inlineFlex,
-                    flexDirection: row,
-                    alignItems: center,
-                    justifyContent: center,
+                    ...pressableRoot,
                     gap: ref("gap"),
-                    borderWidth: px(0),
                     borderRadius: ref("radius"),
-                    cursor: pointer,
-                    states: { disabled: { pointerEvents: none } },
                 },
                 label: { textStyle: textStyle("labelLarge") },
                 icon: iconBox(ref("iconSize")),

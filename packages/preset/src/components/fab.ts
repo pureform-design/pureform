@@ -6,15 +6,7 @@
 // and lifts to level 4 on hover.
 
 import { defineSlotComponent } from "@pureform/core";
-import {
-    center,
-    inlineFlex,
-    none,
-    pointer,
-    px,
-    relative,
-    row,
-} from "@pureform/core/ast";
+import { none, px } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -25,11 +17,10 @@ import {
     disabledColors,
     fillColors,
     interactiveColors,
-    stateTransition,
     sys,
     touchTarget,
-    focusRing,
     iconBox,
+    pressableRoot,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -84,16 +75,8 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
-                    ...focusRing(),
-                    transition: stateTransition,
-                    position: relative,
-                    display: inlineFlex,
-                    flexDirection: row,
-                    alignItems: center,
-                    justifyContent: center,
+                    ...pressableRoot,
                     gap: ref("gap"),
-                    borderWidth: px(0),
-                    cursor: pointer,
                     apply: { shadowElevation: "level3" },
                     states: {
                         hover: { apply: { shadowElevation: "level4" } },

@@ -1,14 +1,7 @@
 // The pureform icon button: a square, fully rounded button holding a single icon.
 
 import { defineSlotComponent } from "@pureform/core";
-import {
-    center,
-    inlineFlex,
-    none,
-    pointer,
-    px,
-    relative,
-} from "@pureform/core/ast";
+import { px } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
@@ -20,9 +13,8 @@ import {
     fillVariant,
     sys,
     touchTarget,
-    stateTransition,
-    focusRing,
     iconBox,
+    pressableRoot,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -61,16 +53,8 @@ export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
-                    ...focusRing(),
-                    transition: stateTransition,
-                    position: relative,
-                    display: inlineFlex,
-                    alignItems: center,
-                    justifyContent: center,
-                    borderWidth: px(0),
+                    ...pressableRoot,
                     borderRadius: ref("radius"),
-                    cursor: pointer,
-                    states: { disabled: { pointerEvents: none } },
                 },
                 icon: iconBox(ref("iconSize")),
                 touchTarget,

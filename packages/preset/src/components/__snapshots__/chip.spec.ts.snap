@@ -33,6 +33,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
       "gap": "var(--components-chip-gap, token(spacing.2))",
       "height": "var(--components-chip-height, token(sizes.controlSmall))",
+      "justifyContent": "center",
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {

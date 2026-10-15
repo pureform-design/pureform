@@ -1,0 +1,96 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`icon > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {},
+  "className": "icon",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "current",
+    "size": "medium",
+  },
+  "jsx": [
+    "Icon",
+  ],
+  "variants": {
+    "color": {
+      "current": {},
+      "info": {
+        "color": "token(colors.info)",
+      },
+      "negative": {
+        "color": "token(colors.negative)",
+      },
+      "notice": {
+        "color": "token(colors.notice)",
+      },
+      "positive": {
+        "color": "token(colors.positive)",
+      },
+      "primary": {
+        "color": "token(colors.primary)",
+      },
+      "secondary": {
+        "color": "token(colors.secondary)",
+      },
+      "tertiary": {
+        "color": "token(colors.tertiary)",
+      },
+    },
+    "size": {
+      "large": {
+        "alignItems": "center",
+        "display": "inline-flex",
+        "fontSize": "var(--components-icon-sizeLarge, 36px)",
+        "height": "var(--components-icon-sizeLarge, 36px)",
+        "justifyContent": "center",
+        "lineHeight": "1",
+        "minWidth": "var(--components-icon-sizeLarge, 36px)",
+        "width": "var(--components-icon-sizeLarge, 36px)",
+      },
+      "medium": {
+        "alignItems": "center",
+        "display": "inline-flex",
+        "fontSize": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
+        "height": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
+        "justifyContent": "center",
+        "lineHeight": "1",
+        "minWidth": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
+        "width": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
+      },
+      "small": {
+        "alignItems": "center",
+        "display": "inline-flex",
+        "fontSize": "var(--components-icon-sizeSmall, token(sizes.iconSmall))",
+        "height": "var(--components-icon-sizeSmall, token(sizes.iconSmall))",
+        "justifyContent": "center",
+        "lineHeight": "1",
+        "minWidth": "var(--components-icon-sizeSmall, token(sizes.iconSmall))",
+        "width": "var(--components-icon-sizeSmall, token(sizes.iconSmall))",
+      },
+    },
+  },
+}
+`;
+
+exports[`touchTarget > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "height": "100%",
+    "left": "50%",
+    "minHeight": "token(sizes.touchTarget)",
+    "minWidth": "token(sizes.touchTarget)",
+    "position": "absolute",
+    "top": "50%",
+    "transform": "translate(-50%, -50%)",
+    "width": "100%",
+  },
+  "className": "touchTarget",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "TouchTarget",
+  ],
+  "variants": {},
+}
+`;

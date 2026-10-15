@@ -10,6 +10,8 @@ export * from "./components/chip";
 export * from "./components/control";
 export * from "./components/separator";
 export * from "./components/fab";
+export * from "./components/icon";
+export * from "./components/touch-target";
 export * from "./components/supporting-text";
 export * from "./components/switch";
 export * from "./components/text";

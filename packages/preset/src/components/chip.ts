@@ -5,19 +5,7 @@
 // selected filter or input chip. Render the icon slot only when there is an icon.
 
 import { defineSlotComponent } from "@pureform/core";
-import {
-    center,
-    inlineFlex,
-    none,
-    pointer,
-    px,
-    relative,
-    row,
-    solid,
-    transparent,
-    slot,
-    when,
-} from "@pureform/core/ast";
+import { px, solid, transparent, slot, when } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -29,11 +17,10 @@ import {
     componentTokens,
     groupRoles,
     disabledColor,
-    stateTransition,
     sys,
     touchTarget,
-    focusRing,
     iconBox,
+    pressableRoot,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -137,20 +124,12 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
-                    ...focusRing(),
-                    transition: stateTransition,
-                    position: relative,
-                    display: inlineFlex,
-                    flexDirection: row,
-                    alignItems: center,
+                    ...pressableRoot,
                     gap: ref("gap"),
                     height: ref("height"),
                     paddingInlineStart: ref("padding"),
                     paddingInlineEnd: ref("padding"),
-                    borderWidth: px(0),
                     borderRadius: ref("radius"),
-                    cursor: pointer,
-                    states: { disabled: { pointerEvents: none } },
                 },
                 icon: {
                     ...iconBox(ref("iconSize")),

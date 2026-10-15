@@ -45,6 +45,7 @@ import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { createFab } from "./components/fab";
+import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
@@ -55,6 +56,7 @@ import { createSwitch } from "./components/switch";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { touchTarget } from "./components/touch-target";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -262,6 +264,8 @@ export const pureform = <
         card,
         scrim,
         ripple,
+        icon: createIcon(theme.color.groups),
+        touchTarget,
         text: createText(Object.keys(theme.typography.styles)),
     };
     const chosen = options.components?.({ theme, defaults }) ?? defaults;

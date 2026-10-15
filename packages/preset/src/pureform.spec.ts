@@ -32,6 +32,8 @@ describe("pureform", () => {
             "card",
             "scrim",
             "ripple",
+            "icon",
+            "touchTarget",
             "text",
         ]);
     });
