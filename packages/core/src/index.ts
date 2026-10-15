@@ -3,4 +3,5 @@
 // `./types`.
 export * from "./define";
 export * from "./path";
+export * from "./typed";
 export type * from "./types";

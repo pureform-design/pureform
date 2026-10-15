@@ -6,7 +6,7 @@
 // sub-field, and the Panda adapter lowers them to `defineRecipe` / `defineSlotRecipe`.
 
 import { unitless } from "./ast";
-import type { NumericScalarNode } from "./ast";
+import type { NumericScalarNode, StyleMap } from "./ast";
 import { validateConfig } from "./path";
 import type {
     ComponentSpec,
@@ -37,9 +37,14 @@ export const defineSlotComponent = <const S extends string>(
     ({ kind: "slotComponent", ...spec }) as SlottedComponentSpec;
 
 /** Fixed named-step utility (lowering to a Panda enum `utilities`). Injects `kind: "static"`. */
-export const defineStaticUtility = (
-    def: Omit<StaticUtilityDef, "kind">,
-): StaticUtilityDef => ({ kind: "static", ...def });
+export const defineStaticUtility = <
+    const V extends Record<string, StyleMap> = Record<string, StyleMap>,
+>(
+    def: Omit<StaticUtilityDef, "kind" | "values"> & { values: V },
+): Omit<StaticUtilityDef, "values"> & { values: V } => ({
+    kind: "static",
+    ...def,
+});
 
 /** Value-parameterized utility (lowering to a Panda function `utilities`). Injects
  *  `kind: "dynamic"`. Reference the call-site value in `template` through `arg()` or

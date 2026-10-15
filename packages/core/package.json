@@ -26,6 +26,28 @@
                 "default": "./dist/ast.mjs"
             }
         },
+        "./raw": {
+            "types": "./dist/raw.d.ts",
+            "import": {
+                "development": "./src/raw.ts",
+                "default": "./dist/raw.mjs"
+            },
+            "require": {
+                "development": "./src/raw.ts",
+                "default": "./dist/raw.mjs"
+            }
+        },
+        "./ast/raw": {
+            "types": "./dist/ast/raw.d.ts",
+            "import": {
+                "development": "./src/ast/raw.ts",
+                "default": "./dist/ast/raw.mjs"
+            },
+            "require": {
+                "development": "./src/ast/raw.ts",
+                "default": "./dist/ast/raw.mjs"
+            }
+        },
         "./ast/helpers": {
             "types": "./dist/ast/helpers/index.d.ts",
             "import": {

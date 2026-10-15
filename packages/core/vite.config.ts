@@ -27,6 +27,8 @@ export default createConfig({
                 entry: {
                     index: "src/index.ts",
                     ast: "src/ast/index.ts",
+                    raw: "src/raw.ts",
+                    "ast/raw": "src/ast/raw.ts",
                     "ast/helpers": "src/ast/helpers/index.ts",
                     "ast/helpers/keyword": "src/ast/helpers/keyword/index.ts",
                     types: "src/types.ts",
