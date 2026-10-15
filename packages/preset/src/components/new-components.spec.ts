@@ -70,14 +70,22 @@ describe("searchBar", () => {
 });
 
 describe("navigation", () => {
-    it("fills the current destination's pill, read from the item", () => {
-        const css = JSON.stringify(
-            compilePreset(configWith(navigationBar)).theme?.slotRecipes
-                ?.navigationBar?.base?.indicator,
+    const base = () =>
+        compilePreset(configWith(navigationBar)).theme?.slotRecipes
+            ?.navigationBar?.base;
+
+    it("grows the active indicator from the center of the current destination's pill", () => {
+        const active = JSON.stringify(base()?.activeIndicator);
+        expect(active).toContain(".navigationBar__item:is(");
+        expect(active).toContain("aria-current");
+        expect(active).toContain("secondaryContainer");
+        expect(active).toContain('"insetInlineStart":{"base":"50%"');
+    });
+
+    it("keeps the pill's own state layer for destinations that aren't current", () => {
+        expect(JSON.stringify(base()?.indicator?.backgroundColor)).toContain(
+            "transparent",
         );
-        expect(css).toContain(".navigationBar__item:is(");
-        expect(css).toContain("aria-current");
-        expect(css).toContain("secondaryContainer");
     });
 });
 

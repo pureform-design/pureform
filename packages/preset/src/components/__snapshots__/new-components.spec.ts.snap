@@ -979,6 +979,36 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
 exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
+    "activeIndicator": {
+      "backgroundColor": {
+        ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
+        ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        "base": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
+      },
+      "borderRadius": "token(radii.full)",
+      "bottom": "0px",
+      "insetInlineEnd": {
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        "base": "50%",
+      },
+      "insetInlineStart": {
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        "base": "50%",
+      },
+      "opacity": {
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
+        "base": "0",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": "0px",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
+      },
+    },
     "icon": {
       "alignItems": "center",
       "display": "inline-flex",
@@ -987,6 +1017,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "lineHeight": "1",
       "minWidth": "var(--components-navigationBar-iconSize, token(sizes.iconMedium))",
+      "position": "relative",
       "width": "var(--components-navigationBar-iconSize, token(sizes.iconMedium))",
     },
     "indicator": {
@@ -996,10 +1027,6 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
         ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
         ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
@@ -1010,6 +1037,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "display": "flex",
       "height": "var(--components-navigationBar-indicatorHeight, 32px)",
       "justifyContent": "center",
+      "position": "relative",
       "transition": {
         "_motionReduce": "none",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
@@ -1076,24 +1104,23 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
     "root",
     "item",
     "indicator",
+    "activeIndicator",
     "icon",
     "label",
   ],
   "variants": {
     "color": {
       "error": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.errorContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.errorContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.errorContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1101,18 +1128,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "info": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.infoContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.infoContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.infoContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1121,18 +1146,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       },
       "primary": {},
       "secondary": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.secondaryContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.secondaryContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.secondaryContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1140,18 +1163,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "success": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.successContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.successContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.successContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1159,18 +1180,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "tertiary": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.tertiaryContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.tertiaryContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.tertiaryContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1178,18 +1197,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "warning": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.warningContainer)",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.warningContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.warningContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
@@ -1204,6 +1221,36 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
 exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
+    "activeIndicator": {
+      "backgroundColor": {
+        ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
+        ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        "base": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
+      },
+      "borderRadius": "token(radii.full)",
+      "bottom": "0px",
+      "insetInlineEnd": {
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        "base": "50%",
+      },
+      "insetInlineStart": {
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        "base": "50%",
+      },
+      "opacity": {
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
+        "base": "0",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "top": "0px",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
+      },
+    },
     "icon": {
       "alignItems": "center",
       "display": "inline-flex",
@@ -1212,6 +1259,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "lineHeight": "1",
       "minWidth": "var(--components-navigationRail-iconSize, token(sizes.iconMedium))",
+      "position": "relative",
       "width": "var(--components-navigationRail-iconSize, token(sizes.iconMedium))",
     },
     "indicator": {
@@ -1221,10 +1269,6 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
         ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
         ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
@@ -1235,6 +1279,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "display": "flex",
       "height": "var(--components-navigationRail-indicatorHeight, 32px)",
       "justifyContent": "center",
+      "position": "relative",
       "transition": {
         "_motionReduce": "none",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
@@ -1300,24 +1345,23 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
     "root",
     "item",
     "indicator",
+    "activeIndicator",
     "icon",
     "label",
   ],
   "variants": {
     "color": {
       "error": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.errorContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.errorContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.errorContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
@@ -1325,18 +1369,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "info": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.infoContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.infoContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.infoContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
@@ -1345,18 +1387,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       },
       "primary": {},
       "secondary": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.secondaryContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.secondaryContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.secondaryContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
@@ -1364,18 +1404,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "success": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.successContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.successContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.successContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
@@ -1383,18 +1421,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "tertiary": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.tertiaryContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.tertiaryContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.tertiaryContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
@@ -1402,18 +1438,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "warning": {
-        "indicator": {
+        "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.warningContainer)",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]):is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
-            "base": "transparent",
+            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.warningContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            "base": "token(colors.warningContainer)",
           },
+        },
+        "indicator": {
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",

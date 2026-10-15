@@ -171,7 +171,10 @@ pill with a group's container.
 ```html
 <nav class="{root}">
     <a class="{item}" href="/" aria-current="page">
-        <span class="{indicator}"><span class="{icon}">⌂</span></span>
+        <span class="{indicator}">
+            <span class="{activeIndicator}"></span>
+            <span class="{icon}">⌂</span>
+        </span>
         <span class="{label}">Home</span>
     </a>
 </nav>

@@ -3,7 +3,10 @@
 //
 //   <nav class={root}>
 //     <a class={item} href="/" aria-current="page">
-//       <span class={indicator}><span class={icon}>⌂</span></span>
+//       <span class={indicator}>
+//         <span class={activeIndicator} />
+//         <span class={icon}>⌂</span>
+//       </span>
 //       <span class={label}>Home</span>
 //     </a>
 //   </nav>
@@ -67,6 +70,7 @@ export const createNavigationBar = (groups: ColorGroups = COLOR_GROUPS) =>
                     paddingBlockEnd: spacing("4"),
                 },
                 indicator: parts.indicator,
+                activeIndicator: parts.activeIndicator,
                 icon: parts.icon,
                 label: parts.label,
             },
