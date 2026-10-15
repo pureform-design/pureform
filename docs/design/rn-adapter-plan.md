@@ -235,9 +235,11 @@ overrides the primary color in either mode.
   override recomputes those that read it, directly or through others.
 - **Viewport conditions** hold by the window's width, which the provider takes from
   `useWindowDimensions`. Container queries are still reported.
-- **Not yet:** text fields, menus, dialogs, navigation, tabs, slider, and ripple; shapes and
-  multi-color gradients, which need SVG or a gradient package; container queries; and running
-  on a device.
+- **Every component but the ripple** passes parity, and the demo shows them all. A sum of a
+  percentage and pixels, as the slider positions its handle, puts the pixels on the inset's
+  margin. Percentages are reported where React Native takes none.
+- **Not yet:** the ripple, shapes, and multi-color gradients, which need SVG or a gradient
+  package; container queries; and running on a device.
 
 ## State transitions
 
