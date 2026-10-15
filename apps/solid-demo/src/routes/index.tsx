@@ -1,5 +1,6 @@
-import { button, card, iconButton, scrim, text } from "$recipes";
+import { button, card, chip, fab, iconButton, scrim, text } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
+import { createSignal } from "solid-js";
 import { For } from "solid-js";
 
 import { Ripple } from "../lib/ripple";
@@ -26,6 +27,77 @@ const THEMES = [undefined, "teal", "sharp"] as const;
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
+            <section style={{ ...row, "align-items": "center" }}>
+                <For each={["small", "medium", "large"] as const}>
+                    {(size) => {
+                        const f = fab({ size });
+                        return (
+                            <button
+                                class={f.root}
+                                type="button"
+                                aria-label={`${size} FAB`}
+                            >
+                                <span class={f.touchTarget} />
+                                <Ripple />
+                                <span
+                                    class={f.icon}
+                                    style={{ "font-size": "inherit" }}
+                                >
+                                    +
+                                </span>
+                            </button>
+                        );
+                    }}
+                </For>
+                <For each={["tonal", "filled", "surface"] as const}>
+                    {(variant) => {
+                        const f = fab({ variant, extended: true });
+                        return (
+                            <button class={f.root} type="button">
+                                <span class={f.touchTarget} />
+                                <Ripple />
+                                <span class={f.label}>
+                                    {`${variant} FAB`.toUpperCase()}
+                                </span>
+                            </button>
+                        );
+                    }}
+                </For>
+            </section>
+            <section style={row}>
+                <For each={["outlined", "elevated"] as const}>
+                    {(variant) => (
+                        <For each={["Filter", "Assist"]}>
+                            {(label) => {
+                                const [selected, setSelected] =
+                                    createSignal(false);
+                                const c = chip({ variant });
+                                return (
+                                    <button
+                                        class={c.root}
+                                        type="button"
+                                        aria-pressed={
+                                            selected() ? "true" : "false"
+                                        }
+                                        data-selected={
+                                            selected() ? "" : undefined
+                                        }
+                                        onClick={() => {
+                                            setSelected(!selected());
+                                        }}
+                                    >
+                                        <span class={c.touchTarget} />
+                                        <Ripple />
+                                        <span
+                                            class={c.label}
+                                        >{`${variant} ${label}`}</span>
+                                    </button>
+                                );
+                            }}
+                        </For>
+                    )}
+                </For>
+            </section>
             <section style={{ display: "grid", gap: "8px" }}>
                 <h1 class={text({ style: "headlineMedium" })}>pureform</h1>
                 <p class={text({ style: "bodyLarge" })}>

@@ -39,6 +39,8 @@ export default defineConfig({
             card: ["*"],
             scrim: ["*"],
             ripple: ["*"],
+            fab: ["*"],
+            chip: ["*"],
             text: ["*"],
         },
     },
