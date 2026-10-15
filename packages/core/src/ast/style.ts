@@ -17,6 +17,7 @@ import type {
     LineStyleKeyword,
     OverflowKeyword,
     CornerShapeKeyword,
+    ObjectFitKeyword,
     PointerEventsKeyword,
     PortableCondition,
     PositionKeyword,
@@ -176,6 +177,7 @@ export interface StyleMap {
     cursor?: Keyword<CursorKeyword>;
     resize?: Keyword<ResizeKeyword>;
     fieldSizing?: Keyword<FieldSizingKeyword>;
+    objectFit?: Keyword<ObjectFitKeyword>;
     pointerEvents?: Keyword<PointerEventsKeyword>;
     transition?: Transition;
     transitionTimingFunction?: Easing;

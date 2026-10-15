@@ -227,6 +227,10 @@ export type OverflowKeyword = "visible" | "hidden" | "scroll" | "auto" | "clip";
  *  beneath, for decorative overlays. React Native's `box-none`/`box-only` have no web
  *  equivalent, so only the portable pair is here. */
 export type PointerEventsKeyword = "auto" | "none";
+/** How a replaced element (an image or video) fills its box: `cover` crops to fill it,
+ *  `contain` fits inside it, `fill` stretches, and `none` keeps its own size. React Native's
+ *  `resizeMode` has the same four. */
+export type ObjectFitKeyword = "cover" | "contain" | "fill" | "none";
 /** How a rounded corner curves, for `cornerShape`. */
 export type CornerShapeKeyword =
     | "round"

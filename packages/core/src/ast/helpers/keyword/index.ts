@@ -11,6 +11,7 @@ export * from "./textAlign";
 export * from "./cursor";
 export * from "./resize";
 export * from "./field-sizing";
+export * from "./object-fit";
 export * from "./overflow";
 export * from "./color";
 export * from "./common";
