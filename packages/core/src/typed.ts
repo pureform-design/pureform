@@ -152,11 +152,12 @@ export interface SlotRecipeHelpers<
 
 interface TypedComponentSpec<
     C,
+    N extends string,
     T extends Record<string, Token<ValueNode>>,
     V extends VariantValues,
     R,
 > {
-    name: string;
+    name: N;
     $meta?: Metadata;
     tokens?: T;
     /** The variant groups and their values. Each value gets an entry, empty unless the
@@ -164,6 +165,10 @@ interface TypedComponentSpec<
     variants?: V;
     recipe: (helpers: RecipeHelpers<C, Keys<T>>) => R;
 }
+
+/** A typed component's name and token names, kept in its type so a config holding it offers
+ *  `alias("components", name, token)`. */
+export type Named<N extends string, T> = { name: N; tokens?: T };
 
 /** What a single-slot recipe returns. */
 type Recipe<V extends VariantValues> = {
@@ -175,12 +180,13 @@ type Recipe<V extends VariantValues> = {
 
 interface TypedSlotComponentSpec<
     C,
+    N extends string,
     S extends string,
     T extends Record<string, Token<ValueNode>>,
     V extends VariantValues,
     R,
 > {
-    name: string;
+    name: N;
     $meta?: Metadata;
     slots: S[];
     /** How the slots nest; keys and children must be declared slots. */
@@ -261,12 +267,13 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
         /** A single-slot component whose recipe receives typed `alias` and `token` helpers,
          *  with its variant groups and values checked. */
         component: <
+            const N extends string,
             const T extends Record<string, Token<ValueNode>> = {},
             const V extends VariantValues = {},
             R extends Recipe<NoInfer<V>> = Recipe<V>,
         >(
-            spec: TypedComponentSpec<C, T, V, R>,
-        ): ComponentSpec => {
+            spec: TypedComponentSpec<C, N, T, V, R>,
+        ): ComponentSpec & Named<N, T> => {
             const recipe = spec.recipe({
                 alias,
                 token: (name) => rawAlias("components", spec.name, name),
@@ -297,19 +304,20 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                             | undefined,
                     }),
                 }) as Omit<ComponentSpec, "kind">,
-            );
+            ) as ComponentSpec & Named<N, T>;
         },
 
         /** A slot component whose recipe receives typed `slot`, `alias`, and `token` helpers,
          *  with its slots and variant groups and values checked. */
         slotComponent: <
+            const N extends string,
             const S extends string,
             const T extends Record<string, Token<ValueNode>> = {},
             const V extends VariantValues = {},
             R extends SlotRecipe<NoInfer<S>, NoInfer<V>> = SlotRecipe<S, V>,
         >(
-            spec: TypedSlotComponentSpec<C, S, T, V, R>,
-        ): SlottedComponentSpec => {
+            spec: TypedSlotComponentSpec<C, N, S, T, V, R>,
+        ): SlottedComponentSpec & Named<N, T> => {
             const recipe = spec.recipe({
                 alias,
                 token: (name) => rawAlias("components", spec.name, name),
@@ -341,7 +349,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                             | undefined,
                     }),
                 }) as Parameters<typeof defineSlotComponent>[0],
-            );
+            ) as SlottedComponentSpec & Named<N, T>;
         },
     };
 };

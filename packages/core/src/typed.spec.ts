@@ -294,3 +294,24 @@ describe("typed configs with index signatures", () => {
         >();
     });
 });
+
+describe("component tokens", () => {
+    it("are offered from a config holding typed components", () => {
+        const chip = pf.slotComponent({
+            name: "chip",
+            slots: ["root"],
+            tokens: { height: px(32), radius: px(8) },
+            recipe: () => ({ base: {} }),
+        });
+        const withChip = typed({ ...base, components: { chip } });
+        expectTypeOf<
+            Extract<
+                AliasPath<{ components: { chip: typeof chip } }>,
+                ["components", ...string[]]
+            >
+        >().toEqualTypeOf<["components", "chip", "height" | "radius"]>();
+        withChip.alias("components", "chip", "radius");
+        // @ts-expect-error not one of the chip's tokens
+        withChip.alias("components", "chip", "width");
+    });
+});
