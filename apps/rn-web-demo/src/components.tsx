@@ -27,6 +27,10 @@ const atext = (style: Animatable) =>
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+// Controls aren't text to select. Native text isn't selectable unless asked, but React Native
+// Web's is, and a drag across a control would select its parts.
+const unselectable = { userSelect: "none" } as const;
+
 /** Pressable's interaction state, as handlers to spread on it. */
 const usePress = (
     own: Omit<State, "pressed" | "hover" | "focus" | "focusVisible" | "active">,
@@ -68,11 +72,13 @@ export function Button(props: {
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
-            style={aview(s.root)}
+            style={aview({ ...s.root, ...unselectable })}
             testID={`button-${props.variant ?? "filled"}`}
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.Text style={atext(s.label)}>{props.label}</Animated.Text>
+            <Animated.Text selectable={false} style={atext(s.label)}>
+                {props.label}
+            </Animated.Text>
         </AnimatedPressable>
     );
 }
@@ -90,10 +96,12 @@ export function Chip(props: {
             {...handlers}
             role="button"
             onPress={props.onPress}
-            style={aview(s.root)}
+            style={aview({ ...s.root, ...unselectable })}
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.Text style={atext(s.label)}>{props.label}</Animated.Text>
+            <Animated.Text selectable={false} style={atext(s.label)}>
+                {props.label}
+            </Animated.Text>
         </AnimatedPressable>
     );
 }
@@ -112,7 +120,7 @@ export function Checkbox(props: {
             aria-checked={props.checked}
             aria-label={props.label}
             onPress={() => props.onChange(!props.checked)}
-            style={aview(s.root)}
+            style={aview({ ...s.root, ...unselectable })}
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
             <Animated.View style={aview(s.box)}>
@@ -137,13 +145,13 @@ export function Switch(props: {
             aria-checked={props.checked}
             aria-label={props.label}
             onPress={() => props.onChange(!props.checked)}
-            style={aview(s.root)}
+            style={aview({ ...s.root, ...unselectable })}
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
             <Animated.View style={aview(s.track)}>
                 <Animated.View style={aview(s.stateLayer)} />
                 <Animated.View style={aview(s.handle)}>
-                    <Animated.Text style={atext(s.icon)}>
+                    <Animated.Text selectable={false} style={atext(s.icon)}>
                         {props.checked ? "✓" : ""}
                     </Animated.Text>
                 </Animated.View>
