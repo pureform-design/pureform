@@ -1,7 +1,9 @@
 // The core set as React Native components, styled by the adapter. Each tracks its interaction
-// state, asks for its slots' styles, and lays the slots out as the web markup does.
+// state, asks for its slots' styles, and lays the slots out as the web markup does. The
+// interactive ones animate their state changes.
 
 import type { State, Style } from "@pureform/rn-adapter";
+import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
 import {
     pressableState,
     useRecipe,
@@ -9,12 +11,21 @@ import {
 } from "@pureform/rn-adapter/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Animated, Pressable, Text, View } from "react-native";
 import type { TextStyle, ViewStyle } from "react-native";
 
 // The adapter's styles are checked against React Native's types when lowered.
 const view = (style: Style | undefined) => style as ViewStyle;
 const text = (style: Style | undefined) => style as TextStyle;
+
+// Animated styles hold animated values where a property transitions.
+type Animatable = Record<string, unknown> | undefined;
+const aview = (style: Animatable) =>
+    style as Animated.WithAnimatedValue<ViewStyle>;
+const atext = (style: Animatable) =>
+    style as Animated.WithAnimatedValue<TextStyle>;
+
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 /** Pressable's interaction state, as handlers to spread on it. */
 const usePress = (
@@ -46,23 +57,23 @@ export function Button(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ disabled: props.disabled ?? false });
-    const s = useRecipe(
+    const s = useAnimatedRecipe(
         "button",
         { variant: props.variant, color: props.color },
         state,
     );
     return (
-        <Pressable
+        <AnimatedPressable
             {...handlers}
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
-            style={view(s.root)}
+            style={aview(s.root)}
             testID={`button-${props.variant ?? "filled"}`}
         >
-            <View pointerEvents="none" style={view(s.touchTarget)} />
-            <Text style={text(s.label)}>{props.label}</Text>
-        </Pressable>
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.Text style={atext(s.label)}>{props.label}</Animated.Text>
+        </AnimatedPressable>
     );
 }
 
@@ -73,17 +84,17 @@ export function Chip(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected ?? false });
-    const s = useRecipe("chip", { variant: props.variant }, state);
+    const s = useAnimatedRecipe("chip", { variant: props.variant }, state);
     return (
-        <Pressable
+        <AnimatedPressable
             {...handlers}
             role="button"
             onPress={props.onPress}
-            style={view(s.root)}
+            style={aview(s.root)}
         >
-            <View pointerEvents="none" style={view(s.touchTarget)} />
-            <Text style={text(s.label)}>{props.label}</Text>
-        </Pressable>
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.Text style={atext(s.label)}>{props.label}</Animated.Text>
+        </AnimatedPressable>
     );
 }
 
@@ -93,21 +104,21 @@ export function Checkbox(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useRecipe("checkbox", {}, state);
+    const s = useAnimatedRecipe("checkbox", {}, state);
     return (
-        <Pressable
+        <AnimatedPressable
             {...handlers}
             role="checkbox"
             aria-checked={props.checked}
             aria-label={props.label}
             onPress={() => props.onChange(!props.checked)}
-            style={view(s.root)}
+            style={aview(s.root)}
         >
-            <View pointerEvents="none" style={view(s.touchTarget)} />
-            <View style={view(s.box)}>
-                <Text style={text(s.checkIcon)}>✓</Text>
-            </View>
-        </Pressable>
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.View style={aview(s.box)}>
+                <Animated.Text style={atext(s.checkIcon)}>✓</Animated.Text>
+            </Animated.View>
+        </AnimatedPressable>
     );
 }
 
@@ -117,24 +128,26 @@ export function Switch(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useRecipe("switchControl", {}, state);
+    const s = useAnimatedRecipe("switchControl", {}, state);
     return (
-        <Pressable
+        <AnimatedPressable
             {...handlers}
             role="switch"
             aria-checked={props.checked}
             aria-label={props.label}
             onPress={() => props.onChange(!props.checked)}
-            style={view(s.root)}
+            style={aview(s.root)}
         >
-            <View pointerEvents="none" style={view(s.touchTarget)} />
-            <View style={view(s.track)}>
-                <View style={view(s.stateLayer)} />
-                <View style={view(s.handle)}>
-                    <Text style={text(s.icon)}>{props.checked ? "✓" : ""}</Text>
-                </View>
-            </View>
-        </Pressable>
+            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
+            <Animated.View style={aview(s.track)}>
+                <Animated.View style={aview(s.stateLayer)} />
+                <Animated.View style={aview(s.handle)}>
+                    <Animated.Text style={atext(s.icon)}>
+                        {props.checked ? "✓" : ""}
+                    </Animated.Text>
+                </Animated.View>
+            </Animated.View>
+        </AnimatedPressable>
     );
 }
 
@@ -142,8 +155,10 @@ export function Card(props: {
     variant?: "elevated" | "filled" | "outlined";
     children: ReactNode;
 }) {
-    const s = useRecipe("card", { variant: props.variant });
-    return <View style={view(s.root)}>{props.children}</View>;
+    const s = useAnimatedRecipe("card", { variant: props.variant });
+    return (
+        <Animated.View style={aview(s.root)}>{props.children}</Animated.View>
+    );
 }
 
 type TextStyleName =

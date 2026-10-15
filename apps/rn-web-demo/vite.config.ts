@@ -73,5 +73,7 @@ export default createConfig({
         resolve: {
             alias: { "react-native": "react-native-web" },
         },
+        // Parts of React Native Web's Animated refer to Node's `global`.
+        define: { global: "globalThis" },
     },
 });

@@ -133,6 +133,7 @@ export function App() {
     const [theme, setTheme] = useState<"base" | "teal">("base");
     const [mode, setMode] = useState<"precomputed" | "runtime">("precomputed");
     const [override, setOverride] = useState<keyof typeof OVERRIDES>("none");
+    const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
     const controls = (
         <View style={styles.section}>
             <Choices
@@ -151,6 +152,11 @@ export function App() {
                 onChange={setMode}
             />
             <Choices
+                value={motion}
+                options={["motion", "reduced motion"] as const}
+                onChange={setMotion}
+            />
+            <Choices
                 value={override}
                 options={Object.keys(OVERRIDES)}
                 onChange={setOverride}
@@ -163,6 +169,7 @@ export function App() {
             scheme={scheme}
             {...(theme === "teal" ? { theme } : {})}
             overrides={OVERRIDES[override]!}
+            reducedMotion={motion === "reduced motion"}
         >
             <Page controls={controls} />
         </PureformProvider>
