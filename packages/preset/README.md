@@ -150,6 +150,28 @@ and close on curves. Browsers without `shape()` (Firefox, for now) keep the roun
 Each shape a page uses adds about 1 to 2 kB of CSS, so avoid `staticCss: ["*"]` for these
 components unless you show every shape.
 
+### Morphing
+
+`morph(from, to)` makes a shape that changes into another while pressed, easing over `medium2`
+on the emphasized curve (instantly under reduced motion). It redraws both as the same number
+of curves, running the same direction from the closest starting points, which is what lets
+the browser animate between them.
+
+```ts
+import { morph } from "@pureform/core/ast";
+
+pureform({
+    shapes: {
+        ...MATERIAL_SHAPES,
+        cookieToCircle: morph(
+            MATERIAL_SHAPES.cookie9Sided,
+            MATERIAL_SHAPES.circle,
+        ),
+    },
+});
+iconButton({ shape: "cookieToCircle" });
+```
+
 ### Avatar
 
 `avatar` shows a picture, initials, or an icon in a color group's container, `small` (24px),

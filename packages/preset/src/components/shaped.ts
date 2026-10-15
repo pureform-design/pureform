@@ -27,6 +27,8 @@ import {
     transparent,
     linearGradient,
     stop,
+    transition,
+    tween,
     unitless,
     when,
 } from "@pureform/core/ast";
@@ -35,13 +37,16 @@ import type {
     AliasNode,
     ColorValue,
     NumericValue,
+    Condition,
     ShapeGeometry,
+    ShapeMorph,
     StyleMap,
 } from "@pureform/core/ast";
-import { elevationTint } from "@pureform/theme";
+import { duration, easing, elevationTint } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
 import {
+    STATE_TWEENS,
     disabledColor,
     fillColors,
     slotStateLayer,
@@ -49,12 +54,28 @@ import {
 } from "./shared";
 import type { Fill, OutlineTokens } from "./shared";
 
-/** Shapes components offer as their `shape` variant, by name. */
-export type Shapes = Record<string, ShapeGeometry>;
+/** Shapes components offer as their `shape` variant, by name. A morph rests as its first
+ *  shape and changes into the second while pressed. */
+export type Shapes = Record<string, ShapeGeometry | ShapeMorph>;
+
+const isMorph = (shape: ShapeGeometry | ShapeMorph): shape is ShapeMorph =>
+    "from" in shape;
+
+// A morph changes shape over medium2 on the emphasized curve, as Material's shape morphs do,
+// along with the state colors; under reduced motion it changes at once.
+const morphTransition = when(
+    "reducedMotion",
+    none,
+    transition(
+        ...STATE_TWEENS,
+        tween("clipPath", duration("medium2"), easing("emphasized")),
+    ),
+);
 
 export const DEFAULT_SHAPES: Shapes = MATERIAL_SHAPES;
 
 const DISABLED = slot("root", "disabled");
+const PRESSED = slot("root", "pressed");
 
 /** The container: it fills the root, draws the fill, and lays out the content. */
 export const shapedContainer = (radius: NumericValue): StyleMap => ({
@@ -157,20 +178,41 @@ export const shapedElevation = (fill: Fill): Record<string, StyleMap> =>
 
 /** Clip styles per shape, for an element that takes the clip itself: `none` keeps the rounded
  *  corners, and each shape clips to itself, keeping `radius` where a target can't clip to a
- *  shape. Only for an element with no focus ring or shadow to lose, such as an avatar. */
+ *  shape. A morph changes shape while `morphOn` holds, or keeps its first shape without one.
+ *  Only for an element with no focus ring or shadow to lose, such as an avatar. */
 export const clipVariant = (
     shapes: Shapes,
     radius: NumericValue,
+    morphOn?: Condition,
 ): Record<string, StyleMap> => ({
     none: {},
     ...Object.fromEntries(
-        Object.entries(shapes).map(([name, shape]) => [
-            name,
-            {
-                clipPath: clipShape(shape),
-                borderRadius: when("clipShape", px(0), radius),
-            },
-        ]),
+        Object.entries(shapes).map(([name, shape]) => {
+            const fallback = when("clipShape", px(0), radius);
+            if (!isMorph(shape)) {
+                return [
+                    name,
+                    { clipPath: clipShape(shape), borderRadius: fallback },
+                ];
+            }
+            return [
+                name,
+                morphOn
+                    ? {
+                          clipPath: when(
+                              morphOn,
+                              clipShape(shape.to),
+                              clipShape(shape.from),
+                          ),
+                          borderRadius: fallback,
+                          transition: morphTransition,
+                      }
+                    : {
+                          clipPath: clipShape(shape.from),
+                          borderRadius: fallback,
+                      },
+            ];
+        }),
     ),
 });
 
@@ -196,11 +238,22 @@ export const shapeVariant = (
         Object.entries(shapes).map(([name, shape]) => [
             name,
             {
-                container: clipVariant({ [name]: shape }, radius)[name]!,
+                container: clipVariant({ [name]: shape }, radius, PRESSED)[
+                    name
+                ]!,
                 ...(outlineColor
                     ? {
                           outline: {
-                              clipPath: outlineShape(shape, outlineWidth),
+                              clipPath: isMorph(shape)
+                                  ? when(
+                                        PRESSED,
+                                        outlineShape(shape.to, outlineWidth),
+                                        outlineShape(shape.from, outlineWidth),
+                                    )
+                                  : outlineShape(shape, outlineWidth),
+                              ...(isMorph(shape)
+                                  ? { transition: morphTransition }
+                                  : {}),
                               borderWidth: when(
                                   "clipShape",
                                   px(0),

@@ -259,16 +259,18 @@ export const fillVariant = (
  *  elevation over `medium1`, both on the standard curve. The motion tokens set both, so a
  *  theme's motion provider retimes every component. Under reduced motion, states change
  *  instantly. */
+export const STATE_TWEENS = [
+    tween("backgroundColor", duration("short3"), easing("standard")),
+    tween("color", duration("short3"), easing("standard")),
+    tween("borderColor", duration("short3"), easing("standard")),
+    tween("outlineColor", duration("short3"), easing("standard")),
+    tween("boxShadow", duration("medium1"), easing("standard")),
+];
+
 export const stateTransition = when(
     "reducedMotion",
     none,
-    transition(
-        tween("backgroundColor", duration("short3"), easing("standard")),
-        tween("color", duration("short3"), easing("standard")),
-        tween("borderColor", duration("short3"), easing("standard")),
-        tween("outlineColor", duration("short3"), easing("standard")),
-        tween("boxShadow", duration("medium1"), easing("standard")),
-    ),
+    transition(...STATE_TWEENS),
 );
 
 /** A transition of the given properties over `short3` on the standard curve, instant under

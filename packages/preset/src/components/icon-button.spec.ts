@@ -1,4 +1,4 @@
-import { defineShape, px, roundedPolygon } from "@pureform/core/ast";
+import { defineShape, morph, px, roundedPolygon } from "@pureform/core/ast";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
@@ -92,5 +92,38 @@ describe("custom shapes", () => {
         expect(css?.variants?.shape?.ticket?.container?.clipPath).toContain(
             "min(",
         );
+    });
+});
+
+describe("morphing shapes", () => {
+    const spec = createIconButton(undefined, undefined, {
+        cookieToCircle: morph(
+            MATERIAL_SHAPES.cookie9Sided,
+            MATERIAL_SHAPES.circle,
+        ),
+    });
+    const shape = () =>
+        compilePreset(configWith(spec)).theme?.slotRecipes?.iconButton?.variants
+            ?.shape?.cookieToCircle;
+
+    it("rest as the first shape and change into the second while pressed", () => {
+        const clip = shape()?.container?.clipPath as Record<string, string>;
+        expect(clip.base).toMatch(/^shape\(/);
+        const pressed = Object.entries(clip).find(([key]) =>
+            key.includes(":active"),
+        );
+        expect(pressed?.[1]).toMatch(/^shape\(/);
+        // Matching commands let the browser animate between them.
+        const commands = (css: string) => css.match(/[a-z]+ to/g);
+        expect(commands(pressed![1])).toEqual(commands(clip.base!));
+    });
+
+    it("animate the clip, and not under reduced motion", () => {
+        expect(JSON.stringify(shape()?.container?.transition)).toContain(
+            "clip-path token(durations.medium2) token(easings.emphasized)",
+        );
+        expect(shape()?.container?.transition).toMatchObject({
+            _motionReduce: "none",
+        });
     });
 });
