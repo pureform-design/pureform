@@ -23,7 +23,6 @@ import type {
     ShapeProvider,
     ShapeRole,
     SizeRole,
-    DensityStep,
     StateProvider,
     StateRole,
     TypographyProvider,
@@ -142,9 +141,11 @@ export interface MaterialLayoutOptions {
     grid?: number;
     /** Change or add component sizes, in px. */
     sizes?: Partial<Record<SizeRole, number>> & Record<string, number>;
-    /** How dense components are: `0` (the default) to `-3`, 4px off a dense component's
-     *  height per step. */
-    density?: DensityStep;
+    /** The density steps components offer, by name: grid units added to a dense component's
+     *  height, from `-3` up. Default Material's `"0"` to `"-3"`. */
+    densities?: Record<string, number>;
+    /** The theme's density: a step's name, or its grid units. Default `0`. */
+    density?: string | number;
 }
 
 /** Material's 4px spacing grid and component sizes. */
@@ -154,6 +155,9 @@ export const materialLayout = (
     const provider = gridLayout({
         grid: options.grid ?? 4,
         sizes: { ...MATERIAL_SIZES, ...options.sizes },
+        ...(options.densities === undefined
+            ? {}
+            : { densities: options.densities }),
         ...(options.density === undefined ? {} : { density: options.density }),
     });
     return { ...provider, name: "material" };
