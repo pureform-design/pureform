@@ -3,8 +3,9 @@
 // adapter's stylesheet, nested as the component's structure says so CSS inheritance applies.
 // Key properties must compute the same: colors, border widths, radii, padding, opacity, type,
 // and the sizes the React Native styles set in pixels. Layout that React Native Web does its
-// own way (flex defaults, box sizing) is left out, and so are the radii of shape variants,
-// which clip on the web and fall back to rounded corners in React Native.
+// own way (flex defaults, box sizing) is left out, and so are the radii and outline rings of
+// shape variants, which clip on the web and fall back to rounded corners and borders in React
+// Native.
 
 import { recipes } from "@pureform/css-adapter";
 import { select, stylesFor, themeKey } from "@pureform/rn-adapter";
@@ -232,8 +233,20 @@ const same = (property: string, a: string, b: string): boolean => {
 const SHAPED = (selection: Record<string, string>) =>
     selection.shape !== undefined && selection.shape !== "none";
 
-const comparedFor = (style: Style | undefined, shaped: boolean): string[] => [
-    ...ALWAYS.filter((property) => !(shaped && property.endsWith("radius"))),
+// A shaped outline is a filled ring on the web and a border in React Native.
+const RING = (property: string) =>
+    property === "background-color" || /^border-.*-width$/.test(property);
+
+const comparedFor = (
+    style: Style | undefined,
+    shaped: boolean,
+    slot: string,
+): string[] => [
+    ...ALWAYS.filter(
+        (property) =>
+            !(shaped && property.endsWith("radius")) &&
+            !(shaped && slot === "outline" && RING(property)),
+    ),
     ...Object.entries(style ?? {}).flatMap(([property, value]) =>
         // Sizes only where React Native sets them in pixels: percentages follow each side's
         // own layout.
@@ -302,6 +315,7 @@ describe("the React Native adapter matches the CSS adapter", () => {
                 for (const property of comparedFor(
                     bySlot[slot],
                     SHAPED(selection),
+                    slot,
                 )) {
                     compared++;
                     const [x, y] = [
