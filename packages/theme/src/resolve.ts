@@ -4,7 +4,14 @@
 // plain JavaScript callers and casts, and names the provider and the missing name.
 
 import { defineStaticUtility, mergeConfigs } from "@pureform/core";
-import { alias, linearGradient, stop } from "@pureform/core/ast";
+import {
+    alias,
+    dropShadow,
+    filter,
+    linearGradient,
+    literal,
+    stop,
+} from "@pureform/core/ast";
 import type {
     NumericScalarNode,
     StyleMap,
@@ -44,7 +51,12 @@ import type {
     ThemeFragment,
     TypographyProvider,
 } from "./provider";
-import { ELEVATION_UTILITY, PATHS, elevationTintName } from "./refs";
+import {
+    ELEVATION_FILTER_UTILITY,
+    ELEVATION_UTILITY,
+    PATHS,
+    elevationTintName,
+} from "./refs";
 
 export interface ThemeProviders<
     G extends string,
@@ -208,7 +220,14 @@ const lowerElevation = (levels: ElevationContract["levels"]) => {
     const shadows: Record<string, ValueNode> = {};
     const tints: Record<string, ValueNode> = {};
     const values: Record<string, StyleMap> = {};
+    const filters: Record<string, StyleMap> = {};
     for (const [level, { shadow, tint }] of Object.entries(levels)) {
+        filters[level] = {
+            filter:
+                shadow.type === "shadow"
+                    ? filter(...shadow.layers.map(dropShadow))
+                    : literal("none"),
+        };
         shadows[level] = shadow;
         tints[elevationTintName(level)] = tint;
         const tintRef = alias(...PATHS.color, elevationTintName(level));
@@ -217,7 +236,7 @@ const lowerElevation = (levels: ElevationContract["levels"]) => {
             backgroundImage: linearGradient([stop(tintRef), stop(tintRef)]),
         };
     }
-    return { shadows, tints, values };
+    return { shadows, tints, values, filters };
 };
 
 /** Lower a typography contract to core config: a font token per role, a token per text style
@@ -231,18 +250,23 @@ export const typographyFragment = (
     return { tokens, fonts: contract.fonts, textStyles };
 };
 
-/** Lower an elevation contract to core config: a shadow and a tint token per level, and the
- *  `shadowElevation` utility that reads them. */
+/** Lower an elevation contract to core config: a shadow and a tint token per level, the
+ *  `shadowElevation` utility that reads them, and `filterElevation`, the same shadows as
+ *  drop shadows. */
 export const elevationFragment = (
     contract: ElevationContract,
 ): Required<Pick<CoreConfig, "semanticTokens" | "utilities">> => {
-    const { shadows, tints, values } = lowerElevation(contract.levels);
+    const { shadows, tints, values, filters } = lowerElevation(contract.levels);
     return {
         semanticTokens: { colors: tints, shadows },
         utilities: {
             [ELEVATION_UTILITY]: defineStaticUtility({
                 property: "boxShadow",
                 values,
+            }),
+            [ELEVATION_FILTER_UTILITY]: defineStaticUtility({
+                property: "filter",
+                values: filters,
             }),
         },
     };

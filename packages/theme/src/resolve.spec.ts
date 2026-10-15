@@ -86,6 +86,15 @@ describe("resolveTheme", () => {
         });
     });
 
+    it("draws each elevation level as drop shadows for clipped shapes", () => {
+        const { config } = resolveTheme(providers());
+        expect(config.utilities?.filterElevation).toMatchObject({
+            kind: "static",
+            property: "filter",
+            values: { level2: { filter: { type: "literal", value: "none" } } },
+        });
+    });
+
     it("returns the resolved contracts, including the color groups", () => {
         expect(resolveTheme(providers()).color.groups).toEqual([
             "primary",

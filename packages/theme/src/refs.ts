@@ -42,6 +42,10 @@ export const elevationTintName = (level: string): string =>
 /** The utility that applies an elevation level. */
 export const ELEVATION_UTILITY = "shadowElevation";
 
+/** The utility that applies an elevation level as drop shadows, which follow a clipped shape
+ *  where a box shadow follows the box. It draws no tint. */
+export const ELEVATION_FILTER_UTILITY = "filterElevation";
+
 const ref =
     <N extends string>(path: readonly string[]) =>
     (name: N): AliasNode =>
