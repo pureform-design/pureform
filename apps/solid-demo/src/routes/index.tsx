@@ -50,7 +50,7 @@ const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
 
 // Named themes from panda.pureform.ts, each applied to a subtree by `data-panda-theme`.
-const THEMES = [undefined, "teal", "sharp"] as const;
+const THEMES = [undefined, "teal", "sharp", "dense"] as const;
 
 function IndexRoute() {
     return (
@@ -493,6 +493,93 @@ function IndexRoute() {
                             </For>
                         </div>
                     )}
+                </For>
+            </section>
+
+            <section
+                data-section="density"
+                style={{ display: "grid", gap: "12px" }}
+            >
+                <For each={["0", "-1", "-2", "-3"] as const}>
+                    {(density) => {
+                        const b = button({ density, variant: "tonal" });
+                        const c = chip({ density });
+                        const x = checkbox({ density });
+                        const t = textField({ density, variant: "outlined" });
+                        const f = textField({ density });
+                        const l = listItem({ density, interactive: true });
+                        return (
+                            <div style={{ ...row, "align-items": "center" }}>
+                                <button class={b.root} type="button">
+                                    <span class={b.touchTarget} />
+                                    <span
+                                        class={b.label}
+                                    >{`DENSITY ${density}`}</span>
+                                </button>
+                                <button class={c.root} type="button">
+                                    <span class={c.touchTarget} />
+                                    <span class={c.label}>Chip</span>
+                                </button>
+                                <label class={x.root}>
+                                    <span class={x.touchTarget} />
+                                    <input
+                                        class={x.input}
+                                        type="checkbox"
+                                        checked
+                                        aria-label={`density ${density}`}
+                                    />
+                                    <span class={x.box}>
+                                        <span class={x.checkIcon} />
+                                        <span class={x.indeterminateIcon} />
+                                    </span>
+                                </label>
+                                <div class={t.root} style={{ width: "180px" }}>
+                                    <div class={t.container}>
+                                        <input
+                                            class={t.input}
+                                            id={`dense-${density}`}
+                                            placeholder=" "
+                                            value="Value"
+                                        />
+                                        <label
+                                            class={t.label}
+                                            for={`dense-${density}`}
+                                        >
+                                            Label
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class={f.root} style={{ width: "180px" }}>
+                                    <div class={f.container}>
+                                        <input
+                                            class={f.input}
+                                            id={`dense-filled-${density}`}
+                                            placeholder=" "
+                                            value="Value"
+                                        />
+                                        <label
+                                            class={f.label}
+                                            for={`dense-filled-${density}`}
+                                        >
+                                            Label
+                                        </label>
+                                    </div>
+                                </div>
+                                <div
+                                    class={l.root}
+                                    tabindex="0"
+                                    style={{ width: "200px" }}
+                                >
+                                    <span class={l.leading}>★</span>
+                                    <div class={l.content}>
+                                        <span class={l.headline}>
+                                            List item
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }}
                 </For>
             </section>
 

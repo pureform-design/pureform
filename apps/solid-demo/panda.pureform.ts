@@ -2,6 +2,7 @@
 
 import {
     materialColor,
+    materialLayout,
     materialShape,
     materialTypescale,
 } from "@pureform/material";
@@ -35,6 +36,7 @@ const config = pureform({
             shape: materialShape({ full: 12 }),
         },
         sharp: { shape: roundedShape({ base: 0 }) },
+        dense: { layout: materialLayout({ density: -3 }) },
     },
 });
 

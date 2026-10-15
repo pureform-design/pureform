@@ -2304,6 +2304,14 @@ that shares the same style:
 
 A new component looks for these first, and extracts anything it would otherwise repeat.
 
+**Density.** The layout contract's `densityOffset` size is what Material's density takes off
+a dense component's height: `gridLayout({ density })` sets it to one grid unit per step below
+0, so a named theme can make a subtree denser. Each dense component also has a `density`
+variant, `inherit` (the default, following the theme) or `0` to `-3`. A variant can't set a
+CSS var, so each step restates the sized properties at its offset; where those properties
+come from another variant (a button's `size`, a list item's `lines`, a field's fill), compound
+variants restate them per value instead.
+
 **Accessibility.** Every interactive component draws `focusRing()`: a 3px secondary outline,
 offset 2px, on keyboard focus. Its touch target reaches the theme's `touchTarget` size.
 Selection controls lay a native input over the control, so forms, the keyboard, and screen

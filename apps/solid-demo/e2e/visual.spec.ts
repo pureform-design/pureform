@@ -8,6 +8,7 @@ import type { Page } from "@playwright/test";
 const SECTIONS = [
     "intro",
     "themes",
+    "density",
     "buttons",
     "icon-buttons",
     "disabled-buttons",
