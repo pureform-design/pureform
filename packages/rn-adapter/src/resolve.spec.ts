@@ -177,6 +177,25 @@ describe("select", () => {
     });
 });
 
+describe("evaluate with units", () => {
+    it("carries a unit through calc and min/max, and refuses to mix units", () => {
+        const theme = { value: 40 };
+        expect(
+            evaluate({ $calc: "*", args: [{ $ref: "value" }, "1%"] }, theme),
+        ).toBe("40%");
+        expect(evaluate({ $calc: "+", args: ["-135deg", "9deg"] }, theme)).toBe(
+            "-126deg",
+        );
+        expect(evaluate({ $math: "max", args: ["10%", "40%"] }, theme)).toBe(
+            "40%",
+        );
+        expect(evaluate({ $calc: "+", args: [4, 8] }, theme)).toBe(12);
+        expect(() =>
+            evaluate({ $calc: "-", args: ["100%", 8] }, theme),
+        ).toThrow(`calc can't combine "100%" and "8"`);
+    });
+});
+
 describe("overridesFor", () => {
     it("writes override colors in other notations as rgba()", () => {
         expect(

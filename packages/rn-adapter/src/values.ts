@@ -70,11 +70,47 @@ const share = (value: Concrete): number =>
 const px = (value: Concrete): string =>
     typeof value === "number" ? `${value}px` : value;
 
-const ARITHMETIC = {
-    "+": (a: number, b: number) => a + b,
-    "-": (a: number, b: number) => a - b,
-    "*": (a: number, b: number) => a * b,
-    "/": (a: number, b: number) => a / b,
+// A number with its unit, `""` for React Native's plain numbers (pixels, or none).
+interface Quantity {
+    n: number;
+    unit: string;
+}
+
+const quantity = (value: Concrete, what: string): Quantity => {
+    if (typeof value === "number") return { n: value, unit: "" };
+    const match = /^(-?\d*\.?\d+(?:e[-+]?\d+)?)([a-z%]*)$/i.exec(value.trim());
+    if (!match) throw new Error(`${what} needs a number, got "${value}"`);
+    return { n: Number(match[1]), unit: match[2]! };
+};
+
+const written = ({ n, unit }: Quantity): Concrete => (unit ? `${n}${unit}` : n);
+
+// Sums and comparisons take one unit; a product takes at most one, and a divisor none, as in
+// CSS. A percentage of a box can't meet pixels: React Native has no calc() to defer it to.
+const sameUnit = (a: Quantity, b: Quantity, what: string): string => {
+    if (a.unit === b.unit) return a.unit;
+    throw new Error(
+        `${what} can't combine "${written(a)}" and "${written(b)}"`,
+    );
+};
+
+const ARITHMETIC: Record<
+    "+" | "-" | "*" | "/",
+    (a: Quantity, b: Quantity) => Quantity
+> = {
+    "+": (a, b) => ({ n: a.n + b.n, unit: sameUnit(a, b, "calc") }),
+    "-": (a, b) => ({ n: a.n - b.n, unit: sameUnit(a, b, "calc") }),
+    "*": (a, b) => {
+        if (a.unit && b.unit)
+            throw new Error(
+                `calc can't multiply "${written(a)}" by "${written(b)}"`,
+            );
+        return { n: a.n * b.n, unit: a.unit || b.unit };
+    },
+    "/": (a, b) => {
+        if (b.unit) throw new Error(`calc can't divide by "${written(b)}"`);
+        return { n: a.n / b.n, unit: a.unit };
+    },
 };
 
 /** Evaluate a value against a theme. */
@@ -113,14 +149,24 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
         );
     }
     if ("$calc" in value) {
-        const args = value.args.map((a) => number(concrete(a), "calc"));
-        return args.slice(1).reduce(ARITHMETIC[value.$calc], args[0]!);
+        const args = value.args.map((a) => quantity(concrete(a), "calc"));
+        return written(args.slice(1).reduce(ARITHMETIC[value.$calc], args[0]!));
     }
     if ("$math" in value) {
-        const args = value.args.map((a) => number(concrete(a), value.$math));
-        if (value.$math === "min") return Math.min(...args);
-        if (value.$math === "max") return Math.max(...args);
-        return Math.min(Math.max(args[1]!, args[0]!), args[2]!);
+        const what = value.$math;
+        const args = value.args.map((a) => quantity(concrete(a), what));
+        const unit = args.reduce(
+            (u, a) => sameUnit({ n: 0, unit: u }, a, what),
+            args[0]!.unit,
+        );
+        const ns = args.map((a) => a.n);
+        const n =
+            what === "min"
+                ? Math.min(...ns)
+                : what === "max"
+                  ? Math.max(...ns)
+                  : Math.min(Math.max(ns[1]!, ns[0]!), ns[2]!);
+        return written({ n, unit });
     }
     return value.$shadow
         .map((layer) =>
