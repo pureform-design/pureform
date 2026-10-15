@@ -111,10 +111,49 @@ describe("selected and pressed slot states", () => {
         const recipes = compilePreset(chipLike).theme?.slotRecipes as Slots;
         expect(recipes.chipLike?.base.icon?.color).toEqual({
             base: "rgb(0 0 0)",
-            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [aria-checked=true], [data-selected]) &":
+            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &":
                 "rgb(17 17 17)",
             ".chipLike__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &":
                 "rgb(34 34 34)",
+        });
+    });
+});
+
+describe("checked and indeterminate slot states", () => {
+    it("match a checked or indeterminate input inside the slot", () => {
+        const box = defineConfig({
+            tokens: {},
+            semanticTokens: {},
+            components: {
+                box: defineSlotComponent({
+                    name: "box",
+                    slots: ["root", "mark"],
+                    structure: { root: ["mark"] },
+                    recipe: {
+                        base: {
+                            mark: {
+                                color: when()
+                                    .on(slot("root", "checked"), hex("#111"))
+                                    .on(
+                                        slot("root", "indeterminate"),
+                                        hex("#222"),
+                                    )
+                                    .else(hex("#000")),
+                            },
+                        },
+                    },
+                }),
+            },
+        });
+        const recipes = compilePreset(box).theme?.slotRecipes as Slots;
+        const CHECKED =
+            ":is(:checked, :has(:checked), [aria-checked=true], [data-checked])";
+        const MIXED =
+            ":is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate])";
+        expect(recipes.box?.base.mark?.color).toEqual({
+            base: "rgb(0 0 0)",
+            [`.box__root${CHECKED} &`]: "rgb(17 17 17)",
+            [`.box__root${MIXED}${MIXED} &`]: "rgb(34 34 34)",
         });
     });
 });

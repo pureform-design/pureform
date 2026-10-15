@@ -59,7 +59,7 @@ const MEDIA_RULE: Record<string, string> = {
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
 // Repeating raises specificity, so a later state wins wherever Panda orders the rules: hover,
-// filled, and selected, then focus, then pressed, then invalid, then disabled. Selected
+// filled, selected, and checked, then indeterminate and focus, then pressed, then invalid, then disabled. Selected
 // combines with the later states through an AND case rather than outranking them. Each also takes a data attribute, for custom
 // controls and native-like bindings that set the state by hand.
 const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
@@ -69,8 +69,17 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
         rank: 1,
     },
     selected: {
-        match: "[aria-selected=true], [aria-pressed=true], [aria-checked=true], [data-selected]",
+        match: "[aria-selected=true], [aria-pressed=true], [data-selected]",
         rank: 1,
+    },
+    checked: {
+        match: ":checked, :has(:checked), [aria-checked=true], [data-checked]",
+        rank: 1,
+    },
+    // Above checked, so a box that is both shows the dash.
+    indeterminate: {
+        match: ":indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]",
+        rank: 2,
     },
     focusWithin: { match: ":focus-within, [data-focused]", rank: 2 },
     focusVisibleWithin: {
