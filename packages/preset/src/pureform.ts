@@ -58,12 +58,14 @@ import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
 import { separator } from "./components/separator";
+import { snackbar } from "./components/snackbar";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTabs } from "./components/tabs";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
 
@@ -285,6 +287,8 @@ export const pureform = <
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
         dialog,
+        snackbar,
+        tooltip,
         card,
         scrim,
         ripple,

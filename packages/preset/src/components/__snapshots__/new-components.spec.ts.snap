@@ -1410,6 +1410,118 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "action": {
+      "_disabled": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateDragged))",
+        "_active": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.statePressed))",
+        "_focusVisible": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateFocus))",
+        "_hover": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateHover))",
+        "base": "transparent",
+      },
+      "borderRadius": "token(radii.full)",
+      "borderWidth": "0px",
+      "color": "var(--components-snackbar-actionColor, token(colors.inversePrimary))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "height": "var(--components-snackbar-actionHeight, token(sizes.controlMedium))",
+      "justifyContent": "center",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        "_focusVisible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
+      "paddingInlineEnd": "token(spacing.3)",
+      "paddingInlineStart": "token(spacing.3)",
+      "position": "relative",
+      "textStyle": "labelLarge",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+    },
+    "close": {
+      "_disabled": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateDragged))",
+        "_active": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.statePressed))",
+        "_focusVisible": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateFocus))",
+        "_hover": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateHover))",
+        "base": "transparent",
+      },
+      "borderRadius": "token(radii.full)",
+      "borderWidth": "0px",
+      "color": "var(--components-snackbar-content, token(colors.inverseOnSurface))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "fontSize": "var(--components-snackbar-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-snackbar-closeSize, 48px)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        "_focusVisible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
+      "position": "relative",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+      "width": "var(--components-snackbar-closeSize, 48px)",
+    },
+    "root": {
+      "alignItems": "center",
+      "backgroundColor": "var(--components-snackbar-container, token(colors.inverseSurface))",
+      "borderRadius": "var(--components-snackbar-radius, token(radii.extraSmall))",
+      "color": "var(--components-snackbar-content, token(colors.inverseOnSurface))",
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-snackbar-gap, token(spacing.2))",
+      "maxWidth": "var(--components-snackbar-maxWidth, 560px)",
+      "minHeight": "var(--components-snackbar-minHeight, 48px)",
+      "paddingInlineEnd": "var(--components-snackbar-gap, token(spacing.2))",
+      "paddingInlineStart": "var(--components-snackbar-paddingInline, token(spacing.4))",
+      "shadowElevation": "level3",
+    },
+    "supportingText": {
+      "flexGrow": "1",
+      "paddingBlockEnd": "token(spacing.3)",
+      "paddingBlockStart": "token(spacing.3)",
+      "textStyle": "bodyMedium",
+    },
+  },
+  "className": "snackbar",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "Snackbar",
+  ],
+  "slots": [
+    "root",
+    "supportingText",
+    "action",
+    "close",
+  ],
+  "variants": {},
+}
+`;
+
 exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
@@ -1867,6 +1979,77 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-tabs-container, token(colors.surface))",
           },
           "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`tooltip > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "token(spacing.2)",
+      "justifyContent": "end",
+    },
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+      "minHeight": "var(--components-tooltip-minHeight, 24px)",
+    },
+    "subhead": {
+      "color": "var(--components-tooltip-subheadColor, token(colors.onSurfaceVariant))",
+      "textStyle": "titleSmall",
+    },
+    "supportingText": {
+      "textStyle": "bodyMedium",
+    },
+  },
+  "className": "tooltip",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "variant": "plain",
+  },
+  "jsx": [
+    "Tooltip",
+  ],
+  "slots": [
+    "root",
+    "subhead",
+    "supportingText",
+    "actions",
+  ],
+  "variants": {
+    "variant": {
+      "plain": {
+        "root": {
+          "backgroundColor": "var(--components-tooltip-container, token(colors.inverseSurface))",
+          "borderRadius": "var(--components-tooltip-radius, token(radii.extraSmall))",
+          "color": "var(--components-tooltip-content, token(colors.inverseOnSurface))",
+          "maxWidth": "var(--components-tooltip-maxWidth, 200px)",
+          "paddingBlockEnd": "token(spacing.1)",
+          "paddingBlockStart": "token(spacing.1)",
+          "paddingInlineEnd": "token(spacing.2)",
+          "paddingInlineStart": "token(spacing.2)",
+          "shadowElevation": "level0",
+          "textStyle": "bodySmall",
+        },
+      },
+      "rich": {
+        "root": {
+          "backgroundColor": "var(--components-tooltip-richContainer, token(colors.surfaceContainer))",
+          "borderRadius": "var(--components-tooltip-richRadius, token(radii.medium))",
+          "color": "var(--components-tooltip-richContent, token(colors.onSurfaceVariant))",
+          "gap": "token(spacing.1)",
+          "maxWidth": "var(--components-tooltip-richMaxWidth, 320px)",
+          "paddingBlockEnd": "token(spacing.2)",
+          "paddingBlockStart": "token(spacing.3)",
+          "paddingInlineEnd": "token(spacing.4)",
+          "paddingInlineStart": "token(spacing.4)",
+          "shadowElevation": "level2",
         },
       },
     },

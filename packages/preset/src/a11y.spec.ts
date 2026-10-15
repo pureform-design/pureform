@@ -128,6 +128,7 @@ const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
     ["searchBar", (s) => s.recipe.base.root, "height"],
     ["navigationBar", (s) => s.recipe.base.item, "height"],
     ["navigationRail", (s) => s.recipe.base.item, "itemHeight"],
+    ["snackbar", (s) => s.recipe.base.close, "closeSize"],
     [
         "listItem",
         (s) =>

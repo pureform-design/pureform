@@ -19,6 +19,8 @@ export * from "./components/navigation";
 export * from "./components/navigation-bar";
 export * from "./components/navigation-rail";
 export * from "./components/search-bar";
+export * from "./components/snackbar";
+export * from "./components/tooltip";
 export * from "./components/tabs";
 export * from "./components/touch-target";
 export * from "./components/supporting-text";

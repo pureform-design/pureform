@@ -8,7 +8,9 @@ import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
 import { searchBar } from "./search-bar";
+import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
+import { tooltip } from "./tooltip";
 
 describe.each([
     ["listItem", listItem],
@@ -18,6 +20,8 @@ describe.each([
     ["searchBar", searchBar],
     ["navigationBar", navigationBar],
     ["navigationRail", navigationRail],
+    ["snackbar", snackbar],
+    ["tooltip", tooltip],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();

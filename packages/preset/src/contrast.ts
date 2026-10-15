@@ -97,6 +97,15 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     ],
     navigationBar: NAV_PAIRS,
     navigationRail: NAV_PAIRS,
+    snackbar: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("actionColor"), token("container"), TEXT_CONTRAST),
+    ],
+    tooltip: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("richContent"), token("richContainer"), TEXT_CONTRAST),
+        pair(token("subheadColor"), token("richContainer"), TEXT_CONTRAST),
+    ],
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,
     supportingText: [
