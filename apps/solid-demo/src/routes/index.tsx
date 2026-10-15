@@ -131,6 +131,7 @@ function IndexRoute() {
                                         >
                                             <span class={c.touchTarget} />
                                             <Ripple />
+                                            <span class={c.icon}>★</span>
                                             <span
                                                 class={c.label}
                                             >{`${variant} ${label}`}</span>
