@@ -180,8 +180,10 @@ overrides the primary color in either mode.
 
 ## Open questions
 
-- **Hover on native.** There's no pointer hover on phones, so hover layers only apply on Web and
-  with a pointer.
+- **Hover is for pointers, not only Web.** Touch-only phones never hover, but iPads with a
+  trackpad or mouse, Android with a mouse (Chromebooks, DeX), stylus hover, React Native for
+  Windows and macOS, and visionOS all report it through `Pressable`. The hover layer applies
+  whenever `hovered` is reported and costs nothing where it never is.
 - **Focus rings.** The outline properties render on Web; on native, keyboard focus is rare, so
   the POC leaves them as is.
 
