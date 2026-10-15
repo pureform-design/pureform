@@ -4,6 +4,7 @@ import {
     circle,
     clipShape,
     defineShape,
+    morph,
     normalize,
     outlineShape,
     px,
@@ -111,5 +112,59 @@ describe("fitting", () => {
         expect(JSON.stringify(ring.contours[1]?.from)).toContain(
             '"value":2,"unit":"px"',
         );
+    });
+});
+
+describe("morph", () => {
+    const square = defineShape(rectangle(1, 1));
+    const star5 = defineShape(normalize([star(5, 0.5, 0.05)]));
+
+    it("redraws both shapes as the same number of curves", () => {
+        const { from, to } = morph(square, star5);
+        const [a, b] = [from.contours[0]!, to.contours[0]!];
+        expect(a.segments.length).toBe(b.segments.length);
+        expect(a.segments.every((s) => s.op === "curve")).toBe(true);
+        expect(b.segments.every((s) => s.op === "curve")).toBe(true);
+    });
+
+    it("keeps each contour closed", () => {
+        const { from, to } = morph(square, star5);
+        for (const contour of [from.contours[0]!, to.contours[0]!]) {
+            const last = contour.segments.at(-1)!.to;
+            expect(last[0]).toBeCloseTo(contour.from[0]);
+            expect(last[1]).toBeCloseTo(contour.from[1]);
+        }
+    });
+
+    it("starts the target at the point closest to the source's start", () => {
+        const shifted = defineShape(rectangle(1, 1));
+        const { from, to } = morph(square, shifted);
+        expect(to.contours[0]!.from).toEqual(from.contours[0]!.from);
+    });
+
+    it("runs both the same direction", () => {
+        const backwards = defineShape({
+            ...rectangle(1, 1),
+            segments: [...rectangle(1, 1).segments].reverse(),
+        });
+        const { from, to } = morph(square, backwards);
+        const signed = (c: UnitContour) =>
+            [c.from, ...c.segments.map((s) => s.to)].reduce(
+                (sum, p, i, all) => {
+                    const q = all[(i + 1) % all.length]!;
+                    return sum + p[0] * q[1] - q[0] * p[1];
+                },
+                0,
+            );
+        expect(Math.sign(signed(to.contours[0]!))).toBe(
+            Math.sign(signed(from.contours[0]!)),
+        );
+    });
+
+    it("lowers to matching commands", () => {
+        const { from, to } = morph(square, star5);
+        const ops = (shape: typeof from) =>
+            clipShape(shape).contours[0]!.segments.map((s) => s.op);
+        expect(ops(to)).toEqual(ops(from));
     });
 });

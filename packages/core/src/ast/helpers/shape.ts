@@ -372,3 +372,118 @@ export const outlineShape = (
         fitContour(contour, shape.fit, width),
     ]),
 });
+
+/* Morphing between two shapes. */
+
+type Curve = { from: Vec; c1: Vec; c2: Vec; to: Vec };
+
+const lerp = (a: Vec, b: Vec, t: number): Vec => [
+    a[0] + (b[0] - a[0]) * t,
+    a[1] + (b[1] - a[1]) * t,
+];
+
+// Every segment as a cubic: a line becomes a curve with its handles on the line. The closing
+// line back to the start becomes one too, so the curves can start anywhere.
+const toCurves = (contour: UnitContour): Curve[] => {
+    const close = (from: Vec, to: Vec): Curve => ({
+        from,
+        c1: lerp(from, to, 1 / 3),
+        c2: lerp(from, to, 2 / 3),
+        to,
+    });
+    let last = contour.from;
+    const curves = contour.segments.map((segment) => {
+        const curve =
+            segment.op === "curve"
+                ? { from: last, c1: segment.c1, c2: segment.c2, to: segment.to }
+                : close(last, segment.to);
+        last = segment.to;
+        return curve;
+    });
+    const gap = length(minus(last, contour.from));
+    return gap > 1e-9 ? [...curves, close(last, contour.from)] : curves;
+};
+
+// Split a cubic in two at its middle (de Casteljau).
+const halve = ({ from, c1, c2, to }: Curve): [Curve, Curve] => {
+    const ab = lerp(from, c1, 0.5);
+    const bc = lerp(c1, c2, 0.5);
+    const cd = lerp(c2, to, 0.5);
+    const abc = lerp(ab, bc, 0.5);
+    const bcd = lerp(bc, cd, 0.5);
+    const mid = lerp(abc, bcd, 0.5);
+    return [
+        { from, c1: ab, c2: abc, to: mid },
+        { from: mid, c1: bcd, c2: cd, to },
+    ];
+};
+
+const span = ({ from, c1, c2, to }: Curve) =>
+    length(minus(c1, from)) + length(minus(c2, c1)) + length(minus(to, c2));
+
+// Split the longest curves until there are `count`.
+const splitTo = (curves: Curve[], count: number): Curve[] => {
+    const result = [...curves];
+    while (result.length < count) {
+        let longest = 0;
+        result.forEach((curve, i) => {
+            if (span(curve) > span(result[longest]!)) longest = i;
+        });
+        result.splice(longest, 1, ...halve(result[longest]!));
+    }
+    return result;
+};
+
+// Twice the signed area: its sign is the direction the contour runs.
+const area = (curves: Curve[]) =>
+    curves.reduce(
+        (sum, { from, to }) => sum + from[0] * to[1] - to[0] * from[1],
+        0,
+    );
+
+const reversed = (curves: Curve[]): Curve[] =>
+    [...curves].reverse().map(({ from, c1, c2, to }) => ({
+        from: to,
+        c1: c2,
+        c2: c1,
+        to: from,
+    }));
+
+const fromCurves = (curves: Curve[]): UnitContour => ({
+    from: curves[0]!.from,
+    segments: curves.map(({ c1, c2, to }) => ({ op: "curve", c1, c2, to })),
+});
+
+/** A shape that changes into another, such as on press. */
+export interface ShapeMorph {
+    from: ShapeGeometry;
+    to: ShapeGeometry;
+}
+
+/** Two shapes redrawn so one can animate into the other: both as the same number of cubic
+ *  curves, running the same direction, from the closest pair of starting points. A target that
+ *  animates between shapes (CSS `shape()` among them) needs that match. Each shape keeps its
+ *  own fit. Only single-contour shapes morph. */
+export const morph = (from: ShapeGeometry, to: ShapeGeometry): ShapeMorph => {
+    const [a, b] = [from.contours, to.contours];
+    if (a.length !== 1 || b.length !== 1) {
+        throw new Error("morph() takes shapes with one contour each");
+    }
+    let start = toCurves(a[0]!);
+    let end = toCurves(b[0]!);
+    if (Math.sign(area(start)) !== Math.sign(area(end))) end = reversed(end);
+    const count = Math.max(start.length, end.length);
+    start = splitTo(start, count);
+    end = splitTo(end, count);
+    // Start the target at the point closest to the source's start.
+    let offset = 0;
+    end.forEach((curve, i) => {
+        const distance = (c: Curve) => length(minus(c.from, start[0]!.from));
+        if (distance(curve) < distance(end[offset]!)) offset = i;
+    });
+    end = [...end.slice(offset), ...end.slice(0, offset)];
+    return {
+        from: { ...from, contours: [fromCurves(start)] },
+        to: { ...to, contours: [fromCurves(end)] },
+    };
+};
