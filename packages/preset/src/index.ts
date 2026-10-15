@@ -7,4 +7,5 @@ export * from "./components/ripple";
 export * from "./components/chip";
 export * from "./components/fab";
 export * from "./components/text";
+export * from "./components/text-field";
 export * from "./pureform";

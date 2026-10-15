@@ -1,0 +1,179 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`textField > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "container": {
+      "height": "var(--components-textField-height, 56px)",
+      "position": "relative",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+    },
+    "input": {
+      "_disabled": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-textField-inputColor, token(colors.onSurface))",
+      "height": "100%",
+      "outlineStyle": "none",
+      "paddingInlineEnd": "var(--components-textField-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-textField-paddingInline, token(spacing.4))",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "label": {
+      "color": {
+        ":focus-within > &": "var(--components-textField-focusColor, token(colors.primary))",
+        ":has(:disabled) > &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ":has([aria-invalid=true][aria-invalid=true]) > &": "var(--components-textField-errorColor, token(colors.negative))",
+        "base": "var(--components-textField-labelColor, token(colors.onSurfaceVariant))",
+      },
+      "fontSize": {
+        ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(fontSizes.bodySmall)",
+        "base": "token(fontSizes.bodyLarge)",
+      },
+      "insetInlineStart": "var(--components-textField-paddingInline, token(spacing.4))",
+      "letterSpacing": {
+        ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(letterSpacings.bodySmall)",
+        "base": "token(letterSpacings.bodyLarge)",
+      },
+      "lineHeight": {
+        ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(lineHeights.bodySmall)",
+        "base": "token(lineHeights.bodyLarge)",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "textStyle": "bodyLarge",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "top token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+    },
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "supportingText": {
+      "color": {
+        ":has(:disabled) > &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ":has([aria-invalid=true][aria-invalid=true]) > &": "var(--components-textField-errorColor, token(colors.negative))",
+        "base": "var(--components-textField-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-textField-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-textField-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
+  },
+  "className": "textField",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "variant": "filled",
+  },
+  "jsx": [
+    "TextField",
+  ],
+  "slots": [
+    "root",
+    "container",
+    "input",
+    "label",
+    "supportingText",
+  ],
+  "variants": {
+    "variant": {
+      "filled": {
+        "container": {
+          "backgroundColor": {
+            "&:has(:disabled)": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-textField-container, token(colors.surfaceContainerHighest))",
+          },
+          "borderStartEndRadius": "var(--components-textField-radius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-textField-radius, token(radii.extraSmall))",
+          "boxShadow": {
+            "&:focus-within:focus-within": "inset 0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-textField-focusColor, token(colors.primary))",
+            "&:has(:disabled)": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:has([aria-invalid=true][aria-invalid=true])": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px var(--components-textField-errorColor, token(colors.negative))",
+            "&:has([aria-invalid=true][aria-invalid=true]):focus-within": "inset 0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-textField-errorColor, token(colors.negative))",
+            "_hover": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px var(--components-textField-hoverColor, token(colors.onSurface))",
+            "base": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px var(--components-textField-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "token(spacing.2)",
+          "paddingBlockStart": "token(spacing.6)",
+        },
+        "label": {
+          "top": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(spacing.2)",
+            "base": "50%",
+          },
+          "transform": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "none",
+            "base": "translateY(-50%)",
+          },
+        },
+      },
+      "outlined": {
+        "container": {
+          "borderRadius": "var(--components-textField-radius, token(radii.extraSmall))",
+          "outlineColor": {
+            "&:focus-within:focus-within": "var(--components-textField-focusColor, token(colors.primary))",
+            "&:has(:disabled)": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:has([aria-invalid=true][aria-invalid=true])": "var(--components-textField-errorColor, token(colors.negative))",
+            "&:has([aria-invalid=true][aria-invalid=true]):focus-within": "var(--components-textField-errorColor, token(colors.negative))",
+            "_hover": "var(--components-textField-hoverColor, token(colors.onSurface))",
+            "base": "var(--components-textField-outlineColor, token(colors.outline))",
+          },
+          "outlineOffset": {
+            "&:focus-within:focus-within": "calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
+            "&:has(:disabled)": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
+            "&:has([aria-invalid=true][aria-invalid=true])": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
+            "&:has([aria-invalid=true][aria-invalid=true]):focus-within": "calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
+            "base": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
+          },
+          "outlineStyle": "solid",
+          "outlineWidth": {
+            "&:focus-within:focus-within": "var(--components-textField-focusIndicatorWidth, 2px)",
+            "&:has(:disabled)": "var(--components-textField-indicatorWidth, 1px)",
+            "&:has([aria-invalid=true][aria-invalid=true])": "var(--components-textField-indicatorWidth, 1px)",
+            "&:has([aria-invalid=true][aria-invalid=true]):focus-within": "var(--components-textField-focusIndicatorWidth, 2px)",
+            "base": "var(--components-textField-indicatorWidth, 1px)",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "token(spacing.4)",
+          "paddingBlockStart": "token(spacing.4)",
+        },
+        "label": {
+          "backgroundColor": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "var(--components-textField-labelBackground, token(colors.surface))",
+            "base": "transparent",
+          },
+          "marginInlineStart": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "calc(token(spacing.1) * -1)",
+            "base": "0px",
+          },
+          "paddingInlineEnd": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "paddingInlineStart": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "top": {
+            ":is(:focus-within, :has(:is(input, textarea):not(:placeholder-shown))) > &": "0px",
+            "base": "50%",
+          },
+          "transform": "translateY(-50%)",
+        },
+      },
+    },
+  },
+}
+`;

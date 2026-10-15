@@ -48,6 +48,7 @@ import { createIconButton } from "./components/icon-button";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { createText } from "./components/text";
+import { textField } from "./components/text-field";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -245,6 +246,7 @@ export const pureform = <
         iconButton: createIconButton(theme.color.groups),
         fab: createFab(theme.color.groups),
         chip,
+        textField,
         card,
         scrim,
         ripple,
