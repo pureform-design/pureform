@@ -62,8 +62,9 @@ step but can't declare different ones. A step named `inherit`, or below `-3`, wh
 stop holding up, is rejected. Each step adds CSS to every dense component, so declare only the
 ones you use.
 
-Dense components: `button`, `iconButton`, `chip`, `checkbox`, `radio`, `textField`, `select`,
-`listItem`, and `menu`. Buttons, chips, and controls keep their full touch target; list and
+Dense components: `button`, `iconButton`, `chip`, `checkbox`, `radio`, `textField`,
+`textArea`, `select`, `listItem`, and `menu`. The text area has no fixed height, so its steps
+move its paddings, label, and minimum height. Buttons, chips, and controls keep their full touch target; list and
 menu items shrink with no touch target, so keep dense menus for pointer layouts.
 
 ## Buttons

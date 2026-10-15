@@ -5,7 +5,6 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "container": {
       "display": "flex",
-      "minHeight": "var(--components-textArea-height, 56px)",
       "position": "relative",
       "transition": {
         "_motionReduce": "none",
@@ -319,10 +318,179 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       "leadingIcon": true,
       "variant": "outlined",
     },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + 0px)",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.6) + calc(0px * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(0px * 0.5))",
+          "paddingBlockStart": "0px",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(0px * 0.5))",
+          },
+        },
+      },
+      "density": "0",
+      "variant": "filled",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -1))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          "paddingBlockStart": "0px",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          },
+        },
+      },
+      "density": "-1",
+      "variant": "filled",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -2))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          "paddingBlockStart": "0px",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          },
+        },
+      },
+      "density": "-2",
+      "variant": "filled",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -3))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          "paddingBlockStart": "0px",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          },
+        },
+      },
+      "density": "-3",
+      "variant": "filled",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + 0px)",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.2) + calc(0px * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(0px * 0.5))",
+          "paddingBlockStart": "token(spacing.2)",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(0px * 0.5))",
+          },
+        },
+      },
+      "density": "0",
+      "variant": "outlined",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -1))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          "paddingBlockStart": "token(spacing.2)",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -1) * 0.5))",
+          },
+        },
+      },
+      "density": "-1",
+      "variant": "outlined",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -2))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          "paddingBlockStart": "token(spacing.2)",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -2) * 0.5))",
+          },
+        },
+      },
+      "density": "-2",
+      "variant": "outlined",
+    },
+    {
+      "css": {
+        "container": {
+          "minHeight": "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -3))",
+        },
+        "input": {
+          "marginBlockStart": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          "paddingBlockStart": "token(spacing.2)",
+        },
+        "label": {
+          "top": {
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(calc(token(spacing.1) * -3) * 0.5))",
+          },
+        },
+      },
+      "density": "-3",
+      "variant": "outlined",
+    },
   ],
   "defaultVariants": {
     "autoGrow": false,
     "color": "primary",
+    "density": "inherit",
     "leadingIcon": false,
     "trailingIcon": false,
     "variant": "filled",
@@ -412,6 +580,13 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "density": {
+      "-1": {},
+      "-2": {},
+      "-3": {},
+      "0": {},
+      "inherit": {},
+    },
     "leadingIcon": {
       "false": {},
       "true": {
@@ -448,17 +623,18 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
             "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-textArea-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-textArea-errorColor, token(colors.error))",
             "base": "inset 0px calc(var(--components-textArea-indicatorWidth, 1px) * -1) 0px 0px var(--components-textArea-indicatorColor, token(colors.onSurfaceVariant))",
           },
+          "minHeight": "calc(var(--components-textArea-height, 56px) + token(sizes.densityOffset))",
         },
         "input": {
-          "marginBlockStart": "token(spacing.6)",
-          "paddingBlockEnd": "token(spacing.2)",
+          "marginBlockStart": "calc(token(spacing.6) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
           "paddingBlockStart": "0px",
         },
         "label": {
           "top": {
-            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.2)",
-            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.2)",
-            "base": "calc(var(--components-textArea-height, 56px) * 0.5)",
+            ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
+            ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(token(sizes.densityOffset) * 0.5))",
           },
           "transform": {
             ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "none",
@@ -470,6 +646,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       "outlined": {
         "container": {
           "borderRadius": "var(--components-textArea-radius, token(radii.extraSmall))",
+          "minHeight": "calc(var(--components-textArea-height, 56px) + token(sizes.densityOffset))",
           "outlineColor": {
             "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-textArea-focusColor, token(colors.primary))",
@@ -495,8 +672,8 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "input": {
-          "marginBlockStart": "token(spacing.2)",
-          "paddingBlockEnd": "token(spacing.4)",
+          "marginBlockStart": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(token(sizes.densityOffset) * 0.5))",
           "paddingBlockStart": "token(spacing.2)",
         },
         "label": {
@@ -523,7 +700,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
           "top": {
             ".textArea__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
             ".textArea__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
-            "base": "calc(var(--components-textArea-height, 56px) * 0.5)",
+            "base": "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(token(sizes.densityOffset) * 0.5))",
           },
           "transform": "translateY(-50%)",
         },

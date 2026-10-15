@@ -287,7 +287,7 @@ export const pureform = <
         fab: createFab(theme.color.groups),
         chip: createChip(theme.color.groups, densities),
         textField: createTextField(theme.color.groups, densities),
-        textArea: createTextArea(theme.color.groups),
+        textArea: createTextArea(theme.color.groups, densities),
         searchBar,
         select: createSelect(theme.color.groups, densities),
         supportingText: createSupportingText(theme.color.groups),

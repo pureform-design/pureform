@@ -25,9 +25,10 @@ describe("textArea", () => {
     });
 
     it("grows with the textarea and resizes vertically", () => {
-        const { base } = compile(textArea, "textArea");
-        expect(base.container).toMatchObject({
-            minHeight: "var(--components-textArea-height, 56px)",
+        const { base, variants } = compile(textArea, "textArea");
+        expect(variants.variant?.filled?.container).toMatchObject({
+            minHeight:
+                "calc(var(--components-textArea-height, 56px) + token(sizes.densityOffset))",
         });
         expect(base.container).not.toHaveProperty("height");
         expect(base.input).toMatchObject({ resize: "vertical" });
@@ -37,7 +38,7 @@ describe("textArea", () => {
         const label = compile(textArea, "textArea").variants.variant?.filled
             ?.label as Record<string, Record<string, string>>;
         expect(label.top?.base).toBe(
-            "calc(var(--components-textArea-height, 56px) * 0.5)",
+            "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(token(sizes.densityOffset) * 0.5))",
         );
     });
 

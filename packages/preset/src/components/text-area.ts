@@ -15,6 +15,7 @@
 
 import { defineSlotComponent } from "@pureform/core";
 import {
+    add,
     content,
     flex,
     mul,
@@ -23,24 +24,71 @@ import {
     unitless,
     vertical,
 } from "@pureform/core/ast";
+import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
-import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
-import { COLOR_GROUPS, DEFAULT_GROUP } from "./shared";
-import type { ColorGroups } from "./shared";
+import {
+    FIELD_SLOTS,
+    FIELD_STRUCTURE,
+    fieldParts,
+    fieldTokens,
+    floated,
+} from "./field";
+import {
+    COLOR_GROUPS,
+    DEFAULT_DENSITIES,
+    DEFAULT_GROUP,
+    THEME_DENSITY,
+    densityCompounds,
+    densityMarkers,
+} from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("textArea");
 
 // The first line's center: half the single-line height, so the label rests where a text
 // field's would.
+const labelRest = mul(ref("height"), unitless(0.5));
 const { base, variant, colors, icons } = fieldParts(ref, {
-    labelRest: mul(ref("height"), unitless(0.5)),
+    labelRest,
     iconRoom: "container",
 });
 
+// The sizes density changes, at an offset: half of it off each side of the text, and the
+// label's resting line moving with it. The text scrolls through its own padding, under the
+// floated label, so the label's room is a margin outside the scroll area instead.
+const sized = (offset: NumericValue) => {
+    const plus = (value: NumericValue) =>
+        add(value, mul(offset, unitless(0.5)));
+    return {
+        filled: {
+            container: { minHeight: add(ref("height"), offset) },
+            input: {
+                paddingBlockStart: px(0),
+                paddingBlockEnd: plus(spacing("2")),
+                marginBlockStart: plus(spacing("6")),
+            },
+            label: { top: floated(plus(labelRest), plus(spacing("2"))) },
+        },
+        outlined: {
+            container: { minHeight: add(ref("height"), offset) },
+            input: {
+                paddingBlockStart: spacing("2"),
+                paddingBlockEnd: plus(spacing("4")),
+                marginBlockStart: plus(spacing("2")),
+            },
+            label: { top: floated(plus(labelRest), px(0)) },
+        },
+    } satisfies Record<string, Record<string, StyleMap>>;
+};
+const themeSized = sized(THEME_DENSITY);
+
 /** Build the text area with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
-export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
+export const createTextArea = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) => {
     const color = colors(groups);
     return defineSlotComponent({
         name: "textArea",
@@ -58,12 +106,9 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
                 container: {
                     ...base.container,
                     display: flex,
-                    minHeight: ref("height"),
                 },
                 input: { ...base.input, resize: vertical },
             },
-            // A textarea scrolls its text through its own padding, under the floated label, so the
-            // label's room is a margin outside the scroll area instead.
             variants: {
                 color: color.color,
                 ...icons.variants,
@@ -76,31 +121,54 @@ export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
                 variant: {
                     filled: {
                         ...variant.filled,
+                        container: {
+                            ...variant.filled.container,
+                            ...themeSized.filled.container,
+                        },
                         input: {
                             ...variant.filled.input,
-                            paddingBlockStart: px(0),
-                            marginBlockStart: spacing("6"),
+                            ...themeSized.filled.input,
+                        },
+                        label: {
+                            ...variant.filled.label,
+                            ...themeSized.filled.label,
                         },
                     },
                     outlined: {
                         ...variant.outlined,
+                        container: {
+                            ...variant.outlined.container,
+                            ...themeSized.outlined.container,
+                        },
                         input: {
                             ...variant.outlined.input,
-                            paddingBlockStart: spacing("2"),
-                            marginBlockStart: spacing("2"),
+                            ...themeSized.outlined.input,
+                        },
+                        label: {
+                            ...variant.outlined.label,
+                            ...themeSized.outlined.label,
                         },
                     },
                 },
+                density: densityMarkers(densities),
             },
             compoundVariants: [
                 ...color.compoundVariants,
                 ...icons.compoundVariants,
+                ...(["filled", "outlined"] as const).flatMap((fill) =>
+                    densityCompounds(
+                        densities,
+                        { variant: fill },
+                        (offset) => sized(offset)[fill],
+                    ),
+                ),
             ],
             defaultVariants: {
                 variant: "filled",
                 color: DEFAULT_GROUP,
                 autoGrow: "false",
                 ...icons.defaultVariants,
+                density: "inherit",
             },
         },
     });

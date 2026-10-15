@@ -12,7 +12,6 @@ import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { radio } from "./radio";
 import { select } from "./select";
-import { textArea } from "./text-area";
 import { textField } from "./text-field";
 
 describe.each([
@@ -42,8 +41,18 @@ describe.each([
 });
 
 describe("density", () => {
-    it("leaves the text area alone", () => {
-        expect(textArea.recipe.variants?.density).toBeUndefined();
+    it("moves the text area's paddings and label, not a fixed height", () => {
+        const recipe = compilePreset(pureform()).theme?.slotRecipes?.textArea;
+        const compact = recipe?.compoundVariants?.find(
+            (c) => c.variant === "filled" && c.density === "-2",
+        )?.css as Record<string, Record<string, unknown>>;
+        expect(compact.container?.minHeight).toBe(
+            "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -2))",
+        );
+        expect(compact.container).not.toHaveProperty("height");
+        expect(compact.input?.marginBlockStart).toBe(
+            "calc(token(spacing.6) + calc(calc(token(spacing.1) * -2) * 0.5))",
+        );
     });
 
     it("takes 4px per step off a Material layout", () => {
