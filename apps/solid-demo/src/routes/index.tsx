@@ -120,6 +120,83 @@ function IndexRoute() {
                     }}
                 </For>
             </section>
+            <section style={{ ...row, "align-items": "center" }}>
+                <For each={["negative", "positive", "tertiary"] as const}>
+                    {(color) => {
+                        const c = checkbox({ color });
+                        const s = switchControl({ color });
+                        const ch = chip({ color });
+                        const t = textField({ color, variant: "outlined" });
+                        return (
+                            <>
+                                <label
+                                    class={c.root}
+                                    title={`${color} checkbox`}
+                                >
+                                    <span class={c.touchTarget} />
+                                    <input
+                                        class={c.input}
+                                        type="checkbox"
+                                        id={`checkbox-${color}`}
+                                        checked
+                                    />
+                                    <span class={c.box}>
+                                        <span class={c.checkIcon}>✓</span>
+                                        <span class={c.indeterminateIcon}>
+                                            –
+                                        </span>
+                                    </span>
+                                </label>
+                                <label class={s.root} title={`${color} switch`}>
+                                    <span class={s.touchTarget} />
+                                    <input
+                                        class={s.input}
+                                        type="checkbox"
+                                        role="switch"
+                                        id={`switch-${color}`}
+                                        checked
+                                    />
+                                    <span class={s.track}>
+                                        <span class={s.stateLayer} />
+                                        <span class={s.handle}>
+                                            <span class={s.icon}>✓</span>
+                                        </span>
+                                    </span>
+                                </label>
+                                <button
+                                    class={ch.root}
+                                    type="button"
+                                    aria-pressed="true"
+                                    id={`chip-${color}`}
+                                >
+                                    <span class={ch.icon}>★</span>
+                                    <span class={ch.label}>{color}</span>
+                                </button>
+                                <div class={t.root} style={{ width: "160px" }}>
+                                    <div class={t.container}>
+                                        <input
+                                            class={t.input}
+                                            id={`field-${color}`}
+                                            placeholder=" "
+                                        />
+                                        <label
+                                            class={t.label}
+                                            for={`field-${color}`}
+                                        >
+                                            {color}
+                                        </label>
+                                    </div>
+                                    <span
+                                        class={supportingText({ tone: color })}
+                                    >
+                                        {`${color} tone`}
+                                    </span>
+                                </div>
+                            </>
+                        );
+                    }}
+                </For>
+            </section>
             <hr class={divider()} />
             <section style={{ ...row, "align-items": "flex-start" }}>
                 <For each={["filled", "outlined"] as const}>
