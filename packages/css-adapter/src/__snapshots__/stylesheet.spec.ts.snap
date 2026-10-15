@@ -1,0 +1,157 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`compileCss > compiles to a stable stylesheet 1`] = `
+"@layer pureform.reset, pureform.tokens, pureform.recipes;
+
+@layer pureform.tokens {
+    :root {
+        --colors-violet600: rgb(124 58 237);
+        --colors-violet700: rgb(109 40 217);
+        --colors-red600: rgb(220 38 38);
+        --colors-red700: rgb(185 28 28);
+        --colors-white: rgb(255 255 255);
+        --spacing-1: 4px;
+        --spacing-2: 8px;
+        --spacing-3: 12px;
+        --spacing-4: 16px;
+        --spacing-5: 20px;
+        --radii-sm: 4px;
+        --radii-md: 8px;
+        --radii-lg: 12px;
+        --radii-full: 9999px;
+        --font-sizes-sm: 14px;
+        --font-sizes-md: 16px;
+        --font-sizes-lg: 18px;
+        --sizes-icon-sm: 16px;
+        --sizes-icon-md: 20px;
+        --sizes-icon-lg: 24px;
+        --colors-brand: var(--global-colors-brand, var(--colors-violet600));
+        --colors-brand-hover: var(--global-colors-brandHover, var(--colors-violet700));
+        --colors-on-brand: var(--colors-white);
+        --colors-danger: var(--colors-red600);
+        --colors-danger-hover: var(--colors-red700);
+        --colors-on-danger: var(--colors-white);
+        --fonts-sans: Inter, system-ui, sans-serif;
+        --durations-fast: 150ms;
+        --easings-standard: cubic-bezier(0.2, 0, 0, 1);
+        --z-index-base: 0;
+        --z-index-raised: 100;
+        --z-index-overlay: 200;
+    }
+}
+
+@layer pureform.recipes {
+    @layer base, variants, compounds;
+    @layer base {
+        .button__root {
+            box-shadow: 0px 1px 3px rgb(0 0 0 / 0.2), 0px 1px 2px rgb(0 0 0 / 0.12);
+            font-family: var(--fonts-sans);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-2);
+            cursor: pointer;
+            border-radius: var(--ui-button-radius, var(--components-button-radius, var(--radii-md)));
+            background-color: var(--ui-button-bg, var(--components-button-bg, var(--colors-brand)));
+            color: var(--ui-button-fg, var(--components-button-fg, var(--colors-on-brand)));
+            opacity: 1;
+            transition: all var(--durations-fast) var(--easings-standard);
+            &:is(:disabled, [disabled], [data-disabled], [aria-disabled=true]) {
+                opacity: 0.38;
+                box-shadow: none;
+                cursor: not-allowed;
+            }
+            &:is(:hover, [data-hover]) {
+                box-shadow: 0px 2px 6px rgb(0 0 0 / 0.2), 0px 1px 2px rgb(0 0 0 / 0.12);
+            }
+        }
+        .button__label {
+            font-weight: 600;
+            line-height: 1.2;
+            letter-spacing: 0px;
+        }
+        .button__leadingIcon {
+            width: var(--sizes-icon-md);
+            height: var(--sizes-icon-md);
+        }
+        .button__trailingIcon {
+            width: var(--sizes-icon-md);
+            height: var(--sizes-icon-md);
+        }
+    }
+    @layer variants {
+        .button__root--color_brand {
+            background-color: var(--colors-brand);
+            color: var(--colors-on-brand);
+        }
+        .button__root--color_danger {
+            background-color: var(--colors-danger);
+            color: var(--colors-on-danger);
+        }
+        .button__root--variant_outline {
+            background-color: transparent;
+            border-width: 1px;
+            border-style: solid;
+            border-color: var(--colors-brand);
+            color: var(--colors-brand);
+        }
+        .button__root--variant_ghost {
+            background-color: transparent;
+            color: var(--colors-brand);
+        }
+        .button__root--size_sm {
+            padding-block-start: var(--spacing-1);
+            padding-block-end: var(--spacing-1);
+            padding-inline-start: var(--spacing-2);
+            padding-inline-end: var(--spacing-2);
+        }
+        .button__root--size_md {
+            padding-block-start: var(--spacing-2);
+            padding-block-end: var(--spacing-2);
+            padding-inline-start: var(--spacing-4);
+            padding-inline-end: var(--spacing-4);
+        }
+        .button__root--size_lg {
+            padding-block-start: var(--spacing-3);
+            padding-block-end: var(--spacing-3);
+            padding-inline-start: var(--spacing-5);
+            padding-inline-end: var(--spacing-5);
+        }
+        .button__label--size_sm {
+            font-size: var(--font-sizes-sm);
+        }
+        .button__label--size_md {
+            font-size: var(--font-sizes-md);
+        }
+        .button__label--size_lg {
+            font-size: var(--font-sizes-lg);
+        }
+        .button__leadingIcon--size_sm {
+            width: var(--sizes-icon-sm);
+            height: var(--sizes-icon-sm);
+        }
+        .button__leadingIcon--size_lg {
+            width: var(--sizes-icon-lg);
+            height: var(--sizes-icon-lg);
+        }
+        .button__trailingIcon--size_sm {
+            width: var(--sizes-icon-sm);
+            height: var(--sizes-icon-sm);
+        }
+        .button__trailingIcon--size_lg {
+            width: var(--sizes-icon-lg);
+            height: var(--sizes-icon-lg);
+        }
+    }
+    @layer compounds {
+        .button__root--variant_outline.button__root--color_danger {
+            border-color: var(--colors-danger);
+            color: var(--colors-danger);
+        }
+        .button__root--variant_solid.button__root--size_sm {
+            background-color: color-mix(in srgb, var(--colors-brand), var(--colors-white) 8%);
+        }
+    }
+}
+"
+`;
