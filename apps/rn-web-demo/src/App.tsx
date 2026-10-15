@@ -1,13 +1,13 @@
 // The demo page: the core set in light and dark, the base and teal themes, precomputed or
-// runtime styles, and an override of the primary color, which recomputes the state layers
-// mixed over it in either mode.
+// runtime styles, and a brand color overriding the primary family per scheme, which
+// recomputes the state layers mixed over it in either mode.
 
-import type { ThemeValues } from "@pureform/rn-adapter";
+import type { Overrides } from "@pureform/rn-adapter";
 import { PureformProvider, useTokens } from "@pureform/rn-adapter/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView, StyleSheet, View } from "react-native";
-import { precomputed, runtime } from "virtual:pureform-rn";
+import { brands, precomputed, runtime } from "virtual:pureform-rn";
 
 import {
     Avatar,
@@ -19,11 +19,8 @@ import {
     Type,
 } from "./components";
 
-const OVERRIDES: Record<string, ThemeValues> = {
-    none: {},
-    crimson: { "colors.primary": "rgba(176, 0, 32, 1)" },
-    forest: { "colors.primary": "rgba(27, 94, 32, 1)" },
-};
+// No override, or a brand's whole primary family for each scheme.
+const OVERRIDES: Record<string, Overrides> = { none: {}, ...brands };
 
 type Choice<T extends string> = {
     value: T;
