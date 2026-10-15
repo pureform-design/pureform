@@ -2671,7 +2671,9 @@ The parity test runs every scenario for this adapter too, through Tailwind's own
 `@pureform/rn-adapter` lowers component specs straight from the AST to React Native style
 objects, not through CSS. Theme-dependent values stay as references in style templates, and
 one resolver turns them into plain styles, either ahead of time for each scheme and named
-theme, or at runtime against a theme object that also carries runtime overrides. With no
+theme, or at runtime against a theme object. Both modes take runtime overrides: precomputed
+output keeps an index of which values read which tokens, and recomputes only those, mixes
+included. With no
 selectors or cascade, the adapter does three things CSS did for free: a component's state
 (from `Pressable` and props) picks state layers for every slot, inherited text properties
 pass down the slot structure, and `color-mix` is computed when resolving. The proof of

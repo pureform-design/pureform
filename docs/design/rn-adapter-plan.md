@@ -122,10 +122,26 @@ convert to `rgb()`, since React Native has no `oklch()`.
 
 - **Precomputed** (default): `precompute(config, { themes, schemes })` resolves every
   component's templates for each combination into plain `StyleSheet`-ready objects, and can
-  be written to a module ahead of time, so the app ships no lowering or color code.
+  be written to a module ahead of time, so the app ships no lowering code. Every `color-mix`
+  is computed here, since its inputs are known tokens.
 - **Runtime:** the app ships templates and a theme object. The provider resolves on theme
   change, cached per theme. Runtime overrides (the native stand-in for `dynamic()` and
   component tokens) are entries in that theme object.
+
+### Overrides on precomputed styles
+
+Overriding a token at runtime makes every precomputed value built on it stale. A plain
+reference is replaced directly, but a mix has to be computed again. So precomputed output
+keeps, next to each resolved value, what it came from:
+
+- **References:** which token a value is, so an override replaces it.
+- **Mixes:** a small template (base, overlay, amount, color space) with its inputs as token
+  references, so an override recomputes only the mixes that read the changed token.
+
+Applying overrides walks only the values that depend on the overridden tokens, through an
+index built when precomputing, and the result is cached per set of overrides. The app ships a
+small mixing function, but no lowering code or token tiers. Mixes in `oklch` need its
+conversion too, so the mixer stays as small as the color spaces the config uses.
 
 ## Runtime
 
@@ -146,12 +162,14 @@ native.
 
 `apps/rn-web-demo`: React 19, React Native Web, and Vite. It renders the core set in every fill
 and color, with light and dark and the teal theme, through the React entry. A toggle switches
-between precomputed and runtime modes to show they render the same.
+between precomputed and runtime modes to show they render the same, and a color picker
+overrides the primary color in either mode.
 
 ## Verification
 
 - **Unit tests:** lowering per node kind and property, inheritance, state layers, both modes
-  resolving to the same styles, and type checks of the output against React Native's
+  resolving to the same styles with and without overrides, an override recomputing only the
+  values that depend on it, and type checks of the output against React Native's
   `ViewStyle` and `TextStyle`.
 - **Browser parity:** in `tests/browser-e2e-tests`, each component renders through React
   Native Web next to the CSS adapter's markup, in each state, scheme, and the teal theme, and
@@ -162,8 +180,6 @@ between precomputed and runtime modes to show they render the same.
 
 ## Open questions
 
-- **`color-mix` over runtime overrides.** A mix whose base is overridden at runtime must mix
-  again in the resolver. Fine for the runtime mode; precomputed sets can't see overrides.
 - **Hover on native.** There's no pointer hover on phones, so hover layers only apply on Web and
   with a pointer.
 - **Focus rings.** The outline properties render on Web; on native, keyboard focus is rare, so
@@ -174,7 +190,8 @@ between precomputed and runtime modes to show they render the same.
 1. Move `inlineStyles` to the core.
 2. Lowering: nodes, properties, conditions into state layers, inheritance.
 3. `resolveTheme`, `resolve`, color conversion and mixing, both modes.
-4. The React entry: provider, `useRecipe`, `pressableState`.
-5. The React Native Web demo.
-6. Browser parity tests.
-7. Docs: the design doc's adapter section.
+4. Overrides on precomputed styles: the dependency index and the mixer.
+5. The React entry: provider, `useRecipe`, `pressableState`, and an `overrides` prop.
+6. The React Native Web demo, with a brand color override in both modes.
+7. Browser parity tests.
+8. Docs: the design doc's adapter section.
