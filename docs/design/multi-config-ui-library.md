@@ -2639,8 +2639,9 @@ the interaction selectors match Panda's built-ins, so both adapters style the sa
   their variants and slots, or, ahead of time, from declarations generated with each manifest.
 
 A parity test renders every component at its defaults and at each variant value, styled once
-by each adapter, and requires the same computed styles. It covers resting styles; states,
-color schemes, and named themes are left to the unit tests. It found that two variant groups
+by each adapter, and requires the same computed styles. It also compares each component's
+defaults in every state (forced through the data attributes both adapters' selectors match),
+in the dark scheme, and in a named theme. It found that two variant groups
 setting one property at equal specificity leave the winner to rule order, which the adapters
 needn't share, so a component must not do that: the FAB's size radius moved into a compound
 variant for that reason.
