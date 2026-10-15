@@ -86,17 +86,28 @@ export const SIZE_ROLES = [
 
 export type SizeRole = (typeof SIZE_ROLES)[number];
 
-/** Material's density steps: 0 is the default, and each step down takes one grid unit off a
- *  dense component's height. */
-export const DENSITY_STEPS = [0, -1, -2, -3] as const;
+/** Material's density steps, by name: how many grid units each adds to a dense component's
+ *  height (negative to take them off). */
+export const MATERIAL_DENSITIES: Record<string, number> = {
+    "0": 0,
+    "-1": -1,
+    "-2": -2,
+    "-3": -3,
+};
 
-export type DensityStep = (typeof DENSITY_STEPS)[number];
+/** The densest step components hold up at, in grid units: below it a filled text field's label
+ *  and paddings would go negative, and a checkbox would shrink under its box. */
+export const MIN_DENSITY = -3;
 
 export interface LayoutContract {
     spacing: Record<SpacingStep, NumericScalarNode> &
         Record<string, NumericScalarNode>;
     sizes: Record<SizeRole, NumericScalarNode> &
         Record<string, NumericScalarNode>;
+    /** The density steps components offer as their `density` variant, by name: grid units
+     *  added to a dense component's height, from `MIN_DENSITY` up. Default Material's `0` to
+     *  `-3`. */
+    densities?: Record<string, number>;
 }
 
 export const STATE_ROLES = [

@@ -153,6 +153,77 @@ describe("gridLayout", () => {
         });
         expect(config.tokens.sizes?.densityOffset).toEqual(px(-8));
     });
+
+    const SIZES = {
+        iconSmall: 16,
+        iconMedium: 20,
+        controlSmall: 28,
+        controlMedium: 36,
+        controlLarge: 44,
+        touchTarget: 44,
+    };
+    const STEPS = { comfortable: 1, standard: 0, compact: -2 };
+
+    it("takes named steps and picks the theme's by name", () => {
+        const { layout, config } = resolveTheme({
+            ...providers(),
+            layout: gridLayout({
+                sizes: SIZES,
+                densities: STEPS,
+                density: "comfortable",
+            }),
+        });
+        expect(layout.densities).toEqual(STEPS);
+        expect(config.tokens.sizes?.densityOffset).toEqual(px(4));
+    });
+
+    it("defaults to Material's steps", () => {
+        const { layout } = resolveTheme({
+            ...providers(),
+            layout: gridLayout({ sizes: SIZES }),
+        });
+        expect(Object.keys(layout.densities)).toEqual(["0", "-1", "-2", "-3"]);
+    });
+
+    it("rejects a theme density that is not one of the steps", () => {
+        expect(() =>
+            resolveTheme({
+                ...providers(),
+                layout: gridLayout({
+                    sizes: SIZES,
+                    densities: STEPS,
+                    density: -1,
+                }),
+            }),
+        ).toThrow(
+            /density -1 is not one of the steps: comfortable, standard, compact/,
+        );
+    });
+
+    it("rejects a step named inherit", () => {
+        expect(() =>
+            resolveTheme({
+                ...providers(),
+                layout: gridLayout({
+                    sizes: SIZES,
+                    densities: { inherit: 0 },
+                    density: "inherit",
+                }),
+            }),
+        ).toThrow(/density step "inherit"/);
+    });
+
+    it("rejects a step below -3", () => {
+        expect(() =>
+            resolveTheme({
+                ...providers(),
+                layout: gridLayout({
+                    sizes: SIZES,
+                    densities: { standard: 0, tiny: -5 },
+                }),
+            }),
+        ).toThrow(/density step "tiny" -5 grid units/);
+    });
 });
 
 describe("oklchPalette", () => {

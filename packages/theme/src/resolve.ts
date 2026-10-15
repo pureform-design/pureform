@@ -15,6 +15,8 @@ import type { CoreConfig } from "@pureform/core/types";
 import { NEUTRAL_ROLES, groupRoles } from "./contracts/color";
 import type { ColorContract } from "./contracts/color";
 import {
+    MATERIAL_DENSITIES,
+    MIN_DENSITY,
     DURATION_ROLES,
     EASING_ROLES,
     ELEVATION_LEVELS,
@@ -377,12 +379,28 @@ export const resolveTheme = <
         requireNames(where, "radius", c.radii, SHAPE_ROLES);
         requireKind(where, "radius", c.radii, KINDS.length);
     });
-    const layout = step("layout", providers.layout, (c, where) => {
+    const resolvedLayout = step("layout", providers.layout, (c, where) => {
         requireNames(where, "spacing step", c.spacing, SPACING_STEPS);
         requireNames(where, "size", c.sizes, SIZE_ROLES);
         requireKind(where, "spacing step", c.spacing, KINDS.length);
         requireKind(where, "size", c.sizes, KINDS.length);
+        for (const [name, units] of Object.entries(c.densities ?? {})) {
+            if (name === "inherit") {
+                throw new ContractError(
+                    `${where} names a density step "inherit", which components use to follow the theme`,
+                );
+            }
+            if (!Number.isInteger(units) || units < MIN_DENSITY) {
+                throw new ContractError(
+                    `${where} gives density step "${name}" ${units} grid units; steps are whole numbers from ${MIN_DENSITY} up`,
+                );
+            }
+        }
     });
+    const layout = {
+        ...resolvedLayout,
+        densities: resolvedLayout.densities ?? MATERIAL_DENSITIES,
+    };
     const state = step("state", providers.state, (c, where) => {
         requireNames(where, "opacity", c.opacities, STATE_ROLES);
         requireKind(where, "opacity", c.opacities, KINDS.percent);

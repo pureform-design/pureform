@@ -17,11 +17,11 @@ import type { FontFamilyNode, NumericScalarNode } from "@pureform/core/ast";
 
 import {
     ELEVATION_LEVELS,
+    MATERIAL_DENSITIES,
     SHAPE_ROLES,
     SPACING_STEPS,
 } from "../contracts/foundations";
 import type {
-    DensityStep,
     ElevationLevel,
     ShapeRole,
     SizeRole,
@@ -41,6 +41,7 @@ import type {
     TypographyProvider,
 } from "../provider";
 import { colorRole } from "../refs";
+import { ContractError } from "../resolve";
 
 const byName = <K extends string, V>(
     names: readonly K[],
@@ -219,15 +220,35 @@ export interface GridLayoutOptions {
     /** Component sizes, in px. */
     sizes: Record<Exclude<SizeRole, "densityOffset">, number> &
         Record<string, number>;
-    /** How dense components are: `0` (the default) to `-3`, one grid unit off a dense
-     *  component's height per step. */
-    density?: DensityStep;
+    /** The density steps components offer, by name: grid units added to a dense component's
+     *  height, from `-3` up. Default Material's `"0"` to `"-3"`. */
+    densities?: Record<string, number>;
+    /** The theme's density: a step's name, or its grid units. Default `0`. */
+    density?: string | number;
 }
+
+/** The grid units of the theme's density, which must be one of the steps. */
+const densityUnits = (
+    densities: Record<string, number>,
+    density: string | number,
+): number => {
+    const units =
+        typeof density === "number"
+            ? Object.values(densities).find((value) => value === density)
+            : densities[density];
+    if (units === undefined) {
+        throw new ContractError(
+            `layout density ${JSON.stringify(density)} is not one of the steps: ${Object.keys(densities).join(", ")}`,
+        );
+    }
+    return units;
+};
 
 /** Spacing on a grid of the given unit, with the given component sizes and density. */
 export const gridLayout = ({
     grid = 4,
     sizes,
+    densities = MATERIAL_DENSITIES,
     density = 0,
 }: GridLayoutOptions): LayoutProvider =>
     defineProvider({
@@ -241,8 +262,12 @@ export const gridLayout = ({
                     px(value),
                 ]),
                 // `|| 0` keeps the default from being -0.
-                ["densityOffset", px(density * grid || 0)],
+                [
+                    "densityOffset",
+                    px(densityUnits(densities, density) * grid || 0),
+                ],
             ]) as Record<SizeRole, NumericScalarNode>,
+            densities,
         }),
     });
 
