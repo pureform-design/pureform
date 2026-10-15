@@ -42,6 +42,8 @@ import type {
 
 import { createButton } from "./components/button";
 import { card } from "./components/card";
+import { chip } from "./components/chip";
+import { createFab } from "./components/fab";
 import { createIconButton } from "./components/icon-button";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
@@ -241,6 +243,8 @@ export const pureform = <
     const defaults: Record<string, AnyComponentSpec> = {
         button: createButton(theme.color.groups),
         iconButton: createIconButton(theme.color.groups),
+        fab: createFab(theme.color.groups),
+        chip,
         card,
         scrim,
         ripple,

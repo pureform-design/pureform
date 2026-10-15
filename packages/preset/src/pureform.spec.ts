@@ -20,6 +20,8 @@ describe("pureform", () => {
         expect(Object.keys(pureform().components)).toEqual([
             "button",
             "iconButton",
+            "fab",
+            "chip",
             "card",
             "scrim",
             "ripple",
@@ -51,6 +53,8 @@ describe("pureform", () => {
         expect(Object.keys(preset.theme?.slotRecipes ?? {})).toEqual([
             "button",
             "iconButton",
+            "fab",
+            "chip",
             "card",
             "scrim",
             "ripple",

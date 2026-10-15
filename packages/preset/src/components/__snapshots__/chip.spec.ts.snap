@@ -1,0 +1,129 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`chip > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "icon": {
+      "color": "var(--components-chip-iconColor, token(colors.primary))",
+      "height": "var(--components-chip-iconSize, token(sizes.iconSmall))",
+      "width": "var(--components-chip-iconSize, token(sizes.iconSmall))",
+    },
+    "label": {
+      "textStyle": "labelLarge",
+    },
+    "root": {
+      "_disabled": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "borderRadius": "var(--components-chip-radius, token(radii.small))",
+      "borderWidth": "0px",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "gap": "var(--components-chip-gap, token(spacing.2))",
+      "height": "var(--components-chip-height, token(sizes.controlSmall))",
+      "paddingInlineEnd": "var(--components-chip-padding, token(spacing.4))",
+      "paddingInlineStart": "var(--components-chip-padding, token(spacing.4))",
+      "position": "relative",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+    },
+    "touchTarget": {
+      "height": "100%",
+      "left": "50%",
+      "minHeight": "token(sizes.touchTarget)",
+      "minWidth": "token(sizes.touchTarget)",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translate(-50%, -50%)",
+      "width": "100%",
+    },
+  },
+  "className": "chip",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "variant": "outlined",
+  },
+  "jsx": [
+    "Chip",
+  ],
+  "slots": [
+    "root",
+    "icon",
+    "label",
+    "touchTarget",
+  ],
+  "variants": {
+    "variant": {
+      "elevated": {
+        "root": {
+          "_disabled": {
+            "backgroundColor": "transparent",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "shadowElevation": "level0",
+          },
+          "_hover": {
+            "shadowElevation": "level2",
+          },
+          "_selected": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "base": "var(--components-chip-selectedContainer, token(colors.secondaryContainer))",
+            },
+            "color": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+            "outlineColor": "transparent",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow))",
+          },
+          "color": "var(--components-chip-content, token(colors.onSurfaceVariant))",
+          "shadowElevation": "level1",
+        },
+      },
+      "outlined": {
+        "root": {
+          "_disabled": {
+            "backgroundColor": "transparent",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+          },
+          "_selected": {
+            "backgroundColor": {
+              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
+              "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+              "_focusVisible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+              "_hover": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "base": "var(--components-chip-selectedContainer, token(colors.secondaryContainer))",
+            },
+            "color": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+            "outlineColor": "transparent",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "base": "var(--components-chip-container, transparent)",
+          },
+          "color": "var(--components-chip-content, token(colors.onSurfaceVariant))",
+          "outlineColor": "var(--components-chip-outlineColor, token(colors.outlineVariant))",
+          "outlineOffset": "calc(var(--components-chip-outlineWidth, 1px) * -1)",
+          "outlineStyle": "solid",
+          "outlineWidth": "var(--components-chip-outlineWidth, 1px)",
+        },
+      },
+    },
+  },
+}
+`;
