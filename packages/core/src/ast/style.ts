@@ -21,6 +21,7 @@ import type {
     PointerEventsKeyword,
     PortableCondition,
     PositionKeyword,
+    RefNode,
     TextAlignKeyword,
     ValueNode,
 } from "./nodes";
@@ -171,8 +172,9 @@ export interface StyleMap {
     clipPath?: Clip;
     /** How the rounded corners curve: `round` (a circular arc), `squircle`, `bevel` (a straight
      *  cut), `scoop` (curving in), `notch` (a square cut), or `square`. Borders, outlines, and
-     *  shadows follow it. Targets without it keep round corners. */
-    cornerShape?: Keyword<CornerShapeKeyword>;
+     *  shadows follow it. Targets without it keep round corners. A reference reads it from a
+     *  token, so a theme can change it. */
+    cornerShape?: Keyword<CornerShapeKeyword> | RefNode;
     // interaction / motion
     cursor?: Keyword<CursorKeyword>;
     resize?: Keyword<ResizeKeyword>;
