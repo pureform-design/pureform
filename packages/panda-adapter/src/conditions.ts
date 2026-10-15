@@ -43,6 +43,8 @@ const CONDITION_KEY: Record<string, string> = {
     // `data-filled`. CSS sees a value through `:placeholder-shown`, so the input needs a
     // placeholder (a single space works when none should show).
     filled: "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])",
+    // A control whose popup is open, or anything marked data-expanded.
+    expanded: "&:is([aria-expanded=true], [data-expanded])",
     dark: "_dark",
     light: "_light",
     ltr: "_ltr",
@@ -63,7 +65,7 @@ const MEDIA_RULE: Record<string, string> = {
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
 // Repeating raises specificity, so a later state wins wherever Panda orders the rules: hover,
-// filled, selected, and checked, then indeterminate and focus, then pressed, then invalid, then disabled. Selected
+// filled, selected, checked, and expanded, then indeterminate and focus, then pressed, then invalid, then disabled. Selected
 // combines with the later states through an AND case rather than outranking them. Each also takes a data attribute, for custom
 // controls and native-like bindings that set the state by hand.
 const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
@@ -78,6 +80,10 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
     },
     checked: {
         match: ":checked, :has(:checked), [aria-checked=true], [data-checked]",
+        rank: 1,
+    },
+    expanded: {
+        match: "[aria-expanded=true], :has([aria-expanded=true]), [data-expanded]",
         rank: 1,
     },
     // Above checked, so a box that is both shows the dash.

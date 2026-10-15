@@ -247,6 +247,14 @@ describe("compileValue conditionals", () => {
         });
     });
 
+    it("lowers expanded to aria-expanded or data-expanded", () => {
+        const node = when("expanded", unitless(1), unitless(0));
+        expect(compileValue(node, ctx())).toEqual({
+            base: "0",
+            "&:is([aria-expanded=true], [data-expanded])": "1",
+        });
+    });
+
     it("lowers filled to an input with a value, its container, or data-filled", () => {
         const node = when("filled", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({

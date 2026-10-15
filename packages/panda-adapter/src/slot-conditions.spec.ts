@@ -205,3 +205,34 @@ describe("checked and indeterminate slot states", () => {
         });
     });
 });
+
+describe("expanded slot state", () => {
+    it("matches a control inside the slot whose popup is open", () => {
+        const field = defineConfig({
+            tokens: {},
+            semanticTokens: {},
+            components: {
+                field: defineSlotComponent({
+                    name: "field",
+                    slots: ["root", "arrow"],
+                    structure: { root: ["arrow"] },
+                    recipe: {
+                        base: {
+                            arrow: {
+                                color: when()
+                                    .on(slot("root", "expanded"), hex("#111"))
+                                    .else(hex("#000")),
+                            },
+                        },
+                    },
+                }),
+            },
+        });
+        const recipes = compilePreset(field).theme?.slotRecipes as Slots;
+        expect(recipes.field?.base.arrow?.color).toEqual({
+            base: "rgb(0 0 0)",
+            ".field__root:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &":
+                "rgb(17 17 17)",
+        });
+    });
+});
