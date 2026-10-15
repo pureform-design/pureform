@@ -49,6 +49,8 @@ export default defineConfig({
             separator: ["*"],
             supportingText: ["*"],
             text: ["*"],
+            icon: ["*"],
+            touchTarget: ["*"],
         },
     },
 

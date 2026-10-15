@@ -5,6 +5,7 @@ import {
     chip,
     separator,
     fab,
+    icon,
     iconButton,
     radio,
     scrim,
@@ -285,6 +286,22 @@ function IndexRoute() {
                             </div>
                         );
                     }}
+                </For>
+            </section>
+            <section style={{ ...row, "align-items": "center" }}>
+                <For each={["small", "medium", "large"] as const}>
+                    {(size) => (
+                        <span class={icon({ size })} title={`${size} icon`}>
+                            ★
+                        </span>
+                    )}
+                </For>
+                <For each={["primary", "negative", "positive"] as const}>
+                    {(color) => (
+                        <span class={icon({ color })} title={`${color} icon`}>
+                            ★
+                        </span>
+                    )}
                 </For>
             </section>
             <section style={{ ...row, "align-items": "center" }}>
