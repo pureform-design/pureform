@@ -70,6 +70,7 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
         },
         tokens,
         slots: ["root", "label", "icon", "touchTarget"],
+        structure: { root: ["touchTarget", "icon", "label"] },
         recipe: {
             base: {
                 root: {

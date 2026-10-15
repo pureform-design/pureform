@@ -16,7 +16,9 @@ import {
     row,
     solid,
     transparent,
+    slot,
     unitless,
+    when,
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -76,6 +78,7 @@ export const chip = defineSlotComponent({
     },
     tokens,
     slots: ["root", "icon", "label", "touchTarget"],
+    structure: { root: ["touchTarget", "icon", "label"] },
     recipe: {
         base: {
             root: {
@@ -96,7 +99,15 @@ export const chip = defineSlotComponent({
             icon: {
                 width: ref("iconSize"),
                 height: ref("iconSize"),
-                color: ref("iconColor"),
+                // Material tints the icon on its own: primary at rest, the selected content
+                // color when selected, and the disabled content color when disabled.
+                color: when()
+                    .on(slot("root", "selected"), ref("selectedContent"))
+                    .on(
+                        slot("root", "disabled"),
+                        disabledColor("disabledContent"),
+                    )
+                    .else(ref("iconColor")),
             },
             label: { textStyle: textStyle("labelLarge") },
             touchTarget,

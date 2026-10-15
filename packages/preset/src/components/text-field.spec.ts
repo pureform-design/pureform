@@ -45,10 +45,9 @@ describe("textField", () => {
         expect(shadow[`&${FOCUS}${FOCUS}`]).toContain(
             "0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
         );
-        const errored = shadow[`&${INVALID}${INVALID}${INVALID}${INVALID}`] as Record<
-            string,
-            string
-        >;
+        const errored = shadow[
+            `&${INVALID}${INVALID}${INVALID}${INVALID}`
+        ] as Record<string, string>;
         expect(errored.base).toContain("errorColor");
         expect(errored[`&${FOCUS}${FOCUS}`]).toContain("focusIndicatorWidth");
     });

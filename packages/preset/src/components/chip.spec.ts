@@ -21,6 +21,22 @@ describe("chip", () => {
         }
     });
 
+    it("tints the icon from the chip's selected and disabled states", () => {
+        const icon = compiled()?.base?.icon as Record<
+            string,
+            Record<string, string>
+        >;
+        const keys = Object.keys(icon.color ?? {});
+        expect(
+            keys.some((k) =>
+                k.startsWith(".chip__root:is([aria-selected=true]"),
+            ),
+        ).toBe(true);
+        expect(keys.some((k) => k.startsWith(".chip__root:is(:disabled"))).toBe(
+            true,
+        );
+    });
+
     it("compiles to a stable Panda slot recipe", () => {
         expect(compiled()).toMatchSnapshot();
     });

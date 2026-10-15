@@ -47,6 +47,7 @@ export const ripple = defineSlotComponent({
     },
     tokens,
     slots: ["root", "ripple"],
+    structure: { root: ["ripple"] },
     recipe: {
         base: {
             root: {

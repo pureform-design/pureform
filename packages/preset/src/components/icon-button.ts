@@ -55,6 +55,7 @@ export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
         $meta: { description: "Material icon button holding a single icon." },
         tokens,
         slots: ["root", "icon", "touchTarget"],
+        structure: { root: ["touchTarget", "icon"] },
         recipe: {
             base: {
                 root: {

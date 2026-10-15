@@ -108,6 +108,7 @@ export const card = defineSlotComponent({
     },
     tokens,
     slots: ["root", "touchTarget"],
+    structure: { root: ["touchTarget"] },
     recipe: {
         base: {
             root: {

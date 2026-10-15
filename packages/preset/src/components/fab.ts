@@ -79,6 +79,7 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
         },
         tokens,
         slots: ["root", "icon", "label", "touchTarget"],
+        structure: { root: ["touchTarget", "icon", "label"] },
         recipe: {
             base: {
                 root: {
