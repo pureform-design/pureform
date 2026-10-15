@@ -1,312 +1,131 @@
-// The pureform text field: Material's filled and outlined text fields.
+// The pureform text field: Material's filled and outlined single-line text fields.
 //
-// Markup: a root holding the container and the supporting text, with the input before the
-// label inside the container. The input needs a placeholder (a single space when none should
-// show), so CSS can tell when it holds a value and float the label.
+// Markup: a root holding the container and the supporting text. Inside the container, the
+// optional leading icon, the input, the label, and the optional trailing icon, in that order.
+// The input needs a placeholder (a single space when none should show), so CSS can tell when
+// it holds a value and float the label. Turn on `leadingIcon` or `trailingIcon` when you
+// render one, so the text makes room for it.
 //
 //   <div class={root}>
 //     <div class={container}>
+//       <span class={leadingIcon}>…</span>
 //       <input class={input} id="name" placeholder=" " />
 //       <label class={label} for="name">Name</label>
 //     </div>
 //     <span class={supportingText}>Helper or error text</span>
 //   </div>
 //
-// Mark an error with `aria-invalid="true"` on the input. The label and supporting text follow
-// their parent's state (focused, filled, invalid), which core's conditions do not express, so
-// they use raw parent selectors.
+// Mark an error with `aria-invalid="true"` on the input. The container reads its state from
+// the input, and the label, icons, and supporting text follow it.
 
 import { defineSlotComponent } from "@pureform/core";
 import {
     absolute,
-    alias,
-    column,
+    center,
     flex,
-    mul,
-    none,
     pct,
     px,
-    slot,
-    relative,
-    shadow,
-    solid,
     transform,
-    transition,
     translateY,
-    transparent,
-    tween,
-    unitless,
     when,
 } from "@pureform/core/ast";
-import type {
-    ColorValue,
-    NumericValue,
-    StyleMap,
-    ValueNode,
-} from "@pureform/core/ast";
+import type { StyleMap } from "@pureform/core/ast";
+import { spacing } from "@pureform/theme";
+
 import {
-    colorRole,
-    duration,
-    easing,
-    radius,
-    size as sizeToken,
-    spacing,
-    textStyle,
-} from "@pureform/theme";
+    DISABLED,
+    FIELD_SLOTS,
+    INVALID,
+    fieldParts,
+    fieldTokens,
+    floated,
+} from "./field";
+import { disabledColor, sys } from "./shared";
 
-import { componentTokens, disabledColor, stateTransition, sys } from "./shared";
-import { supportingTextStyle } from "./supporting-text";
-
-const { tokens, ref } = componentTokens("textField", {
-    height: px(56),
-    radius: radius("extraSmall"),
-    paddingInline: spacing("4"),
-    container: sys("surfaceContainerHighest"),
-    labelBackground: sys("surface"),
-    indicatorColor: sys("onSurfaceVariant"),
-    outlineColor: sys("outline"),
-    hoverColor: sys("onSurface"),
-    focusColor: sys("primary"),
-    errorColor: colorRole("negative"),
-    labelColor: sys("onSurfaceVariant"),
-    inputColor: sys("onSurface"),
-    supportingColor: sys("onSurfaceVariant"),
-    indicatorWidth: px(1),
-    focusIndicatorWidth: px(2),
-    iconSize: sizeToken("iconMedium"),
+const { tokens, ref } = fieldTokens("textField", {
+    iconInset: spacing("3"),
+    iconColor: sys("onSurfaceVariant"),
+    // The icon inset, the icon, and the gap before the text.
+    textInsetWithIcon: px(52),
 });
 
-// States of the container, read from the input inside it. The adapter ranks them, so a later
-// state wins: hover, then focus, then invalid, then disabled.
-const HOVER = slot("container", "hover");
-const FOCUSED = slot("container", "focusWithin");
-const FILLED = slot("container", "filled");
-const INVALID = slot("container", "invalid");
-const DISABLED = slot("container", "disabled");
+const { base, variant } = fieldParts(ref, { labelRest: pct(50) });
 
-// A value per container state.
-const byState = <T extends ValueNode>(
-    rest: T,
-    states: { hover?: T; focus: T; error: T; errorFocus: T; disabled: T },
-) => {
-    const builder = when();
-    if (states.hover) builder.on(HOVER, states.hover);
-    return builder
-        .on(FOCUSED, states.focus)
-        .on(INVALID, states.error)
-        .on([INVALID, FOCUSED], states.errorFocus)
-        .on(DISABLED, states.disabled)
-        .else(rest);
-};
-
-// The filled field's bottom indicator, an inset shadow so it thickens without moving anything.
-const indicator = (width: NumericValue, color: ColorValue) =>
-    shadow({
-        x: px(0),
-        y: mul(width, unitless(-1)),
-        blur: px(0),
-        spread: px(0),
-        color,
-        inset: true,
-    });
-
-const filled: StyleMap = {
-    backgroundColor: when()
-        .on(DISABLED, disabledColor("disabledContainer"))
-        .else(ref("container")),
-    borderStartStartRadius: ref("radius"),
-    borderStartEndRadius: ref("radius"),
-    boxShadow: byState(
-        indicator(ref("indicatorWidth"), ref("indicatorColor")),
-        {
-            hover: indicator(ref("indicatorWidth"), ref("hoverColor")),
-            focus: indicator(ref("focusIndicatorWidth"), ref("focusColor")),
-            error: indicator(ref("indicatorWidth"), ref("errorColor")),
-            errorFocus: indicator(
-                ref("focusIndicatorWidth"),
-                ref("errorColor"),
-            ),
-            disabled: indicator(
-                ref("indicatorWidth"),
-                disabledColor("disabledContent"),
-            ),
-        },
-    ),
-};
-
-const strokeWidth = byState(ref("indicatorWidth"), {
-    focus: ref("focusIndicatorWidth"),
-    error: ref("indicatorWidth"),
-    errorFocus: ref("focusIndicatorWidth"),
-    disabled: ref("indicatorWidth"),
+const icon = (side: "Start" | "End"): StyleMap => ({
+    position: absolute,
+    top: pct(50),
+    transform: transform(translateY(pct(-50))),
+    [`insetInline${side}`]: ref("iconInset"),
+    display: flex,
+    alignItems: center,
+    justifyContent: center,
+    width: ref("iconSize"),
+    height: ref("iconSize"),
+    fontSize: ref("iconSize"),
+    color: when()
+        .on(DISABLED, disabledColor("disabledContent"))
+        .else(ref("iconColor")),
 });
-
-const outlined: StyleMap = {
-    borderRadius: ref("radius"),
-    outlineStyle: solid,
-    outlineWidth: strokeWidth,
-    outlineOffset: byState(mul(ref("indicatorWidth"), unitless(-1)), {
-        focus: mul(ref("focusIndicatorWidth"), unitless(-1)),
-        error: mul(ref("indicatorWidth"), unitless(-1)),
-        errorFocus: mul(ref("focusIndicatorWidth"), unitless(-1)),
-        disabled: mul(ref("indicatorWidth"), unitless(-1)),
-    }),
-    outlineColor: byState(ref("outlineColor"), {
-        hover: ref("hoverColor"),
-        focus: ref("focusColor"),
-        error: ref("errorColor"),
-        errorFocus: ref("errorColor"),
-        disabled: disabledColor("disabledContainer"),
-    }),
-};
-
-// A label value: resting in the middle, or floated by focus or a value.
-const floated = (rest: ValueNode, float: ValueNode) =>
-    when().on(FILLED, float).on(FOCUSED, float).else(rest);
-
-const labelColor = when()
-    .on(FOCUSED, ref("focusColor"))
-    .on(INVALID, ref("errorColor"))
-    .on(DISABLED, disabledColor("disabledContent"))
-    .else(ref("labelColor"));
-
-const smallText = {
-    fontSize: floated(
-        textStyleValue("fontSize", "bodyLarge"),
-        textStyleValue("fontSize", "bodySmall"),
-    ),
-    lineHeight: floated(
-        textStyleValue("lineHeight", "bodyLarge"),
-        textStyleValue("lineHeight", "bodySmall"),
-    ),
-    letterSpacing: floated(
-        textStyleValue("letterSpacing", "bodyLarge"),
-        textStyleValue("letterSpacing", "bodySmall"),
-    ),
-};
-
-function textStyleValue(
-    property: "fontSize" | "lineHeight" | "letterSpacing",
-    style: string,
-): ValueNode {
-    return alias("tokens", property, style);
-}
-
-// The label floats with its color, under reduced motion instantly.
-const labelTransition = when(
-    "reducedMotion",
-    none,
-    transition(
-        ...(
-            [
-                "top",
-                "transform",
-                "fontSize",
-                "lineHeight",
-                "letterSpacing",
-                "color",
-            ] as const
-        ).map((property) =>
-            tween(property, duration("short3"), easing("standard")),
-        ),
-    ),
-);
 
 export const textField = defineSlotComponent({
     name: "textField",
     $meta: {
         description:
-            "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid.",
+            "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
     },
     tokens,
-    slots: ["root", "container", "input", "label", "supportingText"],
+    slots: [...FIELD_SLOTS, "leadingIcon", "trailingIcon"],
     structure: {
         root: ["container", "supportingText"],
-        container: ["input", "label"],
+        container: ["leadingIcon", "input", "label", "trailingIcon"],
     },
     recipe: {
         base: {
-            root: { display: flex, flexDirection: column },
-            container: {
-                transition: stateTransition,
-                position: relative,
-                height: ref("height"),
-            },
-            input: {
-                textStyle: textStyle("bodyLarge"),
-                width: pct(100),
-                height: pct(100),
-                paddingInlineStart: ref("paddingInline"),
-                paddingInlineEnd: ref("paddingInline"),
-                borderWidth: px(0),
-                outlineStyle: none,
-                backgroundColor: transparent,
-                color: ref("inputColor"),
-                states: {
-                    disabled: { color: disabledColor("disabledContent") },
-                },
-            },
-            label: {
-                textStyle: textStyle("bodyLarge"),
-                ...smallText,
-                position: absolute,
-                insetInlineStart: ref("paddingInline"),
-                pointerEvents: none,
-                color: labelColor,
-                transition: labelTransition,
-            },
-            supportingText: {
-                ...supportingTextStyle,
+            ...base,
+            container: { ...base.container, height: ref("height") },
+            input: { ...base.input, height: pct(100) },
+            leadingIcon: icon("Start"),
+            // Material turns the trailing icon to the error color with the field.
+            trailingIcon: {
+                ...icon("End"),
                 color: when()
-                    .on(slot("root", "invalid"), ref("errorColor"))
-                    .on(
-                        slot("root", "disabled"),
-                        disabledColor("disabledContent"),
-                    )
-                    .else(ref("supportingColor")),
-                paddingInlineStart: ref("paddingInline"),
-                paddingInlineEnd: ref("paddingInline"),
+                    .on(INVALID, ref("errorColor"))
+                    .on(DISABLED, disabledColor("disabledContent"))
+                    .else(ref("iconColor")),
             },
         },
         variants: {
-            variant: {
-                filled: {
-                    container: filled,
-                    input: {
-                        paddingBlockStart: spacing("6"),
-                        paddingBlockEnd: spacing("2"),
-                    },
-                    label: {
-                        top: floated(pct(50), spacing("2")),
-                        transform: floated(
-                            transform(translateY(pct(-50))),
-                            none,
-                        ),
-                    },
+            variant,
+            leadingIcon: {
+                true: {
+                    input: { paddingInlineStart: ref("textInsetWithIcon") },
+                    label: { insetInlineStart: ref("textInsetWithIcon") },
                 },
-                outlined: {
-                    container: outlined,
-                    input: {
-                        paddingBlockStart: spacing("4"),
-                        paddingBlockEnd: spacing("4"),
-                    },
+                false: {},
+            },
+            trailingIcon: {
+                true: { input: { paddingInlineEnd: ref("textInsetWithIcon") } },
+                false: {},
+            },
+        },
+        // An outlined label floats onto the border at the usual inset, clear of the icon.
+        compoundVariants: [
+            {
+                match: { variant: "outlined", leadingIcon: "true" },
+                style: {
                     label: {
-                        top: floated(pct(50), px(0)),
-                        transform: transform(translateY(pct(-50))),
-                        paddingInlineStart: floated(px(0), spacing("1")),
-                        paddingInlineEnd: floated(px(0), spacing("1")),
-                        marginInlineStart: floated(
-                            px(0),
-                            mul(spacing("1"), unitless(-1)),
-                        ),
-                        backgroundColor: floated(
-                            transparent,
-                            ref("labelBackground"),
+                        insetInlineStart: floated(
+                            ref("textInsetWithIcon"),
+                            ref("paddingInline"),
                         ),
                     },
                 },
             },
+        ],
+        defaultVariants: {
+            variant: "filled",
+            leadingIcon: "false",
+            trailingIcon: "false",
         },
-        defaultVariants: { variant: "filled" },
     },
 });

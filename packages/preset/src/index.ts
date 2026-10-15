@@ -8,5 +8,7 @@ export * from "./components/chip";
 export * from "./components/fab";
 export * from "./components/supporting-text";
 export * from "./components/text";
+export * from "./components/field";
+export * from "./components/text-area";
 export * from "./components/text-field";
 export * from "./pureform";

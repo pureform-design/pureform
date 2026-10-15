@@ -21,8 +21,40 @@ describe("textField", () => {
     it("declares how its slots nest", () => {
         expect(textField.structure).toEqual({
             root: ["container", "supportingText"],
-            container: ["input", "label"],
+            container: ["leadingIcon", "input", "label", "trailingIcon"],
         });
+    });
+
+    it("makes room for icons and floats an outlined label clear of the leading one", () => {
+        const recipe = compiled();
+        expect(recipe?.variants?.leadingIcon?.true?.input).toEqual({
+            paddingInlineStart:
+                "var(--components-textField-textInsetWithIcon, 52px)",
+        });
+        const outlinedIcon = recipe?.compoundVariants?.find(
+            (c) => c.variant === "outlined" && c.leadingIcon === true,
+        );
+        const css = outlinedIcon?.css as Record<
+            string,
+            Record<string, unknown>
+        >;
+        const inset = css.label?.insetInlineStart as Record<string, string>;
+        expect(inset.base).toContain("textInsetWithIcon");
+        expect(inset[`.textField__container${FOCUS}${FOCUS} &`]).toContain(
+            "paddingInline",
+        );
+    });
+
+    it("turns the trailing icon to the error color with the field", () => {
+        const icon = compiled()?.base?.trailingIcon as Record<
+            string,
+            Record<string, string>
+        >;
+        expect(
+            icon.color?.[
+                `.textField__container${INVALID}${INVALID}${INVALID}${INVALID} &`
+            ],
+        ).toContain("errorColor");
     });
 
     it("floats the label to the small body style on focus or a value", () => {

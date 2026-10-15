@@ -49,6 +49,7 @@ import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { supportingText } from "./components/supporting-text";
 import { createText } from "./components/text";
+import { textArea } from "./components/text-area";
 import { textField } from "./components/text-field";
 
 type ThemeConfig = Theme<string, string, string>["config"];
@@ -248,6 +249,7 @@ export const pureform = <
         fab: createFab(theme.color.groups),
         chip,
         textField,
+        textArea,
         supportingText,
         card,
         scrim,
