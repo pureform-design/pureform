@@ -180,7 +180,7 @@ describe("select", () => {
         const { root } = select(button, { variant: "tinted" });
         expect(root!.backgroundColor).toBe("rgba(178, 153, 203, 1)");
         expect(root!.outlineWidth).toBe(0);
-        expect(root!.outlineStyle).toBeUndefined();
+        expect(root!.outlineStyle).toBe("solid");
         expect(root!.zIndex).toBeUndefined();
     });
 });

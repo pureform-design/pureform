@@ -137,6 +137,11 @@ const settle = (style: Style): Style => {
             style[width] = 0;
         }
     }
+    // A solid outline of no width, not none: React Native has no none, and an outline left
+    // unset lets a browser draw its own focus ring, which ignores the width.
+    if (style.outlineWidth === 0 && style.outlineStyle === undefined) {
+        style.outlineStyle = "solid";
+    }
     // CSS paints outlines over everything beside them, and React Native Web layers each view
     // over the ones before it, which would cover a focus ring's far side.
     if (
