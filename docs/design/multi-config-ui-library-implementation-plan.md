@@ -2,7 +2,10 @@
 
 > **Status:** phases 0 to 4 are complete. `@pureform/ui-utils` has since been renamed to
 > `@pureform/material`, and the hand-written `@pureform/pandacss-preset` has been removed.
-> Older names below refer to those packages. Companion to `multi-config-ui-library.md` (the design doc). The
+> Older names below refer to those packages. Work since phase 4 sits outside these phases:
+> `@pureform/theme` (typed foundation contracts and providers, design doc §4.8),
+> `@pureform/preset` (`pureform()` and the components), and `@pureform/js-effects` (the
+> ripple). The graph in §3 shows the current packages. Companion to `multi-config-ui-library.md` (the design doc). The
 > design doc is the contract: what the AST means and why. This doc is the build order:
 > which packages, in what sequence, with which acceptance gates. When the two disagree,
 > the design doc wins and this plan gets corrected.
@@ -61,11 +64,20 @@ stops at Layer 2.
 
 ```
 @pureform/dtcg ──► @pureform/panda-adapter ──► @pureform/core
- (codec, Layer 2)         ▲                          ▲
-                          │                          │
-                          │                          │
-@pureform/ui-utils ───────┴──────────────────────────┘
+ (codec, Layer 2)                                    ▲
+                                                     │
+@pureform/theme ─────────────────────────────────────┤
+      ▲                                              │
+@pureform/material ──────────────────────────────────┤
+      ▲                                              │
+@pureform/preset ────────────────────────────────────┘
+  (also ► @pureform/theme)
+
+@pureform/js-effects  (DOM only; its declared @pureform/material dependency is unused)
 ```
+
+As built: `@pureform/dtcg` is not started. The demo app compiles `pureform()` from
+`@pureform/preset` with `@pureform/panda-adapter`.
 
 New packages this plan creates, in dependency order:
 
