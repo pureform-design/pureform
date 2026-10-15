@@ -93,42 +93,85 @@ const px = (value: Concrete): string =>
 interface Quantity {
     n: number;
     unit: string;
+    /** Pixels added to a percentage, which React Native can't sum before layout. */
+    offset?: number;
 }
 
-const quantity = (value: Concrete, what: string): Quantity => {
+/** A percentage plus pixels, which selection splits for an inset: the percentage on the inset
+ *  and the pixels on its margin, as Yoga adds a margin to an absolute position. */
+export interface PercentOffset {
+    percent: number;
+    offset: number;
+}
+
+export const isPercentOffset = (value: unknown): value is PercentOffset =>
+    typeof value === "object" &&
+    value !== null &&
+    "percent" in value &&
+    "offset" in value;
+
+const quantity = (value: Value, what: string): Quantity => {
     if (typeof value === "number") return { n: value, unit: "" };
-    const match = /^(-?\d*\.?\d+(?:e[-+]?\d+)?)([a-z%]*)$/i.exec(value.trim());
-    if (!match) throw new Error(`${what} needs a number, got "${value}"`);
+    if (isPercentOffset(value))
+        return { n: value.percent, unit: "%", offset: value.offset };
+    const match =
+        typeof value === "string"
+            ? /^(-?\d*\.?\d+(?:e[-+]?\d+)?)([a-z%]*)$/i.exec(value.trim())
+            : null;
+    if (!match)
+        throw new Error(
+            `${what} needs a number, got "${JSON.stringify(value)}"`,
+        );
     return { n: Number(match[1]), unit: match[2]! };
 };
 
-const written = ({ n, unit }: Quantity): Concrete => (unit ? `${n}${unit}` : n);
+const written = ({ n, unit, offset }: Quantity): Value =>
+    offset ? { percent: n, offset } : unit ? `${n}${unit}` : n;
 
-// Sums and comparisons take one unit; a product takes at most one, and a divisor none, as in
-// CSS. A percentage of a box can't meet pixels: React Native has no calc() to defer it to.
+const shown = (q: Quantity) => JSON.stringify(written(q));
+
+// Comparisons take one unit; a product takes at most one, and a divisor none, as in CSS. A
+// sum takes one unit, or a percentage and pixels, kept apart for selection to place.
 const sameUnit = (a: Quantity, b: Quantity, what: string): string => {
-    if (a.unit === b.unit) return a.unit;
-    throw new Error(
-        `${what} can't combine "${written(a)}" and "${written(b)}"`,
-    );
+    if (a.unit === b.unit && !a.offset && !b.offset) return a.unit;
+    throw new Error(`${what} can't combine ${shown(a)} and ${shown(b)}`);
 };
+
+const sum = (a: Quantity, b: Quantity): Quantity => {
+    if (a.unit === b.unit) {
+        const offset = (a.offset ?? 0) + (b.offset ?? 0);
+        return { n: a.n + b.n, unit: a.unit, ...(offset ? { offset } : {}) };
+    }
+    const [percent, pixels] = a.unit === "%" ? [a, b] : [b, a];
+    if (percent.unit !== "%" || pixels.unit !== "" || pixels.offset) {
+        throw new Error(`calc can't combine ${shown(a)} and ${shown(b)}`);
+    }
+    const offset = (percent.offset ?? 0) + pixels.n;
+    return { n: percent.n, unit: "%", ...(offset ? { offset } : {}) };
+};
+
+const scale = (q: Quantity, by: number): Quantity => ({
+    n: q.n * by,
+    unit: q.unit,
+    ...(q.offset ? { offset: q.offset * by } : {}),
+});
 
 const ARITHMETIC: Record<
     "+" | "-" | "*" | "/",
     (a: Quantity, b: Quantity) => Quantity
 > = {
-    "+": (a, b) => ({ n: a.n + b.n, unit: sameUnit(a, b, "calc") }),
-    "-": (a, b) => ({ n: a.n - b.n, unit: sameUnit(a, b, "calc") }),
+    "+": sum,
+    "-": (a, b) => sum(a, scale(b, -1)),
     "*": (a, b) => {
-        if (a.unit && b.unit)
-            throw new Error(
-                `calc can't multiply "${written(a)}" by "${written(b)}"`,
-            );
-        return { n: a.n * b.n, unit: a.unit || b.unit };
+        if ((a.unit || a.offset) && (b.unit || b.offset)) {
+            throw new Error(`calc can't multiply ${shown(a)} by ${shown(b)}`);
+        }
+        return a.unit || a.offset ? scale(a, b.n) : scale(b, a.n);
     },
     "/": (a, b) => {
-        if (b.unit) throw new Error(`calc can't divide by "${written(b)}"`);
-        return { n: a.n / b.n, unit: a.unit };
+        if (b.unit || b.offset)
+            throw new Error(`calc can't divide by ${shown(b)}`);
+        return scale(a, 1 / b.n);
     },
 };
 
@@ -168,7 +211,9 @@ export const evaluate = (value: Value, theme: ThemeValues): Value => {
         );
     }
     if ("$calc" in value) {
-        const args = value.args.map((a) => quantity(concrete(a), "calc"));
+        const args = value.args.map((a) =>
+            quantity(evaluate(a, theme), "calc"),
+        );
         return written(args.slice(1).reduce(ARITHMETIC[value.$calc], args[0]!));
     }
     if ("$math" in value) {

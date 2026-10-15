@@ -348,9 +348,47 @@ describe("evaluate with units", () => {
             "40%",
         );
         expect(evaluate({ $calc: "+", args: [4, 8] }, theme)).toBe(12);
+        expect(evaluate({ $calc: "-", args: ["100%", 8] }, theme)).toEqual({
+            percent: 100,
+            offset: -8,
+        });
         expect(() =>
-            evaluate({ $calc: "-", args: ["100%", 8] }, theme),
-        ).toThrow(`calc can't combine "100%" and "8"`);
+            evaluate({ $calc: "*", args: ["2%", "3%"] }, theme),
+        ).toThrow(`calc can't multiply "2%" by "3%"`);
+    });
+});
+
+describe("percentages plus pixels", () => {
+    it("put the pixels on an inset's margin", () => {
+        const handle = lowerRn({
+            ...config,
+            components: {
+                handle: {
+                    kind: "component",
+                    name: "handle",
+                    recipe: {
+                        base: {
+                            insetInlineStart: {
+                                type: "calc",
+                                op: "-",
+                                operands: [pct(40), px(10)],
+                            },
+                            width: {
+                                type: "calc",
+                                op: "+",
+                                operands: [pct(50), px(4)],
+                            },
+                        },
+                    },
+                },
+            },
+        } as unknown as CoreConfig).components.handle!;
+        const style = select(resolve({ handle }, {}).handle!)[""]!;
+        expect(style).toMatchObject({
+            start: "40%",
+            marginStart: -10,
+            width: "50%",
+        });
     });
 });
 

@@ -7,7 +7,7 @@
 
 import type { ComponentStyles } from "./lower";
 import { compositeOver, formatColor, parseColor } from "./rgba";
-import { ANIMATION, TINT, TRANSITION } from "./values";
+import { ANIMATION, TINT, TRANSITION, isPercentOffset } from "./values";
 import type { Animation, Transition, Value } from "./values";
 
 /** A component's state. Pressable reports the interaction states, props the rest. */
@@ -78,6 +78,15 @@ const holds = (
           : width < n;
 };
 
+const INSET_MARGIN: Record<string, string> = {
+    top: "marginTop",
+    bottom: "marginBottom",
+    left: "marginLeft",
+    right: "marginRight",
+    start: "marginStart",
+    end: "marginEnd",
+};
+
 // Turn what CSS reads differently into React Native's terms: `none` line styles (no line),
 // a tint layered over the background, a line height relative to the font size, no shadow,
 // a flex box's direction, and an outline over its neighbors.
@@ -102,6 +111,17 @@ const settle = (style: Style): Style => {
         }
     }
     if (style.boxShadow === "none") delete style.boxShadow;
+    // A percentage plus pixels: on an inset, the pixels go to its margin, which Yoga adds to an
+    // absolute position. Elsewhere React Native has no sum for it, and the percentage stays.
+    for (const [property, value] of Object.entries(style)) {
+        if (!isPercentOffset(value)) continue;
+        style[property] = `${value.percent}%`;
+        const margin = INSET_MARGIN[property];
+        if (margin) {
+            const own = style[margin];
+            style[margin] = (typeof own === "number" ? own : 0) + value.offset;
+        }
+    }
     // A CSS flex box runs in a row unless told otherwise, and React Native's in a column.
     // Only a slot that asks for flex gets the row: CSS stacks a block's children, as React
     // Native's column does.
