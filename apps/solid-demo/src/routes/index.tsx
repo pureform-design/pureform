@@ -981,6 +981,9 @@ function IndexRoute() {
                                             onClick={() => setCurrent(i())}
                                         >
                                             <span class={n.indicator}>
+                                                <span
+                                                    class={n.activeIndicator}
+                                                />
                                                 <span class={n.icon}>
                                                     {glyphs[i()]}
                                                 </span>
