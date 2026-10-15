@@ -160,7 +160,7 @@ export class ColorScheme<TCustomColorGroups extends string = BaseColorGroup> {
                 lightTone: 0,
             },
             white: {
-                colorGroup: "negative",
+                colorGroup: "error",
                 darkTone: 100,
                 lightTone: 100,
             },

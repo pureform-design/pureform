@@ -124,9 +124,9 @@ describe("palette color options", () => {
             "primary",
             "secondary",
             "tertiary",
-            "positive",
-            "notice",
-            "negative",
+            "success",
+            "warning",
+            "error",
             "info",
             "coral",
         ]);

@@ -49,16 +49,16 @@ export class CorePalette<TCustomColorGroups extends string = BaseColorGroup> {
             sourceHue,
             Math.min(sourceChroma / 6, 8),
         );
-        const tpNegative = TonalPalette.fromHueAndChroma(25, 84);
+        const tpError = TonalPalette.fromHueAndChroma(25, 84);
         const tpInfo = TonalPalette.fromHueAndChroma(219, 74);
-        const tpNotice = TonalPalette.fromHueAndChroma(92, 53);
-        const tpPositive = TonalPalette.fromHueAndChroma(147, 74);
+        const tpWarning = TonalPalette.fromHueAndChroma(92, 53);
+        const tpSuccess = TonalPalette.fromHueAndChroma(147, 74);
 
         return {
             info: tpInfo,
-            positive: tpPositive,
-            notice: tpNotice,
-            negative: tpNegative,
+            success: tpSuccess,
+            warning: tpWarning,
+            error: tpError,
             neutral: tpNeutral,
             neutralVariant: tpNeutralVariant,
             primary: tpPrimary,

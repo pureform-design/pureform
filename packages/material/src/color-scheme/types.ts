@@ -2,7 +2,7 @@ import type { BaseColorGroup as ContractColorGroup } from "@pureform/theme";
 
 export type AccentColorGroup = "primary" | "secondary" | "tertiary";
 
-export type SemanticColorGroup = "positive" | "notice" | "negative" | "info";
+export type SemanticColorGroup = "success" | "warning" | "error" | "info";
 
 /** The accent and semantic groups, as the color contract in `@pureform/theme` names them. */
 export type BaseKeyColorGroup = ContractColorGroup;

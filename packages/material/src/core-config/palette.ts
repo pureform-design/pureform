@@ -29,7 +29,7 @@ export interface PaletteOptions<TCustomColorGroups extends string = never> {
     mode?: PaletteMode;
     /** Color space the primitives are encoded in. Default `"hct"`. */
     space?: PaletteSpace;
-    /** Seeds per color group. A built-in group (`tertiary`, `negative`) is regenerated from
+    /** Seeds per color group. A built-in group (`tertiary`, `error`) is regenerated from
      *  its seed; a new name (`brandAlt`) adds a group with its full set of system colors. A
      *  bare hex is harmonized toward the main seed; `{ hex, harmonize: false }` keeps it. */
     customSeeds?: ColorSchemeArgs<TCustomColorGroups>["customSeeds"];
@@ -69,8 +69,8 @@ const SEMANTIC_ROLES: Record<string, string> = {
     onBrand: "onPrimary",
     accent: "secondary",
     onAccent: "onSecondary",
-    danger: "negative",
-    onDanger: "onNegative",
+    danger: "error",
+    onDanger: "onError",
     canvas: "surface",
     onCanvas: "onSurface",
 };
