@@ -23,6 +23,7 @@ describe("pureform", () => {
             "fab",
             "chip",
             "textField",
+            "supportingText",
             "card",
             "scrim",
             "ripple",

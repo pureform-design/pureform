@@ -1,0 +1,33 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`supportingText > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "color": {
+      ":has(:disabled) > &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      ":has([aria-invalid=true][aria-invalid=true]) > &": "var(--components-supportingText-errorColor, token(colors.negative))",
+      "base": "var(--components-supportingText-color, token(colors.onSurfaceVariant))",
+    },
+    "display": "flex",
+    "flexDirection": "column",
+    "paddingBlockStart": "token(spacing.1)",
+    "textStyle": "bodySmall",
+  },
+  "className": "supportingText",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "tone": "neutral",
+  },
+  "jsx": [
+    "SupportingText",
+  ],
+  "variants": {
+    "tone": {
+      "error": {
+        "color": "var(--components-supportingText-errorColor, token(colors.negative))",
+      },
+      "neutral": {},
+    },
+  },
+}
+`;

@@ -55,6 +55,7 @@ import {
 } from "@pureform/theme";
 
 import { componentTokens, disabledColor, stateTransition, sys } from "./shared";
+import { INVALID_INPUT, supportingTextStyle } from "./supporting-text";
 
 const { tokens, ref } = componentTokens("textField", {
     height: px(56),
@@ -80,7 +81,7 @@ const css = (selector: string) => rawCondition({ css: selector });
 // States of the container, read from the input inside it. Focus repeats its pseudo-class so
 // it outranks hover, and the error selectors repeat the attribute so they outrank focus,
 // wherever Panda orders the rules.
-const INVALID = "[aria-invalid=true][aria-invalid=true]";
+const INVALID = INVALID_INPUT;
 const FOCUSED = css("&:focus-within:focus-within");
 const ERRORED = css(`&:has(${INVALID})`);
 const ERRORED_FOCUSED = css(`&:has(${INVALID}):focus-within`);
@@ -262,14 +263,12 @@ export const textField = defineSlotComponent({
                 transition: labelTransition,
             },
             supportingText: {
-                textStyle: textStyle("bodySmall"),
+                ...supportingTextStyle({
+                    rest: ref("supportingColor"),
+                    error: ref("errorColor"),
+                }),
                 paddingInlineStart: ref("paddingInline"),
                 paddingInlineEnd: ref("paddingInline"),
-                paddingBlockStart: spacing("1"),
-                color: when()
-                    .on(PARENT_ERRORED, ref("errorColor"))
-                    .on(PARENT_DISABLED, disabledColor("disabledContent"))
-                    .else(ref("supportingColor")),
             },
         },
         variants: {

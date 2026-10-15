@@ -47,6 +47,7 @@ import { createFab } from "./components/fab";
 import { createIconButton } from "./components/icon-button";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
+import { supportingText } from "./components/supporting-text";
 import { createText } from "./components/text";
 import { textField } from "./components/text-field";
 
@@ -247,6 +248,7 @@ export const pureform = <
         fab: createFab(theme.color.groups),
         chip,
         textField,
+        supportingText,
         card,
         scrim,
         ripple,
