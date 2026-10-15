@@ -10,7 +10,8 @@
         "start": "node --env-file-if-exists=.env dist/server/node.js",
         "serve": "vite preview",
         "test": "vitest",
-        "lint": "oxlint src"
+        "lint": "oxlint src",
+        "test:visual": "playwright test"
     },
     "dependencies": {
         "@pureform/core": "catalog:",
@@ -29,6 +30,7 @@
     },
     "devDependencies": {
         "@pandacss/dev": "catalog:",
+        "@playwright/test": "catalog:",
         "@pandacss/preset-base": "catalog:",
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",

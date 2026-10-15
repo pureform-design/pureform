@@ -29,3 +29,5 @@ Thumbs.db
 
 # Generated files
 styled-system
+test-results/
+playwright-report/

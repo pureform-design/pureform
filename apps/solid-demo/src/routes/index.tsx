@@ -42,7 +42,10 @@ const THEMES = [undefined, "teal", "sharp"] as const;
 function IndexRoute() {
     return (
         <main style={{ display: "grid", gap: "32px", padding: "32px" }}>
-            <section style={{ ...row, "align-items": "center" }}>
+            <section
+                data-section="controls"
+                style={{ ...row, "align-items": "center" }}
+            >
                 <For
                     each={["off", "on", "mixed", "error", "disabled"] as const}
                 >
@@ -121,7 +124,10 @@ function IndexRoute() {
                     }}
                 </For>
             </section>
-            <section style={{ ...row, "align-items": "center" }}>
+            <section
+                data-section="color-groups"
+                style={{ ...row, "align-items": "center" }}
+            >
                 <For each={["negative", "positive", "tertiary"] as const}>
                     {(color) => {
                         const c = checkbox({ color });
@@ -199,7 +205,10 @@ function IndexRoute() {
                 </For>
             </section>
             <hr class={separator()} />
-            <section style={{ ...row, "align-items": "flex-start" }}>
+            <section
+                data-section="text-fields"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
                 <For each={["filled", "outlined"] as const}>
                     {(variant) => (
                         <For each={[false, true]}>
@@ -236,7 +245,10 @@ function IndexRoute() {
                     )}
                 </For>
             </section>
-            <section style={{ ...row, "align-items": "flex-start" }}>
+            <section
+                data-section="icon-fields-and-areas"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
                 <For each={["filled", "outlined"] as const}>
                     {(variant) => {
                         const t = textField({
@@ -308,7 +320,10 @@ function IndexRoute() {
                     );
                 })()}
             </section>
-            <section style={{ ...row, "align-items": "center" }}>
+            <section
+                data-section="icons"
+                style={{ ...row, "align-items": "center" }}
+            >
                 <For each={["small", "medium", "large"] as const}>
                     {(size) => (
                         <span class={icon({ size })} title={`${size} icon`}>
@@ -324,7 +339,10 @@ function IndexRoute() {
                     )}
                 </For>
             </section>
-            <section style={{ ...row, "align-items": "center" }}>
+            <section
+                data-section="fabs"
+                style={{ ...row, "align-items": "center" }}
+            >
                 <For each={["small", "medium", "large"] as const}>
                     {(size) => {
                         const f = fab({ size });
@@ -357,7 +375,7 @@ function IndexRoute() {
                 </For>
             </section>
             <div>
-                <section style={row}>
+                <section data-section="chips" style={row}>
                     <For each={["outlined", "elevated"] as const}>
                         {(variant) => (
                             <For each={["Filter", "Assist"]}>
@@ -399,7 +417,10 @@ function IndexRoute() {
                     An error tone, set directly.
                 </span>
             </div>
-            <section style={{ display: "grid", gap: "8px" }}>
+            <section
+                data-section="intro"
+                style={{ display: "grid", gap: "8px" }}
+            >
                 <h1 class={text({ style: "headlineMedium" })}>pureform</h1>
                 <p class={text({ style: "bodyLarge" })}>
                     Components from theme providers. The theme adds a{" "}
@@ -408,7 +429,7 @@ function IndexRoute() {
                 </p>
             </section>
 
-            <section style={row}>
+            <section data-section="themes" style={row}>
                 <For each={THEMES}>
                     {(theme) => (
                         <div
@@ -434,7 +455,7 @@ function IndexRoute() {
                 </For>
             </section>
 
-            <section style={row}>
+            <section data-section="buttons" style={row}>
                 <For each={FILLS}>
                     {(variant) => {
                         const b = button({ variant });
@@ -455,7 +476,7 @@ function IndexRoute() {
                 </button>
             </section>
 
-            <section style={row}>
+            <section data-section="icon-buttons" style={row}>
                 <For each={ICON_FILLS}>
                     {(variant) => {
                         const b = iconButton({ variant });
@@ -488,7 +509,7 @@ function IndexRoute() {
                 </button>
             </section>
 
-            <section style={row}>
+            <section data-section="disabled-buttons" style={row}>
                 <For each={FILLS}>
                     {(variant) => {
                         const b = button({ variant });
@@ -505,7 +526,7 @@ function IndexRoute() {
                 </For>
             </section>
 
-            <section style={row}>
+            <section data-section="cards" style={row}>
                 <For each={CARD_FILLS}>
                     {(variant) => (
                         <div class={card({ variant }).root}>{variant} card</div>
@@ -524,6 +545,7 @@ function IndexRoute() {
             </section>
 
             <section
+                data-section="scrim"
                 style={{
                     position: "relative",
                     width: "240px",

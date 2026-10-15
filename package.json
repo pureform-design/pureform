@@ -23,6 +23,7 @@
         "oxfmt": "^0.71.0",
         "oxlint": "^1.86.0",
         "vitest": "^5.0.1",
+        "@playwright/test": "^1.64.1",
         "vite": "^8.3.1",
         "unplugin-dts": "^1.1.1",
         "@pureform/tsconfig": "workspace:^",
