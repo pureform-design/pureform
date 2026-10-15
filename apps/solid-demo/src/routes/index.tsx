@@ -855,7 +855,7 @@ function IndexRoute() {
                             <div
                                 class={s.root}
                                 style={{
-                                    "--pf-components-slider-value": `${value()}%`,
+                                    "--pf-components-slider-value": `${value()}`,
                                 }}
                             >
                                 <span class={s.track} />
@@ -879,7 +879,7 @@ function IndexRoute() {
                                 aria-valuenow={value()}
                                 aria-label="Determinate progress"
                                 style={{
-                                    "--pf-components-linearProgress-value": `${value()}%`,
+                                    "--pf-components-linearProgress-value": `${value()}`,
                                 }}
                             >
                                 <div class={p.indicator} />
@@ -904,15 +904,44 @@ function IndexRoute() {
                                 />
                             </div>
                             <div style={row}>
+                                {(() => {
+                                    const c = circularProgress();
+                                    return (
+                                        <div
+                                            class={c.root}
+                                            role="progressbar"
+                                            id="circular"
+                                            aria-valuenow={value()}
+                                            aria-label="Determinate progress"
+                                            style={{
+                                                "--pf-components-circularProgress-value": `${value()}`,
+                                            }}
+                                        >
+                                            <span class={c.endHalf}>
+                                                <span class={c.endArc} />
+                                            </span>
+                                            <span class={c.startHalf}>
+                                                <span class={c.startArc} />
+                                            </span>
+                                        </div>
+                                    );
+                                })()}
                                 <div
-                                    class={circularProgress()}
+                                    class={
+                                        circularProgress({
+                                            indeterminate: true,
+                                        }).root
+                                    }
                                     role="progressbar"
                                     aria-label="Loading"
                                 />
                                 <div
-                                    class={circularProgress({
-                                        color: "success",
-                                    })}
+                                    class={
+                                        circularProgress({
+                                            indeterminate: true,
+                                            color: "success",
+                                        }).root
+                                    }
                                     role="progressbar"
                                     aria-label="Loading"
                                 />
@@ -920,7 +949,7 @@ function IndexRoute() {
                                     class={slider({ color: "error" }).root}
                                     style={{
                                         width: "200px",
-                                        "--pf-components-slider-value": "70%",
+                                        "--pf-components-slider-value": "70",
                                     }}
                                 >
                                     <span
