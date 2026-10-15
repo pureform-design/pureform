@@ -2336,6 +2336,48 @@ token or role (4.5:1 for text, 3:1 for the parts that identify a control), and
 `requireComponentContrast` checks them and every color group in light and dark for each
 theme. The preset's tests run the same check, plus the touch targets and the focus ring.
 
+### 4.10 Typed authoring (`typed`) **[DECIDED]**
+
+The untyped API checks references only at runtime, in `defineConfig`. `typed(config)` returns
+helpers bound to a config's names, so references autocomplete and a typo is a type error:
+
+```ts
+import { typed } from "@pureform/core";
+
+const pf = typed(base);
+pf.alias("tokens", "colors", "violet600"); // each segment narrows from the one before
+pf.apply({ shadowElevation: "level1" }); // utility names, and a static utility's steps
+pf.viewport({ from: "md" }); // breakpoints
+pf.textStyle("labelLarge");
+
+const button = pf.slotComponent({
+    name: "button",
+    slots: ["root", "label"],
+    tokens: { height: px(40) },
+    variants: { size: ["small", "medium"] },
+    recipe: ({ slot, token, alias }) => ({
+        base: { root: { height: token("height") } }, // slots and tokens checked
+        defaultVariants: { size: "medium" }, // groups and values checked
+    }),
+});
+```
+
+- **Binding.** `typed(config)` binds to a config, or any part holding the referenced names, so
+  several configs coexist. A project with one config can register it instead
+  (`declare module "@pureform/core" { interface Register { config: typeof base } }`) and call
+  `typed()`. Unregistered, the names are plain strings under the known roots.
+- **Paths.** Alias roots have fixed depths (two levels under `tokens` and `semanticTokens`, one
+  under the other tiers, component then token under `components`), so the path types are flat
+  unions, not recursive, and stay fast: 1,300 tokens add about 0.3s to a type check.
+- **Components.** The recipe is a function that receives the typed helpers. Its return type
+  is a constrained generic, so an unknown slot or variant value is flagged at the key. Every
+  declared variant value gets an entry, empty unless styled.
+- **Compatibility.** The helpers build the same nodes and specs as the untyped API, which stays
+  where it is; `@pureform/core/raw` and `@pureform/core/ast/raw` re-export it for files that opt
+  out explicitly. `dynamic()` stays untyped, since its path names a new runtime var rather than
+  pointing into the config. Names known only at runtime, such as a theme's color groups, are
+  plain strings.
+
 ---
 
 ## 5. Adapter resolution logic (Panda / Web CSS)
