@@ -32,6 +32,7 @@ import {
     tween,
     unitless,
     vertical,
+    content,
     when,
 } from "@pureform/core/ast";
 import {
@@ -251,6 +252,14 @@ describe("compileValue conditionals", () => {
             base: "0",
             "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])":
                 "1",
+        });
+    });
+});
+
+describe("compileStyleMap fieldSizing", () => {
+    it("passes the field-sizing keyword through", () => {
+        expect(compileStyleMap({ fieldSizing: content }, ctx())).toEqual({
+            fieldSizing: "content",
         });
     });
 });
