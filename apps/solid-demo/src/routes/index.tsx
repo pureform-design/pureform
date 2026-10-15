@@ -512,6 +512,7 @@ function IndexRoute() {
                         const t = textField({ density, variant: "outlined" });
                         const f = textField({ density });
                         const l = listItem({ density, interactive: true });
+                        const a = textArea({ density });
                         return (
                             <div style={{ ...row, "align-items": "center" }}>
                                 <button class={b.root} type="button">
@@ -550,6 +551,22 @@ function IndexRoute() {
                                             for={`dense-${density}`}
                                         >
                                             Label
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class={a.root} style={{ width: "180px" }}>
+                                    <div class={a.container}>
+                                        <textarea
+                                            class={a.input}
+                                            id={`dense-area-${density}`}
+                                            placeholder=" "
+                                            rows={2}
+                                        />
+                                        <label
+                                            class={a.label}
+                                            for={`dense-area-${density}`}
+                                        >
+                                            Notes
                                         </label>
                                     </div>
                                 </div>
