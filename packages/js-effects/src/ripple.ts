@@ -12,31 +12,18 @@
 //   faint fill with a shimmering ring of sparkles that expands with it and thins out as the
 //   ripple reaches full size.
 
-const PRESS_GROW_MS = 450;
-const FADE_MS = 375;
-const TOUCH_DELAY_MS = 150;
-const INITIAL_ORIGIN_SCALE = 0.2;
-const PADDING = 10;
-const SOFT_EDGE_MINIMUM_SIZE = 75;
-const SOFT_EDGE_CONTAINER_RATIO = 0.35;
-const STANDARD_EASING = "cubic-bezier(0.2, 0, 0, 1)";
-
-/** How long a ripple grows and fades, and the grow curve. A release waits for at least half
- *  the grow, so a quick tap still shows most of the ripple. */
-export type RippleTiming = {
-    /** Grow duration, in ms. */
-    grow: number;
-    /** Fade duration, in ms. */
-    fade: number;
-    /** CSS easing for the grow. */
-    easing: string;
-};
-
-const DEFAULT_TIMING: RippleTiming = {
-    grow: PRESS_GROW_MS,
-    fade: FADE_MS,
-    easing: STANDARD_EASING,
-};
+import {
+    DEFAULT_RIPPLE_TIMING,
+    TOUCH_DELAY_MS,
+    rippleGeometry,
+    ripplePress,
+} from "./ripple-core";
+import type {
+    Point,
+    RippleGeometry,
+    RippleHandle,
+    RippleTiming,
+} from "./ripple-core";
 
 // Split a computed list on top-level commas, keeping `cubic-bezier(a, b, c, d)` whole.
 const splitList = (value: string): string[] => {
@@ -71,7 +58,7 @@ export function readRippleTiming(
         CSSStyleDeclaration,
         "transitionProperty" | "transitionDuration" | "transitionTimingFunction"
     >,
-    fallback: RippleTiming = DEFAULT_TIMING,
+    fallback: RippleTiming = DEFAULT_RIPPLE_TIMING,
 ): RippleTiming {
     const properties = splitList(style.transitionProperty);
     const durations = splitList(style.transitionDuration);
@@ -157,39 +144,9 @@ function isDisabled(container: HTMLElement, options: RippleOptions) {
     );
 }
 
-type Point = { x: number; y: number };
-
-/** Geometry of one ripple in a layer of the given size, pressed at `origin`. `size` is the
- *  starting diameter and `scale` the factor it grows by; `start` and `end` are the top-left
- *  corner of the starting circle at the press point and at the center. */
-export function rippleGeometry(
-    rect: { width: number; height: number },
-    origin: Point,
-) {
-    const { width, height } = rect;
-    const maxDim = Math.max(width, height);
-    const softEdge = Math.max(
-        SOFT_EDGE_CONTAINER_RATIO * maxDim,
-        SOFT_EDGE_MINIMUM_SIZE,
-    );
-    const size = Math.floor(maxDim * INITIAL_ORIGIN_SCALE);
-    const maxRadius = Math.hypot(width, height) + PADDING;
-    return {
-        size,
-        scale: (maxRadius + softEdge) / size,
-        start: { x: origin.x - size / 2, y: origin.y - size / 2 },
-        end: { x: (width - size) / 2, y: (height - size) / 2 },
-    };
-}
-
-type Geometry = ReturnType<typeof rippleGeometry>;
-
-/** A drawn ripple. `release` fades it after `delay` ms and removes it. */
-type RippleHandle = { release: (delay: number) => void };
-
 type Renderer = (
     layer: HTMLElement,
-    geometry: Geometry,
+    geometry: RippleGeometry,
     timing: RippleTiming,
     options: RippleOptions,
 ) => RippleHandle;
@@ -388,9 +345,7 @@ const RENDERERS: Record<RippleVariant, Renderer> = {
 
 /** Attach Material press ripples to `container`. Returns a function that detaches them. */
 export function ripple(container: HTMLElement, options: RippleOptions = {}) {
-    let press:
-        | { handle: RippleHandle; startedAt: number; minimum: number }
-        | undefined;
+    const press = ripplePress(() => performance.now());
     let touchTimer: ReturnType<typeof setTimeout> | undefined;
 
     const layerOf = () =>
@@ -420,21 +375,13 @@ export function ripple(container: HTMLElement, options: RippleOptions = {}) {
             ...readRippleTiming(getComputedStyle(layer)),
             ...options.timing,
         };
-        press = {
-            handle: render(layer, geometry, timing, options),
-            minimum: timing.grow / 2,
-            startedAt: performance.now(),
-        };
+        press.begin(render(layer, geometry, timing, options), timing);
     }
 
     function end() {
         clearTimeout(touchTimer);
         touchTimer = undefined;
-        if (!press) return;
-        const { handle, startedAt, minimum } = press;
-        press = undefined;
-        const held = performance.now() - startedAt;
-        handle.release(Math.max(minimum - held, 0));
+        press.end();
     }
 
     function onPointerDown(e: PointerEvent) {

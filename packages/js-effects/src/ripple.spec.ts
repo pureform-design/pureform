@@ -1,42 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readRippleTiming, ripple, rippleGeometry } from "./ripple";
+import { readRippleTiming, ripple } from "./ripple";
 
 const transitionStyle = (
     transitionProperty: string,
     transitionDuration: string,
     transitionTimingFunction: string,
 ) => ({ transitionProperty, transitionDuration, transitionTimingFunction });
-
-describe("rippleGeometry", () => {
-    it("starts at a fifth of the larger side, centered on the press", () => {
-        const g = rippleGeometry({ width: 200, height: 40 }, { x: 30, y: 10 });
-        expect(g.size).toBe(40);
-        expect(g.start).toEqual({ x: 10, y: -10 });
-    });
-
-    it("ends centered in the layer", () => {
-        const g = rippleGeometry({ width: 200, height: 40 }, { x: 30, y: 10 });
-        expect(g.end).toEqual({ x: 80, y: 0 });
-    });
-
-    it("grows past the far corner by the padding and the soft edge", () => {
-        const { size, scale } = rippleGeometry(
-            { width: 200, height: 40 },
-            { x: 0, y: 0 },
-        );
-        const softEdge = 75; // max(0.35 * 200, 75)
-        expect(size * scale).toBeCloseTo(Math.hypot(200, 40) + 10 + softEdge);
-    });
-
-    it("scales the soft edge with large surfaces", () => {
-        const { size, scale } = rippleGeometry(
-            { width: 1000, height: 500 },
-            { x: 0, y: 0 },
-        );
-        expect(size * scale).toBeCloseTo(Math.hypot(1000, 500) + 10 + 350);
-    });
-});
 
 describe("readRippleTiming", () => {
     it("reads the grow from transform and the fade from opacity", () => {

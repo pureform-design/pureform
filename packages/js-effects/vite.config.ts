@@ -9,6 +9,7 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
+                    core: "src/core.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
