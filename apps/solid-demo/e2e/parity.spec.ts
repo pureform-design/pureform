@@ -3,6 +3,10 @@
 // keep Panda's reset and base layers (the app's global styles), so only the components' own
 // styles differ. Custom properties are left out: Panda's own preset adds tokens of its own, and
 // what matters is the values they resolve to.
+//
+// Every variant value is compared at rest. States, the dark scheme, and a named theme are
+// compared on each component's defaults: a state through the data attributes both adapters'
+// selectors match, set on every element, so element and slot conditions both apply.
 
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
@@ -75,19 +79,42 @@ const plainClasses = (): Classes => {
     return ITEMS.map(({ name, selection }) => fns[name]!(selection));
 };
 
-const markup = (classes: Classes): string =>
-    ITEMS.map(({ id, slots }, index) => {
+interface Scenario {
+    name: string;
+    /** Only each component's defaults, or every variant value too. */
+    every?: boolean;
+    /** Data attributes set on every element. */
+    attributes?: string[];
+    /** A class on the root element. */
+    rootClass?: string;
+    /** A named theme the components sit in. */
+    theme?: string;
+}
+
+const THEME_ATTRIBUTE = "data-panda-theme";
+
+const markup = (classes: Classes, scenario: Scenario): string => {
+    const attributes = (scenario.attributes ?? [])
+        .map((name) => ` ${name}`)
+        .join("");
+    const elements = ITEMS.flatMap(({ id, slots }, index) => {
+        if (!scenario.every && !id.endsWith("-0")) return [];
         const own = classes[index]!;
-        if (!slots)
-            return `<div data-id="${id}" class="${own as string}"></div>`;
+        if (!slots) {
+            return `<div data-id="${id}"${attributes} class="${own as string}"></div>`;
+        }
         const bySlot = own as Record<string, string>;
         return `<div data-id="${id}">${slots
             .map(
                 (slot) =>
-                    `<div data-id="${id}.${slot}" class="${bySlot[slot]}"></div>`,
+                    `<div data-id="${id}.${slot}"${attributes} class="${bySlot[slot]}"></div>`,
             )
             .join("")}</div>`;
     }).join("\n");
+    return scenario.theme
+        ? `<div ${THEME_ATTRIBUTE}="${scenario.theme}">${elements}</div>`
+        : elements;
+};
 
 const computed = (page: Page) =>
     page.evaluate(() => {
@@ -113,10 +140,14 @@ const render = async (
     page: Page,
     css: string,
     classes: Classes,
+    scenario: Scenario,
     keepOnly?: string[],
 ) => {
+    const rootClass = scenario.rootClass
+        ? ` class="${scenario.rootClass}"`
+        : "";
     await page.setContent(
-        `<!doctype html><html><head><style>${css}</style><style>${PAUSED}</style></head><body>${markup(classes)}</body></html>`,
+        `<!doctype html><html${rootClass}><head><style>${css}</style><style>${PAUSED}</style></head><body>${markup(classes, scenario)}</body></html>`,
     );
     if (keepOnly) {
         // Keep only the named layers and the layer order statements.
@@ -153,14 +184,38 @@ const same = (a: string, b: string | undefined): boolean => {
     return (a.match(PX) ?? []).every((n, i) => close(n, right[i] ?? ""));
 };
 
-test("the CSS adapter computes the same styles as the Panda preset", async ({
-    browser,
-    page,
-}) => {
-    test.setTimeout(120_000);
-    await page.emulateMedia({ reducedMotion: "reduce" });
+const SCENARIOS: Scenario[] = [
+    { name: "every variant value at rest", every: true },
+    { name: "hovered", attributes: ["data-hover"] },
+    {
+        name: "focused",
+        attributes: ["data-focus", "data-focus-visible", "data-focused"],
+    },
+    { name: "pressed", attributes: ["data-active", "data-pressed"] },
+    { name: "dragged", attributes: ["data-dragging"] },
+    { name: "disabled", attributes: ["data-disabled"] },
+    { name: "selected", attributes: ["data-selected"] },
+    { name: "checked", attributes: ["data-checked"] },
+    { name: "indeterminate", attributes: ["data-indeterminate"] },
+    { name: "invalid", attributes: ["data-invalid"] },
+    { name: "expanded", attributes: ["data-expanded"] },
+    { name: "filled", attributes: ["data-filled"] },
+    { name: "dark", rootClass: "dark" },
+    { name: "in a named theme", theme: "teal" },
+];
+
+let pandaCss = "";
+let fromPanda: Classes = [];
+const fromPlain = plainClasses();
+const plainCss = compileCss(pureformConfig, {
+    prefix: PREFIX,
+    themeAttribute: THEME_ATTRIBUTE,
+});
+
+test.beforeAll(async ({ browser }) => {
+    const page = await browser.newPage();
     await page.goto("/", { waitUntil: "networkidle" });
-    const pandaCss = await page.evaluate(() =>
+    pandaCss = await page.evaluate(() =>
         [...document.styleSheets]
             .flatMap((sheet) => {
                 try {
@@ -171,34 +226,44 @@ test("the CSS adapter computes the same styles as the Panda preset", async ({
             })
             .join("\n"),
     );
+    fromPanda = await pandaClasses(page);
+    await page.close();
+});
 
-    const fromPanda = await pandaClasses(page);
+for (const scenario of SCENARIOS) {
+    test(`the CSS adapter matches the Panda preset: ${scenario.name}`, async ({
+        browser,
+    }) => {
+        test.setTimeout(120_000);
+        const pandaPage = await browser.newPage();
+        await pandaPage.emulateMedia({ reducedMotion: "reduce" });
+        await render(pandaPage, pandaCss, fromPanda, scenario);
+        const panda = await computed(pandaPage);
 
-    const pandaPage = await browser.newPage();
-    await pandaPage.emulateMedia({ reducedMotion: "reduce" });
-    await render(pandaPage, pandaCss, fromPanda);
-    const panda = await computed(pandaPage);
+        const plainPage = await browser.newPage();
+        await plainPage.emulateMedia({ reducedMotion: "reduce" });
+        await render(plainPage, pandaCss, fromPlain, scenario, [
+            "reset",
+            "base",
+        ]);
+        await plainPage.addStyleTag({ content: plainCss });
+        const plain = await computed(plainPage);
 
-    const plainPage = await browser.newPage();
-    await plainPage.emulateMedia({ reducedMotion: "reduce" });
-    await render(plainPage, pandaCss, plainClasses(), ["reset", "base"]);
-    await plainPage.addStyleTag({
-        content: compileCss(pureformConfig, { prefix: PREFIX }),
-    });
-    const plain = await computed(plainPage);
-
-    const differences: string[] = [];
-    for (const [id, values] of Object.entries(panda)) {
-        for (const [property, value] of Object.entries(values)) {
-            const other = plain[id]?.[property];
-            if (!same(value, other)) {
-                differences.push(
-                    `${id} ${property}: panda "${value}", css "${other}"`,
-                );
+        const differences: string[] = [];
+        for (const [id, values] of Object.entries(panda)) {
+            for (const [property, value] of Object.entries(values)) {
+                const other = plain[id]?.[property];
+                if (!same(value, other)) {
+                    differences.push(
+                        `${id} ${property}: panda "${value}", css "${other}"`,
+                    );
+                }
             }
         }
-    }
-    expect(Object.keys(panda).length).toBeGreaterThan(100);
-    expect(Object.keys(plain)).toEqual(Object.keys(panda));
-    expect(differences).toEqual([]);
-});
+        expect(Object.keys(panda).length).toBeGreaterThan(30);
+        expect(Object.keys(plain)).toEqual(Object.keys(panda));
+        expect(differences).toEqual([]);
+        await pandaPage.close();
+        await plainPage.close();
+    });
+}
