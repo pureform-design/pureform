@@ -85,7 +85,7 @@ For colors, `oklchPalette` builds the whole contract from a hue per group:
 import { oklchPalette } from "@pureform/theme";
 
 const color = oklchPalette({
-    groups: { primary: { hue: 265 }, negative: { hue: 25, chroma: 0.18 } },
+    groups: { primary: { hue: 265 }, error: { hue: 25, chroma: 0.18 } },
 });
 ```
 

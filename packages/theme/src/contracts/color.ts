@@ -38,9 +38,9 @@ export const BASE_COLOR_GROUPS = [
     "primary",
     "secondary",
     "tertiary",
-    "positive",
-    "notice",
-    "negative",
+    "success",
+    "warning",
+    "error",
     "info",
 ] as const;
 
