@@ -27,7 +27,6 @@ import {
     pressableRoot,
     surface,
     sys,
-    circle,
 } from "./shared";
 
 const { tokens, ref } = componentTokens("snackbar", {
@@ -94,7 +93,7 @@ export const snackbar = pf.slotComponent({
                 height: ref("closeSize"),
                 fontSize: ref("iconSize"),
                 lineHeight: unitless(1),
-                borderRadius: circle,
+                borderRadius: radius("full"),
                 justifyContent: center,
             },
         },

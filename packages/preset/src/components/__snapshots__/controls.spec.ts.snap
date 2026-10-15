@@ -747,7 +747,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
         ".switchControl__root:is(:hover, [data-hover]) &": "var(--components-switchControl-handleHoverColor, token(colors.onSurfaceVariant))",
         "base": "var(--components-switchControl-handleColor, token(colors.outline))",
       },
-      "borderRadius": "50%",
+      "borderRadius": "token(radii.full)",
       "display": "inline-flex",
       "height": {
         ".switchControl__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "var(--components-switchControl-handleSizePressed, 28px)",
@@ -819,7 +819,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
         ".switchControl__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.stateHover))",
         "base": "transparent",
       },
-      "borderRadius": "50%",
+      "borderRadius": "token(radii.full)",
       "height": "var(--components-switchControl-stateLayerSize, token(sizes.controlMedium))",
       "left": {
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "var(--components-switchControl-handleOn, 36px)",
