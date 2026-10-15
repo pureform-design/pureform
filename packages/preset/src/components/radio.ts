@@ -50,8 +50,9 @@ import {
     focusRing,
     dense,
     densityVariant,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("radio", {
     size: sizeToken("controlMedium"),
@@ -79,7 +80,10 @@ const colored = (checked: ColorValue) => ({
 });
 
 /** Build the radio button with a `color` variant per group in `groups`. */
-export const createRadio = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createRadio = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "radio",
         $meta: {
@@ -130,7 +134,7 @@ export const createRadio = (groups: ColorGroups = COLOR_GROUPS) =>
                 colored(ref("checkedColor")),
             ),
             variants: {
-                density: densityVariant((offset) => {
+                density: densityVariant(densities, (offset) => {
                     const side = add(ref("size"), offset);
                     return { root: { width: side, height: side } };
                 }),

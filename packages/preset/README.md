@@ -29,16 +29,38 @@ Every component token is a CSS var with a default from the theme, for example
 
 ## Density
 
-Material's density makes controls more compact, 4px off a component's height per step, down
-to `-3`. Set it for a whole theme or subtree through the layout provider, or per component:
+Density makes controls more compact (or roomier), a grid unit off a component's height per
+step. Material's steps are `"0"` to `"-3"`; declare your own on the layout provider, in grid
+units from `-3` up, and pick the theme's step by name:
 
 ```ts
-pureform({ themes: { dense: { layout: materialLayout({ density: -2 }) } } });
+pureform({
+    layout: materialLayout({
+        densities: { comfortable: 1, default: 0, compact: -1, dense: -3 },
+        density: "default",
+    }),
+    themes: {
+        dense: {
+            layout: materialLayout({
+                densities: {
+                    comfortable: 1,
+                    default: 0,
+                    compact: -1,
+                    dense: -3,
+                },
+                density: "dense",
+            }),
+        },
+    },
+});
+
+button({ density: "compact" }); // "inherit" (the default) follows the theme
 ```
 
-```ts
-button({ density: "-1" }); // "inherit" (the default) follows the theme
-```
+The steps become each dense component's `density` variant, so a named theme can pick another
+step but can't declare different ones. A step named `inherit`, or below `-3`, where layouts
+stop holding up, is rejected. Each step adds CSS to every dense component, so declare only the
+ones you use.
 
 Dense components: `button`, `iconButton`, `chip`, `checkbox`, `radio`, `textField`, `select`,
 `listItem`, and `menu`. Buttons, chips, and controls keep their full touch target; list and

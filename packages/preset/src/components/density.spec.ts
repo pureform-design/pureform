@@ -65,3 +65,64 @@ describe("density", () => {
         );
     });
 });
+
+describe("named density steps", () => {
+    const STEPS = { comfortable: 1, standard: 0, compact: -2 };
+    const config = pureform({
+        layout: materialLayout({ densities: STEPS, density: "standard" }),
+    });
+
+    it("become every dense component's density variant", () => {
+        for (const name of [
+            "button",
+            "chip",
+            "textField",
+            "listItem",
+            "menu",
+        ]) {
+            const spec = config.components[name] as typeof button;
+            expect(
+                Object.keys(spec.recipe.variants?.density ?? {}),
+                name,
+            ).toEqual(["inherit", "comfortable", "standard", "compact"]);
+        }
+    });
+
+    it("restate sizes at each step's grid units, larger ones too", () => {
+        const recipe = compilePreset(config).theme?.slotRecipes?.chip;
+        expect(recipe?.variants?.density?.comfortable?.root?.height).toBe(
+            "calc(var(--components-chip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * 1))",
+        );
+    });
+
+    it("let a named theme pick another step", () => {
+        const themed = pureform({
+            layout: materialLayout({ densities: STEPS, density: "standard" }),
+            themes: {
+                roomy: {
+                    layout: materialLayout({
+                        densities: STEPS,
+                        density: "comfortable",
+                    }),
+                },
+            },
+        });
+        expect(
+            themed.themes?.roomy?.tokens?.sizes?.densityOffset,
+        ).toMatchObject({
+            value: 4,
+        });
+    });
+
+    it("reject a named theme with other steps", () => {
+        expect(() =>
+            pureform({
+                layout: materialLayout({
+                    densities: STEPS,
+                    density: "standard",
+                }),
+                themes: { dense: { layout: materialLayout({ density: -3 }) } },
+            }),
+        ).toThrow(/theme "dense" declares density steps 0, -1, -2, -3/);
+    });
+});

@@ -28,8 +28,9 @@ import {
     colorVariant,
     dense,
     densityVariant,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = rowTokens("menu", {
     container: sys("surfaceContainer"),
@@ -46,7 +47,10 @@ const parts = rowParts(ref, "item");
 
 /** Build the menu with a `color` variant per group in `groups`. A group colors the selected
  *  item with the group's container. */
-export const createMenu = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createMenu = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "menu",
         $meta: {
@@ -104,7 +108,7 @@ export const createMenu = (groups: ColorGroups = COLOR_GROUPS) =>
                 itemTrailingText: parts.trailingText("labelLarge"),
             },
             variants: {
-                density: densityVariant((offset) => ({
+                density: densityVariant(densities, (offset) => ({
                     item: { height: add(ref("itemHeight"), offset) },
                 })),
                 color: colorVariant(groups, (g) => {

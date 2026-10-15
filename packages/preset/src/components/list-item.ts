@@ -28,8 +28,9 @@ import {
     dense,
     densityCompounds,
     densityMarkers,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = rowTokens("listItem", {
     paddingInline: spacing("4"),
@@ -55,7 +56,10 @@ const lines = (height: LineHeight) => ({
 
 /** Build the list item with a `color` variant per group in `groups`. A group colors the
  *  selected item and its parts with the group's container; at rest, every item is neutral. */
-export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createListItem = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "listItem",
         $meta: {
@@ -120,7 +124,7 @@ export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
                     true: { root: parts.interactive },
                     false: {},
                 },
-                density: densityMarkers(),
+                density: densityMarkers(densities),
                 color: colorVariant(groups, (g) => {
                     const c = rowGroupColors(ref, "root", g);
                     return {
@@ -145,7 +149,7 @@ export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
                         },
                     })),
                 ...Object.entries(LINES).flatMap(([count, height]) =>
-                    densityCompounds({ lines: count }, (offset) => ({
+                    densityCompounds(densities, { lines: count }, (offset) => ({
                         root: { minHeight: add(ref(height), offset) },
                     })),
                 ),

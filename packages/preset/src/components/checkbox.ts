@@ -59,8 +59,9 @@ import {
     focusRing,
     dense,
     densityVariant,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("checkbox", {
     size: sizeToken("controlMedium"),
@@ -122,7 +123,10 @@ const mark = {
 } as const;
 
 /** Build the checkbox with a `color` variant per group in `groups`. */
-export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createCheckbox = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "checkbox",
         $meta: {
@@ -209,7 +213,7 @@ export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
                 }),
             ),
             variants: {
-                density: densityVariant((offset) => {
+                density: densityVariant(densities, (offset) => {
                     const side = add(ref("size"), offset);
                     return { root: { width: side, height: side } };
                 }),

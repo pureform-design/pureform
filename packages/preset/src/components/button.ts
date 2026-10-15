@@ -21,8 +21,9 @@ import {
     dense,
     densityCompounds,
     densityMarkers,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups, Fill } from "./shared";
+import type { ColorGroups, Fill, Densities } from "./shared";
 
 const FILLS: Record<string, Fill> = {
     filled: "filled",
@@ -58,7 +59,10 @@ const size = (s: Size): { root: StyleMap } => ({
 });
 
 /** Build the button with a `color` variant per group in `groups`. */
-export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createButton = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "button",
         $meta: {
@@ -92,14 +96,18 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     medium: size("Medium"),
                     large: size("Large"),
                 },
-                density: densityMarkers(),
+                density: densityMarkers(densities),
             },
             compoundVariants: [
                 ...colorCompounds(FILLS, groups),
                 ...SIZES.flatMap((s) =>
-                    densityCompounds({ size: s.toLowerCase() }, (offset) => ({
-                        root: { height: add(ref(`height${s}`), offset) },
-                    })),
+                    densityCompounds(
+                        densities,
+                        { size: s.toLowerCase() },
+                        (offset) => ({
+                            root: { height: add(ref(`height${s}`), offset) },
+                        }),
+                    ),
                 ),
             ],
             defaultVariants: {

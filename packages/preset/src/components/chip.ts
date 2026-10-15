@@ -23,8 +23,9 @@ import {
     pressableRoot,
     dense,
     densityVariant,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {
     height: sizeToken("controlSmall"),
@@ -113,7 +114,10 @@ const iconColor = (selected: ColorValue) =>
 
 /** Build the chip with a `color` variant per group in `groups`. A group colors the selected
  *  chip: its container and content, and the icon. At rest, every chip is neutral. */
-export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createChip = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "chip",
         $meta: {
@@ -148,7 +152,7 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
                 color: colorVariant(groups, (g) => ({
                     icon: { color: iconColor(g.onContainer) },
                 })),
-                density: densityVariant((offset) => ({
+                density: densityVariant(densities, (offset) => ({
                     root: { height: add(ref("height"), offset) },
                 })),
             },

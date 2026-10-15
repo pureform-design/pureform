@@ -57,7 +57,7 @@ import {
     sys,
     tweens,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 import { supportingTextStyle } from "./supporting-text";
 
 /** The tokens every text input has. */
@@ -431,20 +431,20 @@ export const fieldParts = (
         defaultVariants: { leadingIcon: "false", trailingIcon: "false" },
     };
 
-    // The density variant, and a compound per fill and step restating the sizes, since the
-    // fill variant sets them too. A component with a fixed height reads it at the theme's
-    // density through `height`.
-    const densities = {
+    // The density variant over the given steps, and a compound per fill and step restating the
+    // sizes, since the fill variant sets them too. A component with a fixed height reads it at
+    // the theme's density through `height`.
+    const densityParts = (steps: Densities) => ({
         height: dense(ref("height")),
-        variants: { density: densityMarkers() },
+        variants: { density: densityMarkers(steps) },
         compoundVariants: (["filled", "outlined"] as const).flatMap((fill) =>
-            densityCompounds({ variant: fill }, (offset) => ({
+            densityCompounds(steps, { variant: fill }, (offset) => ({
                 ...sized(offset)[fill],
                 container: { height: add(ref("height"), offset) },
             })),
         ),
         defaultVariants: { density: "inherit" },
-    };
+    });
 
-    return { base, variant, colors, icons, densities };
+    return { base, variant, colors, icons, densityParts };
 };

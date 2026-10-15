@@ -22,12 +22,12 @@ import { defineSlotComponent } from "@pureform/core";
 import { pct } from "@pureform/core/ast";
 
 import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
-import { COLOR_GROUPS, DEFAULT_GROUP } from "./shared";
-import type { ColorGroups } from "./shared";
+import { COLOR_GROUPS, DEFAULT_DENSITIES, DEFAULT_GROUP } from "./shared";
+import type { ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField");
 
-const { base, variant, colors, icons, densities } = fieldParts(ref, {
+const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
     labelRest: pct(50),
     iconRoom: "input",
     density: true,
@@ -35,8 +35,12 @@ const { base, variant, colors, icons, densities } = fieldParts(ref, {
 
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
-export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
+export const createTextField = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) => {
     const color = colors(groups);
+    const density = densityParts(densities);
     return defineSlotComponent({
         name: "textField",
         $meta: {
@@ -50,25 +54,25 @@ export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
             base: {
                 ...base,
                 ...icons.base,
-                container: { ...base.container, height: densities.height },
+                container: { ...base.container, height: density.height },
                 input: { ...base.input, height: pct(100) },
             },
             variants: {
                 variant,
                 color: color.color,
                 ...icons.variants,
-                ...densities.variants,
+                ...density.variants,
             },
             compoundVariants: [
                 ...color.compoundVariants,
                 ...icons.compoundVariants,
-                ...densities.compoundVariants,
+                ...density.compoundVariants,
             ],
             defaultVariants: {
                 color: DEFAULT_GROUP,
                 variant: "filled",
                 ...icons.defaultVariants,
-                ...densities.defaultVariants,
+                ...density.defaultVariants,
             },
         },
     });

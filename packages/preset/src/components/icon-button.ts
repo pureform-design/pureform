@@ -18,8 +18,9 @@ import {
     dense,
     densityCompounds,
     densityMarkers,
+    DEFAULT_DENSITIES,
 } from "./shared";
-import type { ColorGroups, Fill } from "./shared";
+import type { ColorGroups, Fill, Densities } from "./shared";
 
 const FILLS: Record<string, Fill> = {
     filled: "filled",
@@ -46,7 +47,10 @@ const size = (
 });
 
 /** Build the iconButton with a `color` variant per group in `groups`. */
-export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createIconButton = (
+    groups: ColorGroups = COLOR_GROUPS,
+    densities: Densities = DEFAULT_DENSITIES,
+) =>
     defineSlotComponent({
         name: "iconButton",
         $meta: { description: "Material icon button holding a single icon." },
@@ -75,15 +79,19 @@ export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     medium: size("sizeMedium"),
                     large: size("sizeLarge"),
                 },
-                density: densityMarkers(),
+                density: densityMarkers(densities),
             },
             compoundVariants: [
                 ...colorCompounds(FILLS, groups),
                 ...(["Small", "Medium", "Large"] as const).flatMap((s) =>
-                    densityCompounds({ size: s.toLowerCase() }, (offset) => {
-                        const side = add(ref(`size${s}`), offset);
-                        return { root: { width: side, height: side } };
-                    }),
+                    densityCompounds(
+                        densities,
+                        { size: s.toLowerCase() },
+                        (offset) => {
+                            const side = add(ref(`size${s}`), offset);
+                            return { root: { width: side, height: side } };
+                        },
+                    ),
                 ),
             ],
             defaultVariants: {

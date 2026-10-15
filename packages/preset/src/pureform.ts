@@ -271,29 +271,35 @@ export const pureform = <
                 `theme "${name}" adds color groups ${extra.join(", ")}; components only have variants for the base groups, so add them to the base color provider`,
             );
         }
+        if (!same(variant.layout.densities, theme.layout.densities)) {
+            throw new ContractError(
+                `theme "${name}" declares density steps ${Object.keys(variant.layout.densities).join(", ")}; components only have variants for the base steps (${Object.keys(theme.layout.densities).join(", ")}), so declare them on the base layout provider`,
+            );
+        }
         themes[name] = themeOverride(theme.config, variant.config);
         colors.push([`theme "${name}"`, variant.color]);
     }
 
+    const densities = theme.layout.densities;
     const defaults: Record<string, AnyComponentSpec> = {
-        button: createButton(theme.color.groups),
-        iconButton: createIconButton(theme.color.groups),
+        button: createButton(theme.color.groups, densities),
+        iconButton: createIconButton(theme.color.groups, densities),
         fab: createFab(theme.color.groups),
-        chip: createChip(theme.color.groups),
-        textField: createTextField(theme.color.groups),
+        chip: createChip(theme.color.groups, densities),
+        textField: createTextField(theme.color.groups, densities),
         textArea: createTextArea(theme.color.groups),
         searchBar,
-        select: createSelect(theme.color.groups),
+        select: createSelect(theme.color.groups, densities),
         supportingText: createSupportingText(theme.color.groups),
-        checkbox: createCheckbox(theme.color.groups),
-        radio: createRadio(theme.color.groups),
+        checkbox: createCheckbox(theme.color.groups, densities),
+        radio: createRadio(theme.color.groups, densities),
         switchControl: createSwitch(theme.color.groups),
         slider: createSlider(theme.color.groups),
         linearProgress: createLinearProgress(theme.color.groups),
         circularProgress: createCircularProgress(theme.color.groups),
         separator,
-        listItem: createListItem(theme.color.groups),
-        menu: createMenu(theme.color.groups),
+        listItem: createListItem(theme.color.groups, densities),
+        menu: createMenu(theme.color.groups, densities),
         tabs: createTabs(theme.color.groups),
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
