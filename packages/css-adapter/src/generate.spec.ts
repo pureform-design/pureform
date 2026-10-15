@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 
 import { buildCss } from "./build";
 import { generate } from "./generate";
-import { pureformCss } from "./vite";
+import { pureformCss, pureformPlugin, writeIfChanged } from "./vite";
 
 describe("generate", () => {
     it("writes each component as a pure call holding its manifest", async () => {
@@ -96,5 +96,52 @@ describe("pureformCss", () => {
 
     it("leaves other modules alone", () => {
         expect(call(plugin.resolveId, "./app.ts")).toBeUndefined();
+    });
+});
+
+describe("pureformPlugin", () => {
+    const call = <A extends unknown[], R>(hook: unknown, ...args: A) =>
+        (hook as (...args: A) => R)(...args);
+
+    it("writes the stylesheet from the given compiler, before the build starts", async () => {
+        const dir = await mkdtemp(join(tmpdir(), "pureform-plugin-"));
+        try {
+            const outFile = join(dir, "nested", "styles.css");
+            const plugin = pureformPlugin(
+                {
+                    config: buttonConfig,
+                    compile: (config) =>
+                        `/* ${Object.keys(config.components)} */`,
+                    dts: join(dir, "pureform.d.ts"),
+                },
+                { name: "test", outFile },
+            );
+            expect(plugin.enforce).toBe("pre");
+            await call(plugin.buildStart);
+            expect(await readFile(outFile, "utf8")).toBe("/* button */");
+            expect(
+                await readFile(join(dir, "pureform.d.ts"), "utf8"),
+            ).toContain('declare module "virtual:pureform/recipes" {');
+            // Written to disk, so the stylesheet isn't served as a module.
+            expect(
+                call(plugin.resolveId, "virtual:pureform.css"),
+            ).toBeUndefined();
+        } finally {
+            await rm(dir, { recursive: true });
+        }
+    });
+});
+
+describe("writeIfChanged", () => {
+    it("writes only when the contents differ", async () => {
+        const dir = await mkdtemp(join(tmpdir(), "pureform-write-"));
+        try {
+            const path = join(dir, "a.css");
+            expect(await writeIfChanged(path, "a")).toBe(true);
+            expect(await writeIfChanged(path, "a")).toBe(false);
+            expect(await writeIfChanged(path, "b")).toBe(true);
+        } finally {
+            await rm(dir, { recursive: true });
+        }
     });
 });

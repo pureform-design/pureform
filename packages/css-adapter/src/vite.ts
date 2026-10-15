@@ -4,14 +4,17 @@
 //   import { button } from "virtual:pureform/recipes";
 //
 // Vite processes the stylesheet like any other, so its Lightning CSS transformer applies.
+// Other adapters build their plugins on `pureformPlugin`, compiling the stylesheet their own
+// way (the `compile` option) and writing it to disk for tools that can't read virtual modules.
 
-import { writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { dirname } from "node:path";
 
 import type { CoreConfig } from "@pureform/core/types";
 import type { Plugin } from "vite";
 
 import { generate } from "./generate";
-import type { GenerateOptions } from "./generate";
+import type { GenerateOptions, Generated } from "./generate";
 
 export interface PureformPluginOptions extends GenerateOptions {
     /** The config, or a function returning it. */
@@ -21,15 +24,47 @@ export interface PureformPluginOptions extends GenerateOptions {
     dts?: string;
 }
 
+/** How an adapter's plugin differs from the CSS adapter's. */
+export interface PluginTarget {
+    /** The plugin's name. */
+    name: string;
+    /** Write the stylesheet to this path instead of serving it as `virtual:pureform.css`. */
+    outFile?: string;
+}
+
 const CSS_ID = "virtual:pureform.css";
 const RECIPES_ID = "virtual:pureform/recipes";
 // Vite's convention for virtual ids, so other plugins leave them alone. The stylesheet's id
 // keeps its extension, so Vite treats it as CSS.
 const resolved = (id: string) => `\0${id}`;
 
-/** Serve a config's stylesheet and class name functions as virtual modules. */
-export const pureformCss = (options: PureformPluginOptions): Plugin => {
-    let output: ReturnType<typeof generate> | undefined;
+/** Write a file only when its contents change, so watchers don't reload for nothing. */
+export const writeIfChanged = async (
+    path: string,
+    content: string,
+): Promise<boolean> => {
+    const current = await readFile(path, "utf8").catch(() => undefined);
+    if (current === content) return false;
+    await mkdir(dirname(path), { recursive: true });
+    await writeFile(path, content);
+    return true;
+};
+
+/** The recipes module's declarations, as an ambient module for its virtual id. */
+export const recipesModuleDts = (dts: string): string =>
+    `declare module "${RECIPES_ID}" {\n${dts
+        .split("\n")
+        .filter(Boolean)
+        .map((line) => `    ${line.replace("export declare", "export")}`)
+        .join("\n")}\n}\n`;
+
+/** Serve a config's class name functions as a virtual module, and its stylesheet as another
+ *  or as a file. */
+export const pureformPlugin = (
+    options: PureformPluginOptions,
+    target: PluginTarget,
+): Plugin => {
+    let output: Promise<Generated> | undefined;
     const generated = () => {
         output ??= (async () => {
             const config =
@@ -37,27 +72,26 @@ export const pureformCss = (options: PureformPluginOptions): Plugin => {
                     ? await options.config()
                     : options.config;
             const result = await generate(config, options);
-            if (options.dts) {
-                await writeFile(
-                    options.dts,
-                    `declare module "${RECIPES_ID}" {\n${result.dts
-                        .split("\n")
-                        .filter(Boolean)
-                        .map(
-                            (line) =>
-                                `    ${line.replace("export declare", "export")}`,
-                        )
-                        .join("\n")}\n}\n`,
-                );
-            }
+            await Promise.all([
+                options.dts &&
+                    writeIfChanged(options.dts, recipesModuleDts(result.dts)),
+                target.outFile && writeIfChanged(target.outFile, result.css),
+            ]);
             return result;
         })();
         return output;
     };
     return {
-        name: "pureform-css",
+        name: target.name,
+        // Before other plugins, so a written stylesheet exists when they read it.
+        enforce: "pre",
+        buildStart: async () => {
+            await generated();
+        },
         resolveId: (id) =>
-            id === CSS_ID || id === RECIPES_ID ? resolved(id) : undefined,
+            (id === CSS_ID && !target.outFile) || id === RECIPES_ID
+                ? resolved(id)
+                : undefined,
         load: async (id) => {
             if (id === resolved(CSS_ID)) return (await generated()).css;
             if (id === resolved(RECIPES_ID)) return (await generated()).js;
@@ -65,3 +99,7 @@ export const pureformCss = (options: PureformPluginOptions): Plugin => {
         },
     };
 };
+
+/** Serve a config's stylesheet and class name functions as virtual modules. */
+export const pureformCss = (options: PureformPluginOptions): Plugin =>
+    pureformPlugin(options, { name: "pureform-css" });

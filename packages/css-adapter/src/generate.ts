@@ -16,6 +16,8 @@ export interface GenerateOptions extends CssOptions {
     /** Where the generated modules import the runtime from. Default
      *  `@pureform/css-adapter/runtime`. */
     runtime?: string;
+    /** Compile the stylesheet another way, as other adapters do. Default `compileCss`. */
+    compile?: (config: CoreConfig) => string;
 }
 
 /** The generated files' contents. */
@@ -44,7 +46,7 @@ export const generate = async (
     options: GenerateOptions = {},
 ): Promise<Generated> => {
     const runtime = options.runtime ?? "@pureform/css-adapter/runtime";
-    const css = compileCss(config, options);
+    const css = (options.compile ?? ((c) => compileCss(c, options)))(config);
     const manifests = Object.entries(config.components).map(([name, spec]) => {
         if (!IDENTIFIER.test(name)) {
             throw new Error(`component "${name}" is not a valid export name`);
