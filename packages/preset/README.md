@@ -150,6 +150,18 @@ and close on curves. Browsers without `shape()` (Firefox, for now) keep the roun
 Each shape a page uses adds about 1 to 2 kB of CSS, so avoid `staticCss: ["*"]` for these
 components unless you show every shape.
 
+### Corner shape
+
+The shape provider's `corner` sets how every rounded corner curves: `round` (the default),
+`squircle`, `bevel`, `scoop`, `notch`, or `square`. `pureform()` sets `cornerShape` wherever a
+component rounds a corner, and borders, outlines, and shadows follow it. Browsers without
+`corner-shape` (only Chromium has it so far) keep round corners. Named themes take the base
+theme's corner.
+
+```ts
+pureform({ shape: materialShape({}, { corner: "squircle" }) });
+```
+
 ## Chip
 
 A chip is `outlined` or `elevated`. Mark a filter chip with `aria-pressed="true"`, or a

@@ -77,6 +77,7 @@ import { createTextField } from "./components/text-field";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
+import { withCorner } from "./corners";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -282,6 +283,14 @@ export const pureform = <
                 `theme "${name}" declares density steps ${Object.keys(variant.layout.densities).join(", ")}; components only have variants for the base steps (${Object.keys(theme.layout.densities).join(", ")}), so declare them on the base layout provider`,
             );
         }
+        if (
+            (variant.shape.corner ?? "round") !==
+            (theme.shape.corner ?? "round")
+        ) {
+            throw new ContractError(
+                `theme "${name}" sets corner "${variant.shape.corner ?? "round"}"; components take the base theme's corner ("${theme.shape.corner ?? "round"}"), so set it on the base shape provider`,
+            );
+        }
         themes[name] = themeOverride(theme.config, variant.config);
         colors.push([`theme "${name}"`, variant.color]);
     }
@@ -320,6 +329,9 @@ export const pureform = <
         touchTarget,
         text: createText(Object.keys(theme.typography.styles)),
     };
+    for (const [name, spec] of Object.entries(defaults)) {
+        defaults[name] = withCorner(spec, theme.shape.corner);
+    }
     const chosen = options.components?.({ theme, defaults }) ?? defaults;
     const components = Object.fromEntries(
         Object.entries(chosen).filter(

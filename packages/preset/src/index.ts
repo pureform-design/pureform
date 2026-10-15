@@ -34,5 +34,6 @@ export * from "./components/field";
 export * from "./components/text-area";
 export * from "./components/text-field";
 export * from "./contrast";
+export * from "./corners";
 export * from "./shapes";
 export * from "./pureform";
