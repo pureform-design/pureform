@@ -25,3 +25,7 @@ cache:
 tasks:
   test:e2e:
     enabled: true
+    # The demo's Panda codegen writes the styled-system the tests import.
+    dependencies:
+      append:
+        - ^prepare
