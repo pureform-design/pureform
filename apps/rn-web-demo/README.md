@@ -11,6 +11,6 @@ bun run dev
   `runtimeStyles`, and serves both as `virtual:pureform-rn`, so the page ships only the
   runtime and the data.
 - `src/components.tsx`: the core set (button, chip, checkbox, switch, card, text, avatar) on
-  `Pressable`, `View`, and `Text`, styled with `useRecipe`.
+  `Pressable`, `View`, and `Text`, styled with `useComponentStyles`.
 - `src/App.tsx`: switches the scheme, the teal theme, precomputed or runtime styles, and an
   override of the primary color.

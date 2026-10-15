@@ -2,8 +2,8 @@
 // tracks its interaction state, asks for its slots' styles, and lays the slots out as the web
 // markup does. The interactive ones animate their state changes and ripple when pressed.
 
-import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
-import { useRecipe, useTokens } from "@pureform/rn-adapter/react";
+import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
+import { useComponentStyles, useTokens } from "@pureform/rn-adapter/react";
 import type { ReactNode } from "react";
 import { Animated, Image, Text, View } from "react-native";
 import type { ImageStyle } from "react-native";
@@ -31,7 +31,7 @@ export function Button(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ disabled: props.disabled ?? false });
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "button",
         { variant: props.variant, color: props.color },
         state,
@@ -67,7 +67,11 @@ export function Chip(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected ?? false });
-    const s = useAnimatedRecipe("chip", { variant: props.variant }, state);
+    const s = useAnimatedComponentStyles(
+        "chip",
+        { variant: props.variant },
+        state,
+    );
     const ink = useInk("chip", { variant: props.variant }, state);
     return (
         <AnimatedPressable
@@ -91,7 +95,7 @@ export function Checkbox(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedRecipe("checkbox", {}, state);
+    const s = useAnimatedComponentStyles("checkbox", {}, state);
     return (
         <AnimatedPressable
             {...handlers}
@@ -116,7 +120,7 @@ export function Switch(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedRecipe("switchControl", {}, state);
+    const s = useAnimatedComponentStyles("switchControl", {}, state);
     return (
         <AnimatedPressable
             {...handlers}
@@ -143,7 +147,7 @@ export function Card(props: {
     variant?: "elevated" | "filled" | "outlined";
     children: ReactNode;
 }) {
-    const s = useAnimatedRecipe("card", { variant: props.variant });
+    const s = useAnimatedComponentStyles("card", { variant: props.variant });
     return (
         <Animated.View style={aview(s.root)}>{props.children}</Animated.View>
     );
@@ -159,7 +163,7 @@ type TextStyleName =
 /** Text in a type style. Without CSS inheritance from the page, it takes the surface's text
  *  color unless it sits in a component that sets its own. */
 export function Type(props: { style: TextStyleName; children: ReactNode }) {
-    const s = useRecipe("text", { style: props.style });
+    const s = useComponentStyles("text", { style: props.style });
     const tokens = useTokens();
     return (
         <Text
@@ -175,7 +179,10 @@ export function Avatar(props: {
     size?: "small" | "medium" | "large";
     color?: Color;
 }) {
-    const s = useRecipe("avatar", { size: props.size, color: props.color });
+    const s = useComponentStyles("avatar", {
+        size: props.size,
+        color: props.color,
+    });
     return (
         <View role="img" aria-label={props.initials} style={view(s[""])}>
             <Text style={text(ownText(s[""]))}>{props.initials}</Text>
@@ -188,7 +195,10 @@ export function Icon(props: {
     size?: "small" | "medium" | "large";
     color?: Group;
 }) {
-    const s = useRecipe("icon", { size: props.size, color: props.color });
+    const s = useComponentStyles("icon", {
+        size: props.size,
+        color: props.color,
+    });
     const tokens = useTokens();
     return (
         <View role="img" style={view(s[""])}>
@@ -213,7 +223,7 @@ export function IconButton(props: {
     disabled?: boolean;
 }) {
     const { state, handlers } = usePress({ disabled: props.disabled ?? false });
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "iconButton",
         { variant: props.variant, size: props.size },
         state,
@@ -257,7 +267,7 @@ export function Fab(props: {
     size?: "small" | "medium" | "large";
 }) {
     const { state, handlers } = usePress({});
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "fab",
         {
             variant: props.variant,
@@ -305,7 +315,7 @@ export function Radio(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedRecipe("radio", {}, state);
+    const s = useAnimatedComponentStyles("radio", {}, state);
     return (
         <AnimatedPressable
             {...handlers}
@@ -340,7 +350,7 @@ export function ListItem(props: {
             : props.overline || props.supportingText
               ? "two"
               : "one";
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "listItem",
         { lines, interactive: interactive ? "true" : "false" },
         interactive ? state : {},
@@ -381,7 +391,7 @@ export function ListItem(props: {
 }
 
 export function Separator(props: { inset?: "none" | "start" | "middle" }) {
-    const s = useRecipe("separator", { inset: props.inset });
+    const s = useComponentStyles("separator", { inset: props.inset });
     return <View role="separator" style={view(s[""])} />;
 }
 
@@ -390,7 +400,7 @@ export function LinearProgress(props: {
     value?: number | undefined;
     color?: Group;
 }) {
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "linearProgress",
         {
             color: props.color,
@@ -416,7 +426,7 @@ export function CircularProgress(props: {
     value?: number | undefined;
     color?: Group;
 }) {
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "circularProgress",
         {
             color: props.color,
@@ -447,13 +457,13 @@ export function SupportingText(props: {
     tone?: "neutral" | "error" | "success" | "warning";
     children: ReactNode;
 }) {
-    const s = useRecipe("supportingText", { tone: props.tone });
+    const s = useComponentStyles("supportingText", { tone: props.tone });
     return <Text style={text(s[""])}>{props.children}</Text>;
 }
 
 /** A layer dimming what sits behind it, over the whole of its parent. */
 export function Scrim() {
-    const s = useRecipe("scrim");
+    const s = useComponentStyles("scrim");
     return <View pointerEvents="none" style={view(s.root)} />;
 }
 
@@ -462,7 +472,7 @@ export function Scrim() {
 const PICTURE = `data:image/svg+xml;utf8,${'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><defs><linearGradient id="g" x2="1" y2="1"><stop offset="0" stop-color="#6750A4"/><stop offset="1" stop-color="#7D5260"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/><circle cx="3" cy="0.9" r="0.45" fill="#FFD8E4"/></svg>'}`;
 
 export function Media(props: { aspect?: "square" | "landscape" | "portrait" }) {
-    const { objectFit, ...style } = useRecipe("media", {
+    const { objectFit, ...style } = useComponentStyles("media", {
         aspect: props.aspect,
     })[""]!;
     return (

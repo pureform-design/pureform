@@ -22,11 +22,7 @@ import type { Ref } from "react";
 import { Animated, Easing } from "react-native";
 
 import { animatable, blend } from "../motion";
-import {
-    useReducedMotion,
-    useRecipeWithTransitions,
-    useTokens,
-} from "../react";
+import { useReducedMotion, useComponentState, useTokens } from "../react";
 import type { Style } from "../select";
 import { NATIVE_DRIVER, curve } from "./curve";
 
@@ -184,7 +180,7 @@ export const useRipple = (options: {
     centered?: boolean;
     disabled?: boolean;
 }) => {
-    const { styles, transitions } = useRecipeWithTransitions("ripple");
+    const { styles, transitions } = useComponentState("ripple");
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
     const controller = useRef<Controller>(null);

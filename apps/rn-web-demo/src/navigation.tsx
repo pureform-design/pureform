@@ -1,7 +1,7 @@
 // Navigation and surfaces: tabs, the navigation bar and rail, a menu, a dialog, a snackbar,
 // and tooltips. Each destination, tab, or item tracks its own interaction state.
 
-import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
+import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import type { ReactNode } from "react";
 import { Animated } from "react-native";
 
@@ -29,7 +29,7 @@ function Tab(props: {
     onPress: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected });
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "tabs",
         { variant: props.variant, icon: "true" },
         state,
@@ -69,7 +69,7 @@ export function Tabs(props: {
     onChange: (index: number) => void;
 }) {
     const variant = props.variant ?? "primary";
-    const s = useAnimatedRecipe("tabs", { variant, icon: "true" });
+    const s = useAnimatedComponentStyles("tabs", { variant, icon: "true" });
     return (
         <Animated.View role="tablist" style={aview(s.root)}>
             {props.items.map((item, index) => (
@@ -94,7 +94,7 @@ function NavigationItem(props: {
     onPress: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected });
-    const s = useAnimatedRecipe(props.name, {}, state);
+    const s = useAnimatedComponentStyles(props.name, {}, state);
     const ink = useInk(props.name, {}, state, {
         slot: "indicator",
         centered: true,
@@ -132,7 +132,7 @@ export function NavigationBar(props: {
     rail?: boolean;
 }) {
     const name: Navigation = props.rail ? "navigationRail" : "navigationBar";
-    const s = useAnimatedRecipe(name);
+    const s = useAnimatedComponentStyles(name);
     return (
         <Animated.View role="navigation" style={aview(s.root)}>
             {props.items.map((item, index) => (
@@ -158,7 +158,7 @@ function MenuItem(props: {
         selected: props.selected,
         disabled: props.disabled ?? false,
     });
-    const s = useAnimatedRecipe("menu", {}, state);
+    const s = useAnimatedComponentStyles("menu", {}, state);
     const ink = useInk("menu", {}, state, {
         slot: "item",
         ...(props.disabled ? { disabled: true } : {}),
@@ -202,7 +202,7 @@ export function Menu(props: {
     value: number;
     onChange: (index: number) => void;
 }) {
-    const s = useAnimatedRecipe("menu");
+    const s = useAnimatedComponentStyles("menu");
     return (
         <Animated.View role="menu" style={aview(s.root)}>
             {props.items.map((item, index) => (
@@ -224,7 +224,7 @@ export function Dialog(props: {
     children: ReactNode;
     actions: { label: string; onPress?: () => void }[];
 }) {
-    const s = useAnimatedRecipe("dialog", {
+    const s = useAnimatedComponentStyles("dialog", {
         icon: props.glyph ? "true" : "false",
     });
     return (
@@ -264,7 +264,7 @@ function SnackbarButton(props: {
     text: string;
 }) {
     const { state, handlers } = usePress({});
-    const s = useAnimatedRecipe("snackbar", {}, state);
+    const s = useAnimatedComponentStyles("snackbar", {}, state);
     return (
         <AnimatedPressable
             {...handlers}
@@ -278,7 +278,7 @@ function SnackbarButton(props: {
 }
 
 export function Snackbar(props: { message: string; action?: string }) {
-    const s = useAnimatedRecipe("snackbar");
+    const s = useAnimatedComponentStyles("snackbar");
     return (
         <Animated.View role="status" style={aview(s.root)}>
             <Animated.Text style={atext(s.supportingText)}>
@@ -298,7 +298,7 @@ export function Snackbar(props: { message: string; action?: string }) {
 
 export function Tooltip(props: { children: string; subhead?: string }) {
     const rich = props.subhead !== undefined;
-    const s = useAnimatedRecipe("tooltip", {
+    const s = useAnimatedComponentStyles("tooltip", {
         variant: rich ? "rich" : "plain",
     });
     if (!rich) {

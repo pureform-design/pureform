@@ -54,7 +54,7 @@ in the catalog, for oklch and mixing).
 - `lowerRn(config, options)`: every component as style templates.
 - `resolveTheme(config, { scheme, theme })`: the token values for one scheme and named theme.
 - `resolve(templates, theme)`: plain style objects. Precomputing is running this ahead of time.
-- `@pureform/rn-adapter/react`: `PureformProvider` (scheme, theme, mode), `useRecipe(name,
+- `@pureform/rn-adapter/react`: `PureformProvider` (scheme, theme, mode), `useComponentStyles(name,
 variants, state)`, and a `pressableState` helper mapping `Pressable`'s callback state.
   React and React Native are peer dependencies of this entry only.
 
@@ -146,7 +146,7 @@ conversion too, so the mixer stays as small as the color spaces the config uses.
 
 ## Runtime
 
-`useRecipe("button", { variant: "tonal" }, state)` returns styles per slot:
+`useComponentStyles("button", { variant: "tonal" }, state)` returns styles per slot:
 
 1. Start from the slot's base, then the selected variant values, then matching compound
    variants, as the CSS layers order them.
@@ -220,7 +220,7 @@ overrides the primary color in either mode.
   functions, written as `rgba()` as they come in.
 - **Units in calc:** sums and comparisons keep one unit, a product at most one, so a value
   times 1% is a percentage and an angle sum stays in degrees. Percentages can't meet pixels.
-- **Per-instance tokens:** `useRecipe` and `useAnimatedRecipe` take token values for one
+- **Per-instance tokens:** `useComponentStyles` and `useAnimatedComponentStyles` take token values for one
   instance, such as a progress indicator's value.
 - **Animated colors** blend premultiplied, through eight stops, so fades don't dip through gray.
 - **Parity:** the browser tests compare every slot of the covered components across every
@@ -228,7 +228,7 @@ overrides the primary color in either mode.
   and outline rings of shape variants, which clip on the web and fall back to rounded corners
   and borders here.
 - **Keyframe animations** lower with their frames inside them, so themes resolve the frames,
-  and `useAnimatedRecipe` loops them with `Animated`; indeterminate progress slides and spins.
+  and `useAnimatedComponentStyles` loops them with `Animated`; indeterminate progress slides and spins.
 - **Focus rings** show for keyboard focus only on the web, following the latest input as
   browsers decide `:focus-visible`; native focus is always visible.
 - **Derived tokens:** building keeps the formula of each token that reads others, and an
@@ -268,7 +268,7 @@ reduced motion.
 
 A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of React Native:
 
-- `useAnimatedRecipe(name, variants, state)` returns per slot a style in which each property
+- `useAnimatedComponentStyles(name, variants, state)` returns per slot a style in which each property
   with a transition is an animated value, to pass to `Animated.View` and `Animated.Text`.
 - Each such property has an `Animated.Value` for progress, driven by `Animated.timing` with
   `Easing.bezier` and the transition's duration, from the value it's showing to the new one.
@@ -304,7 +304,7 @@ A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of R
 ### Steps
 
 1. Lower transitions, durations, and easings; return them from selection.
-2. The `animated` entry: `useAnimatedRecipe`, interpolation, interruption, reduced motion.
+2. The `animated` entry: `useAnimatedComponentStyles`, interpolation, interruption, reduced motion.
 3. The demo on animated components.
 4. Unit and browser tests.
 
@@ -314,7 +314,7 @@ A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of R
 2. Lowering: nodes, properties, conditions into state layers, inheritance.
 3. `resolveTheme`, `resolve`, color conversion and mixing, both modes.
 4. Overrides on precomputed styles: the dependency index and the mixer.
-5. The React entry: provider, `useRecipe`, `pressableState`, and an `overrides` prop.
+5. The React entry: provider, `useComponentStyles`, `pressableState`, and an `overrides` prop.
 6. The React Native Web demo, with a brand color override in both modes.
 7. Browser parity tests.
 8. Docs: the design doc's adapter section.

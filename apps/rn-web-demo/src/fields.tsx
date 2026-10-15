@@ -2,8 +2,8 @@
 // focus and value, which the field's container and label read as the web's :focus-within and
 // a filled input.
 
-import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
-import { pressableState, useRecipe } from "@pureform/rn-adapter/react";
+import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
+import { pressableState, useComponentStyles } from "@pureform/rn-adapter/react";
 import { useRef, useState } from "react";
 import type { Ref } from "react";
 import {
@@ -63,7 +63,7 @@ function Field(
 ) {
     const [ownFocus, setFocused] = useState(false);
     const focused = ownFocus || (props.expanded ?? false);
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         props.name,
         {
             variant: props.variant,
@@ -213,9 +213,10 @@ export function SearchBar(props: {
         focusVisible: focused,
         filled: props.value !== "",
     };
-    const s = useAnimatedRecipe("searchBar", {}, searchState);
+    const s = useAnimatedComponentStyles("searchBar", {}, searchState);
     // A placeholder's color is a prop, so it takes the plain value rather than an animated one.
-    const placeholder = useRecipe("searchBar", {}, searchState).input?.color;
+    const placeholder = useComponentStyles("searchBar", {}, searchState).input
+        ?.color;
     return (
         <AnimatedPressable
             {...handlers}
@@ -265,7 +266,7 @@ export function Slider(props: {
             ) => void,
         ) => void;
     }>(null);
-    const s = useAnimatedRecipe(
+    const s = useAnimatedComponentStyles(
         "slider",
         {},
         {

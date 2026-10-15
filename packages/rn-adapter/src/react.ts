@@ -97,13 +97,13 @@ export const useTokens = (): ThemeValues =>
 /** A component's styles per slot, and each slot's transitions, for its variants and state.
  *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
  *  one element: `{ "components.linearProgress.value": 40 }`. */
-export const useRecipeWithTransitions = (
+export const useComponentState = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
 ): Selected => {
-    const context = useContextOrThrow("useRecipe");
+    const context = useContextOrThrow("useComponentStyles");
     const tokenKey = tokens ? JSON.stringify(tokens) : "";
     const own = useMemo(
         () =>
@@ -143,13 +143,13 @@ export const useRecipeWithTransitions = (
 };
 
 /** A component's styles per slot, or its one style under `""` without slots. */
-export const useRecipe = (
+export const useComponentStyles = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
 ): Record<string, Style> =>
-    useRecipeWithTransitions(name, variants, state, tokens).styles;
+    useComponentState(name, variants, state, tokens).styles;
 
 // Whether the latest input was a key press rather than a pointer, as browsers decide
 // :focus-visible. Native apps have no document, and focus there comes from a keyboard or

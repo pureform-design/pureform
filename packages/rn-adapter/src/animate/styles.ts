@@ -2,7 +2,7 @@
 // value, and each keyframe animation runs, through React Native's Animated, which React
 // Native Web runs too. Pass the slots' styles to `Animated.View` and `Animated.Text`.
 
-import { useRecipeWithTransitions } from "../react";
+import { useComponentState } from "../react";
 import type { State } from "../select";
 import type { ThemeValues } from "../values";
 import { useKeyframes } from "./keyframes";
@@ -10,14 +10,18 @@ import { useTransitions } from "./transitions";
 
 /** A component's styles per slot, with transitioned and keyframed properties as animated
  *  values. `tokens` gives this one instance its own token values. */
-export const useAnimatedRecipe = (
+export const useAnimatedComponentStyles = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
     tokens?: ThemeValues,
 ): Record<string, Record<string, unknown>> => {
-    const { styles, transitions, animations, parents } =
-        useRecipeWithTransitions(name, variants, state, tokens);
+    const { styles, transitions, animations, parents } = useComponentState(
+        name,
+        variants,
+        state,
+        tokens,
+    );
     const transition = useTransitions();
     const keyframes = useKeyframes();
     const out: Record<string, Record<string, unknown>> = {};

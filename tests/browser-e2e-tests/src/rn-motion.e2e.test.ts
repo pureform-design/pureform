@@ -1,9 +1,9 @@
-// State transitions through React Native Web: a button's root animated by useAnimatedRecipe
+// State transitions through React Native Web: a button's root animated by useAnimatedComponentStyles
 // moves from its rest color to its hover color over the transition's duration, rather than at
 // once, and changes at once under reduced motion.
 
 import type { PrecomputedStyles } from "@pureform/rn-adapter";
-import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
+import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import { PureformProvider } from "@pureform/rn-adapter/react";
 import { createElement } from "react";
 import { flushSync } from "react-dom";
@@ -27,7 +27,11 @@ afterEach(() => {
 });
 
 const Button = (props: { hover: boolean }) => {
-    const slots = useAnimatedRecipe("button", {}, { hover: props.hover });
+    const slots = useAnimatedComponentStyles(
+        "button",
+        {},
+        { hover: props.hover },
+    );
     return createElement(Animated.View, {
         testID: "root",
         style: slots.root as never,
@@ -54,7 +58,7 @@ const channels = (color: string) =>
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe("useAnimatedRecipe", () => {
+describe("useAnimatedComponentStyles", () => {
     const mount = () => {
         host = document.createElement("div");
         document.body.append(host);
@@ -94,7 +98,7 @@ describe("useAnimatedRecipe", () => {
 });
 
 const Spinner = () => {
-    const slots = useAnimatedRecipe("circularProgress", {
+    const slots = useAnimatedComponentStyles("circularProgress", {
         indeterminate: "true",
     });
     return createElement(Animated.View, {
@@ -104,7 +108,7 @@ const Spinner = () => {
 };
 
 const Elevated = (props: { hover: boolean }) => {
-    const slots = useAnimatedRecipe(
+    const slots = useAnimatedComponentStyles(
         "button",
         { variant: "elevated" },
         { hover: props.hover },

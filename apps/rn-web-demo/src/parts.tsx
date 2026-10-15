@@ -3,7 +3,7 @@
 
 import type { State, Style } from "@pureform/rn-adapter";
 import { useRipple } from "@pureform/rn-adapter/animated";
-import { pressableState, useRecipe } from "@pureform/rn-adapter/react";
+import { pressableState, useComponentStyles } from "@pureform/rn-adapter/react";
 import { useState } from "react";
 import type { ComponentProps } from "react";
 import { Animated, Pressable } from "react-native";
@@ -63,7 +63,9 @@ export const useInk = (
     state: State,
     options: { slot?: string; centered?: boolean; disabled?: boolean } = {},
 ) => {
-    const own = useRecipe(name, variants, state)[options.slot ?? "root"];
+    const own = useComponentStyles(name, variants, state)[
+        options.slot ?? "root"
+    ];
     const radius = own?.borderRadius;
     return useRipple({
         color: String(own?.color ?? "rgb(0, 0, 0)"),

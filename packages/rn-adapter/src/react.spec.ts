@@ -7,7 +7,7 @@ import { precompute, runtimeStyles } from "./build";
 import {
     PureformProvider,
     pressableState,
-    useRecipe,
+    useComponentStyles,
     useTokens,
 } from "./react";
 import type { Overrides, Styles } from "./resolve";
@@ -34,7 +34,7 @@ const rootStyle = (
             "pre",
             null,
             JSON.stringify(
-                useRecipe("button", { variant: "filled" }, state).root,
+                useComponentStyles("button", { variant: "filled" }, state).root,
             ),
         );
     const html = renderToString(
@@ -45,7 +45,7 @@ const rootStyle = (
     ) as Record<string, unknown>;
 };
 
-describe("PureformProvider and useRecipe", () => {
+describe("PureformProvider and useComponentStyles", () => {
     it("give a component's styles for the scheme", () => {
         const light = rootStyle({ styles: precomputed, scheme: "light" });
         const dark = rootStyle({ styles: precomputed, scheme: "dark" });
@@ -119,7 +119,7 @@ describe("PureformProvider and useRecipe", () => {
                 "i",
                 null,
                 String(
-                    useRecipe(
+                    useComponentStyles(
                         "linearProgress",
                         {},
                         {},
@@ -142,7 +142,7 @@ describe("PureformProvider and useRecipe", () => {
 
     it("need a provider", () => {
         const Probe = () =>
-            createElement("i", null, String(useRecipe("button")));
+            createElement("i", null, String(useComponentStyles("button")));
         expect(() => renderToString(createElement(Probe))).toThrow(
             "needs a PureformProvider",
         );
