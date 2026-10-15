@@ -1,7 +1,8 @@
 // The pureform checkbox: Material's checkbox, checked, unchecked, or indeterminate.
 //
-// Markup: a native checkbox laid over the control, and the box holding both marks. Render your
-// own check and dash icons (an svg or a glyph); each shows only in its state. Set the
+// Markup: a native checkbox laid over the control, and the box holding both marks. The marks
+// draw themselves (the check from two borders, the dash as a bar), so their slots stay empty;
+// each shows only in its state. Set the
 // indeterminate state through the input's `indeterminate` property, and errors with
 // `aria-invalid="true"`.
 //
@@ -9,8 +10,8 @@
 //     <span class={touchTarget} />
 //     <input class={input} type="checkbox" />
 //     <span class={box}>
-//       <span class={checkIcon}>✓</span>
-//       <span class={indeterminateIcon}>–</span>
+//       <span class={checkIcon} />
+//       <span class={indeterminateIcon} />
 //     </span>
 //   </span>
 
@@ -27,6 +28,10 @@ import {
     transparent,
     unitless,
     when,
+    numeric,
+    rotate,
+    transform,
+    translateY,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
@@ -59,7 +64,11 @@ const { tokens, ref } = componentTokens("checkbox", {
     boxSize: px(18),
     boxRadius: px(2),
     borderWidth: px(2),
-    iconSize: px(14),
+    // The check is an L of two borders turned 45 degrees; the dash is a bar.
+    checkWidth: px(6),
+    checkHeight: px(11),
+    dashWidth: px(10),
+    markThickness: px(2),
     borderColor: sys("onSurfaceVariant"),
     checkedColor: sys("primary"),
     iconColor: sys("onPrimary"),
@@ -94,8 +103,8 @@ const colored = ({ checked, onChecked }: CheckboxColors) => ({
             .on([CONTROL_DISABLED, MARKED[1]], disabledColor("disabledContent"))
             .else(transparent),
     },
-    checkIcon: { color: iconColor(onChecked) },
-    indeterminateIcon: { color: iconColor(onChecked) },
+    checkIcon: { borderColor: iconColor(onChecked) },
+    indeterminateIcon: { backgroundColor: iconColor(onChecked) },
 });
 
 const iconColor = (rest: ColorValue) =>
@@ -104,15 +113,8 @@ const iconColor = (rest: ColorValue) =>
         .on(CONTROL_DISABLED, ref("disabledIconColor"))
         .else(rest);
 
-const icon = {
+const mark = {
     position: absolute,
-    display: inlineFlex,
-    alignItems: center,
-    justifyContent: center,
-    width: ref("iconSize"),
-    height: ref("iconSize"),
-    fontSize: ref("iconSize"),
-    lineHeight: unitless(1),
     pointerEvents: none,
 } as const;
 
@@ -122,7 +124,7 @@ export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
         name: "checkbox",
         $meta: {
             description:
-                "Material checkbox over a native input. Render a check icon and an indeterminate icon; each shows in its state.",
+                "Material checkbox over a native input. Render the empty checkIcon and indeterminateIcon slots; each draws its mark in its state.",
         },
         tokens,
         slots: [
@@ -173,14 +175,26 @@ export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
                             .else(ref("borderColor")),
                     },
                     checkIcon: {
-                        ...icon,
+                        ...mark,
+                        width: ref("checkWidth"),
+                        height: ref("checkHeight"),
+                        borderStyle: solid,
+                        borderWidth: px(0),
+                        borderInlineEndWidth: ref("markThickness"),
+                        borderBlockEndWidth: ref("markThickness"),
+                        transform: transform(
+                            translateY(px(-1)),
+                            rotate(numeric(45, "deg")),
+                        ),
                         opacity: when()
                             .on(CONTROL_CHECKED, unitless(1))
                             .on(INDETERMINATE, unitless(0))
                             .else(unitless(0)),
                     },
                     indeterminateIcon: {
-                        ...icon,
+                        ...mark,
+                        width: ref("dashWidth"),
+                        height: ref("markThickness"),
                         opacity: when()
                             .on(INDETERMINATE, unitless(1))
                             .else(unitless(0)),

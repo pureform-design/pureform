@@ -89,13 +89,13 @@ input; the label, icons, and supporting text follow it.
 keyboard, and screen readers work unchanged. `color` sets the checked colors.
 
 ```html
-<!-- checkbox: set input.indeterminate for the dash -->
+<!-- checkbox: the marks draw themselves; set input.indeterminate for the dash -->
 <label class="{root}">
     <span class="{touchTarget}"></span>
     <input class="{input}" type="checkbox" />
     <span class="{box}">
-        <span class="{checkIcon}">✓</span>
-        <span class="{indeterminateIcon}">–</span>
+        <span class="{checkIcon}"></span>
+        <span class="{indeterminateIcon}"></span>
     </span>
 </label>
 

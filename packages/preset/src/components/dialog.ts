@@ -15,7 +15,7 @@
 //   </dialog>
 
 import { defineSlotComponent } from "@pureform/core";
-import { center, column, end, flex, pct, px, row } from "@pureform/core/ast";
+import { auto, center, column, end, flex, px, row } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import { size as sizeToken } from "@pureform/theme";
 
@@ -81,8 +81,7 @@ export const dialog = defineSlotComponent({
         variants: {
             icon: {
                 true: {
-                    // The icon's box spans the dialog and centers the icon in it.
-                    icon: { width: pct(100) },
+                    icon: { marginInlineStart: auto, marginInlineEnd: auto },
                     headline: { textAlign: center },
                 },
                 false: {},

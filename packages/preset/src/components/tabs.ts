@@ -17,7 +17,6 @@ import {
     absolute,
     column,
     flex,
-    pct,
     px,
     row,
     shadow,
@@ -97,7 +96,7 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
                     flexDirection: row,
                     backgroundColor: ref("container"),
                 },
-                // Every tab is as wide as the list, so they shrink to equal shares.
+                // Tabs share the list's width equally.
                 tab: {
                     ...pressableRoot,
                     ...tabColors(ref("activeColor")),
@@ -105,7 +104,9 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
                         ...pressableRoot.states,
                         ...tabColors(ref("activeColor")).states,
                     },
-                    width: pct(100),
+                    flexBasis: px(0),
+                    flexGrow: unitless(1),
+                    minWidth: px(0),
                     height: ref("height"),
                     // The divider under the tabs: an inset shadow on each tab, so it takes no space
                     // and draws over the tab's state layer.

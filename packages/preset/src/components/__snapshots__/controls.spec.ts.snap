@@ -36,17 +36,16 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-checkbox-boxSize, 18px)",
     },
     "checkIcon": {
-      "alignItems": "center",
-      "color": {
+      "borderBlockEndWidth": "var(--components-checkbox-markThickness, 2px)",
+      "borderColor": {
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
         ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
         "base": "var(--components-checkbox-iconColor, token(colors.onPrimary))",
       },
-      "display": "inline-flex",
-      "fontSize": "var(--components-checkbox-iconSize, 14px)",
-      "height": "var(--components-checkbox-iconSize, 14px)",
-      "justifyContent": "center",
-      "lineHeight": "1",
+      "borderInlineEndWidth": "var(--components-checkbox-markThickness, 2px)",
+      "borderStyle": "solid",
+      "borderWidth": "0px",
+      "height": "var(--components-checkbox-checkHeight, 11px)",
       "opacity": {
         ".checkbox__root:is(:checked, :has(:checked), [aria-checked=true], [data-checked]) &": "1",
         ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "0",
@@ -54,27 +53,23 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
       },
       "pointerEvents": "none",
       "position": "absolute",
-      "width": "var(--components-checkbox-iconSize, 14px)",
+      "transform": "translateY(-1px) rotate(45deg)",
+      "width": "var(--components-checkbox-checkWidth, 6px)",
     },
     "indeterminateIcon": {
-      "alignItems": "center",
-      "color": {
+      "backgroundColor": {
         ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
         ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
         "base": "var(--components-checkbox-iconColor, token(colors.onPrimary))",
       },
-      "display": "inline-flex",
-      "fontSize": "var(--components-checkbox-iconSize, 14px)",
-      "height": "var(--components-checkbox-iconSize, 14px)",
-      "justifyContent": "center",
-      "lineHeight": "1",
+      "height": "var(--components-checkbox-markThickness, 2px)",
       "opacity": {
         ".checkbox__root:is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]):is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]) &": "1",
         "base": "0",
       },
       "pointerEvents": "none",
       "position": "absolute",
-      "width": "var(--components-checkbox-iconSize, 14px)",
+      "width": "var(--components-checkbox-dashWidth, 10px)",
     },
     "input": {
       "cursor": "pointer",
@@ -158,14 +153,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onError)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onError)",
@@ -197,14 +192,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onInfo)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onInfo)",
@@ -237,14 +232,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSecondary)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSecondary)",
@@ -276,14 +271,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSuccess)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onSuccess)",
@@ -315,14 +310,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onTertiary)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onTertiary)",
@@ -354,14 +349,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "checkIcon": {
-          "color": {
+          "borderColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onWarning)",
           },
         },
         "indeterminateIcon": {
-          "color": {
+          "backgroundColor": {
             ".checkbox__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-checkbox-disabledIconColor, token(colors.surface))",
             ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
             "base": "token(colors.onWarning)",
