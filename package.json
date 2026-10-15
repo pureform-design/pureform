@@ -38,6 +38,8 @@
         "@pureform/material": "workspace:^",
         "@pureform/theme": "workspace:^",
         "@pureform/panda-adapter": "workspace:^",
+        "@pureform/css-lowering": "workspace:^",
+        "@pureform/css-adapter": "workspace:^",
         "@pureform/preset": "workspace:^",
         "typescript": "^7.0.2",
         "@typescript/typescript6": "^6.0.2",

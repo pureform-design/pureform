@@ -1,6 +1,6 @@
-// Runtime theming: a config's tokens as the CSS vars Panda reads.
+// Runtime theming: a config's tokens as the CSS vars the components read.
 //
-// Panda bakes recipes, text styles, and utilities into static CSS at build time, but every
+// Adapters bake recipes, text styles, and utilities into static CSS at build time, but every
 // token is a CSS var. Setting those vars on an element retheme everything inside it with no
 // rebuild, as long as the new config has the same recipes. `themeVars` computes them.
 
@@ -9,14 +9,14 @@ import type { ConditionalNode, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, Token } from "@pureform/core/types";
 
 import { compileNodeToCSS } from "./compile-node";
-import { aliasTarget, tokenVarName } from "./css";
-import type { CompileCtx } from "./options";
+import type { LowerCtx, VarPrefix } from "./context";
+import { aliasTarget, tokenVarName, varTokenRef } from "./css";
 
 export interface ThemeVarsOptions {
-    /** Panda's own `prefix`, if the Panda config sets one. Default none. */
+    /** The token var prefix, if the adapter sets one (Panda's own `prefix`). Default none. */
     tokenPrefix?: string;
-    /** The pureform component var prefix, as passed to `compilePreset`. Default none. */
-    prefix?: CompileCtx["prefix"];
+    /** The pureform component var prefix, as passed to the adapter. Default none. */
+    prefix?: VarPrefix;
     /** Resolve scheme-dependent tokens for this scheme. Without it they are left out. */
     scheme?: "light" | "dark";
 }
@@ -38,7 +38,7 @@ const forScheme = (
 /** Every token in `config` as a CSS var name and value, ready for `element.style.setProperty`.
  *  Values that reference other tokens spell the var, so they follow overrides too.
  *
- *  A token that varies by color scheme needs `scheme` to resolve, since Panda declares it on
+ *  A token that varies by color scheme needs `scheme` to resolve, since the adapter declares it on
  *  the root and an override on a descendant would not reach it. Pass the scheme the page shows,
  *  and recompute when it changes. Other conditional tokens are left out. Text styles and
  *  utilities are not vars, so a provider that changes them needs a rebuild. */
@@ -46,12 +46,11 @@ export const themeVars = (
     config: CoreConfig,
     options: ThemeVarsOptions = {},
 ): Record<string, string> => {
-    const ctx: CompileCtx = {
+    const ctx: LowerCtx = {
         config,
         prefix: options.prefix,
         target: "css",
-        refStyle: "var",
-        ...(options.tokenPrefix ? { tokenPrefix: options.tokenPrefix } : {}),
+        tokenRef: varTokenRef(options.tokenPrefix),
     };
     const vars: Record<string, string> = {};
 

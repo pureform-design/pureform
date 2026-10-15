@@ -11,9 +11,9 @@ import type {
     ComponentSpec,
     SlottedComponentSpec,
 } from "@pureform/core/types";
+import { compileStyleMap } from "@pureform/css-lowering";
 
 import type { CompileCtx } from "./options";
-import { compileStyleMap } from "./style-map";
 
 const capitalize = (s: string): string =>
     s.charAt(0).toUpperCase() + s.slice(1);

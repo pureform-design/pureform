@@ -2,14 +2,18 @@
 // styles, keyframes, and utilities.
 
 import { tokenValue } from "@pureform/core";
-import type { StyleMap, ValueNode } from "@pureform/core/ast";
+import type { ValueNode } from "@pureform/core/ast";
 import type { Token, UtilityDef } from "@pureform/core/types";
+import {
+    compileConditional,
+    compileNodeToCSS,
+    compileStyleMap,
+    compileTemplate,
+} from "@pureform/css-lowering";
+import type { CondObject } from "@pureform/css-lowering";
 
-import { compileNodeToCSS } from "./compile-node";
-import { compileConditional } from "./conditions";
-import type { CondObject } from "./conditions";
+import { tokenCurly } from "./options";
 import type { CompileCtx } from "./options";
-import { compileStyleMap } from "./style-map";
 
 // Core token group to Panda token category. Groups not listed keep their name (`colors`,
 // `spacing`, `radii`, `sizes` are already Panda categories).
@@ -61,7 +65,7 @@ export const compileThemeTokens = (
 ): Record<string, PandaTokenGroup> => {
     const { config } = ctx;
     // Token definitions resolve the curly `{...}` ref form, not `token(...)`.
-    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
+    const tctx: CompileCtx = { ...ctx, tokenRef: tokenCurly };
     const out: Record<string, PandaTokenGroup> = {};
     for (const [group, entries] of Object.entries(config.tokens)) {
         out[CATEGORY[group] ?? group] = groupToPanda(entries, tctx);
@@ -77,7 +81,7 @@ export const compileThemeTokens = (
 export const compileSemanticTokens = (
     ctx: CompileCtx,
 ): Record<string, PandaTokenGroup> => {
-    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
+    const tctx: CompileCtx = { ...ctx, tokenRef: tokenCurly };
     return Object.fromEntries(
         Object.entries(ctx.config.semanticTokens).map(([group, entries]) => [
             CATEGORY[group] ?? group,
@@ -130,45 +134,6 @@ export const compileKeyframes = (
             ),
         ]),
     );
-};
-
-// Replace every utilityArg in a template with the call-site value, so a dynamic utility's
-// transform can compile a concrete style. Single-arg only (what Panda passes); object/array
-// args pick a member by key.
-const substituteArgs = (node: ValueNode, value: string): ValueNode => {
-    if (node.type === "utilityArg") {
-        return { type: "literal", value };
-    }
-    const clone = structuredClone(node) as unknown as Record<string, unknown>;
-    for (const [k, v] of Object.entries(clone)) {
-        if (Array.isArray(v)) {
-            clone[k] = v.map((item) =>
-                isNode(item) ? substituteArgs(item, value) : item,
-            );
-        } else if (isNode(v)) {
-            clone[k] = substituteArgs(v, value);
-        }
-    }
-    return clone as unknown as ValueNode;
-};
-
-const isNode = (v: unknown): v is ValueNode =>
-    typeof v === "object" &&
-    v !== null &&
-    typeof (v as ValueNode).type === "string";
-
-const compileTemplate = (
-    template: StyleMap,
-    value: string,
-    ctx: CompileCtx,
-): Record<string, unknown> => {
-    const substituted = Object.fromEntries(
-        Object.entries(template as Record<string, unknown>).map(([k, v]) => [
-            k,
-            isNode(v) ? substituteArgs(v, value) : v,
-        ]),
-    ) as StyleMap;
-    return compileStyleMap(substituted, ctx);
 };
 
 type PandaUtility = {

@@ -2,7 +2,7 @@ import { defineConfig, mergeConfigs } from "@pureform/core";
 import { alias, hex } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { materialState } from "@pureform/material";
-import { compileStyleMap } from "@pureform/panda-adapter";
+import { compileStyleMap, pandaContext } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
 import { stateLayer } from "./state-layer";
@@ -56,7 +56,7 @@ describe("stateLayer", () => {
     it("lowers to a Panda conditional background", () => {
         const css = compileStyleMap(
             { backgroundColor: stateLayer({ base, content }) },
-            { config, target: "css", refStyle: "fn", prefix: undefined },
+            pandaContext(config),
         );
         expect(css).toEqual({
             backgroundColor: {

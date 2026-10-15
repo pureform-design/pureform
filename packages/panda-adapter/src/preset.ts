@@ -4,9 +4,9 @@ import type { Preset } from "@pandacss/types";
 import { tokenValue, validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
+import { compileNodeToCSS, varName } from "@pureform/css-lowering";
 
-import { compileNodeToCSS } from "./compile-node";
-import { varName } from "./css";
+import { pandaContext, tokenCurly } from "./options";
 import type { CompileCtx, CompileOptions } from "./options";
 import { compileRecipes } from "./recipes";
 import {
@@ -26,7 +26,7 @@ const compileTokenGroups = (
 ) => {
     if (!groups || Object.keys(groups).length === 0) return undefined;
     // Token definitions use the curly ref form.
-    const tctx: CompileCtx = { ...ctx, refStyle: "curly" };
+    const tctx: CompileCtx = { ...ctx, tokenRef: tokenCurly };
     return Object.fromEntries(
         Object.entries(groups).map(([group, entries]) => [
             pandaCategory(group),
@@ -130,13 +130,7 @@ export const compilePreset = (
     options: CompileOptions = {},
 ): Preset => {
     validateConfig(config);
-    const ctx: CompileCtx = {
-        config,
-        prefix: options.prefix,
-        ...(options.pandaPrefix ? { tokenPrefix: options.pandaPrefix } : {}),
-        target: options.target ?? "css",
-        refStyle: "fn",
-    };
+    const ctx = pandaContext(config, options);
 
     const { recipes, slotRecipes } = compileRecipes(ctx);
     const themes = config.themes

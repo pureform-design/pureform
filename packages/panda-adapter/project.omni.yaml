@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/core"
+    - "@pureform/css-lowering"
 
 tasks:
   test:unit:

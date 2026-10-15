@@ -56,6 +56,20 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/css-lowering"]
+path = "packages/css-lowering"
+include = [
+    "packages/css-lowering/**",
+]
+public_api = false
+
+[monorepo.packages."@pureform/css-adapter"]
+path = "packages/css-adapter"
+include = [
+    "packages/css-adapter/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]

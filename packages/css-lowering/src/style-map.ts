@@ -1,16 +1,16 @@
-// Compile a `StyleMap` to a Panda style object.
+// Compile a `StyleMap` to a style object.
 //
 // Each property value is compiled through `compileValue`, so a conditional becomes a nested
-// conditional object. `apply` passes through as native Panda utility invocations (declared
-// first so explicit properties win on conflict), `states` lower to Panda condition keys, and
-// `rawRules` emit the target's raw nested selectors.
+// conditional object. `apply` passes through as utility invocations (declared first so explicit
+// properties win on conflict), `states` lower to condition keys, and `rawRules` emit the
+// target's raw nested selectors.
 
 import type { StyleMap } from "@pureform/core/ast";
 import type { Condition, ValueNode } from "@pureform/core/ast";
 
 import { compileNodeToCSS } from "./compile-node";
 import { compileValue, conditionKey } from "./conditions";
-import type { CompileCtx } from "./options";
+import type { LowerCtx } from "./context";
 
 type ApplyArg = string | ValueNode | Record<string, ValueNode> | ValueNode[];
 
@@ -19,7 +19,7 @@ const isNode = (v: unknown): v is ValueNode =>
     v !== null &&
     typeof (v as ValueNode).type === "string";
 
-const compileApplyArg = (arg: ApplyArg, ctx: CompileCtx): unknown => {
+const compileApplyArg = (arg: ApplyArg, ctx: LowerCtx): unknown => {
     if (typeof arg === "string") return arg;
     if (Array.isArray(arg)) return arg.map((a) => compileNodeToCSS(a, ctx));
     if (isNode(arg)) return compileNodeToCSS(arg, ctx);
@@ -30,7 +30,7 @@ const compileApplyArg = (arg: ApplyArg, ctx: CompileCtx): unknown => {
 
 export const compileStyleMap = (
     map: StyleMap,
-    ctx: CompileCtx,
+    ctx: LowerCtx,
 ): Record<string, unknown> => {
     const out: Record<string, unknown> = {};
     const m = map as Record<string, unknown>;

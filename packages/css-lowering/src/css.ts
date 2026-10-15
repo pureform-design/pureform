@@ -1,9 +1,9 @@
 // CSS spelling primitives shared by the node and style compilers: the keyword table, name
-// hyphenation, color formatting, var naming, and the alias-to-Panda-token mapping.
+// hyphenation, color formatting, var naming, and the alias-to-token mapping.
 
 import type { ColorNode } from "@pureform/core/ast";
 
-import type { VarPrefix } from "./options";
+import type { VarPrefix } from "./context";
 
 /** Canonical camelCase keyword to its web spelling. Only tokens whose CSS form differs from
  *  the token appear here; everything else (`center`, `flex`, `solid`, `transparent`, `start`,
@@ -75,8 +75,9 @@ export const varName = (
     return `--${[p, tier, ...rest].filter(Boolean).join("-")}`;
 };
 
-/** Core token group to the Panda token category it lowers to. Groups not listed pass through
- *  unchanged (for example `colors`, `spacing`, `radii`, `sizes` are already Panda categories). */
+/** Core token group to the token category it lowers to, which names its vars. The names are
+ *  Panda's, so both adapters emit the same vars. Groups not listed pass through unchanged (for
+ *  example `colors`, `spacing`, `radii`, `sizes`). */
 const TOKEN_CATEGORY: Record<string, string> = {
     fontSize: "fontSizes",
     fontWeight: "fontWeights",
@@ -85,9 +86,9 @@ const TOKEN_CATEGORY: Record<string, string> = {
     borderWidth: "borderWidths",
 };
 
-/** Where an `alias` path lowers to in Panda. A `token` ref preserves dark-mode and conditions
+/** Where an `alias` path lowers to. A `token` ref preserves dark-mode and conditions
  *  (never inlined); its `ref` is the bare `category.name` path, which the caller spells as
- *  `token(ref)` or `{ref}` depending on context. A `textStyle` alias becomes the bare style
+ *  however the target references tokens. A `textStyle` alias becomes the bare style
  *  name the `textStyle` property takes; `resolve` means the compiler should follow the alias
  *  and inline the result (component-token aliases resolve to a dynamic var, as does any
  *  unmapped path). */
@@ -96,7 +97,7 @@ export type AliasTarget =
     | { kind: "textStyle"; name: string }
     | { kind: "resolve" };
 
-/** Map an alias path to its Panda lowering. */
+/** Map an alias path to its lowering. */
 export const aliasTarget = (path: string[]): AliasTarget => {
     const [ns, ...rest] = path;
     switch (ns) {
@@ -106,7 +107,7 @@ export const aliasTarget = (path: string[]): AliasTarget => {
             return { kind: "token", ref: `${category}.${name.join(".")}` };
         }
         case "semanticTokens": {
-            // Panda folds semantic tokens into their category namespace, so a semantic color
+            // Semantic tokens share their category's namespace, so a semantic color
             // `brand` is referenced as `colors.brand`.
             const [group, ...name] = rest;
             return { kind: "token", ref: `${group}.${name.join(".")}` };
@@ -127,19 +128,14 @@ export const aliasTarget = (path: string[]): AliasTarget => {
     }
 };
 
-/** The CSS var Panda emits for a token ref: `colors.primaryLight` is
- *  `--colors-primary-light`, after Panda's own prefix if one is set. */
+/** The CSS var a token ref emits: `colors.primaryLight` is
+ *  `--colors-primary-light`, after the token prefix if one is set. */
 export const tokenVarName = (ref: string, tokenPrefix?: string): string =>
     `--${[tokenPrefix, ...ref.split(".").map(hyphenate)].filter(Boolean).join("-")}`;
 
-/** Spell a token ref for the given context: `token(ref)` in a style value, `{ref}` in a token
- *  definition, and `var(--ref)` at runtime. */
-export const formatTokenRef = (
-    ref: string,
-    refStyle: "fn" | "curly" | "var",
-    tokenPrefix?: string,
-): string => {
-    if (refStyle === "curly") return `{${ref}}`;
-    if (refStyle === "var") return `var(${tokenVarName(ref, tokenPrefix)})`;
-    return `token(${ref})`;
-};
+/** Spell token references as the vars their tokens emit: `colors.brand` is
+ *  `var(--colors-brand)`, after the token prefix if one is set. */
+export const varTokenRef =
+    (tokenPrefix?: string) =>
+    (ref: string): string =>
+        `var(${tokenVarName(ref, tokenPrefix)})`;

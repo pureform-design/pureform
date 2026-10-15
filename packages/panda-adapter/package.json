@@ -17,7 +17,8 @@
         }
     },
     "dependencies": {
-        "@pureform/core": "catalog:"
+        "@pureform/core": "catalog:",
+        "@pureform/css-lowering": "catalog:"
     },
     "devDependencies": {
         "@pandacss/types": "catalog:",

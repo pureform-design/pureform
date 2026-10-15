@@ -1,10 +1,8 @@
 // Condition lowering and the conditional-value object compiler.
 //
-// A `ConditionalNode` in a value slot compiles to a Panda conditional value object
-// (`{ base, _hover, md, ... }`) rather than a flat string. Portable conditions map to Panda's
-// built-in `_`-prefixed keys; a viewport breakpoint referencing a single `from` token maps to
-// that breakpoint's name (a Panda condition); everything else lowers to a raw `@media` /
-// `@container` at-rule or the target's raw selector.
+// A `ConditionalNode` in a value slot compiles to a conditional value object (`{ base, key:
+// value }`) rather than a flat string. Each key is a selector or an at-rule, or the target's
+// own key where it has one (Panda's `_hover`, a named breakpoint), through the context's hooks.
 
 import { getByPath, tokenValue } from "@pureform/core";
 import type {
@@ -17,42 +15,41 @@ import type {
 } from "@pureform/core/ast";
 
 import { compileNodeToCSS } from "./compile-node";
+import type { LowerCtx } from "./context";
 import { aliasTarget } from "./css";
-import type { CompileCtx } from "./options";
 
-// Interaction, form, color-scheme, and direction conditions that map to a Panda built-in key.
-const CONDITION_KEY: Record<string, string> = {
-    hover: "_hover",
-    focus: "_focus",
-    focusVisible: "_focusVisible",
-    active: "_active",
-    pressed: "_active",
+// Interaction, form, and direction conditions as selectors. The ones a target commonly builds in
+// (hover, focus, disabled) match Panda's built-ins, so either adapter styles the same elements.
+const CONDITION_SELECTOR: Record<string, string> = {
+    hover: "&:is(:hover, [data-hover])",
+    focus: "&:is(:focus, [data-focus])",
+    focusVisible: "&:is(:focus-visible, [data-focus-visible])",
+    active: "&:is(:active, [data-active])",
+    pressed: "&:is(:active, [data-active])",
     // Repeating the attribute raises specificity above hover, focus, and pressed, so the drag
-    // tint wins wherever Panda orders the rules; the pointer is over the element while dragging.
+    // tint wins wherever the rules are ordered; the pointer is over the element while dragging.
     dragged: "&[data-dragging][data-dragging]",
-    disabled: "_disabled",
-    // Panda's _selected misses aria-pressed, which a toggle button (a filter chip) uses, and
-    // aria-current, which marks the current page in navigation; the selected slot state
-    // matches both too.
+    disabled:
+        "&:is(:disabled, [disabled], [data-disabled], [aria-disabled=true])",
+    // aria-pressed marks a toggle button (a filter chip) and aria-current the current page in
+    // navigation, so selected matches both, as the selected slot state does.
     selected:
         "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])",
-    checked: "_checked",
-    invalid: "_invalid",
-    readOnly: "_readOnly",
+    checked:
+        '&:is(:checked, [data-checked], [aria-checked=true], [data-state="checked"])',
+    invalid: "&:is(:invalid, [data-invalid], [aria-invalid=true])",
+    readOnly: "&:is(:read-only, [data-read-only], [aria-readonly=true])",
     // An input or textarea with a value, or an element containing one, or anything marked
     // `data-filled`. CSS sees a value through `:placeholder-shown`, so the input needs a
     // placeholder (a single space works when none should show).
     filled: "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])",
     // A control whose popup is open, or anything marked data-expanded.
     expanded: "&:is([aria-expanded=true], [data-expanded])",
-    dark: "_dark",
-    light: "_light",
-    ltr: "_ltr",
-    rtl: "_rtl",
-    reducedMotion: "_motionReduce",
+    ltr: ":where([dir=ltr], :dir(ltr)) &",
+    rtl: ":where([dir=rtl], :dir(rtl)) &",
 };
 
-// Media features with no Panda built-in: lowered to a raw at-rule key.
+// Media and feature conditions as at-rules.
 const MEDIA_RULE: Record<string, string> = {
     moreContrast: "@media (prefers-contrast: more)",
     lessContrast: "@media (prefers-contrast: less)",
@@ -61,12 +58,13 @@ const MEDIA_RULE: Record<string, string> = {
     portrait: "@media (orientation: portrait)",
     touch: "@media (pointer: coarse)",
     mouse: "@media (pointer: fine)",
+    reducedMotion: "@media (prefers-reduced-motion: reduce)",
     clipShape: "@supports (clip-path: shape(from 0 0, line to 0 0))",
     cornerShape: "@supports (corner-shape: squircle)",
 };
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
-// Repeating raises specificity, so a later state wins wherever Panda orders the rules: hover,
+// Repeating raises specificity, so a later state wins wherever the rules are ordered: hover,
 // filled, selected, checked, and expanded, then indeterminate and focus, then pressed, then invalid, then disabled. Selected
 // combines with the later states through an AND case rather than outranking them. Each also takes a data attribute, for custom
 // controls and native-like bindings that set the state by hand.
@@ -118,7 +116,7 @@ const stateSelector = (conditions: SlotCondition[]): string =>
 // Slot states as one selector. States of one slot join on that slot's element, and the
 // ancestor slots chain outermost first, ending at the styled slot (`&`) with its own states.
 // Nesting them instead would demand a separate element per state, in the wrong order.
-const slotSelector = (conditions: SlotCondition[], ctx: CompileCtx): string => {
+const slotSelector = (conditions: SlotCondition[], ctx: LowerCtx): string => {
     const [first] = conditions;
     if (!first) return "&";
     if (!ctx.slot) {
@@ -134,7 +132,7 @@ const slotSelector = (conditions: SlotCondition[], ctx: CompileCtx): string => {
             condition,
         ]);
     }
-    const prefix = ctx.tokenPrefix ? `${ctx.tokenPrefix}-` : "";
+    const prefix = ctx.classPrefix ? `${ctx.classPrefix}-` : "";
     const outer = [...bySlot.keys()]
         .filter((slot) => slot !== name)
         .sort((a, b) => ancestors.indexOf(b) - ancestors.indexOf(a))
@@ -147,7 +145,7 @@ const slotSelector = (conditions: SlotCondition[], ctx: CompileCtx): string => {
 
 // The keys for an AND-list of conditions, in nesting order: every slot condition in one key,
 // and one key for each other condition.
-const conditionKeys = (conditions: Condition[], ctx: CompileCtx): string[] => {
+const conditionKeys = (conditions: Condition[], ctx: LowerCtx): string[] => {
     const slots = conditions.filter(
         (c): c is SlotCondition => typeof c === "object" && c.type === "slot",
     );
@@ -167,7 +165,7 @@ const conditionKeys = (conditions: Condition[], ctx: CompileCtx): string[] => {
 const sizeCss = (n: NumericScalarNode): string =>
     n.unit === "none" ? String(n.value) : `${n.value}${n.unit}`;
 
-const breakpointCss = (name: string, ctx: CompileCtx): string => {
+const breakpointCss = (name: string, ctx: LowerCtx): string => {
     const bp = ctx.config.breakpoints?.[name];
     if (!bp) throw new Error(`unknown breakpoint token: ${name}`);
     return sizeCss(bp);
@@ -193,16 +191,24 @@ const rangeRule = (
     return `@media ${query}`;
 };
 
-/** The Panda conditional-value key for one condition. */
-export const conditionKey = (condition: Condition, ctx: CompileCtx): string => {
+/** The conditional-value key for one condition: the target's own key if it has one, else a
+ *  selector or at-rule. */
+export const conditionKey = (condition: Condition, ctx: LowerCtx): string => {
     if (typeof condition === "string") {
-        return CONDITION_KEY[condition] ?? MEDIA_RULE[condition] ?? condition;
+        return (
+            ctx.conditionKey?.(condition) ??
+            CONDITION_SELECTOR[condition] ??
+            MEDIA_RULE[condition] ??
+            condition
+        );
     }
     switch (condition.type) {
         case "viewportBreakpoint":
-            // A plain `from` maps to the breakpoint name (a Panda condition); a band or an
-            // open `until` becomes a raw media range.
-            if (condition.from && !condition.until) return condition.from;
+            // A plain `from` takes the target's breakpoint key, if it names them.
+            if (condition.from && !condition.until) {
+                const key = ctx.breakpointKey?.(condition.from);
+                if (key) return key;
+            }
             return rangeRule(
                 "media",
                 undefined,
@@ -267,11 +273,11 @@ const assignNested = (
     assignNested(next, tail, value);
 };
 
-/** Compile a `ConditionalNode` to a Panda conditional value object. AND-lists nest their
+/** Compile a `ConditionalNode` to a conditional value object. AND-lists nest their
  *  keys; several cases merge into one object. */
 export const compileConditional = (
     node: ConditionalNode,
-    ctx: CompileCtx,
+    ctx: LowerCtx,
 ): CondObject => {
     const out: CondObject = { base: compileValue(node.base, ctx) };
     for (const c of node.cases) {
@@ -289,7 +295,7 @@ export const compileConditional = (
  *  everything else a flat CSS string. An alias to a conditional token is followed first. */
 export const compileValue = (
     node: ValueNode,
-    ctx: CompileCtx,
+    ctx: LowerCtx,
 ): string | CondObject => {
     if (node.type === "conditional") return compileConditional(node, ctx);
     // A token tier emits its own conditional values, so an alias into one stays a token ref.

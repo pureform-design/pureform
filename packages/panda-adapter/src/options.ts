@@ -1,15 +1,8 @@
-// Adapter options and shared compile context.
+// Adapter options, and the lowering hooks that spell pureform's CSS the way Panda reads it.
 
+import type { PortableCondition } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
-
-/** Per-tier var prefix applied only at lowering. The config stays canonical and prefix-free;
- *  the adapter prepends this when it emits a CSS var, so vars can be namespaced to avoid
- *  collisions when a design system is embedded alongside others. A bare string prefixes every
- *  tier (`"pf"` gives `--pf-ui-*`, `--pf-components-*`, `--pf-global-*`); an object sets
- *  per-tier prefixes, with omitted tiers staying unprefixed. Default is no prefix. */
-export type VarPrefix =
-    | string
-    | { ui?: string; components?: string; global?: string };
+import type { LowerCtx, VarPrefix } from "@pureform/css-lowering";
 
 export interface CompileOptions {
     /** Preset name. Default `"pureform"`. */
@@ -23,24 +16,51 @@ export interface CompileOptions {
     pandaPrefix?: string;
 }
 
-/** Everything the node and style compilers need: the config to resolve refs against, the var
- *  prefix policy, and the target id.
- *
- *  `refStyle` picks how an aliased token reference is spelled. Panda resolves the function form
- *  `token(colors.brand)` only in style-value contexts (recipes, style maps). In a token or
- *  semantic-token DEFINITION it resolves only the curly form `{colors.brand}` (even inside a
- *  `var()` fallback), so token tiers compile with `refStyle: "curly"`. At runtime, outside
- *  Panda, `refStyle: "var"` spells the CSS var Panda emits for the token, using
- *  `tokenPrefix` (Panda's own `prefix`, not the component var prefix). */
-export interface CompileCtx {
-    config: CoreConfig;
-    prefix: VarPrefix | undefined;
-    target: string;
-    refStyle: "fn" | "curly" | "var";
-    tokenPrefix?: string;
-    /** The slot recipe and slot being compiled, for slot conditions, with the slot's
-     *  ancestors from the component's structure, nearest first. */
-    slot?: { className: string; name: string; ancestors?: string[] };
-    /** Every slot's ancestors in the component being compiled. */
-    slotAncestors?: Map<string, string[]>;
-}
+export type CompileCtx = LowerCtx;
+
+/** Panda resolves the function form `token(colors.brand)` only in style values (recipes,
+ *  style maps). */
+export const tokenFn = (ref: string): string => `token(${ref})`;
+
+/** In a token or semantic token definition Panda resolves only the curly form
+ *  `{colors.brand}`, even inside a `var()` fallback. */
+export const tokenCurly = (ref: string): string => `{${ref}}`;
+
+// Conditions Panda builds in, by their `_` keys. pureform's dark and light are Panda conditions
+// the preset declares.
+const CONDITION_KEY: Partial<Record<PortableCondition, string>> = {
+    hover: "_hover",
+    focus: "_focus",
+    focusVisible: "_focusVisible",
+    active: "_active",
+    pressed: "_active",
+    disabled: "_disabled",
+    checked: "_checked",
+    invalid: "_invalid",
+    readOnly: "_readOnly",
+    dark: "_dark",
+    light: "_light",
+    ltr: "_ltr",
+    rtl: "_rtl",
+    reducedMotion: "_motionReduce",
+};
+
+/** The context hooks for Panda: its condition keys, and breakpoints by name. */
+export const pandaHooks = {
+    conditionKey: (condition: PortableCondition) => CONDITION_KEY[condition],
+    breakpointKey: (name: string) => name,
+} satisfies Partial<LowerCtx>;
+
+/** The lowering context for Panda style values, as `compilePreset` builds it, for lowering a
+ *  style map or value on its own. */
+export const pandaContext = (
+    config: CoreConfig,
+    options: CompileOptions = {},
+): CompileCtx => ({
+    config,
+    prefix: options.prefix,
+    ...(options.pandaPrefix ? { classPrefix: options.pandaPrefix } : {}),
+    target: options.target ?? "css",
+    tokenRef: tokenFn,
+    ...pandaHooks,
+});

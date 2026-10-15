@@ -1,23 +1,22 @@
 // Compile a single value node to its CSS string form.
 //
 // This is the string-context compiler. A `ConditionalNode` in a value slot is compiled to a
-// Panda conditional value OBJECT by the sibling compiler in `conditions.ts`; if one reaches
+// conditional value object by the sibling compiler in `conditions.ts`; if one reaches
 // here (a string-only context) it falls back to its `base` value.
 
 import { getByPath, tokenValue } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 
+import type { LowerCtx } from "./context";
 import {
     aliasTarget,
     formatColor,
-    formatTokenRef,
     hyphenate,
     KEYWORD_CSS,
     varName,
 } from "./css";
-import type { CompileCtx } from "./options";
 
-export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
+export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
     switch (node.type) {
         case "literal":
             // Raw off-baseline escape, emitted verbatim; any unit is already in the string.
@@ -33,12 +32,7 @@ export const compileNodeToCSS = (node: ValueNode, ctx: CompileCtx): string => {
             return formatColor(node);
         case "alias": {
             const target = aliasTarget(node.path);
-            if (target.kind === "token")
-                return formatTokenRef(
-                    target.ref,
-                    ctx.refStyle,
-                    ctx.tokenPrefix,
-                );
+            if (target.kind === "token") return ctx.tokenRef(target.ref);
             if (target.kind === "textStyle") return target.name;
             // Resolve: follow the alias and inline the result (component tokens resolve to a
             // dynamic var; metadata is unwrapped so it stays transparent).

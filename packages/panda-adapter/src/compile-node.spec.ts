@@ -49,12 +49,15 @@ import {
     solid,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import {
+    compileNodeToCSS,
+    compileStyleMap,
+    compileValue,
+} from "@pureform/css-lowering";
 import { describe, expect, it } from "vitest";
 
-import { compileNodeToCSS } from "./compile-node";
-import { compileValue } from "./conditions";
+import { pandaHooks, tokenFn } from "./options";
 import type { CompileCtx } from "./options";
-import { compileStyleMap } from "./style-map";
 
 const emptyConfig: CoreConfig = {
     tokens: {},
@@ -66,7 +69,8 @@ const ctx = (over: Partial<CompileCtx> = {}): CompileCtx => ({
     config: emptyConfig,
     prefix: undefined,
     target: "css",
-    refStyle: "fn",
+    tokenRef: tokenFn,
+    ...pandaHooks,
     ...over,
 });
 
