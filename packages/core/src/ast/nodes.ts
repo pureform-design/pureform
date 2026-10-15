@@ -203,6 +203,9 @@ export type FlexDirectionKeyword =
 export type LineStyleKeyword = "none" | "solid" | "dashed" | "dotted";
 /** Logical; prefer `start` and `end` over `left` and `right`. */
 export type TextAlignKeyword = "start" | "end" | "center" | "justify";
+/** Which way a user can resize the element, as a text area's drag handle. Web-only, like
+ *  `cursor`: native text inputs have no handle, so the native adapter drops it. */
+export type ResizeKeyword = "none" | "vertical" | "horizontal" | "both";
 /** A pointer-device hint. Inert where there is no pointer (touch), like `hover`; the native
  *  adapter drops it rather than erroring. */
 export type CursorKeyword =

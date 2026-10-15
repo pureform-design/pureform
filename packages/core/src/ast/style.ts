@@ -9,6 +9,7 @@ import type {
     AlignKeyword,
     ColorKeyword,
     CursorKeyword,
+    ResizeKeyword,
     DisplayKeyword,
     FlexDirectionKeyword,
     KeywordNode,
@@ -146,6 +147,7 @@ export interface StyleMap {
     backdropFilter?: Filter;
     // interaction / motion
     cursor?: Keyword<CursorKeyword>;
+    resize?: Keyword<ResizeKeyword>;
     pointerEvents?: Keyword<PointerEventsKeyword>;
     transition?: Transition;
     transitionTimingFunction?: Easing;
