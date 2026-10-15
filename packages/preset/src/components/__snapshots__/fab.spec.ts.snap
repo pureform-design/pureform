@@ -519,6 +519,33 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     },
     {
       "css": {
+        "container": {
+          "borderRadius": "var(--components-fab-radiusSmall, token(radii.medium))",
+        },
+      },
+      "shape": "none",
+      "size": "small",
+    },
+    {
+      "css": {
+        "container": {
+          "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
+        },
+      },
+      "shape": "none",
+      "size": "medium",
+    },
+    {
+      "css": {
+        "container": {
+          "borderRadius": "var(--components-fab-radiusLarge, token(radii.extraLarge))",
+        },
+      },
+      "shape": "none",
+      "size": "large",
+    },
+    {
+      "css": {
         "root": {
           "width": "var(--components-fab-sizeSmall, 40px)",
         },
@@ -602,9 +629,6 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     },
     "size": {
       "large": {
-        "container": {
-          "borderRadius": "var(--components-fab-radiusLarge, token(radii.extraLarge))",
-        },
         "icon": {
           "fontSize": "var(--components-fab-iconSizeLarge, 36px)",
           "height": "var(--components-fab-iconSizeLarge, 36px)",
@@ -617,9 +641,6 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "medium": {
-        "container": {
-          "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
-        },
         "icon": {},
         "root": {
           "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
@@ -628,9 +649,6 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "small": {
-        "container": {
-          "borderRadius": "var(--components-fab-radiusSmall, token(radii.medium))",
-        },
         "icon": {},
         "root": {
           "borderRadius": "var(--components-fab-radiusSmall, token(radii.medium))",

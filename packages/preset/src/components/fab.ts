@@ -25,6 +25,7 @@ import {
 } from "./shaped";
 import type { Shapes } from "./shaped";
 import {
+    lower,
     COLOR_GROUPS,
     colorVariants,
     componentTokens,
@@ -57,15 +58,12 @@ const { tokens, ref } = componentTokens("fab", {
 
 type Size = "Small" | "Medium" | "Large";
 
-const fabSize = (
-    s: Size,
-): { root: StyleMap; container: StyleMap; icon: StyleMap } => ({
+const fabSize = (s: Size): { root: StyleMap; icon: StyleMap } => ({
     root: {
         height: ref(`size${s}`),
         minWidth: ref(`size${s}`),
         borderRadius: ref(`radius${s}`),
     },
-    container: { borderRadius: ref(`radius${s}`) },
     icon:
         s === "Large"
             ? {
@@ -162,6 +160,13 @@ export const createFab = (
                         };
                     }),
                 ),
+                // The container's radius follows the size only when unshaped. A shape sets
+                // its own, and as a variant it would tie with the size's, leaving the order
+                // of their rules to decide.
+                ...(["Small", "Medium", "Large"] as const).map((s) => ({
+                    match: { size: lower(s), shape: "none" as const },
+                    style: { container: { borderRadius: ref(`radius${s}`) } },
+                })),
                 ...(["small", "large"] as const).map((size) => ({
                     match: { size, extended: "false" as const },
                     style: {
