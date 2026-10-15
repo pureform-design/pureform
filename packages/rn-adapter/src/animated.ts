@@ -118,11 +118,13 @@ export const useAnimatedRecipe = (
     const out: Record<string, Record<string, unknown>> = {};
     for (const [slot, style] of Object.entries(styles)) {
         const animated: Record<string, unknown> = { ...style };
-        for (const transition of transitions[slot] ?? []) {
-            const target = style[transition.property];
-            if (typeof target !== "number" && typeof target !== "string")
-                continue;
-            const key = `${slot}.${transition.property}`;
+        // One value moving under a transition: a property, or one step of a transform. It
+        // returns the animated value, or the target itself where it can't move.
+        const drive = (
+            key: string,
+            target: Concrete,
+            transition: Transition,
+        ): unknown => {
             const to = animatable(target);
             let track = tracks.current.get(key);
             if (!track) {
@@ -151,13 +153,37 @@ export const useAnimatedRecipe = (
                 current.progress = progressOf(0, () => current);
                 current.animation = undefined;
             }
-            if (interpolates(track.from, track.to)) {
-                const { inputRange, outputRange } = stops(track.from, track.to);
-                animated[transition.property] = track.progress.interpolate({
-                    inputRange,
-                    // Both numbers or both strings, which `interpolates` checked.
-                    outputRange: outputRange as unknown as number[],
-                });
+            if (!interpolates(track.from, track.to)) return target;
+            const { inputRange, outputRange } = stops(track.from, track.to);
+            return track.progress.interpolate({
+                inputRange,
+                // Both numbers or both strings, which `interpolates` checked.
+                outputRange: outputRange as unknown as number[],
+            });
+        };
+        for (const transition of transitions[slot] ?? []) {
+            const target = style[transition.property];
+            const key = `${slot}.${transition.property}`;
+            if (typeof target === "number" || typeof target === "string") {
+                animated[transition.property] = drive(key, target, transition);
+            } else if (
+                transition.property === "transform" &&
+                Array.isArray(target)
+            ) {
+                // Each step moves on its own, as CSS interpolates transforms of one shape.
+                animated.transform = (target as Record<string, Concrete>[]).map(
+                    (step, index) =>
+                        Object.fromEntries(
+                            Object.entries(step).map(([name, value]) => [
+                                name,
+                                drive(
+                                    `${key}.${index}.${name}`,
+                                    value,
+                                    transition,
+                                ),
+                            ]),
+                        ),
+                );
             }
         }
         const animation = animations[slot];
