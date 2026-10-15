@@ -92,6 +92,32 @@ const cache = new WeakMap<
     { templates: Value[]; sets: Map<string, Resolved> }
 >();
 
+/** Overrides for both schemes, or for each: a brand color generated for light and dark has
+ *  different values in each. */
+export type Overrides =
+    | ThemeValues
+    | { light?: ThemeValues; dark?: ThemeValues };
+
+const isPerScheme = (
+    overrides: Overrides,
+): overrides is { light?: ThemeValues; dark?: ThemeValues } =>
+    Object.keys(overrides).length > 0 &&
+    Object.entries(overrides).every(
+        ([key, value]) =>
+            (key === "light" || key === "dark") && typeof value === "object",
+    );
+
+/** The overrides that apply in a scheme. */
+export const overridesFor = (
+    overrides: Overrides | undefined,
+    scheme: Scheme,
+): ThemeValues =>
+    !overrides
+        ? {}
+        : isPerScheme(overrides)
+          ? (overrides[scheme] ?? {})
+          : (overrides as ThemeValues);
+
 /** A theme's styles with runtime overrides of token or component token values applied. */
 export const stylesFor = (
     styles: Styles,

@@ -17,7 +17,7 @@ import { describe, expect, it } from "vitest";
 
 import { precompute, runtimeStyles } from "./build";
 import { lowerRn } from "./lower";
-import { resolve, stylesFor, themeKey } from "./resolve";
+import { overridesFor, resolve, stylesFor, themeKey } from "./resolve";
 import { select } from "./select";
 import { resolveTheme } from "./theme";
 import { evaluate } from "./values";
@@ -226,6 +226,17 @@ describe("theme modes", () => {
 
     it("are plain JSON", () => {
         expect(JSON.parse(JSON.stringify(precomputed))).toEqual(precomputed);
+    });
+});
+
+describe("overridesFor", () => {
+    it("applies flat overrides to both schemes, and per-scheme ones to theirs", () => {
+        const flat = { "colors.primary": "rgba(1, 1, 1, 1)" };
+        expect(overridesFor(flat, "dark")).toBe(flat);
+        const perScheme = { light: flat };
+        expect(overridesFor(perScheme, "light")).toBe(flat);
+        expect(overridesFor(perScheme, "dark")).toEqual({});
+        expect(overridesFor(undefined, "light")).toEqual({});
     });
 });
 

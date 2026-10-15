@@ -10,8 +10,9 @@ export { rnKeyword, rnProperty } from "./props";
 export type { RnStyleKey } from "./props";
 export { precompute, runtimeStyles } from "./build";
 export type { BuildOptions } from "./build";
-export { resolve, stylesFor, themeKey } from "./resolve";
+export { overridesFor, resolve, stylesFor, themeKey } from "./resolve";
 export type {
+    Overrides,
     PrecomputedStyles,
     Resolved,
     RuntimeStyles,

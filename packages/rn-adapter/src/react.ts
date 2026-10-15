@@ -4,8 +4,8 @@
 import { createContext, createElement, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
 
-import { stylesFor, themeKey } from "./resolve";
-import type { Resolved, Styles } from "./resolve";
+import { overridesFor, stylesFor, themeKey } from "./resolve";
+import type { Overrides, Resolved, Styles } from "./resolve";
 import { select } from "./select";
 import type { State, Style } from "./select";
 import type { Scheme } from "./theme";
@@ -26,15 +26,16 @@ export interface PureformProviderProps {
     /** A named theme. Default the base theme. */
     theme?: string;
     /** Token or component token values to override, by key: `colors.primary`,
-     *  `components.button.container`. Colors are `rgb()`/`rgba()` or hex, which mixes read
-     *  without a color library. */
-    overrides?: ThemeValues;
+     *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
+     *  `rgb()`/`rgba()` or hex, which mixes read without a color library. */
+    overrides?: Overrides;
     children?: ReactNode;
 }
 
 export const PureformProvider = (props: PureformProviderProps) => {
-    const { styles, scheme, theme, overrides } = props;
+    const { styles, scheme, theme } = props;
     const key = themeKey(theme, scheme);
+    const overrides = overridesFor(props.overrides, scheme);
     // Overrides are compared by contents, so an inline object doesn't recompute every render.
     const overrideKey = JSON.stringify(overrides ?? {});
     const resolved = useMemo(

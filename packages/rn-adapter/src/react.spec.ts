@@ -10,7 +10,7 @@ import {
     useRecipe,
     useTokens,
 } from "./react";
-import type { Styles } from "./resolve";
+import type { Overrides, Styles } from "./resolve";
 import type { State } from "./select";
 
 const config = pureform();
@@ -25,7 +25,7 @@ const rootStyle = (
     provider: {
         styles: Styles;
         scheme: "light" | "dark";
-        overrides?: Record<string, string>;
+        overrides?: Overrides;
     },
     state: State = {},
 ) => {
@@ -92,6 +92,21 @@ describe("PureformProvider and useRecipe", () => {
             ),
         );
         expect(html).toBe("<i>rgba(255, 0, 0, 1)</i>");
+    });
+
+    it("take overrides per scheme", () => {
+        const overrides = {
+            light: { "colors.primary": "rgba(200, 0, 0, 1)" },
+            dark: { "colors.primary": "rgba(0, 0, 200, 1)" },
+        };
+        expect(
+            rootStyle({ styles: precomputed, scheme: "light", overrides })
+                .backgroundColor,
+        ).toBe("rgba(200, 0, 0, 1)");
+        expect(
+            rootStyle({ styles: precomputed, scheme: "dark", overrides })
+                .backgroundColor,
+        ).toBe("rgba(0, 0, 200, 1)");
     });
 
     it("need a provider", () => {
