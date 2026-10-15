@@ -3,7 +3,7 @@ import {
     card,
     checkbox,
     chip,
-    divider,
+    separator,
     fab,
     iconButton,
     radio,
@@ -197,7 +197,7 @@ function IndexRoute() {
                     }}
                 </For>
             </section>
-            <hr class={divider()} />
+            <hr class={separator()} />
             <section style={{ ...row, "align-items": "flex-start" }}>
                 <For each={["filled", "outlined"] as const}>
                     {(variant) => (

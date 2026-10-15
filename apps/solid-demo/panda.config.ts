@@ -46,7 +46,7 @@ export default defineConfig({
             checkbox: ["*"],
             radio: ["*"],
             switchControl: ["*"],
-            divider: ["*"],
+            separator: ["*"],
             supportingText: ["*"],
             text: ["*"],
         },
