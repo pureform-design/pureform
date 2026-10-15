@@ -25,6 +25,7 @@ import {
     sys,
     touchTarget,
     stateTransition,
+    focusRing,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -74,6 +75,7 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
         recipe: {
             base: {
                 root: {
+                    ...focusRing(),
                     transition: stateTransition,
                     position: relative,
                     display: inlineFlex,

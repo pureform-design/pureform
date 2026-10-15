@@ -5,19 +5,19 @@ import {
     alias,
     colorMix,
     dynamic,
-    mul,
     none,
     pct,
+    px,
     solid,
     transform,
     transition,
     translate,
     transparent,
     tween,
-    unitless,
     when,
 } from "@pureform/core/ast";
 import type {
+    Condition,
     AliasNode,
     ColorValue,
     StyleMap,
@@ -175,7 +175,7 @@ export const disabledColors = (fill: Fill): StyleMap => {
             return {
                 backgroundColor: transparent,
                 color: content,
-                outlineColor: disabledColor("disabledContainer"),
+                borderColor: disabledColor("disabledContainer"),
             };
         case "text":
             return { backgroundColor: transparent, color: content };
@@ -216,10 +216,9 @@ export const fillVariant = (
     const outline: StyleMap =
         fill === "outlined"
             ? {
-                  outlineWidth: ref("outlineWidth"),
-                  outlineStyle: solid,
-                  outlineColor: ref("outlineColor"),
-                  outlineOffset: mul(ref("outlineWidth"), unitless(-1)),
+                  borderWidth: ref("outlineWidth"),
+                  borderStyle: solid,
+                  borderColor: ref("outlineColor"),
               }
             : {};
     return {
@@ -264,3 +263,15 @@ export const tweens = (...properties: Parameters<typeof tween>[0][]) =>
             ),
         ),
     );
+
+/** Material's focus indicator: a 3px ring in the secondary color, 2px outside the element,
+ *  shown while `focused` holds (keyboard focus by default). It replaces the browser's own
+ *  outline, and is drawn with `outline`, so it never moves anything. */
+export const focusRing = (
+    focused: Condition | Condition[] = "focusVisible",
+): StyleMap => ({
+    outlineStyle: when(focused, solid, none),
+    outlineWidth: px(3),
+    outlineColor: sys("secondary"),
+    outlineOffset: px(2),
+});

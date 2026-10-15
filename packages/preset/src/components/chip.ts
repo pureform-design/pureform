@@ -8,7 +8,6 @@ import { defineSlotComponent } from "@pureform/core";
 import {
     center,
     inlineFlex,
-    mul,
     none,
     pointer,
     px,
@@ -17,7 +16,6 @@ import {
     solid,
     transparent,
     slot,
-    unitless,
     when,
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
@@ -30,6 +28,7 @@ import {
     stateTransition,
     sys,
     touchTarget,
+    focusRing,
 } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {
@@ -60,12 +59,12 @@ const colors = (container: ColorValue): StyleMap => ({
                 content: ref("selectedContent"),
             }),
             color: ref("selectedContent"),
-            outlineColor: transparent,
+            borderColor: transparent,
         },
         disabled: {
             backgroundColor: transparent,
             color: disabledColor("disabledContent"),
-            outlineColor: disabledColor("disabledContainer"),
+            borderColor: disabledColor("disabledContainer"),
         },
     },
 });
@@ -82,6 +81,7 @@ export const chip = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                ...focusRing(),
                 transition: stateTransition,
                 position: relative,
                 display: inlineFlex,
@@ -117,10 +117,9 @@ export const chip = defineSlotComponent({
                 outlined: {
                     root: {
                         ...colors(ref("container")),
-                        outlineWidth: ref("outlineWidth"),
-                        outlineStyle: solid,
-                        outlineColor: ref("outlineColor"),
-                        outlineOffset: mul(ref("outlineWidth"), unitless(-1)),
+                        borderWidth: ref("outlineWidth"),
+                        borderStyle: solid,
+                        borderColor: ref("outlineColor"),
                     },
                 },
                 elevated: {

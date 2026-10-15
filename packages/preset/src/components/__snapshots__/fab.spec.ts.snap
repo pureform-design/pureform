@@ -30,6 +30,13 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
       "gap": "var(--components-fab-gap, token(spacing.3))",
       "justifyContent": "center",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        "_focusVisible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
       "position": "relative",
       "shadowElevation": "level3",
       "transition": {

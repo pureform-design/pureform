@@ -7,13 +7,11 @@
 import { defineSlotComponent } from "@pureform/core";
 import {
     colorMix,
-    mul,
     none,
     pointer,
     px,
     relative,
     solid,
-    unitless,
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { opacity, radius, spacing } from "@pureform/theme";
@@ -25,6 +23,7 @@ import {
     sys,
     touchTarget,
     stateTransition,
+    focusRing,
 } from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
@@ -66,10 +65,9 @@ const fillVariant = (fill: CardFill): { root: StyleMap } => ({
         apply: { shadowElevation: RESTING[fill] },
         ...(fill === "outlined"
             ? {
-                  outlineWidth: ref("outlineWidth"),
-                  outlineStyle: solid,
-                  outlineColor: ref("outlineColor"),
-                  outlineOffset: mul(ref("outlineWidth"), unitless(-1)),
+                  borderWidth: ref("outlineWidth"),
+                  borderStyle: solid,
+                  borderColor: ref("outlineColor"),
               }
             : {}),
     },
@@ -92,7 +90,7 @@ const interactive = (fill: CardFill) => ({
                     color: disabledColor("disabledContent"),
                     apply: { shadowElevation: "level0" },
                     ...(fill === "outlined"
-                        ? { outlineColor: disabledColor("disabledContainer") }
+                        ? { borderColor: disabledColor("disabledContainer") }
                         : {}),
                 },
             },
@@ -112,6 +110,7 @@ export const card = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                ...focusRing(),
                 transition: stateTransition,
                 position: relative,
                 color: content,

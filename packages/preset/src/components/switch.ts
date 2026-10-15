@@ -39,6 +39,7 @@ import {
     controlInput,
     controlStateLayer,
     controlTouchTarget,
+    CONTROL_FOCUS,
 } from "./control";
 import {
     componentTokens,
@@ -46,6 +47,7 @@ import {
     stateTransition,
     sys,
     tweens,
+    focusRing,
 } from "./shared";
 
 // Named switchControl, not switch: Panda names the generated recipe after the component, and
@@ -103,6 +105,8 @@ export const switchControl = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                ...focusRing(CONTROL_FOCUS),
+                borderRadius: radius("full"),
                 position: relative,
                 display: inlineFlex,
                 cursor: pointer,

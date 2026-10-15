@@ -22,6 +22,13 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
       "gap": "var(--components-button-gap, token(spacing.2))",
       "justifyContent": "center",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        "_focusVisible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
       "position": "relative",
       "transition": {
         "_motionReduce": "none",
@@ -327,8 +334,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
@@ -348,8 +355,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
@@ -369,8 +376,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
@@ -390,8 +397,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.positive) token(opacity.stateDragged))",
@@ -411,8 +418,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.notice) token(opacity.stateDragged))",
@@ -432,8 +439,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.negative) token(opacity.stateDragged))",
@@ -453,8 +460,8 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {
           "_disabled": {
             "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "outlineColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
           },
           "backgroundColor": {
             "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
@@ -836,10 +843,9 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "outlined": {
         "root": {
           "_disabled": {},
-          "outlineColor": "var(--components-button-outlineColor, token(colors.outline))",
-          "outlineOffset": "calc(var(--components-button-outlineWidth, 1px) * -1)",
-          "outlineStyle": "solid",
-          "outlineWidth": "var(--components-button-outlineWidth, 1px)",
+          "borderColor": "var(--components-button-outlineColor, token(colors.outline))",
+          "borderStyle": "solid",
+          "borderWidth": "var(--components-button-outlineWidth, 1px)",
         },
       },
       "text": {

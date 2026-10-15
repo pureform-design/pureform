@@ -33,6 +33,7 @@ import {
     controlRoot,
     controlStateLayer,
     controlTouchTarget,
+    CONTROL_FOCUS,
 } from "./control";
 import {
     componentTokens,
@@ -40,6 +41,7 @@ import {
     stateTransition,
     sys,
     tweens,
+    focusRing,
 } from "./shared";
 
 const { tokens, ref } = componentTokens("radio", {
@@ -75,6 +77,7 @@ export const radio = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                ...focusRing(CONTROL_FOCUS),
                 ...controlRoot(ref("size")),
                 transition: stateTransition,
                 borderRadius: radius("full"),

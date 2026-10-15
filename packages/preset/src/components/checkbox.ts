@@ -38,8 +38,15 @@ import {
     controlRoot,
     controlStateLayer,
     controlTouchTarget,
+    CONTROL_FOCUS,
 } from "./control";
-import { componentTokens, disabledColor, stateTransition, sys } from "./shared";
+import {
+    componentTokens,
+    disabledColor,
+    stateTransition,
+    sys,
+    focusRing,
+} from "./shared";
 
 const { tokens, ref } = componentTokens("checkbox", {
     size: sizeToken("controlMedium"),
@@ -108,6 +115,7 @@ export const checkbox = defineSlotComponent({
     recipe: {
         base: {
             root: {
+                ...focusRing(CONTROL_FOCUS),
                 ...controlRoot(ref("size")),
                 transition: stateTransition,
                 borderRadius: radius("full"),
