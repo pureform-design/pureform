@@ -42,6 +42,7 @@ export default defineConfig({
             fab: ["*"],
             chip: ["*"],
             textField: ["*"],
+            textArea: ["*"],
             supportingText: ["*"],
             text: ["*"],
         },

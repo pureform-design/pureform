@@ -7,6 +7,7 @@ import {
     scrim,
     supportingText,
     text,
+    textArea,
     textField,
 } from "$recipes";
 import { createFileRoute } from "@tanstack/solid-router";
@@ -72,6 +73,58 @@ function IndexRoute() {
                             }}
                         </For>
                     )}
+                </For>
+            </section>
+            <section style={{ ...row, "align-items": "flex-start" }}>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = textField({
+                            variant,
+                            leadingIcon: true,
+                            trailingIcon: true,
+                        });
+                        const id = `icon-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <span class={t.leadingIcon}>⌕</span>
+                                    <input
+                                        class={t.input}
+                                        id={id}
+                                        placeholder=" "
+                                    />
+                                    <label class={t.label} for={id}>
+                                        Search
+                                    </label>
+                                    <span class={t.trailingIcon}>×</span>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = textArea({ variant });
+                        const id = `area-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <textarea
+                                        class={t.input}
+                                        id={id}
+                                        placeholder=" "
+                                        rows={3}
+                                    />
+                                    <label class={t.label} for={id}>
+                                        {`${variant} area`}
+                                    </label>
+                                </div>
+                                <span class={t.supportingText}>
+                                    Drag the corner to resize
+                                </span>
+                            </div>
+                        );
+                    }}
                 </For>
             </section>
             <section style={{ ...row, "align-items": "center" }}>
