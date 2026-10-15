@@ -13,6 +13,7 @@ import type {
 import type { CoreConfig } from "@pureform/core/types";
 
 import { NEUTRAL_ROLES, groupRoles } from "./contracts/color";
+import type { ColorContract } from "./contracts/color";
 import {
     DURATION_ROLES,
     EASING_ROLES,
@@ -25,6 +26,7 @@ import {
 import type { ElevationContract } from "./contracts/foundations";
 import { BASE_FONT_ROLES, BASE_TEXT_STYLES } from "./contracts/typography";
 import type { TextStyleNode, TypographyContract } from "./contracts/typography";
+import { contrastFailures } from "./contrast";
 import type {
     ColorProvider,
     Domain,
@@ -249,6 +251,11 @@ export interface ResolveOptions {
      *  such as `transparent`, or an alias to a role that has one. Set it when the page offers
      *  both schemes, so a hand-authored palette cannot leave a role fixed. Default `false`. */
     requireDark?: boolean;
+    /** Require every content role to reach this WCAG contrast ratio against the role it sits
+     *  on (`onPrimary` on `primary`, `onSurface` on each surface, …) in light and dark. `4.5`
+     *  is WCAG AA for body text. Pairs whose colors cannot be evaluated (mixes, dynamic
+     *  values) are skipped. Default off. */
+    requireContrast?: number;
 }
 
 // Whether a role looks right in the dark scheme: it has a dark case, is scheme-independent
@@ -313,6 +320,23 @@ export const resolveTheme = <
         ]);
         requireKind(where, "color role", c.roles, KINDS.color);
         requireKind(where, "primitive color", c.primitives ?? {}, KINDS.color);
+        if (options.requireContrast !== undefined) {
+            const failures = contrastFailures(
+                c as ColorContract<string>,
+                options.requireContrast,
+            );
+            if (failures.length > 0) {
+                const list = failures
+                    .map(
+                        (f) =>
+                            `${f.content} on ${f.background} (${f.scheme}) is ${f.ratio.toFixed(2)}:1`,
+                    )
+                    .join(", ");
+                throw new ContractError(
+                    `${where} falls below ${options.requireContrast}:1 contrast: ${list}`,
+                );
+            }
+        }
         if (options.requireDark) {
             for (const [role, value] of Object.entries(c.roles)) {
                 if (!hasDark(c.roles, value)) {
