@@ -51,7 +51,7 @@ const SCENARIOS: Scenario[] = [
     },
     {
         name: "focused",
-        attributes: ["data-focus", "data-focus-visible"],
+        attributes: ["data-focus", "data-focused", "data-focus-visible"],
         state: { focus: true, focusVisible: true },
     },
     {
