@@ -45,7 +45,7 @@ describe("textField", () => {
         expect(shadow[`&${FOCUS}${FOCUS}`]).toContain(
             "0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
         );
-        const errored = shadow[`&${INVALID}${INVALID}${INVALID}`] as Record<
+        const errored = shadow[`&${INVALID}${INVALID}${INVALID}${INVALID}`] as Record<
             string,
             string
         >;
@@ -58,8 +58,8 @@ describe("textField", () => {
             string,
             Record<string, Record<string, string>>
         >;
-        const label = `.textField__container${INVALID}${INVALID}${INVALID} &`;
-        const helper = `.textField__root${INVALID}${INVALID}${INVALID} &`;
+        const label = `.textField__container${INVALID}${INVALID}${INVALID}${INVALID} &`;
+        const helper = `.textField__root${INVALID}${INVALID}${INVALID}${INVALID} &`;
         expect(base.label?.color?.[label]).toContain("errorColor");
         expect(base.supportingText?.color?.[helper]).toContain("errorColor");
     });

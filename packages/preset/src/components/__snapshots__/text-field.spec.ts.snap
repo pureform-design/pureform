@@ -27,9 +27,9 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
     },
     "label": {
       "color": {
-        ".textField__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".textField__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-textField-focusColor, token(colors.primary))",
-        ".textField__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-textField-errorColor, token(colors.negative))",
+        ".textField__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-textField-errorColor, token(colors.negative))",
         "base": "var(--components-textField-labelColor, token(colors.onSurfaceVariant))",
       },
       "fontSize": {
@@ -62,8 +62,8 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
     },
     "supportingText": {
       "color": {
-        ".textField__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".textField__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-textField-errorColor, token(colors.negative))",
+        ".textField__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".textField__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-textField-errorColor, token(colors.negative))",
         "base": "var(--components-textField-supportingColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
@@ -94,16 +94,16 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       "filled": {
         "container": {
           "backgroundColor": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "base": "var(--components-textField-container, token(colors.surfaceContainerHighest))",
           },
           "borderStartEndRadius": "var(--components-textField-radius, token(radii.extraSmall))",
           "borderStartStartRadius": "var(--components-textField-radius, token(radii.extraSmall))",
           "boxShadow": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-textField-focusColor, token(colors.primary))",
             "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px var(--components-textField-hoverColor, token(colors.onSurface))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
               "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-textField-errorColor, token(colors.negative))",
               "base": "inset 0px calc(var(--components-textField-indicatorWidth, 1px) * -1) 0px 0px var(--components-textField-errorColor, token(colors.negative))",
             },
@@ -131,19 +131,19 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
         "container": {
           "borderRadius": "var(--components-textField-radius, token(radii.extraSmall))",
           "outlineColor": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-textField-focusColor, token(colors.primary))",
             "&:is(:hover, [data-hover])": "var(--components-textField-hoverColor, token(colors.onSurface))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
               "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-textField-errorColor, token(colors.negative))",
               "base": "var(--components-textField-errorColor, token(colors.negative))",
             },
             "base": "var(--components-textField-outlineColor, token(colors.outline))",
           },
           "outlineOffset": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
             "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
               "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
               "base": "calc(var(--components-textField-indicatorWidth, 1px) * -1)",
             },
@@ -151,9 +151,9 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
           },
           "outlineStyle": "solid",
           "outlineWidth": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "var(--components-textField-indicatorWidth, 1px)",
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "var(--components-textField-indicatorWidth, 1px)",
             "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-textField-focusIndicatorWidth, 2px)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": {
               "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-textField-focusIndicatorWidth, 2px)",
               "base": "var(--components-textField-indicatorWidth, 1px)",
             },
