@@ -39,6 +39,9 @@ type Background =
     | KeywordNode<ColorKeyword>;
 /** A length or number: px, rem, %, calc, min, max, clamp. */
 type Dimension = ValueNodeMap["numeric" | "calc" | "mathFn" | "literal"];
+/** A margin: a length, or `auto` to take the free space (centering an item in a flex
+ *  container, or pushing it to one end). Native supports `auto` margins too. */
+type Margin = Dimension | KeywordNode<"auto">;
 /** A portable keyword from a per-property vocabulary, plus a raw `literal` escape and a ref.
  *  `V` narrows the acceptable tokens so `display: keyword("center")` is a type error. */
 type Keyword<V extends string = string> =
@@ -75,6 +78,10 @@ export interface StyleMap {
     alignItems?: Keyword<AlignKeyword>;
     justifyContent?: Keyword<AlignKeyword>;
     overflow?: Keyword<OverflowKeyword>;
+    // a flex item's starting size, then its share of free space and of a shortfall (unitless)
+    flexBasis?: Dimension;
+    flexGrow?: Dimension;
+    flexShrink?: Dimension;
     // a number, or literal("16 / 9")
     aspectRatio?: Dimension;
     // physical offsets for a positioned element
@@ -113,14 +120,23 @@ export interface StyleMap {
     paddingInlineEnd?: Dimension;
     paddingBlockStart?: Dimension;
     paddingBlockEnd?: Dimension;
-    marginInlineStart?: Dimension;
-    marginInlineEnd?: Dimension;
-    marginBlockStart?: Dimension;
-    marginBlockEnd?: Dimension;
+    marginInlineStart?: Margin;
+    marginInlineEnd?: Margin;
+    marginBlockStart?: Margin;
+    marginBlockEnd?: Margin;
     insetInlineStart?: Dimension;
     insetInlineEnd?: Dimension;
     insetBlockStart?: Dimension;
     insetBlockEnd?: Dimension;
+    // one side's border, flow-relative like the padding; set `borderStyle` alongside
+    borderInlineStartWidth?: Dimension;
+    borderInlineEndWidth?: Dimension;
+    borderBlockStartWidth?: Dimension;
+    borderBlockEndWidth?: Dimension;
+    borderInlineStartColor?: Color;
+    borderInlineEndColor?: Color;
+    borderBlockStartColor?: Color;
+    borderBlockEndColor?: Color;
     borderStartStartRadius?: Dimension;
     borderStartEndRadius?: Dimension;
     borderEndStartRadius?: Dimension;
