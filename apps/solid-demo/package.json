@@ -30,11 +30,12 @@
     },
     "devDependencies": {
         "@pandacss/dev": "catalog:",
-        "@playwright/test": "catalog:",
         "@pandacss/preset-base": "catalog:",
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
+        "@playwright/test": "catalog:",
+        "@pureform/css-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",

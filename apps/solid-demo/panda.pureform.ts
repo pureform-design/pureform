@@ -16,7 +16,7 @@ import { roundedShape } from "@pureform/theme";
 // Named density steps, in grid units: one roomier than Material's default, and two denser.
 const DENSITIES = { comfortable: 1, default: 0, compact: -1, dense: -3 };
 
-const config = pureform({
+export const pureformConfig = pureform({
     // Material's shapes, and two that change shape while pressed.
     shapes: {
         ...MATERIAL_SHAPES,
@@ -56,7 +56,7 @@ const config = pureform({
     },
 });
 
-export const pureformPreset = compilePreset(config, {
+export const pureformPreset = compilePreset(pureformConfig, {
     name: "pureform",
     prefix: "pf",
 });
