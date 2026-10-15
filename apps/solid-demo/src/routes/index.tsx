@@ -74,8 +74,8 @@ function IndexRoute() {
                                     }
                                 />
                                 <span class={c.box}>
-                                    <span class={c.checkIcon}>✓</span>
-                                    <span class={c.indeterminateIcon}>–</span>
+                                    <span class={c.checkIcon} />
+                                    <span class={c.indeterminateIcon} />
                                 </span>
                             </label>
                         );
@@ -152,10 +152,8 @@ function IndexRoute() {
                                         checked
                                     />
                                     <span class={c.box}>
-                                        <span class={c.checkIcon}>✓</span>
-                                        <span class={c.indeterminateIcon}>
-                                            –
-                                        </span>
+                                        <span class={c.checkIcon} />
+                                        <span class={c.indeterminateIcon} />
                                     </span>
                                 </label>
                                 <label class={s.root} title={`${color} switch`}>
