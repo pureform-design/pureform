@@ -15,24 +15,24 @@ import { Animated, Image, Pressable, Text, View } from "react-native";
 import type { ImageStyle, TextStyle, ViewStyle } from "react-native";
 
 // The adapter's styles are checked against React Native's types when lowered.
-const view = (style: Style | undefined) => style as ViewStyle;
-const text = (style: Style | undefined) => style as TextStyle;
+export const view = (style: Style | undefined) => style as ViewStyle;
+export const text = (style: Style | undefined) => style as TextStyle;
 
 // Animated styles hold animated values where a property transitions.
-type Animatable = Record<string, unknown> | undefined;
-const aview = (style: Animatable) =>
+export type Animatable = Record<string, unknown> | undefined;
+export const aview = (style: Animatable) =>
     style as Animated.WithAnimatedValue<ViewStyle>;
-const atext = (style: Animatable) =>
+export const atext = (style: Animatable) =>
     style as Animated.WithAnimatedValue<TextStyle>;
 
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+export const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
 // Controls aren't text to select. Native text isn't selectable unless asked, but React Native
 // Web's is, and a drag across a control would select its parts.
-const unselectable = { userSelect: "none" } as const;
+export const unselectable = { userSelect: "none" } as const;
 
 /** Pressable's interaction state, as handlers to spread on it. */
-const usePress = (
+export const usePress = (
     own: Omit<State, "pressed" | "hover" | "focus" | "focusVisible" | "active">,
 ) => {
     const [pressed, setPressed] = useState(false);
@@ -51,7 +51,7 @@ const usePress = (
     };
 };
 
-type Color = "primary" | "secondary" | "tertiary" | "error";
+export type Color = "primary" | "secondary" | "tertiary" | "error";
 
 export function Button(props: {
     label: string;
@@ -200,7 +200,7 @@ const TEXT = [
     "lineHeight",
     "letterSpacing",
 ];
-const ownText = (style: Style | undefined) =>
+export const ownText = (style: Style | undefined) =>
     Object.fromEntries(
         Object.entries(style ?? {}).filter(([key]) => TEXT.includes(key)),
     );
@@ -218,10 +218,10 @@ export function Avatar(props: {
     );
 }
 
-type Group = Color | "success" | "warning" | "info";
+export type Group = Color | "success" | "warning" | "info";
 
 /** A glyph standing in for an icon, in an icon slot's type and color. */
-const Glyph = (props: { style: Animatable; glyph: string }) => (
+export const Glyph = (props: { style: Animatable; glyph: string }) => (
     <Animated.Text
         selectable={false}
         style={atext(ownText(props.style as Style))}

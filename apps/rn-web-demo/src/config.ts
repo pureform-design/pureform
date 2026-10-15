@@ -32,6 +32,18 @@ export const COMPONENTS = [
     "scrim",
     "supportingText",
     "media",
+    "textField",
+    "textArea",
+    "searchBar",
+    "select",
+    "slider",
+    "menu",
+    "tabs",
+    "navigationBar",
+    "navigationRail",
+    "dialog",
+    "snackbar",
+    "tooltip",
 ];
 
 /** Brand colors the demo can switch to at runtime, as seeds for Material's primary family. */

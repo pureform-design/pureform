@@ -34,6 +34,21 @@ import {
     Switch,
     Type,
 } from "./components";
+import { SearchBar, Select, Slider, TextArea, TextField } from "./fields";
+import {
+    Dialog,
+    Menu,
+    NavigationBar,
+    Snackbar,
+    Tabs,
+    Tooltip,
+} from "./navigation";
+
+const DESTINATIONS = [
+    { label: "Mail", glyph: "✉" },
+    { label: "Chat", glyph: "☏" },
+    { label: "Rooms", glyph: "⌂" },
+];
 
 // No override, or a brand's whole primary family for each scheme.
 const OVERRIDES: Record<string, Overrides> = { none: {}, ...brands };
@@ -75,6 +90,14 @@ function Page(props: { controls: ReactNode }) {
     const [size, setSize] = useState("medium");
     const [item, setItem] = useState(0);
     const [progress, setProgress] = useState<number | undefined>(40);
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("ada@");
+    const [bio, setBio] = useState("");
+    const [query, setQuery] = useState("");
+    const [volume, setVolume] = useState(30);
+    const [tab, setTab] = useState(0);
+    const [destination, setDestination] = useState(0);
+    const [choice, setChoice] = useState(1);
     return (
         <ScrollView
             style={{
@@ -242,6 +265,115 @@ function Page(props: { controls: ReactNode }) {
                     </View>
                 </View>
             </Section>
+            <Section title="Fields">
+                <View style={styles.row}>
+                    <View style={styles.field}>
+                        <TextField
+                            label="Name"
+                            value={name}
+                            onChange={setName}
+                        />
+                    </View>
+                    <View style={styles.field}>
+                        <TextField
+                            label="Email"
+                            variant="outlined"
+                            value={email}
+                            onChange={setEmail}
+                            invalid={!email.includes(".")}
+                            supportingText={
+                                email.includes(".")
+                                    ? "Looks right"
+                                    : "Add a domain"
+                            }
+                            leading="✉"
+                        />
+                    </View>
+                    <View style={styles.field}>
+                        <Select
+                            label="Size"
+                            value="Medium"
+                            supportingText="Focus to open"
+                        />
+                    </View>
+                    <View style={styles.field}>
+                        <TextArea
+                            label="Bio"
+                            variant="outlined"
+                            value={bio}
+                            onChange={setBio}
+                        />
+                    </View>
+                </View>
+                <View style={styles.field}>
+                    <SearchBar value={query} onChange={setQuery} />
+                </View>
+                <View style={styles.bar}>
+                    <Slider
+                        label="Volume"
+                        value={volume}
+                        onChange={setVolume}
+                    />
+                </View>
+            </Section>
+            <Section title="Tabs and navigation">
+                <View style={styles.list}>
+                    <Tabs items={DESTINATIONS} value={tab} onChange={setTab} />
+                    <Tabs
+                        items={DESTINATIONS}
+                        variant="secondary"
+                        value={tab}
+                        onChange={setTab}
+                    />
+                </View>
+                <View style={styles.row}>
+                    <View style={styles.list}>
+                        <NavigationBar
+                            items={DESTINATIONS}
+                            value={destination}
+                            onChange={setDestination}
+                        />
+                    </View>
+                    <NavigationBar
+                        rail
+                        items={DESTINATIONS}
+                        value={destination}
+                        onChange={setDestination}
+                    />
+                </View>
+            </Section>
+            <Section title="Menus, dialogs, and messages">
+                <View style={[styles.row, styles.top]}>
+                    <Menu
+                        items={[
+                            { label: "Cut", glyph: "✂", shortcut: "⌘X" },
+                            { label: "Copy", glyph: "⧉", shortcut: "⌘C" },
+                            {
+                                label: "Paste",
+                                glyph: "⎘",
+                                shortcut: "⌘V",
+                                disabled: true,
+                            },
+                        ]}
+                        value={choice}
+                        onChange={setChoice}
+                    />
+                    <Dialog
+                        glyph="⚠"
+                        headline="Discard draft?"
+                        actions={[{ label: "Cancel" }, { label: "Discard" }]}
+                    >
+                        Your changes won't be saved.
+                    </Dialog>
+                    <View style={[styles.section, styles.start]}>
+                        <Snackbar message="Message archived" action="Undo" />
+                        <Tooltip>Save to drafts</Tooltip>
+                        <Tooltip subhead="Drafts">
+                            Drafts stay on this device.
+                        </Tooltip>
+                    </View>
+                </View>
+            </Section>
             <Section title="Cards and avatars">
                 <View style={styles.row}>
                     {(["elevated", "filled", "outlined"] as const).map(
@@ -327,7 +459,11 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     card: { padding: 16, gap: 8, width: 220 },
-    list: { width: 360 },
+    list: { width: 360, gap: 12 },
+    field: { width: 260 },
+    top: { alignItems: "flex-start" },
+    // Tooltips fit their text, as inline elements do on the web.
+    start: { alignItems: "flex-start" },
     bar: { width: 240 },
     media: { width: 160, position: "relative" },
     // The scrim dims the picture, so it takes the picture's corners.
