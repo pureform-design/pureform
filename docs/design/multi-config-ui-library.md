@@ -2666,7 +2666,7 @@ stylesheet is imported after `tailwindcss`:
 
 The parity test runs every scenario for this adapter too, through Tailwind's own compiler.
 
-### 5.3 The React Native adapter (planned)
+### 5.3 The React Native adapter (proof of concept)
 
 `@pureform/rn-adapter` lowers component specs straight from the AST to React Native style
 objects, not through CSS. Theme-dependent values stay as references in style templates, and
@@ -2677,8 +2677,10 @@ included. With no
 selectors or cascade, the adapter does three things CSS did for free: a component's state
 (from `Pressable` and props) picks state layers for every slot, inherited text properties
 pass down the slot structure, and `color-mix` is computed when resolving. The proof of
-concept renders through React Native Web, and browser tests compare key properties against
-the CSS adapter. The plan is in `docs/design/rn-adapter-plan.md`.
+concept covers button, card, chip, checkbox, switch, text, and avatar. It renders through React
+Native Web in `apps/rn-web-demo`, and browser tests compare key properties against the CSS
+adapter in every state, scheme, and a named theme. The plan, and how the build differs from it,
+is in `docs/design/rn-adapter-plan.md`.
 
 ---
 

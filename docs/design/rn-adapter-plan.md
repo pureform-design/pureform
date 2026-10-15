@@ -1,6 +1,7 @@
 # React Native adapter plan
 
-Status: planned. A proof of concept, rendered in the browser through React Native Web.
+Status: implemented as a proof of concept, rendered in the browser through React Native Web.
+"As built" below records where the implementation differs from the plan.
 
 An adapter that compiles a pureform `CoreConfig` to React Native style objects, with a small
 runtime that picks a component's styles for its variants, its state, and the active theme. It
@@ -94,8 +95,8 @@ Each component lowers to, per slot:
 | `objectFit`                                     | `objectFit`, and `resizeMode` on images                                     |
 | `transition`, `clipPath`                        | Dropped                                                                     |
 
-Anything else outside React Native's style types is a build error, so gaps surface rather
-than vanish.
+Anything else outside React Native's style types is reported in `lowerRn`'s diagnostics and
+dropped, so gaps surface rather than vanish. The core set has none.
 
 ### Inheritance
 
@@ -107,8 +108,8 @@ inherited properties (`color`, `fontFamily`, `fontSize`, `fontWeight`, `lineHeig
 
 ### Density
 
-Density's `inherit` value reads the density of an enclosing component through the cascade on
-web. Here it reads a `density` from the provider, which a surrounding component can set.
+Density's `inherit` value is the theme's `densityOffset` size token inside `calc`, so it
+resolves from the theme like any token, with no provider setting.
 
 ### Fonts
 
@@ -186,6 +187,29 @@ overrides the primary color in either mode.
   whenever `hovered` is reported and costs nothing where it never is.
 - **Focus rings.** The outline properties render on Web; on native, keyboard focus is rare, so
   the POC leaves them as is.
+
+## As built
+
+- **Precomputed output** shares the components' structure, with theme-reading values kept as
+  templates, and ships each theme's resolved values as an array in walk order. Overrides patch
+  that array. For the core set the structure is about 146 kB of JSON, plus about 45 kB per
+  scheme and theme (resolved values and the token values overrides and `useTokens` read).
+- **Build and runtime split:** `precompute` and `runtimeStyles` are in the main entry with the
+  lowering and `chroma-js`. The React entry loads only `select`, the resolver, and an sRGB
+  mixer of about 6 kB.
+- **Overrides** replace the values components read. A token derived from an overridden one in
+  the config isn't recomputed, and override colors are `rgb()`/`rgba()` or hex, which the
+  runtime parses without a color library.
+- **One-color background images,** Material's elevation tints, become a tint composited over
+  the background color when a component's styles are picked. Other gradients are dropped.
+- **Unitless line heights** multiply the slot's font size once it's known.
+- **`fontStack: "all"`** keeps a font family's whole stack for React Native Web, which passes
+  it to CSS. Native takes the first family.
+- **`useTokens`** gives the theme's token values, for app styles such as a page background.
+  Without CSS inheritance from the page, text outside a component takes its color from there.
+- **Parity:** the browser tests compare 5,843 properties across every variant value at rest,
+  and 394 per state, scheme, and theme scenario. All match except the radii of shape variants,
+  which clip on the web and fall back to rounded corners here.
 
 ## Steps
 
