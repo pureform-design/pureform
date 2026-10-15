@@ -116,7 +116,8 @@ export function Checkbox(props: {
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
             <Animated.View style={aview(s.box)}>
-                <Animated.Text style={atext(s.checkIcon)}>✓</Animated.Text>
+                <Animated.View style={aview(s.checkIcon)} />
+                <Animated.View style={aview(s.indeterminateIcon)} />
             </Animated.View>
         </AnimatedPressable>
     );
