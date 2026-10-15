@@ -4,7 +4,7 @@
 // there is one; the root's gap spaces it from the label.
 
 import { defineSlotComponent } from "@pureform/core";
-import { px } from "@pureform/core/ast";
+import { px, add } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -18,6 +18,9 @@ import {
     touchTarget,
     iconBox,
     pressableRoot,
+    dense,
+    densityCompounds,
+    densityMarkers,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -44,10 +47,11 @@ const { tokens, ref } = componentTokens("button", {
 });
 
 type Size = "Small" | "Medium" | "Large";
+const SIZES: Size[] = ["Small", "Medium", "Large"];
 
 const size = (s: Size): { root: StyleMap } => ({
     root: {
-        height: ref(`height${s}`),
+        height: dense(ref(`height${s}`)),
         paddingInlineStart: ref(`padding${s}`),
         paddingInlineEnd: ref(`padding${s}`),
     },
@@ -88,12 +92,21 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     medium: size("Medium"),
                     large: size("Large"),
                 },
+                density: densityMarkers(),
             },
-            compoundVariants: colorCompounds(FILLS, groups),
+            compoundVariants: [
+                ...colorCompounds(FILLS, groups),
+                ...SIZES.flatMap((s) =>
+                    densityCompounds({ size: s.toLowerCase() }, (offset) => ({
+                        root: { height: add(ref(`height${s}`), offset) },
+                    })),
+                ),
+            ],
             defaultVariants: {
                 color: "primary",
                 variant: "filled",
                 size: "medium",
+                density: "inherit",
             },
         },
     });

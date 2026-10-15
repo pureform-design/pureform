@@ -27,6 +27,23 @@ pureform({
 Every component token is a CSS var with a default from the theme, for example
 `--components-button-radius`. Set it on the component or any ancestor to restyle it at runtime.
 
+## Density
+
+Material's density makes controls more compact, 4px off a component's height per step, down
+to `-3`. Set it for a whole theme or subtree through the layout provider, or per component:
+
+```ts
+pureform({ themes: { dense: { layout: materialLayout({ density: -2 }) } } });
+```
+
+```ts
+button({ density: "-1" }); // "inherit" (the default) follows the theme
+```
+
+Dense components: `button`, `iconButton`, `chip`, `checkbox`, `radio`, `textField`, `select`,
+`listItem`, and `menu`. Buttons, chips, and controls keep their full touch target; list and
+menu items shrink with no touch target, so keep dense menus for pointer layouts.
+
 ## Buttons
 
 `button`, `iconButton`, and `fab` take `color` (any color group) and `variant`. Put the touch

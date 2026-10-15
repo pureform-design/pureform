@@ -32,6 +32,7 @@ import {
     rotate,
     transform,
     translateY,
+    add,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
@@ -56,6 +57,8 @@ import {
     stateTransition,
     sys,
     focusRing,
+    dense,
+    densityVariant,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -144,7 +147,7 @@ export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
                 {
                     root: {
                         ...focusRing(CONTROL_FOCUS),
-                        ...controlRoot(ref("size")),
+                        ...controlRoot(dense(ref("size"))),
                         transition: stateTransition,
                         borderRadius: radius("full"),
                         cursor: pointer,
@@ -206,11 +209,15 @@ export const createCheckbox = (groups: ColorGroups = COLOR_GROUPS) =>
                 }),
             ),
             variants: {
+                density: densityVariant((offset) => {
+                    const side = add(ref("size"), offset);
+                    return { root: { width: side, height: side } };
+                }),
                 color: colorVariant(groups, (g) =>
                     colored({ checked: g.main, onChecked: g.on }),
                 ),
             },
-            defaultVariants: { color: DEFAULT_GROUP },
+            defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
         },
     });
 

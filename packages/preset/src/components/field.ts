@@ -7,6 +7,7 @@
 
 import {
     absolute,
+    add,
     alias,
     sub,
     column,
@@ -44,6 +45,10 @@ import {
     DEFAULT_GROUP,
     iconBox,
     inputText,
+    THEME_DENSITY,
+    dense,
+    densityCompounds,
+    densityMarkers,
     colorVariant,
     componentTokens,
     groupRoles,
@@ -173,12 +178,15 @@ export interface FieldOptions {
     /** How the text makes room for an icon: `input` pads the input, and `container` pads the
      *  container, so a textarea's scrollbar and resize handle stay clear of the icons. */
     iconRoom: "input" | "container";
+    /** Whether density shrinks the field: its height, and the input's padding and a filled
+     *  label's floated position, half off the top and half off the bottom. */
+    density?: boolean;
 }
 
 /** The shared slot styles and variants of a text input, over its tokens. */
 export const fieldParts = (
     ref: (token: FieldToken) => AliasNode,
-    { labelRest, iconRoom }: FieldOptions,
+    { labelRest, iconRoom, density = false }: FieldOptions,
 ) => {
     // The filled indicator and outlined stroke, in a given focus color.
     const indicatorShadow = (focus: ColorValue) =>
@@ -283,24 +291,40 @@ export const fieldParts = (
         },
     } satisfies Record<string, StyleMap>;
 
+    // The sizes density changes, at an offset: half of it off each side.
+    const sized = (offset: NumericValue | undefined) => {
+        const plus = (value: NumericValue) =>
+            offset ? add(value, mul(offset, unitless(0.5))) : value;
+        return {
+            filled: {
+                input: {
+                    paddingBlockStart: plus(spacing("6")),
+                    paddingBlockEnd: plus(spacing("2")),
+                },
+                label: { top: floated(labelRest, plus(spacing("2"))) },
+            },
+            outlined: {
+                input: {
+                    paddingBlockStart: plus(spacing("4")),
+                    paddingBlockEnd: plus(spacing("4")),
+                },
+            },
+        } satisfies Record<string, Record<string, StyleMap>>;
+    };
+    const themeSized = sized(density ? THEME_DENSITY : undefined);
+
     const variant = {
         filled: {
             container: filled,
-            input: {
-                paddingBlockStart: spacing("6"),
-                paddingBlockEnd: spacing("2"),
-            },
+            input: themeSized.filled.input,
             label: {
-                top: floated(labelRest, spacing("2")),
+                ...themeSized.filled.label,
                 transform: floated(transform(translateY(pct(-50))), none),
             },
         },
         outlined: {
             container: outlined,
-            input: {
-                paddingBlockStart: spacing("4"),
-                paddingBlockEnd: spacing("4"),
-            },
+            input: themeSized.outlined.input,
             label: {
                 top: floated(labelRest, px(0)),
                 transform: transform(translateY(pct(-50))),
@@ -407,5 +431,20 @@ export const fieldParts = (
         defaultVariants: { leadingIcon: "false", trailingIcon: "false" },
     };
 
-    return { base, variant, colors, icons };
+    // The density variant, and a compound per fill and step restating the sizes, since the
+    // fill variant sets them too. A component with a fixed height reads it at the theme's
+    // density through `height`.
+    const densities = {
+        height: dense(ref("height")),
+        variants: { density: densityMarkers() },
+        compoundVariants: (["filled", "outlined"] as const).flatMap((fill) =>
+            densityCompounds({ variant: fill }, (offset) => ({
+                ...sized(offset)[fill],
+                container: { height: add(ref("height"), offset) },
+            })),
+        ),
+        defaultVariants: { density: "inherit" },
+    };
+
+    return { base, variant, colors, icons, densities };
 };

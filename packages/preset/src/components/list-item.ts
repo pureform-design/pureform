@@ -16,7 +16,7 @@
 // a state layer and the focus ring. Mark it selected with `aria-selected` or `data-selected`.
 
 import { defineSlotComponent } from "@pureform/core";
-import { column, flex, pct, px, start } from "@pureform/core/ast";
+import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { spacing, textStyle } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
@@ -25,6 +25,9 @@ import {
     DEFAULT_GROUP,
     colorVariant,
     groupRoles,
+    dense,
+    densityCompounds,
+    densityMarkers,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -38,8 +41,16 @@ const { tokens, ref } = rowTokens("listItem", {
 
 const parts = rowParts(ref, "root");
 
-const lines = (height: "heightOne" | "heightTwo" | "heightThree") => ({
-    root: { minHeight: ref(height) },
+type LineHeight = "heightOne" | "heightTwo" | "heightThree";
+
+const LINES: Record<string, LineHeight> = {
+    one: "heightOne",
+    two: "heightTwo",
+    three: "heightThree",
+};
+
+const lines = (height: LineHeight) => ({
+    root: { minHeight: dense(ref(height)) },
 });
 
 /** Build the list item with a `color` variant per group in `groups`. A group colors the
@@ -98,7 +109,7 @@ export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
                     // Material tops the leading and trailing parts in a three-line item.
                     three: {
                         root: {
-                            minHeight: ref("heightThree"),
+                            minHeight: dense(ref("heightThree")),
                             alignItems: start,
                             paddingBlockStart: spacing("3"),
                             paddingBlockEnd: spacing("3"),
@@ -109,6 +120,7 @@ export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
                     true: { root: parts.interactive },
                     false: {},
                 },
+                density: densityMarkers(),
                 color: colorVariant(groups, (g) => {
                     const c = rowGroupColors(ref, "root", g);
                     return {
@@ -122,19 +134,27 @@ export const createListItem = (groups: ColorGroups = COLOR_GROUPS) =>
             },
             // An interactive item's selected colors sit in the interactive variant, so a compound
             // variant per group replaces them in the later layer.
-            compoundVariants: groups
-                .filter((group) => group !== DEFAULT_GROUP)
-                .map((group) => ({
-                    match: { interactive: "true", color: group },
-                    style: {
-                        root: rowGroupColors(ref, "root", groupRoles(group))
-                            .interactive,
-                    },
-                })),
+            compoundVariants: [
+                ...groups
+                    .filter((group) => group !== DEFAULT_GROUP)
+                    .map((group) => ({
+                        match: { interactive: "true", color: group },
+                        style: {
+                            root: rowGroupColors(ref, "root", groupRoles(group))
+                                .interactive,
+                        },
+                    })),
+                ...Object.entries(LINES).flatMap(([count, height]) =>
+                    densityCompounds({ lines: count }, (offset) => ({
+                        root: { minHeight: add(ref(height), offset) },
+                    })),
+                ),
+            ],
             defaultVariants: {
                 lines: "one",
                 interactive: "false",
                 color: DEFAULT_GROUP,
+                density: "inherit",
             },
         },
     });

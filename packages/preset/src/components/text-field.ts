@@ -27,9 +27,10 @@ import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField");
 
-const { base, variant, colors, icons } = fieldParts(ref, {
+const { base, variant, colors, icons, densities } = fieldParts(ref, {
     labelRest: pct(50),
     iconRoom: "input",
+    density: true,
 });
 
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
@@ -49,22 +50,25 @@ export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
             base: {
                 ...base,
                 ...icons.base,
-                container: { ...base.container, height: ref("height") },
+                container: { ...base.container, height: densities.height },
                 input: { ...base.input, height: pct(100) },
             },
             variants: {
                 variant,
                 color: color.color,
                 ...icons.variants,
+                ...densities.variants,
             },
             compoundVariants: [
                 ...color.compoundVariants,
                 ...icons.compoundVariants,
+                ...densities.compoundVariants,
             ],
             defaultVariants: {
                 color: DEFAULT_GROUP,
                 variant: "filled",
                 ...icons.defaultVariants,
+                ...densities.defaultVariants,
             },
         },
     });

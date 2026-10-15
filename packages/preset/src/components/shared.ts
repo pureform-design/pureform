@@ -2,6 +2,8 @@
 
 import {
     absolute,
+    add,
+    mul,
     pointer,
     relative,
     row,
@@ -28,6 +30,7 @@ import type {
     AliasNode,
     ColorValue,
     SlotCondition,
+    NumericValue,
     StyleMap,
     ValueNode,
 } from "@pureform/core/ast";
@@ -38,6 +41,7 @@ import {
     easing,
     opacity,
     size,
+    spacing,
     textStyle,
 } from "@pureform/theme";
 
@@ -415,3 +419,50 @@ export const slotStateLayer = (
     if (selected?.base) layer.on(selected.state, selected.base);
     return layer.on(slot(slotName, "disabled"), rest.base).else(rest.base);
 };
+
+/** Material's density steps, as `density` variant keys: `0` is the default size, and each step
+ *  down takes one grid unit off a dense component's height. */
+export const DENSITIES = ["0", "-1", "-2", "-3"] as const;
+
+export type Density = (typeof DENSITIES)[number];
+
+/** The theme's density offset, which `density` on the layout provider sets. */
+export const THEME_DENSITY: NumericValue = size("densityOffset");
+
+/** What one density step takes off: a grid unit per step. */
+export const densityOffset = (density: Density): NumericValue =>
+    density === "0" ? px(0) : mul(spacing("1"), unitless(Number(density)));
+
+/** A size at the theme's density. */
+export const dense = (value: NumericValue): NumericValue =>
+    add(value, THEME_DENSITY);
+
+type SlotStyles = Record<string, StyleMap>;
+
+/** A `density` variant: `inherit` follows the theme, and each step restates the sized styles
+ *  at its offset. For a component whose sizes depend on no other variant. */
+export const densityVariant = (
+    sized: (offset: NumericValue) => SlotStyles,
+): Record<string, SlotStyles> => ({
+    inherit: {},
+    ...Object.fromEntries(
+        DENSITIES.map((density) => [density, sized(densityOffset(density))]),
+    ),
+});
+
+/** A `density` variant whose steps only name themselves, for a component whose sizes depend on
+ *  another variant; `densityCompounds` then restates them per that variant's value. */
+export const densityMarkers = (): Record<string, SlotStyles> =>
+    Object.fromEntries(
+        ["inherit", ...DENSITIES].map((density) => [density, {}]),
+    );
+
+/** One compound variant per density step, restating the sized styles where `match` holds. */
+export const densityCompounds = (
+    match: Record<string, string>,
+    sized: (offset: NumericValue) => SlotStyles,
+) =>
+    DENSITIES.map((density) => ({
+        match: { ...match, density },
+        style: sized(densityOffset(density)),
+    }));

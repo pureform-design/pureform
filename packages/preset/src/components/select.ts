@@ -33,9 +33,10 @@ import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = fieldTokens("select");
 
-const { base, variant, colors, icons } = fieldParts(ref, {
+const { base, variant, colors, icons, densities } = fieldParts(ref, {
     labelRest: pct(50),
     iconRoom: "input",
+    density: true,
 });
 
 const EXPANDED = slot("container", "expanded");
@@ -56,7 +57,7 @@ export const createSelect = (groups: ColorGroups = COLOR_GROUPS) => {
             base: {
                 ...base,
                 ...icons.base,
-                container: { ...base.container, height: ref("height") },
+                container: { ...base.container, height: densities.height },
                 input: { ...base.input, height: pct(100), cursor: pointer },
                 // The arrow turns over while the menu is open.
                 trailingIcon: {
@@ -77,16 +78,19 @@ export const createSelect = (groups: ColorGroups = COLOR_GROUPS) => {
                 variant,
                 color: color.color,
                 ...icons.variants,
+                ...densities.variants,
             },
             compoundVariants: [
                 ...color.compoundVariants,
                 ...icons.compoundVariants,
+                ...densities.compoundVariants,
             ],
             // The arrow is always there.
             defaultVariants: {
                 color: DEFAULT_GROUP,
                 variant: "filled",
                 ...icons.defaultVariants,
+                ...densities.defaultVariants,
                 trailingIcon: "true",
             },
         },

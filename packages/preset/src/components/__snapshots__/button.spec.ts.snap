@@ -761,9 +761,118 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "variant": "elevated",
     },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + 0px)",
+        },
+      },
+      "density": "0",
+      "size": "small",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "density": "-1",
+      "size": "small",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "density": "-2",
+      "size": "small",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "density": "-3",
+      "size": "small",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + 0px)",
+        },
+      },
+      "density": "0",
+      "size": "medium",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "density": "-1",
+      "size": "medium",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "density": "-2",
+      "size": "medium",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "density": "-3",
+      "size": "medium",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + 0px)",
+        },
+      },
+      "density": "0",
+      "size": "large",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "density": "-1",
+      "size": "large",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "density": "-2",
+      "size": "large",
+    },
+    {
+      "css": {
+        "root": {
+          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "density": "-3",
+      "size": "large",
+    },
   ],
   "defaultVariants": {
     "color": "primary",
+    "density": "inherit",
     "size": "medium",
     "variant": "filled",
   },
@@ -800,24 +909,31 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "root": {},
       },
     },
+    "density": {
+      "-1": {},
+      "-2": {},
+      "-3": {},
+      "0": {},
+      "inherit": {},
+    },
     "size": {
       "large": {
         "root": {
-          "height": "var(--components-button-heightLarge, token(sizes.controlLarge))",
+          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + token(sizes.densityOffset))",
           "paddingInlineEnd": "var(--components-button-paddingLarge, token(spacing.8))",
           "paddingInlineStart": "var(--components-button-paddingLarge, token(spacing.8))",
         },
       },
       "medium": {
         "root": {
-          "height": "var(--components-button-heightMedium, token(sizes.controlMedium))",
+          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + token(sizes.densityOffset))",
           "paddingInlineEnd": "var(--components-button-paddingMedium, token(spacing.6))",
           "paddingInlineStart": "var(--components-button-paddingMedium, token(spacing.6))",
         },
       },
       "small": {
         "root": {
-          "height": "var(--components-button-heightSmall, token(sizes.controlSmall))",
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + token(sizes.densityOffset))",
           "paddingInlineEnd": "var(--components-button-paddingSmall, token(spacing.4))",
           "paddingInlineStart": "var(--components-button-paddingSmall, token(spacing.4))",
         },

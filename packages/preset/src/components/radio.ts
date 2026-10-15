@@ -22,6 +22,7 @@ import {
     transform,
     unitless,
     when,
+    add,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
@@ -47,6 +48,8 @@ import {
     sys,
     tweens,
     focusRing,
+    dense,
+    densityVariant,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -94,7 +97,7 @@ export const createRadio = (groups: ColorGroups = COLOR_GROUPS) =>
                 {
                     root: {
                         ...focusRing(CONTROL_FOCUS),
-                        ...controlRoot(ref("size")),
+                        ...controlRoot(dense(ref("size"))),
                         transition: stateTransition,
                         borderRadius: radius("full"),
                         cursor: pointer,
@@ -127,9 +130,13 @@ export const createRadio = (groups: ColorGroups = COLOR_GROUPS) =>
                 colored(ref("checkedColor")),
             ),
             variants: {
+                density: densityVariant((offset) => {
+                    const side = add(ref("size"), offset);
+                    return { root: { width: side, height: side } };
+                }),
                 color: colorVariant(groups, (g) => colored(g.main)),
             },
-            defaultVariants: { color: DEFAULT_GROUP },
+            defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
         },
     });
 

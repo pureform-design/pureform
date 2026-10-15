@@ -18,7 +18,10 @@ describe("button", () => {
     });
 
     it("pairs every color group with every fill", () => {
-        expect(button.recipe.compoundVariants).toHaveLength(7 * 5);
+        const colors = button.recipe.compoundVariants?.filter(
+            (c) => c.match.color !== undefined,
+        );
+        expect(colors).toHaveLength(7 * 5);
     });
 
     it("tints a filled primary button with its on-color on hover", () => {

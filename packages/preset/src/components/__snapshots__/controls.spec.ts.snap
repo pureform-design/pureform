@@ -95,7 +95,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
       "borderRadius": "token(radii.full)",
       "cursor": "pointer",
       "display": "inline-flex",
-      "height": "var(--components-checkbox-size, token(sizes.controlMedium))",
+      "height": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + token(sizes.densityOffset))",
       "justifyContent": "center",
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
@@ -109,7 +109,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
         "_motionReduce": "none",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       },
-      "width": "var(--components-checkbox-size, token(sizes.controlMedium))",
+      "width": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + token(sizes.densityOffset))",
     },
     "touchTarget": {
       "height": "100%",
@@ -126,6 +126,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "density": "inherit",
   },
   "jsx": [
     "Checkbox",
@@ -376,6 +377,33 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "density": {
+      "-1": {
+        "root": {
+          "height": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
+          "width": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "-2": {
+        "root": {
+          "height": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
+          "width": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "-3": {
+        "root": {
+          "height": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
+          "width": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "0": {
+        "root": {
+          "height": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + 0px)",
+          "width": "calc(var(--components-checkbox-size, token(sizes.controlMedium)) + 0px)",
+        },
+      },
+      "inherit": {},
+    },
   },
 }
 `;
@@ -448,7 +476,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
       "borderRadius": "token(radii.full)",
       "cursor": "pointer",
       "display": "inline-flex",
-      "height": "var(--components-radio-size, token(sizes.controlMedium))",
+      "height": "calc(var(--components-radio-size, token(sizes.controlMedium)) + token(sizes.densityOffset))",
       "justifyContent": "center",
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
@@ -462,7 +490,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
         "_motionReduce": "none",
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       },
-      "width": "var(--components-radio-size, token(sizes.controlMedium))",
+      "width": "calc(var(--components-radio-size, token(sizes.controlMedium)) + token(sizes.densityOffset))",
     },
     "touchTarget": {
       "height": "100%",
@@ -479,6 +507,7 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "density": "inherit",
   },
   "jsx": [
     "Radio",
@@ -673,6 +702,33 @@ exports[`radio > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "height": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
+          "width": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "-2": {
+        "root": {
+          "height": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
+          "width": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "-3": {
+        "root": {
+          "height": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
+          "width": "calc(var(--components-radio-size, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "0": {
+        "root": {
+          "height": "calc(var(--components-radio-size, token(sizes.controlMedium)) + 0px)",
+          "width": "calc(var(--components-radio-size, token(sizes.controlMedium)) + 0px)",
+        },
+      },
+      "inherit": {},
     },
   },
 }

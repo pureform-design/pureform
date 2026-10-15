@@ -5,7 +5,7 @@
 // selected filter or input chip. Render the icon slot only when there is an icon.
 
 import { defineSlotComponent } from "@pureform/core";
-import { px, solid, transparent, slot, when } from "@pureform/core/ast";
+import { px, solid, transparent, slot, when, add } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -21,6 +21,8 @@ import {
     touchTarget,
     iconBox,
     pressableRoot,
+    dense,
+    densityVariant,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -126,7 +128,7 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
                 root: {
                     ...pressableRoot,
                     gap: ref("gap"),
-                    height: ref("height"),
+                    height: dense(ref("height")),
                     paddingInlineStart: ref("padding"),
                     paddingInlineEnd: ref("padding"),
                     borderRadius: ref("radius"),
@@ -146,6 +148,9 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
                 color: colorVariant(groups, (g) => ({
                     icon: { color: iconColor(g.onContainer) },
                 })),
+                density: densityVariant((offset) => ({
+                    root: { height: add(ref("height"), offset) },
+                })),
             },
             // The selected colors sit in each fill's states, so a compound variant per fill and
             // group replaces them in the later layer.
@@ -164,7 +169,11 @@ export const createChip = (groups: ColorGroups = COLOR_GROUPS) =>
                         };
                     }),
                 ),
-            defaultVariants: { variant: "outlined", color: DEFAULT_GROUP },
+            defaultVariants: {
+                variant: "outlined",
+                color: DEFAULT_GROUP,
+                density: "inherit",
+            },
         },
     });
 

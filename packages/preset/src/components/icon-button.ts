@@ -1,7 +1,7 @@
 // The pureform icon button: a square, fully rounded button holding a single icon.
 
 import { defineSlotComponent } from "@pureform/core";
-import { px } from "@pureform/core/ast";
+import { px, add } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
@@ -15,6 +15,9 @@ import {
     touchTarget,
     iconBox,
     pressableRoot,
+    dense,
+    densityCompounds,
+    densityMarkers,
 } from "./shared";
 import type { ColorGroups, Fill } from "./shared";
 
@@ -39,7 +42,7 @@ const { tokens, ref } = componentTokens("iconButton", {
 const size = (
     token: "sizeSmall" | "sizeMedium" | "sizeLarge",
 ): { root: StyleMap } => ({
-    root: { width: ref(token), height: ref(token) },
+    root: { width: dense(ref(token)), height: dense(ref(token)) },
 });
 
 /** Build the iconButton with a `color` variant per group in `groups`. */
@@ -72,12 +75,22 @@ export const createIconButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     medium: size("sizeMedium"),
                     large: size("sizeLarge"),
                 },
+                density: densityMarkers(),
             },
-            compoundVariants: colorCompounds(FILLS, groups),
+            compoundVariants: [
+                ...colorCompounds(FILLS, groups),
+                ...(["Small", "Medium", "Large"] as const).flatMap((s) =>
+                    densityCompounds({ size: s.toLowerCase() }, (offset) => {
+                        const side = add(ref(`size${s}`), offset);
+                        return { root: { width: side, height: side } };
+                    }),
+                ),
+            ],
             defaultVariants: {
                 color: "primary",
                 variant: "standard",
                 size: "medium",
+                density: "inherit",
             },
         },
     });

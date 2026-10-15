@@ -32,7 +32,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "display": "inline-flex",
       "flexDirection": "row",
       "gap": "var(--components-chip-gap, token(spacing.2))",
-      "height": "var(--components-chip-height, token(sizes.controlSmall))",
+      "height": "calc(var(--components-chip-height, token(sizes.controlSmall)) + token(sizes.densityOffset))",
       "justifyContent": "center",
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
@@ -377,6 +377,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
   ],
   "defaultVariants": {
     "color": "primary",
+    "density": "inherit",
     "variant": "outlined",
   },
   "jsx": [
@@ -445,6 +446,29 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "height": "calc(var(--components-chip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
+        },
+      },
+      "-2": {
+        "root": {
+          "height": "calc(var(--components-chip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
+        },
+      },
+      "-3": {
+        "root": {
+          "height": "calc(var(--components-chip-height, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
+        },
+      },
+      "0": {
+        "root": {
+          "height": "calc(var(--components-chip-height, token(sizes.controlSmall)) + 0px)",
+        },
+      },
+      "inherit": {},
     },
     "variant": {
       "elevated": {

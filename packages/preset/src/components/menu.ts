@@ -16,7 +16,7 @@
 // `disabled` or `aria-disabled`.
 
 import { defineSlotComponent } from "@pureform/core";
-import { column, flex, pct, px, start } from "@pureform/core/ast";
+import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
@@ -26,6 +26,8 @@ import {
     COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
+    dense,
+    densityVariant,
 } from "./shared";
 import type { ColorGroups } from "./shared";
 
@@ -86,7 +88,7 @@ export const createMenu = (groups: ColorGroups = COLOR_GROUPS) =>
                     ...parts.interactive,
                     gap: ref("gap"),
                     width: pct(100),
-                    height: ref("itemHeight"),
+                    height: dense(ref("itemHeight")),
                     paddingInlineStart: ref("itemPaddingInline"),
                     paddingInlineEnd: ref("itemPaddingInline"),
                     borderWidth: px(0),
@@ -102,6 +104,9 @@ export const createMenu = (groups: ColorGroups = COLOR_GROUPS) =>
                 itemTrailingText: parts.trailingText("labelLarge"),
             },
             variants: {
+                density: densityVariant((offset) => ({
+                    item: { height: add(ref("itemHeight"), offset) },
+                })),
                 color: colorVariant(groups, (g) => {
                     const c = rowGroupColors(ref, "item", g);
                     return {
@@ -111,7 +116,7 @@ export const createMenu = (groups: ColorGroups = COLOR_GROUPS) =>
                     };
                 }),
             },
-            defaultVariants: { color: DEFAULT_GROUP },
+            defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
         },
     });
 
