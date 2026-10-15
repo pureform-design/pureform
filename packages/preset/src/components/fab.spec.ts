@@ -22,6 +22,15 @@ describe("fab", () => {
         });
     });
 
+    it("tints its container by elevation level, level 0 when disabled", () => {
+        const image = JSON.stringify(
+            compiled()?.base?.container?.backgroundImage,
+        );
+        expect(image).toContain("elevationTintLevel3");
+        expect(image).toContain("elevationTintLevel4");
+        expect(image).toContain("elevationTintLevel0");
+    });
+
     it("is square unless extended", () => {
         const square = compiled()?.compoundVariants?.find(
             (c) => c.size === "large" && c.extended === false,

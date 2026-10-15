@@ -1026,6 +1026,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       },
       "variant": {
         "elevated": {
+          "container": {
+            "backgroundImage": {
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel2), token(colors.elevationTintLevel2))",
+              "base": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
+            },
+          },
           "root": {
             "_disabled": {
               "filterElevation": "level0",
@@ -1037,6 +1044,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "filled": {
+          "container": {
+            "backgroundImage": {
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
+              "base": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+            },
+          },
           "root": {
             "_disabled": {
               "filterElevation": "level0",
@@ -1057,12 +1071,16 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
             "borderWidth": "var(--components-iconButton-outlineWidth, 1px)",
             "display": "flex",
           },
-          "root": {},
         },
-        "standard": {
-          "root": {},
-        },
+        "standard": {},
         "tonal": {
+          "container": {
+            "backgroundImage": {
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
+              "base": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+            },
+          },
           "root": {
             "_disabled": {
               "filterElevation": "level0",

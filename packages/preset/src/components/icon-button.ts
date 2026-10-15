@@ -97,7 +97,7 @@ export const createIconButton = (
                     Object.entries(FILLS).map(([name, fill]) => [
                         name,
                         {
-                            root: shapedElevation(fill),
+                            ...shapedElevation(fill),
                             ...(fill === "outlined"
                                 ? { outline: shapedOutlineStroke(ref) }
                                 : {}),

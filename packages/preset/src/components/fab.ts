@@ -20,6 +20,7 @@ import {
     DEFAULT_SHAPES,
     shapedColors,
     shapedContainer,
+    shapedElevationLevels,
     shapeVariant,
 } from "./shaped";
 import type { Shapes } from "./shaped";
@@ -75,6 +76,8 @@ const fabSize = (
             : {},
 });
 
+const elevation = shapedElevationLevels("level3", "level4");
+
 /** Build the FAB with a `color` variant per group in `groups`. */
 export const createFab = (
     groups: ColorGroups = COLOR_GROUPS,
@@ -96,17 +99,18 @@ export const createFab = (
             base: {
                 root: {
                     ...pressableRoot,
-                    apply: { filterElevation: "level3" },
+                    ...elevation.root,
                     states: {
-                        hover: { apply: { filterElevation: "level4" } },
+                        ...elevation.root.states,
                         disabled: {
+                            ...elevation.root.states.disabled,
                             pointerEvents: none,
-                            apply: { filterElevation: "level0" },
                         },
                     },
                 },
                 container: {
                     ...shapedContainer(ref("radiusMedium")),
+                    ...elevation.container,
                     gap: ref("gap"),
                 },
                 icon: iconBox(ref("iconSize")),

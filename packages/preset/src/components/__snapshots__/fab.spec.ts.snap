@@ -5,6 +5,11 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "container": {
       "alignItems": "center",
+      "backgroundImage": {
+        ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+        ".fab__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel4), token(colors.elevationTintLevel4))",
+        "base": "linear-gradient(token(colors.elevationTintLevel3), token(colors.elevationTintLevel3))",
+      },
       "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
       "display": "flex",
       "flexGrow": "1",

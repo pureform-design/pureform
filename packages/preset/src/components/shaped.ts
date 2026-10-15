@@ -25,6 +25,8 @@ import {
     slot,
     solid,
     transparent,
+    linearGradient,
+    stop,
     unitless,
     when,
 } from "@pureform/core/ast";
@@ -36,6 +38,7 @@ import type {
     ShapeGeometry,
     StyleMap,
 } from "@pureform/core/ast";
+import { elevationTint } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
 import {
@@ -118,23 +121,39 @@ export const shapedColors = (
     } satisfies Record<string, StyleMap>;
 };
 
-/** Elevation for a fill, as drop shadows on the root so they follow the shape. */
-export const shapedElevation = (fill: Fill): StyleMap => {
-    const levels =
-        fill === "elevated"
-            ? ["level1", "level2"]
-            : fill === "filled" || fill === "tonal"
-              ? ["level0", "level1"]
-              : undefined;
-    if (!levels) return {};
-    return {
-        apply: { filterElevation: levels[0]! },
-        states: {
-            hover: { apply: { filterElevation: levels[1]! } },
-            disabled: { apply: { filterElevation: "level0" } },
-        },
-    };
+const tint = (level: string) => {
+    const color = elevationTint(level);
+    return linearGradient([stop(color), stop(color)]);
 };
+
+/** Elevation that rests at one level and lifts to another on hover: drop shadows on the root,
+ *  so they follow the shape, and the level's tint over the container's fill. A disabled
+ *  component drops to level 0. */
+export const shapedElevationLevels = (rest: string, hover: string) =>
+    ({
+        root: {
+            apply: { filterElevation: rest },
+            states: {
+                hover: { apply: { filterElevation: hover } },
+                disabled: { apply: { filterElevation: "level0" } },
+            },
+        },
+        container: {
+            backgroundImage: when()
+                .on(DISABLED, tint("level0"))
+                .on(slot("root", "hover"), tint(hover))
+                .else(tint(rest)),
+        },
+    }) satisfies Record<string, StyleMap>;
+
+/** Elevation for a fill, as Material specifies for buttons. Outlined and text fills draw
+ *  none. */
+export const shapedElevation = (fill: Fill): Record<string, StyleMap> =>
+    fill === "elevated"
+        ? shapedElevationLevels("level1", "level2")
+        : fill === "filled" || fill === "tonal"
+          ? shapedElevationLevels("level0", "level1")
+          : {};
 
 /** The `shape` variant: `none` keeps the rounded corners, and each shape clips the container
  *  to itself, and the outline layer to a ring `outlineWidth` wide along it, filled with the
