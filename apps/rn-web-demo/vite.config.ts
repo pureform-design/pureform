@@ -1,3 +1,6 @@
+import { createRequire } from "node:module";
+import { dirname } from "node:path";
+
 import { materialColor } from "@pureform/material";
 import { pureform } from "@pureform/preset";
 import { precompute, resolveTheme, runtimeStyles } from "@pureform/rn-adapter";
@@ -7,6 +10,8 @@ import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 
 import packageJson from "./package.json";
+
+const require = createRequire(import.meta.url);
 import { BRAND_TOKENS, BRANDS, COMPONENTS, config } from "./src/config";
 
 const STYLES_ID = "virtual:pureform-rn";
@@ -71,7 +76,12 @@ export default createConfig({
     overrides: {
         plugins: [react(), pureformRn()],
         resolve: {
-            alias: { "react-native": "react-native-web" },
+            // An absolute path, so the adapter's built files, outside this app, find it too.
+            alias: {
+                "react-native": dirname(
+                    require.resolve("react-native-web/package.json"),
+                ),
+            },
         },
         // Parts of React Native Web's Animated refer to Node's `global`.
         define: { global: "globalThis" },
