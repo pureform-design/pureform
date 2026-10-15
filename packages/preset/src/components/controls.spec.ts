@@ -1,3 +1,4 @@
+import type { SlottedComponentSpec } from "@pureform/core/types";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
@@ -8,7 +9,7 @@ import { separator } from "./separator";
 import { switchControl } from "./switch";
 
 type Slots = Record<string, { base: Record<string, Record<string, unknown>> }>;
-const slotRecipe = (spec: typeof checkbox) => {
+const slotRecipe = (spec: SlottedComponentSpec) => {
     const preset = compilePreset(configWith(spec));
     const recipes = preset.theme?.slotRecipes as Slots;
     return recipes[spec.name]!;

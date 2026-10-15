@@ -1,3 +1,4 @@
+import type { SlottedComponentSpec } from "@pureform/core/types";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
@@ -13,7 +14,7 @@ type Slots = Record<
     }
 >;
 
-const compile = (spec: typeof textArea, name: string) => {
+const compile = (spec: SlottedComponentSpec, name: string) => {
     const preset = compilePreset(configWith(spec));
     const recipes = preset.theme?.slotRecipes as Slots;
     return recipes[name]!;

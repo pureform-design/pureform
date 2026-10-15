@@ -1,3 +1,4 @@
+import type { SlottedComponentSpec } from "@pureform/core/types";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
@@ -42,7 +43,7 @@ describe.each([
 });
 
 describe("rows", () => {
-    const recipe = (name: string, spec: typeof listItem) =>
+    const recipe = (name: string, spec: SlottedComponentSpec) =>
         JSON.stringify(
             compilePreset(configWith(spec)).theme?.slotRecipes?.[name],
         );

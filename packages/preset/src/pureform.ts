@@ -87,13 +87,14 @@ type ThemeConfig = Theme<string, string, string>["config"];
  *  for its color groups. */
 export interface ComponentsContext<G extends string> {
     theme: ResolvedTheme<G>;
-    defaults: Record<string, AnyComponentSpec>;
+    defaults: DefaultComponents;
 }
 
 export interface PureformOptions<
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
+    TComponents extends ComponentMap = DefaultComponents,
 > {
     /** Default `materialColor()`. Its groups become each component's `color` variant. */
     color?: ColorProvider<G>;
@@ -130,9 +131,7 @@ export interface PureformOptions<
     themes?: Record<string, Partial<ThemeProviders<string, string, string>>>;
     /** Choose the components. Return `defaults` to keep them all, leave some out, or add your
      *  own. Default: every pureform component. */
-    components?: (
-        ctx: ComponentsContext<G>,
-    ) => Record<string, AnyComponentSpec | undefined>;
+    components?: (ctx: ComponentsContext<G>) => TComponents;
 }
 
 type TokenTiers = Record<string, Record<string, unknown>>;
@@ -226,10 +225,78 @@ export type PureformConfig<
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
+    TComponents extends ComponentMap = DefaultComponents,
 > = CoreConfig &
     ThemeVocabulary<G, TFont, TStyle> & {
+        /** The components, typed by name and token, so `typed(config)` offers
+         *  `alias("components", name, token)`. */
+        components: Chosen<TComponents>;
         readonly theme: Theme<G, TFont, TStyle>;
     };
+
+/** Components by name; `undefined` leaves one out. */
+type ComponentMap = Record<string, AnyComponentSpec | undefined>;
+
+/** pureform's components, built for a theme's color groups, density steps, typescale, and
+ *  corner, and the given shapes. */
+const defaultComponents = (
+    theme: ResolvedTheme<string, string, string>,
+    shapes: Shapes,
+) => {
+    const densities = theme.layout.densities;
+    const components = {
+        button: createButton(theme.color.groups, densities),
+        iconButton: createIconButton(theme.color.groups, densities, shapes),
+        fab: createFab(theme.color.groups, shapes),
+        avatar: createAvatar(theme.color.groups, shapes),
+        chip: createChip(theme.color.groups, densities),
+        textField: createTextField(theme.color.groups, densities),
+        textArea: createTextArea(theme.color.groups, densities),
+        searchBar,
+        select: createSelect(theme.color.groups, densities),
+        supportingText: createSupportingText(theme.color.groups),
+        checkbox: createCheckbox(theme.color.groups, densities),
+        radio: createRadio(theme.color.groups, densities),
+        switchControl: createSwitch(theme.color.groups),
+        slider: createSlider(theme.color.groups),
+        linearProgress: createLinearProgress(theme.color.groups),
+        circularProgress: createCircularProgress(theme.color.groups),
+        separator,
+        listItem: createListItem(theme.color.groups, densities),
+        menu: createMenu(theme.color.groups, densities),
+        tabs: createTabs(theme.color.groups),
+        navigationBar: createNavigationBar(theme.color.groups),
+        navigationRail: createNavigationRail(theme.color.groups),
+        dialog,
+        snackbar,
+        tooltip,
+        card,
+        scrim,
+        ripple,
+        icon: createIcon(theme.color.groups),
+        touchTarget,
+        text: createText(Object.keys(theme.typography.styles)),
+    };
+    for (const [name, spec] of Object.entries(components)) {
+        (components as Record<string, AnyComponentSpec>)[name] = withCorner(
+            spec,
+            theme.shape.corner,
+        );
+    }
+    return components;
+};
+
+/** pureform's default components, by name. */
+export type DefaultComponents = ReturnType<typeof defaultComponents>;
+
+/** The components a config holds: the ones a `components` function returns, less any it
+ *  set to `undefined`. */
+type Chosen<TC> = {
+    [K in keyof TC as undefined extends TC[K] ? never : K]: Exclude<
+        TC[K],
+        undefined
+    >;
+};
 
 /** Build the full pureform config. Every contract is checked and every alias resolves, or
  *  this throws naming the provider or the bad path. */
@@ -237,9 +304,10 @@ export const pureform = <
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
+    TComponents extends ComponentMap = DefaultComponents,
 >(
-    options: PureformOptions<G, TFont, TStyle> = {},
-): PureformConfig<G, TFont, TStyle> => {
+    options: PureformOptions<G, TFont, TStyle, TComponents> = {},
+): PureformConfig<G, TFont, TStyle, TComponents> => {
     const providers: ThemeProviders<G, TFont, TStyle> = {
         color: options.color ?? (materialColor() as ColorProvider<G>),
         typography:
@@ -298,45 +366,10 @@ export const pureform = <
         colors.push([`theme "${name}"`, variant.color]);
     }
 
-    const densities = theme.layout.densities;
     const shapes = options.shapes ?? DEFAULT_SHAPES;
-    const defaults: Record<string, AnyComponentSpec> = {
-        button: createButton(theme.color.groups, densities),
-        iconButton: createIconButton(theme.color.groups, densities, shapes),
-        fab: createFab(theme.color.groups, shapes),
-        avatar: createAvatar(theme.color.groups, shapes),
-        chip: createChip(theme.color.groups, densities),
-        textField: createTextField(theme.color.groups, densities),
-        textArea: createTextArea(theme.color.groups, densities),
-        searchBar,
-        select: createSelect(theme.color.groups, densities),
-        supportingText: createSupportingText(theme.color.groups),
-        checkbox: createCheckbox(theme.color.groups, densities),
-        radio: createRadio(theme.color.groups, densities),
-        switchControl: createSwitch(theme.color.groups),
-        slider: createSlider(theme.color.groups),
-        linearProgress: createLinearProgress(theme.color.groups),
-        circularProgress: createCircularProgress(theme.color.groups),
-        separator,
-        listItem: createListItem(theme.color.groups, densities),
-        menu: createMenu(theme.color.groups, densities),
-        tabs: createTabs(theme.color.groups),
-        navigationBar: createNavigationBar(theme.color.groups),
-        navigationRail: createNavigationRail(theme.color.groups),
-        dialog,
-        snackbar,
-        tooltip,
-        card,
-        scrim,
-        ripple,
-        icon: createIcon(theme.color.groups),
-        touchTarget,
-        text: createText(Object.keys(theme.typography.styles)),
-    };
-    for (const [name, spec] of Object.entries(defaults)) {
-        defaults[name] = withCorner(spec, theme.shape.corner);
-    }
-    const chosen = options.components?.({ theme, defaults }) ?? defaults;
+    const defaults = defaultComponents(theme, shapes);
+    const chosen: ComponentMap =
+        options.components?.({ theme, defaults }) ?? defaults;
     const components = Object.fromEntries(
         Object.entries(chosen).filter(
             (entry): entry is [string, AnyComponentSpec] =>
@@ -375,5 +408,5 @@ export const pureform = <
     );
     // Not enumerable, so adapters, merges, and validation see a plain config.
     Object.defineProperty(config, "theme", { value: theme, enumerable: false });
-    return config as PureformConfig<G, TFont, TStyle>;
+    return config as unknown as PureformConfig<G, TFont, TStyle, TComponents>;
 };

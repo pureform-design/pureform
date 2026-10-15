@@ -343,3 +343,36 @@ describe("pureform with typed()", () => {
         pf.alias("semanticTokens", "colors", "onLogoContainer");
     });
 });
+
+describe("component tokens with typed()", () => {
+    it("are offered for every default component", () => {
+        const pf = typed(pureform());
+        pf.alias("components", "button", "radius");
+        pf.alias("components", "textField", "focusColor");
+        pf.alias("components", "iconButton", "outlineColor");
+        // @ts-expect-error not one of the button's tokens
+        pf.alias("components", "button", "radus");
+    });
+
+    it("follow the components function: dropped ones go, added ones come", () => {
+        const badge = typed().component({
+            name: "badge",
+            tokens: { size: px(16) },
+            recipe: () => ({ base: {} }),
+        });
+        const config = pureform({
+            components: ({ defaults }) => ({
+                ...defaults,
+                tooltip: undefined,
+                badge,
+            }),
+        });
+        const pf = typed(config);
+        pf.alias("components", "badge", "size");
+        pf.alias("components", "button", "radius");
+        // @ts-expect-error the tooltip was left out
+        pf.alias("components", "tooltip", "container");
+        expect(Object.keys(config.components)).toContain("badge");
+        expect(Object.keys(config.components)).not.toContain("tooltip");
+    });
+});

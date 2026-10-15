@@ -2381,6 +2381,10 @@ const button = pf.slotComponent({
   levels), so `typed(theme.config)` and `typed(pureform(...))` offer them, custom color groups
   and text styles included. A provider's extra names stay readable through each tier's index
   signature, which `typed()` ignores when declared names exist.
+- **Component tokens.** `component` and `slotComponent` keep the component's name and token
+  names in their types, and `pureform()` keeps its components by name, following the
+  `components` function (dropped ones go, added ones come), so `typed(pureform(...))` offers
+  `alias("components", name, token)`.
 - **Preset.** Every preset component is authored with `typed()`.
 
 ---
