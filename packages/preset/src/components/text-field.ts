@@ -40,7 +40,8 @@ import {
     fieldTokens,
     floated,
 } from "./field";
-import { disabledColor, sys } from "./shared";
+import { COLOR_GROUPS, DEFAULT_GROUP, disabledColor, sys } from "./shared";
+import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField", {
     iconInset: spacing("3"),
@@ -49,7 +50,7 @@ const { tokens, ref } = fieldTokens("textField", {
     textInsetWithIcon: px(52),
 });
 
-const { base, variant } = fieldParts(ref, { labelRest: pct(50) });
+const { base, variant, colors } = fieldParts(ref, { labelRest: pct(50) });
 
 const icon = (side: "Start" | "End"): StyleMap => ({
     position: absolute,
@@ -67,65 +68,77 @@ const icon = (side: "Start" | "End"): StyleMap => ({
         .else(ref("iconColor")),
 });
 
-export const textField = defineSlotComponent({
-    name: "textField",
-    $meta: {
-        description:
-            "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
-    },
-    tokens,
-    slots: [...FIELD_SLOTS, "leadingIcon", "trailingIcon"],
-    structure: {
-        root: ["container", "supportingText"],
-        container: ["leadingIcon", "input", "label", "trailingIcon"],
-    },
-    recipe: {
-        base: {
-            ...base,
-            container: { ...base.container, height: ref("height") },
-            input: { ...base.input, height: pct(100) },
-            leadingIcon: icon("Start"),
-            // Material turns the trailing icon to the error color with the field.
-            trailingIcon: {
-                ...icon("End"),
-                color: when()
-                    .on(INVALID, ref("errorColor"))
-                    .on(DISABLED, disabledColor("disabledContent"))
-                    .else(ref("iconColor")),
-            },
+/** Build the text field with a `color` variant per group in `groups`, setting its focus
+ *  color. Errors keep the negative color. */
+export const createTextField = (groups: ColorGroups = COLOR_GROUPS) => {
+    const color = colors(groups);
+    return defineSlotComponent({
+        name: "textField",
+        $meta: {
+            description:
+                "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
         },
-        variants: {
-            variant,
-            leadingIcon: {
-                true: {
-                    input: { paddingInlineStart: ref("textInsetWithIcon") },
-                    label: { insetInlineStart: ref("textInsetWithIcon") },
+        tokens,
+        slots: [...FIELD_SLOTS, "leadingIcon", "trailingIcon"],
+        structure: {
+            root: ["container", "supportingText"],
+            container: ["leadingIcon", "input", "label", "trailingIcon"],
+        },
+        recipe: {
+            base: {
+                ...base,
+                container: { ...base.container, height: ref("height") },
+                input: { ...base.input, height: pct(100) },
+                leadingIcon: icon("Start"),
+                // Material turns the trailing icon to the error color with the field.
+                trailingIcon: {
+                    ...icon("End"),
+                    color: when()
+                        .on(INVALID, ref("errorColor"))
+                        .on(DISABLED, disabledColor("disabledContent"))
+                        .else(ref("iconColor")),
                 },
-                false: {},
             },
-            trailingIcon: {
-                true: { input: { paddingInlineEnd: ref("textInsetWithIcon") } },
-                false: {},
+            variants: {
+                variant,
+                color: color.color,
+                leadingIcon: {
+                    true: {
+                        input: { paddingInlineStart: ref("textInsetWithIcon") },
+                        label: { insetInlineStart: ref("textInsetWithIcon") },
+                    },
+                    false: {},
+                },
+                trailingIcon: {
+                    true: {
+                        input: { paddingInlineEnd: ref("textInsetWithIcon") },
+                    },
+                    false: {},
+                },
             },
-        },
-        // An outlined label floats onto the border at the usual inset, clear of the icon.
-        compoundVariants: [
-            {
-                match: { variant: "outlined", leadingIcon: "true" },
-                style: {
-                    label: {
-                        insetInlineStart: floated(
-                            ref("textInsetWithIcon"),
-                            ref("paddingInline"),
-                        ),
+            // An outlined label floats onto the border at the usual inset, clear of the icon.
+            compoundVariants: [
+                ...color.compoundVariants,
+                {
+                    match: { variant: "outlined", leadingIcon: "true" },
+                    style: {
+                        label: {
+                            insetInlineStart: floated(
+                                ref("textInsetWithIcon"),
+                                ref("paddingInline"),
+                            ),
+                        },
                     },
                 },
+            ],
+            defaultVariants: {
+                color: DEFAULT_GROUP,
+                variant: "filled",
+                leadingIcon: "false",
+                trailingIcon: "false",
             },
-        ],
-        defaultVariants: {
-            variant: "filled",
-            leadingIcon: "false",
-            trailingIcon: "false",
         },
-    },
-});
+    });
+};
+
+export const textField = createTextField();

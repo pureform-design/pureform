@@ -1,9 +1,10 @@
 // Accessibility checks over the components and the default theme.
 //
-// - Contrast: each component's color pairs, read from the component's own token defaults, so
-//   the check follows the code. Text needs WCAG AA's 4.5:1, and the parts that identify a
-//   control (borders, the switch handle, the checkbox outline) need 3:1. Decorative lines
-//   (dividers, the chip outline, which its label already identifies) are exempt.
+// - Contrast: each component's color pairs, read from its own token defaults so the check
+//   follows the code, and each color group as the color variants use it. Text needs WCAG
+//   AA's 4.5:1, and the parts that identify a control (borders, the switch handle, the
+//   checkbox outline) need 3:1. Decorative lines (dividers, the chip outline, which its
+//   label already identifies) are exempt.
 // - Touch targets: every interactive component reaches the theme's touch target.
 // - Focus: every interactive component shows the focus ring.
 
@@ -117,6 +118,33 @@ describe("component contrast", () => {
             expect(contrastRatio(front!, back!)).toBeGreaterThanOrEqual(min);
         },
     );
+});
+
+// Every color group, on the surfaces its components draw it on.
+const GROUP_PAIRS: [string, string, number][] =
+    config.theme.color.groups.flatMap((g): [string, string, number][] => {
+        const on = `on${g.charAt(0).toUpperCase()}${g.slice(1)}`;
+        return [
+            [g, "surface", TEXT],
+            [`${on}Container`, `${g}Container`, TEXT],
+            [on, g, UI],
+        ];
+    });
+
+describe("color group contrast", () => {
+    it.each(
+        GROUP_PAIRS.flatMap(([fg, bg, min]) =>
+            (["light", "dark"] as const).map(
+                (scheme) => [fg, bg, scheme, min] as const,
+            ),
+        ),
+    )("%s on %s (%s) reaches %s:1", (fg, bg, scheme, min) => {
+        const front = roleColor(fg, scheme);
+        const back = roleColor(bg, scheme);
+        expect(
+            front && back && contrastRatio(front, back),
+        ).toBeGreaterThanOrEqual(min);
+    });
 });
 
 const INTERACTIVE = [

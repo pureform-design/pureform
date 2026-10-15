@@ -275,3 +275,42 @@ export const focusRing = (
     outlineColor: sys("secondary"),
     outlineOffset: px(2),
 });
+
+/** A color group's four roles, for example `primary`, `onPrimary`, `primaryContainer`, and
+ *  `onPrimaryContainer`. */
+export const groupRoles = (group: string) => ({
+    main: sys(group),
+    on: on(group),
+    container: sys(`${group}Container`),
+    onContainer: on(`${group}Container`),
+});
+
+/** The default color group. A component's base draws it through its tokens, so its `color`
+ *  variant entry stays empty and the tokens keep working. */
+export const DEFAULT_GROUP = "primary";
+
+/** A `color` variant group: an entry per group, built from that group's roles, except the
+ *  default group, which the base already draws. */
+export const colorVariant = <T>(
+    groups: ColorGroups,
+    build: (roles: ReturnType<typeof groupRoles>) => T,
+): Record<string, T | Record<string, never>> =>
+    Object.fromEntries(
+        groups.map((group) => [
+            group,
+            group === DEFAULT_GROUP ? {} : build(groupRoles(group)),
+        ]),
+    );
+
+/** Merge slot styles, slot by slot; later maps win per property. */
+export const mergeSlots = (
+    ...maps: Record<string, StyleMap>[]
+): Record<string, StyleMap> => {
+    const out: Record<string, StyleMap> = {};
+    for (const map of maps) {
+        for (const [slot, style] of Object.entries(map)) {
+            out[slot] = { ...out[slot], ...style };
+        }
+    }
+    return out;
+};

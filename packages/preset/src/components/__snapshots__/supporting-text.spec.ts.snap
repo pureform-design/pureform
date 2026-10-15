@@ -22,7 +22,28 @@ exports[`supportingText > compiles to a stable Panda recipe 1`] = `
       "error": {
         "color": "var(--components-supportingText-errorColor, token(colors.negative))",
       },
+      "info": {
+        "color": "token(colors.info)",
+      },
+      "negative": {
+        "color": "token(colors.negative)",
+      },
       "neutral": {},
+      "notice": {
+        "color": "token(colors.notice)",
+      },
+      "positive": {
+        "color": "token(colors.positive)",
+      },
+      "primary": {
+        "color": "token(colors.primary)",
+      },
+      "secondary": {
+        "color": "token(colors.secondary)",
+      },
+      "tertiary": {
+        "color": "token(colors.tertiary)",
+      },
     },
   },
 }

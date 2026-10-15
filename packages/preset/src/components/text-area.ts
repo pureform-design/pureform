@@ -18,59 +18,70 @@ import { flex, mul, px, unitless, vertical } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
 import { FIELD_SLOTS, fieldParts, fieldTokens } from "./field";
+import { COLOR_GROUPS, DEFAULT_GROUP } from "./shared";
+import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = fieldTokens("textArea");
 
 // The first line's center: half the single-line height, so the label rests where a text
 // field's would.
-const { base, variant } = fieldParts(ref, {
+const { base, variant, colors } = fieldParts(ref, {
     labelRest: mul(ref("height"), unitless(0.5)),
 });
 
-export const textArea = defineSlotComponent({
-    name: "textArea",
-    $meta: {
-        description:
-            "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid.",
-    },
-    tokens,
-    slots: [...FIELD_SLOTS],
-    structure: {
-        root: ["container", "supportingText"],
-        container: ["input", "label"],
-    },
-    recipe: {
-        base: {
-            ...base,
-            container: {
-                ...base.container,
-                display: flex,
-                minHeight: ref("height"),
-            },
-            input: { ...base.input, resize: vertical },
+/** Build the text area with a `color` variant per group in `groups`, setting its focus
+ *  color. Errors keep the negative color. */
+export const createTextArea = (groups: ColorGroups = COLOR_GROUPS) => {
+    const color = colors(groups);
+    return defineSlotComponent({
+        name: "textArea",
+        $meta: {
+            description:
+                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid.",
         },
-        // A textarea scrolls its text through its own padding, under the floated label, so the
-        // label's room is a margin outside the scroll area instead.
-        variants: {
-            variant: {
-                filled: {
-                    ...variant.filled,
-                    input: {
-                        ...variant.filled.input,
-                        paddingBlockStart: px(0),
-                        marginBlockStart: spacing("6"),
+        tokens,
+        slots: [...FIELD_SLOTS],
+        structure: {
+            root: ["container", "supportingText"],
+            container: ["input", "label"],
+        },
+        recipe: {
+            base: {
+                ...base,
+                container: {
+                    ...base.container,
+                    display: flex,
+                    minHeight: ref("height"),
+                },
+                input: { ...base.input, resize: vertical },
+            },
+            // A textarea scrolls its text through its own padding, under the floated label, so the
+            // label's room is a margin outside the scroll area instead.
+            variants: {
+                color: color.color,
+                variant: {
+                    filled: {
+                        ...variant.filled,
+                        input: {
+                            ...variant.filled.input,
+                            paddingBlockStart: px(0),
+                            marginBlockStart: spacing("6"),
+                        },
+                    },
+                    outlined: {
+                        ...variant.outlined,
+                        input: {
+                            ...variant.outlined.input,
+                            paddingBlockStart: spacing("2"),
+                            marginBlockStart: spacing("2"),
+                        },
                     },
                 },
-                outlined: {
-                    ...variant.outlined,
-                    input: {
-                        ...variant.outlined.input,
-                        paddingBlockStart: spacing("2"),
-                        marginBlockStart: spacing("2"),
-                    },
-                },
             },
+            compoundVariants: color.compoundVariants,
+            defaultVariants: { variant: "filled", color: DEFAULT_GROUP },
         },
-        defaultVariants: { variant: "filled" },
-    },
-});
+    });
+};
+
+export const textArea = createTextArea();

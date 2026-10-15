@@ -15,9 +15,13 @@ describe("chip", () => {
         for (const variant of ["outlined", "elevated"]) {
             const root = compiled()?.variants?.variant?.[variant]
                 ?.root as Record<string, unknown>;
-            expect(JSON.stringify(root?._selected)).toContain(
-                "components-chip-selectedContainer",
-            );
+            expect(
+                JSON.stringify(
+                    root?.[
+                        "&:is([aria-selected=true], [aria-pressed=true], [data-selected])"
+                    ],
+                ),
+            ).toContain("components-chip-selectedContainer");
         }
     });
 
@@ -39,5 +43,15 @@ describe("chip", () => {
 
     it("compiles to a stable Panda slot recipe", () => {
         expect(compiled()).toMatchSnapshot();
+    });
+});
+
+describe("chip color", () => {
+    it("colors a selected chip with its group's container", () => {
+        const negative = compiled()?.compoundVariants?.find(
+            (c) => c.color === "negative" && c.variant === "outlined",
+        );
+        expect(JSON.stringify(negative?.css)).toContain("negativeContainer");
+        expect(JSON.stringify(negative?.css)).toContain("onNegativeContainer");
     });
 });

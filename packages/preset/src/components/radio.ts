@@ -23,6 +23,7 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
+import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
 import {
@@ -36,13 +37,18 @@ import {
     CONTROL_FOCUS,
 } from "./control";
 import {
+    COLOR_GROUPS,
+    DEFAULT_GROUP,
+    colorVariant,
     componentTokens,
+    mergeSlots,
     disabledColor,
     stateTransition,
     sys,
     tweens,
     focusRing,
 } from "./shared";
+import type { ColorGroups } from "./shared";
 
 const { tokens, ref } = componentTokens("radio", {
     size: sizeToken("controlMedium"),
@@ -54,65 +60,77 @@ const { tokens, ref } = componentTokens("radio", {
     errorColor: sys("negative"),
 });
 
-// The ring and the dot share one color.
-const color = (rest: ReturnType<typeof ref>) =>
+// The ring and the dot share one color: the group's once checked.
+const markColor = (checked: ColorValue, rest: ColorValue) =>
     when()
-        .on(CONTROL_CHECKED, ref("checkedColor"))
+        .on(CONTROL_CHECKED, checked)
         .on(CONTROL_INVALID, ref("errorColor"))
         .on(CONTROL_DISABLED, disabledColor("disabledContent"))
         .else(rest);
 
-export const radio = defineSlotComponent({
-    name: "radio",
-    $meta: {
-        description:
-            "Material radio button over a native input. Group radios with a shared name.",
-    },
-    tokens,
-    slots: ["root", "touchTarget", "input", "ring", "dot"],
-    structure: {
-        root: ["touchTarget", "input", "ring"],
-        ring: ["dot"],
-    },
-    recipe: {
-        base: {
-            root: {
-                ...focusRing(CONTROL_FOCUS),
-                ...controlRoot(ref("size")),
-                transition: stateTransition,
-                borderRadius: radius("full"),
-                cursor: pointer,
-                backgroundColor: controlStateLayer(
-                    sys("onSurface"),
-                    ref("checkedColor"),
-                ),
-            },
-            touchTarget: controlTouchTarget,
-            input: controlInput,
-            ring: {
-                transition: stateTransition,
-                position: absolute,
-                display: inlineFlex,
-                alignItems: center,
-                justifyContent: center,
-                width: ref("ringSize"),
-                height: ref("ringSize"),
-                borderRadius: radius("full"),
-                borderStyle: solid,
-                borderWidth: ref("borderWidth"),
-                borderColor: color(ref("borderColor")),
-                pointerEvents: none,
-            },
-            dot: {
-                width: ref("dotSize"),
-                height: ref("dotSize"),
-                borderRadius: radius("full"),
-                backgroundColor: color(ref("checkedColor")),
-                transform: when()
-                    .on(CONTROL_CHECKED, transform(scale(unitless(1))))
-                    .else(transform(scale(unitless(0)))),
-                transition: tweens("transform", "backgroundColor"),
-            },
-        },
-    },
+// Every property that depends on the color group, each with its full set of states.
+const colored = (checked: ColorValue) => ({
+    root: { backgroundColor: controlStateLayer(sys("onSurface"), checked) },
+    ring: { borderColor: markColor(checked, ref("borderColor")) },
+    dot: { backgroundColor: markColor(checked, checked) },
 });
+
+/** Build the radio button with a `color` variant per group in `groups`. */
+export const createRadio = (groups: ColorGroups = COLOR_GROUPS) =>
+    defineSlotComponent({
+        name: "radio",
+        $meta: {
+            description:
+                "Material radio button over a native input. Group radios with a shared name.",
+        },
+        tokens,
+        slots: ["root", "touchTarget", "input", "ring", "dot"],
+        structure: {
+            root: ["touchTarget", "input", "ring"],
+            ring: ["dot"],
+        },
+        recipe: {
+            base: mergeSlots(
+                {
+                    root: {
+                        ...focusRing(CONTROL_FOCUS),
+                        ...controlRoot(ref("size")),
+                        transition: stateTransition,
+                        borderRadius: radius("full"),
+                        cursor: pointer,
+                    },
+                    touchTarget: controlTouchTarget,
+                    input: controlInput,
+                    ring: {
+                        transition: stateTransition,
+                        position: absolute,
+                        display: inlineFlex,
+                        alignItems: center,
+                        justifyContent: center,
+                        width: ref("ringSize"),
+                        height: ref("ringSize"),
+                        borderRadius: radius("full"),
+                        borderStyle: solid,
+                        borderWidth: ref("borderWidth"),
+                        pointerEvents: none,
+                    },
+                    dot: {
+                        width: ref("dotSize"),
+                        height: ref("dotSize"),
+                        borderRadius: radius("full"),
+                        transform: when()
+                            .on(CONTROL_CHECKED, transform(scale(unitless(1))))
+                            .else(transform(scale(unitless(0)))),
+                        transition: tweens("transform", "backgroundColor"),
+                    },
+                },
+                colored(ref("checkedColor")),
+            ),
+            variants: {
+                color: colorVariant(groups, (g) => colored(g.main)),
+            },
+            defaultVariants: { color: DEFAULT_GROUP },
+        },
+    });
+
+export const radio = createRadio();

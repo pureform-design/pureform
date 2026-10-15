@@ -40,12 +40,16 @@ import {
 } from "@pureform/theme";
 
 import {
+    DEFAULT_GROUP,
+    colorVariant,
     componentTokens,
+    groupRoles,
     disabledColor,
     stateTransition,
     sys,
     tweens,
 } from "./shared";
+import type { ColorGroups } from "./shared";
 import { supportingTextStyle } from "./supporting-text";
 
 /** The tokens every text input has. */
@@ -155,28 +159,45 @@ export const fieldParts = (
     ref: (token: FieldToken) => AliasNode,
     { labelRest }: FieldOptions,
 ) => {
+    // The filled indicator and outlined stroke, in a given focus color.
+    const indicatorShadow = (focus: ColorValue) =>
+        byState(indicator(ref("indicatorWidth"), ref("indicatorColor")), {
+            hover: indicator(ref("indicatorWidth"), ref("hoverColor")),
+            focus: indicator(ref("focusIndicatorWidth"), focus),
+            error: indicator(ref("indicatorWidth"), ref("errorColor")),
+            errorFocus: indicator(
+                ref("focusIndicatorWidth"),
+                ref("errorColor"),
+            ),
+            disabled: indicator(
+                ref("indicatorWidth"),
+                disabledColor("disabledContent"),
+            ),
+        });
+
+    const strokeColor = (focus: ColorValue) =>
+        byState(ref("outlineColor"), {
+            hover: ref("hoverColor"),
+            focus,
+            error: ref("errorColor"),
+            errorFocus: ref("errorColor"),
+            disabled: disabledColor("disabledContainer"),
+        });
+
+    const labelColor = (focus: ColorValue) =>
+        when()
+            .on(FOCUSED, focus)
+            .on(INVALID, ref("errorColor"))
+            .on(DISABLED, disabledColor("disabledContent"))
+            .else(ref("labelColor"));
+
     const filled: StyleMap = {
         backgroundColor: when()
             .on(DISABLED, disabledColor("disabledContainer"))
             .else(ref("container")),
         borderStartStartRadius: ref("radius"),
         borderStartEndRadius: ref("radius"),
-        boxShadow: byState(
-            indicator(ref("indicatorWidth"), ref("indicatorColor")),
-            {
-                hover: indicator(ref("indicatorWidth"), ref("hoverColor")),
-                focus: indicator(ref("focusIndicatorWidth"), ref("focusColor")),
-                error: indicator(ref("indicatorWidth"), ref("errorColor")),
-                errorFocus: indicator(
-                    ref("focusIndicatorWidth"),
-                    ref("errorColor"),
-                ),
-                disabled: indicator(
-                    ref("indicatorWidth"),
-                    disabledColor("disabledContent"),
-                ),
-            },
-        ),
+        boxShadow: indicatorShadow(ref("focusColor")),
     };
 
     const strokeWidth = byState(ref("indicatorWidth"), {
@@ -196,13 +217,7 @@ export const fieldParts = (
             errorFocus: mul(ref("focusIndicatorWidth"), unitless(-1)),
             disabled: mul(ref("indicatorWidth"), unitless(-1)),
         }),
-        outlineColor: byState(ref("outlineColor"), {
-            hover: ref("hoverColor"),
-            focus: ref("focusColor"),
-            error: ref("errorColor"),
-            errorFocus: ref("errorColor"),
-            disabled: disabledColor("disabledContainer"),
-        }),
+        outlineColor: strokeColor(ref("focusColor")),
     };
 
     const base = {
@@ -241,11 +256,7 @@ export const fieldParts = (
             position: absolute,
             insetInlineStart: ref("paddingInline"),
             pointerEvents: none,
-            color: when()
-                .on(FOCUSED, ref("focusColor"))
-                .on(INVALID, ref("errorColor"))
-                .on(DISABLED, disabledColor("disabledContent"))
-                .else(ref("labelColor")),
+            color: labelColor(ref("focusColor")),
             transition: labelTransition,
         },
         supportingText: {
@@ -291,5 +302,33 @@ export const fieldParts = (
         },
     } satisfies Record<string, Record<string, StyleMap>>;
 
-    return { base, variant };
+    // A color group sets the focus color. The label takes it as a variant; the indicator and
+    // stroke are already set by the fill variant, so a compound variant per fill and group
+    // replaces them in the later layer.
+    const colors = (groups: ColorGroups) => ({
+        color: colorVariant(groups, (g) => ({
+            label: { color: labelColor(g.main) },
+        })),
+        compoundVariants: groups
+            .filter((group) => group !== DEFAULT_GROUP)
+            .flatMap((group) => {
+                const focus = groupRoles(group).main;
+                return [
+                    {
+                        match: { variant: "filled", color: group },
+                        style: {
+                            container: { boxShadow: indicatorShadow(focus) },
+                        },
+                    },
+                    {
+                        match: { variant: "outlined", color: group },
+                        style: {
+                            container: { outlineColor: strokeColor(focus) },
+                        },
+                    },
+                ];
+            }),
+    });
+
+    return { base, variant, colors };
 };
