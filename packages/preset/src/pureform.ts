@@ -42,12 +42,16 @@ import type {
 
 import { createButton } from "./components/button";
 import { card } from "./components/card";
+import { checkbox } from "./components/checkbox";
 import { chip } from "./components/chip";
+import { divider } from "./components/divider";
 import { createFab } from "./components/fab";
 import { createIconButton } from "./components/icon-button";
+import { radio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { supportingText } from "./components/supporting-text";
+import { switchControl } from "./components/switch";
 import { createText } from "./components/text";
 import { textArea } from "./components/text-area";
 import { textField } from "./components/text-field";
@@ -251,6 +255,10 @@ export const pureform = <
         textField,
         textArea,
         supportingText,
+        checkbox,
+        radio,
+        switchControl,
+        divider,
         card,
         scrim,
         ripple,

@@ -19,10 +19,8 @@ import {
     slot,
     solid,
     transform,
-    transition,
     translateY,
     transparent,
-    tween,
     unitless,
     when,
 } from "@pureform/core/ast";
@@ -35,15 +33,19 @@ import type {
 } from "@pureform/core/ast";
 import {
     colorRole,
-    duration,
-    easing,
     radius,
     size as sizeToken,
     spacing,
     textStyle,
 } from "@pureform/theme";
 
-import { componentTokens, disabledColor, stateTransition, sys } from "./shared";
+import {
+    componentTokens,
+    disabledColor,
+    stateTransition,
+    sys,
+    tweens,
+} from "./shared";
 import { supportingTextStyle } from "./supporting-text";
 
 /** The tokens every text input has. */
@@ -115,24 +117,14 @@ const textValue = (
     style: string,
 ): AliasNode => alias("tokens", property, style);
 
-// The label floats with its color, under reduced motion instantly.
-const labelTransition = when(
-    "reducedMotion",
-    none,
-    transition(
-        ...(
-            [
-                "top",
-                "transform",
-                "fontSize",
-                "lineHeight",
-                "letterSpacing",
-                "color",
-            ] as const
-        ).map((property) =>
-            tween(property, duration("short3"), easing("standard")),
-        ),
-    ),
+// The label floats with its color.
+const labelTransition = tweens(
+    "top",
+    "transform",
+    "fontSize",
+    "lineHeight",
+    "letterSpacing",
+    "color",
 );
 
 // The filled container's bottom indicator, an inset shadow so it thickens without moving

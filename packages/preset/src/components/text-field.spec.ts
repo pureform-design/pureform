@@ -77,11 +77,11 @@ describe("textField", () => {
         expect(shadow[`&${FOCUS}${FOCUS}`]).toContain(
             "0px calc(var(--components-textField-focusIndicatorWidth, 2px) * -1)",
         );
-        const errored = shadow[
-            `&${INVALID}${INVALID}${INVALID}${INVALID}`
-        ] as Record<string, string>;
-        expect(errored.base).toContain("errorColor");
-        expect(errored[`&${FOCUS}${FOCUS}`]).toContain("focusIndicatorWidth");
+        const invalid = `${INVALID}${INVALID}${INVALID}${INVALID}`;
+        expect(shadow[`&${invalid}`]).toContain("errorColor");
+        expect(shadow[`&${invalid}${FOCUS}${FOCUS}`]).toContain(
+            "focusIndicatorWidth",
+        );
     });
 
     it("colors the label from the container and the supporting text from the root", () => {

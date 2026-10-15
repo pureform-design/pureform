@@ -6,7 +6,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
     "icon": {
       "color": {
         ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-checked=true], [data-selected]) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+        ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-chip-iconColor, token(colors.primary))",
       },
       "height": "var(--components-chip-iconSize, token(sizes.iconSmall))",

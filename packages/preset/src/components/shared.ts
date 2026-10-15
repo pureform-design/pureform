@@ -251,3 +251,16 @@ export const stateTransition = when(
         tween("boxShadow", duration("medium1"), easing("standard")),
     ),
 );
+
+/** A transition of the given properties over `short3` on the standard curve, instant under
+ *  reduced motion. For movement a component adds to its state colors. */
+export const tweens = (...properties: Parameters<typeof tween>[0][]) =>
+    when(
+        "reducedMotion",
+        none,
+        transition(
+            ...properties.map((property) =>
+                tween(property, duration("short3"), easing("standard")),
+            ),
+        ),
+    );
