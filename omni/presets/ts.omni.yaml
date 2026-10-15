@@ -12,6 +12,9 @@ cache:
 tasks:
   test:unit:
     exec: bun run test:unit
+    # Tests type-check against dependencies' built declarations, so build those first.
+    dependencies:
+      - ^build
 
   test:integration:
     exec: bun run test:integration
