@@ -16,7 +16,10 @@
 
 import type {
     AliasNode,
+    Condition,
+    ConditionalNode,
     ContainerBreakpointCondition,
+    DynamicNode,
     SlotCondition,
     SlotState,
     StyleMap,
@@ -26,8 +29,10 @@ import type {
 import {
     alias as rawAlias,
     containerBreakpoint,
+    dynamic as rawDynamic,
     slot as rawSlot,
     viewportBreakpoint,
+    when as rawWhen,
 } from "./ast/helpers";
 import { defineComponent, defineSlotComponent } from "./define";
 import type {
@@ -144,6 +149,45 @@ export type AliasFn<C> = <
     ...rest: A extends NestedRoot ? [token: Z] : []
 ) => AliasNode;
 
+/** The tiers a runtime override var lives in. */
+export type DynamicTier = "ui" | "components" | "global";
+
+// A config with no components leaves component names open.
+type ComponentsOf<C> = [Field<C, "components">] extends [never]
+    ? Record<string, { tokens?: Record<string, unknown> }>
+    : Field<C, "components">;
+
+/** The names that can follow a dynamic tier: a component, when the tier is `components`. */
+export type DynamicSecond<C, A> = A extends "components"
+    ? Keys<ComponentsOf<C>>
+    : string;
+
+/** The component token names that can follow `components` and a component. */
+export type DynamicThird<C, A, B> = A extends "components"
+    ? B extends string
+        ? Keys<
+              ComponentsOf<C>[B & keyof ComponentsOf<C>] extends {
+                  tokens?: infer K;
+              }
+                  ? NonNullable<K>
+                  : never
+          >
+        : never
+    : string;
+
+/** A runtime override var, by tier and names, with an optional fallback. Under
+ *  `components`, the component and token narrow to the config's, like `alias`. */
+export type DynamicFn<C> = <
+    const A extends DynamicTier,
+    const B extends DynamicSecond<C, A>,
+    const Z extends DynamicThird<C, A, B>,
+>(
+    path: A extends "components"
+        ? readonly [tier: A, component: B, token: Z]
+        : readonly [tier: A, name: B, ...rest: string[]],
+    fallback?: ValueNode,
+) => DynamicNode;
+
 /** A breakpoint name in the config. */
 export type BreakpointName<C> = Keys<Field<C, "breakpoints">>;
 
@@ -164,6 +208,45 @@ type RawRange = string | { from?: string; until?: string };
 type BreakpointRange<C> =
     | BreakpointName<C>
     | { from?: BreakpointName<C>; until?: BreakpointName<C> };
+
+type InRange<C> = { from?: BreakpointName<C>; until?: BreakpointName<C> };
+
+/** A viewport range at the config's breakpoints. */
+export type TypedViewportCondition<C> = ViewportBreakpointCondition &
+    InRange<C>;
+
+/** A container range at the config's breakpoints. */
+export type TypedContainerCondition<C> = ContainerBreakpointCondition &
+    InRange<C>;
+
+/** A condition whose breakpoints, if any, are the config's. */
+export type TypedCondition<C> =
+    | Exclude<
+          Condition,
+          ViewportBreakpointCondition | ContainerBreakpointCondition
+      >
+    | TypedViewportCondition<C>
+    | TypedContainerCondition<C>;
+
+/** `when`, with breakpoint conditions checked against the config. */
+export interface TypedWhen<C> {
+    (): TypedConditionalBuilder<C>;
+    (
+        conditions: TypedCondition<C> | TypedCondition<C>[],
+        value: ValueNode,
+        base: ValueNode,
+    ): ConditionalNode;
+}
+
+export interface TypedConditionalBuilder<C> {
+    /** Add a case. `conditions` is one condition or an AND-list. Chainable. */
+    on(
+        conditions: TypedCondition<C> | TypedCondition<C>[],
+        value: ValueNode,
+    ): TypedConditionalBuilder<C>;
+    /** Supply the fallback and finish. */
+    else(base: ValueNode): ConditionalNode;
+}
 
 /** Variant groups, each listing its values. */
 type VariantValues = Record<string, readonly string[]>;
@@ -284,6 +367,13 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
         /** A reference into the config: each segment autocompletes from the one before. */
         alias,
 
+        /** A runtime override var: `components` paths name a component and its token. */
+        dynamic: ((path: readonly string[], fallback?: ValueNode) =>
+            rawDynamic([...path], fallback)) as DynamicFn<C>,
+
+        /** A conditional value, its breakpoint conditions checked against the config. */
+        when: rawWhen as TypedWhen<C>,
+
         /** A text style, for `textStyle`. */
         textStyle: (name: Keys<Field<C, "textStyles">>): AliasNode =>
             rawAlias("textStyles", name as string),
@@ -293,15 +383,18 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
             map as NonNullable<StyleMap["apply"]>,
 
         /** A viewport range at the config's breakpoints. */
-        viewport: (range: BreakpointRange<C>): ViewportBreakpointCondition =>
-            viewportBreakpoint(range as RawRange),
+        viewport: (range: BreakpointRange<C>): TypedViewportCondition<C> =>
+            viewportBreakpoint(range as RawRange) as TypedViewportCondition<C>,
 
         /** A container range at the config's breakpoints, optionally of a named container. */
         container: (
             range: BreakpointRange<C>,
             name?: string,
-        ): ContainerBreakpointCondition =>
-            containerBreakpoint(range as RawRange, name),
+        ): TypedContainerCondition<C> =>
+            containerBreakpoint(
+                range as RawRange,
+                name,
+            ) as TypedContainerCondition<C>,
 
         /** A single-slot component whose recipe receives typed `alias` and `token` helpers,
          *  with its variant groups and values checked. */

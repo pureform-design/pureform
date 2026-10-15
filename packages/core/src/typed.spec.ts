@@ -1,6 +1,6 @@
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { hex, literal, px, when } from "./ast";
+import { dynamic, hex, literal, px, viewportBreakpoint, when } from "./ast";
 import { alias as rawAlias } from "./ast/raw";
 import { defineConfig, defineStaticUtility } from "./define";
 import { defineConfig as rawDefineConfig } from "./raw";
@@ -375,5 +375,64 @@ describe("alias narrowing", () => {
         expectTypeOf<
             AliasThird<WithChip, "components", "chip">
         >().toEqualTypeOf<"height">();
+    });
+});
+
+describe("typed dynamic", () => {
+    const withChip = typed({
+        components: {
+            chip: pf.slotComponent({
+                name: "chip",
+                slots: ["root"],
+                tokens: { height: px(32) },
+                recipe: () => ({ base: {} }),
+            }),
+        },
+    });
+
+    it("builds the same node as the untyped dynamic", () => {
+        expect(pf.dynamic(["global", "colors", "brand"], hex("#000"))).toEqual(
+            dynamic(["global", "colors", "brand"], hex("#000")),
+        );
+    });
+
+    it("checks the tier", () => {
+        // @ts-expect-error not a tier
+        pf.dynamic(["theme", "brand"]);
+    });
+
+    it("narrows a component path by the config's components", () => {
+        expect(withChip.dynamic(["components", "chip", "height"]).path).toEqual(
+            ["components", "chip", "height"],
+        );
+        // @ts-expect-error a component the config doesn't have
+        withChip.dynamic(["components", "chop", "height"]);
+        // @ts-expect-error a token the component doesn't have
+        withChip.dynamic(["components", "chip", "width"]);
+        // @ts-expect-error a component path names one token
+        withChip.dynamic(["components", "chip"]);
+    });
+
+    it("leaves component names open when the config has none", () => {
+        pf.dynamic(["components", "anything", "bg"]);
+    });
+});
+
+describe("typed when", () => {
+    it("builds the same node as the untyped when", () => {
+        expect(pf.when(pf.viewport("md"), px(2), px(1))).toEqual(
+            when(viewportBreakpoint("md"), px(2), px(1)),
+        );
+    });
+
+    it("checks breakpoints in its conditions", () => {
+        pf.when()
+            .on(pf.viewport({ until: "lg" }), px(2))
+            .else(px(1));
+        pf.when([pf.container("lg"), "hover"], px(2), px(1));
+        // @ts-expect-error a breakpoint the config doesn't have
+        pf.when(viewportBreakpoint("xl"), px(2), px(1));
+        // @ts-expect-error a breakpoint the config doesn't have, in the builder
+        pf.when().on({ type: "containerBreakpoint", from: "xl" }, px(2));
     });
 });

@@ -2377,8 +2377,11 @@ const button = pf.slotComponent({
   declared variant value gets an entry, empty unless styled.
 - **Compatibility.** The helpers build the same nodes and specs as the untyped API, which stays
   where it is; `@pureform/core/raw` and `@pureform/core/ast/raw` re-export it for files that opt
-  out explicitly. `dynamic()` stays untyped, since its path names a new runtime var rather than
-  pointing into the config.
+  out explicitly.
+- **Dynamic and conditions.** `dynamic` checks the tier (`ui`, `components`, `global`); a
+  `components` path names one of the config's components and its token, or any names when the
+  config has none, since its path can name a new runtime var. `when` takes breakpoint conditions
+  only at the config's breakpoints, so an untyped `viewportBreakpoint("xl")` is flagged.
 - **Themes.** `ThemeVocabulary` types a resolved theme's config by its contract roles (color
   roles from its groups, radii, spacing, sizes, text styles, durations, easings, elevation
   levels), so `typed(theme.config)` and `typed(pureform(...))` offer them, custom color groups
