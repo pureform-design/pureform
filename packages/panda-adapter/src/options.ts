@@ -18,6 +18,9 @@ export interface CompileOptions {
     prefix?: VarPrefix;
     /** Adapter target id read from `platform(...)` nodes. Fixed to `"css"` for web. */
     target?: string;
+    /** The `prefix` in your Panda config, if any. Panda prefixes recipe class names with it,
+     *  and slot conditions select slots by class. Default none. */
+    pandaPrefix?: string;
 }
 
 /** Everything the node and style compilers need: the config to resolve refs against, the var
@@ -35,4 +38,6 @@ export interface CompileCtx {
     target: string;
     refStyle: "fn" | "curly" | "var";
     tokenPrefix?: string;
+    /** The slot recipe and slot being compiled, for slot conditions. */
+    slot?: { className: string; name: string };
 }

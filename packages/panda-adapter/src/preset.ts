@@ -110,6 +110,7 @@ export const compilePreset = (
     const ctx: CompileCtx = {
         config,
         prefix: options.prefix,
+        ...(options.pandaPrefix ? { tokenPrefix: options.pandaPrefix } : {}),
         target: options.target ?? "css",
         refStyle: "fn",
     };

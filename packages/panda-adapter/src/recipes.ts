@@ -88,12 +88,19 @@ const compileSlotStyles = (
     Object.fromEntries(
         Object.entries(bySlot).map(([slot, style]) => [
             slot,
-            compileStyleMap(style, ctx),
+            compileStyleMap(style, {
+                ...ctx,
+                slot: { className: ctx.slot?.className ?? "", name: slot },
+            }),
         ]),
     );
 
-const compileSlotRecipe = (spec: SlottedComponentSpec, ctx: CompileCtx) => {
+const compileSlotRecipe = (spec: SlottedComponentSpec, outer: CompileCtx) => {
     const { className, jsx } = hints(spec);
+    const ctx: CompileCtx = {
+        ...outer,
+        slot: { className: className ?? spec.name, name: "" },
+    };
     // Shared base styles land on the root slot (or the first slot if there is no `root`).
     const rootSlot = spec.slots.includes("root") ? "root" : spec.slots[0];
     const base: Record<string, StyleMap> = { ...spec.recipe.base };

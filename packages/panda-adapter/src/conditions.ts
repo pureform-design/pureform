@@ -10,6 +10,8 @@ import { getByPath, tokenValue } from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
+    SlotCondition,
+    SlotState,
     NumericScalarNode,
     ValueNode,
 } from "@pureform/core/ast";
@@ -53,6 +55,42 @@ const MEDIA_RULE: Record<string, string> = {
     portrait: "@media (orientation: portrait)",
     touch: "@media (pointer: coarse)",
     mouse: "@media (pointer: fine)",
+};
+
+// What each slot state matches on the slot's element, and how many times its selector repeats.
+// Repeating raises specificity, so a later state wins wherever Panda orders the rules: hover,
+// then focus, then invalid, then disabled. Each also takes a data attribute, for custom
+// controls and native-like bindings that set the state by hand.
+const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
+    hover: { match: ":hover, [data-hover]", rank: 1 },
+    filled: {
+        match: ":is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]",
+        rank: 1,
+    },
+    focusWithin: { match: ":focus-within, [data-focused]", rank: 2 },
+    focusVisibleWithin: {
+        match: ":focus-visible, :has(:focus-visible), [data-focus-visible]",
+        rank: 2,
+    },
+    invalid: {
+        match: "[aria-invalid=true], :has([aria-invalid=true]), [data-invalid]",
+        rank: 3,
+    },
+    disabled: { match: ":disabled, :has(:disabled), [data-disabled]", rank: 4 },
+};
+
+// The selector for a slot state: on the styled slot itself, or on an ancestor slot's class.
+const slotSelector = (condition: SlotCondition, ctx: CompileCtx): string => {
+    if (!ctx.slot) {
+        throw new Error(
+            `slot("${condition.slot}", "${condition.state}") is only valid inside a slotted component's recipe`,
+        );
+    }
+    const { match, rank } = SLOT_STATE[condition.state];
+    const state = `:is(${match})`.repeat(rank);
+    if (condition.slot === ctx.slot.name) return `&${state}`;
+    const prefix = ctx.tokenPrefix ? `${ctx.tokenPrefix}-` : "";
+    return `.${prefix}${ctx.slot.className}__${condition.slot}${state} &`;
 };
 
 const sizeCss = (n: NumericScalarNode): string =>
@@ -127,6 +165,8 @@ export const conditionKey = (condition: Condition, ctx: CompileCtx): string => {
             );
         case "rawCondition":
             return condition.by[ctx.target] ?? "";
+        case "slot":
+            return slotSelector(condition, ctx);
     }
 };
 
@@ -139,12 +179,21 @@ const assignNested = (
 ): void => {
     const [head, ...tail] = keys;
     if (head === undefined) return;
+    const existing = target[head];
     if (tail.length === 0) {
-        target[head] = value;
+        // A case that shares a key with a longer one becomes the nested object's base.
+        if (typeof existing === "object" && typeof value === "string") {
+            existing.base = value;
+        } else {
+            target[head] = value;
+        }
         return;
     }
-    const next = (target[head] ??= {});
-    if (typeof next !== "string") assignNested(next, tail, value);
+    // A shorter case already holding this key keeps its value as the base.
+    const next: CondObject =
+        typeof existing === "string" ? { base: existing } : (existing ?? {});
+    target[head] = next;
+    assignNested(next, tail, value);
 };
 
 /** Compile a `ConditionalNode` to a Panda conditional value object. AND-lists nest their
