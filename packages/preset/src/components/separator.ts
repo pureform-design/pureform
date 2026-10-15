@@ -1,4 +1,7 @@
-// The pureform divider: Material's divider, a thin line between groups of content.
+// The pureform separator: Material's divider, a thin line between groups of content.
+//
+// Named for the ARIA separator role, since Panda already has a divider pattern and names the
+// generated recipe after the component.
 //
 // Use an `<hr>` (it carries the separator role) or any element with `role="separator"`.
 // `inset` indents it from the start (`start`, past a list item's leading icon) or from both
@@ -10,14 +13,14 @@ import { spacing } from "@pureform/theme";
 
 import { componentTokens, sys } from "./shared";
 
-const { tokens, ref } = componentTokens("divider", {
+const { tokens, ref } = componentTokens("separator", {
     thickness: px(1),
     color: sys("outlineVariant"),
     inset: spacing("4"),
 });
 
-export const divider = defineComponent({
-    name: "divider",
+export const separator = defineComponent({
+    name: "separator",
     $meta: {
         description:
             "Material divider. Use an hr; inset indents it from the start or both sides.",

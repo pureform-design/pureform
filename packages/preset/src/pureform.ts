@@ -44,12 +44,12 @@ import { createButton } from "./components/button";
 import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
-import { divider } from "./components/divider";
 import { createFab } from "./components/fab";
 import { createIconButton } from "./components/icon-button";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
+import { separator } from "./components/separator";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createText } from "./components/text";
@@ -258,7 +258,7 @@ export const pureform = <
         checkbox: createCheckbox(theme.color.groups),
         radio: createRadio(theme.color.groups),
         switchControl: createSwitch(theme.color.groups),
-        divider,
+        separator,
         card,
         scrim,
         ripple,

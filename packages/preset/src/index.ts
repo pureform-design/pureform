@@ -8,7 +8,7 @@ export * from "./components/ripple";
 export * from "./components/checkbox";
 export * from "./components/chip";
 export * from "./components/control";
-export * from "./components/divider";
+export * from "./components/separator";
 export * from "./components/fab";
 export * from "./components/supporting-text";
 export * from "./components/switch";

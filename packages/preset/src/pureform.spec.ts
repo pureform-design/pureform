@@ -28,7 +28,7 @@ describe("pureform", () => {
             "checkbox",
             "radio",
             "switchControl",
-            "divider",
+            "separator",
             "card",
             "scrim",
             "ripple",

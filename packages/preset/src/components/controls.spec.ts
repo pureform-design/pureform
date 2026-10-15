@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
 import { checkbox } from "./checkbox";
-import { divider } from "./divider";
 import { radio } from "./radio";
+import { separator } from "./separator";
 import { switchControl } from "./switch";
 
 type Slots = Record<string, { base: Record<string, Record<string, unknown>> }>;
@@ -83,17 +83,17 @@ describe("switchControl", () => {
     });
 });
 
-describe("divider", () => {
+describe("separator", () => {
     it("draws a filled line and insets it", () => {
-        const preset = compilePreset(configWith(divider));
+        const preset = compilePreset(configWith(separator));
         const recipes = preset.theme?.recipes as Record<
             string,
             { base: object; variants: Record<string, Record<string, object>> }
         >;
-        const recipe = recipes.divider!;
+        const recipe = recipes.separator!;
         expect(recipe.base).toMatchObject({
             borderWidth: "0px",
-            height: "var(--components-divider-thickness, 1px)",
+            height: "var(--components-separator-thickness, 1px)",
         });
         expect(recipe.variants.inset?.middle).toHaveProperty("marginInlineEnd");
     });

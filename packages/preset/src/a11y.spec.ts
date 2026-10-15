@@ -3,7 +3,7 @@
 // - Contrast: each component's color pairs, read from its own token defaults so the check
 //   follows the code, and each color group as the color variants use it. Text needs WCAG
 //   AA's 4.5:1, and the parts that identify a control (borders, the switch handle, the
-//   checkbox outline) need 3:1. Decorative lines (dividers, the chip outline, which its
+//   checkbox outline) need 3:1. Decorative lines (separators, the chip outline, which its
 //   label already identifies) are exempt.
 // - Touch targets: every interactive component reaches the theme's touch target.
 // - Focus: every interactive component shows the focus ring.
