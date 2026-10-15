@@ -21,6 +21,7 @@ describe("pureform", () => {
             "button",
             "iconButton",
             "fab",
+            "avatar",
             "chip",
             "textField",
             "textArea",

@@ -41,6 +41,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { createAvatar } from "./components/avatar";
 import { createButton } from "./components/button";
 import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
@@ -117,7 +118,7 @@ export interface PureformOptions<
      *  (4.5:1 for text, 3:1 for control parts), and every color group as the color variants
      *  use it, in light and dark, for the base theme and every named theme. */
     requireComponentContrast?: boolean;
-    /** The shapes the icon button and FAB offer as their `shape` variant, by name. Default
+    /** The shapes the icon button, FAB, and avatar offer as their `shape` variant, by name. Default
      *  `MATERIAL_SHAPES`. Draw your own with core's shape builder (`defineShape`,
      *  `roundedPolygon`, `star`), and choose how each fits its box with `fitted`. */
     shapes?: Shapes;
@@ -301,6 +302,7 @@ export const pureform = <
         button: createButton(theme.color.groups, densities),
         iconButton: createIconButton(theme.color.groups, densities, shapes),
         fab: createFab(theme.color.groups, shapes),
+        avatar: createAvatar(theme.color.groups, shapes),
         chip: createChip(theme.color.groups, densities),
         textField: createTextField(theme.color.groups, densities),
         textArea: createTextArea(theme.color.groups, densities),

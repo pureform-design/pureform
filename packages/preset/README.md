@@ -101,8 +101,8 @@ target first, and render the icon slot only when there is an icon.
 
 ## Shapes
 
-`iconButton` and `fab` take `shape`: `none` (the default, rounded corners) or one of the
-theme's shapes, which clips the container to it.
+`iconButton`, `fab`, and `avatar` take `shape`: `none` (the default, rounded corners) or one of
+the theme's shapes, which clips the container to it.
 
 ```ts
 iconButton({ variant: "tonal", shape: "cookie9Sided" });
@@ -149,6 +149,27 @@ button's `outline` slot is clipped to a ring along the shape, 1px wide, exact on
 and close on curves. Browsers without `shape()` (Firefox, for now) keep the rounded corners.
 Each shape a page uses adds about 1 to 2 kB of CSS, so avoid `staticCss: ["*"]` for these
 components unless you show every shape.
+
+### Avatar
+
+`avatar` shows a picture, initials, or an icon in a color group's container, `small` (24px),
+`medium` (40px), or `large` (56px). Style the `img` itself, which it crops to fill; give
+initials `role="img"` and an `aria-label`. An avatar isn't interactive, so it takes the clip
+directly.
+
+```html
+<img
+    class="{avatar({ size: 'large', shape: 'sunny' })}"
+    src="…"
+    alt="Ada Lovelace"
+/>
+<span
+    class="{avatar({ color: 'tertiary', shape: 'cookie9Sided' })}"
+    role="img"
+    aria-label="Ada Lovelace"
+    >AL</span
+>
+```
 
 ### Corner shape
 

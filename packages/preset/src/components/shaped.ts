@@ -155,6 +155,25 @@ export const shapedElevation = (fill: Fill): Record<string, StyleMap> =>
           ? shapedElevationLevels("level0", "level1")
           : {};
 
+/** Clip styles per shape, for an element that takes the clip itself: `none` keeps the rounded
+ *  corners, and each shape clips to itself, keeping `radius` where a target can't clip to a
+ *  shape. Only for an element with no focus ring or shadow to lose, such as an avatar. */
+export const clipVariant = (
+    shapes: Shapes,
+    radius: NumericValue,
+): Record<string, StyleMap> => ({
+    none: {},
+    ...Object.fromEntries(
+        Object.entries(shapes).map(([name, shape]) => [
+            name,
+            {
+                clipPath: clipShape(shape),
+                borderRadius: when("clipShape", px(0), radius),
+            },
+        ]),
+    ),
+});
+
 /** The `shape` variant: `none` keeps the rounded corners, and each shape clips the container
  *  to itself, and the outline layer to a ring `outlineWidth` wide along it, filled with the
  *  outline color, when the component has one. Where a target can't clip to a shape, the
@@ -177,10 +196,7 @@ export const shapeVariant = (
         Object.entries(shapes).map(([name, shape]) => [
             name,
             {
-                container: {
-                    clipPath: clipShape(shape),
-                    borderRadius: when("clipShape", px(0), radius),
-                },
+                container: clipVariant({ [name]: shape }, radius)[name]!,
                 ...(outlineColor
                     ? {
                           outline: {

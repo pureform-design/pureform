@@ -76,6 +76,7 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         ),
         pair(token("iconColor"), SURFACE, UI_CONTRAST),
     ],
+    avatar: [pair(token("content"), token("container"), TEXT_CONTRAST)],
     listItem: ROW_PAIRS,
     menu: ROW_PAIRS,
     tabs: [
