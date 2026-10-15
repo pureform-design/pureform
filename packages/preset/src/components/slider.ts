@@ -2,10 +2,10 @@
 //
 // The native input lies invisibly over the slider, so dragging, the keyboard, forms, and
 // screen readers all work through it. The drawn track and handle follow the `value` token,
-// a CSS var the app keeps in step with the input as a percentage
-// (`--components-slider-value: 40%`).
+// a CSS var the app keeps in step with the input as a number from 0 to 100
+// (`--components-slider-value: 40`).
 //
-//   <div class={root} style="--components-slider-value: 40%">
+//   <div class={root} style="--components-slider-value: 40">
 //     <span class={track} />
 //     <span class={activeTrack} />
 //     <span class={stateLayer} />
@@ -57,7 +57,7 @@ const { tokens, ref } = componentTokens("slider", {
     trackHeight: px(4),
     handleSize: px(20),
     stateLayerSize: px(40),
-    value: pct(0),
+    value: unitless(0),
 });
 
 const DISABLED = slot("root", "disabled");
@@ -66,7 +66,7 @@ const DISABLED = slot("root", "disabled");
 const atValue = (size: ReturnType<typeof ref>) => ({
     position: absolute,
     top: pct(50),
-    insetInlineStart: sub(ref("value"), mul(size, unitless(0.5))),
+    insetInlineStart: sub(mul(ref("value"), pct(1)), mul(size, unitless(0.5))),
     transform: transform(translateY(pct(-50))),
     width: size,
     height: size,
@@ -100,7 +100,7 @@ export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
         name: "slider",
         $meta: {
             description:
-                "Material slider over a native range input. Keep the value token in step with the input as a percentage.",
+                "Material slider over a native range input. Keep the value token (0 to 100) in step with the input.",
         },
         tokens,
         slots: [
@@ -138,7 +138,7 @@ export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
                     activeTrack: {
                         position: absolute,
                         insetInlineStart: px(0),
-                        width: ref("value"),
+                        width: mul(ref("value"), pct(1)),
                         height: ref("trackHeight"),
                         borderRadius: radius("full"),
                         transition: tweens("width", "backgroundColor"),

@@ -7,7 +7,7 @@ import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
-import { linearProgress } from "./progress";
+import { circularProgress, linearProgress } from "./progress";
 import { searchBar } from "./search-bar";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
@@ -26,6 +26,7 @@ describe.each([
     ["tooltip", tooltip],
     ["slider", slider],
     ["linearProgress", linearProgress],
+    ["circularProgress", circularProgress],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();
@@ -90,6 +91,17 @@ describe("navigation", () => {
 });
 
 describe("progress", () => {
+    it("turns each half of the circular arc through its share of the value", () => {
+        const base = compilePreset(configWith(circularProgress)).theme
+            ?.slotRecipes?.circularProgress?.base;
+        expect(base?.endArc?.transform).toBe(
+            "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
+        );
+        expect(base?.startArc?.transform).toBe(
+            "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
+        );
+    });
+
     it("adds its keyframes to the pureform config", async () => {
         const { pureform } = await import("../pureform");
         expect(Object.keys(pureform().keyframes ?? {})).toEqual([

@@ -232,11 +232,11 @@ and `actions` slots.
 ## Slider and progress
 
 The slider lays a native range input over its drawn track and handle. Both it and the linear
-progress indicator read their value from a `value` token, a CSS var you keep in step as a
-percentage (prefixed like every var, for example `--components-slider-value: 40%`).
+progress indicators read their value from a `value` token, a CSS var you keep in step as a
+number from 0 to 100 (prefixed like every var, for example `--components-slider-value: 40`).
 
 ```html
-<div class="{root}" style="--components-slider-value: 40%">
+<div class="{root}" style="--components-slider-value: 40">
     <span class="{track}"></span>
     <span class="{activeTrack}"></span>
     <span class="{stateLayer}"></span>
@@ -255,8 +255,20 @@ percentage (prefixed like every var, for example `--components-slider-value: 40%
 ```
 
 - `linearProgress`: turn on `indeterminate` when the amount is unknown.
-- `circularProgress`: an indeterminate spinner on one element. Give it `role="progressbar"` and
-  a label.
+- `circularProgress`: a ring drawn by two halves, each turning through its share of the
+  value. Turn on `indeterminate` for a spinner, which needs only the root.
+
+```html
+<div
+    class="{root}"
+    role="progressbar"
+    aria-valuenow="40"
+    style="--components-circularProgress-value: 40"
+>
+    <span class="{endHalf}"><span class="{endArc}"></span></span>
+    <span class="{startHalf}"><span class="{startArc}"></span></span>
+</div>
+```
 
 ## Surfaces
 

@@ -84,6 +84,7 @@ describe("pureform", () => {
             "switchControl",
             "slider",
             "linearProgress",
+            "circularProgress",
             "listItem",
             "menu",
             "tabs",

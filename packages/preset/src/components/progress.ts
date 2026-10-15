@@ -1,31 +1,41 @@
 // The pureform progress indicators: Material's linear and circular progress.
 //
-// A determinate linear indicator reads its value from the `value` token, a CSS var the app
-// sets as a percentage (`--components-linearProgress-value: 40%`), alongside
-// `aria-valuenow` on the element with `role="progressbar"`. Turn on `indeterminate` when
-// the amount is unknown; the indicator then slides along the track. The circular indicator
-// is indeterminate: a ring with two colored quarters that spins.
+// Both read their value from the `value` token, a CSS var the app sets as a number from 0 to
+// 100 (`--components-linearProgress-value: 40`), alongside `aria-valuenow` on the element
+// with `role="progressbar"`. Turn on `indeterminate` when the amount is unknown: the linear
+// indicator then slides along its track, and the circular one spins.
 //
-//   <div class={root} role="progressbar" aria-valuenow="40" style="--components-linearProgress-value: 40%">
+//   <div class={root} role="progressbar" aria-valuenow="40" style="--components-linearProgress-value: 40">
 //     <div class={indicator} />
 //   </div>
 //
-//   <div class={circularProgress()} role="progressbar" aria-label="Loading" />
+//   <div class={root} role="progressbar" aria-valuenow="40" style="--components-circularProgress-value: 40">
+//     <span class={endHalf}><span class={endArc} /></span>
+//     <span class={startHalf}><span class={startArc} /></span>
+//   </div>
 
-import { defineComponent, defineSlotComponent } from "@pureform/core";
+import { defineSlotComponent } from "@pureform/core";
 import {
     absolute,
+    add,
     animation,
+    clamp,
     hidden,
+    max,
+    min,
+    mul,
+    none,
     numeric,
     pct,
     px,
     relative,
     rotate,
     solid,
+    sub,
     transform,
     translateX,
     transparent,
+    unitless,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { duration, easing, radius } from "@pureform/theme";
@@ -59,7 +69,7 @@ const linear = componentTokens("linearProgress", {
     activeColor: sys("primary"),
     trackColor: sys("secondaryContainer"),
     height: px(4),
-    value: pct(0),
+    value: unitless(0),
     indeterminateWidth: pct(40),
 });
 
@@ -70,7 +80,7 @@ export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         name: "linearProgress",
         $meta: {
             description:
-                "Material linear progress. Set the value token as a percentage, or turn on indeterminate.",
+                "Material linear progress. Set the value token (0 to 100), or turn on indeterminate.",
         },
         tokens: linear.tokens,
         slots: ["root", "indicator"],
@@ -90,7 +100,7 @@ export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                     top: px(0),
                     insetInlineStart: px(0),
                     height: pct(100),
-                    width: ref("value"),
+                    width: mul(ref("value"), pct(1)),
                     borderRadius: radius("full"),
                     backgroundColor: ref("activeColor"),
                     transition: tweens("width"),
@@ -127,43 +137,111 @@ const circular = componentTokens("circularProgress", {
     activeColor: sys("primary"),
     size: px(48),
     thickness: px(4),
+    value: unitless(0),
 });
+
+const DEG_PER_PERCENT = numeric(3.6, "deg");
 
 /** Build the circular progress indicator with a `color` variant per group in `groups`. */
 export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
     const { ref } = circular;
-    return defineComponent({
+
+    // A half of the circle, clipping a ring whose two colored sides make a half-circle arc.
+    // The ring turns from `start` by `sweep`: hidden at 0, filling its half at 180 degrees.
+    const half = (side: "Start" | "End"): StyleMap => ({
+        position: absolute,
+        top: px(0),
+        [`insetInline${side}`]: px(0),
+        width: pct(50),
+        height: pct(100),
+        overflow: hidden,
+    });
+    const arc = (
+        side: "Start" | "End",
+        start: number,
+        sweep: ReturnType<typeof min>,
+    ): StyleMap => ({
+        position: absolute,
+        top: px(0),
+        [`insetInline${side}`]: px(0),
+        width: pct(200),
+        height: pct(100),
+        borderRadius: radius("full"),
+        borderStyle: solid,
+        borderWidth: ref("thickness"),
+        borderColor: transparent,
+        borderBlockStartColor: ref("activeColor"),
+        borderInlineEndColor: ref("activeColor"),
+        transform: transform(
+            rotate(add(numeric(start, "deg"), mul(sweep, DEG_PER_PERCENT))),
+        ),
+        // Hidden until it has a share to show, so its anti-aliased edge never shows at the seam.
+        opacity: clamp(unitless(0), sweep, unitless(1)),
+        transition: tweens("transform"),
+    });
+
+    return defineSlotComponent({
         name: "circularProgress",
         $meta: {
             description:
-                "Material circular progress, indeterminate: a spinning ring. Give it role=progressbar and a label.",
+                "Material circular progress. Set the value token (0 to 100), or turn on indeterminate for a spinner.",
         },
         tokens: circular.tokens,
+        slots: ["root", "endHalf", "endArc", "startHalf", "startArc"],
+        structure: {
+            root: ["endHalf", "startHalf"],
+            endHalf: ["endArc"],
+            startHalf: ["startArc"],
+        },
         recipe: {
-            // Two colored quarters of a bordered circle, turning.
             base: {
-                width: ref("size"),
-                height: ref("size"),
-                borderRadius: radius("full"),
-                borderStyle: solid,
-                borderWidth: ref("thickness"),
-                borderColor: transparent,
-                borderBlockStartColor: ref("activeColor"),
-                borderInlineEndColor: ref("activeColor"),
-                animation: animation({
-                    name: "circularProgressSpin",
-                    duration: duration("long2"),
-                    easing: easing("linear"),
-                    iterations: "infinite",
-                }),
+                root: {
+                    position: relative,
+                    width: ref("size"),
+                    height: ref("size"),
+                    borderRadius: radius("full"),
+                },
+                // The end half shows the first 50%, the start half the rest.
+                endHalf: half("End"),
+                endArc: arc("End", -135, min(ref("value"), unitless(50))),
+                startHalf: half("Start"),
+                startArc: arc(
+                    "Start",
+                    45,
+                    max(sub(ref("value"), unitless(50)), unitless(0)),
+                ),
             },
             variants: {
-                color: colorVariant(groups, (g) => ({
-                    borderBlockStartColor: g.main,
-                    borderInlineEndColor: g.main,
-                })),
+                // Two colored quarters of a bordered circle, turning; the halves stay hidden.
+                indeterminate: {
+                    true: {
+                        root: {
+                            borderStyle: solid,
+                            borderWidth: ref("thickness"),
+                            borderColor: transparent,
+                            borderBlockStartColor: ref("activeColor"),
+                            borderInlineEndColor: ref("activeColor"),
+                            animation: animation({
+                                name: "circularProgressSpin",
+                                duration: duration("long2"),
+                                easing: easing("linear"),
+                                iterations: "infinite",
+                            }),
+                        },
+                        endHalf: { display: none },
+                        startHalf: { display: none },
+                    },
+                    false: {},
+                },
+                color: colorVariant(groups, (g) => {
+                    const sides = {
+                        borderBlockStartColor: g.main,
+                        borderInlineEndColor: g.main,
+                    };
+                    return { root: sides, endArc: sides, startArc: sides };
+                }),
             },
-            defaultVariants: { color: DEFAULT_GROUP },
+            defaultVariants: { indeterminate: "false", color: DEFAULT_GROUP },
         },
     });
 };
