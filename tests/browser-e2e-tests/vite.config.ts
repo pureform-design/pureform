@@ -32,5 +32,12 @@ export default createConfig({
             ],
             dedupe: ["solid-js", "@solidjs/web"],
         },
+        define: {
+            // Parts of React Native Web's Animated refer to Node's `global`.
+            global: "globalThis",
+            // React Native Web swaps Animated for a mock that ends every animation at once
+            // under test, and the motion tests need the real one.
+            "process.env.NODE_ENV": JSON.stringify("development"),
+        },
     },
 });
