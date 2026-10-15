@@ -61,7 +61,20 @@ type Open = {
 /** The parts of a config that references point into. Any config, or part of one, fits. */
 export type Vocabulary = { [K in keyof Open]?: unknown };
 
-type Keys<T> = T extends object ? Extract<keyof T, string> : never;
+// The names a type declares. Where it also has an index signature, as a typed config does
+// when it extends `CoreConfig`, the declared names win, so they autocomplete; a type with
+// only an index signature gives `string`.
+type KnownKeys<T> = keyof {
+    [K in keyof T as string extends K ? never : K]: 0;
+};
+type Keys<T> = Extract<
+    T extends object
+        ? [Extract<KnownKeys<T>, string>] extends [never]
+            ? keyof T
+            : KnownKeys<T>
+        : never,
+    string
+>;
 type Field<C, K extends string> = C extends { [P in K]?: infer V }
     ? NonNullable<V>
     : never;
@@ -104,6 +117,9 @@ export type ApplyMap<C> = {
         ? Keys<V>
         : string | ValueNode | Record<string, ValueNode> | ValueNode[];
 };
+
+// What the untyped breakpoint conditions take.
+type RawRange = string | { from?: string; until?: string };
 
 type BreakpointRange<C> =
     | BreakpointName<C>
@@ -225,7 +241,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
 
         /** A text style, for `textStyle`. */
         textStyle: (name: Keys<Field<C, "textStyles">>): AliasNode =>
-            rawAlias("textStyles", name),
+            rawAlias("textStyles", name as string),
 
         /** Utilities to apply, by name, each with a value it accepts. */
         apply: (map: ApplyMap<C>): NonNullable<StyleMap["apply"]> =>
@@ -233,13 +249,14 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
 
         /** A viewport range at the config's breakpoints. */
         viewport: (range: BreakpointRange<C>): ViewportBreakpointCondition =>
-            viewportBreakpoint(range),
+            viewportBreakpoint(range as RawRange),
 
         /** A container range at the config's breakpoints, optionally of a named container. */
         container: (
             range: BreakpointRange<C>,
             name?: string,
-        ): ContainerBreakpointCondition => containerBreakpoint(range, name),
+        ): ContainerBreakpointCondition =>
+            containerBreakpoint(range as RawRange, name),
 
         /** A single-slot component whose recipe receives typed `alias` and `token` helpers,
          *  with its variant groups and values checked. */

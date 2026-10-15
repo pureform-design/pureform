@@ -281,3 +281,16 @@ describe("mixing typed and raw", () => {
         ).not.toThrow();
     });
 });
+
+describe("typed configs with index signatures", () => {
+    it("offers the declared names over the index signature", () => {
+        type Config = {
+            tokens: Record<string, Record<string, unknown>> & {
+                radii: { small: unknown; full: unknown };
+            };
+        };
+        expectTypeOf<AliasPath<Config>>().toEqualTypeOf<
+            ["tokens", "radii", "small"] | ["tokens", "radii", "full"]
+        >();
+    });
+});
