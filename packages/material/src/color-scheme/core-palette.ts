@@ -1,9 +1,4 @@
-import {
-    argbFromHex,
-    Blend,
-    Hct,
-    hexFromArgb,
-} from "@material/material-color-utilities";
+import { argbFromHex, Blend, Hct } from "@material/material-color-utilities";
 
 import type { BaseColorGroup, HexColor } from "../types";
 import { TonalPalette } from "./tonal-palette";
