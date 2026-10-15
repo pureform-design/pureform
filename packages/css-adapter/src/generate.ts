@@ -4,9 +4,9 @@
 
 import type { CoreConfig } from "@pureform/core/types";
 
+import { manifestOf } from "./classes";
 import type { CssOptions } from "./options";
-import { manifestOf } from "./recipes";
-import type { RecipeManifest } from "./runtime";
+import type { ComponentManifest } from "./runtime";
 import { compileCss } from "./stylesheet";
 
 export interface GenerateOptions extends CssOptions {
@@ -34,7 +34,7 @@ const union = (values: readonly string[]): string =>
         ? values.map((v) => JSON.stringify(v)).join(" | ")
         : "never";
 
-const variantsType = (manifest: RecipeManifest): string => {
+const variantsType = (manifest: ComponentManifest): string => {
     const groups = Object.entries(manifest.variants);
     if (groups.length === 0) return "{}";
     return `{ ${groups.map(([group, values]) => `${JSON.stringify(group)}: ${union(values)}`).join("; ")} }`;
@@ -54,20 +54,20 @@ export const generate = async (
         return [name, manifestOf(spec, options)] as const;
     });
     const js = [
-        `import { recipe } from ${JSON.stringify(runtime)};`,
+        `import { componentClasses } from ${JSON.stringify(runtime)};`,
         "",
         ...manifests.map(
             ([name, manifest]) =>
-                `export const ${name} = /* @__PURE__ */ recipe(${JSON.stringify(manifest)});`,
+                `export const ${name} = /* @__PURE__ */ componentClasses(${JSON.stringify(manifest)});`,
         ),
         "",
     ].join("\n");
     const dts = [
-        `import type { RecipeFn } from ${JSON.stringify(runtime)};`,
+        `import type { ComponentClasses } from ${JSON.stringify(runtime)};`,
         "",
         ...manifests.map(
             ([name, manifest]) =>
-                `export declare const ${name}: RecipeFn<${variantsType(manifest)}, ${union(manifest.slots ?? [])}>;`,
+                `export declare const ${name}: ComponentClasses<${variantsType(manifest)}, ${union(manifest.slots ?? [])}>;`,
         ),
         "",
     ].join("\n");

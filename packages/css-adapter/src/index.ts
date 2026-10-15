@@ -2,7 +2,7 @@
 // components to class name functions.
 export { compileCss } from "./stylesheet";
 export type { CssOptions } from "./options";
-export { manifestOf, recipes } from "./recipes";
-export type { Recipes, SlotsOf, VariantsOf } from "./recipes";
-export { recipe } from "./runtime";
-export type { Choice, RecipeFn, RecipeManifest } from "./runtime";
+export { manifestOf, classesFor } from "./classes";
+export type { ClassesFor, SlotsOf, VariantsOf } from "./classes";
+export { componentClasses } from "./runtime";
+export type { Choice, ComponentClasses, ComponentManifest } from "./runtime";

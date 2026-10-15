@@ -5,12 +5,12 @@ under 1 kB. No Panda and no build tool needed. Components keep Panda's class nam
 works with either adapter.
 
 ```ts
-import { compileCss, recipes } from "@pureform/css-adapter";
+import { compileCss, classesFor } from "@pureform/css-adapter";
 import { pureform } from "@pureform/preset";
 
 const config = pureform();
 const css = compileCss(config); // put it in a <style>, or write it to a file
-const { button, avatar } = recipes(config);
+const { button, avatar } = classesFor(config);
 
 button({ variant: "tonal", size: "large" }).root;
 // "button__root button__root--color_primary button__root--variant_tonal …"
@@ -33,13 +33,13 @@ import { pureform } from "@pureform/preset";
 
 await buildCss(pureform(), { outDir: "src/pureform" });
 // src/pureform/styles.css
-// src/pureform/recipes.js     (export const button = recipe({…}), one per component)
-// src/pureform/recipes.d.ts   (typed from each component's variant values)
+// src/pureform/components.js     (export const button = componentClasses({…}), one per component)
+// src/pureform/components.d.ts   (typed from each component's variant values)
 ```
 
 ```ts
 import "./pureform/styles.css";
-import { button } from "./pureform/recipes";
+import { button } from "./pureform/components";
 ```
 
 Each export is a pure call, so bundlers drop the components you don't import.
@@ -61,27 +61,27 @@ export default defineConfig({
 
 ```ts
 import "virtual:pureform.css";
-import { button } from "virtual:pureform/recipes";
+import { button } from "virtual:pureform/components";
 ```
 
 ## Options
 
 `compileCss`, `buildCss`, and the plugin take:
 
-| Option           | Default      | Sets                                                                |
-| ---------------- | ------------ | ------------------------------------------------------------------- |
-| `prefix`         | none         | The component var prefix: `pf` gives `--pf-components-*`            |
-| `tokenPrefix`    | none         | The token var prefix: `pf` gives `--pf-colors-primary`              |
-| `classPrefix`    | none         | The class prefix: `pf` gives `.pf-button`. Pass it to `recipes` too |
-| `themeAttribute` | `data-theme` | The attribute that switches named themes: `[data-theme=teal]`       |
-| `layer`          | `pureform`   | The cascade layer everything sits in, or `false` for none           |
+| Option           | Default      | Sets                                                                   |
+| ---------------- | ------------ | ---------------------------------------------------------------------- |
+| `prefix`         | none         | The component var prefix: `pf` gives `--pf-components-*`               |
+| `tokenPrefix`    | none         | The token var prefix: `pf` gives `--pf-colors-primary`                 |
+| `classPrefix`    | none         | The class prefix: `pf` gives `.pf-button`. Pass it to `classesFor` too |
+| `themeAttribute` | `data-theme` | The attribute that switches named themes: `[data-theme=teal]`          |
+| `layer`          | `pureform`   | The cascade layer everything sits in, or `false` for none              |
 
 `buildCss` and the plugin also take `transform`, a `(css) => css` post-process, and `runtime`,
 where the generated modules import the runtime from.
 
 ## The stylesheet
 
-- **Layers:** `pureform.reset`, `pureform.tokens`, then `pureform.recipes`, which holds base
+- **Layers:** `pureform.reset`, `pureform.tokens`, then `pureform.components`, which holds base
   styles, variants, and compound variants in that order. Your own unlayered CSS wins over all
   of it.
 - **Tokens** are CSS vars on `:root`. Dark values apply under a `.dark` class on the root, or

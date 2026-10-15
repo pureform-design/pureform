@@ -52,7 +52,7 @@ The move is a pure refactor; the Panda snapshots must not change.
 ### Stylesheet
 
 ```css
-@layer pureform.reset, pureform.tokens, pureform.recipes;
+@layer pureform.reset, pureform.tokens, pureform.components;
 
 @layer pureform.tokens {
     :root {
@@ -69,7 +69,7 @@ The move is a pure refactor; the Panda snapshots must not change.
     @keyframes …
 }
 
-@layer pureform.recipes {
+@layer pureform.components {
     @layer base, variants, compounds;
     @layer base {
         .button {
@@ -119,7 +119,7 @@ match Panda's `data-panda-theme`.
 ```ts
 import { recipes } from "@pureform/css-adapter/runtime";
 
-const { button, tabs } = recipes(config); // or recipes<typeof config>(manifest)
+const { button, tabs } = classesFor(config); // or classesFor<typeof config>(manifest)
 
 button({ variant: "tonal", size: "large" }); // "button button--variant_tonal button--size_large …"
 tabs({ variant: "secondary" }).tab; // per-slot class strings
@@ -139,14 +139,14 @@ import { buildCss } from "@pureform/css-adapter/build";
 
 await buildCss(config, { outDir: "src/pureform" });
 // src/pureform/styles.css
-// src/pureform/recipes.js       (export const button = recipe({…manifest}), per component)
-// src/pureform/recipes.d.ts
+// src/pureform/components.js       (export const button = recipe({…manifest}), per component)
+// src/pureform/components.d.ts
 ```
 
 - The generated JS is the manifest as literals plus the shared runtime import, one export per
   component, so bundlers tree-shake unused components and nothing compiles at runtime.
 - The config, theme providers, and color generation stay out of the app bundle.
-- A Vite plugin wraps the same build (`virtual:pureform.css`, `virtual:pureform/recipes`), so
+- A Vite plugin wraps the same build (`virtual:pureform.css`, `virtual:pureform/components`), so
   a dev server rebuilds on config change. The later Layer 3 CLI calls `buildCss` too.
 
 ## Reset
@@ -205,7 +205,7 @@ Three ways in:
    token reference spelling and condition output. Panda snapshots and all tests unchanged.
 2. **Stylesheet emitter.** Tokens and themes, keyframes, recipes with layers and nesting,
    text styles and utilities inlined. Snapshot tests on the default `pureform()` config.
-3. **Runtime.** `recipe(manifest)` and `recipes(config)`, typed from the specs. Type tests.
+3. **Runtime.** `componentClasses(manifest)` and `classesFor(config)`, typed from the specs. Type tests.
 4. **AOT build and Vite plugin.** `buildCss` writing CSS, JS, and `.d.ts`; the plugin's virtual
    modules.
 5. **Parity tests.** The computed-style comparison against Panda, in the demo's e2e suite.

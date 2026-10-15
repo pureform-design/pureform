@@ -7,7 +7,7 @@
 // shape variants, which clip on the web and fall back to rounded corners and borders in React
 // Native.
 
-import { recipes } from "@pureform/css-adapter";
+import { classesFor } from "@pureform/css-adapter";
 import { select, stylesFor, themeKey } from "@pureform/rn-adapter";
 import type {
     PrecomputedStyles,
@@ -114,7 +114,7 @@ const tree = (
 const SKIPPED = new Set(["input"]);
 
 const cssMarkup = (list: Item[], styles: Resolved, scenario: Scenario) => {
-    const fns = recipes(pureformConfig) as Record<
+    const fns = classesFor(pureformConfig) as Record<
         string,
         (selection: object) => string | Record<string, string>
     >;

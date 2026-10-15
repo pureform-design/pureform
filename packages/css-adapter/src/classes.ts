@@ -5,8 +5,8 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 
 import { className } from "./options";
 import type { CssOptions } from "./options";
-import { recipe } from "./runtime";
-import type { RecipeFn, RecipeManifest } from "./runtime";
+import { componentClasses } from "./runtime";
+import type { ComponentClasses, ComponentManifest } from "./runtime";
 
 /** A component spec's variant values by group, from its typed spec, or open when untyped. */
 export type VariantsOf<S> = S extends { $variants?: infer V }
@@ -24,8 +24,8 @@ export type SlotsOf<S> = S extends {
     : never;
 
 /** A config's components as class name functions, by name. */
-export type Recipes<C extends { components: object }> = {
-    [K in keyof C["components"]]: RecipeFn<
+export type ClassesFor<C extends { components: object }> = {
+    [K in keyof C["components"]]: ComponentClasses<
         VariantsOf<C["components"][K]>,
         SlotsOf<C["components"][K]>
     >;
@@ -35,7 +35,7 @@ export type Recipes<C extends { components: object }> = {
 export const manifestOf = (
     spec: AnyComponentSpec,
     options: Pick<CssOptions, "classPrefix"> = {},
-): RecipeManifest => ({
+): ComponentManifest => ({
     className: className(spec.name, options),
     ...(spec.kind === "slotComponent" ? { slots: spec.slots } : {}),
     variants: Object.fromEntries(
@@ -49,13 +49,13 @@ export const manifestOf = (
 
 /** Every component in a config as a class name function. Pass the same class prefix as to
  *  `compileCss`. */
-export const recipes = <C extends Pick<CoreConfig, "components">>(
+export const classesFor = <C extends Pick<CoreConfig, "components">>(
     config: C,
     options: Pick<CssOptions, "classPrefix"> = {},
-): Recipes<C> =>
+): ClassesFor<C> =>
     Object.fromEntries(
         Object.entries(config.components).map(([name, spec]) => [
             name,
-            recipe(manifestOf(spec as AnyComponentSpec, options)),
+            componentClasses(manifestOf(spec as AnyComponentSpec, options)),
         ]),
-    ) as Recipes<C>;
+    ) as ClassesFor<C>;

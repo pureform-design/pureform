@@ -2,7 +2,7 @@
 
 pureform in Tailwind v4: the Tailwind adapter's Vite plugin writes the stylesheet that
 `src/app.css` imports after Tailwind, and serves the class name functions as
-`virtual:pureform/recipes`.
+`virtual:pureform/components`.
 
 ```sh
 bun run dev

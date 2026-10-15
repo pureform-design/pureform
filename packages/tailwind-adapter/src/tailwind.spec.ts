@@ -93,7 +93,7 @@ describe("compileTailwind", () => {
             /^@theme \{\n {4}--spacing-0: 0px;[^]*\n@theme inline \{/,
         );
         expect(css).toContain(
-            "@layer components {\n    @layer pureform.reset, pureform.tokens, pureform.recipes;",
+            "@layer components {\n    @layer pureform.reset, pureform.tokens, pureform.components;",
         );
     });
 
@@ -133,7 +133,7 @@ describe("compileTailwind", () => {
         const out = await build(css, ["p-0"]);
         expect(out).toMatch(/^@layer theme, base, components, utilities;/m);
         expect(out).toContain(
-            "@layer pureform.recipes {\n    @layer base, variants, compounds;",
+            "@layer pureform.components {\n    @layer base, variants, compounds;",
         );
         expect(out).toContain(".button__root {");
     });
@@ -162,10 +162,10 @@ describe("pureformTailwind", () => {
             const css = await readFile(outFile, "utf8");
             expect(css).toBe(compileTailwind(config, { classPrefix: "pf" }));
             expect(css).toContain(".pf-button__root {");
-            const recipes = await (
+            const components = await (
                 plugin.load as (id: string) => Promise<string>
-            )("\0virtual:pureform/recipes");
-            expect(recipes).toContain('"className":"pf-button"');
+            )("\0virtual:pureform/components");
+            expect(components).toContain('"className":"pf-button"');
         } finally {
             await rm(dir, { recursive: true });
         }

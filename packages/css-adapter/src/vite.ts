@@ -1,7 +1,7 @@
 // A Vite plugin serving the generated output as virtual modules:
 //
 //   import "virtual:pureform.css";
-//   import { button } from "virtual:pureform/recipes";
+//   import { button } from "virtual:pureform/components";
 //
 // Vite processes the stylesheet like any other, so its Lightning CSS transformer applies.
 // Other adapters build their plugins on `pureformPlugin`, compiling the stylesheet their own
@@ -19,8 +19,8 @@ import type { GenerateOptions, Generated } from "./generate";
 export interface PureformPluginOptions extends GenerateOptions {
     /** The config, or a function returning it. */
     config: CoreConfig | (() => CoreConfig | Promise<CoreConfig>);
-    /** Write the recipes module's declarations here, so TypeScript knows
-     *  `virtual:pureform/recipes`. */
+    /** Write the components module's declarations here, so TypeScript knows
+     *  `virtual:pureform/components`. */
     dts?: string;
 }
 
@@ -33,7 +33,7 @@ export interface PluginTarget {
 }
 
 const CSS_ID = "virtual:pureform.css";
-const RECIPES_ID = "virtual:pureform/recipes";
+const COMPONENTS_ID = "virtual:pureform/components";
 // Vite's convention for virtual ids, so other plugins leave them alone. The stylesheet's id
 // keeps its extension, so Vite treats it as CSS.
 const resolved = (id: string) => `\0${id}`;
@@ -50,9 +50,9 @@ export const writeIfChanged = async (
     return true;
 };
 
-/** The recipes module's declarations, as an ambient module for its virtual id. */
-export const recipesModuleDts = (dts: string): string =>
-    `declare module "${RECIPES_ID}" {\n${dts
+/** the components module's declarations, as an ambient module for its virtual id. */
+export const componentsModuleDts = (dts: string): string =>
+    `declare module "${COMPONENTS_ID}" {\n${dts
         .split("\n")
         .filter(Boolean)
         .map((line) => `    ${line.replace("export declare", "export")}`)
@@ -74,7 +74,10 @@ export const pureformPlugin = (
             const result = await generate(config, options);
             await Promise.all([
                 options.dts &&
-                    writeIfChanged(options.dts, recipesModuleDts(result.dts)),
+                    writeIfChanged(
+                        options.dts,
+                        componentsModuleDts(result.dts),
+                    ),
                 target.outFile && writeIfChanged(target.outFile, result.css),
             ]);
             return result;
@@ -89,12 +92,12 @@ export const pureformPlugin = (
             await generated();
         },
         resolveId: (id) =>
-            (id === CSS_ID && !target.outFile) || id === RECIPES_ID
+            (id === CSS_ID && !target.outFile) || id === COMPONENTS_ID
                 ? resolved(id)
                 : undefined,
         load: async (id) => {
             if (id === resolved(CSS_ID)) return (await generated()).css;
-            if (id === resolved(RECIPES_ID)) return (await generated()).js;
+            if (id === resolved(COMPONENTS_ID)) return (await generated()).js;
             return undefined;
         },
     };

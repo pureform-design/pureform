@@ -1,7 +1,7 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
 exports[`compileCss > compiles to a stable stylesheet 1`] = `
-"@layer pureform.reset, pureform.tokens, pureform.recipes;
+"@layer pureform.reset, pureform.tokens, pureform.components;
 
 @layer pureform.tokens {
     :root {
@@ -40,7 +40,7 @@ exports[`compileCss > compiles to a stable stylesheet 1`] = `
     }
 }
 
-@layer pureform.recipes {
+@layer pureform.components {
     @layer base, variants, compounds;
     @layer base {
         .button__root {

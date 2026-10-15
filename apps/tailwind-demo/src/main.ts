@@ -10,7 +10,7 @@ import {
     media,
     text,
     textField,
-} from "virtual:pureform/recipes";
+} from "virtual:pureform/components";
 
 type Child = Node | string;
 

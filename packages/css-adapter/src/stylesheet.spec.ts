@@ -25,9 +25,9 @@ describe("compileCss", () => {
         expect(compileCss(buttonConfig)).toMatchSnapshot();
     });
 
-    it("orders its layers, with recipes last", () => {
+    it("orders its layers, with components last", () => {
         expect(compileCss(buttonConfig)).toMatch(
-            /^@layer pureform\.reset, pureform\.tokens, pureform\.recipes;/,
+            /^@layer pureform\.reset, pureform\.tokens, pureform\.components;/,
         );
     });
 

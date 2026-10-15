@@ -1,11 +1,11 @@
 import { pureform } from "@pureform/preset";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
-import { recipes } from "./recipes";
-import { recipe } from "./runtime";
+import { classesFor } from "./classes";
+import { componentClasses } from "./runtime";
 
-describe("recipe", () => {
-    const chip = recipe<
+describe("componentClasses", () => {
+    const chip = componentClasses<
         { size: "small" | "large"; selected: "true" | "false" },
         never
     >({
@@ -25,7 +25,7 @@ describe("recipe", () => {
     });
 
     it("gives each slot its classes", () => {
-        const tabs = recipe<{ variant: "primary" }, "root" | "tab">({
+        const tabs = componentClasses<{ variant: "primary" }, "root" | "tab">({
             className: "pf-tabs",
             slots: ["root", "tab"],
             variants: { variant: ["primary"] },
@@ -46,8 +46,10 @@ describe("recipe", () => {
     });
 });
 
-describe("recipes", () => {
-    const { button, card, avatar } = recipes(pureform(), { classPrefix: "pf" });
+describe("classesFor", () => {
+    const { button, card, avatar } = classesFor(pureform(), {
+        classPrefix: "pf",
+    });
 
     it("builds every component's function from the config", () => {
         expect(button({ variant: "tonal" }).root).toContain(

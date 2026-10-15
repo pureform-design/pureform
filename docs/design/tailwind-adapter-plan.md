@@ -51,7 +51,7 @@ layer control.
 - `tailwindCss(parts)`: writes the parts as one CSS file.
 - `pureformTailwind(options)` from `@pureform/tailwind-adapter/vite`: writes the file to disk.
 
-Class names come from the CSS adapter's runtime (`recipes(config)` or the generated recipes
+Class names come from the CSS adapter's runtime (`classesFor(config)` or the generated components
 module), unchanged.
 
 The CSS adapter's Vite plugin and the new one share config loading, watching, and `.d.ts`

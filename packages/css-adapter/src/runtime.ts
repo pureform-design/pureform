@@ -5,7 +5,7 @@
 // Compound variants need no runtime: the stylesheet selects them by the variant classes chained.
 
 /** What the runtime needs to know about a component. */
-export interface RecipeManifest {
+export interface ComponentManifest {
     /** The component's class, after any class prefix. */
     className: string;
     /** A slot component's slots, each of which gets its own classes. */
@@ -24,7 +24,7 @@ export type Choice<V> = {
 
 /** A component's class name function: its classes for a selection, or, for a slot component,
  *  each slot's classes. */
-export type RecipeFn<V, S extends string> = ((
+export type ComponentClasses<V, S extends string> = ((
     choice?: Choice<V>,
 ) => [S] extends [never] ? string : Record<S, string>) & {
     /** Each variant group's values. */
@@ -40,9 +40,9 @@ export type RecipeFn<V, S extends string> = ((
 const valueOf = (value: unknown): string | undefined =>
     value === true ? "true" : value === false ? "false" : (value as string);
 
-const classesFor = (
+const classList = (
     base: string,
-    manifest: RecipeManifest,
+    manifest: ComponentManifest,
     choice: Record<string, unknown>,
 ): string => {
     const classes = [base];
@@ -54,16 +54,19 @@ const classesFor = (
 };
 
 /** The class name function for a component's manifest. */
-export const recipe = <V = Record<string, string>, S extends string = never>(
-    manifest: RecipeManifest,
-): RecipeFn<V, S> => {
+export const componentClasses = <
+    V = Record<string, string>,
+    S extends string = never,
+>(
+    manifest: ComponentManifest,
+): ComponentClasses<V, S> => {
     const fn = (choice: Record<string, unknown> = {}) => {
         if (!manifest.slots)
-            return classesFor(manifest.className, manifest, choice);
+            return classList(manifest.className, manifest, choice);
         return Object.fromEntries(
             manifest.slots.map((slot) => [
                 slot,
-                classesFor(`${manifest.className}__${slot}`, manifest, choice),
+                classList(`${manifest.className}__${slot}`, manifest, choice),
             ]),
         );
     };
@@ -79,5 +82,5 @@ export const recipe = <V = Record<string, string>, S extends string = never>(
             }
             return [choice, rest];
         },
-    }) as unknown as RecipeFn<V, S>;
+    }) as unknown as ComponentClasses<V, S>;
 };

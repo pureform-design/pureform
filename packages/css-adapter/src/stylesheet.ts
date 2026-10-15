@@ -1,5 +1,5 @@
 // Compile a pureform config to one stylesheet: token vars on the root, named themes under their
-// attribute, keyframes, and each component's classes, in cascade layers that give recipes the
+// attribute, keyframes, and each component's classes, in cascade layers that give components the
 // same precedence as in Panda: base, then variants, then compound variants.
 
 import { inlineStyles, tokenValue, validateConfig } from "@pureform/core";
@@ -121,7 +121,7 @@ const tokenRules = (config: CoreConfig, ctx: LowerCtx, options: CssOptions) => [
 ];
 
 /** The layers a component's styles go in. */
-interface RecipeLayers {
+interface ComponentLayers {
     base: Block;
     variants: Block;
     compounds: Block;
@@ -133,7 +133,7 @@ const variantClass = (base: string, group: string, value: string) =>
 // One part of a component (the component itself, or a slot) with its class: its base, a class
 // per variant value, and a chained class per compound variant.
 const addPart = (
-    layers: RecipeLayers,
+    layers: ComponentLayers,
     base: string,
     styles: {
         base: StyleMap | undefined;
@@ -162,7 +162,7 @@ const addPart = (
 };
 
 const addComponent = (
-    layers: RecipeLayers,
+    layers: ComponentLayers,
     spec: AnyComponentSpec,
     ctx: LowerCtx,
     options: CssOptions,
@@ -250,8 +250,8 @@ const addComponent = (
     }
 };
 
-const recipeRules = (ctx: LowerCtx, options: CssOptions): string[] => {
-    const layers: RecipeLayers = {
+const componentRules = (ctx: LowerCtx, options: CssOptions): string[] => {
+    const layers: ComponentLayers = {
         base: block(),
         variants: block(),
         compounds: block(),
@@ -287,12 +287,12 @@ export const compileCss = (
         ...(layer === false
             ? []
             : [
-                  `@layer ${layer}.reset, ${layer}.tokens, ${layer}.recipes;`,
+                  `@layer ${layer}.reset, ${layer}.tokens, ${layer}.components;`,
                   "",
               ]),
         ...inLayer(sub("tokens"), tokenRules(config, ctx, options)),
         "",
-        ...inLayer(sub("recipes"), recipeRules(ctx, options)),
+        ...inLayer(sub("components"), componentRules(ctx, options)),
     ];
     return `${lines.join("\n")}\n`;
 };

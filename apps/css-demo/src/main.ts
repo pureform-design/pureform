@@ -1,5 +1,5 @@
 // pureform with no framework and no Panda: the CSS adapter's stylesheet, its reset, and class
-// names from the generated recipes module.
+// names from the generated components module.
 
 import "@pureform/css-adapter/reset.css";
 import "virtual:pureform.css";
@@ -14,7 +14,7 @@ import {
     switchControl,
     text,
     textField,
-} from "virtual:pureform/recipes";
+} from "virtual:pureform/components";
 
 type Child = Node | string;
 

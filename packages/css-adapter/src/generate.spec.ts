@@ -15,17 +15,17 @@ describe("generate", () => {
     it("writes each component as a pure call holding its manifest", async () => {
         const { js } = await generate(pureform(), { classPrefix: "pf" });
         expect(js).toMatch(
-            /^import \{ recipe \} from "@pureform\/css-adapter\/runtime";/,
+            /^import \{ componentClasses \} from "@pureform\/css-adapter\/runtime";/,
         );
         expect(js).toContain(
-            'export const avatar = /* @__PURE__ */ recipe({"className":"pf-avatar",',
+            'export const avatar = /* @__PURE__ */ componentClasses({"className":"pf-avatar",',
         );
     });
 
     it("types each function by its variant values and slots", async () => {
         const { dts } = await generate(buttonConfig);
         expect(dts).toContain(
-            'export declare const button: RecipeFn<{ "color": "brand" | "danger"; "variant": "solid" | "outline" | "ghost"; "size": "sm" | "md" | "lg" }, "root" | "label" | "leadingIcon" | "trailingIcon">;',
+            'export declare const button: ComponentClasses<{ "color": "brand" | "danger"; "variant": "solid" | "outline" | "ghost"; "size": "sm" | "md" | "lg" }, "root" | "label" | "leadingIcon" | "trailingIcon">;',
         );
     });
 
@@ -61,8 +61,8 @@ describe("buildCss", () => {
             const paths = await buildCss(buttonConfig, { outDir });
             expect(paths.map((path) => path.slice(outDir.length + 1))).toEqual([
                 "styles.css",
-                "recipes.js",
-                "recipes.d.ts",
+                "components.js",
+                "components.d.ts",
             ]);
             expect(
                 await readFile(join(outDir, "styles.css"), "utf8"),
@@ -78,7 +78,7 @@ describe("pureformCss", () => {
     const call = <A extends unknown[], R>(hook: unknown, ...args: A) =>
         (hook as (...args: A) => R)(...args);
 
-    it("serves the stylesheet and the recipes as virtual modules", async () => {
+    it("serves the stylesheet and the class name functions as virtual modules", async () => {
         const cssId = call<[string], string>(
             plugin.resolveId,
             "virtual:pureform.css",
@@ -87,7 +87,7 @@ describe("pureformCss", () => {
         expect(await call(plugin.load, cssId)).toContain(".button__root {");
         const recipesId = call<[string], string>(
             plugin.resolveId,
-            "virtual:pureform/recipes",
+            "virtual:pureform/components",
         );
         expect(await call(plugin.load, recipesId)).toContain(
             "export const button =",
@@ -121,7 +121,7 @@ describe("pureformPlugin", () => {
             expect(await readFile(outFile, "utf8")).toBe("/* button */");
             expect(
                 await readFile(join(dir, "pureform.d.ts"), "utf8"),
-            ).toContain('declare module "virtual:pureform/recipes" {');
+            ).toContain('declare module "virtual:pureform/components" {');
             // Written to disk, so the stylesheet isn't served as a module.
             expect(
                 call(plugin.resolveId, "virtual:pureform.css"),

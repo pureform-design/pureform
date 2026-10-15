@@ -1,5 +1,5 @@
-// Write the ahead-of-time output to a directory: `styles.css`, and `recipes.js` with its
-// declarations in `recipes.d.ts`.
+// Write the ahead-of-time output to a directory: `styles.css`, and `components.js` with its
+// declarations in `components.d.ts`.
 
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -24,8 +24,8 @@ export const buildCss = async (
     await mkdir(options.outDir, { recursive: true });
     const files: [string, string][] = [
         ["styles.css", css],
-        ["recipes.js", js],
-        ["recipes.d.ts", dts],
+        ["components.js", js],
+        ["components.d.ts", dts],
     ];
     return Promise.all(
         files.map(async ([name, content]) => {

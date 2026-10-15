@@ -1,5 +1,5 @@
 // A Vite plugin writing a config's Tailwind stylesheet to a file, since Tailwind's Vite plugin
-// reads imports from disk, and serving the class name functions as `virtual:pureform/recipes`.
+// reads imports from disk, and serving the class name functions as `virtual:pureform/components`.
 //
 //   plugins: [pureformTailwind({ config, outFile: "src/pureform.gen.css" }), tailwindcss()]
 

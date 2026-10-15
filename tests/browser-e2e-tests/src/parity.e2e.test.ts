@@ -10,8 +10,8 @@
 // selectors match, set on every element, so element and slot conditions both apply.
 
 import * as pandaRecipes from "$recipes";
-import { manifestOf, recipes } from "@pureform/css-adapter";
-import type { RecipeManifest } from "@pureform/css-adapter";
+import { manifestOf, classesFor } from "@pureform/css-adapter";
+import type { ComponentManifest } from "@pureform/css-adapter";
 import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -25,7 +25,7 @@ const THEME_ATTRIBUTE = "data-panda-theme";
 const OPTIONS = { prefix: PREFIX, themeAttribute: THEME_ATTRIBUTE };
 
 // One element per selection: the defaults, then each variant value on its own.
-const selections = (manifest: RecipeManifest): Record<string, string>[] => [
+const selections = (manifest: ComponentManifest): Record<string, string>[] => [
     {},
     ...Object.entries(manifest.variants).flatMap(([group, values]) =>
         values.map((value) => ({ [group]: value })),
@@ -54,7 +54,7 @@ const ITEMS: Item[] = Object.values(pureformConfig.components).flatMap(
 // Each item's classes, from Panda's generated recipe functions, which add compound variants
 // as atomic classes, or from the CSS adapter's runtime.
 type Classes = (string | Record<string, string>)[];
-type RecipeFns = Record<
+type ClassFns = Record<
     string,
     (selection: object) => string | Record<string, string>
 >;
@@ -69,12 +69,12 @@ const typed = (selection: Record<string, string>) =>
     );
 
 const pandaClasses: Classes = ITEMS.map(({ name, selection }) => {
-    const fn = (pandaRecipes as unknown as RecipeFns)[name];
+    const fn = (pandaRecipes as unknown as ClassFns)[name];
     if (!fn) throw new Error(`no Panda recipe for ${name}`);
     return fn(typed(selection));
 });
 
-const plainFns = recipes(pureformConfig) as RecipeFns;
+const plainFns = classesFor(pureformConfig) as ClassFns;
 const plainClasses: Classes = ITEMS.map(({ name, selection }) =>
     plainFns[name]!(selection),
 );
