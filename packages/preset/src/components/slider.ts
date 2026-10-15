@@ -61,6 +61,14 @@ const { tokens, ref } = componentTokens("slider", {
 });
 
 const DISABLED = slot("root", "disabled");
+const PRESSED = slot("root", "pressed");
+
+// Movement eases for keyboard steps, but follows the pointer directly while it is down, so a
+// drag doesn't trail behind it. Colors ease either way.
+const follows = (property: "insetInlineStart" | "width") =>
+    when()
+        .on(PRESSED, tweens("backgroundColor"))
+        .else(tweens(property, "backgroundColor"));
 
 // Centered on the value along the track, and on the track across it.
 const atValue = (size: ReturnType<typeof ref>) => ({
@@ -72,7 +80,7 @@ const atValue = (size: ReturnType<typeof ref>) => ({
     height: size,
     borderRadius: radius("full"),
     pointerEvents: none,
-    transition: tweens("insetInlineStart", "backgroundColor"),
+    transition: follows("insetInlineStart"),
 });
 
 const unlessDisabled = (
@@ -141,7 +149,7 @@ export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
                         width: mul(ref("value"), pct(1)),
                         height: ref("trackHeight"),
                         borderRadius: radius("full"),
-                        transition: tweens("width", "backgroundColor"),
+                        transition: follows("width"),
                     },
                     stateLayer: atValue(ref("stateLayerSize")),
                     handle: {

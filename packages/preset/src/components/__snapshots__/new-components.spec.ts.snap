@@ -2559,8 +2559,14 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "insetInlineStart": "0px",
       "position": "absolute",
       "transition": {
-        "_motionReduce": "none",
-        "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+          "_motionReduce": "none",
+          "base": "background-color token(durations.short3) token(easings.standard)",
+        },
+        "base": {
+          "_motionReduce": "none",
+          "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        },
       },
       "width": "calc(var(--components-slider-value, 0) * 1%)",
     },
@@ -2584,8 +2590,14 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        "_motionReduce": "none",
-        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+          "_motionReduce": "none",
+          "base": "background-color token(durations.short3) token(easings.standard)",
+        },
+        "base": {
+          "_motionReduce": "none",
+          "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        },
       },
       "width": "var(--components-slider-handleSize, 20px)",
     },
@@ -2621,8 +2633,14 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        "_motionReduce": "none",
-        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+          "_motionReduce": "none",
+          "base": "background-color token(durations.short3) token(easings.standard)",
+        },
+        "base": {
+          "_motionReduce": "none",
+          "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        },
       },
       "width": "var(--components-slider-stateLayerSize, 40px)",
     },
