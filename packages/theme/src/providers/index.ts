@@ -13,7 +13,11 @@ import {
     transparent,
     unitless,
 } from "@pureform/core/ast";
-import type { FontFamilyNode, NumericScalarNode } from "@pureform/core/ast";
+import type {
+    CornerShapeKeyword,
+    FontFamilyNode,
+    NumericScalarNode,
+} from "@pureform/core/ast";
 
 import {
     ELEVATION_LEVELS,
@@ -194,10 +198,11 @@ const SHAPE_MULTIPLES: Record<ShapeRole, number> = {
 };
 
 /** Radii scaled from one base size, in px. `full` stays fully round, unless the base is 0:
- *  then every corner is square, `full` included. */
+ *  then every corner is square, `full` included. `corner` sets how corners curve. */
 export const roundedShape = ({
     base = 4,
-}: { base?: number } = {}): ShapeProvider =>
+    corner,
+}: { base?: number; corner?: CornerShapeKeyword } = {}): ShapeProvider =>
     defineProvider({
         domain: "shape",
         name: "rounded",
@@ -211,6 +216,7 @@ export const roundedShape = ({
                         : base * SHAPE_MULTIPLES[role],
                 ),
             ),
+            ...(corner ? { corner } : {}),
         }),
     });
 

@@ -5,6 +5,7 @@
 
 import type {
     ColorValue,
+    CornerShapeKeyword,
     EasingNode,
     KeywordNode,
     NumericScalarNode,
@@ -48,10 +49,24 @@ export const SHAPE_ROLES = [
 
 export type ShapeRole = (typeof SHAPE_ROLES)[number];
 
+/** How a rounded corner can curve. */
+export const CORNER_SHAPES: readonly CornerShapeKeyword[] = [
+    "round",
+    "squircle",
+    "bevel",
+    "scoop",
+    "notch",
+    "square",
+];
+
 export interface ShapeContract {
     /** Corner radii, as lengths. */
     radii: Record<ShapeRole, NumericScalarNode> &
         Record<string, NumericScalarNode>;
+    /** How every rounded corner curves: `round` (the default, a circular arc), `squircle`,
+     *  `bevel`, `scoop`, `notch`, or `square`. Targets without corner shapes keep round
+     *  corners. */
+    corner?: CornerShapeKeyword;
 }
 
 /** Spacing steps on a grid, keyed by multiple: `"4"` is four grid units. */

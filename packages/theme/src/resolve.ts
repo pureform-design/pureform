@@ -22,6 +22,7 @@ import type { CoreConfig } from "@pureform/core/types";
 import { NEUTRAL_ROLES, groupRoles } from "./contracts/color";
 import type { ColorContract } from "./contracts/color";
 import {
+    CORNER_SHAPES,
     MATERIAL_DENSITIES,
     MIN_DENSITY,
     DURATION_ROLES,
@@ -402,6 +403,11 @@ export const resolveTheme = <
     const shape = step("shape", providers.shape, (c, where) => {
         requireNames(where, "radius", c.radii, SHAPE_ROLES);
         requireKind(where, "radius", c.radii, KINDS.length);
+        if (c.corner !== undefined && !CORNER_SHAPES.includes(c.corner)) {
+            throw new ContractError(
+                `${where} sets corner "${String(c.corner)}"; corners are ${CORNER_SHAPES.join(", ")}`,
+            );
+        }
     });
     const resolvedLayout = step("layout", providers.layout, (c, where) => {
         requireNames(where, "spacing step", c.spacing, SPACING_STEPS);
