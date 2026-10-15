@@ -83,6 +83,30 @@ input; the label, icons, and supporting text follow it.
 - `textArea`: use a `<textarea>` with `rows`, or turn on `autoGrow` to grow it with the text.
   The textarea sits between its icons, so its scrollbar and resize handle stay clear of them.
 
+## Select
+
+A text field whose read-only combobox input picks from a menu, with the arrow as its trailing
+icon. Mark the input `aria-expanded="true"` while the menu is open (the arrow turns over), and
+render the `menu` component below it. Opening, closing, and choosing are yours to wire.
+
+```html
+<div class="{root}">
+    <div class="{container}">
+        <input
+            class="{input}"
+            id="size"
+            role="combobox"
+            aria-expanded="false"
+            readonly
+            placeholder=" "
+            value="Medium"
+        />
+        <label class="{label}" for="size">Size</label>
+        <span class="{trailingIcon}">▾</span>
+    </div>
+</div>
+```
+
 ## Selection controls
 
 `checkbox`, `radio`, and `switchControl` lay a native input over the control, so forms, the

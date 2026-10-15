@@ -20,6 +20,7 @@ export * from "./components/navigation-bar";
 export * from "./components/navigation-rail";
 export * from "./components/progress";
 export * from "./components/search-bar";
+export * from "./components/select";
 export * from "./components/slider";
 export * from "./components/snackbar";
 export * from "./components/tooltip";

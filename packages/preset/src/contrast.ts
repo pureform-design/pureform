@@ -116,6 +116,7 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     circularProgress: [pair(token("activeColor"), SURFACE, UI_CONTRAST)],
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,
+    select: FIELD_PAIRS,
     supportingText: [
         pair(token("color"), SURFACE, TEXT_CONTRAST),
         pair(token("errorColor"), SURFACE, TEXT_CONTRAST),

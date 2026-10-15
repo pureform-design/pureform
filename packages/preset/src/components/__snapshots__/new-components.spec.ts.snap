@@ -1738,6 +1738,534 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`select > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "container": {
+      "height": "var(--components-select-height, 56px)",
+      "position": "relative",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+    },
+    "input": {
+      "_disabled": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-select-inputColor, token(colors.onSurface))",
+      "cursor": "pointer",
+      "height": "100%",
+      "outlineStyle": "none",
+      "paddingInlineEnd": "var(--components-select-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "label": {
+      "color": {
+        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-focusColor, token(colors.primary))",
+        ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+      },
+      "fontSize": {
+        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(fontSizes.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(fontSizes.bodySmall)",
+        "base": "token(fontSizes.bodyLarge)",
+      },
+      "insetInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
+      "letterSpacing": {
+        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(letterSpacings.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(letterSpacings.bodySmall)",
+        "base": "token(letterSpacings.bodyLarge)",
+      },
+      "lineHeight": {
+        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(lineHeights.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(lineHeights.bodySmall)",
+        "base": "token(lineHeights.bodyLarge)",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "textStyle": "bodyLarge",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+    },
+    "leadingIcon": {
+      "alignItems": "center",
+      "color": {
+        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-select-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "insetInlineStart": "var(--components-select-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-select-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "supportingText": {
+      "color": {
+        ".select__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        "base": "var(--components-select-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-select-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
+    "trailingIcon": {
+      "alignItems": "center",
+      "color": {
+        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        "base": "var(--components-select-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "insetInlineEnd": "var(--components-select-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": {
+        ".select__container:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &": "translateY(-50%) rotate(180deg)",
+        "base": "translateY(-50%)",
+      },
+      "transition": {
+        "_motionReduce": "none",
+        "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-select-iconSize, token(sizes.iconMedium))",
+    },
+  },
+  "className": "select",
+  "compoundVariants": [
+    {
+      "color": "secondary",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.secondary)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "secondary",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.secondary)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "color": "tertiary",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.tertiary)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "tertiary",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.tertiary)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "color": "success",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.success)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "success",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.success)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "color": "warning",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.warning)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "warning",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.warning)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "color": "error",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.error)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "error",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.error)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "color": "info",
+      "css": {
+        "container": {
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px token(colors.info)",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "variant": "filled",
+    },
+    {
+      "color": "info",
+      "css": {
+        "container": {
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "token(colors.info)",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+        },
+      },
+      "variant": "outlined",
+    },
+    {
+      "css": {
+        "label": {
+          "insetInlineStart": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-paddingInline, token(spacing.4))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "var(--components-select-paddingInline, token(spacing.4))",
+            "base": "var(--components-select-textInsetWithIcon, 52px)",
+          },
+        },
+      },
+      "leadingIcon": true,
+      "variant": "outlined",
+    },
+  ],
+  "defaultVariants": {
+    "color": "primary",
+    "leadingIcon": false,
+    "trailingIcon": true,
+    "variant": "filled",
+  },
+  "jsx": [
+    "Select",
+  ],
+  "slots": [
+    "root",
+    "container",
+    "leadingIcon",
+    "input",
+    "label",
+    "trailingIcon",
+    "supportingText",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.error)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "info": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.info)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.secondary)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "success": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.success)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "tertiary": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.tertiary)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+      "warning": {
+        "label": {
+          "color": {
+            ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(colors.warning)",
+            ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
+          },
+        },
+      },
+    },
+    "leadingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineStart": "var(--components-select-textInsetWithIcon, 52px)",
+        },
+        "label": {
+          "insetInlineStart": "var(--components-select-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "trailingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineEnd": "var(--components-select-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "variant": {
+      "filled": {
+        "container": {
+          "backgroundColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-select-container, token(colors.surfaceContainerHighest))",
+          },
+          "borderStartEndRadius": "var(--components-select-radius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-select-radius, token(radii.extraSmall))",
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "token(spacing.2)",
+          "paddingBlockStart": "token(spacing.6)",
+        },
+        "label": {
+          "top": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.2)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.2)",
+            "base": "50%",
+          },
+          "transform": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "none",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "none",
+            "base": "translateY(-50%)",
+          },
+        },
+      },
+      "outlined": {
+        "container": {
+          "borderRadius": "var(--components-select-radius, token(radii.extraSmall))",
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "base": "var(--components-select-outlineColor, token(colors.outline))",
+          },
+          "outlineOffset": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
+            "base": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
+          },
+          "outlineStyle": "solid",
+          "outlineWidth": {
+            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "var(--components-select-indicatorWidth, 1px)",
+            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusIndicatorWidth, 2px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-indicatorWidth, 1px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusIndicatorWidth, 2px)",
+            "base": "var(--components-select-indicatorWidth, 1px)",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "token(spacing.4)",
+          "paddingBlockStart": "token(spacing.4)",
+        },
+        "label": {
+          "backgroundColor": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-labelBackground, token(colors.surface))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "var(--components-select-labelBackground, token(colors.surface))",
+            "base": "transparent",
+          },
+          "marginInlineStart": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.1) * -1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.1) * -1)",
+            "base": "0px",
+          },
+          "paddingInlineEnd": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "paddingInlineStart": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "top": {
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            "base": "50%",
+          },
+          "transform": "translateY(-50%)",
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`slider > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {

@@ -9,6 +9,7 @@ import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
 import { circularProgress, linearProgress } from "./progress";
 import { searchBar } from "./search-bar";
+import { select } from "./select";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
@@ -20,6 +21,7 @@ describe.each([
     ["tabs", tabs],
     ["dialog", dialog],
     ["searchBar", searchBar],
+    ["select", select],
     ["navigationBar", navigationBar],
     ["navigationRail", navigationRail],
     ["snackbar", snackbar],
@@ -108,5 +110,21 @@ describe("progress", () => {
             "linearProgressSlide",
             "circularProgressSpin",
         ]);
+    });
+});
+
+describe("select", () => {
+    it("turns the arrow over while the field is expanded", () => {
+        const css = compilePreset(configWith(select)).theme?.slotRecipes
+            ?.select;
+        expect(css?.base?.trailingIcon?.transform).toEqual({
+            base: "translateY(-50%)",
+            ".select__container:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &":
+                "translateY(-50%) rotate(180deg)",
+        });
+        expect(
+            (css?.defaultVariants as Record<string, unknown> | undefined)
+                ?.trailingIcon,
+        ).toBe(true);
     });
 });

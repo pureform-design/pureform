@@ -8,6 +8,7 @@ import { createNavigationBar } from "./navigation-bar";
 import { createNavigationRail } from "./navigation-rail";
 import { createCircularProgress, createLinearProgress } from "./progress";
 import { createRadio } from "./radio";
+import { createSelect } from "./select";
 import { createSlider } from "./slider";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
@@ -24,6 +25,7 @@ describe.each([
     ["chip", createChip],
     ["textField", createTextField],
     ["textArea", createTextArea],
+    ["select", createSelect],
     ["listItem", createListItem],
     ["menu", createMenu],
     ["tabs", createTabs],

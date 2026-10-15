@@ -62,6 +62,7 @@ import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
+import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
@@ -282,6 +283,7 @@ export const pureform = <
         textField: createTextField(theme.color.groups),
         textArea: createTextArea(theme.color.groups),
         searchBar,
+        select: createSelect(theme.color.groups),
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox(theme.color.groups),
         radio: createRadio(theme.color.groups),
