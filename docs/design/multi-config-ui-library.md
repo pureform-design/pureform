@@ -2070,7 +2070,7 @@ defineSlotComponent({
   `checked`, `indeterminate`, `invalid`, `disabled`. Each describes the slot's element together
   with what it contains, so a container is `invalid` when an input inside it is, and a
   checkbox's root is `checked` when its native input is. `selected` (`aria-selected`,
-  `aria-pressed`) is separate from `checked` (`:checked`, `aria-checked`).
+  `aria-pressed`, `aria-current`) is separate from `checked` (`:checked`, `aria-checked`).
 - **Rules.** A slot can always read its own state. Reading another slot needs `structure`, and
   that slot must be an ancestor there; `validateConfig` rejects anything else, and a slot
   condition outside a slotted component. `defineSlotComponent` types `structure` against the
@@ -2259,8 +2259,10 @@ pureform({
 
 `pureform()` ships Material's components as core specs: `button`, `iconButton`, `fab`, `chip`,
 `textField`, `textArea`, `supportingText`, `checkbox`, `radio`, `switchControl`, `separator`,
-`listItem`, `menu`, `tabs`, `dialog`, `card`, `scrim`, `ripple`, `icon`, `touchTarget`, and
-`text`. A component's name is its
+`listItem`, `menu`, `tabs`, `dialog`, `searchBar`, `navigationBar`, `navigationRail`,
+`snackbar`, `tooltip`, `slider`, `linearProgress`, `circularProgress`, `card`, `scrim`,
+`ripple`, `icon`, `touchTarget`, and `text`. Their keyframes come with them: `pureform()` adds
+the progress indicators' to the config. A component's name is its
 generated export, so it avoids reserved words (`switchControl`) and Panda's own patterns
 (`separator`, not `divider`).
 
@@ -2296,6 +2298,9 @@ that shares the same style:
 | Text input parts        | `field.ts`: container, label, states, colors  |                  |
 | List and menu rows      | `list.ts`: row, leading and trailing, text    |                  |
 | Surface                 | `surface(container, content, level)`          |                  |
+| Bare text input         | `inputText(color)`                            |                  |
+| State layer of a slot   | `slotStateLayer(slot, rest, selected)`        |                  |
+| Navigation destinations | `navigation.ts`: item, indicator pill, label  |                  |
 
 A new component looks for these first, and extracts anything it would otherwise repeat.
 

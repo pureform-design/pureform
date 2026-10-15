@@ -23,12 +23,19 @@ const SECTIONS = [
     "lists",
     "tabs",
     "row-colors",
+    "search-and-feedback",
+    "progress",
+    "navigation",
 ];
 
 const open = async (page: Page) => {
     await page.emulateMedia({ reducedMotion: "reduce" });
     await page.goto("/", { waitUntil: "networkidle" });
     await page.evaluate(() => document.fonts.ready);
+    // The dev server's toolbar floats over the page; it isn't part of the demo.
+    await page.addStyleTag({
+        content: "[data-solid-dev-toolbar] { display: none !important; }",
+    });
 };
 
 test.describe("sections", () => {

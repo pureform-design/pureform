@@ -3,6 +3,14 @@ import {
     card,
     checkbox,
     chip,
+    circularProgress,
+    linearProgress,
+    navigationBar,
+    navigationRail,
+    searchBar,
+    slider,
+    snackbar,
+    tooltip,
     dialog,
     listItem,
     menu,
@@ -783,6 +791,216 @@ function IndexRoute() {
                         );
                     }}
                 </For>
+            </section>
+            <section
+                data-section="search-and-feedback"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <label class={searchBar().root} style={{ width: "320px" }}>
+                    <span class={searchBar().leading}>⌕</span>
+                    <input
+                        class={searchBar().input}
+                        type="search"
+                        placeholder="Search messages"
+                    />
+                    <span class={searchBar().trailing}>⋮</span>
+                </label>
+                <div
+                    class={snackbar().root}
+                    role="status"
+                    style={{ width: "360px" }}
+                >
+                    <span class={snackbar().supportingText}>
+                        Message archived
+                    </span>
+                    <button class={snackbar().action} type="button">
+                        Undo
+                    </button>
+                    <button
+                        class={snackbar().close}
+                        type="button"
+                        aria-label="Dismiss"
+                    >
+                        ×
+                    </button>
+                </div>
+                <div class={tooltip().root} role="tooltip">
+                    Save to drafts
+                </div>
+                <div class={tooltip({ variant: "rich" }).root} role="tooltip">
+                    <span class={tooltip().subhead}>Drafts</span>
+                    <span class={tooltip().supportingText}>
+                        Drafts stay on this device until you send them.
+                    </span>
+                    <div class={tooltip().actions}>
+                        <button
+                            class={button({ variant: "text" }).root}
+                            type="button"
+                        >
+                            <span class={button().label}>Learn more</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+            <section
+                data-section="progress"
+                style={{ display: "grid", gap: "16px", width: "480px" }}
+            >
+                {(() => {
+                    const [value, setValue] = createSignal(40);
+                    const s = slider();
+                    const p = linearProgress();
+                    return (
+                        <>
+                            <div
+                                class={s.root}
+                                style={{
+                                    "--pf-components-slider-value": `${value()}%`,
+                                }}
+                            >
+                                <span class={s.track} />
+                                <span class={s.activeTrack} />
+                                <span class={s.stateLayer} />
+                                <span class={s.handle} />
+                                <input
+                                    class={s.input}
+                                    type="range"
+                                    id="slider"
+                                    aria-label="Progress"
+                                    value={value()}
+                                    onInput={(e) =>
+                                        setValue(Number(e.currentTarget.value))
+                                    }
+                                />
+                            </div>
+                            <div
+                                class={p.root}
+                                role="progressbar"
+                                aria-valuenow={value()}
+                                aria-label="Determinate progress"
+                                style={{
+                                    "--pf-components-linearProgress-value": `${value()}%`,
+                                }}
+                            >
+                                <div class={p.indicator} />
+                            </div>
+                            <div
+                                class={
+                                    linearProgress({
+                                        indeterminate: true,
+                                        color: "tertiary",
+                                    }).root
+                                }
+                                role="progressbar"
+                                aria-label="Loading"
+                            >
+                                <div
+                                    class={
+                                        linearProgress({
+                                            indeterminate: true,
+                                            color: "tertiary",
+                                        }).indicator
+                                    }
+                                />
+                            </div>
+                            <div style={row}>
+                                <div
+                                    class={circularProgress()}
+                                    role="progressbar"
+                                    aria-label="Loading"
+                                />
+                                <div
+                                    class={circularProgress({
+                                        color: "success",
+                                    })}
+                                    role="progressbar"
+                                    aria-label="Loading"
+                                />
+                                <div
+                                    class={slider({ color: "error" }).root}
+                                    style={{
+                                        width: "200px",
+                                        "--pf-components-slider-value": "70%",
+                                    }}
+                                >
+                                    <span
+                                        class={slider({ color: "error" }).track}
+                                    />
+                                    <span
+                                        class={
+                                            slider({ color: "error" })
+                                                .activeTrack
+                                        }
+                                    />
+                                    <span
+                                        class={
+                                            slider({ color: "error" })
+                                                .stateLayer
+                                        }
+                                    />
+                                    <span
+                                        class={
+                                            slider({ color: "error" }).handle
+                                        }
+                                    />
+                                    <input
+                                        class={slider({ color: "error" }).input}
+                                        type="range"
+                                        value={70}
+                                        aria-label="Fixed"
+                                        disabled
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    );
+                })()}
+            </section>
+            <section
+                data-section="navigation"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                {(() => {
+                    const [current, setCurrent] = createSignal(0);
+                    const destinations = ["Home", "Search", "Inbox", "Profile"];
+                    const glyphs = ["⌂", "⌕", "✉", "☺"];
+                    const nav = (recipe: typeof navigationBar) => {
+                        const n = recipe();
+                        return (
+                            <nav class={n.root}>
+                                <For each={destinations}>
+                                    {(label, i) => (
+                                        <button
+                                            class={n.item}
+                                            type="button"
+                                            aria-current={
+                                                current() === i()
+                                                    ? "page"
+                                                    : "false"
+                                            }
+                                            onClick={() => setCurrent(i())}
+                                        >
+                                            <span class={n.indicator}>
+                                                <span class={n.icon}>
+                                                    {glyphs[i()]}
+                                                </span>
+                                            </span>
+                                            <span class={n.label}>{label}</span>
+                                        </button>
+                                    )}
+                                </For>
+                            </nav>
+                        );
+                    };
+                    return (
+                        <>
+                            <div style={{ width: "400px" }}>
+                                {nav(navigationBar)}
+                            </div>
+                            {nav(navigationRail as typeof navigationBar)}
+                        </>
+                    );
+                })()}
             </section>
             <section data-section="cards" style={row}>
                 <For each={CARD_FILLS}>
