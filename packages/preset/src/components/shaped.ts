@@ -138,8 +138,8 @@ export const shapedElevation = (fill: Fill): StyleMap => {
 
 /** The `shape` variant: `none` keeps the rounded corners, and each shape clips the container
  *  to itself, and the outline layer to a ring `outlineWidth` wide along it, filled with the
- *  outline color, when the component has one. Where a target can't clip to a shape, the container keeps `radius` and the
- *  outline its border. The ring's width is a plain length, since each of its points restates
+ *  outline color, when the component has one. Where a target can't clip to a shape, the
+ *  container keeps `radius` and the outline its border. The ring's width is a plain length, since each of its points restates
  *  it. */
 export const shapeVariant = (
     shapes: Shapes,
@@ -162,21 +162,27 @@ export const shapeVariant = (
                     clipPath: clipShape(shape),
                     borderRadius: when("clipShape", px(0), radius),
                 },
-                ...(outlineColor && {
-                    outline: {
-                        clipPath: outlineShape(shape, outlineWidth),
-                        borderWidth: when("clipShape", px(0), outlineWidth),
-                        backgroundColor: when(
-                            "clipShape",
-                            when(
-                                DISABLED,
-                                disabledColor("disabledContainer"),
-                                outlineColor,
-                            ),
-                            transparent,
-                        ),
-                    },
-                }),
+                ...(outlineColor
+                    ? {
+                          outline: {
+                              clipPath: outlineShape(shape, outlineWidth),
+                              borderWidth: when(
+                                  "clipShape",
+                                  px(0),
+                                  outlineWidth,
+                              ),
+                              backgroundColor: when(
+                                  "clipShape",
+                                  when(
+                                      DISABLED,
+                                      disabledColor("disabledContainer"),
+                                      outlineColor,
+                                  ),
+                                  transparent,
+                              ),
+                          },
+                      }
+                    : {}),
             },
         ]),
     ),
