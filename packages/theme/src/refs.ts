@@ -39,6 +39,10 @@ export const PATHS = {
 export const elevationTintName = (level: string): string =>
     `elevationTint${level.charAt(0).toUpperCase()}${level.slice(1)}`;
 
+/** An elevation level's tint color, which the elevation utilities draw over a surface. */
+export const elevationTint = (level: string): AliasNode =>
+    alias(...PATHS.color, elevationTintName(level));
+
 /** The utility that applies an elevation level. */
 export const ELEVATION_UTILITY = "shadowElevation";
 
