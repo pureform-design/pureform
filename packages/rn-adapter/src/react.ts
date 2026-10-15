@@ -12,6 +12,9 @@ import type { Scheme } from "./theme";
 import type { ThemeValues } from "./values";
 
 interface Context {
+    styles: Styles;
+    key: string;
+    overrides: ThemeValues;
     resolved: Resolved;
     tokens: ThemeValues;
     scheme: Scheme;
@@ -54,7 +57,16 @@ export const PureformProvider = (props: PureformProviderProps) => {
     );
     const reducedMotion = props.reducedMotion ?? false;
     const value = useMemo(
-        () => ({ resolved, tokens, scheme, reducedMotion }),
+        () => ({
+            styles,
+            key,
+            overrides,
+            resolved,
+            tokens,
+            scheme,
+            reducedMotion,
+        }),
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [resolved, tokens, scheme, reducedMotion],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
@@ -70,14 +82,29 @@ const useContextOrThrow = (hook: string): Context => {
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
 
-/** A component's styles per slot, and each slot's transitions, for its variants and state. */
+/** A component's styles per slot, and each slot's transitions, for its variants and state.
+ *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
+ *  one element: `{ "components.linearProgress.value": 40 }`. */
 export const useRecipeWithTransitions = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
+    tokens?: ThemeValues,
 ): Selected => {
     const context = useContextOrThrow("useRecipe");
-    const component = context.resolved[name];
+    const tokenKey = tokens ? JSON.stringify(tokens) : "";
+    const own = useMemo(
+        () =>
+            tokens
+                ? stylesFor(context.styles, context.key, {
+                      ...context.overrides,
+                      ...overridesFor(tokens, context.scheme),
+                  })[name]
+                : undefined,
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+        [context.styles, context.key, context.overrides, name, tokenKey],
+    );
+    const component = own ?? context.resolved[name];
     if (!component) throw new Error(`no styles for component "${name}"`);
     const variantKey = JSON.stringify(variants);
     const stateKey = JSON.stringify(state);
@@ -104,8 +131,9 @@ export const useRecipe = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
+    tokens?: ThemeValues,
 ): Record<string, Style> =>
-    useRecipeWithTransitions(name, variants, state).styles;
+    useRecipeWithTransitions(name, variants, state, tokens).styles;
 
 /** A component's state from Pressable's callback state and its own props. Focus counts as
  *  visible focus, since Pressable doesn't tell keyboard focus apart. */

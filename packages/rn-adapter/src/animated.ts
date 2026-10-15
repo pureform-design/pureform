@@ -8,7 +8,7 @@ import { Animated, Easing } from "react-native";
 import { animatable, blend, easingPoints, interpolates, stops } from "./motion";
 import { useRecipeWithTransitions } from "./react";
 import type { State, Style } from "./select";
-import type { Concrete, Transition } from "./values";
+import type { Concrete, ThemeValues, Transition } from "./values";
 
 // One property in motion: where it's going from and to, and how far along it is.
 interface Track {
@@ -46,11 +46,13 @@ export const useAnimatedRecipe = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
+    tokens?: ThemeValues,
 ): Record<string, Record<string, unknown>> => {
     const { styles, transitions } = useRecipeWithTransitions(
         name,
         variants,
         state,
+        tokens,
     );
     const tracks = useRef(new Map<string, Track>());
     const pending = useRef<Pending[]>([]);

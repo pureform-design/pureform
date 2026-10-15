@@ -109,6 +109,37 @@ describe("PureformProvider and useRecipe", () => {
         ).toBe("rgba(0, 0, 200, 1)");
     });
 
+    it("give one instance its own token values", () => {
+        const styles = precompute(config, {
+            components: ["linearProgress"],
+            schemes: ["light"],
+        });
+        const Probe = (props: { value: number }) =>
+            createElement(
+                "i",
+                null,
+                String(
+                    useRecipe(
+                        "linearProgress",
+                        {},
+                        {},
+                        {
+                            "components.linearProgress.value": props.value,
+                        },
+                    ).indicator!.width,
+                ),
+            );
+        const html = renderToString(
+            createElement(
+                PureformProvider,
+                { styles, scheme: "light" },
+                createElement(Probe, { value: 40 }),
+                createElement(Probe, { value: 75 }),
+            ),
+        );
+        expect(html).toBe("<i>40%</i><i>75%</i>");
+    });
+
     it("need a provider", () => {
         const Probe = () =>
             createElement("i", null, String(useRecipe("button")));
