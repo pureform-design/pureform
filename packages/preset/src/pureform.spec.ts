@@ -255,3 +255,29 @@ describe("pureform text styles", () => {
         expect(recipe?.defaultVariants).toEqual({ style: "bodyMedium" });
     });
 });
+
+describe("pureform result", () => {
+    it("carries the typed theme without exposing it to adapters", () => {
+        const config = pureform({
+            typography: materialTypescale({
+                fonts: { mono: { families: ["Menlo"], generic: "monospace" } },
+                custom: {
+                    code: {
+                        font: "mono",
+                        fontSize: "0.875rem",
+                        lineHeight: "1.25rem",
+                        letterSpacing: "0rem",
+                        fontWeight: 400,
+                    },
+                },
+            }),
+        });
+        const code: keyof typeof config.theme.typography.styles = "code";
+        const label: keyof typeof config.theme.typography.styles = "labelLarge";
+        const mono: keyof typeof config.theme.typography.fonts = "mono";
+        expect([code, label, mono]).toEqual(["code", "labelLarge", "mono"]);
+        expect(config.theme.color.groups).toContain("primary");
+        expect(Object.keys(config)).not.toContain("theme");
+        expect(() => compilePreset(config)).not.toThrow();
+    });
+});

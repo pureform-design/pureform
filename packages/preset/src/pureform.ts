@@ -176,6 +176,18 @@ const themeOverride = (
     ) as ThemeOverride;
 };
 
+/** A pureform config, with the resolved base theme on `theme`, so code outside Panda can
+ *  read the typed color groups, font roles, and text style names:
+ *  `config.theme.color.groups`, `keyof typeof config.theme.typography.styles`. The property is
+ *  not enumerable, so spreading or merging the config drops it. */
+export type PureformConfig<
+    G extends string = BaseColorGroup,
+    TFont extends string = never,
+    TStyle extends string = never,
+> = CoreConfig & {
+    readonly theme: Theme<G, TFont, TStyle>;
+};
+
 /** Build the full pureform config. Every contract is checked and every alias resolves, or
  *  this throws naming the provider or the bad path. */
 export const pureform = <
@@ -184,7 +196,7 @@ export const pureform = <
     TStyle extends string = never,
 >(
     options: PureformOptions<G, TFont, TStyle> = {},
-): CoreConfig => {
+): PureformConfig<G, TFont, TStyle> => {
     const providers: ThemeProviders<G, TFont, TStyle> = {
         color: options.color ?? (materialColor() as ColorProvider<G>),
         typography:
@@ -242,7 +254,7 @@ export const pureform = <
         ),
     );
 
-    return defineConfig(
+    const config = defineConfig(
         mergeConfigs(
             { tokens: {}, semanticTokens: {}, components: {} },
             theme.config,
@@ -253,4 +265,7 @@ export const pureform = <
             },
         ),
     );
+    // Not enumerable, so adapters, merges, and validation see a plain config.
+    Object.defineProperty(config, "theme", { value: theme, enumerable: false });
+    return config as PureformConfig<G, TFont, TStyle>;
 };
