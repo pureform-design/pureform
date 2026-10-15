@@ -117,9 +117,15 @@ const textValue = (
     style: string,
 ): AliasNode => alias("tokens", property, style);
 
-// The label floats with its color.
+// The label floats with its color. Its inset moves too where a leading icon pushes it in, and
+// the outlined label's notch (padding, margin, background) grows with it.
 const labelTransition = tweens(
     "top",
+    "insetInlineStart",
+    "paddingInlineStart",
+    "paddingInlineEnd",
+    "marginInlineStart",
+    "backgroundColor",
     "transform",
     "fontSize",
     "lineHeight",
