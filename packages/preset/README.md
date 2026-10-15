@@ -198,8 +198,11 @@ directly.
 The shape provider's `corner` sets how every rounded corner curves: `round` (the default),
 `squircle`, `bevel`, `scoop`, `notch`, or `square`. `pureform()` sets `cornerShape` wherever a
 component rounds a corner, and borders, outlines, and shadows follow it. Browsers without
-`corner-shape` (only Chromium has it so far) keep round corners. Named themes take the base
-theme's corner.
+`corner-shape` (only Chromium has it so far) keep round corners.
+
+Named themes can set their own corner. Then each rounded component reads its corner from a
+`corner` token, which each theme sets, so the corner changes with the theme; an app can also
+set the token itself, for example `--components-card-corner: bevel` on one section.
 
 ```ts
 pureform({ shape: materialShape({}, { corner: "squircle" }) });

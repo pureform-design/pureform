@@ -10,6 +10,7 @@
 // `mergeConfigs`.
 
 import { defineConfig, mergeConfigs } from "@pureform/core";
+import type { CornerShapeKeyword } from "@pureform/core/ast";
 import type {
     AnyComponentSpec,
     CoreConfig,
@@ -79,7 +80,12 @@ import { createTextField } from "./components/text-field";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
-import { withCorner } from "./corners";
+import {
+    CORNER_TOKEN,
+    cornerKeyword,
+    withCorner,
+    withCornerToken,
+} from "./corners";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -242,6 +248,7 @@ type ComponentMap = Record<string, AnyComponentSpec | undefined>;
 const defaultComponents = (
     theme: ResolvedTheme<string, string, string>,
     shapes: Shapes,
+    cornerToken: boolean,
 ) => {
     const densities = theme.layout.densities;
     const components = {
@@ -278,10 +285,9 @@ const defaultComponents = (
         text: createText(Object.keys(theme.typography.styles)),
     };
     for (const [name, spec] of Object.entries(components)) {
-        (components as Record<string, AnyComponentSpec>)[name] = withCorner(
-            spec,
-            theme.shape.corner,
-        );
+        (components as Record<string, AnyComponentSpec>)[name] = (
+            cornerToken ? withCornerToken : withCorner
+        )(spec, theme.shape.corner);
     }
     return components;
 };
@@ -328,6 +334,9 @@ export const pureform = <
     const theme = resolveTheme(providers, resolveOptions);
 
     const themes: Record<string, ThemeOverride> = {};
+    // Named themes whose corner differs from the base's, by name.
+    const baseCorner = theme.shape.corner ?? "round";
+    const corners: Record<string, CornerShapeKeyword> = {};
     const colors: [string, ColorContract<string>][] = [
         ["base theme", theme.color],
     ];
@@ -354,20 +363,20 @@ export const pureform = <
                 `theme "${name}" declares density steps ${Object.keys(variant.layout.densities).join(", ")}; components only have variants for the base steps (${Object.keys(theme.layout.densities).join(", ")}), so declare them on the base layout provider`,
             );
         }
-        if (
-            (variant.shape.corner ?? "round") !==
-            (theme.shape.corner ?? "round")
-        ) {
-            throw new ContractError(
-                `theme "${name}" sets corner "${variant.shape.corner ?? "round"}"; components take the base theme's corner ("${theme.shape.corner ?? "round"}"), so set it on the base shape provider`,
-            );
+        if ((variant.shape.corner ?? "round") !== baseCorner) {
+            corners[name] = variant.shape.corner ?? "round";
         }
         themes[name] = themeOverride(theme.config, variant.config);
         colors.push([`theme "${name}"`, variant.color]);
     }
 
     const shapes = options.shapes ?? DEFAULT_SHAPES;
-    const defaults = defaultComponents(theme, shapes);
+    // Corners that vary by theme go through each component's corner token.
+    const defaults = defaultComponents(
+        theme,
+        shapes,
+        Object.keys(corners).length > 0,
+    );
     const chosen: ComponentMap =
         options.components?.({ theme, defaults }) ?? defaults;
     const components = Object.fromEntries(
@@ -376,6 +385,21 @@ export const pureform = <
                 entry[1] !== undefined,
         ),
     );
+
+    for (const [name, corner] of Object.entries(corners)) {
+        const overrides = Object.fromEntries(
+            Object.entries(components)
+                .filter(([, spec]) => spec.tokens?.[CORNER_TOKEN] !== undefined)
+                .map(([component]) => [
+                    component,
+                    { tokens: { [CORNER_TOKEN]: cornerKeyword(corner) } },
+                ]),
+        );
+        themes[name] = {
+            ...themes[name],
+            components: { ...themes[name]?.components, ...overrides },
+        };
+    }
 
     if (options.requireComponentContrast) {
         for (const [where, color] of colors) {
