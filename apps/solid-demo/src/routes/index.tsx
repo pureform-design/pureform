@@ -1436,6 +1436,53 @@ function IndexRoute() {
                 </div>
                 <div class={scrim().root} />
             </section>
+
+            <section
+                data-section="media"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <article
+                    class={card({ variant: "elevated" }).root}
+                    style={{ width: "240px", display: "grid", gap: "12px" }}
+                >
+                    <img
+                        class={media({ aspect: "landscape" })}
+                        src={PORTRAIT}
+                        alt=""
+                    />
+                    <h3 class={text({ style: "titleMedium" })}>
+                        Hills at dusk
+                    </h3>
+                    <p class={text({ style: "bodyMedium" })}>
+                        The card stays rectangular; the media takes its corners.
+                    </p>
+                </article>
+                <article
+                    class={card({ variant: "outlined" }).root}
+                    style={{
+                        width: "320px",
+                        display: "flex",
+                        gap: "16px",
+                        "align-items": "center",
+                    }}
+                >
+                    <img
+                        class={media({
+                            aspect: "square",
+                            shape: "cookie9Sided",
+                        })}
+                        style={{ width: "96px" }}
+                        src={PORTRAIT}
+                        alt="Album art"
+                    />
+                    <div>
+                        <h3 class={text({ style: "titleMedium" })}>Album</h3>
+                        <p class={text({ style: "bodyMedium" })}>
+                            Shaped artwork, unclipped text.
+                        </p>
+                    </div>
+                </article>
+            </section>
         </main>
     );
 }

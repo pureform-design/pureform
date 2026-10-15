@@ -14,6 +14,7 @@ const SECTIONS = [
     "disabled-buttons",
     "cards",
     "scrim",
+    "media",
     "controls",
     "color-groups",
     "text-fields",
