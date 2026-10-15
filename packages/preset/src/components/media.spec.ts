@@ -24,7 +24,7 @@ describe("media", () => {
 
     it("sets the aspect ratio, leaving auto to the content", () => {
         expect(compiled()?.variants?.aspect?.landscape).toEqual({
-            aspectRatio: "calc(16 / 9)",
+            aspectRatio: String(16 / 9),
         });
         expect(compiled()?.variants?.aspect?.auto).toEqual({});
     });

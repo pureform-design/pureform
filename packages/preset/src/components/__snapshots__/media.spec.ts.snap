@@ -22,13 +22,13 @@ exports[`media > compiles to a stable Panda recipe 1`] = `
     "aspect": {
       "auto": {},
       "landscape": {
-        "aspectRatio": "calc(16 / 9)",
+        "aspectRatio": "1.7777777777777777",
       },
       "portrait": {
-        "aspectRatio": "calc(3 / 4)",
+        "aspectRatio": "0.75",
       },
       "square": {
-        "aspectRatio": "calc(1 / 1)",
+        "aspectRatio": "1",
       },
     },
     "shape": {

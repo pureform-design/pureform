@@ -6,7 +6,7 @@
 //   <img class={media({ aspect: "square", shape: "cookie9Sided" })} src="…" alt="Album art" />
 
 import { typed } from "@pureform/core";
-import { cover, div, flex, pct, unitless } from "@pureform/core/ast";
+import { cover, flex, pct, unitless } from "@pureform/core/ast";
 import { radius } from "@pureform/theme";
 
 import { DEFAULT_SHAPES, clipVariant } from "./shaped";
@@ -19,8 +19,9 @@ const { tokens, ref } = componentTokens("media", {
     container: sys("surfaceContainerHighest"),
 });
 
+// A plain number, which every target reads as a ratio.
 const ratio = (width: number, height: number) => ({
-    aspectRatio: div(unitless(width), unitless(height)),
+    aspectRatio: unitless(width / height),
 });
 
 const pf = typed();
