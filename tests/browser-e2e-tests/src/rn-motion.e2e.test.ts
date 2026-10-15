@@ -103,6 +103,46 @@ const Spinner = () => {
     });
 };
 
+const Elevated = (props: { hover: boolean }) => {
+    const slots = useAnimatedRecipe(
+        "button",
+        { variant: "elevated" },
+        { hover: props.hover },
+    );
+    return createElement(Animated.View, {
+        testID: "root",
+        style: slots.root as never,
+    });
+};
+
+describe("transitioned shadows", () => {
+    it("keep their shadow through a state change", async () => {
+        host = document.createElement("div");
+        document.body.append(host);
+        root = createRoot(host);
+        const show = (hover: boolean) =>
+            flushSync(() =>
+                root!.render(
+                    createElement(
+                        PureformProvider,
+                        { styles, scheme: "light" },
+                        createElement(Elevated, { hover }),
+                    ),
+                ),
+            );
+        const shadow = () =>
+            getComputedStyle(document.querySelector('[data-testid="root"]')!)
+                .boxShadow;
+        show(false);
+        const rest = shadow();
+        show(true);
+        await wait(400);
+        expect(rest).toMatch(/px/);
+        expect(shadow()).toMatch(/px/);
+        expect(shadow()).not.toBe(rest);
+    });
+});
+
 describe("keyframe animations", () => {
     it("turn an indeterminate circular progress indicator", async () => {
         host = document.createElement("div");
