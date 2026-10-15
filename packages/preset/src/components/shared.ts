@@ -30,7 +30,14 @@ import type {
     ValueNode,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
-import { colorRole, duration, easing, opacity, size } from "@pureform/theme";
+import {
+    colorRole,
+    duration,
+    easing,
+    opacity,
+    size,
+    textStyle,
+} from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 
@@ -360,4 +367,17 @@ export const surface = (
     backgroundColor: container,
     color: content,
     apply: { shadowElevation: level },
+});
+
+/** A bare text input: the body text in the given color, and nothing else drawn, so the
+ *  component around it supplies the container. Text fields, text areas, and the search bar
+ *  share it. */
+export const inputText = (color: ColorValue): StyleMap => ({
+    textStyle: textStyle("bodyLarge"),
+    width: pct(100),
+    borderWidth: px(0),
+    outlineStyle: none,
+    backgroundColor: transparent,
+    color,
+    states: { disabled: { color: disabledColor("disabledContent") } },
 });

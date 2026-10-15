@@ -43,6 +43,7 @@ import {
 import {
     DEFAULT_GROUP,
     iconBox,
+    inputText,
     colorVariant,
     componentTokens,
     groupRoles,
@@ -247,17 +248,9 @@ export const fieldParts = (
             position: relative,
         },
         input: {
-            textStyle: textStyle("bodyLarge"),
-            width: pct(100),
+            ...inputText(ref("inputColor")),
             paddingInlineStart: ref("paddingInline"),
             paddingInlineEnd: ref("paddingInline"),
-            borderWidth: px(0),
-            outlineStyle: none,
-            backgroundColor: transparent,
-            color: ref("inputColor"),
-            states: {
-                disabled: { color: disabledColor("disabledContent") },
-            },
         },
         label: {
             textStyle: textStyle("bodyLarge"),
