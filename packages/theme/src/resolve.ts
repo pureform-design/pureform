@@ -58,6 +58,7 @@ import {
     PATHS,
     elevationTintName,
 } from "./refs";
+import type { ThemeVocabulary } from "./vocabulary";
 
 export interface ThemeProviders<
     G extends string,
@@ -78,8 +79,11 @@ export interface Theme<
     TFont extends string,
     TStyle extends string,
 > extends ResolvedTheme<G, TFont, TStyle> {
-    /** Every contract lowered to core config, with each provider's extras merged in. */
-    config: ThemeFragment & Pick<CoreConfig, "tokens" | "semanticTokens">;
+    /** Every contract lowered to core config, with each provider's extras merged in. Its type
+     *  names the contract roles, so `typed(theme.config)` offers them. */
+    config: ThemeFragment &
+        Pick<CoreConfig, "tokens" | "semanticTokens"> &
+        ThemeVocabulary<G, TFont, TStyle>;
 }
 
 export class ContractError extends Error {
@@ -478,6 +482,7 @@ export const resolveTheme = <
         state,
         motion,
         elevation,
-        config,
+        // Built at runtime from the contracts, which hold exactly these names.
+        config: config as Theme<G, TFont, TStyle>["config"],
     };
 };

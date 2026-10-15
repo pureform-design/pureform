@@ -6,3 +6,4 @@ export * from "./provider";
 export * from "./refs";
 export * from "./resolve";
 export * from "./providers";
+export type * from "./vocabulary";
