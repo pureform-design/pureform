@@ -697,6 +697,33 @@ function IndexRoute() {
                             );
                         }}
                     </For>
+                    <For each={["cookieToCircle", "squareToSunny"] as const}>
+                        {(shape) => {
+                            const b = iconButton({
+                                variant: "filled",
+                                size: "large",
+                                shape,
+                            });
+                            return (
+                                <button
+                                    class={b.root}
+                                    type="button"
+                                    aria-label={`${shape}, morphs on press`}
+                                >
+                                    <span class={b.touchTarget} />
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                            />
+                                        </svg>
+                                    </span>
+                                </button>
+                            );
+                        }}
+                    </For>
                     <For each={["medium", "large"] as const}>
                         {(size) => {
                             const f = fab({

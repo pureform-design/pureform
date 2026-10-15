@@ -2324,7 +2324,9 @@ the root keeps the ring and touch target and casts elevation through `filterElev
 shadows), and an `outline` slot clipped to the ring strokes outlined styles. Where `shape()`
 is unsupported, the `clipShape` condition keeps the rounded corners. The preset ships
 Material's expressive shapes as `MATERIAL_SHAPES`, and `pureform({ shapes })` sets the `shape`
-variant of the icon button and FAB.
+variant of the icon button, FAB, and avatar. `morph(from, to)` redraws two shapes as matching
+cubic curves, so a shape can animate into another on press. The shape provider's `corner`
+sets `cornerShape` wherever a component rounds a corner.
 
 **Accessibility.** Every interactive component draws `focusRing()`: a 3px secondary outline,
 offset 2px, on keyboard focus. Its touch target reaches the theme's `touchTarget` size.

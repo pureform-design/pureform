@@ -1,5 +1,6 @@
 // The pureform preset for Panda: the composed pureform config compiled by the Panda adapter.
 
+import { morph } from "@pureform/core/ast";
 import {
     materialColor,
     materialLayout,
@@ -7,7 +8,7 @@ import {
     materialTypescale,
 } from "@pureform/material";
 import { compilePreset } from "@pureform/panda-adapter";
-import { pureform } from "@pureform/preset";
+import { MATERIAL_SHAPES, pureform } from "@pureform/preset";
 import { roundedShape } from "@pureform/theme";
 
 // The base theme is Material's defaults plus a monospace `code` text style. Named themes swap
@@ -16,6 +17,15 @@ import { roundedShape } from "@pureform/theme";
 const DENSITIES = { comfortable: 1, default: 0, compact: -1, dense: -3 };
 
 const config = pureform({
+    // Material's shapes, and two that change shape while pressed.
+    shapes: {
+        ...MATERIAL_SHAPES,
+        cookieToCircle: morph(
+            MATERIAL_SHAPES.cookie9Sided,
+            MATERIAL_SHAPES.circle,
+        ),
+        squareToSunny: morph(MATERIAL_SHAPES.square, MATERIAL_SHAPES.sunny),
+    },
     layout: materialLayout({ densities: DENSITIES, density: "default" }),
     typography: materialTypescale({
         fonts: {
