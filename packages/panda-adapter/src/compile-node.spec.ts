@@ -236,6 +236,15 @@ describe("compileValue conditionals", () => {
         });
     });
 
+    it("lowers selected to aria-selected, aria-pressed, or data-selected", () => {
+        const node = when("selected", unitless(1), unitless(0));
+        expect(compileValue(node, ctx())).toEqual({
+            base: "0",
+            "&:is([aria-selected=true], [aria-pressed=true], [data-selected])":
+                "1",
+        });
+    });
+
     it("lowers filled to an input with a value, its container, or data-filled", () => {
         const node = when("filled", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({

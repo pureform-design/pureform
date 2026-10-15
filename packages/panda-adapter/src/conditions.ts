@@ -31,7 +31,10 @@ const CONDITION_KEY: Record<string, string> = {
     // tint wins wherever Panda orders the rules; the pointer is over the element while dragging.
     dragged: "&[data-dragging][data-dragging]",
     disabled: "_disabled",
-    selected: "_selected",
+    // Panda's _selected misses aria-pressed, which a toggle button (a filter chip) uses; the
+    // selected slot state matches it too.
+    selected:
+        "&:is([aria-selected=true], [aria-pressed=true], [data-selected])",
     checked: "_checked",
     invalid: "_invalid",
     readOnly: "_readOnly",
