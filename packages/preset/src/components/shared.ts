@@ -395,7 +395,7 @@ export const inputText = (color: ColorValue): StyleMap => ({
  *  tint. */
 export const slotStateLayer = (
     slotName: string,
-    rest: { base: ColorValue; content: ColorValue },
+    rest: { base: ColorValue; content: ColorValue; disabled?: ColorValue },
     selected?: { state: SlotCondition; base?: ColorValue; content: ColorValue },
 ) => {
     const layer = when();
@@ -418,7 +418,9 @@ export const slotStateLayer = (
         }
     }
     if (selected?.base) layer.on(selected.state, selected.base);
-    return layer.on(slot(slotName, "disabled"), rest.base).else(rest.base);
+    return layer
+        .on(slot(slotName, "disabled"), rest.disabled ?? rest.base)
+        .else(rest.base);
 };
 
 /** Density steps by name: grid units each adds to a dense component's height. The theme's

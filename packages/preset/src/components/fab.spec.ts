@@ -2,9 +2,13 @@ import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
+import { MATERIAL_SHAPES } from "../shapes";
 import { createFab, fab } from "./fab";
 
-const compiled = () => compilePreset(configWith(fab)).theme?.slotRecipes?.fab;
+// One shape keeps the snapshot readable.
+const oneShape = createFab(undefined, { circle: MATERIAL_SHAPES.circle });
+const compiled = () =>
+    compilePreset(configWith(oneShape)).theme?.slotRecipes?.fab;
 
 describe("fab", () => {
     it("validates against a full pureform config", () => {
@@ -13,8 +17,8 @@ describe("fab", () => {
 
     it("rests at level 3 and lifts to level 4 on hover", () => {
         expect(compiled()?.base?.root).toMatchObject({
-            shadowElevation: "level3",
-            _hover: { shadowElevation: "level4" },
+            filterElevation: "level3",
+            _hover: { filterElevation: "level4" },
         });
     });
 
@@ -25,7 +29,7 @@ describe("fab", () => {
         expect(square?.css?.root).toEqual({
             width: "var(--components-fab-sizeLarge, 96px)",
         });
-        expect(compiled()?.variants?.extended?.true?.root).toHaveProperty(
+        expect(compiled()?.variants?.extended?.true?.container).toHaveProperty(
             "paddingInlineStart",
         );
     });
@@ -34,9 +38,9 @@ describe("fab", () => {
         const surface = fab.recipe.compoundVariants?.find(
             (c) => c.match.variant === "surface" && c.match.color === "primary",
         );
-        expect(JSON.stringify(surface?.style.root?.backgroundColor)).toContain(
-            "surfaceContainerHigh",
-        );
+        expect(
+            JSON.stringify(surface?.style.container?.backgroundColor),
+        ).toContain("surfaceContainerHigh");
     });
 
     it("offers the given color groups", () => {

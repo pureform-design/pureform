@@ -80,12 +80,75 @@ target first, and render the icon slot only when there is an icon.
 </button>
 ```
 
+`iconButton` and `fab` draw their fill in a `container` slot, which can take a shape (see
+[Shapes](#shapes)), so their content goes inside it. An outlined icon button also renders the
+`outline` slot:
+
+```html
+<button class="{root}" type="button" aria-label="Favorite">
+    <span class="{touchTarget}"></span>
+    <span class="{container}"><span class="{icon}">★</span></span>
+    <span class="{outline}"></span>
+</button>
+```
+
 - `button`: `variant` is `filled`, `tonal`, `outlined`, `text`, or `elevated`; `size` is
   `small`, `medium`, or `large`.
 - `iconButton`: `variant` is `standard`, `filled`, `tonal`, `outlined`, or `elevated`. Give it
   an `aria-label`.
 - `fab`: `variant` is `tonal`, `filled`, or `surface`; `size` is `small`, `medium`, or
   `large`. Set `extended` and render the label for an extended FAB.
+
+## Shapes
+
+`iconButton` and `fab` take `shape`: `none` (the default, rounded corners) or one of the
+theme's shapes, which clips the container to it.
+
+```ts
+iconButton({ variant: "tonal", shape: "cookie9Sided" });
+fab({ shape: "sunny" });
+```
+
+The shapes default to Material's expressive set, `MATERIAL_SHAPES`: `circle`, `square`,
+`slanted`, `arch`, `fan`, `arrow`, `semiCircle`, `oval`, `pill`, `triangle`, `diamond`,
+`clamShell`, `pentagon`, `gem`, `sunny`, `verySunny`, `cookie4Sided`, `cookie6Sided`,
+`cookie7Sided`, `cookie9Sided`, `cookie12Sided`, `ghostish`, `clover4Leaf`, `clover8Leaf`,
+`burst`, `softBurst`, `boom`, `softBoom`, `flower`, `puffy`, `puffyDiamond`, `pixelCircle`,
+`pixelTriangle`, `bun`, and `heart`. They are ported from Compose, with every rounding drawn as
+a circular arc.
+
+Replace or extend them with `pureform({ shapes })`. Core's builder draws a shape in a unit
+square, and its fit decides how it scales with the box:
+
+```ts
+import { defineShape, fitted, normalize, px, star } from "@pureform/core/ast";
+import { MATERIAL_SHAPES, pureform } from "@pureform/preset";
+
+pureform({
+    shapes: {
+        ...MATERIAL_SHAPES,
+        badge: defineShape(normalize([star(6, 0.7, 0.1)])),
+        // Keep the cookie's scallops 48px wide on an extended FAB.
+        wideCookie: fitted(MATERIAL_SHAPES.cookie9Sided, {
+            fit: "fixed",
+            size: px(48),
+        }),
+    },
+});
+```
+
+- `stretch` (the default, as in Compose): the shape follows the box's aspect ratio.
+- `contain`: the shape keeps its aspect ratio at `size`, centered.
+- `fixed`: points near an edge keep their distance from it at `size`, and the middle stretches,
+  like a 9-slice, so features keep their size on a wide box. A box smaller than `size`
+  stretches instead.
+
+How it works: a clip cuts away everything outside it, so the root keeps the focus ring, the
+touch target, and the elevation, cast as drop shadows that follow the shape. An outlined icon
+button's `outline` slot is clipped to a ring along the shape, 1px wide, exact on straight edges
+and close on curves. Browsers without `shape()` (Firefox, for now) keep the rounded corners.
+Each shape a page uses adds about 1 to 2 kB of CSS, so avoid `staticCss: ["*"]` for these
+components unless you show every shape.
 
 ## Chip
 

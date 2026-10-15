@@ -64,6 +64,8 @@ import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
 import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
+import { DEFAULT_SHAPES } from "./components/shaped";
+import type { Shapes } from "./components/shaped";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSupportingText } from "./components/supporting-text";
@@ -114,6 +116,10 @@ export interface PureformOptions<
      *  (4.5:1 for text, 3:1 for control parts), and every color group as the color variants
      *  use it, in light and dark, for the base theme and every named theme. */
     requireComponentContrast?: boolean;
+    /** The shapes the icon button and FAB offer as their `shape` variant, by name. Default
+     *  `MATERIAL_SHAPES`. Draw your own with core's shape builder (`defineShape`,
+     *  `roundedPolygon`, `star`), and choose how each fits its box with `fitted`. */
+    shapes?: Shapes;
     /** Named themes, each replacing some of the providers above. Every token that differs
      *  from the base is emitted for the theme, and Panda applies it inside
      *  `[data-panda-theme=<name>]` (list the names in Panda's `staticCss.themes`). A theme
@@ -281,10 +287,11 @@ export const pureform = <
     }
 
     const densities = theme.layout.densities;
+    const shapes = options.shapes ?? DEFAULT_SHAPES;
     const defaults: Record<string, AnyComponentSpec> = {
         button: createButton(theme.color.groups, densities),
-        iconButton: createIconButton(theme.color.groups, densities),
-        fab: createFab(theme.color.groups),
+        iconButton: createIconButton(theme.color.groups, densities, shapes),
+        fab: createFab(theme.color.groups, shapes),
         chip: createChip(theme.color.groups, densities),
         textField: createTextField(theme.color.groups, densities),
         textArea: createTextArea(theme.color.groups, densities),

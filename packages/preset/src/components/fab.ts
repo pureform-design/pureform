@@ -3,7 +3,13 @@
 //
 // The container takes a color group's container color (`tonal`), its main color (`filled`),
 // or a surface with the group's color as content (`surface`). It rests at elevation level 3
-// and lifts to level 4 on hover.
+// and lifts to level 4 on hover. Its container can take a shape, so the icon and label sit
+// inside it:
+//
+//   <button class={root}>
+//     <span class={touchTarget} />
+//     <span class={container}><span class={icon}>…</span><span class={label}>…</span></span>
+//   </button>
 
 import { defineSlotComponent } from "@pureform/core";
 import { none, px } from "@pureform/core/ast";
@@ -11,12 +17,17 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import {
+    DEFAULT_SHAPES,
+    shapedColors,
+    shapedContainer,
+    shapeVariant,
+} from "./shaped";
+import type { Shapes } from "./shaped";
+import {
     COLOR_GROUPS,
     colorVariants,
     componentTokens,
-    disabledColors,
     fillColors,
-    interactiveColors,
     sys,
     touchTarget,
     iconBox,
@@ -45,12 +56,15 @@ const { tokens, ref } = componentTokens("fab", {
 
 type Size = "Small" | "Medium" | "Large";
 
-const fabSize = (s: Size): { root: StyleMap; icon: StyleMap } => ({
+const fabSize = (
+    s: Size,
+): { root: StyleMap; container: StyleMap; icon: StyleMap } => ({
     root: {
         height: ref(`size${s}`),
         minWidth: ref(`size${s}`),
         borderRadius: ref(`radius${s}`),
     },
+    container: { borderRadius: ref(`radius${s}`) },
     icon:
         s === "Large"
             ? {
@@ -62,29 +76,38 @@ const fabSize = (s: Size): { root: StyleMap; icon: StyleMap } => ({
 });
 
 /** Build the FAB with a `color` variant per group in `groups`. */
-export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
+export const createFab = (
+    groups: ColorGroups = COLOR_GROUPS,
+    shapes: Shapes = DEFAULT_SHAPES,
+) =>
     defineSlotComponent({
         name: "fab",
         $meta: {
             description:
-                "Material floating action button. Render the label slot for an extended FAB.",
+                "Material floating action button. Put the icon, and the label for an extended FAB, in the container. shape clips the container to one of the theme's shapes.",
         },
         tokens,
-        slots: ["root", "icon", "label", "touchTarget"],
-        structure: { root: ["touchTarget", "icon", "label"] },
+        slots: ["root", "touchTarget", "container", "icon", "label"],
+        structure: {
+            root: ["touchTarget", "container"],
+            container: ["icon", "label"],
+        },
         recipe: {
             base: {
                 root: {
                     ...pressableRoot,
-                    gap: ref("gap"),
-                    apply: { shadowElevation: "level3" },
+                    apply: { filterElevation: "level3" },
                     states: {
-                        hover: { apply: { shadowElevation: "level4" } },
+                        hover: { apply: { filterElevation: "level4" } },
                         disabled: {
                             pointerEvents: none,
-                            apply: { shadowElevation: "level0" },
+                            apply: { filterElevation: "level0" },
                         },
                     },
+                },
+                container: {
+                    ...shapedContainer(ref("radiusMedium")),
+                    gap: ref("gap"),
                 },
                 icon: iconBox(ref("iconSize")),
                 label: { textStyle: textStyle("labelLarge") },
@@ -102,13 +125,14 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
                 },
                 extended: {
                     true: {
-                        root: {
+                        container: {
                             paddingInlineStart: ref("padding"),
                             paddingInlineEnd: ref("padding"),
                         },
                     },
                     false: { root: {} },
                 },
+                shape: shapeVariant(shapes, { radius: ref("radiusMedium") }),
             },
             compoundVariants: [
                 ...Object.entries(FILLS).flatMap(([variant, fill]) =>
@@ -119,15 +143,9 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
                             variant === "surface"
                                 ? sys("surfaceContainerHigh")
                                 : colors.container;
-                        const { content } = colors;
                         return {
                             match: { color, variant },
-                            style: {
-                                root: {
-                                    ...interactiveColors(container, content),
-                                    states: { disabled: disabledColors(fill) },
-                                },
-                            },
+                            style: shapedColors(fill, color, container),
                         };
                     }),
                 ),
@@ -147,6 +165,7 @@ export const createFab = (groups: ColorGroups = COLOR_GROUPS) =>
                 variant: "tonal",
                 size: "medium",
                 extended: "false",
+                shape: "none",
             },
         },
     });

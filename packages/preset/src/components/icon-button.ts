@@ -1,4 +1,12 @@
-// The pureform icon button: a square, fully rounded button holding a single icon.
+// The pureform icon button: a square, fully rounded button holding a single icon. Its
+// container can take a shape, so the icon sits inside it, and an outlined button draws its
+// outline with an outline slot:
+//
+//   <button class={root}>
+//     <span class={touchTarget} />
+//     <span class={container}><span class={icon}>…</span></span>
+//     <span class={outline} />
+//   </button>
 
 import { defineSlotComponent } from "@pureform/core";
 import { px, add } from "@pureform/core/ast";
@@ -6,11 +14,19 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
 import {
+    DEFAULT_SHAPES,
+    shapedColors,
+    shapedContainer,
+    shapedElevation,
+    shapedOutline,
+    shapedOutlineStroke,
+    shapeVariant,
+} from "./shaped";
+import type { Shapes } from "./shaped";
+import {
     COLOR_GROUPS,
-    colorCompounds,
     colorVariants,
     componentTokens,
-    fillVariant,
     sys,
     touchTarget,
     iconBox,
@@ -50,20 +66,29 @@ const size = (
 export const createIconButton = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
+    shapes: Shapes = DEFAULT_SHAPES,
 ) =>
     defineSlotComponent({
         name: "iconButton",
-        $meta: { description: "Material icon button holding a single icon." },
+        $meta: {
+            description:
+                "Material icon button holding a single icon. Put the icon in the container; render the outline slot for the outlined variant. shape clips the container to one of the theme's shapes.",
+        },
         tokens,
-        slots: ["root", "icon", "touchTarget"],
-        structure: { root: ["touchTarget", "icon"] },
+        slots: ["root", "touchTarget", "container", "icon", "outline"],
+        structure: {
+            root: ["touchTarget", "container", "outline"],
+            container: ["icon"],
+        },
         recipe: {
             base: {
                 root: {
                     ...pressableRoot,
                     borderRadius: ref("radius"),
                 },
+                container: shapedContainer(ref("radius")),
                 icon: iconBox(ref("iconSize")),
+                outline: shapedOutline(ref("radius")),
                 touchTarget,
             },
             variants: {
@@ -71,9 +96,18 @@ export const createIconButton = (
                 variant: Object.fromEntries(
                     Object.entries(FILLS).map(([name, fill]) => [
                         name,
-                        fillVariant(fill, ref),
+                        {
+                            root: shapedElevation(fill),
+                            ...(fill === "outlined"
+                                ? { outline: shapedOutlineStroke(ref) }
+                                : {}),
+                        },
                     ]),
                 ),
+                shape: shapeVariant(shapes, {
+                    radius: ref("radius"),
+                    outlineColor: ref("outlineColor"),
+                }),
                 size: {
                     small: size("sizeSmall"),
                     medium: size("sizeMedium"),
@@ -82,7 +116,12 @@ export const createIconButton = (
                 density: densityMarkers(densities),
             },
             compoundVariants: [
-                ...colorCompounds(FILLS, groups),
+                ...Object.entries(FILLS).flatMap(([variant, fill]) =>
+                    groups.map((color) => ({
+                        match: { color, variant },
+                        style: shapedColors(fill, color),
+                    })),
+                ),
                 ...(["Small", "Medium", "Large"] as const).flatMap((s) =>
                     densityCompounds(
                         densities,
@@ -99,6 +138,7 @@ export const createIconButton = (
                 variant: "standard",
                 size: "medium",
                 density: "inherit",
+                shape: "none",
             },
         },
     });
