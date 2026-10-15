@@ -1,12 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-    animatable,
-    blend,
-    colorEnds,
-    easingPoints,
-    interpolates,
-} from "./motion";
+import { animatable, blend, easingPoints, interpolates, stops } from "./motion";
 
 describe("easingPoints", () => {
     it("reads Bézier points, and takes anything else as linear", () => {
@@ -44,10 +38,10 @@ describe("interpolates", () => {
 });
 
 describe("blend", () => {
-    it("finds the value partway, channel by channel for colors", () => {
+    it("finds the value partway, premultiplied for colors", () => {
         expect(blend(0, 10, 0.25)).toBe(2.5);
         expect(blend("rgba(0, 0, 0, 1)", "rgba(200, 100, 0, 0.5)", 0.5)).toBe(
-            "rgba(100, 50, 0, 0.75)",
+            "rgba(67, 33, 0, 0.75)",
         );
         expect(blend("0px 2px", "4px 6px", 0.5)).toBe("2px 4px");
     });
@@ -59,10 +53,22 @@ describe("blend", () => {
         expect(blend("transparent", "rgba(200, 100, 0, 1)", 0.5)).toBe(
             "rgba(200, 100, 0, 0.5)",
         );
-        expect(colorEnds("transparent", "rgba(200, 100, 0, 1)")).toEqual([
-            "rgba(200, 100, 0, 0)",
-            "rgba(200, 100, 0, 1)",
-        ]);
+        // A faint dark color to an opaque light one stays light, where a channel-by-channel
+        // blend would be rgba(142, 138, 144, 0.56): gray.
+        expect(blend("rgba(73, 69, 78, 0.11)", "rgb(216, 207, 232)", 0.5)).toBe(
+            "rgba(202, 193, 217, 0.555)",
+        );
+    });
+
+    it("gives Animated stops along a color's blend, and the ends otherwise", () => {
+        const color = stops("transparent", "rgb(200, 100, 0)");
+        expect(color.inputRange).toHaveLength(9);
+        expect(color.outputRange[4]).toBe("rgba(200, 100, 0, 0.5)");
+        expect(color.outputRange[0]).toBe("rgba(200, 100, 0, 0)");
+        expect(stops(0, 10)).toEqual({
+            inputRange: [0, 1],
+            outputRange: [0, 10],
+        });
     });
 
     it("holds a discrete value until the end", () => {

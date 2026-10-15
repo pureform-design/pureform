@@ -5,13 +5,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Animated, Easing } from "react-native";
 
-import {
-    animatable,
-    blend,
-    colorEnds,
-    easingPoints,
-    interpolates,
-} from "./motion";
+import { animatable, blend, easingPoints, interpolates, stops } from "./motion";
 import { useRecipeWithTransitions } from "./react";
 import type { State, Style } from "./select";
 import type { Concrete, Transition } from "./values";
@@ -98,13 +92,11 @@ export const useAnimatedRecipe = (
                 current.animation = undefined;
             }
             if (interpolates(track.from, track.to)) {
+                const { inputRange, outputRange } = stops(track.from, track.to);
                 animated[transition.property] = track.progress.interpolate({
-                    inputRange: [0, 1],
+                    inputRange,
                     // Both numbers or both strings, which `interpolates` checked.
-                    outputRange: colorEnds(
-                        track.from,
-                        track.to,
-                    ) as unknown as number[],
+                    outputRange: outputRange as unknown as number[],
                 });
             }
         }
