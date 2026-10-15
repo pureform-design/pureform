@@ -287,6 +287,26 @@ function IndexRoute() {
                         );
                     }}
                 </For>
+                {(() => {
+                    const t = textArea({ autoGrow: true });
+                    return (
+                        <div class={t.root} style={{ width: "240px" }}>
+                            <div class={t.container}>
+                                <textarea
+                                    class={t.input}
+                                    id="area-grow"
+                                    placeholder=" "
+                                />
+                                <label class={t.label} for="area-grow">
+                                    Auto-grow area
+                                </label>
+                            </div>
+                            <span class={t.supportingText}>
+                                Grows as you type
+                            </span>
+                        </div>
+                    );
+                })()}
             </section>
             <section style={{ ...row, "align-items": "center" }}>
                 <For each={["small", "medium", "large"] as const}>
