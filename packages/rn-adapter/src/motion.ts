@@ -21,13 +21,16 @@ const NUMBER = /-?\d*\.?\d+(?:e[-+]?\d+)?/gi;
 const isColor = (value: string) =>
     /^(rgba?\(|#)/i.test(value.trim()) || value === "transparent";
 
-/** Whether two values can move smoothly into each other: numbers, colors, or strings of the
- *  same shape with numbers in them (a shadow with as many layers). Anything else changes at
+/** Whether two values can move smoothly into each other through Animated: numbers, colors,
+ *  or strings of the same shape with numbers in them but no colors. Anything else changes at
  *  once, as CSS does for discrete properties. */
 export const interpolates = (from: Concrete, to: Concrete): boolean => {
     if (typeof from === "number" && typeof to === "number") return true;
     if (typeof from !== "string" || typeof to !== "string") return false;
     if (isColor(from) && isColor(to)) return true;
+    // Animated reads any string holding a color as a color, so a shadow would come out as its
+    // color alone. Those change at once.
+    if (/rgba?\(|#[0-9a-f]{3}/i.test(from + to)) return false;
     return (
         from.replace(NUMBER, "#") === to.replace(NUMBER, "#") && /\d/.test(from)
     );

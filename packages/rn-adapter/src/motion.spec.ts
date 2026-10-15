@@ -23,12 +23,16 @@ describe("interpolates", () => {
     it("moves numbers, colors, and strings of the same shape", () => {
         expect(interpolates(0, 10)).toBe(true);
         expect(interpolates("rgba(0, 0, 0, 1)", "transparent")).toBe(true);
+        expect(interpolates("-100%", "250%")).toBe(true);
+    });
+
+    it("changes a shadow at once, which Animated would read as its color", () => {
         expect(
             interpolates(
                 "0px 1px 2px rgba(0, 0, 0, 0.3)",
                 "0px 2px 6px rgba(0, 0, 0, 0.2)",
             ),
-        ).toBe(true);
+        ).toBe(false);
     });
 
     it("changes the rest at once", () => {
