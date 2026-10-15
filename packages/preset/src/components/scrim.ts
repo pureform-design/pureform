@@ -1,13 +1,14 @@
 // The pureform scrim: a translucent layer that dims what sits behind a modal surface.
 
 import { defineSlotComponent } from "@pureform/core";
-import { absolute, alias, colorMix, px, transparent } from "@pureform/core/ast";
+import { absolute, colorMix, px, transparent } from "@pureform/core/ast";
+import { opacity } from "@pureform/theme";
 
 import { componentTokens, sys } from "./shared";
 
 const { tokens, ref } = componentTokens("scrim", {
     color: sys("scrim"),
-    opacity: alias("tokens", "opacity", "scrim"),
+    opacity: opacity("scrim"),
 });
 
 export const scrim = defineSlotComponent({

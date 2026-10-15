@@ -2,7 +2,6 @@
 
 import { defineSlotComponent } from "@pureform/core";
 import {
-    alias,
     center,
     inlineFlex,
     none,
@@ -11,6 +10,7 @@ import {
     relative,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
+import { radius, size as sizeToken } from "@pureform/theme";
 
 import {
     COLOR_GROUPS,
@@ -33,13 +33,13 @@ const FILLS: Record<string, Fill> = {
 };
 
 const { tokens, ref } = componentTokens("iconButton", {
-    radius: alias("tokens", "radii", "full"),
-    iconSize: alias("tokens", "sizes", "iconMedium"),
+    radius: radius("full"),
+    iconSize: sizeToken("iconMedium"),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
-    sizeSmall: alias("tokens", "sizes", "controlSmall"),
-    sizeMedium: alias("tokens", "sizes", "controlMedium"),
-    sizeLarge: alias("tokens", "sizes", "controlLarge"),
+    sizeSmall: sizeToken("controlSmall"),
+    sizeMedium: sizeToken("controlMedium"),
+    sizeLarge: sizeToken("controlLarge"),
 });
 
 const size = (

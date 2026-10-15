@@ -6,7 +6,6 @@
 
 import { defineSlotComponent } from "@pureform/core";
 import {
-    alias,
     colorMix,
     mul,
     none,
@@ -17,6 +16,7 @@ import {
     unitless,
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
+import { opacity, radius, spacing } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 import {
@@ -30,8 +30,8 @@ import {
 type CardFill = "elevated" | "filled" | "outlined";
 
 const { tokens, ref } = componentTokens("card", {
-    radius: alias("tokens", "radii", "medium"),
-    padding: alias("tokens", "spacing", "4"),
+    radius: radius("medium"),
+    padding: spacing("4"),
     content: sys("onSurface"),
     outlineWidth: px(1),
     outlineColor: sys("outlineVariant"),
@@ -87,7 +87,7 @@ const interactive = (fill: CardFill) => ({
                     backgroundColor: colorMix(
                         CONTAINER[fill],
                         sys("onSurface"),
-                        alias("tokens", "opacity", "disabledContainer"),
+                        opacity("disabledContainer"),
                     ),
                     color: disabledColor("disabledContent"),
                     apply: { shadowElevation: "level0" },

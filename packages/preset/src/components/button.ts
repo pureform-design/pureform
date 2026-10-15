@@ -5,7 +5,6 @@
 
 import { defineSlotComponent } from "@pureform/core";
 import {
-    alias,
     center,
     inlineFlex,
     none,
@@ -15,6 +14,7 @@ import {
     row,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
+import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import {
     COLOR_GROUPS,
@@ -37,17 +37,17 @@ const FILLS: Record<string, Fill> = {
 };
 
 const { tokens, ref } = componentTokens("button", {
-    radius: alias("tokens", "radii", "full"),
-    gap: alias("tokens", "spacing", "2"),
-    iconSize: alias("tokens", "sizes", "iconSmall"),
+    radius: radius("full"),
+    gap: spacing("2"),
+    iconSize: sizeToken("iconSmall"),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
-    heightSmall: alias("tokens", "sizes", "controlSmall"),
-    heightMedium: alias("tokens", "sizes", "controlMedium"),
-    heightLarge: alias("tokens", "sizes", "controlLarge"),
-    paddingSmall: alias("tokens", "spacing", "4"),
-    paddingMedium: alias("tokens", "spacing", "6"),
-    paddingLarge: alias("tokens", "spacing", "8"),
+    heightSmall: sizeToken("controlSmall"),
+    heightMedium: sizeToken("controlMedium"),
+    heightLarge: sizeToken("controlLarge"),
+    paddingSmall: spacing("4"),
+    paddingMedium: spacing("6"),
+    paddingLarge: spacing("8"),
 });
 
 type Size = "Small" | "Medium" | "Large";
@@ -85,7 +85,7 @@ export const createButton = (groups: ColorGroups = COLOR_GROUPS) =>
                     cursor: pointer,
                     states: { disabled: { pointerEvents: none } },
                 },
-                label: { textStyle: alias("textStyles", "labelLarge") },
+                label: { textStyle: textStyle("labelLarge") },
                 icon: {
                     width: ref("iconSize"),
                     height: ref("iconSize"),

@@ -24,7 +24,7 @@ import type {
     ValueNode,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
-import { duration, easing } from "@pureform/theme";
+import { colorRole, duration, easing, opacity, size } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 
@@ -49,8 +49,7 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 /** A Material system color from the palette, for example `sys("onPrimary")`. It reads the
  *  semantic token, so it follows the light or dark scheme. */
-export const sys = (name: string): AliasNode =>
-    alias("semanticTokens", "colors", name);
+export const sys = (name: string): AliasNode => colorRole(name);
 
 /** A component's token set. Each entry compiles to an overridable
  *  `--<prefix>-components-<name>-<token>` var that falls back to the given default, so an app
@@ -77,13 +76,8 @@ export const on = (name: string): AliasNode => sys(`on${capitalize(name)}`);
 
 /** The on-surface color at one of the disabled opacities. */
 export const disabledColor = (
-    opacity: "disabledContainer" | "disabledContent",
-): ColorValue =>
-    colorMix(
-        transparent,
-        sys("onSurface"),
-        alias("tokens", "opacity", opacity),
-    );
+    level: "disabledContainer" | "disabledContent",
+): ColorValue => colorMix(transparent, sys("onSurface"), opacity(level));
 
 /** Container and content colors for an interactive surface: the container takes a state layer
  *  of the content color, and the content stays as given. */
@@ -102,8 +96,8 @@ export const touchTarget: StyleMap = {
     top: pct(50),
     left: pct(50),
     transform: transform(translate(pct(-50), pct(-50))),
-    minWidth: alias("tokens", "sizes", "touchTarget"),
-    minHeight: alias("tokens", "sizes", "touchTarget"),
+    minWidth: size("touchTarget"),
+    minHeight: size("touchTarget"),
     width: pct(100),
     height: pct(100),
 };
