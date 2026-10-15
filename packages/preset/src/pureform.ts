@@ -54,6 +54,7 @@ import { createMenu } from "./components/menu";
 import { createRadio } from "./components/radio";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
+import { searchBar } from "./components/search-bar";
 import { separator } from "./components/separator";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
@@ -270,6 +271,7 @@ export const pureform = <
         chip: createChip(theme.color.groups),
         textField: createTextField(theme.color.groups),
         textArea: createTextArea(theme.color.groups),
+        searchBar,
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox(theme.color.groups),
         radio: createRadio(theme.color.groups),

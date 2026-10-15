@@ -15,6 +15,7 @@ export * from "./components/dialog";
 export * from "./components/list";
 export * from "./components/list-item";
 export * from "./components/menu";
+export * from "./components/search-bar";
 export * from "./components/tabs";
 export * from "./components/touch-target";
 export * from "./components/supporting-text";

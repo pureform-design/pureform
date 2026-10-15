@@ -5,6 +5,7 @@ import { configWith } from "../__fixtures__/config";
 import { dialog } from "./dialog";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
+import { searchBar } from "./search-bar";
 import { tabs } from "./tabs";
 
 describe.each([
@@ -12,6 +13,7 @@ describe.each([
     ["menu", menu],
     ["tabs", tabs],
     ["dialog", dialog],
+    ["searchBar", searchBar],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();
@@ -42,5 +44,15 @@ describe("tabs", () => {
         expect(JSON.stringify(css?.base?.indicator)).toContain(
             '.tabs__tab:is([aria-selected=true], [aria-pressed=true], [data-selected]) &":"1"',
         );
+    });
+});
+
+describe("searchBar", () => {
+    it("colors the placeholder through a raw rule", () => {
+        const css = compilePreset(configWith(searchBar)).theme?.slotRecipes
+            ?.searchBar;
+        expect(css?.base?.input?.["&::placeholder"]).toEqual({
+            color: "var(--components-searchBar-placeholderColor, token(colors.onSurfaceVariant))",
+        });
     });
 });

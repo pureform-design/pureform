@@ -873,6 +873,94 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "input": {
+      "&::placeholder": {
+        "color": "var(--components-searchBar-placeholderColor, token(colors.onSurfaceVariant))",
+      },
+      "_disabled": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-searchBar-inputColor, token(colors.onSurface))",
+      "height": "100%",
+      "outlineStyle": "none",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "leading": {
+      "alignItems": "center",
+      "color": "var(--components-searchBar-leadingColor, token(colors.onSurface))",
+      "display": "inline-flex",
+      "fontSize": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "width": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "alignItems": "center",
+      "backgroundColor": {
+        "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateDragged))",
+        "_active": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.statePressed))",
+        "_focusVisible": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        "_hover": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateHover))",
+        "base": "var(--components-searchBar-container, token(colors.surfaceContainerHigh))",
+      },
+      "borderRadius": "var(--components-searchBar-radius, token(radii.full))",
+      "color": "var(--components-searchBar-inputColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-searchBar-gap, token(spacing.4))",
+      "height": "var(--components-searchBar-height, 56px)",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "2px",
+      "outlineStyle": {
+        "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "3px",
+      "paddingInlineEnd": "var(--components-searchBar-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-searchBar-paddingInline, token(spacing.4))",
+      "position": "relative",
+      "shadowElevation": "level3",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+    },
+    "trailing": {
+      "alignItems": "center",
+      "color": "var(--components-searchBar-trailingColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "fontSize": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "width": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+    },
+  },
+  "className": "searchBar",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "SearchBar",
+  ],
+  "slots": [
+    "root",
+    "leading",
+    "input",
+    "trailing",
+  ],
+  "variants": {},
+}
+`;
+
 exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
