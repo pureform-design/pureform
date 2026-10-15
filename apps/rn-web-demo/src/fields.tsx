@@ -251,9 +251,10 @@ export function Slider(props: {
 }) {
     const [dragged, setDragged] = useState(false);
     const [hovered, setHovered] = useState(false);
-    const origin = useRef({ x: 0, width: 1 });
-    // The view, read for where it sits on the page when a drag starts.
+    // Where the track sits on the page, read when a drag starts; until then, none.
+    const origin = useRef<{ x: number; width: number }>(undefined);
     const root = useRef<{
+        getBoundingClientRect?: () => DOMRect;
         measure: (
             done: (
                 x: number,
@@ -274,6 +275,7 @@ export function Slider(props: {
         { "components.slider.value": props.value },
     );
     const move = (event: GestureResponderEvent) => {
+        if (!origin.current) return;
         const { x, width } = origin.current;
         const ratio = (event.nativeEvent.pageX - x) / width;
         props.onChange(Math.round(Math.min(Math.max(ratio, 0), 1) * 100));
@@ -293,14 +295,28 @@ export function Slider(props: {
             onResponderGrant={(event) => {
                 setDragged(true);
                 const pageX = event.nativeEvent.pageX;
-                root.current?.measure((_x, _y, width, _h, left) => {
-                    origin.current = { x: left, width };
+                const start = (x: number, width: number) => {
+                    origin.current = { x, width };
                     move({ nativeEvent: { pageX } } as GestureResponderEvent);
-                });
+                };
+                // At once from the DOM on the web, so the first moves don't wait on measure,
+                // which answers a turn later; through measure on a device.
+                const rect = root.current?.getBoundingClientRect?.();
+                if (rect) start(rect.left + window.scrollX, rect.width);
+                else
+                    root.current?.measure((_x, _y, width, _h, left) =>
+                        start(left, width),
+                    );
             }}
             onResponderMove={move}
-            onResponderRelease={() => setDragged(false)}
-            onResponderTerminate={() => setDragged(false)}
+            onResponderRelease={() => {
+                origin.current = undefined;
+                setDragged(false);
+            }}
+            onResponderTerminate={() => {
+                origin.current = undefined;
+                setDragged(false);
+            }}
             style={aview({ ...s.root, ...unselectable })}
         >
             <Animated.View pointerEvents="none" style={aview(s.track)} />
