@@ -2304,10 +2304,12 @@ that shares the same style:
 
 A new component looks for these first, and extracts anything it would otherwise repeat.
 
-**Density.** The layout contract's `densityOffset` size is what Material's density takes off
-a dense component's height: `gridLayout({ density })` sets it to one grid unit per step below
-0, so a named theme can make a subtree denser. Each dense component also has a `density`
-variant, `inherit` (the default, following the theme) or `0` to `-3`. A variant can't set a
+**Density.** The layout contract declares density steps by name, in grid units from `-3` up
+(`MIN_DENSITY`, below which layouts stop holding up; Material's `"0"` to `"-3"` by default),
+and its `densityOffset` size is the theme's step, which dense components add to their heights.
+A named theme can pick another step but not declare different ones, like color groups. Each
+dense component also has a `density` variant, `inherit` (the default, following the theme) or
+one of the steps, built by `createX(groups, densities)`. A variant can't set a
 CSS var, so each step restates the sized properties at its offset; where those properties
 come from another variant (a button's `size`, a list item's `lines`, a field's fill), compound
 variants restate them per value instead.

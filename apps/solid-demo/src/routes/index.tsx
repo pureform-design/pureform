@@ -500,7 +500,11 @@ function IndexRoute() {
                 data-section="density"
                 style={{ display: "grid", gap: "12px" }}
             >
-                <For each={["0", "-1", "-2", "-3"] as const}>
+                <For
+                    each={
+                        ["comfortable", "default", "compact", "dense"] as const
+                    }
+                >
                     {(density) => {
                         const b = button({ density, variant: "tonal" });
                         const c = chip({ density });
@@ -512,9 +516,9 @@ function IndexRoute() {
                             <div style={{ ...row, "align-items": "center" }}>
                                 <button class={b.root} type="button">
                                     <span class={b.touchTarget} />
-                                    <span
-                                        class={b.label}
-                                    >{`DENSITY ${density}`}</span>
+                                    <span class={b.label}>
+                                        {density.toUpperCase()}
+                                    </span>
                                 </button>
                                 <button class={c.root} type="button">
                                     <span class={c.touchTarget} />

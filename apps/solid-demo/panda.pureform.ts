@@ -12,7 +12,11 @@ import { roundedShape } from "@pureform/theme";
 
 // The base theme is Material's defaults plus a monospace `code` text style. Named themes swap
 // some providers and apply inside `[data-panda-theme=<name>]`.
+// Named density steps, in grid units: one roomier than Material's default, and two denser.
+const DENSITIES = { comfortable: 1, default: 0, compact: -1, dense: -3 };
+
 const config = pureform({
+    layout: materialLayout({ densities: DENSITIES, density: "default" }),
     typography: materialTypescale({
         fonts: {
             mono: {
@@ -36,7 +40,9 @@ const config = pureform({
             shape: materialShape({ full: 12 }),
         },
         sharp: { shape: roundedShape({ base: 0 }) },
-        dense: { layout: materialLayout({ density: -3 }) },
+        dense: {
+            layout: materialLayout({ densities: DENSITIES, density: "dense" }),
+        },
     },
 });
 
