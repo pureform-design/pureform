@@ -11,6 +11,8 @@ export default createConfig({
                 entry: {
                     index: "src/index.ts",
                     runtime: "src/runtime.ts",
+                    build: "src/build.ts",
+                    vite: "src/vite.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

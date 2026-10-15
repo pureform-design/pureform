@@ -25,6 +25,28 @@
                 "development": "./src/runtime.ts",
                 "default": "./dist/runtime.mjs"
             }
+        },
+        "./build": {
+            "types": "./dist/build.d.ts",
+            "import": {
+                "development": "./src/build.ts",
+                "default": "./dist/build.mjs"
+            },
+            "require": {
+                "development": "./src/build.ts",
+                "default": "./dist/build.mjs"
+            }
+        },
+        "./vite": {
+            "types": "./dist/vite.d.ts",
+            "import": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            },
+            "require": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            }
         }
     },
     "dependencies": {
@@ -40,5 +62,13 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "vite": "catalog:"
+    },
+    "peerDependenciesMeta": {
+        "vite": {
+            "optional": true
+        }
     }
 }
