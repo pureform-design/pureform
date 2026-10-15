@@ -95,17 +95,61 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
 };
 
 // The selector for a slot state: on the styled slot itself, or on an ancestor slot's class.
-const slotSelector = (condition: SlotCondition, ctx: CompileCtx): string => {
+const stateSelector = (conditions: SlotCondition[]): string =>
+    conditions
+        .map(({ state }) => {
+            const { match, rank } = SLOT_STATE[state];
+            return `:is(${match})`.repeat(rank);
+        })
+        .join("");
+
+// Slot states as one selector. States of one slot join on that slot's element, and the
+// ancestor slots chain outermost first, ending at the styled slot (`&`) with its own states.
+// Nesting them instead would demand a separate element per state, in the wrong order.
+const slotSelector = (conditions: SlotCondition[], ctx: CompileCtx): string => {
+    const [first] = conditions;
+    if (!first) return "&";
     if (!ctx.slot) {
         throw new Error(
-            `slot("${condition.slot}", "${condition.state}") is only valid inside a slotted component's recipe`,
+            `slot("${first.slot}", "${first.state}") is only valid inside a slotted component's recipe`,
         );
     }
-    const { match, rank } = SLOT_STATE[condition.state];
-    const state = `:is(${match})`.repeat(rank);
-    if (condition.slot === ctx.slot.name) return `&${state}`;
+    const { name, className, ancestors = [] } = ctx.slot;
+    const bySlot = new Map<string, SlotCondition[]>();
+    for (const condition of conditions) {
+        bySlot.set(condition.slot, [
+            ...(bySlot.get(condition.slot) ?? []),
+            condition,
+        ]);
+    }
     const prefix = ctx.tokenPrefix ? `${ctx.tokenPrefix}-` : "";
-    return `.${prefix}${ctx.slot.className}__${condition.slot}${state} &`;
+    const outer = [...bySlot.keys()]
+        .filter((slot) => slot !== name)
+        .sort((a, b) => ancestors.indexOf(b) - ancestors.indexOf(a))
+        .map(
+            (slot) =>
+                `.${prefix}${className}__${slot}${stateSelector(bySlot.get(slot) ?? [])}`,
+        );
+    return [...outer, `&${stateSelector(bySlot.get(name) ?? [])}`].join(" ");
+};
+
+// The keys for an AND-list of conditions, in nesting order: every slot condition in one key,
+// and one key for each other condition.
+const conditionKeys = (conditions: Condition[], ctx: CompileCtx): string[] => {
+    const slots = conditions.filter(
+        (c): c is SlotCondition => typeof c === "object" && c.type === "slot",
+    );
+    const keys: string[] = [];
+    let placed = false;
+    for (const condition of conditions) {
+        if (typeof condition === "object" && condition.type === "slot") {
+            if (!placed) keys.push(slotSelector(slots, ctx));
+            placed = true;
+        } else {
+            keys.push(conditionKey(condition, ctx));
+        }
+    }
+    return keys;
 };
 
 const sizeCss = (n: NumericScalarNode): string =>
@@ -181,7 +225,7 @@ export const conditionKey = (condition: Condition, ctx: CompileCtx): string => {
         case "rawCondition":
             return condition.by[ctx.target] ?? "";
         case "slot":
-            return slotSelector(condition, ctx);
+            return slotSelector([condition], ctx);
     }
 };
 
@@ -222,7 +266,7 @@ export const compileConditional = (
         const conds = Array.isArray(c.on) ? c.on : [c.on];
         assignNested(
             out,
-            conds.map((k) => conditionKey(k, ctx)),
+            conditionKeys(conds, ctx),
             compileValue(c.value, ctx),
         );
     }

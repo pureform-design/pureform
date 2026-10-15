@@ -81,6 +81,24 @@ const compileRecipe = (spec: ComponentSpec, ctx: CompileCtx) => {
     };
 };
 
+// Each slot's ancestors in a component's structure, nearest first.
+const ancestorsOf = (structure: Record<string, string[]>) => {
+    const parent = new Map<string, string>();
+    for (const [outer, inner] of Object.entries(structure)) {
+        for (const child of inner) parent.set(child, outer);
+    }
+    const out = new Map<string, string[]>();
+    for (const child of parent.keys()) {
+        const chain: string[] = [];
+        for (let p = parent.get(child); p !== undefined; p = parent.get(p)) {
+            if (chain.includes(p)) break;
+            chain.push(p);
+        }
+        out.set(child, chain);
+    }
+    return out;
+};
+
 const compileSlotStyles = (
     bySlot: Record<string, StyleMap>,
     ctx: CompileCtx,
@@ -90,7 +108,11 @@ const compileSlotStyles = (
             slot,
             compileStyleMap(style, {
                 ...ctx,
-                slot: { className: ctx.slot?.className ?? "", name: slot },
+                slot: {
+                    className: ctx.slot?.className ?? "",
+                    name: slot,
+                    ancestors: ctx.slotAncestors?.get(slot) ?? [],
+                },
             }),
         ]),
     );
@@ -100,6 +122,7 @@ const compileSlotRecipe = (spec: SlottedComponentSpec, outer: CompileCtx) => {
     const ctx: CompileCtx = {
         ...outer,
         slot: { className: className ?? spec.name, name: "" },
+        slotAncestors: ancestorsOf(spec.structure ?? {}),
     };
     // Shared base styles land on the root slot (or the first slot if there is no `root`).
     const rootSlot = spec.slots.includes("root") ? "root" : spec.slots[0];

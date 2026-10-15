@@ -38,6 +38,9 @@ export interface CompileCtx {
     target: string;
     refStyle: "fn" | "curly" | "var";
     tokenPrefix?: string;
-    /** The slot recipe and slot being compiled, for slot conditions. */
-    slot?: { className: string; name: string };
+    /** The slot recipe and slot being compiled, for slot conditions, with the slot's
+     *  ancestors from the component's structure, nearest first. */
+    slot?: { className: string; name: string; ancestors?: string[] };
+    /** Every slot's ancestors in the component being compiled. */
+    slotAncestors?: Map<string, string[]>;
 }

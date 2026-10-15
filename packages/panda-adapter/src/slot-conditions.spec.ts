@@ -66,13 +66,61 @@ describe("slot conditions", () => {
         );
     });
 
-    it("nests a case that needs every condition under the shorter one's base", () => {
+    it("joins a case on several slots into one selector, outermost first", () => {
         const color = recipe().base.label?.color as Record<string, unknown>;
+        const invalid = `${INVALID}${INVALID}${INVALID}${INVALID}`;
+        expect(color[`.field__root${invalid} &`]).toBe("rgb(51 51 51)");
         expect(
-            color[`.field__root${INVALID}${INVALID}${INVALID}${INVALID} &`],
-        ).toEqual({
-            base: "rgb(51 51 51)",
-            [`.field__container${FOCUS}${FOCUS} &`]: "rgb(68 68 68)",
+            color[`.field__root${invalid} .field__container${FOCUS}${FOCUS} &`],
+        ).toBe("rgb(68 68 68)");
+    });
+
+    it("joins two states of one slot on the same element", () => {
+        const both = defineConfig({
+            tokens: {},
+            semanticTokens: {},
+            components: {
+                box: defineSlotComponent({
+                    name: "box",
+                    slots: ["root", "mark"],
+                    structure: { root: ["mark"] },
+                    recipe: {
+                        base: {
+                            root: {
+                                color: when(
+                                    [
+                                        slot("root", "invalid"),
+                                        slot("root", "hover"),
+                                    ],
+                                    hex("#111"),
+                                    hex("#000"),
+                                ),
+                            },
+                            mark: {
+                                color: when(
+                                    [
+                                        slot("root", "invalid"),
+                                        slot("root", "hover"),
+                                    ],
+                                    hex("#111"),
+                                    hex("#000"),
+                                ),
+                            },
+                        },
+                    },
+                }),
+            },
+        });
+        const recipes = compilePreset(both).theme?.slotRecipes as Slots;
+        const invalid = `${INVALID}${INVALID}${INVALID}${INVALID}`;
+        const hover = ":is(:hover, [data-hover])";
+        expect(recipes.box?.base.root?.color).toEqual({
+            base: "rgb(0 0 0)",
+            [`&${invalid}${hover}`]: "rgb(17 17 17)",
+        });
+        expect(recipes.box?.base.mark?.color).toEqual({
+            base: "rgb(0 0 0)",
+            [`.box__root${invalid}${hover} &`]: "rgb(17 17 17)",
         });
     });
 
