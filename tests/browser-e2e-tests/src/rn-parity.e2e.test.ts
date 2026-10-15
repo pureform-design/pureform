@@ -65,6 +65,11 @@ const SCENARIOS: Scenario[] = [
         attributes: ["data-selected"],
         state: { selected: true },
     },
+    {
+        name: "invalid",
+        attributes: ["data-invalid", 'aria-invalid="true"'],
+        state: { invalid: true },
+    },
     { name: "dark", scheme: "dark" },
     { name: "in a named theme", theme: "teal" },
 ];
