@@ -227,9 +227,17 @@ overrides the primary color in either mode.
   variant value at rest, and per state, scheme, and theme scenario. All match except the radii
   and outline rings of shape variants, which clip on the web and fall back to rounded corners
   and borders here.
-- **Not yet:** indeterminate progress (keyframe animations are dropped), text fields, menus,
-  dialogs, navigation, tabs, slider, and ripple; shapes and multi-color gradients; viewport
-  conditions; and running on a device.
+- **Keyframe animations** lower with their frames inside them, so themes resolve the frames,
+  and `useAnimatedRecipe` loops them with `Animated`; indeterminate progress slides and spins.
+- **Focus rings** show for keyboard focus only on the web, following the latest input as
+  browsers decide `:focus-visible`; native focus is always visible.
+- **Derived tokens:** building keeps the formula of each token that reads others, and an
+  override recomputes those that read it, directly or through others.
+- **Viewport conditions** hold by the window's width, which the provider takes from
+  `useWindowDimensions`. Container queries are still reported.
+- **Not yet:** text fields, menus, dialogs, navigation, tabs, slider, and ripple; shapes and
+  multi-color gradients, which need SVG or a gradient package; container queries; and running
+  on a device.
 
 ## State transitions
 
