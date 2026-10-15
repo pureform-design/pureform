@@ -144,6 +144,48 @@ describe("lowerRn values", () => {
     });
 });
 
+describe("lowerRn filters", () => {
+    it("casts drop shadows as box shadows, and reports other filters", () => {
+        const layer = { x: px(0), y: px(2), blur: px(4), color: rgb(0, 0, 0) };
+        const shadow = rulesOf({
+            filter: when("disabled", { type: "literal", value: "none" }, {
+                type: "filter",
+                fns: [{ fn: "dropShadow", layer }],
+            } as unknown as ValueNode),
+        } as unknown as StyleMap);
+        expect(shadow.rules).toEqual([
+            {
+                when: [],
+                specificity: 0,
+                style: {
+                    boxShadow: {
+                        $shadow: [
+                            {
+                                x: 0,
+                                y: 2,
+                                blur: 4,
+                                spread: 0,
+                                color: "rgba(0, 0, 0, 1)",
+                            },
+                        ],
+                    },
+                },
+            },
+            {
+                when: ["disabled"],
+                specificity: 1,
+                style: { boxShadow: "none" },
+            },
+        ]);
+        const blur = rulesOf({
+            filter: { type: "filter", fns: [{ fn: "blur", args: [px(2)] }] },
+        } as unknown as StyleMap);
+        expect(blur.diagnostics).toEqual([
+            "box: filter: filters other than drop shadows",
+        ]);
+    });
+});
+
 describe("lowerRn transitions", () => {
     it("lowers durations to milliseconds and easings to curves, with reduced motion a state", () => {
         const motion = {

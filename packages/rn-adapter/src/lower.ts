@@ -304,6 +304,17 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 node.args.map((n) => lowerNode(n, ctx)),
                 (args) => ({ $math: node.fn, args }),
             );
+        case "filter": {
+            // Drop shadows follow what an element draws, where box shadows follow its box. Here
+            // shapes fall back to rounded boxes, so the two cast the same shadow.
+            const layers = node.fns.flatMap((fn) =>
+                fn.fn === "dropShadow" ? [fn.layer] : [],
+            );
+            if (layers.length !== node.fns.length) {
+                throw new Unsupported("filters other than drop shadows");
+            }
+            return lowerNode({ type: "shadow", layers } as ValueNode, ctx);
+        }
         case "shadow": {
             const fields = node.layers.flatMap((layer) => [
                 layer.x,
@@ -455,7 +466,9 @@ const lowerStyle = (
                 ? TINT
                 : property === "transition"
                   ? TRANSITION
-                  : rnProperty(property);
+                  : property === "filter"
+                    ? "boxShadow"
+                    : rnProperty(property);
         if (rn === null) continue;
         if (rn === undefined) {
             diagnostics.add(
