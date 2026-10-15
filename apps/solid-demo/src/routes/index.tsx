@@ -5,6 +5,7 @@ import {
     fab,
     iconButton,
     scrim,
+    supportingText,
     text,
     textField,
 } from "$recipes";
@@ -105,40 +106,48 @@ function IndexRoute() {
                     }}
                 </For>
             </section>
-            <section style={row}>
-                <For each={["outlined", "elevated"] as const}>
-                    {(variant) => (
-                        <For each={["Filter", "Assist"]}>
-                            {(label) => {
-                                const [selected, setSelected] =
-                                    createSignal(false);
-                                const c = chip({ variant });
-                                return (
-                                    <button
-                                        class={c.root}
-                                        type="button"
-                                        aria-pressed={
-                                            selected() ? "true" : "false"
-                                        }
-                                        data-selected={
-                                            selected() ? "" : undefined
-                                        }
-                                        onClick={() => {
-                                            setSelected(!selected());
-                                        }}
-                                    >
-                                        <span class={c.touchTarget} />
-                                        <Ripple />
-                                        <span
-                                            class={c.label}
-                                        >{`${variant} ${label}`}</span>
-                                    </button>
-                                );
-                            }}
-                        </For>
-                    )}
-                </For>
-            </section>
+            <div>
+                <section style={row}>
+                    <For each={["outlined", "elevated"] as const}>
+                        {(variant) => (
+                            <For each={["Filter", "Assist"]}>
+                                {(label) => {
+                                    const [selected, setSelected] =
+                                        createSignal(false);
+                                    const c = chip({ variant });
+                                    return (
+                                        <button
+                                            class={c.root}
+                                            type="button"
+                                            aria-pressed={
+                                                selected() ? "true" : "false"
+                                            }
+                                            data-selected={
+                                                selected() ? "" : undefined
+                                            }
+                                            onClick={() => {
+                                                setSelected(!selected());
+                                            }}
+                                        >
+                                            <span class={c.touchTarget} />
+                                            <Ripple />
+                                            <span
+                                                class={c.label}
+                                            >{`${variant} ${label}`}</span>
+                                        </button>
+                                    );
+                                }}
+                            </For>
+                        )}
+                    </For>
+                </section>
+                <span class={supportingText()}>
+                    Pick any filters; chips use the standalone supporting text.
+                </span>
+                <span class={supportingText({ tone: "error" })}>
+                    An error tone, set directly.
+                </span>
+            </div>
             <section style={{ display: "grid", gap: "8px" }}>
                 <h1 class={text({ style: "headlineMedium" })}>pureform</h1>
                 <p class={text({ style: "bodyLarge" })}>
