@@ -2612,6 +2612,39 @@ semanticTokens.colors.brand`).
    multiplier in the same template compounds (look-up then scale, usually one or the other);
    and the build-time-expanded and Panda-function lowerings of a dynamic util must stay in sync.
 
+### 5.1 Shared lowering and the plain CSS adapter
+
+Both web adapters lower through `@pureform/css-lowering`: value nodes, conditions, style maps,
+utility templates, and `themeVars`. Its context carries the few hooks where targets differ:
+`tokenRef` spells a token reference (Panda: `token(colors.x)`, or `{colors.x}` in token
+definitions; plain CSS: `var(--colors-x)`), `conditionKey` and `breakpointKey` give a target's
+own condition keys (Panda's `_hover`, breakpoint names), and `classPrefix` prefixes the slot
+classes slot conditions select. Without a hook, a condition lowers to its selector or at-rule;
+the interaction selectors match Panda's built-ins, so both adapters style the same elements.
+
+`@pureform/css-adapter` compiles a config to one stylesheet with no build tool:
+
+- **Tokens** are the vars Panda emits (`--colors-primary`), on `:root`, with dark values under
+  `:root.dark` and under `prefers-color-scheme` unless the root has `.light`. Named themes set
+  theirs under a configurable attribute, `[data-theme=<name>]` by default.
+- **Components** keep Panda's class names (`.button__root--variant_tonal`), so markup works
+  with either adapter. Base styles, variants, and compound variants sit in nested layers in
+  that order, which gives Panda's precedence; a compound variant selects its variant classes
+  chained, so it needs nothing at runtime.
+- **Text styles and utilities**, which plain CSS lacks, are written out where they are used,
+  under the map's own properties. Conditional values become nested rules: the CSS is natively
+  nested, and Lightning CSS can flatten it for older browsers.
+- **Class names** come from a runtime under 1 kB that reads only a manifest of each
+  component's variants and defaults. It is typed from typed component specs, whose type keeps
+  their variants and slots, or, ahead of time, from declarations generated with each manifest.
+
+A parity test renders every component at its defaults and at each variant value, styled once
+by each adapter, and requires the same computed styles. It covers resting styles; states,
+color schemes, and named themes are left to the unit tests. It found that two variant groups
+setting one property at equal specificity leave the winner to rule order, which the adapters
+needn't share, so a component must not do that: the FAB's size radius moved into a compound
+variant for that reason.
+
 ---
 
 ## 6. Runtime overriding and customization

@@ -1,5 +1,7 @@
 # Plain CSS adapter plan
 
+Status: implemented.
+
 A second adapter that compiles a pureform `CoreConfig` to plain CSS, with no Panda. It proves the
 core is target-agnostic and gives apps a zero-dependency path: one stylesheet and a small class
 name runtime.
@@ -190,9 +192,11 @@ Three ways in:
 
 - **Unit tests** in `css-lowering` (moved from `panda-adapter`), and snapshot tests of the
   stylesheet and manifests in `css-adapter`.
-- **Parity tests**: a demo page renders every component and variant twice, once styled by the
-  Panda adapter and once by the CSS adapter, and Playwright compares the computed styles of
-  each pair. Any difference is a bug in one of them.
+- **Parity tests**: every component at its defaults and at each variant value, rendered on two
+  pages, one with the demo's Panda CSS and Panda's recipe classes, one with the CSS adapter's
+  stylesheet and runtime classes, and Playwright compares the computed styles of each pair.
+  Any difference is a bug in one of them. (Both stylesheets share class names, so the pages
+  are separate rather than a route in the demo.)
 - **Panda snapshots unchanged** after the extraction.
 
 ## Steps
@@ -204,8 +208,7 @@ Three ways in:
 3. **Runtime.** `recipe(manifest)` and `recipes(config)`, typed from the specs. Type tests.
 4. **AOT build and Vite plugin.** `buildCss` writing CSS, JS, and `.d.ts`; the plugin's virtual
    modules.
-5. **Parity demo and tests.** A demo route styled by the CSS adapter, and the computed-style
-   comparison against Panda.
+5. **Parity tests.** The computed-style comparison against Panda, in the demo's e2e suite.
 6. **Reset.** `reset.css`, opt-in, in the `pureform.reset` layer.
 7. **Docs.** Package README, including Lightning CSS setup, and the design doc's adapter
    section.
