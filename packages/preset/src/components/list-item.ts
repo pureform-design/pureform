@@ -46,7 +46,7 @@ const parts = rowParts(ref, "root");
 
 type LineHeight = "heightOne" | "heightTwo" | "heightThree";
 
-const LINES: Record<string, LineHeight> = {
+const LINES: Record<"one" | "two" | "three", LineHeight> = {
     one: "heightOne",
     two: "heightTwo",
     three: "heightThree",
@@ -156,7 +156,9 @@ export const createListItem = (
                                 .interactive,
                         },
                     })),
-                ...Object.entries(LINES).flatMap(([count, height]) =>
+                ...(
+                    Object.entries(LINES) as [keyof typeof LINES, LineHeight][]
+                ).flatMap(([count, height]) =>
                     densityCompounds(densities, { lines: count }, (offset) => ({
                         root: { minHeight: add(ref(height), offset) },
                     })),

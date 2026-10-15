@@ -20,6 +20,7 @@ import {
     pressableRoot,
     dense,
     densityCompounds,
+    lower,
     densityMarkers,
     DEFAULT_DENSITIES,
 } from "./shared";
@@ -111,7 +112,7 @@ export const createButton = (
                     ...SIZES.flatMap((s) =>
                         densityCompounds(
                             densities,
-                            { size: s.toLowerCase() },
+                            { size: lower(s) },
                             (offset) => ({
                                 root: {
                                     height: add(token(`height${s}`), offset),

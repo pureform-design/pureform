@@ -33,6 +33,7 @@ import {
     pressableRoot,
     dense,
     densityCompounds,
+    lower,
     densityMarkers,
     DEFAULT_DENSITIES,
 } from "./shared";
@@ -134,7 +135,7 @@ export const createIconButton = (
                 ...(["Small", "Medium", "Large"] as const).flatMap((s) =>
                     densityCompounds(
                         densities,
-                        { size: s.toLowerCase() },
+                        { size: lower(s) },
                         (offset) => {
                             const side = add(ref(`size${s}`), offset);
                             return { root: { width: side, height: side } };

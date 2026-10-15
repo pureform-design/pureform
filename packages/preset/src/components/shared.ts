@@ -468,13 +468,21 @@ export const densityMarkers = (
         ["inherit", ...Object.keys(densities)].map((name) => [name, {}]),
     );
 
-/** One compound variant per density step, restating the sized styles where `match` holds. */
-export const densityCompounds = (
-    densities: Densities,
-    match: Record<string, string>,
+/** A name in lower case, typed as such, for a variant value made from a token suffix. */
+export const lower = <S extends string>(name: S) =>
+    name.toLowerCase() as Lowercase<S>;
+
+/** One compound variant per density step, restating the sized styles where `match` holds.
+ *  The match keeps its literal values, so a typed recipe checks them. */
+export const densityCompounds = <
+    const M extends Record<string, string>,
+    D extends string = string,
+>(
+    densities: Record<D, number>,
+    match: M,
     sized: (offset: NumericValue) => SlotStyles,
-) =>
-    Object.entries(densities).map(([density, units]) => ({
+): { match: M & { density: D }; style: SlotStyles }[] =>
+    (Object.entries(densities) as [D, number][]).map(([density, units]) => ({
         match: { ...match, density },
         style: sized(densityOffset(units)),
     }));
