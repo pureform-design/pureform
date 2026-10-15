@@ -35,6 +35,21 @@ export const interpolates = (from: Concrete, to: Concrete): boolean => {
 
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
+/** The two ends of a move, with a fully transparent color taking the other end's channels.
+ *  Animated blends each channel on its own, so a fade to `transparent` (black at no alpha)
+ *  would pass through a dark gray; CSS blends with alpha premultiplied, which only fades. */
+export const colorEnds = (
+    from: Concrete,
+    to: Concrete,
+): [Concrete, Concrete] => {
+    if (typeof from !== "string" || typeof to !== "string") return [from, to];
+    if (!isColor(from) || !isColor(to)) return [from, to];
+    const [a, b] = [parseColor(from), parseColor(to)];
+    if (a[3] === 0) return [formatColor([b[0], b[1], b[2], 0]), to];
+    if (b[3] === 0) return [from, formatColor([a[0], a[1], a[2], 0])];
+    return [from, to];
+};
+
 /** The value `t` of the way from one to the other, channel by channel for colors, as
  *  `Animated` interpolates them. */
 export const blend = (from: Concrete, to: Concrete, t: number): Concrete => {
@@ -43,7 +58,8 @@ export const blend = (from: Concrete, to: Concrete, t: number): Concrete => {
     if (typeof from !== "string" || typeof to !== "string")
         return t < 1 ? from : to;
     if (isColor(from) && isColor(to)) {
-        const [a, b] = [parseColor(from), parseColor(to)];
+        const [x, y] = colorEnds(from, to) as [string, string];
+        const [a, b] = [parseColor(x), parseColor(y)];
         return formatColor(
             [0, 1, 2, 3].map((i) => lerp(a[i]!, b[i]!, t)) as never,
         );

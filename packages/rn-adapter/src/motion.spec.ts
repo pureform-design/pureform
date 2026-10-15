@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 
-import { animatable, blend, easingPoints, interpolates } from "./motion";
+import {
+    animatable,
+    blend,
+    colorEnds,
+    easingPoints,
+    interpolates,
+} from "./motion";
 
 describe("easingPoints", () => {
     it("reads Bézier points, and takes anything else as linear", () => {
@@ -40,10 +46,23 @@ describe("interpolates", () => {
 describe("blend", () => {
     it("finds the value partway, channel by channel for colors", () => {
         expect(blend(0, 10, 0.25)).toBe(2.5);
-        expect(blend("rgba(0, 0, 0, 1)", "rgba(200, 100, 0, 0)", 0.5)).toBe(
-            "rgba(100, 50, 0, 0.5)",
+        expect(blend("rgba(0, 0, 0, 1)", "rgba(200, 100, 0, 0.5)", 0.5)).toBe(
+            "rgba(100, 50, 0, 0.75)",
         );
         expect(blend("0px 2px", "4px 6px", 0.5)).toBe("2px 4px");
+    });
+
+    it("fades to and from transparent without passing through black", () => {
+        expect(blend("rgba(200, 100, 0, 1)", "transparent", 0.5)).toBe(
+            "rgba(200, 100, 0, 0.5)",
+        );
+        expect(blend("transparent", "rgba(200, 100, 0, 1)", 0.5)).toBe(
+            "rgba(200, 100, 0, 0.5)",
+        );
+        expect(colorEnds("transparent", "rgba(200, 100, 0, 1)")).toEqual([
+            "rgba(200, 100, 0, 0)",
+            "rgba(200, 100, 0, 1)",
+        ]);
     });
 
     it("holds a discrete value until the end", () => {
