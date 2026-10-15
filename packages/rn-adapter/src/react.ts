@@ -135,8 +135,31 @@ export const useRecipe = (
 ): Record<string, Style> =>
     useRecipeWithTransitions(name, variants, state, tokens).styles;
 
-/** A component's state from Pressable's callback state and its own props. Focus counts as
- *  visible focus, since Pressable doesn't tell keyboard focus apart. */
+// Whether the latest input was a key press rather than a pointer, as browsers decide
+// :focus-visible. Native apps have no document, and focus there comes from a keyboard or
+// assistive technology, so it's always visible.
+let keyboard = true;
+if (
+    typeof document !== "undefined" &&
+    typeof document.addEventListener === "function"
+) {
+    keyboard = false;
+    const options = { capture: true, passive: true } as const;
+    document.addEventListener(
+        "keydown",
+        (event) => {
+            if (!event.metaKey && !event.altKey && !event.ctrlKey)
+                keyboard = true;
+        },
+        options,
+    );
+    for (const type of ["pointerdown", "mousedown", "touchstart"]) {
+        document.addEventListener(type, () => (keyboard = false), options);
+    }
+}
+
+/** A component's state from Pressable's callback state and its own props. Focus is visible
+ *  when it came from the keyboard, as browsers show a focus ring, and always on native. */
 export const pressableState = (
     interaction: { pressed?: boolean; hovered?: boolean; focused?: boolean },
     props: Omit<
@@ -149,5 +172,5 @@ export const pressableState = (
     active: interaction.pressed ?? false,
     hover: interaction.hovered ?? false,
     focus: interaction.focused ?? false,
-    focusVisible: interaction.focused ?? false,
+    focusVisible: (interaction.focused ?? false) && keyboard,
 });
