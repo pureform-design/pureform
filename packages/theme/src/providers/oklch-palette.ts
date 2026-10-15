@@ -22,7 +22,7 @@ const GROUP_TONES: Record<"base" | "on" | "container" | "onContainer", Tone> = {
     onContainer: { light: 0.25, dark: 0.92, chroma: 0.6 },
 };
 
-const NEUTRAL_TONES: Record<NeutralRole, Tone> = {
+const NEUTRAL_TONES: Record<Exclude<NeutralRole, "inversePrimary">, Tone> = {
     surface: { light: 0.985, dark: 0.16, chroma: 1 },
     surfaceDim: { light: 0.9, dark: 0.16, chroma: 1 },
     surfaceBright: { light: 0.985, dark: 0.3, chroma: 1 },
@@ -97,6 +97,25 @@ export const oklchPalette = <const G extends string>(
             }
 
             const groups = Object.keys(options.groups) as G[];
+            // The inverse primary takes the primary hue (or the first group's), light on the
+            // dark inverse surface and dark on the light one.
+            const primary = (groups as string[]).includes("primary")
+                ? "primary"
+                : groups[0];
+            add(
+                "inversePrimary",
+                {
+                    light: 0.8,
+                    dark: 0.45,
+                    chroma: 0.6,
+                    ...options.tones?.inversePrimary,
+                },
+                {
+                    hue: 270,
+                    chroma: 0.14,
+                    ...(primary ? options.groups[primary as G] : {}),
+                },
+            );
             for (const group of groups) {
                 const hue = { chroma: 0.14, ...options.groups[group] };
                 const name = capitalize(group);

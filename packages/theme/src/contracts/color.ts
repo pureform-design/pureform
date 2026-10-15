@@ -10,7 +10,8 @@ import type {
     ConditionalNode,
 } from "@pureform/core/ast";
 
-/** The surface and outline roles every color provider must fill. */
+/** The surface and outline roles every color provider must fill, plus `inversePrimary`, which
+ *  Material lists with them. */
 export const NEUTRAL_ROLES = [
     "surface",
     "surfaceDim",
@@ -25,6 +26,8 @@ export const NEUTRAL_ROLES = [
     "onSurfaceVariant",
     "inverseSurface",
     "inverseOnSurface",
+    // The primary color on the inverse surface, as a snackbar's action.
+    "inversePrimary",
     "outline",
     "outlineVariant",
     "scrim",
