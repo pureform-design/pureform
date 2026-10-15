@@ -38,6 +38,7 @@ import type {
     ResolveOptions,
     Theme,
     ThemeProviders,
+    ThemeVocabulary,
     TypographyProvider,
 } from "@pureform/theme";
 
@@ -225,9 +226,10 @@ export type PureformConfig<
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
-> = CoreConfig & {
-    readonly theme: Theme<G, TFont, TStyle>;
-};
+> = CoreConfig &
+    ThemeVocabulary<G, TFont, TStyle> & {
+        readonly theme: Theme<G, TFont, TStyle>;
+    };
 
 /** Build the full pureform config. Every contract is checked and every alias resolves, or
  *  this throws naming the provider or the bad path. */

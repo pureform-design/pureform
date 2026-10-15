@@ -1,3 +1,4 @@
+import { typed } from "@pureform/core";
 import { px } from "@pureform/core/ast";
 import {
     materialColor,
@@ -324,5 +325,21 @@ describe("pureform result", () => {
         expect(config.theme.color.groups).toContain("primary");
         expect(Object.keys(config)).not.toContain("theme");
         expect(() => compilePreset(config)).not.toThrow();
+    });
+});
+
+describe("pureform with typed()", () => {
+    it("offers the theme's roles, including custom groups and text styles", () => {
+        const config = pureform({
+            color: materialColor({ customSeeds: { brand: "#0b6e4f" } }),
+        });
+        const pf = typed(config);
+        expect(
+            pf.alias("semanticTokens", "colors", "onBrandContainer").path,
+        ).toEqual(["semanticTokens", "colors", "onBrandContainer"]);
+        pf.alias("tokens", "sizes", "densityOffset");
+        pf.textStyle("titleMedium");
+        // @ts-expect-error not a color group of this theme
+        pf.alias("semanticTokens", "colors", "onLogoContainer");
     });
 });
