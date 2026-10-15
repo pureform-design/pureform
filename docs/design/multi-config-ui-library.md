@@ -2299,9 +2299,10 @@ A new component looks for these first, and extracts anything it would otherwise 
 **Accessibility.** Every interactive component draws `focusRing()`: a 3px secondary outline,
 offset 2px, on keyboard focus. Its touch target reaches the theme's `touchTarget` size.
 Selection controls lay a native input over the control, so forms, the keyboard, and screen
-readers work unchanged. The preset's tests check each component's color pairs (4.5:1 for
-text, 3:1 for the parts that identify a control), every color group in light and dark, the
-touch targets, and the focus ring.
+readers work unchanged. `COMPONENT_CONTRAST` lists the color pairs each component draws, by
+token or role (4.5:1 for text, 3:1 for the parts that identify a control), and
+`requireComponentContrast` checks them and every color group in light and dark for each
+theme. The preset's tests run the same check, plus the touch targets and the focus ring.
 
 ---
 

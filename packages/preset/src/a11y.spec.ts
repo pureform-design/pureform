@@ -1,149 +1,62 @@
 // Accessibility checks over the components and the default theme.
 //
-// - Contrast: each component's color pairs, read from its own token defaults so the check
-//   follows the code, and each color group as the color variants use it. Text needs WCAG
-//   AA's 4.5:1, and the parts that identify a control (borders, the switch handle, the
-//   checkbox outline) need 3:1. Decorative lines (separators, the chip outline, which its
-//   label already identifies) are exempt.
+// - Contrast: every pair in `COMPONENT_CONTRAST` and every color group's pairs (see
+//   `contrast.ts`), in light and dark. Each pair must also resolve, so a token rename can't
+//   quietly skip it.
 // - Touch targets: every interactive component reaches the theme's touch target.
 // - Focus: every interactive component shows the focus ring.
 
 import type { SlottedComponentSpec } from "@pureform/core/types";
-import { contrastRatio, resolveColor } from "@pureform/theme";
-import type { Scheme } from "@pureform/theme";
+import { resolveColor } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
 
-import { checkbox } from "./components/checkbox";
-import { chip } from "./components/chip";
-import { radio } from "./components/radio";
-import { supportingText } from "./components/supporting-text";
-import { switchControl } from "./components/switch";
-import { textArea } from "./components/text-area";
-import { textField } from "./components/text-field";
+import {
+    COMPONENT_CONTRAST,
+    componentContrastFailures,
+    groupContrast,
+} from "./contrast";
+import type { ContrastSide } from "./contrast";
 import { pureform } from "./pureform";
 
 const config = pureform();
 const color = config.theme.color;
 
-type Spec = { name: string; tokens?: Record<string, unknown> };
-
-// A component token's default color, followed through the theme to a concrete color.
-const tokenColor = (spec: Spec, token: string, scheme: Scheme) => {
-    const node = spec.tokens?.[token] as { default?: unknown } | undefined;
-    if (!node) throw new Error(`${spec.name} has no token "${token}"`);
-    return resolveColor(color, node.default, scheme);
-};
-
-const roleColor = (role: string, scheme: Scheme) =>
-    resolveColor(color, color.roles[role], scheme);
-
-type Side = { token: string } | { role: string };
-const side = (spec: Spec, s: Side, scheme: Scheme) =>
-    "token" in s
-        ? tokenColor(spec, s.token, scheme)
-        : roleColor(s.role, scheme);
-
-const TEXT = 4.5;
-const UI = 3;
-
-// [component, what is drawn, on what, minimum ratio]
-const PAIRS: [Spec, Side, Side, number][] = [
-    [chip, { token: "content" }, { role: "surface" }, TEXT],
-    [chip, { token: "content" }, { token: "elevatedContainer" }, TEXT],
-    [chip, { token: "selectedContent" }, { token: "selectedContainer" }, TEXT],
-    [chip, { token: "iconColor" }, { role: "surface" }, UI],
-    [textField, { token: "inputColor" }, { token: "container" }, TEXT],
-    [textField, { token: "labelColor" }, { token: "container" }, TEXT],
-    [textField, { token: "focusColor" }, { token: "container" }, TEXT],
-    [textField, { token: "errorColor" }, { token: "container" }, TEXT],
-    [textField, { token: "inputColor" }, { role: "surface" }, TEXT],
-    [textField, { token: "labelColor" }, { role: "surface" }, TEXT],
-    [textField, { token: "supportingColor" }, { role: "surface" }, TEXT],
-    [textField, { token: "errorColor" }, { role: "surface" }, TEXT],
-    [textField, { token: "indicatorColor" }, { token: "container" }, UI],
-    [textField, { token: "outlineColor" }, { role: "surface" }, UI],
-    [textArea, { token: "inputColor" }, { token: "container" }, TEXT],
-    [textArea, { token: "outlineColor" }, { role: "surface" }, UI],
-    [supportingText, { token: "color" }, { role: "surface" }, TEXT],
-    [supportingText, { token: "errorColor" }, { role: "surface" }, TEXT],
-    [checkbox, { token: "borderColor" }, { role: "surface" }, UI],
-    [checkbox, { token: "checkedColor" }, { role: "surface" }, UI],
-    [checkbox, { token: "iconColor" }, { token: "checkedColor" }, UI],
-    [checkbox, { token: "errorIconColor" }, { token: "errorColor" }, UI],
-    [radio, { token: "borderColor" }, { role: "surface" }, UI],
-    [radio, { token: "checkedColor" }, { role: "surface" }, UI],
-    [switchControl, { token: "outlineColor" }, { role: "surface" }, UI],
-    [switchControl, { token: "handleColor" }, { token: "trackColor" }, UI],
-    [
-        switchControl,
-        { token: "checkedHandleColor" },
-        { token: "checkedTrackColor" },
-        UI,
-    ],
-    [switchControl, { token: "checkedTrackColor" }, { role: "surface" }, UI],
-    [
-        switchControl,
-        { token: "iconColor" },
-        { token: "checkedHandleColor" },
-        UI,
-    ],
-];
-
-const label = (s: Side) => ("token" in s ? s.token : s.role);
-
-describe("component contrast", () => {
-    it.each(
-        PAIRS.flatMap(([spec, fg, bg, min]) =>
-            (["light", "dark"] as const).map(
-                (scheme) =>
-                    [
-                        spec.name,
-                        label(fg),
-                        label(bg),
-                        scheme,
-                        min,
-                        spec,
-                        fg,
-                        bg,
-                    ] as const,
-            ),
-        ),
-    )(
-        "%s: %s on %s (%s) reaches %s:1",
-        (_, __, ___, scheme, min, spec, fg, bg) => {
-            const front = side(spec, fg, scheme);
-            const back = side(spec, bg, scheme);
-            expect(front, "foreground resolves to a color").toBeDefined();
-            expect(back, "background resolves to a color").toBeDefined();
-            expect(contrastRatio(front!, back!)).toBeGreaterThanOrEqual(min);
-        },
-    );
-});
-
-// Every color group, on the surfaces its components draw it on.
-const GROUP_PAIRS: [string, string, number][] =
-    config.theme.color.groups.flatMap((g): [string, string, number][] => {
-        const on = `on${g.charAt(0).toUpperCase()}${g.slice(1)}`;
-        return [
-            [g, "surface", TEXT],
-            [`${on}Container`, `${g}Container`, TEXT],
-            [on, g, UI],
-        ];
+describe("contrast", () => {
+    it("reaches WCAG AA for every component and color group", () => {
+        expect(componentContrastFailures(color, config.components)).toEqual([]);
     });
 
-describe("color group contrast", () => {
-    it.each(
-        GROUP_PAIRS.flatMap(([fg, bg, min]) =>
-            (["light", "dark"] as const).map(
-                (scheme) => [fg, bg, scheme, min] as const,
-            ),
-        ),
-    )("%s on %s (%s) reaches %s:1", (fg, bg, scheme, min) => {
-        const front = roleColor(fg, scheme);
-        const back = roleColor(bg, scheme);
-        expect(
-            front && back && contrastRatio(front, back),
-        ).toBeGreaterThanOrEqual(min);
+    const resolves = (spec: unknown, side: ContrastSide) =>
+        (["light", "dark"] as const).every((scheme) => {
+            const value =
+                "role" in side
+                    ? color.roles[side.role]
+                    : (
+                          spec as {
+                              tokens?: Record<string, { default?: unknown }>;
+                          }
+                      ).tokens?.[side.token]?.default;
+            return resolveColor(color, value, scheme) !== undefined;
+        });
+
+    it.each(Object.entries(COMPONENT_CONTRAST))(
+        "%s's pairs all resolve to colors",
+        (name, pairs) => {
+            const spec = config.components[name];
+            expect(spec).toBeDefined();
+            for (const { draw, on } of pairs) {
+                expect(resolves(spec, draw), JSON.stringify(draw)).toBe(true);
+                expect(resolves(spec, on), JSON.stringify(on)).toBe(true);
+            }
+        },
+    );
+
+    it.each(color.groups)("group %s's pairs all resolve to colors", (group) => {
+        for (const { draw, on } of groupContrast(group)) {
+            expect(resolves(undefined, draw) && resolves(undefined, on)).toBe(
+                true,
+            );
+        }
     });
 });
 

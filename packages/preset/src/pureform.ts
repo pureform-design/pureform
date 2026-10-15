@@ -30,6 +30,7 @@ import type {
     ColorProvider,
     ElevationProvider,
     LayoutProvider,
+    ColorContract,
     MotionProvider,
     ResolvedTheme,
     ShapeProvider,
@@ -57,6 +58,7 @@ import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
 import { touchTarget } from "./components/touch-target";
+import { componentContrastFailures } from "./contrast";
 
 type ThemeConfig = Theme<string, string, string>["config"];
 
@@ -92,6 +94,10 @@ export interface PureformOptions<
     /** Require every content role to reach this WCAG contrast ratio against the role it sits
      *  on, in light and dark, for the base theme and every named theme. `4.5` is WCAG AA. */
     requireContrast?: number;
+    /** Require every color the components draw to reach WCAG AA against what they draw it on
+     *  (4.5:1 for text, 3:1 for control parts), and every color group as the color variants
+     *  use it, in light and dark, for the base theme and every named theme. */
+    requireComponentContrast?: boolean;
     /** Named themes, each replacing some of the providers above. Every token that differs
      *  from the base is emitted for the theme, and Panda applies it inside
      *  `[data-panda-theme=<name>]` (list the names in Panda's `staticCss.themes`). A theme
@@ -228,6 +234,9 @@ export const pureform = <
     const theme = resolveTheme(providers, resolveOptions);
 
     const themes: Record<string, ThemeOverride> = {};
+    const colors: [string, ColorContract<string>][] = [
+        ["base theme", theme.color],
+    ];
     for (const [name, overrides] of Object.entries(options.themes ?? {})) {
         const variant = resolveTheme(
             { ...providers, ...overrides } as ThemeProviders<
@@ -247,6 +256,7 @@ export const pureform = <
             );
         }
         themes[name] = themeOverride(theme.config, variant.config);
+        colors.push([`theme "${name}"`, variant.color]);
     }
 
     const defaults: Record<string, AnyComponentSpec> = {
@@ -275,6 +285,23 @@ export const pureform = <
                 entry[1] !== undefined,
         ),
     );
+
+    if (options.requireComponentContrast) {
+        for (const [where, color] of colors) {
+            const failures = componentContrastFailures(color, components);
+            if (failures.length > 0) {
+                const list = failures
+                    .map(
+                        (f) =>
+                            `${f.source} ${f.draw} on ${f.on} (${f.scheme}) is ${f.ratio.toFixed(2)}:1, needs ${f.minimum}:1`,
+                    )
+                    .join("; ");
+                throw new ContractError(
+                    `${where} falls below component contrast: ${list}`,
+                );
+            }
+        }
+    }
 
     const config = defineConfig(
         mergeConfigs(

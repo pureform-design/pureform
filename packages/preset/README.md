@@ -136,5 +136,13 @@ keyboard, and screen readers work unchanged. `color` sets the checked colors.
 ## Accessibility
 
 Every interactive component shows a focus ring on keyboard focus and reaches the theme's
-touch target size. The tests check each component's contrast pairs and every color group in
-light and dark. Pass `requireContrast: 4.5` to `pureform()` to check a custom palette's roles.
+touch target size. To check a custom palette:
+
+- `requireContrast: 4.5` checks the theme's role pairs, such as `onPrimary` on `primary`.
+- `requireComponentContrast: true` checks every color the components draw against what they
+  draw it on (4.5:1 for text, 3:1 for control parts), and every color group as the color
+  variants use it.
+
+Both check light and dark, for the base theme and every named theme, and throw naming each
+pair that falls short. `componentContrastFailures(color, components)` returns the failures
+instead.

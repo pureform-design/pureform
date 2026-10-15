@@ -18,4 +18,5 @@ export * from "./components/text";
 export * from "./components/field";
 export * from "./components/text-area";
 export * from "./components/text-field";
+export * from "./contrast";
 export * from "./pureform";
