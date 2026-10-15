@@ -23,6 +23,7 @@ import type {
     ShapeProvider,
     ShapeRole,
     SizeRole,
+    DensityStep,
     StateProvider,
     StateRole,
     TypographyProvider,
@@ -124,7 +125,10 @@ export const materialShape = (
     });
 
 /** Material's component sizes, in px. */
-export const MATERIAL_SIZES: Record<SizeRole, number> = {
+export const MATERIAL_SIZES: Record<
+    Exclude<SizeRole, "densityOffset">,
+    number
+> = {
     iconSmall: 18,
     iconMedium: 24,
     controlSmall: 32,
@@ -138,6 +142,9 @@ export interface MaterialLayoutOptions {
     grid?: number;
     /** Change or add component sizes, in px. */
     sizes?: Partial<Record<SizeRole, number>> & Record<string, number>;
+    /** How dense components are: `0` (the default) to `-3`, 4px off a dense component's
+     *  height per step. */
+    density?: DensityStep;
 }
 
 /** Material's 4px spacing grid and component sizes. */
@@ -147,6 +154,7 @@ export const materialLayout = (
     const provider = gridLayout({
         grid: options.grid ?? 4,
         sizes: { ...MATERIAL_SIZES, ...options.sizes },
+        ...(options.density === undefined ? {} : { density: options.density }),
     });
     return { ...provider, name: "material" };
 };
