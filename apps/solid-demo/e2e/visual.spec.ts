@@ -20,6 +20,8 @@ const SECTIONS = [
     "icons",
     "fabs",
     "chips",
+    "lists",
+    "tabs",
 ];
 
 const open = async (page: Page) => {
@@ -44,7 +46,14 @@ test.describe("sections", () => {
 test("every icon slot centers its glyph", async ({ page }) => {
     await open(page);
     const offsets = await page.evaluate(() =>
-        [...document.querySelectorAll<HTMLElement>("[class*=icon]")]
+        [...document.querySelectorAll<HTMLElement>("[class]")]
+            .filter((el) =>
+                [...el.classList].some((c) =>
+                    /^icon$|__(icon|\w+Icon|leading|trailing|itemLeading|itemTrailing)$/.test(
+                        c,
+                    ),
+                ),
+            )
             .filter((el) => el.textContent?.trim())
             .map((el) => {
                 const box = el.getBoundingClientRect();

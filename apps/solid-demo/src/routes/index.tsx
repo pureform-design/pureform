@@ -3,6 +3,10 @@ import {
     card,
     checkbox,
     chip,
+    dialog,
+    listItem,
+    menu,
+    tabs,
     separator,
     fab,
     icon,
@@ -526,6 +530,159 @@ function IndexRoute() {
                 </For>
             </section>
 
+            <section
+                data-section="lists"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <ul style={{ width: "320px", margin: 0, padding: 0 }}>
+                    <li class={listItem().root}>
+                        <span class={listItem().leading}>★</span>
+                        <div class={listItem().content}>
+                            <span class={listItem().headline}>One line</span>
+                        </div>
+                        <span class={listItem().trailingText}>100+</span>
+                    </li>
+                    <li
+                        class={
+                            listItem({ lines: "two", interactive: true }).root
+                        }
+                        tabindex="0"
+                        aria-selected="true"
+                    >
+                        <span class={listItem().leading}>✉</span>
+                        <div class={listItem().content}>
+                            <span class={listItem().headline}>
+                                Selected, two lines
+                            </span>
+                            <span class={listItem().supportingText}>
+                                Supporting text
+                            </span>
+                        </div>
+                        <span class={listItem().trailing}>›</span>
+                    </li>
+                    <li
+                        class={
+                            listItem({ lines: "three", interactive: true }).root
+                        }
+                        tabindex="0"
+                    >
+                        <span class={listItem().leading}>☎</span>
+                        <div class={listItem().content}>
+                            <span class={listItem().overline}>Overline</span>
+                            <span class={listItem().headline}>Three lines</span>
+                            <span class={listItem().supportingText}>
+                                Supporting text that runs long enough to wrap
+                                onto a second line
+                            </span>
+                        </div>
+                    </li>
+                </ul>
+                <div class={menu().root} role="menu" style={{ width: "220px" }}>
+                    <button class={menu().item} role="menuitem" type="button">
+                        <span class={menu().itemLeading}>✂</span>
+                        <span class={menu().itemLabel}>Cut</span>
+                        <span class={menu().itemTrailingText}>⌘X</span>
+                    </button>
+                    <button
+                        class={menu().item}
+                        role="menuitem"
+                        type="button"
+                        aria-selected="true"
+                    >
+                        <span class={menu().itemLeading}>⎘</span>
+                        <span class={menu().itemLabel}>Copy</span>
+                        <span class={menu().itemTrailingText}>⌘C</span>
+                    </button>
+                    <hr class={separator()} />
+                    <button
+                        class={menu().item}
+                        role="menuitem"
+                        type="button"
+                        disabled
+                    >
+                        <span class={menu().itemLeading}>⎀</span>
+                        <span class={menu().itemLabel}>Paste</span>
+                        <span class={menu().itemTrailingText}>⌘V</span>
+                    </button>
+                </div>
+                {(() => {
+                    const d = dialog({ icon: true });
+                    return (
+                        <div
+                            class={d.root}
+                            role="dialog"
+                            aria-labelledby="dialog-title"
+                        >
+                            <span class={d.icon}>⚠</span>
+                            <h2 class={d.headline} id="dialog-title">
+                                Discard draft?
+                            </h2>
+                            <p class={d.body} style={{ margin: 0 }}>
+                                This removes the draft from your device. You
+                                can't undo it.
+                            </p>
+                            <div class={d.actions}>
+                                <button
+                                    class={button({ variant: "text" }).root}
+                                    type="button"
+                                >
+                                    <span class={button().label}>Cancel</span>
+                                </button>
+                                <button
+                                    class={button({ variant: "text" }).root}
+                                    type="button"
+                                >
+                                    <span class={button().label}>Discard</span>
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })()}
+            </section>
+            <section
+                data-section="tabs"
+                style={{ display: "grid", gap: "16px", width: "480px" }}
+            >
+                <For
+                    each={
+                        [
+                            { variant: "primary", icon: true },
+                            { variant: "primary", icon: false },
+                            { variant: "secondary", icon: true },
+                        ] as const
+                    }
+                >
+                    {(options) => {
+                        const [current, setCurrent] = createSignal(0);
+                        const t = tabs(options);
+                        return (
+                            <div class={t.root} role="tablist">
+                                <For each={["Flights", "Trips", "Explore"]}>
+                                    {(label, i) => (
+                                        <button
+                                            class={t.tab}
+                                            role="tab"
+                                            type="button"
+                                            aria-selected={
+                                                current() === i()
+                                                    ? "true"
+                                                    : "false"
+                                            }
+                                            onClick={() => setCurrent(i())}
+                                        >
+                                            {options.icon && (
+                                                <span class={t.icon}>★</span>
+                                            )}
+                                            <span class={t.label}>{label}</span>
+                                            <span class={t.indicator} />
+                                        </button>
+                                    )}
+                                </For>
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
             <section data-section="cards" style={row}>
                 <For each={CARD_FILLS}>
                     {(variant) => (

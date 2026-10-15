@@ -2259,7 +2259,8 @@ pureform({
 
 `pureform()` ships Material's components as core specs: `button`, `iconButton`, `fab`, `chip`,
 `textField`, `textArea`, `supportingText`, `checkbox`, `radio`, `switchControl`, `separator`,
-`card`, `scrim`, `ripple`, `icon`, `touchTarget`, and `text`. A component's name is its
+`listItem`, `menu`, `tabs`, `dialog`, `card`, `scrim`, `ripple`, `icon`, `touchTarget`, and
+`text`. A component's name is its
 generated export, so it avoids reserved words (`switchControl`) and Panda's own patterns
 (`separator`, not `divider`).
 
@@ -2293,6 +2294,8 @@ that shares the same style:
 | Focus indicator         | `focusRing(condition)`                        |                  |
 | Selection control parts | `control.ts`: native input, state layer, root |                  |
 | Text input parts        | `field.ts`: container, label, states, colors  |                  |
+| List and menu rows      | `list.ts`: row, leading and trailing, text    |                  |
+| Surface                 | `surface(container, content, level)`          |                  |
 
 A new component looks for these first, and extracts anything it would otherwise repeat.
 
