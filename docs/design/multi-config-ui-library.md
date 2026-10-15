@@ -2244,7 +2244,7 @@ components only have compound variants for the base groups.
 ```ts
 pureform({
     color: oklchPalette({
-        groups: { primary: { hue: 265 }, negative: { hue: 25 } },
+        groups: { primary: { hue: 265 }, error: { hue: 25 } },
     }),
     typography: modularScale({ ratio: 1.25 }),
     shape: roundedShape({ base: 6 }),

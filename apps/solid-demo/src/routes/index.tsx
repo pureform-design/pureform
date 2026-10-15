@@ -128,7 +128,7 @@ function IndexRoute() {
                 data-section="color-groups"
                 style={{ ...row, "align-items": "center" }}
             >
-                <For each={["negative", "positive", "tertiary"] as const}>
+                <For each={["error", "success", "tertiary"] as const}>
                     {(color) => {
                         const c = checkbox({ color });
                         const s = switchControl({ color });
@@ -331,7 +331,7 @@ function IndexRoute() {
                         </span>
                     )}
                 </For>
-                <For each={["primary", "negative", "positive"] as const}>
+                <For each={["primary", "error", "success"] as const}>
                     {(color) => (
                         <span class={icon({ color })} title={`${color} icon`}>
                             ★

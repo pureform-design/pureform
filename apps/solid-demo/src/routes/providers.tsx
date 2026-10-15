@@ -64,9 +64,9 @@ const COLOR: Choice<ColorProvider<BaseColorGroup>>[] = [
                     primary: { hue: 265 },
                     secondary: { hue: 220, chroma: 0.06 },
                     tertiary: { hue: 330 },
-                    positive: { hue: 150 },
-                    notice: { hue: 80 },
-                    negative: { hue: 25, chroma: 0.18 },
+                    success: { hue: 150 },
+                    warning: { hue: 80 },
+                    error: { hue: 25, chroma: 0.18 },
                     info: { hue: 240 },
                 },
             }),
@@ -380,7 +380,7 @@ function ProvidersRoute() {
 
             <section style={previewStyle()}>
                 {result().error && (
-                    <p style={{ color: "var(--colors-negative)" }}>
+                    <p style={{ color: "var(--colors-error)" }}>
                         {result().error}
                     </p>
                 )}
@@ -411,7 +411,7 @@ function ProvidersRoute() {
                                 "primary",
                                 "secondary",
                                 "tertiary",
-                                "negative",
+                                "error",
                             ] as const
                         }
                     >
