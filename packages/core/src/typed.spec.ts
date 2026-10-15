@@ -5,7 +5,7 @@ import { alias as rawAlias } from "./ast/raw";
 import { defineConfig, defineStaticUtility } from "./define";
 import { defineConfig as rawDefineConfig } from "./raw";
 import { typed } from "./typed";
-import type { AliasPath } from "./typed";
+import type { AliasPath, AliasRoot, AliasSecond, AliasThird } from "./typed";
 
 const base = {
     tokens: {
@@ -326,5 +326,54 @@ describe("component tokens", () => {
         withChip.alias("components", "chip", "radius");
         // @ts-expect-error not one of the chip's tokens
         withChip.alias("components", "chip", "width");
+    });
+});
+
+// Editors suggest each alias name from these, given the names before it, so they pin the
+// narrowing: if one widened back to every name, suggestions would stop narrowing.
+describe("alias narrowing", () => {
+    type C = typeof base;
+
+    it("offers only the roots the config has", () => {
+        expectTypeOf<AliasRoot<C>>().toEqualTypeOf<
+            "tokens" | "semanticTokens" | "fonts" | "textStyles"
+        >();
+    });
+
+    it("narrows the second name by the root", () => {
+        expectTypeOf<AliasSecond<C, "tokens">>().toEqualTypeOf<
+            "colors" | "spacing"
+        >();
+        expectTypeOf<
+            AliasSecond<C, "semanticTokens">
+        >().toEqualTypeOf<"colors">();
+        expectTypeOf<AliasSecond<C, "textStyles">>().toEqualTypeOf<"body">();
+    });
+
+    it("narrows the third name by the root and the second", () => {
+        expectTypeOf<AliasThird<C, "tokens", "colors">>().toEqualTypeOf<
+            "violet600" | "white"
+        >();
+        expectTypeOf<AliasThird<C, "tokens", "spacing">>().toEqualTypeOf<"4">();
+        expectTypeOf<
+            AliasThird<C, "semanticTokens", "colors">
+        >().toEqualTypeOf<"primary">();
+        expectTypeOf<AliasThird<C, "textStyles", "body">>().toBeNever();
+    });
+
+    it("narrows component tokens by the component", () => {
+        const chip = pf.slotComponent({
+            name: "chip",
+            slots: ["root"],
+            tokens: { height: px(32) },
+            recipe: () => ({ base: {} }),
+        });
+        type WithChip = { components: { chip: typeof chip } };
+        expectTypeOf<
+            AliasSecond<WithChip, "components">
+        >().toEqualTypeOf<"chip">();
+        expectTypeOf<
+            AliasThird<WithChip, "components", "chip">
+        >().toEqualTypeOf<"height">();
     });
 });
