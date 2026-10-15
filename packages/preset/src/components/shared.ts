@@ -179,6 +179,17 @@ export const colorCompounds = (
         }),
     );
 
+/** One compound variant per color group but the default, where `match` holds as well, styled
+ *  for the group. The match keeps its literal values, so a typed recipe checks them. */
+export const groupCompounds = <const M extends Record<string, string>, S>(
+    groups: ColorGroups,
+    match: M,
+    style: (group: string) => S,
+): { match: M & { color: string }; style: S }[] =>
+    groups
+        .filter((group) => group !== DEFAULT_GROUP)
+        .map((color) => ({ match: { ...match, color }, style: style(color) }));
+
 /** The `color` variant group: one empty entry per color group, so compound variants can match
  *  on it. */
 export const colorVariants = (

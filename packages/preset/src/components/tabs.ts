@@ -29,6 +29,7 @@ import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 import {
+    groupCompounds,
     COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
@@ -171,12 +172,9 @@ export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
             compoundVariants: [
                 // The color variant sets the active label too, so secondary tabs set theirs back in
                 // the later layer.
-                ...groups
-                    .filter((group) => group !== DEFAULT_GROUP)
-                    .map((group) => ({
-                        match: { variant: "secondary" as const, color: group },
-                        style: { tab: tabColors(ref("secondaryActiveColor")) },
-                    })),
+                ...groupCompounds(groups, { variant: "secondary" }, () => ({
+                    tab: tabColors(ref("secondaryActiveColor")),
+                })),
                 {
                     match: { variant: "primary", icon: "true" },
                     style: {

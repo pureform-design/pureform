@@ -21,6 +21,7 @@ import { spacing, textStyle } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
 import {
+    groupCompounds,
     COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
@@ -147,15 +148,10 @@ export const createListItem = (
             // An interactive item's selected colors sit in the interactive variant, so a compound
             // variant per group replaces them in the later layer.
             compoundVariants: [
-                ...groups
-                    .filter((group) => group !== DEFAULT_GROUP)
-                    .map((group) => ({
-                        match: { interactive: "true" as const, color: group },
-                        style: {
-                            root: rowGroupColors(ref, "root", groupRoles(group))
-                                .interactive,
-                        },
-                    })),
+                ...groupCompounds(groups, { interactive: "true" }, (group) => ({
+                    root: rowGroupColors(ref, "root", groupRoles(group))
+                        .interactive,
+                })),
                 ...(
                     Object.entries(LINES) as [keyof typeof LINES, LineHeight][]
                 ).flatMap(([count, height]) =>

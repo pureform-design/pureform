@@ -42,7 +42,7 @@ import {
 } from "@pureform/theme";
 
 import {
-    DEFAULT_GROUP,
+    groupCompounds,
     iconBox,
     inputText,
     THEME_DENSITY,
@@ -346,25 +346,18 @@ export const fieldParts = (
         color: colorVariant(groups, (g) => ({
             label: { color: labelColor(g.main) },
         })),
-        compoundVariants: groups
-            .filter((group) => group !== DEFAULT_GROUP)
-            .flatMap((group) => {
-                const focus = groupRoles(group).main;
-                return [
-                    {
-                        match: { variant: "filled" as const, color: group },
-                        style: {
-                            container: { boxShadow: indicatorShadow(focus) },
-                        },
-                    },
-                    {
-                        match: { variant: "outlined" as const, color: group },
-                        style: {
-                            container: { outlineColor: strokeColor(focus) },
-                        },
-                    },
-                ];
-            }),
+        compoundVariants: [
+            ...groupCompounds(groups, { variant: "filled" }, (group) => ({
+                container: {
+                    boxShadow: indicatorShadow(groupRoles(group).main),
+                },
+            })),
+            ...groupCompounds(groups, { variant: "outlined" }, (group) => ({
+                container: {
+                    outlineColor: strokeColor(groupRoles(group).main),
+                },
+            })),
+        ],
     });
 
     // Icons sit centered on the container's height, at either end, as in Material's own text
