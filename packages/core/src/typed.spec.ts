@@ -436,3 +436,19 @@ describe("typed when", () => {
         pf.when().on({ type: "containerBreakpoint", from: "xl" }, px(2));
     });
 });
+
+describe("typed variants and slots", () => {
+    it("keeps a component's variant values and slots in its type", () => {
+        const chip = pf.slotComponent({
+            name: "chip",
+            slots: ["root", "label"],
+            variants: { size: ["small", "large"], selected: ["true", "false"] },
+            recipe: () => ({ base: {} }),
+        });
+        expectTypeOf<NonNullable<(typeof chip)["$variants"]>>().toEqualTypeOf<{
+            size: "small" | "large";
+            selected: "true" | "false";
+        }>();
+        expectTypeOf(chip.slots).toEqualTypeOf<("root" | "label")[]>();
+    });
+});
