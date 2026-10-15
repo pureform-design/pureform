@@ -19,6 +19,7 @@ import type {
     NumericScalarNode,
     RefNode,
     ShadowNode,
+    ShapeNode,
     TransformNode,
     TransitionNode,
 } from "./nodes";
@@ -38,6 +39,7 @@ export interface LeafNodeMap {
     shadow: ShadowNode;
     transform: TransformNode;
     filter: FilterNode;
+    shape: ShapeNode;
     transition: TransitionNode;
     animation: AnimationNode;
     easing: EasingNode;

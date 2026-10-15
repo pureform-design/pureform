@@ -16,6 +16,7 @@ import type {
     KeywordNode,
     LineStyleKeyword,
     OverflowKeyword,
+    CornerShapeKeyword,
     PointerEventsKeyword,
     PortableCondition,
     PositionKeyword,
@@ -54,6 +55,8 @@ type Shadow = ValueNodeMap["shadow"] | KeywordNode<"none">;
 type Gradient = ValueNodeMap["gradient" | "literal"];
 type Transform = ValueNodeMap["transform" | "literal"];
 type Filter = ValueNodeMap["filter" | "literal"];
+/** A clip: a shape, or `none`. */
+type Clip = ValueNodeMap["shape" | "literal"] | KeywordNode<"none">;
 type Transition = ValueNodeMap["transition" | "literal"];
 type Animation = ValueNodeMap["animation" | "literal"];
 type Easing = ValueNodeMap["easing" | "literal"];
@@ -162,6 +165,13 @@ export interface StyleMap {
     transform?: Transform;
     filter?: Filter;
     backdropFilter?: Filter;
+    /** Clip the element to a shape. It clips everything the element draws, its border,
+     *  outline, and shadow included, and its hit area. */
+    clipPath?: Clip;
+    /** How the rounded corners curve: `round` (a circular arc), `squircle`, `bevel` (a straight
+     *  cut), `scoop` (curving in), `notch` (a square cut), or `square`. Borders, outlines, and
+     *  shadows follow it. Targets without it keep round corners. */
+    cornerShape?: Keyword<CornerShapeKeyword>;
     // interaction / motion
     cursor?: Keyword<CursorKeyword>;
     resize?: Keyword<ResizeKeyword>;

@@ -21,6 +21,7 @@ export type ValueNode =
     | GradientNode
     | TransformNode
     | FilterNode
+    | ShapeNode
     | TransitionNode
     | AnimationNode
     | EasingNode
@@ -226,6 +227,14 @@ export type OverflowKeyword = "visible" | "hidden" | "scroll" | "auto" | "clip";
  *  beneath, for decorative overlays. React Native's `box-none`/`box-only` have no web
  *  equivalent, so only the portable pair is here. */
 export type PointerEventsKeyword = "auto" | "none";
+/** How a rounded corner curves, for `cornerShape`. */
+export type CornerShapeKeyword =
+    | "round"
+    | "squircle"
+    | "bevel"
+    | "scoop"
+    | "notch"
+    | "square";
 /** `transparent` is a static color constant (verbatim on every target). `currentColor` is
  *  not here: it is a live link to the `color` property (dynamic even on web), so it cannot be
  *  a static keyword. Use `literal("currentColor")` web-side, or model it as a reference to the
@@ -380,6 +389,11 @@ export type MediaCondition =
     | "touch" // pointer: coarse
     | "mouse"; // pointer: fine
 
+/** Whether the target supports a feature, for a fallback where it doesn't: `clipShape` is
+ *  clipping to a `shape` path, and `cornerShape` is drawing corners in a `cornerShape` style.
+ *  Lowers to `@supports` on web; a native target that always supports one matches always. */
+export type FeatureCondition = "clipShape" | "cornerShape";
+
 /** Portable, cross-target states the core guarantees, split by axis. Adapters own the
  *  lowering (web: pseudo-class, media query, or data-attr; native: press or disabled state),
  *  and core never encodes selectors. This mirrors the `Unit` philosophy: a closed portable set
@@ -389,7 +403,8 @@ export type PortableCondition =
     | FormCondition
     | ColorSchemeCondition
     | DirectionCondition
-    | MediaCondition;
+    | MediaCondition
+    | FeatureCondition;
 
 /** Escape hatch for conditions that are not portable: an adapter-target-keyed raw selector
  *  or at-rule, for example `{ css: "&[data-state=open]" }`. This is the condition-level
@@ -563,19 +578,51 @@ export interface TransformOp {
 }
 
 /** Ordered filter functions (lowering to CSS `filter` or `backdrop-filter`). Web-leaning;
- *  use `platform()` where a target lacks an equivalent. Leaf-kind "filter". */
+ *  use `platform()` where a target lacks an equivalent. `dropShadow` casts one shadow layer
+ *  from what the element draws, so it follows a clipped shape where a box shadow follows the
+ *  box; it has no spread or inset. Leaf-kind "filter". */
 export interface FilterNode {
     type: "filter";
-    fns: {
-        fn:
-            | "blur"
-            | "brightness"
-            | "contrast"
-            | "grayscale"
-            | "saturate"
-            | "opacity";
-        args: NumericValue[];
-    }[];
+    fns: (
+        | {
+              fn:
+                  | "blur"
+                  | "brightness"
+                  | "contrast"
+                  | "grayscale"
+                  | "saturate"
+                  | "opacity";
+              args: NumericValue[];
+          }
+        | { fn: "dropShadow"; layer: Omit<ShadowLayer, "spread" | "inset"> }
+    )[];
+}
+
+/* Shapes: closed paths to clip an element to. */
+
+/** A point in a shape, as an x and a y from the box's top left. Percentages are of the box's
+ *  width and height, so a point can follow the box, stay a fixed distance from an edge, or mix
+ *  both through `calc`. */
+export type ShapePoint = readonly [NumericValue, NumericValue];
+
+/** One step of a contour: a straight line, or a cubic curve through two control points. */
+export type ShapeSegment =
+    | { op: "line"; to: ShapePoint }
+    | { op: "curve"; to: ShapePoint; c1: ShapePoint; c2: ShapePoint };
+
+/** A closed contour: it starts at `from`, follows the segments, and closes back to `from`. */
+export interface ShapeContour {
+    from: ShapePoint;
+    segments: ShapeSegment[];
+}
+
+/** A shape to clip an element to: one or more closed contours. `evenodd` makes a contour
+ *  inside another a hole, which draws a ring such as an outline. Lowers to CSS `shape()`, and
+ *  to a path on a native target. Leaf-kind "shape". */
+export interface ShapeNode {
+    type: "shape";
+    fillRule?: "nonzero" | "evenodd";
+    contours: ShapeContour[];
 }
 
 /* Motion: easing, transitions, animations. */

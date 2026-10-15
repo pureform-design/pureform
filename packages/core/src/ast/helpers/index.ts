@@ -16,3 +16,4 @@ export * from "./filter";
 export * from "./motion";
 export * from "./math";
 export * from "./utility";
+export * from "./shape";
