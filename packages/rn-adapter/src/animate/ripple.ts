@@ -2,6 +2,16 @@
 // center while the press lasts, and fades on release, though not before half its grow.
 
 import {
+    DEFAULT_RIPPLE_TIMING,
+    rippleGeometry,
+    ripplePress,
+} from "@pureform/js-effects/core";
+import type {
+    Point,
+    RippleGeometry,
+    RippleTiming,
+} from "@pureform/js-effects/core";
+import {
     createElement,
     useEffect,
     useImperativeHandle,
@@ -11,7 +21,7 @@ import {
 import type { Ref } from "react";
 import { Animated, Easing } from "react-native";
 
-import { animatable, blend, rippleGeometry } from "../motion";
+import { animatable, blend } from "../motion";
 import {
     useReducedMotion,
     useRecipeWithTransitions,
@@ -20,26 +30,16 @@ import {
 import type { Style } from "../select";
 import { NATIVE_DRIVER, curve } from "./curve";
 
-// Material's ripple timing and opacity, where the ripple component declares none.
-const GROW_MS = 450;
-const FADE_MS = 375;
-const GROW_EASING = "cubic-bezier(0.2, 0, 0, 1)";
+// Material's pressed state opacity, where the ripple component declares none.
 const PRESSED_OPACITY = 0.1;
 
-type Point = { x: number; y: number };
 type Box = { left: number; top: number; width: number; height: number };
 
 interface Ripple {
     id: number;
-    geometry: ReturnType<typeof rippleGeometry>;
+    geometry: RippleGeometry;
     grow: Animated.Value;
     fade: Animated.Value;
-}
-
-interface Timing {
-    grow: number;
-    fade: number;
-    easing: string;
 }
 
 /** What the layer does for the hook: grow a ripple from a point in it, and release it. */
@@ -86,30 +86,14 @@ const RippleLayer = (props: {
     controller: Ref<Controller>;
     style: Style;
     color: string;
-    timing: Timing;
+    timing: RippleTiming;
 }) => {
     const [ripples, setRipples] = useState<Ripple[]>([]);
     const node = useRef<unknown>(null);
-    const held = useRef<{ ripple: Ripple; at: number } | undefined>(undefined);
     const ids = useRef(0);
     const { timing } = props;
-
-    const release = () => {
-        const press = held.current;
-        held.current = undefined;
-        if (!press) return;
-        const waited = Date.now() - press.at;
-        Animated.timing(press.ripple.fade, {
-            toValue: 0,
-            duration: timing.fade,
-            delay: Math.max(timing.grow / 2 - waited, 0),
-            easing: Easing.linear,
-            useNativeDriver: NATIVE_DRIVER,
-        }).start(() =>
-            setRipples((list) => list.filter((r) => r !== press.ripple)),
-        );
-    };
-
+    // One ripple held at a time, released no sooner than half its grow.
+    const [press] = useState(() => ripplePress());
     useImperativeHandle(props.controller, () => ({
         press: (page, centered) =>
             boxOf(node.current, (box) => {
@@ -122,8 +106,23 @@ const RippleLayer = (props: {
                     grow: new Animated.Value(0),
                     fade: new Animated.Value(1),
                 };
-                release();
-                held.current = { ripple, at: Date.now() };
+                press.begin(
+                    {
+                        release: (delay) =>
+                            Animated.timing(ripple.fade, {
+                                toValue: 0,
+                                duration: timing.fade,
+                                delay,
+                                easing: Easing.linear,
+                                useNativeDriver: NATIVE_DRIVER,
+                            }).start(() =>
+                                setRipples((list) =>
+                                    list.filter((r) => r !== ripple),
+                                ),
+                            ),
+                    },
+                    timing,
+                );
                 setRipples((list) => [...list, ripple]);
                 Animated.timing(ripple.grow, {
                     toValue: 1,
@@ -132,10 +131,10 @@ const RippleLayer = (props: {
                     useNativeDriver: NATIVE_DRIVER,
                 }).start();
             }),
-        release,
+        release: press.end,
     }));
 
-    useEffect(() => () => held.current?.ripple.grow.stopAnimation(), []);
+    useEffect(() => () => press.end(), [press]);
 
     return createElement(
         Animated.View,
@@ -192,10 +191,10 @@ export const useRipple = (options: {
 
     const timed = (property: string) =>
         transitions.root?.find((t) => t.property === property);
-    const timing: Timing = {
-        grow: timed("transform")?.duration || GROW_MS,
-        fade: timed("opacity")?.duration || FADE_MS,
-        easing: timed("transform")?.easing ?? GROW_EASING,
+    const timing: RippleTiming = {
+        grow: timed("transform")?.duration || DEFAULT_RIPPLE_TIMING.grow,
+        fade: timed("opacity")?.duration || DEFAULT_RIPPLE_TIMING.fade,
+        easing: timed("transform")?.easing ?? DEFAULT_RIPPLE_TIMING.easing,
     };
     const opacity = tokens["components.ripple.opacity"];
     const color = String(

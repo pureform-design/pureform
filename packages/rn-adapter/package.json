@@ -40,6 +40,7 @@
     },
     "dependencies": {
         "@pureform/core": "catalog:",
+        "@pureform/js-effects": "catalog:",
         "chroma-js": "catalog:"
     },
     "devDependencies": {
