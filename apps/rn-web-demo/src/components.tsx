@@ -3,7 +3,7 @@
 // interactive ones animate their state changes.
 
 import type { State, Style } from "@pureform/rn-adapter";
-import { useAnimatedRecipe } from "@pureform/rn-adapter/animated";
+import { useAnimatedRecipe, useRipple } from "@pureform/rn-adapter/animated";
 import {
     pressableState,
     useRecipe,
@@ -51,6 +51,41 @@ export const usePress = (
     };
 };
 
+/** Press ripples for a component, in the content color and corners of one of its slots. */
+export const useInk = (
+    name: string,
+    variants: Record<string, string | undefined>,
+    state: State,
+    options: { slot?: string; centered?: boolean; disabled?: boolean } = {},
+) => {
+    const own = useRecipe(name, variants, state)[options.slot ?? "root"];
+    const radius = own?.borderRadius;
+    return useRipple({
+        color: String(own?.color ?? "rgb(0, 0, 0)"),
+        ...(typeof radius === "number" || typeof radius === "string"
+            ? { radius }
+            : {}),
+        ...(options.centered ? { centered: true } : {}),
+        ...(options.disabled ? { disabled: true } : {}),
+    });
+};
+
+/** Pressable handlers with a ripple's added. */
+export const withInk = (
+    handlers: ReturnType<typeof usePress>["handlers"],
+    ink: ReturnType<typeof useRipple>,
+) => ({
+    ...handlers,
+    onPressIn: (event: { nativeEvent: { pageX: number; pageY: number } }) => {
+        handlers.onPressIn();
+        ink.handlers.onPressIn(event);
+    },
+    onPressOut: () => {
+        handlers.onPressOut();
+        ink.handlers.onPressOut();
+    },
+});
+
 export type Color = "primary" | "secondary" | "tertiary" | "error";
 
 export function Button(props: {
@@ -66,9 +101,15 @@ export function Button(props: {
         { variant: props.variant, color: props.color },
         state,
     );
+    const ink = useInk(
+        "button",
+        { variant: props.variant, color: props.color },
+        state,
+        { disabled: props.disabled ?? false },
+    );
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
@@ -79,6 +120,7 @@ export function Button(props: {
             <Animated.Text selectable={false} style={atext(s.label)}>
                 {props.label}
             </Animated.Text>
+            {ink.layer}
         </AnimatedPressable>
     );
 }
@@ -91,9 +133,10 @@ export function Chip(props: {
 }) {
     const { state, handlers } = usePress({ selected: props.selected ?? false });
     const s = useAnimatedRecipe("chip", { variant: props.variant }, state);
+    const ink = useInk("chip", { variant: props.variant }, state);
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="button"
             onPress={props.onPress}
             style={aview({ ...s.root, ...unselectable })}
@@ -102,6 +145,7 @@ export function Chip(props: {
             <Animated.Text selectable={false} style={atext(s.label)}>
                 {props.label}
             </Animated.Text>
+            {ink.layer}
         </AnimatedPressable>
     );
 }
@@ -265,9 +309,19 @@ export function IconButton(props: {
         { variant: props.variant, size: props.size },
         state,
     );
+    const ink = useInk(
+        "iconButton",
+        { variant: props.variant, size: props.size },
+        state,
+        {
+            slot: "container",
+            centered: true,
+            disabled: props.disabled ?? false,
+        },
+    );
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="button"
             aria-label={props.label}
             disabled={props.disabled}
@@ -278,6 +332,7 @@ export function IconButton(props: {
                 <Animated.View style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
                 </Animated.View>
+                {ink.layer}
             </Animated.View>
             {props.variant === "outlined" && (
                 <Animated.View pointerEvents="none" style={aview(s.outline)} />
@@ -302,9 +357,19 @@ export function Fab(props: {
         },
         state,
     );
+    const ink = useInk(
+        "fab",
+        {
+            variant: props.variant,
+            size: props.size,
+            extended: props.label ? "true" : "false",
+        },
+        state,
+        { slot: "container" },
+    );
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="button"
             aria-label={props.label ?? props.glyph}
             style={aview({ ...s.root, ...unselectable })}
@@ -319,6 +384,7 @@ export function Fab(props: {
                         {props.label}
                     </Animated.Text>
                 )}
+                {ink.layer}
             </Animated.View>
         </AnimatedPressable>
     );
@@ -370,6 +436,12 @@ export function ListItem(props: {
         { lines, interactive: interactive ? "true" : "false" },
         interactive ? state : {},
     );
+    const ink = useInk(
+        "listItem",
+        { lines, interactive: interactive ? "true" : "false" },
+        state,
+        { disabled: !interactive },
+    );
     const line = (slot: string, value: string | undefined) =>
         value !== undefined && (
             <Animated.Text selectable={false} style={atext(s[slot])}>
@@ -378,7 +450,7 @@ export function ListItem(props: {
         );
     return (
         <AnimatedPressable
-            {...(interactive ? handlers : {})}
+            {...(interactive ? withInk(handlers, ink) : {})}
             role={interactive ? "button" : "listitem"}
             {...(interactive ? { onPress: props.onPress } : { disabled: true })}
             style={aview({ ...s.root, ...unselectable })}
@@ -394,6 +466,7 @@ export function ListItem(props: {
                 {line("supportingText", props.supportingText)}
             </Animated.View>
             {line("trailingText", props.trailingText)}
+            {ink.layer}
         </AnimatedPressable>
     );
 }

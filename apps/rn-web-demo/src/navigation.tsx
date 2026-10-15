@@ -12,7 +12,9 @@ import {
     aview,
     atext,
     unselectable,
+    useInk,
     usePress,
+    withInk,
 } from "./components";
 
 interface Destination {
@@ -32,9 +34,17 @@ function Tab(props: {
         { variant: props.variant, icon: "true" },
         state,
     );
+    const ink = useInk(
+        "tabs",
+        { variant: props.variant, icon: "true" },
+        state,
+        {
+            slot: "tab",
+        },
+    );
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="tab"
             aria-selected={props.selected}
             onPress={props.onPress}
@@ -47,6 +57,7 @@ function Tab(props: {
                 {props.item.label}
             </Animated.Text>
             <Animated.View pointerEvents="none" style={aview(s.indicator)} />
+            {ink.layer}
         </AnimatedPressable>
     );
 }
@@ -84,9 +95,13 @@ function NavigationItem(props: {
 }) {
     const { state, handlers } = usePress({ selected: props.selected });
     const s = useAnimatedRecipe(props.name, {}, state);
+    const ink = useInk(props.name, {}, state, {
+        slot: "indicator",
+        centered: true,
+    });
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="link"
             aria-current={props.selected ? "page" : undefined}
             onPress={props.onPress}
@@ -100,6 +115,7 @@ function NavigationItem(props: {
                 <Animated.View style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.item.glyph} />
                 </Animated.View>
+                {ink.layer}
             </Animated.View>
             <Animated.Text selectable={false} style={atext(s.label)}>
                 {props.item.label}
@@ -143,9 +159,13 @@ function MenuItem(props: {
         disabled: props.disabled ?? false,
     });
     const s = useAnimatedRecipe("menu", {}, state);
+    const ink = useInk("menu", {}, state, {
+        slot: "item",
+        ...(props.disabled ? { disabled: true } : {}),
+    });
     return (
         <AnimatedPressable
-            {...handlers}
+            {...withInk(handlers, ink)}
             role="menuitem"
             disabled={props.disabled}
             onPress={props.onPress}
@@ -167,6 +187,7 @@ function MenuItem(props: {
                     {props.item.shortcut}
                 </Animated.Text>
             )}
+            {ink.layer}
         </AnimatedPressable>
     );
 }

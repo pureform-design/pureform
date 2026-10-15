@@ -44,6 +44,7 @@ export const COMPONENTS = [
     "dialog",
     "snackbar",
     "tooltip",
+    "ripple",
 ];
 
 /** Brand colors the demo can switch to at runtime, as seeds for Material's primary family. */
