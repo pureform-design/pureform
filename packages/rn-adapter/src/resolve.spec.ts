@@ -177,6 +177,22 @@ describe("select", () => {
     });
 });
 
+describe("overridesFor", () => {
+    it("writes override colors in other notations as rgba()", () => {
+        expect(
+            overridesFor(
+                {
+                    light: {
+                        "colors.primary": "hsl(120, 100%, 25%)",
+                        "spacing.2": 8,
+                    },
+                },
+                "light",
+            ),
+        ).toEqual({ "colors.primary": "rgba(0, 128, 0, 1)", "spacing.2": 8 });
+    });
+});
+
 describe("selectWithTransitions", () => {
     it("returns transitions beside the styles, not in them", () => {
         const motion = lowerRn({

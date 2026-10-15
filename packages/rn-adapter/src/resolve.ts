@@ -4,6 +4,8 @@
 // the runtime needs no lowering or color library.
 
 import type { ComponentStyles } from "./lower";
+import { formatColor } from "./rgba";
+import { readColorFunction } from "./spaces";
 import type { Scheme } from "./theme";
 import { evaluate, isExpr } from "./values";
 import type { ThemeValues, Value } from "./values";
@@ -111,12 +113,22 @@ const isPerScheme = (
 export const overridesFor = (
     overrides: Overrides | undefined,
     scheme: Scheme,
-): ThemeValues =>
-    !overrides
+): ThemeValues => {
+    const values = !overrides
         ? {}
         : isPerScheme(overrides)
           ? (overrides[scheme] ?? {})
           : (overrides as ThemeValues);
+    // Colors in other notations become rgba(), which the runtime reads without a library. The
+    // same object comes back when there are none, so it stays a stable memo key.
+    let out: ThemeValues | undefined;
+    for (const [key, value] of Object.entries(values)) {
+        const color =
+            typeof value === "string" ? readColorFunction(value) : undefined;
+        if (color) (out ??= { ...values })[key] = formatColor(color);
+    }
+    return out ?? values;
+};
 
 /** A theme's styles with runtime overrides of token or component token values applied. */
 export const stylesFor = (

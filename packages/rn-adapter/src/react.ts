@@ -31,7 +31,7 @@ export interface PureformProviderProps {
     reducedMotion?: boolean;
     /** Token or component token values to override, by key: `colors.primary`,
      *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
-     *  `rgb()`/`rgba()` or hex, which mixes read without a color library. */
+     *  hex or any of CSS's color functions but `hwb()` and `color-mix()`. */
     overrides?: Overrides;
     children?: ReactNode;
 }

@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { parseColor } from "./rgba";
-import { mixIn } from "./spaces";
+import { mixIn, readColorFunction } from "./spaces";
 import type { MixSpace } from "./spaces";
 
 // Chromium's color-mix() for each space, painted to a canvas and read back: space, base,
@@ -125,4 +125,35 @@ describe("mixIn", () => {
             expect(got[3]).toBeCloseTo(want[3]!, 2);
         },
     );
+});
+
+// Chromium's reading of each color function, painted to a canvas and read back.
+const READ: [string, number[]][] = [
+    ["hsl(260 40% 50%)", [111, 77, 179, 1]],
+    ["hsl(120, 100%, 25%)", [0, 128, 0, 1]],
+    ["hsla(0.5turn 60% 70% / 0.5)", [133, 223, 223, 0.5]],
+    ["oklch(0.6 0.15 280)", [113, 115, 215, 1]],
+    ["oklch(60% 37.5% 120deg)", [117, 140, 0, 1]],
+    ["oklab(0.7 -0.1 0.1)", [119, 178, 83, 1]],
+    ["lab(50 40 -20)", [171, 90, 154, 1]],
+    ["lch(70% 50 30)", [251, 137, 128, 1]],
+    ["color(display-p3 0.2 0.6 0.4)", [0, 156, 97, 1]],
+    ["color(srgb 0.1 0.2 0.3 / 80%)", [26, 51, 77, 0.8]],
+];
+
+describe("readColorFunction", () => {
+    it.each(READ)("reads %s as Chromium does", (color, want) => {
+        const got = readColorFunction(color)!;
+        // Canvas stores half-transparent colors premultiplied, so they read back coarser.
+        const slack = want[3]! < 1 ? 4 : 2;
+        for (let i = 0; i < 3; i++)
+            expect(Math.abs(got[i]! - want[i]!)).toBeLessThanOrEqual(slack);
+        expect(got[3]).toBeCloseTo(want[3]!, 2);
+    });
+
+    it("leaves other values alone", () => {
+        expect(readColorFunction("rgb(0, 0, 0)")).toBeUndefined();
+        expect(readColorFunction("12px")).toBeUndefined();
+        expect(readColorFunction("color(rec2020 1 0 0)")).toBeUndefined();
+    });
 });

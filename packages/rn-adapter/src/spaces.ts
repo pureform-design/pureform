@@ -246,3 +246,44 @@ export const mixIn = (
     ) as Vec;
     return [r, g, b2, alpha];
 };
+
+// What 100% means in each function's channels, per CSS Color 4. HSL's saturation and
+// lightness are fractions here, and a bare number there is a percentage.
+const PERCENT: Record<string, Vec> = {
+    hsl: [1, 1, 1],
+    lab: [100, 125, 125],
+    lch: [100, 150, 1],
+    oklab: [1, 0.4, 0.4],
+    oklch: [1, 0.4, 1],
+    srgb: [1, 1, 1],
+    "display-p3": [1, 1, 1],
+};
+const FUNCTION = /^(hsla?|lab|lch|oklab|oklch|color)\(\s*([^)]*)\)$/i;
+
+/** Read a CSS color function (`hsl()`, `lab()`, `lch()`, `oklab()`, `oklch()`, or
+ *  `color(srgb | display-p3 ...)`) as sRGB, or `undefined` for anything else. */
+export const readColorFunction = (value: string): Rgba | undefined => {
+    const match = FUNCTION.exec(value.trim());
+    if (!match) return undefined;
+    let fn = match[1]!.toLowerCase().replace(/a$/, "");
+    let parts = match[2]!.split(/[\s,/]+/).filter(Boolean);
+    if (fn === "color") {
+        fn = parts[0]!.toLowerCase();
+        parts = parts.slice(1);
+    }
+    const scale = PERCENT[fn];
+    if (!scale || parts.length < 3) return undefined;
+    const read = (part: string, i: number) => {
+        if (part === "none") return 0;
+        const n = Number.parseFloat(part);
+        if (part.endsWith("%")) return (n / 100) * (i === 3 ? 1 : scale[i]!);
+        if (part.endsWith("turn")) return n * 360;
+        if (part.endsWith("rad")) return (n * 180) / Math.PI;
+        return fn === "hsl" && (i === 1 || i === 2) ? n / 100 : n;
+    };
+    const [c0, c1, c2, alpha = 1] = parts.slice(0, 4).map(read);
+    const rgb = SPACES[fn as MixSpace]
+        .from([c0!, c1!, c2!])
+        .map((c) => Math.min(Math.max(c, 0), 1) * 255) as Vec;
+    return [rgb[0], rgb[1], rgb[2], Math.min(Math.max(alpha, 0), 1)];
+};
