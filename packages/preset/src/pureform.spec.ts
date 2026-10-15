@@ -118,6 +118,13 @@ describe("pureform providers", () => {
         expect(config.tokens.sizes?.touchTarget).toEqual(px(56));
     });
 
+    it("checks contrast when asked", () => {
+        expect(() => pureform({ requireContrast: 4.5 })).not.toThrow();
+        expect(() => pureform({ requireContrast: 7 })).toThrow(
+            "falls below 7:1 contrast",
+        );
+    });
+
     it("checks dark values when asked", () => {
         expect(() => pureform({ requireDark: true })).not.toThrow();
         const light = colorFromTokens({

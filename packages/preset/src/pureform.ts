@@ -34,6 +34,7 @@ import type {
     ResolvedTheme,
     ShapeProvider,
     StateProvider,
+    ResolveOptions,
     Theme,
     ThemeProviders,
     TypographyProvider,
@@ -77,6 +78,9 @@ export interface PureformOptions<
     /** Require every color role to have a dark value, for a page that offers both schemes.
      *  Default `false`. */
     requireDark?: boolean;
+    /** Require every content role to reach this WCAG contrast ratio against the role it sits
+     *  on, in light and dark, for the base theme and every named theme. `4.5` is WCAG AA. */
+    requireContrast?: number;
     /** Named themes, each replacing some of the providers above. Every token that differs
      *  from the base is emitted for the theme, and Panda applies it inside
      *  `[data-panda-theme=<name>]` (list the names in Panda's `staticCss.themes`). A theme
@@ -192,7 +196,12 @@ export const pureform = <
         motion: options.motion ?? materialMotion(),
         elevation: options.elevation ?? materialElevation(),
     };
-    const resolveOptions = { requireDark: options.requireDark ?? false };
+    const resolveOptions: ResolveOptions = {
+        requireDark: options.requireDark ?? false,
+        ...(options.requireContrast === undefined
+            ? {}
+            : { requireContrast: options.requireContrast }),
+    };
     const theme = resolveTheme(providers, resolveOptions);
 
     const themes: Record<string, ThemeOverride> = {};
