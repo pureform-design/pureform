@@ -451,8 +451,8 @@ export interface ContainerSizeCondition {
  *  and that slot must be an ancestor there. The web lowers it to selectors on the slot's
  *  element (`:focus-within`, `:has(...)`); a native binding passes the component's state to
  *  each slot. Each state can also be set by hand with a data attribute on the slot:
- *  `data-hover`, `data-selected`, `data-pressed`, `data-focused`, `data-focus-visible`,
- *  `data-filled`, `data-invalid`, `data-disabled`. */
+ *  `data-hover`, `data-selected`, `data-checked`, `data-indeterminate`, `data-pressed`,
+ *  `data-focused`, `data-focus-visible`, `data-filled`, `data-invalid`, `data-disabled`. */
 export interface SlotCondition {
     type: "slot";
     slot: string;
@@ -461,11 +461,14 @@ export interface SlotCondition {
 
 /** The slot states. Each describes the slot's element together with what it contains:
  *  `focusWithin` is focus on it or inside it, `filled` is a text input inside holding a value,
- *  `invalid` an input inside marked invalid, `disabled` a disabled control inside. `selected`
- *  and `pressed` describe the slot's element only: selected (or toggled on) and pressed. */
+ *  `invalid` an input inside marked invalid, `disabled` a disabled control inside, `checked`
+ *  and `indeterminate` a checkbox, radio, or switch inside in that state. `selected` and
+ *  `pressed` describe the slot's element only: selected (or toggled on) and pressed. */
 export type SlotState =
     | "hover"
     | "selected"
+    | "checked"
+    | "indeterminate"
     | "pressed"
     | "focusWithin"
     | "focusVisibleWithin"
