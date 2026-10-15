@@ -3,7 +3,7 @@
 // The icon slot is styled but never toggled by a variant. Render the icon element only when
 // there is one; the root's gap spaces it from the label.
 
-import { defineSlotComponent } from "@pureform/core";
+import { typed } from "@pureform/core";
 import { px, add } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
@@ -33,7 +33,7 @@ const FILLS: Record<string, Fill> = {
     elevated: "elevated",
 };
 
-const { tokens, ref } = componentTokens("button", {
+const { tokens } = componentTokens("button", {
     radius: radius("full"),
     gap: spacing("2"),
     iconSize: sizeToken("iconSmall"),
@@ -50,20 +50,14 @@ const { tokens, ref } = componentTokens("button", {
 type Size = "Small" | "Medium" | "Large";
 const SIZES: Size[] = ["Small", "Medium", "Large"];
 
-const size = (s: Size): { root: StyleMap } => ({
-    root: {
-        height: dense(ref(`height${s}`)),
-        paddingInlineStart: ref(`padding${s}`),
-        paddingInlineEnd: ref(`padding${s}`),
-    },
-});
+const pf = typed();
 
 /** Build the button with a `color` variant per group in `groups`. */
 export const createButton = (
     groups: ColorGroups = COLOR_GROUPS,
     densities: Densities = DEFAULT_DENSITIES,
 ) =>
-    defineSlotComponent({
+    pf.slotComponent({
         name: "button",
         $meta: {
             description:
@@ -72,50 +66,67 @@ export const createButton = (
         tokens,
         slots: ["root", "label", "icon", "touchTarget"],
         structure: { root: ["touchTarget", "icon", "label"] },
-        recipe: {
-            base: {
+        variants: {
+            color: groups,
+            variant: Object.keys(FILLS),
+            size: ["small", "medium", "large"],
+            density: ["inherit", ...Object.keys(densities)],
+        },
+        recipe: ({ token }) => {
+            const size = (s: Size): { root: StyleMap } => ({
                 root: {
-                    ...pressableRoot,
-                    gap: ref("gap"),
-                    borderRadius: ref("radius"),
+                    height: dense(token(`height${s}`)),
+                    paddingInlineStart: token(`padding${s}`),
+                    paddingInlineEnd: token(`padding${s}`),
                 },
-                label: { textStyle: textStyle("labelLarge") },
-                icon: iconBox(ref("iconSize")),
-                touchTarget,
-            },
-            variants: {
-                color: colorVariants(groups),
-                variant: Object.fromEntries(
-                    Object.entries(FILLS).map(([name, fill]) => [
-                        name,
-                        fillVariant(fill, ref),
-                    ]),
-                ),
-                size: {
-                    small: size("Small"),
-                    medium: size("Medium"),
-                    large: size("Large"),
+            });
+            return {
+                base: {
+                    root: {
+                        ...pressableRoot,
+                        gap: token("gap"),
+                        borderRadius: token("radius"),
+                    },
+                    label: { textStyle: textStyle("labelLarge") },
+                    icon: iconBox(token("iconSize")),
+                    touchTarget,
                 },
-                density: densityMarkers(densities),
-            },
-            compoundVariants: [
-                ...colorCompounds(FILLS, groups),
-                ...SIZES.flatMap((s) =>
-                    densityCompounds(
-                        densities,
-                        { size: s.toLowerCase() },
-                        (offset) => ({
-                            root: { height: add(ref(`height${s}`), offset) },
-                        }),
+                variants: {
+                    color: colorVariants(groups),
+                    variant: Object.fromEntries(
+                        Object.entries(FILLS).map(([name, fill]) => [
+                            name,
+                            fillVariant(fill, token),
+                        ]),
                     ),
-                ),
-            ],
-            defaultVariants: {
-                color: "primary",
-                variant: "filled",
-                size: "medium",
-                density: "inherit",
-            },
+                    size: {
+                        small: size("Small"),
+                        medium: size("Medium"),
+                        large: size("Large"),
+                    },
+                    density: densityMarkers(densities),
+                },
+                compoundVariants: [
+                    ...colorCompounds(FILLS, groups),
+                    ...SIZES.flatMap((s) =>
+                        densityCompounds(
+                            densities,
+                            { size: s.toLowerCase() },
+                            (offset) => ({
+                                root: {
+                                    height: add(token(`height${s}`), offset),
+                                },
+                            }),
+                        ),
+                    ),
+                ],
+                defaultVariants: {
+                    color: "primary",
+                    variant: "filled",
+                    size: "medium",
+                    density: "inherit",
+                },
+            };
         },
     });
 
