@@ -211,9 +211,9 @@ overrides the primary color in either mode.
   and 394 per state, scheme, and theme scenario. All match except the radii of shape variants,
   which clip on the web and fall back to rounded corners here.
 
-## Next: state transitions
+## State transitions
 
-Status: planned. The proof of concept drops `transition`, so state changes snap. The preset's
+Status: implemented. The proof of concept drops `transition`, so state changes snap. The preset's
 transitions already say what should move: every core component's colors (`backgroundColor`,
 `color`, `borderColor`, `outlineColor`) over `short3` on the standard curve, `boxShadow` over
 `medium1`, and the switch handle's `left`, `width`, and `height`. All of it is off under
@@ -243,8 +243,10 @@ A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of R
   Colors interpolate through `rgba()` strings, which `Animated` supports, and numbers directly.
 - An interrupted change (pressing during a hover fade) starts from the value on screen: the
   hook tracks progress and blends the old pair to find it, with the adapter's mixer for colors.
-- What can't interpolate (a shadow with a different number of layers, a keyword) switches at
-  the end of its duration, as CSS does for discrete properties.
+- What can't interpolate (a shadow with a different number of layers, a keyword) changes at
+  once, as CSS does for discrete properties by default.
+- A live animated value never changes during render, since the views bound to it would update
+  mid-render: a change gets a new progress value, bound in render and started once it commits.
 - Reduced motion: the provider takes a `reducedMotion` flag (an app reads it from
   `AccessibilityInfo`), which selects the reduced case, so nothing animates.
 - `Animated` works on React Native Web too. A Reanimated binding can come later behind the same
@@ -259,6 +261,13 @@ A new entry, `@pureform/rn-adapter/animated`, so the React entry stays free of R
 - Browser tests: mid-transition, a hovered button's background lies between its rest and hover
   colors, and at the end equals the hover color; under reduced motion it changes at once. The
   parity tests keep comparing end states.
+
+### Running on React Native Web
+
+- Parts of React Native Web's `Animated` refer to Node's `global`, so Vite defines it as
+  `globalThis`.
+- Under `NODE_ENV=test` React Native Web swaps `Animated` for a mock that ends every
+  animation at once, so the browser tests build in development mode.
 
 ### Steps
 
