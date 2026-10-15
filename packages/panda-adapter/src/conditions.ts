@@ -31,10 +31,11 @@ const CONDITION_KEY: Record<string, string> = {
     // tint wins wherever Panda orders the rules; the pointer is over the element while dragging.
     dragged: "&[data-dragging][data-dragging]",
     disabled: "_disabled",
-    // Panda's _selected misses aria-pressed, which a toggle button (a filter chip) uses; the
-    // selected slot state matches it too.
+    // Panda's _selected misses aria-pressed, which a toggle button (a filter chip) uses, and
+    // aria-current, which marks the current page in navigation; the selected slot state
+    // matches both too.
     selected:
-        "&:is([aria-selected=true], [aria-pressed=true], [data-selected])",
+        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])",
     checked: "_checked",
     invalid: "_invalid",
     readOnly: "_readOnly",
@@ -72,7 +73,7 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
         rank: 1,
     },
     selected: {
-        match: "[aria-selected=true], [aria-pressed=true], [data-selected]",
+        match: "[aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]",
         rank: 1,
     },
     checked: {

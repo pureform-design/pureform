@@ -159,7 +159,7 @@ describe("selected and pressed slot states", () => {
         const recipes = compilePreset(chipLike).theme?.slotRecipes as Slots;
         expect(recipes.chipLike?.base.icon?.color).toEqual({
             base: "rgb(0 0 0)",
-            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &":
+            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &":
                 "rgb(17 17 17)",
             ".chipLike__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &":
                 "rgb(34 34 34)",

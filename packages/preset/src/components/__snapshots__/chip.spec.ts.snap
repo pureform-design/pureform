@@ -7,7 +7,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+        ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-chip-iconColor, token(colors.primary))",
       },
       "display": "inline-flex",
@@ -66,7 +66,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "secondary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
@@ -90,7 +90,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "secondary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
@@ -118,7 +118,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "tertiary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
@@ -142,7 +142,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "tertiary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
@@ -170,7 +170,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "success",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
@@ -194,7 +194,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "success",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
@@ -222,7 +222,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "warning",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
@@ -246,7 +246,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "warning",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
@@ -274,7 +274,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "error",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
@@ -298,7 +298,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "error",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
@@ -326,7 +326,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "info",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
@@ -350,7 +350,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "color": "info",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
@@ -394,7 +394,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -403,7 +403,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -413,7 +413,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -422,7 +422,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -431,7 +431,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -440,7 +440,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
         "icon": {
           "color": {
             ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-chip-iconColor, token(colors.primary))",
           },
         },
@@ -449,7 +449,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
     "variant": {
       "elevated": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
@@ -482,7 +482,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlined": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",

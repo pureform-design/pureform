@@ -238,11 +238,11 @@ describe("compileValue conditionals", () => {
         });
     });
 
-    it("lowers selected to aria-selected, aria-pressed, or data-selected", () => {
+    it("lowers selected to aria-selected, aria-pressed, aria-current, or data-selected", () => {
         const node = when("selected", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            "&:is([aria-selected=true], [aria-pressed=true], [data-selected])":
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])":
                 "1",
         });
     });

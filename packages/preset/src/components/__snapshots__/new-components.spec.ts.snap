@@ -93,7 +93,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -107,13 +107,13 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "overline": {
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "labelSmall",
     },
     "root": {
-      "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
         "backgroundColor": "var(--components-listItem-selectedContainer, token(colors.secondaryContainer))",
         "color": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
       },
@@ -139,7 +139,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "supportingText": {
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "bodyMedium",
@@ -148,7 +148,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -173,7 +173,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "secondary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
@@ -191,7 +191,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "tertiary",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
@@ -209,7 +209,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "success",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
@@ -227,7 +227,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "warning",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
@@ -245,7 +245,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "error",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
@@ -263,7 +263,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "color": "info",
       "css": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
@@ -302,19 +302,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.errorContainer)",
             "color": "token(colors.onErrorContainer)",
           },
@@ -322,14 +322,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -338,19 +338,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.infoContainer)",
             "color": "token(colors.onInfoContainer)",
           },
@@ -358,14 +358,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -375,19 +375,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.secondaryContainer)",
             "color": "token(colors.onSecondaryContainer)",
           },
@@ -395,14 +395,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -411,19 +411,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.successContainer)",
             "color": "token(colors.onSuccessContainer)",
           },
@@ -431,14 +431,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -447,19 +447,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.tertiaryContainer)",
             "color": "token(colors.onTertiaryContainer)",
           },
@@ -467,14 +467,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -483,19 +483,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "leading": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "overline": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": "token(colors.warningContainer)",
             "color": "token(colors.onWarningContainer)",
           },
@@ -503,14 +503,14 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "supportingText": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
           },
         },
         "trailing": {
           "color": {
             ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -520,7 +520,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
@@ -580,7 +580,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "item": {
-      "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
         "backgroundColor": {
           "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
           "_active": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
@@ -635,7 +635,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -650,7 +650,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "alignItems": "center",
       "color": {
         ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -701,7 +701,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "color": {
       "error": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
@@ -715,21 +715,21 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onErrorContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "info": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
@@ -743,14 +743,14 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onInfoContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -758,7 +758,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "primary": {},
       "secondary": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
@@ -772,21 +772,21 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "success": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
@@ -800,21 +800,21 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "tertiary": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
@@ -828,21 +828,21 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "warning": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
@@ -856,14 +856,14 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         "itemLeading": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
             ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "token(colors.onWarningContainer)",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -983,7 +983,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "insetInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
       "insetInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
       "opacity": {
-        ".tabs__tab:is([aria-selected=true], [aria-pressed=true], [data-selected]) &": "1",
+        ".tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
         "base": "0",
       },
       "position": "absolute",
@@ -997,7 +997,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
     },
     "tab": {
-      "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
         "backgroundColor": {
           "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateDragged))",
           "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.statePressed))",
@@ -1052,7 +1052,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "secondary",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1078,7 +1078,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "tertiary",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1104,7 +1104,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "success",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1130,7 +1130,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "warning",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1156,7 +1156,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "error",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1182,7 +1182,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "color": "info",
       "css": {
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
@@ -1238,7 +1238,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.error)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.error) token(opacity.statePressed))",
@@ -1263,7 +1263,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.info)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.info) token(opacity.statePressed))",
@@ -1289,7 +1289,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.secondary)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.secondary) token(opacity.statePressed))",
@@ -1314,7 +1314,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.success)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.success) token(opacity.statePressed))",
@@ -1339,7 +1339,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.tertiary)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.tertiary) token(opacity.statePressed))",
@@ -1364,7 +1364,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "backgroundColor": "token(colors.warning)",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), token(colors.warning) token(opacity.statePressed))",
@@ -1400,7 +1400,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "insetInlineStart": "0px",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
             "backgroundColor": {
               "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
