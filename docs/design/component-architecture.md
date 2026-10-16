@@ -556,7 +556,8 @@ component), Zag's shape, identical in Solid and React:
   only once the prop changes. If the owner ignores the call, nothing moves, including a
   native input's value, which the binding writes back.
 - **Callbacks report user actions only**, with a details object (`{ checked }`,
-  `{ open, reason }`) so fields can be added later. A prop change never calls them.
+  `{ open, reason }`) so fields can be added later. A prop change never calls them. A
+  form reset counts as a user action (§9.5).
 - **Typed:** a `Controllable<"value", T>` helper writes the three props, and components
   with a value are generic over it (`Select<string[]>` when `multiple`).
 - **Own machines match Zag.** `@pureform/machines` uses the same controllable-state
@@ -566,7 +567,41 @@ component), Zag's shape, identical in Solid and React:
   attributes (§5.7).
 - **React Native:** the same props; a `name` does nothing.
 
-### 9.5 Testing
+### 9.5 Forms
+
+Components take part in a native `<form>` the way native controls do: they submit, reset,
+validate, and disable with it, with no form library.
+
+- **Submitting.** A component with `name` submits under it:
+    - Text field and text area: the `input` slot is the native `<input>` or `<textarea>`,
+      so submitting, autofill, and the browser's validation work as is.
+    - Zag-backed controls (checkbox, switch, radio group, slider, select): Zag's hidden
+      native input, or for select its hidden `<select>`, so autofill fills it too. It
+      becomes an unstyled `HiddenInput` part in the anatomy, alongside the slots;
+      ready-made components render it themselves.
+    - Values: checkbox and switch submit `value` (default `"on"`) when checked, a slider
+      its number, a multiple select one entry per value.
+- **Props:** `name`, `form` (a form's id, for a control outside it), `required`,
+  `disabled`, and `readOnly`, forwarded to the native element.
+- **Reset.** A form reset puts uncontrolled state back to its `default*` value. On
+  controlled state it calls the change callback with `reason: "reset"`, and the owner
+  decides. React 19 and Solid 2 form actions reset the form after submitting, so this
+  path is common.
+- **Disabled fieldsets** disable every control in them. Zag tracks this with
+  `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`.
+- **Validation.** Material's error look keys on the `invalid` state, which the CSS
+  already matches as `aria-invalid` or `data-invalid`. Three ways in:
+    - `invalid` (boolean): the app decides; nothing else changes.
+    - `error` (string): sets `invalid`, shows the text as supporting text, and calls
+      `setCustomValidity`, so the browser blocks submitting and its validation APIs agree.
+    - `validate="native"`: the native constraints (`required`, `pattern`, `min`, …)
+      decide. The binding sets `invalid` once the user has interacted or tried to submit
+      (`:user-invalid`'s rule) and shows the browser's `validationMessage`.
+- **Before hydration** the server's HTML holds the native and hidden inputs with their
+  initial values (§5.7), so a form submits correctly even before scripts load.
+- **React Native** has no forms; apps use the controlled props (§9.4).
+
+### 9.6 Testing
 
 - **Machines and anatomy:** Vitest unit tests, no DOM.
 - **Solid components:** Vitest browser mode (existing setup), with
@@ -574,7 +609,8 @@ component), Zag's shape, identical in Solid and React:
   keyboard tests. A shared suite checks the rules of §9.4 for every stateful component:
   uncontrolled state changes on its own, controlled state doesn't change until the prop
   does, each callback fires once per user action and never for a prop change, and a form
-  reset restores the default.
+  reset restores the default. A forms suite submits a form and compares its `FormData`,
+  resets it, disables a fieldset, and checks that `required` and `error` block submitting.
 - **E2E:** `tests/browser-e2e-tests` selects by `testIds` and roles; a shared contract
   suite runs the same specs against the Solid build and, later, React and RN-web, so
   bindings stay behaviorally identical.
@@ -617,7 +653,7 @@ Deferred until there's demand:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** native form participation; `prefers-reduced-motion`, including token tweens on React Native;
+3. **Not yet covered:** `prefers-reduced-motion`, including token tweens on React Native;
    direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
    committed and how stale glue is detected; and how packages are versioned together.
 
