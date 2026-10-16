@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+    movingTokens,
+    tokensAt,
     animatable,
     blend,
     channels,
@@ -163,5 +165,55 @@ describe("sameUnits", () => {
         expect(sameUnits("top", "50%", 0, undefined)).toEqual(["50%", "0%"]);
         expect(sameUnits("top", "50%", 8, {})).toEqual(["50%", 8]);
         expect(sameUnits("top", 4, 8, undefined)).toEqual([4, 8]);
+    });
+});
+
+describe("token tweens", () => {
+    const timing = { property: "", duration: 100, easing: "linear", delay: 0 };
+    const transitions = new Map(
+        ["n", "color", "length", "angle", "mixed", "word"].map((k) => [
+            k,
+            timing,
+        ]),
+    );
+    const from = {
+        n: 10,
+        color: "rgba(0, 0, 0, 1)",
+        length: "10px",
+        angle: "0deg",
+        mixed: "10px",
+        word: "auto",
+        still: 1,
+    };
+    const to = {
+        n: 20,
+        color: "rgba(255, 255, 255, 1)",
+        length: "30px",
+        angle: "90deg",
+        mixed: "50%",
+        word: "none",
+        still: 2,
+    };
+
+    it("move numbers, colors, and values in one unit, and nothing else", () => {
+        expect(movingTokens(from, to, transitions).map(([k]) => k)).toEqual([
+            "n",
+            "color",
+            "length",
+            "angle",
+        ]);
+    });
+
+    it("blend each moving token, and take the rest as they end", () => {
+        const moving = movingTokens(from, to, transitions);
+        expect(tokensAt(from, to, moving, 0.5)).toEqual({
+            n: 15,
+            color: "rgba(128, 128, 128, 1)",
+            length: "20px",
+            angle: "45deg",
+            mixed: "50%",
+            word: "none",
+            still: 2,
+        });
     });
 });

@@ -3,7 +3,7 @@
 // between two, for a change that interrupts another.
 
 import { formatColor, mixSrgb, parseColor } from "./rgba";
-import type { Concrete } from "./values";
+import type { Concrete, ThemeValues, Transition } from "./values";
 
 /** A transition's curve as Bézier points, or `linear`. */
 export const easingPoints = (
@@ -195,4 +195,41 @@ export const sameUnits = (
     if (from === 0) return ["0%", to];
     if (to === 0) return [from, "0%"];
     return [from, to];
+};
+
+/** The tokens that changed to a value they can move to over their transitions: a number, a
+ *  color, or a length, angle, percentage or time in the unit it was in. Any other change
+ *  happens at once, as CSS's does between units it can't mix. */
+export const movingTokens = (
+    from: ThemeValues | undefined,
+    to: ThemeValues | undefined,
+    transitions: ReadonlyMap<string, Transition>,
+): [string, Transition][] =>
+    [...transitions].filter(([token]) => {
+        const [a, b] = [from?.[token], to?.[token]];
+        return (
+            a !== undefined &&
+            b !== undefined &&
+            a !== b &&
+            interpolates(animatable(a), animatable(b))
+        );
+    });
+
+/** The tokens `t` of the way from `from` to `to`, for those moving; the rest as `to` has
+ *  them. */
+export const tokensAt = (
+    from: ThemeValues,
+    to: ThemeValues,
+    moving: readonly [string, Transition][],
+    t: number,
+): ThemeValues => {
+    const next = { ...to };
+    for (const [token] of moving) {
+        next[token] = blend(
+            animatable(from[token]!),
+            animatable(to[token]!),
+            t,
+        );
+    }
+    return next;
 };
