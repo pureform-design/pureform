@@ -25,6 +25,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
 import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { forcePseudoClasses } from "./force-pseudo";
 import { RN_COMPONENTS } from "./rn-components";
 
 const THEME_ATTRIBUTE = "data-panda-theme";
@@ -34,8 +35,10 @@ interface Scenario {
     name: string;
     /** Every variant value, or only each component's defaults. */
     every?: boolean;
-    /** The data attributes the CSS adapter's selectors match. */
+    /** The ARIA or `data-pf-*` attributes the CSS adapter's selectors match. */
     attributes?: string[];
+    /** Pseudo-classes forced on every element, for states no attribute sets. */
+    pseudoClasses?: string[];
     state?: State;
     scheme?: "light" | "dark";
     theme?: string;
@@ -43,31 +46,35 @@ interface Scenario {
 
 const SCENARIOS: Scenario[] = [
     { name: "every variant value at rest", every: true },
-    { name: "hovered", attributes: ["data-hover"], state: { hover: true } },
+    { name: "hovered", attributes: ["data-pf-hover"], state: { hover: true } },
     {
         name: "pressed",
-        attributes: ["data-active", "data-pressed"],
+        attributes: ["data-pf-active"],
         state: { pressed: true, active: true },
     },
     {
         name: "focused",
-        attributes: ["data-focus", "data-focused", "data-focus-visible"],
+        pseudoClasses: ["focus", "focus-visible", "focus-within"],
         state: { focus: true, focusVisible: true },
     },
     {
         name: "disabled",
-        attributes: ["data-disabled"],
+        attributes: ['aria-disabled="true"'],
         state: { disabled: true },
     },
-    { name: "checked", attributes: ["data-checked"], state: { checked: true } },
+    {
+        name: "checked",
+        attributes: ['aria-checked="true"'],
+        state: { checked: true },
+    },
     {
         name: "selected",
-        attributes: ["data-selected"],
+        attributes: ['aria-selected="true"'],
         state: { selected: true },
     },
     {
         name: "invalid",
-        attributes: ["data-invalid", 'aria-invalid="true"'],
+        attributes: ['aria-invalid="true"'],
         state: { invalid: true },
     },
     { name: "dark", scheme: "dark" },
@@ -279,6 +286,7 @@ describe("the React Native adapter matches the CSS adapter", () => {
         const list = items(styles, scenario.every ?? false);
 
         const frame = document.createElement("iframe");
+        frame.id = "rn-parity-css";
         frame.style.cssText = "width: 1280px; height: 900px; border: 0";
         document.body.append(frame);
         const doc = frame.contentDocument!;
@@ -287,6 +295,13 @@ describe("the React Native adapter matches the CSS adapter", () => {
             `<!doctype html><html${scenario.scheme === "dark" ? ' class="dark"' : ""}><head><style>${css}</style></head><body>${cssMarkup(list, resolved, scenario)}</body></html>`,
         );
         doc.close();
+        if (scenario.pseudoClasses) {
+            await forcePseudoClasses(
+                frame,
+                "[data-id]",
+                scenario.pseudoClasses,
+            );
+        }
 
         const host = document.createElement("div");
         document.body.append(host);

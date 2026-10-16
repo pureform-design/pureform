@@ -6,8 +6,9 @@
 // matters is the values they resolve to.
 //
 // Every variant value is compared at rest. States, the dark scheme, and a named theme are
-// compared on each component's defaults: a state through the data attributes both adapters'
-// selectors match, set on every element, so element and slot conditions both apply.
+// compared on each component's defaults: a state through the ARIA or `data-pf-*` attribute
+// both adapters' selectors match, set on every element, so element and slot conditions both
+// apply. Focus has no attribute, so it is forced on every element through DevTools.
 
 import * as pandaRecipes from "$recipes";
 import { manifestOf, classesFor } from "@pureform/css-adapter";
@@ -17,6 +18,7 @@ import { commands } from "vitest/browser";
 
 import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
 import type { Adapter } from "./commands";
+import { forcePseudoClasses } from "./force-pseudo";
 
 import pandaCss from "#/App.css?inline";
 
@@ -83,8 +85,10 @@ interface Scenario {
     name: string;
     /** Only each component's defaults, or every variant value too. */
     every?: boolean;
-    /** Data attributes set on every element. */
+    /** Attributes set on every element. */
     attributes?: string[];
+    /** Pseudo-classes forced on every element, for states no attribute sets. */
+    pseudoClasses?: string[];
     /** A class on the root element. */
     rootClass?: string;
     /** A named theme the components sit in. */
@@ -127,6 +131,7 @@ const computed = async (
     keepOnly?: string[],
 ): Promise<Record<string, Record<string, string>>> => {
     const frame = document.createElement("iframe");
+    frame.id = "parity-frame";
     frame.style.cssText = "width: 1280px; height: 900px; border: 0";
     document.body.append(frame);
     try {
@@ -143,6 +148,13 @@ const computed = async (
                 )}</head><body>${markup(classes, scenario)}</body></html>`,
         );
         doc.close();
+        if (scenario.pseudoClasses) {
+            await forcePseudoClasses(
+                frame,
+                "[data-id]",
+                scenario.pseudoClasses,
+            );
+        }
         if (keepOnly) {
             // Keep only the named layers and the layer order statements of Panda's sheet.
             const sheet = doc.styleSheets[0]!;
@@ -192,20 +204,20 @@ const same = (a: string, b: string | undefined): boolean => {
 
 const SCENARIOS: Scenario[] = [
     { name: "every variant value at rest", every: true },
-    { name: "hovered", attributes: ["data-hover"] },
+    { name: "hovered", attributes: ["data-pf-hover"] },
     {
         name: "focused",
-        attributes: ["data-focus", "data-focus-visible", "data-focused"],
+        pseudoClasses: ["focus", "focus-visible", "focus-within"],
     },
-    { name: "pressed", attributes: ["data-active", "data-pressed"] },
-    { name: "dragged", attributes: ["data-dragging"] },
-    { name: "disabled", attributes: ["data-disabled"] },
-    { name: "selected", attributes: ["data-selected"] },
-    { name: "checked", attributes: ["data-checked"] },
-    { name: "indeterminate", attributes: ["data-indeterminate"] },
-    { name: "invalid", attributes: ["data-invalid"] },
-    { name: "expanded", attributes: ["data-expanded"] },
-    { name: "filled", attributes: ["data-filled"] },
+    { name: "pressed", attributes: ["data-pf-active"] },
+    { name: "dragged", attributes: ["data-pf-dragging"] },
+    { name: "disabled", attributes: ['aria-disabled="true"'] },
+    { name: "selected", attributes: ['aria-selected="true"'] },
+    { name: "checked", attributes: ['aria-checked="true"'] },
+    { name: "indeterminate", attributes: ['aria-checked="mixed"'] },
+    { name: "invalid", attributes: ['aria-invalid="true"'] },
+    { name: "expanded", attributes: ['aria-expanded="true"'] },
+    { name: "filled", attributes: ["data-pf-filled"] },
     { name: "dark", rootClass: "dark" },
     { name: "in a named theme", theme: "teal" },
 ];
