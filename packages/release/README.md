@@ -4,17 +4,18 @@ Release tooling for this repository. Cocogitto (`cog.toml`) decides which packag
 to what version; this package writes those versions. It sets every core train package to
 one version together, sets a binding's or a tooling package's version alone, and checks that
 `cog.toml` and the workspace agree. It's internal tooling: private, never published, with no
-dependencies on other pureform packages, and nothing depends on it.
+dependencies on other pureform packages. Only `@pureform/generate`'s tests use it, to keep its
+embedded list of train packages in step with `cog.toml`.
 
 ## Release groups
 
 Every package under `packages/` is in exactly one group ([design doc, versioning](../../docs/design/component-architecture.md#11-versioning)):
 
-| Group      | Packages                                                                                                                                                                                       | Versioned as                                                    |
-| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| Core train | `core`, `theme`, `material`, `preset`, `css-lowering`, `css-adapter`, `panda-adapter`, `tailwind-adapter`, `rn-adapter`, `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines` | one cog package, `core-train`: one version, tag `core-train-vX` |
-| Bindings   | `solid` (later `react`, `react-native`)                                                                                                                                                        | a cog package each: tag `@pureform/solid-vX`                    |
-| Tooling    | `tsconfig`, `vite-config`, `vitest-config`, `oxlint-config`, `oxfmt-config`, `release`                                                                                                         | a cog package each                                              |
+| Group      | Packages                                                                                                                                                                                                                   | Versioned as                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Core train | `core`, `theme`, `material`, `preset`, `css-lowering`, `css-adapter`, `panda-adapter`, `tailwind-adapter`, `rn-adapter`, `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines`, `binding-core`, `generate` | one cog package, `core-train`: one version, tag `core-train-vX` |
+| Bindings   | `solid`, `react` (later `react-native`)                                                                                                                                                                                    | a cog package each: tag `@pureform/solid-vX`                    |
+| Tooling    | `tsconfig`, `vite-config`, `vitest-config`, `oxlint-config`, `oxfmt-config`, `release`                                                                                                                                     | a cog package each                                              |
 
 Apps (`apps/*`) and tests (`tests/*`) aren't released and aren't in `cog.toml`.
 
@@ -31,16 +32,17 @@ cog bump --auto
        └─ cli.ts set-version {{package}} {{version}}
             ├─ cog.ts        reads cog.toml: the train's include globs, each package's path
             ├─ workspace.ts  maps the cog package to directories (all train dirs, or one)
-            └─ version.ts    rewrites "version" in each package.json and its bun.lock entry
+            └─ version.ts    rewrites "version" in each package.json, src/package-version.ts,
+                             and bun.lock entry
 ```
 
-| Module         | What it does                                                                                         |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| `cog.ts`       | `parseCogPackages(toml)`: the `[monorepo.packages.*]` sections; `trainPaths(packages)`.              |
-| `version.ts`   | `setManifestVersion(json, v)`, `setLockVersion(lock, dir, v)`: text edits that keep the formatting.  |
-| `check.ts`     | `checkRelease(cog, workspace)`: the problems found, as messages.                                     |
-| `workspace.ts` | The file system side: `findRoot`, `readCog`, `readWorkspace`, `setVersion`, `checkRepository`.       |
-| `cli.ts`       | The command line, run with Bun from the source (no build needed), so cog's hooks work in a checkout. |
+| Module         | What it does                                                                                                                       |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `cog.ts`       | `parseCogPackages(toml)`: the `[monorepo.packages.*]` sections; `trainPaths(packages)`.                                            |
+| `version.ts`   | `setManifestVersion(json, v)`, `setLockVersion(lock, dir, v)`, `setSourceVersion(source, v)`: text edits that keep the formatting. |
+| `check.ts`     | `checkRelease(cog, workspace)`: the problems found, as messages.                                                                   |
+| `workspace.ts` | The file system side: `findRoot`, `readCog`, `readWorkspace`, `setVersion`, `checkRepository`.                                     |
+| `cli.ts`       | The command line, run with Bun from the source (no build needed), so cog's hooks work in a checkout.                               |
 
 The lockfile is edited in place rather than regenerated: `bun install --lockfile-only`
 re-resolves unrelated dependencies, which a release commit shouldn't carry.
@@ -79,6 +81,13 @@ The `ts-package` generator asks for the release group and edits `cog.toml`: a tr
 goes into `core-train`'s `include` (at `# @anchor:new-core-train-package`), a binding or
 tooling package gets its own section, and an unreleased one gets nothing. A new train package
 must start at the train's current version; `check` fails until it does.
+
+### Versions read at runtime
+
+A package that needs its own version at runtime keeps it in `src/package-version.ts`, as
+`export const VERSION = "…";` (`@pureform/styling` does, for the development check that the
+generated glue matches it). `set-version` rewrites that line with `package.json`, and `check`
+fails when the two differ.
 
 ## Build and test
 

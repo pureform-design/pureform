@@ -1,6 +1,11 @@
 import { describe, expect, test } from "vitest";
 
-import { setLockVersion, setManifestVersion } from "./version";
+import {
+    readSourceVersion,
+    setLockVersion,
+    setManifestVersion,
+    setSourceVersion,
+} from "./version";
 
 describe("setManifestVersion", () => {
     test("replaces the top-level version and keeps the formatting", () => {
@@ -56,5 +61,24 @@ describe("setLockVersion", () => {
     test("leaves a workspace without a version alone", () => {
         expect(setLockVersion(lock, "", "0.2.0")).toBe(lock);
         expect(setLockVersion(lock, "packages/missing", "0.2.0")).toBe(lock);
+    });
+});
+
+describe("setSourceVersion", () => {
+    const source = `// Set by the release tooling.\nexport const VERSION = "0.1.0";\n`;
+
+    test("replaces the version and keeps the rest", () => {
+        const updated = setSourceVersion(source, "0.2.0");
+        expect(updated).toBe(
+            `// Set by the release tooling.\nexport const VERSION = "0.2.0";\n`,
+        );
+        expect(readSourceVersion(updated)).toBe("0.2.0");
+    });
+
+    test("fails on a file without the line", () => {
+        expect(() => setSourceVersion("export {};\n", "0.2.0")).toThrow(
+            "has no `export const VERSION",
+        );
+        expect(readSourceVersion("export {};\n")).toBeUndefined();
     });
 });

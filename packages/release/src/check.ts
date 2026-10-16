@@ -5,6 +5,8 @@ export interface WorkspacePackage {
     path: string;
     name: string;
     version: string;
+    /** The version its `src/package-version.ts` holds, when it has one. */
+    sourceVersion?: string;
 }
 
 /** Workspace packages under this directory are released; apps and tests aren't. */
@@ -13,8 +15,9 @@ const RELEASED_DIR = "packages/";
 /**
  * Checks that cog.toml and the workspace agree: every package under `packages/` is in
  * exactly one release group (the core train or its own cog package), every cog entry
- * names a real package, and the core train's packages share one version. Returns the
- * problems found, empty when there are none.
+ * names a real package, the core train's packages share one version, and a package's
+ * `src/package-version.ts` matches its package.json. Returns the problems found, empty
+ * when there are none.
  */
 export function checkRelease(
     cog: readonly CogPackage[],
@@ -90,6 +93,17 @@ export function checkRelease(
         issues.push(
             `the ${CORE_TRAIN}'s packages differ in version: ${listed.join("; ")}`,
         );
+    }
+
+    for (const entry of workspace) {
+        if (
+            entry.sourceVersion !== undefined &&
+            entry.sourceVersion !== entry.version
+        ) {
+            issues.push(
+                `${entry.name}'s src/package-version.ts says ${entry.sourceVersion}, and its package.json ${entry.version}`,
+            );
+        }
     }
 
     return issues;

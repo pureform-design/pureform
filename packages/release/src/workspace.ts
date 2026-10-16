@@ -8,7 +8,13 @@ import {
     trainPaths,
     type CogPackage,
 } from "./cog";
-import { setLockVersion, setManifestVersion } from "./version";
+import {
+    readSourceVersion,
+    setLockVersion,
+    setManifestVersion,
+    setSourceVersion,
+    SOURCE_VERSION_FILE,
+} from "./version";
 
 /** The repository root: the nearest directory, from `from` up, holding a cog.toml. */
 export function findRoot(from: string): string {
@@ -49,10 +55,20 @@ export function readWorkspace(root: string): WorkspacePackage[] {
                 name: string;
                 version?: string;
             };
+            const sourceFile = join(
+                root,
+                parent,
+                child.name,
+                SOURCE_VERSION_FILE,
+            );
+            const sourceVersion = existsSync(sourceFile)
+                ? readSourceVersion(readFileSync(sourceFile, "utf8"))
+                : undefined;
             packages.push({
                 path: `${parent}/${child.name}`,
                 name,
                 version: version ?? "",
+                ...(sourceVersion === undefined ? {} : { sourceVersion }),
             });
         }
     }
@@ -77,7 +93,7 @@ export function releasePaths(
 
 /**
  * Sets the version of a cog.toml package (every train package for `core-train`) in each
- * package.json and in bun.lock. Returns the files it changed, relative to the root.
+ * package.json, each `src/package-version.ts`, and bun.lock. Returns the files it changed, relative to the root.
  */
 export function setVersion(
     root: string,
@@ -99,6 +115,15 @@ export function setVersion(
         if (updated !== manifest) {
             if (!options.dryRun) writeFileSync(file, updated);
             changed.push(`${path}/package.json`);
+        }
+        const sourceFile = join(root, path, SOURCE_VERSION_FILE);
+        if (existsSync(sourceFile)) {
+            const source = readFileSync(sourceFile, "utf8");
+            const updatedSource = setSourceVersion(source, version);
+            if (updatedSource !== source) {
+                if (!options.dryRun) writeFileSync(sourceFile, updatedSource);
+                changed.push(`${path}/${SOURCE_VERSION_FILE}`);
+            }
         }
         if (lock !== undefined) lock = setLockVersion(lock, path, version);
     }
