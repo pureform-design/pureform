@@ -43,6 +43,8 @@ export interface State {
     readOnly?: boolean;
     filled?: boolean;
     expanded?: boolean;
+    /** An icon that points, which flips under `rtl`. */
+    mirrored?: boolean;
     reducedMotion?: boolean;
     rtl?: boolean;
     /** The color scheme, for styles that switch on it rather than through tokens. */
