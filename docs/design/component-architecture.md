@@ -62,8 +62,8 @@ Ryzen 5 5600 under Node 26; `--jitless` stands in for Hermes, which has no JIT):
   lookup selects and freezes, and every later one is a `Map.get`.
 - **The original gate**, 10,000 lookups per frame under 1 ms on a mid-range phone, was
   stricter than any real frame needs: even cached lookups take 1 to 2 ms per 10,000 on
-  this desktop. What's left to measure is a real device under Hermes, in the React Native
-  demo (§13).
+  this desktop. With the cache, a lookup costs a fraction of a microsecond even without a
+  JIT, so a measurement on a real phone isn't planned.
 
 ## 3. Package layout
 
@@ -1010,20 +1010,17 @@ Preset changes these designs need, independent of the steps above:
 
 ## 13. Risks and open questions
 
-1. **Lookup cost** (§2): measured; the bet holds with a per-selection cache. Left: a
-   real phone under Hermes, in the React Native demo, once the native factory exists.
-   Fallback if it falls short: compile-time inlining of static variant classes by the
-   bundler plugin.
-2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Checked again in
+1. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Checked again in
    October 2026: `@zag-js/solid` `latest` (1.46.0) and `next` (2.0.0-next.3) still peer on
    `solid-js >=1.1.3` and depend on `@solid-primitives/keyed`, so the port stays needed.
-3. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
+2. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
    radio group, except form reset, which the bindings take over. The slider doesn't use
    Zag (§8). Left: re-run the check through the Solid 2 port, since it was done with
    Zag's vanilla adapter, and check disabled fieldsets.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
-React built in parallel with Solid; text field gets its own machine; state lives on the
+React built in parallel with Solid; text field gets its own machine; lookups cost little
+once cached per selection (§2), so no phone measurement; state lives on the
 web as data attributes; too many variant combinations is solved by tokens a style sets
 (§5.5), with fragments (§5.4) for the rest.
