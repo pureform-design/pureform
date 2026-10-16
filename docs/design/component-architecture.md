@@ -371,7 +371,7 @@ class. No script runs before paint.
       as a string and the provider renders it the same way.
 - **Hydrating a runtime theme: both options.** `PureformProvider`'s `hydrate` option
   picks how the client gets a server-rendered theme:
-    - `"reuse"` (default on the web): the client keeps the server's `<style>` block and
+    - `"reuse"` (the default): the client keeps the server's `<style>` block and
       generates nothing while hydrating; it only needs the hash, which comes from the
       input. The generators load lazily, the first time the theme changes on the client.
     - `"regenerate"`: the client runs the generators again while hydrating. They're pure,
@@ -530,12 +530,51 @@ so bindings treat them uniformly.
 - **Ownership:** compound parts and slot-keyed overrides replace copying source. An
   `eject` command is deferred (§10).
 
-### 9.4 Testing
+### 9.4 Controlled and uncontrolled state
+
+Every piece of state a user can change takes three props on `Root` (and on the ready-made
+component), Zag's shape, identical in Solid and React:
+
+```tsx
+<Checkbox.Root checked={agreed()} onCheckedChange={(d) => setAgreed(d.checked)} /> // controlled
+<Checkbox.Root defaultChecked name="terms" />                                        // uncontrolled
+```
+
+- **Names come from the AST's states**, so the prop, the data attribute, and the style
+  state match (`checked` → `data-checked` → `slot("root", "checked")`):
+
+    | Prop       | Components                                                                                          |
+    | ---------- | --------------------------------------------------------------------------------------------------- |
+    | `checked`  | checkbox (`boolean \| "indeterminate"`), switch                                                     |
+    | `selected` | chip, toggle icon button                                                                            |
+    | `value`    | text field, text area, select, slider, radio group, tabs, navigation bar and rail, segmented button |
+    | `open`     | menu, dialog, tooltip, select                                                                       |
+
+- **Controlled means defined.** A prop that isn't `undefined` controls the state; the
+  `default*` prop is read once, at creation. Switching between them warns in development.
+- **Controlled is strict.** The component asks with `on*Change` and shows the new state
+  only once the prop changes. If the owner ignores the call, nothing moves, including a
+  native input's value, which the binding writes back.
+- **Callbacks report user actions only**, with a details object (`{ checked }`,
+  `{ open, reason }`) so fields can be added later. A prop change never calls them.
+- **Typed:** a `Controllable<"value", T>` helper writes the three props, and components
+  with a value are generic over it (`Select<string[]>` when `multiple`).
+- **Own machines match Zag.** `@pureform/machines` uses the same controllable-state
+  helper Zag uses (`bindable`), so button toggles, chips, and the text field behave like
+  the Zag-backed ones.
+- **Server rendering:** the controlled or default value renders on the server as its
+  attributes (§5.7).
+- **React Native:** the same props; a `name` does nothing.
+
+### 9.5 Testing
 
 - **Machines and anatomy:** Vitest unit tests, no DOM.
 - **Solid components:** Vitest browser mode (existing setup), with
   `@solidjs/testing-library`; each component has an accessibility check (axe) and
-  keyboard tests.
+  keyboard tests. A shared suite checks the rules of §9.4 for every stateful component:
+  uncontrolled state changes on its own, controlled state doesn't change until the prop
+  does, each callback fires once per user action and never for a prop change, and a form
+  reset restores the default.
 - **E2E:** `tests/browser-e2e-tests` selects by `testIds` and roles; a shared contract
   suite runs the same specs against the Solid build and, later, React and RN-web, so
   bindings stay behaviorally identical.
@@ -578,11 +617,7 @@ Deferred until there's demand:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Server rendering** (§5.7): measure what `"regenerate"` costs while hydrating, to
-   decide whether `"reuse"` stays the default.
-4. **Not yet covered:** controlled and uncontrolled props (`checked`, `defaultChecked`,
-   `onCheckedChange`) mapped onto Zag the same way in Solid and React; native form
-   participation; `prefers-reduced-motion`, including token tweens on React Native;
+3. **Not yet covered:** native form participation; `prefers-reduced-motion`, including token tweens on React Native;
    direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
    committed and how stale glue is detected; and how packages are versioned together.
 
