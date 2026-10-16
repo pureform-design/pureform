@@ -719,8 +719,11 @@ internal API so the swap is local.
 - `useMachine` accepts `undefined` for any prop, which the repo's
   `exactOptionalPropertyTypes` would otherwise reject, so components pass their optional
   props straight through.
-- `Key` from `@solid-primitives/keyed` and `useSyncExternalStore` aren't ported; no
-  machine needs them.
+- **Same exports as v1:** `useMachine`, `normalizeProps`, `mergeProps`, `PropTypes`,
+  `useSyncExternalStore`, and `Key`, with v1's module names and signatures, so swapping
+  to `@zag-js/solid` later is an import change. `Key` keeps its props but is built on
+  Solid 2's `<For keyed>`, dropping the `@solid-primitives/keyed` dependency. The one
+  addition is the `MachineProps` type that `useMachine` accepts.
 - Browser-mode tests run Zag's checkbox, switch, and radio group through the port in
   Chromium, wired as the preset wires them (§9.5): pointer and keyboard input, focus
   visibility, controlled props that only ask to change, callbacks, and `FormData`.
