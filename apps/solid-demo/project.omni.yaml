@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/js-effects"
     - "@pureform/styling"
     - "@pureform/generate"
+    - "@pureform/bundler"
     - "@pureform/material"
     - "@pureform/theme"
     - "@pureform/core"
@@ -26,9 +27,9 @@ cache:
         - panda.config.ts
         - panda.pureform.ts
         - pureform.config.ts
+        - pureform.glue.ts
         - vite.config.ts
         - "scripts/**/*"
-        - ".pureform/**/*"
 
 tasks:
   test:
@@ -43,11 +44,18 @@ tasks:
   test:e2e:
     enabled: false
 
-  # Writes `.pureform/` from `pureform.config.ts` with the built Panda adapter's codegen.
+  # Writes `.pureform/` (ignored by git) from `pureform.config.ts` with the built Panda adapter's
+  # codegen, for Panda's codegen and the tests; `vite dev` and `vite build` write it themselves.
   generate:
-    exec: bun scripts/generate.ts
+    # Under Node, as Vite runs the plugin: the preset computes some values (shape morphs)
+    # differently under Bun, which changes the glue's hash.
+    exec: node scripts/generate.ts
     dependencies:
       - ^build
+    cache:
+      output:
+        files:
+          - ".pureform/**/*"
 
   prepare:
     exec: bun x panda codegen

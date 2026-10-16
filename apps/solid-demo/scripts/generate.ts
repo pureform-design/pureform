@@ -1,19 +1,20 @@
 // Writes `.pureform/` from `pureform.config.ts` with the Panda adapter's codegen, or checks it
-// with `--check`. Until `pureform generate` (`@pureform/cli`) and the bundler plugin land, the
-// omni `generate` task runs this before Panda's codegen.
+// with `--check`, with the options the bundler plugin takes (`pureform.glue.ts`). Panda's
+// codegen (the omni `prepare` task, which the tests need) reads `.pureform/panda.ts` without a
+// bundler, so the omni `generate` task runs this first, until `pureform generate`
+// (`@pureform/cli`) takes its place.
 
 import { generate } from "@pureform/generate";
 import type { PandaCodegenOptions } from "@pureform/panda-adapter/codegen";
 
-import { PREFIX } from "../panda.pureform";
+import { glue } from "../pureform.glue.ts";
 
 const check = process.argv.includes("--check");
 
 const result = await generate<PandaCodegenOptions>({
+    ...glue,
     root: new URL("..", import.meta.url).pathname,
     config: "pureform.config.ts",
-    target: "panda",
-    options: { prefix: PREFIX },
     check,
 });
 
@@ -24,7 +25,7 @@ for (const file of result.files) {
 for (const hint of result.hints) console.log(hint);
 if (!result.ok) {
     console.error(
-        "pureform: .pureform/ is out of date. Run `bun scripts/generate.ts`.",
+        "pureform: .pureform/ is out of date. Run `node scripts/generate.ts`.",
     );
     process.exitCode = 1;
 }
