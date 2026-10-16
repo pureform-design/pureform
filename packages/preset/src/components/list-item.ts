@@ -26,9 +26,8 @@ import {
     colorVariant,
     defaultDensities,
     defaultGroups,
-    dense,
-    densityCompounds,
-    densityMarkers,
+    DENSITY_TOKEN,
+    densityTokenVariant,
     densitySteps,
     variantsOf,
 } from "./shared";
@@ -42,20 +41,15 @@ const { tokens, ref } = rowTokens("listItem", {
     heightOne: px(56),
     heightTwo: px(72),
     heightThree: px(88),
+    ...DENSITY_TOKEN,
 });
 
 const parts = rowParts(ref, "root");
 
 type LineHeight = "heightOne" | "heightTwo" | "heightThree";
 
-const LINES: Record<"one" | "two" | "three", LineHeight> = {
-    one: "heightOne",
-    two: "heightTwo",
-    three: "heightThree",
-};
-
 const lines = (height: LineHeight) => ({
-    root: { minHeight: dense(ref(height)) },
+    root: { minHeight: add(ref(height), ref("densityOffset")) },
 });
 
 /** Build the list item with a `color` variant per group in `groups`. A group colors the
@@ -127,7 +121,10 @@ export const createListItem = <
                         // Material tops the leading and trailing parts in a three-line item.
                         three: {
                             root: {
-                                minHeight: dense(ref("heightThree")),
+                                minHeight: add(
+                                    ref("heightThree"),
+                                    ref("densityOffset"),
+                                ),
                                 alignItems: start,
                                 paddingBlockStart: spacing("3"),
                                 paddingBlockEnd: spacing("3"),
@@ -138,7 +135,7 @@ export const createListItem = <
                         true: { root: parts.interactive },
                         false: {},
                     },
-                    density: densityMarkers(densities),
+                    density: densityTokenVariant(densities),
                     // A group points the selected colors, which the row and its parts read,
                     // at its container roles.
                     color: colorVariant(groups, (g) => ({
@@ -150,13 +147,6 @@ export const createListItem = <
                         },
                     })),
                 },
-                compoundVariants: (
-                    Object.entries(LINES) as [keyof typeof LINES, LineHeight][]
-                ).flatMap(([count, height]) =>
-                    densityCompounds(densities, { lines: count }, (offset) => ({
-                        root: { minHeight: add(ref(height), offset) },
-                    })),
-                ),
                 defaultVariants: {
                     lines: "one",
                     interactive: "false",
