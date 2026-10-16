@@ -1,3 +1,5 @@
+import { defineSlotComponent } from "@pureform/core";
+import { dynamic, hex } from "@pureform/core/ast";
 import { pureform } from "@pureform/preset";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
@@ -230,4 +232,120 @@ describe("token transitions", () => {
         );
         expect(html).toContain("--components.circularProgress.value");
     });
+});
+
+describe("variant tokens", () => {
+    const accent = dynamic(["components", "tinted", "accent"], hex("#0000ff"));
+    const tinted = defineSlotComponent({
+        name: "tinted",
+        tokens: { accent },
+        slots: ["root", "label"],
+        structure: { root: ["label"] },
+        recipe: {
+            base: {
+                root: { backgroundColor: accent },
+                label: { borderColor: accent },
+            },
+            variants: {
+                tone: {
+                    plain: {},
+                    brand: {
+                        root: {
+                            tokens: {
+                                "components.tinted.accent": hex("#ff0000"),
+                            },
+                            states: {
+                                pressed: {
+                                    tokens: {
+                                        "components.tinted.accent":
+                                            hex("#00ff00"),
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+            defaultVariants: { tone: "plain" },
+        },
+    });
+    const withTinted = {
+        ...config,
+        components: { ...config.components, tinted },
+    };
+
+    const render = (
+        styles: Styles,
+        variants: Record<string, string>,
+        state: State = {},
+        tokens?: Record<string, string>,
+    ) => {
+        const Probe = () => {
+            const { styles: s } = useComponentState(
+                "tinted",
+                variants,
+                state,
+                tokens,
+            );
+            return createElement(
+                "pre",
+                null,
+                JSON.stringify([
+                    s.root!.backgroundColor,
+                    s.label!.borderColor,
+                    s.root,
+                ]),
+            );
+        };
+        return renderToString(
+            createElement(
+                PureformProvider,
+                { styles, scheme: "light" },
+                createElement(Probe),
+            ),
+        );
+    };
+
+    for (const [mode, build] of [
+        ["precomputed", precompute],
+        ["runtime", runtimeStyles],
+    ] as const) {
+        const styles = build(withTinted, {
+            components: ["tinted"],
+            schemes: ["light"],
+        });
+
+        it(`move every slot reading them (${mode})`, () => {
+            expect(render(styles, { tone: "plain" })).toContain(
+                "[&quot;rgba(0, 0, 255, 1)&quot;,&quot;rgba(0, 0, 255, 1)&quot;",
+            );
+            expect(render(styles, { tone: "brand" })).toContain(
+                "[&quot;rgba(255, 0, 0, 1)&quot;,&quot;rgba(255, 0, 0, 1)&quot;",
+            );
+            expect(
+                render(styles, { tone: "brand" }, { pressed: true }),
+            ).toContain(
+                "[&quot;rgba(0, 255, 0, 1)&quot;,&quot;rgba(0, 255, 0, 1)&quot;",
+            );
+        });
+
+        it(`give way to the instance's own (${mode})`, () => {
+            expect(
+                render(
+                    styles,
+                    { tone: "brand" },
+                    {},
+                    {
+                        "components.tinted.accent": "#ffffff",
+                    },
+                ),
+            ).toContain("[&quot;#ffffff&quot;,&quot;#ffffff&quot;");
+        });
+
+        it(`stay out of the styles (${mode})`, () => {
+            expect(render(styles, { tone: "brand" })).not.toContain(
+                "--components",
+            );
+        });
+    }
 });

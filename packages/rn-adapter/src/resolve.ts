@@ -5,6 +5,7 @@
 
 import type { ComponentStyles } from "./lower";
 import { formatColor } from "./rgba";
+import type { Selected } from "./select";
 import { readColorFunction } from "./spaces";
 import type { Scheme } from "./theme";
 import { dependencies, evaluate, isExpr } from "./values";
@@ -202,4 +203,54 @@ export const stylesFor = (
     );
     if (affected.size === 0) cached.sets.set(key, set);
     return set;
+};
+
+// Styles resolved with overrides, kept per set of them, so every instance whose variants set
+// the same tokens shares one resolution. A few sets are in use at a time; the cache empties
+// once many build up.
+const withOverrides = new WeakMap<Styles, Map<string, Resolved>>();
+const resolvedWith = (
+    styles: Styles,
+    key: string,
+    overrides: ThemeValues,
+): Resolved => {
+    let sets = withOverrides.get(styles);
+    if (!sets) withOverrides.set(styles, (sets = new Map()));
+    const id = `${key}|${JSON.stringify(overrides)}`;
+    let resolved = sets.get(id);
+    if (!resolved) {
+        if (sets.size >= 256) sets.clear();
+        resolved = stylesFor(styles, key, overrides);
+        sets.set(id, resolved);
+    }
+    return resolved;
+};
+
+/** A selection with the tokens its variants and state set taken into account: when it sets
+ *  any, the component is resolved again with them, under the provider's overrides and the
+ *  instance's own `tokens`, and `selectFrom` selects from that, so every style reading them
+ *  follows. */
+export const withSetTokens = (
+    selected: Selected,
+    selectFrom: (component: ComponentStyles<Value>) => Selected,
+    where: {
+        styles: Styles;
+        /** The theme's key, from `themeKey`. */
+        key: string;
+        /** The component's name. */
+        name: string;
+        scheme: Scheme;
+        /** The provider's overrides. */
+        overrides?: ThemeValues;
+        /** The instance's own tokens, which win over the ones it sets. */
+        tokens?: Overrides;
+    },
+): Selected => {
+    if (Object.keys(selected.tokens).length === 0) return selected;
+    const again = resolvedWith(where.styles, where.key, {
+        ...where.overrides,
+        ...overridesFor(selected.tokens, where.scheme),
+        ...overridesFor(where.tokens, where.scheme),
+    })[where.name];
+    return again ? selectFrom(again) : selected;
 };

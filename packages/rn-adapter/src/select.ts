@@ -13,13 +13,16 @@ import {
     DROP_SHADOW,
     SHAPE,
     TINT,
+    TOKEN,
     TRANSITION,
     isPercentOffset,
 } from "./values";
 import type {
     Animation,
+    Concrete,
     GradientValue,
     ShapeValue,
+    ThemeValues,
     Transition,
     Value,
 } from "./values";
@@ -210,6 +213,9 @@ export interface Selected {
     parents: Record<string, string>;
     /** What each slot draws with SVG, where it draws anything. Only with the `svg` state. */
     drawings: Record<string, Drawing>;
+    /** The tokens the selected styles set, by key. Styles reading them follow only once the
+     *  component is resolved again with them, as `useComponentState` does. */
+    tokens: ThemeValues;
 }
 
 /** A component's style per slot (or its one style under `""`, without slots) for variants and
@@ -289,7 +295,13 @@ export const selectWithTransitions = (
     const transitions: Record<string, Transition[]> = {};
     const animations: Record<string, Animation> = {};
     const drawings: Record<string, Drawing> = {};
+    const tokens: ThemeValues = {};
     for (const [slot, style] of Object.entries(styles)) {
+        for (const property of Object.keys(style)) {
+            if (!property.startsWith(TOKEN)) continue;
+            tokens[property.slice(TOKEN.length)] = style[property] as Concrete;
+            delete style[property];
+        }
         const own = style[TRANSITION];
         delete style[TRANSITION];
         const animation = style[ANIMATION];
@@ -345,5 +357,5 @@ export const selectWithTransitions = (
     )) {
         for (const child of children) parents[child] = parent;
     }
-    return { styles, transitions, animations, parents, drawings };
+    return { styles, transitions, animations, parents, drawings, tokens };
 };
