@@ -95,6 +95,10 @@ export interface ComponentCase {
     /** Renderings that cover its variants and states. The accessibility, direction, and server
      *  rendering suites run each; keep them plain data, since the server gets them too. */
     readonly examples: Readonly<Record<string, SceneProps>>;
+    /** Parts (`data-pf-part` names) that draw the same in both directions, such as a check
+     *  mark: their physical borders, corners, and transform must match between `ltr` and `rtl`.
+     *  The mirrored-box check can't see this, since their boxes are symmetric. */
+    readonly unmirrored?: readonly string[] | undefined;
     readonly state?: StateCase | undefined;
     readonly form?: FormCase | undefined;
     readonly keyboard: KeyboardCase;
