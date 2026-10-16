@@ -628,6 +628,14 @@ What's missing is one source of direction for JS, and a few styles that don't fl
 - **Guarded by a test.** A preset spec fails on a physical horizontal property
   (`left`, `right`, `marginLeft`, `translateX`, …) unless it's symmetric or under a
   direction condition.
+- **Decided in building it:** the switch's centering is `when("rtl", translate(50%, -50%),
+translate(-50%, -50%))`; the linear progress's `rtl` keyframes are
+  `linearProgressSlideRtl`, picked with `when("rtl", …)` on `animation`. The spec is
+  `packages/preset/src/direction.spec.ts`; besides symmetric and direction-conditioned
+  styles it takes an `ALLOWED` list of exceptions with reasons (the ripple, placed from
+  pointer coordinates). A control's native input resets its margins, since the browser's
+  default checkbox margins are physical. The mirrored-box helpers live in
+  `tests/browser-e2e-tests/src/mirror.ts`.
 - **Testing.** Each component renders in Chromium both ways, and every slot's box in
   `rtl` must mirror its `ltr` box across the root (`x' = width - x - w`). React Native
   does the same through selection with `rtl`. Keyboard suites run in both directions.

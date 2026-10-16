@@ -9,19 +9,25 @@ compiles the other adapters' stylesheets in Node through browser commands (`src/
 
 ## Suites
 
-| File                         | What it checks                                                                                                                                                           |
-| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `state-matching.e2e.test.ts` | For each state, an element marked each allowed way (native, ARIA, `data-pf-*`) matches the lowered selector, and Zag's attributes alone don't. Panda lowers to the same. |
-| `parity.e2e.test.ts`         | The CSS and Tailwind adapters compute the same styles as the Panda preset, at every variant value and in each state.                                                     |
-| `rn-parity.e2e.test.ts`      | The React Native adapter, through React Native Web, computes the same key styles as the CSS adapter.                                                                     |
-| `rn-motion.e2e.test.ts`      | A React Native color change fades over the transition's duration, with or without reduced motion; a progress value moves, and jumps under reduced motion.                |
-| `reduced-motion.e2e.test.ts` | Under each way of asking for reduced motion (the system, a `data-pf-motion` provider, nested providers), computed `transition` keeps the fades and drops movement.       |
-| `visual.e2e.test.tsx`        | A screenshot per demo section, plus measured layout rules.                                                                                                               |
+| File                         | What it checks                                                                                                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `state-matching.e2e.test.ts` | For each state, an element marked each allowed way (native, ARIA, `data-pf-*`) matches the lowered selector, and Zag's attributes alone don't. Panda lowers to the same.           |
+| `parity.e2e.test.ts`         | The CSS and Tailwind adapters compute the same styles as the Panda preset, at every variant value and in each state.                                                               |
+| `rn-parity.e2e.test.ts`      | The React Native adapter, through React Native Web, computes the same key styles as the CSS adapter.                                                                               |
+| `rn-motion.e2e.test.ts`      | A React Native color change fades over the transition's duration, with or without reduced motion; a progress value moves, and jumps under reduced motion.                          |
+| `reduced-motion.e2e.test.ts` | Under each way of asking for reduced motion (the system, a `data-pf-motion` provider, nested providers), computed `transition` keeps the fades and drops movement.                 |
+| `direction.e2e.test.ts`      | Components with direction-aware styles (the switch, the linear progress) render left to right and right to left, and every part's `rtl` box mirrors its `ltr` box across the root. |
+| `visual.e2e.test.tsx`        | A screenshot per demo section, plus measured layout rules.                                                                                                                         |
 
 `src/force-pseudo.ts` forces pseudo-classes through the DevTools protocol, for states no
 attribute can set on many elements at once (focus), and finishes the transitions that start.
 The `emulateReducedMotion` command (`src/commands.ts`) switches `prefers-reduced-motion` on
 the page.
+
+`src/mirror.ts` measures parts against a root in both directions and lists where right to left
+doesn't mirror left to right (`x' = width - x - w`): `mirroredBoxMismatches(doc, markup,
+prepare?)` renders markup with a `[data-root]` and `[data-part]` elements under each `dir`;
+`boxesWithin`, `mirrorBox`, and `mirrorMismatches` work on elements you've rendered yourself.
 
 ## Running
 
