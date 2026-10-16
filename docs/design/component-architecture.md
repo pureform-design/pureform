@@ -187,6 +187,16 @@ type StyleFactory<C> = (selection: Selection<C> & States<C>) => {
 …), `SlotOf<C>`, and `InstanceTokens<C>` are typed from the AST via `defineComponent`'s
 inference, reusing the AST's condition names.
 
+Built (p1e) in `@pureform/styling`: the generic types take a component's name, a key of the
+`ComponentRegistry` interface that generated declarations augment with each component's
+`variants`, `slots`, `states`, `tokens`, and `lazy`, or that shape inline. `defineComponent`
+doesn't infer variant types, so the generator writes them from the config. `StyleFactory`
+takes the style and drawing types as parameters, since `styling` can't import `rn-adapter`.
+`selectionCache` is the per-selection cache of §2, and `withTokenStyle` adds instance tokens
+as CSS vars. `componentClasses` moved here from the CSS adapter (which re-exports it);
+`themeVars` stays in `css-lowering`, which it needs, and `@pureform/styling/theme-vars`
+re-exports it.
+
 On the web, interaction states are not part of the selection. The browser and the
 bindings mark them on the element, and the generated CSS matches them, so a press changes
 one attribute and calls nothing. Only a variant or token change calls the factory again.
