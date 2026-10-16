@@ -62,9 +62,14 @@ declare module "@pureform/styling" {
 | `ClassFactory<C>`         | `(s: Selection<C>) => { root: { class, style? }; label: … }`              |
 | `StyleFactory<C, Style?>` | `(s: Selection<C> & States<C>) => { root: { style, drawing? }; … }`       |
 
-While nothing is registered, any string names a component, typed openly. Once the registry is
-augmented, an unknown name is a type error. `StaticComponentName` and `LazyComponentName` split
-the registered names by entry kind.
+Every group and token also takes `undefined`, which means its default, so a component can pass
+its optional props straight through (`{ variant: props.variant }`).
+
+While nothing is registered, any string names a component, typed openly: any group, and
+`tokens`. That's how a binding's own code sees every component, since the app's declarations
+aren't part of its build. Once the registry is augmented, an unknown name is a type error.
+`StaticComponentName` and `LazyComponentName` split the registered names by entry kind; with
+nothing registered, both are `string`.
 
 ### Registry
 
