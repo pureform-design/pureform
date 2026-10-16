@@ -76,6 +76,13 @@ for what they can't do (git, formatting, linting, ad-hoc scripts).
 - **Stubs are fine** when a phase says so: a stub has the final signature, a comment
   naming the phase that fills it in, and a test marked `todo` where one belongs.
 
+## Keeping context small
+
+Compact the session when its context is getting large, even when running as a subagent:
+commit what's finished and draft the output context first, then request compaction
+(`opencode api post /api/session/<session-id>/compact --data '{}'`), then reread the
+phase file and the draft. See the [roadmap](README.md) for the full steps.
+
 ## Finishing: the output context (required)
 
 When a phase or subphase is done, write `docs/roadmap/context/<phase-id>.md` before the
