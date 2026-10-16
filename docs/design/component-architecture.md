@@ -58,10 +58,9 @@ phone.
                             (ripple, state layer, morphing shapes, Material-specific
                             controls). Framework-free.
 
-@pureform/style-panda       Code generators for each target's factories (§5.2), run at
-@pureform/style-tailwind    build time by `@pureform/bundler`. They emit ClassFactory
-@pureform/style-css         (web) or StyleFactory (native) modules into `.pureform/`, plus
-@pureform/style-native      any small runtime helpers those modules import.
+@pureform/*-adapter         Exist. Each gains a `/codegen` subpath (§5.2), run at build
+                            time by `@pureform/bundler`, that emits ClassFactory (web) or
+                            StyleFactory (native) modules into `.pureform/`.
 
 @pureform/solid             NEW. Solid 2 bindings: provider, useClasses, compound
                             components. Includes internal Zag glue for Solid 2 (§8).
@@ -78,8 +77,10 @@ Rule for where code goes: if it compiles without importing a framework, it's not
 registry", typically under 80 lines.
 
 Adapters (`panda-adapter`, `css-adapter`, `tailwind-adapter`, `rn-adapter`) stay build-time
-compilers. The `style-*` packages turn their output into factory modules, so a production
-bundle never pulls a compiler in.
+compilers, and their `/codegen` subpath turns their own output into factory modules, so
+class names and the code using them change together. Small helpers the generated modules
+need at runtime, such as joining classes, live in `@pureform/styling`. The rule: adapters
+are build time, `styling` is runtime, and a production bundle never imports an adapter.
 
 ## 4. `pureform.config.ts`
 
@@ -457,5 +458,5 @@ Deferred until there's demand:
    mismatch, including runtime themes (write vars inline on the server).
 6. **Where state lives on the web:** data attributes (proposed) vs. selection.
 
-Decided: separate `@pureform/style-*` packages; Panda `staticCss` bloat accepted until
+Decided: factory generators live in each adapter's `/codegen` subpath; Panda `staticCss` bloat accepted until
 pruning; React built in parallel with Solid; text field gets its own machine.
