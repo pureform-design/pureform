@@ -376,6 +376,11 @@ function useClasses(name, selection) {
   `useComponent(anatomy, { selection, testId, unstyled })`, which makes the one call and builds
   every part (§9.2). With nothing registered (a binding's own build), `Selection` takes any
   group and `tokens`, and every group and token takes `undefined` for its default.
+- **Built (p2b), React:** `useClasses(name, selection)` takes a plain object and memoizes the
+  factory call on the selection's value (`selectionSignature` in `@pureform/binding-core`), so
+  an inline object is fine. A lazy entry goes through `use(entry.load())` (the registry's
+  promise is shared and stable). `useLazyClassFactory` throws on the server, React's way of
+  rendering a `<Suspense>` boundary's fallback there and the content on the client.
 
 ```tsx
 // Solid
@@ -875,6 +880,10 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   `as` prop only, no render prop. An icon part provides its element to `useIconStyle()`, which
   measures it after mount and re-reads when the component's attributes change, a transition in
   it ends, or it resizes.
+- **Built (p2b), React:** the same `useComponent` scope, with values instead of accessors. The
+  merge order is binding-core's `partSources`, shared with Solid; React joins classes into one
+  `className` string with `cx` (`clsx`-compatible, in binding-core) and merges style objects.
+  Ready-made components take `className` keyed by slot, not `class`, as React props do.
 
 ### 9.3 Configurability
 
