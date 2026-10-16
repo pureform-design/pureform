@@ -83,7 +83,6 @@ const useTween = <T>(
             progress.removeListener(listener);
             progress.stopAnimation();
         };
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
     }, [key]);
     return last.current === key ? shown : current.current;
 };

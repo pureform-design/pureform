@@ -47,15 +47,14 @@ export const useMotionStyles = (
 
 // One of the components' animated parts, from the engine the page picked.
 const either =
-    // oxlint-disable-next-line typescript/no-explicit-any
     <C extends ComponentType<any>>(animated: C, reanimated: unknown) =>
-        (props: ComponentProps<C>) =>
-            createElement(
-                (useContext(MotionContext) === "Reanimated"
-                    ? reanimated
-                    : animated) as C,
-                props,
-            );
+    (props: ComponentProps<C>) =>
+        createElement(
+            (useContext(MotionContext) === "Reanimated"
+                ? reanimated
+                : animated) as C,
+            props,
+        );
 
 export const MView = either(Animated.View, Reanimated.View);
 export const MSvgDrawing = either(SvgDrawing, ReanimatedSvgDrawing);

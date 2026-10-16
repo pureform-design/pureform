@@ -75,7 +75,6 @@ export const useRippleMotion = (
             easing: curve(timing.easing),
             useNativeDriver: driver,
         }).start();
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     useEffect(() => {
         if (ripple.release === undefined) return;
@@ -86,7 +85,6 @@ export const useRippleMotion = (
             easing: Easing.linear,
             useNativeDriver: driver,
         }).start(({ finished }) => finished && done());
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
     }, [ripple.release]);
     return { grow, fade };
 };

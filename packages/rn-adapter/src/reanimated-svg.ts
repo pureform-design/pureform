@@ -96,7 +96,6 @@ const RippleCircle = ({
             animationTimingFunction: cssEasing(timing.easing),
             animationFillMode: "both" as const,
         }),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
     const fade = useMemo(
@@ -105,7 +104,6 @@ const RippleCircle = ({
             transitionDuration: timing.fade,
             transitionTimingFunction: "linear",
         }),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [],
     );
     useEffect(() => {
@@ -116,7 +114,6 @@ const RippleCircle = ({
             clearTimeout(start);
             clearTimeout(end);
         };
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
     }, [released]);
     return h(
         AnimatedG,

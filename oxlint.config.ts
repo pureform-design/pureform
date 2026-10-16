@@ -45,5 +45,6 @@ export default defineConfig({
         "**/CHANGELOG.md",
         "./CHANGELOG.root.md",
     ],
+    options: { reportUnusedDisableDirectives: "deny" },
     extends: [createConfig()],
 });

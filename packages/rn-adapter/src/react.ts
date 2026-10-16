@@ -68,7 +68,6 @@ export const PureformProvider = (props: PureformProviderProps) => {
     const overrideKey = JSON.stringify(overrides ?? {});
     const resolved = useMemo(
         () => stylesFor(styles, key, overrides),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [styles, key, overrideKey],
     );
     const tokens = useMemo(
@@ -76,7 +75,6 @@ export const PureformProvider = (props: PureformProviderProps) => {
             ...styles.themes[key],
             ...withDerived(styles, key, overrides),
         }),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [styles, key, overrideKey],
     );
     const reducedMotion = props.reducedMotion ?? false;
@@ -95,7 +93,6 @@ export const PureformProvider = (props: PureformProviderProps) => {
             svg,
             timeScale,
         }),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [resolved, tokens, scheme, reducedMotion, props.width, svg, timeScale],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
@@ -208,7 +205,6 @@ export const useComponentState = (
                       ...overridesFor(tokens, context.scheme),
                   })[name]
                 : undefined,
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [context.styles, context.key, context.overrides, name, tokenKey],
     );
     const component = own ?? context.resolved[name];
@@ -230,7 +226,6 @@ export const useComponentState = (
                 }),
                 context.timeScale,
             ),
-        // oxlint-disable-next-line react-hooks/exhaustive-deps
         [
             component,
             context.scheme,
