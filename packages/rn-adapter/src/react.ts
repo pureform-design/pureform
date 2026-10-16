@@ -15,14 +15,21 @@ import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { curve } from "./animate/curve";
+import type { ComponentStyles } from "./lower";
 import { movingTokens, tokensAt } from "./motion";
-import { overridesFor, stylesFor, themeKey, withDerived } from "./resolve";
+import {
+    overridesFor,
+    stylesFor,
+    themeKey,
+    withDerived,
+    withSetTokens,
+} from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import { TOKEN_TRANSITION } from "./values";
-import type { ThemeValues, Transition } from "./values";
+import { TOKEN } from "./values";
+import type { ThemeValues, Transition, Value } from "./values";
 
 interface Context {
     styles: Styles;
@@ -214,10 +221,10 @@ const useSelected = (
     if (!component) throw new Error(`no styles for component "${name}"`);
     const variantKey = JSON.stringify(variants);
     const stateKey = JSON.stringify(state);
-    return useMemo(
-        () =>
+    return useMemo(() => {
+        const selectFrom = (styles: ComponentStyles<Value>) =>
             slowed(
-                selectWithTransitions(component, variants, {
+                selectWithTransitions(styles, variants, {
                     scheme: context.scheme,
                     reducedMotion: context.reducedMotion,
                     svg: context.svg,
@@ -228,19 +235,31 @@ const useSelected = (
                     ...state,
                 }),
                 context.timeScale,
-            ),
-        [
-            component,
-            context.scheme,
-            context.reducedMotion,
-            context.width,
-            context.svg,
-            context.timeScale,
-            containers,
-            variantKey,
-            stateKey,
-        ],
-    );
+            );
+        return withSetTokens(selectFrom(component), selectFrom, {
+            styles: context.styles,
+            key: context.key,
+            name,
+            scheme: context.scheme,
+            overrides: context.overrides,
+            ...(tokens ? { tokens } : {}),
+        });
+    }, [
+        component,
+        context.scheme,
+        context.reducedMotion,
+        context.width,
+        context.svg,
+        context.timeScale,
+        containers,
+        variantKey,
+        stateKey,
+        context.styles,
+        context.key,
+        context.overrides,
+        tokenKey,
+        name,
+    ]);
 };
 
 // A token value's transition, as selection names it, by the token's key.
@@ -248,8 +267,8 @@ const tokenTransitions = (selected: Selected): Map<string, Transition> => {
     const out = new Map<string, Transition>();
     for (const list of Object.values(selected.transitions)) {
         for (const t of list) {
-            if (t.property.startsWith(TOKEN_TRANSITION)) {
-                out.set(t.property.slice(TOKEN_TRANSITION.length), t);
+            if (t.property.startsWith(TOKEN)) {
+                out.set(t.property.slice(TOKEN.length), t);
             }
         }
     }

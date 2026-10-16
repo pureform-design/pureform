@@ -16,6 +16,7 @@ export {
     stylesFor,
     themeKey,
     withDerived,
+    withSetTokens,
 } from "./resolve";
 export type {
     Overrides,

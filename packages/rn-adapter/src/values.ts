@@ -27,9 +27,10 @@ export interface Transition {
     delay: number;
 }
 
-/** What a transition of a token's own value names, before the token's key: such a transition
- *  moves the token, and everything reading it, rather than a style property. */
-export const TOKEN_TRANSITION = "--";
+/** What names a token itself, before its key. A transition of it moves the token, and
+ *  everything reading it, rather than a style property; a style property of it sets the token
+ *  where that style applies. */
+export const TOKEN = "--";
 
 /** A style's keyframe animation, which selection returns beside the style. */
 export const ANIMATION = "animation";

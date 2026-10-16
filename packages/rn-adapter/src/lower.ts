@@ -27,7 +27,7 @@ import {
     DROP_SHADOW,
     SHAPE,
     TINT,
-    TOKEN_TRANSITION,
+    TOKEN,
     TRANSITION,
 } from "./values";
 import type { Value } from "./values";
@@ -584,7 +584,7 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 // token itself, which the hooks tween.
                 const property =
                     typeof part.property !== "string"
-                        ? `${TOKEN_TRANSITION}${part.property.path.join(".")}`
+                        ? `${TOKEN}${part.property.path.join(".")}`
                         : part.property === "clipPath"
                           ? SHAPE
                           : rnProperty(part.property);
@@ -664,9 +664,26 @@ const lowerStyle = (
     when: string[] = [],
     specificity = 0,
 ) => {
-    const { states, ...own } = map as StyleMap & {
+    const { states, tokens, ...own } = map as StyleMap & {
         states?: Record<string, StyleMap>;
     };
+    // A token set here is a property naming it, which selection takes out and resolves the
+    // component again with.
+    for (const [path, node] of Object.entries(tokens ?? {})) {
+        try {
+            for (const entry of lowerNode(node, ctx)) {
+                rules.add(
+                    [...new Set([...when, ...entry.when])],
+                    specificity + entry.specificity,
+                    `${TOKEN}${path}`,
+                    entry.value,
+                );
+            }
+        } catch (error) {
+            if (!(error instanceof Unsupported)) throw error;
+            diagnostics.add(`${where}: token ${path}: ${error.message}`);
+        }
+    }
     for (const [property, node] of Object.entries(own)) {
         if (node === undefined) continue;
         // Raw rules are keyed by target, and other targets' rules add nothing here.
