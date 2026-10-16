@@ -27,6 +27,9 @@ pureform({
 Every component token is a CSS var with a default from the theme, for example
 `--components-button-radius`. Set it on the component or any ancestor to restyle it at runtime.
 
+Changing a component's slots, `structure`, or icon slots changes its anatomy: run
+`@pureform/anatomy`'s `generate` task afterwards, or its drift test fails.
+
 ## States
 
 Components read their states from the element: the native state first (`:hover`, `:checked`,

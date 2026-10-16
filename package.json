@@ -42,6 +42,7 @@
         "@pureform/panda-adapter": "workspace:^",
         "@pureform/css-lowering": "workspace:^",
         "@pureform/styling": "workspace:^",
+        "@pureform/anatomy": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",

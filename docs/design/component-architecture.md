@@ -825,6 +825,16 @@ so bindings treat them uniformly.
   (§5.1), usable as selectors. Exported `testIds.button.root` constants from
   `@pureform/anatomy` so tests don't hard-code strings.
 - **Per-instance styling hooks:** `tokens={{ value: 40 }}` sets instance tokens (§5.4).
+- **Decided in building it:**
+    - The anatomy is generated: a script in `@pureform/anatomy` writes it from the preset's
+      default components as plain data, and a drift test compares it with what the AST
+      derives. Deriving at import would bundle the whole preset to learn part names.
+    - Attribute values and test ids are kebab case: the `touchTarget` part of `iconButton`
+      is `data-pf-part="touch-target"`, `data-scope="icon-button"`, and
+      `data-testid="pf-icon-button-touch-target"`; with `testId="save"` on Root it's
+      `save-touch-target`. `testIds.iconButton.touchTarget` keeps the AST's names.
+    - Each part records whether it's an icon that takes `mirror`: any of its styles reads
+      the `mirrored` state.
 
 ### 9.3 Configurability
 

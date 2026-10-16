@@ -126,6 +126,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/anatomy"]
+path = "packages/anatomy"
+include = [
+    "packages/anatomy/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
