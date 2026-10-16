@@ -136,6 +136,7 @@
       "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/css-lowering": "catalog:",
+        "@pureform/styling": "catalog:",
       },
       "devDependencies": {
         "@pureform/material": "catalog:",
