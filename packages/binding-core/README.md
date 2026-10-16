@@ -34,7 +34,7 @@ framework: context, memos, effects, and rendering.
 | `components/`     | One file per component's contract (`button.ts`, `checkbox.ts`), and `VariantProp` (`variants.ts`)                       |
 | `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                          |
 | `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                       |
-| `version.ts`      | `trainVersionMismatch`, a stub until `@pureform/generate` records the train's version (p4a)                             |
+| `version.ts`      | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`           |
 | `warn.ts`         | `warnOnce`                                                                                                              |
 | `dom.ts`          | The DOM half, on its own subpath: reduced motion, measuring an icon slot, a checkbox input kept in step                 |
 
@@ -157,8 +157,11 @@ of it, so a controlled checkbox whose owner ignores the change would otherwise s
 ## Worth knowing
 
 - **Stubs:** `theme`, `overrides`, and `hydrate` are carried through nesting but nothing applies
-  them (p5b). `trainVersionMismatch` always returns `undefined` until p4a records the glue's
-  version.
+  them (p5b).
+- **Train version check:** `@pureform/generate` passes the core train's version to
+  `createRegistry`, and the providers call `trainVersionMismatch(registry)` in development; it
+  returns a warning when `registry.version` differs from `@pureform/styling`'s `VERSION`. A
+  registry made by hand, with no version, passes.
 - **Reset reasons with Zag.** Zag's checkbox, switch, and radio group put their state back to
   its value at creation during the form's `reset` event. `untilNextTask({ drop })` covers that
   moment: callbacks are marked `reason: "reset"` when uncontrolled (the value at creation is the
