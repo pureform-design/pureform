@@ -5,6 +5,39 @@
 export { cx } from "./class-names";
 export type { ClassDictionary, ClassValue } from "./class-names";
 export {
+    BUTTON_CONTENT_PROPS,
+    BUTTON_ROOT_PROPS,
+    buttonMachineProps,
+    buttonSelection,
+} from "./components/button";
+export type {
+    ButtonBehaviorProps,
+    ButtonContentProps,
+    ButtonElementIds,
+    ButtonPart,
+    ButtonRootOwnProps,
+    ButtonVariantProps,
+} from "./components/button";
+export {
+    CHECKBOX_INPUT_LABEL_PROPS,
+    CHECKBOX_ROOT_PROPS,
+    checkboxInputProps,
+    checkboxMachineProps,
+    checkboxMarkProps,
+    checkboxNativeDefault,
+    checkboxResetState,
+    checkboxSelection,
+} from "./components/checkbox";
+export type {
+    CheckboxBehaviorProps,
+    CheckboxElementIds,
+    CheckboxPart,
+    CheckboxRootOwnProps,
+    CheckboxVariantProps,
+    CheckedState,
+} from "./components/checkbox";
+export type { VariantProp } from "./components/variants";
+export {
     controllableNames,
     controlSwitchMessage,
     createChangeReason,
@@ -37,6 +70,7 @@ export {
     forSlot,
     isIconPart,
     isUnstyled,
+    outsideRootMessage,
     partClasses,
     partSources,
     spreadableProps,
