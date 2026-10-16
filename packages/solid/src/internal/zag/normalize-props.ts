@@ -52,6 +52,11 @@ export const normalizeProps = createNormalizer<PropTypes>((props: Dict) => {
             normalized["style"] = cssify(value as Dict);
             continue;
         }
+        // Solid 2 writes `true` as an empty attribute, which ARIA reads as unset.
+        if (key.startsWith("aria-") && typeof value === "boolean") {
+            normalized[key] = String(value);
+            continue;
+        }
         if (key === "children") {
             if (isString(value)) normalized["textContent"] = value;
             continue;
