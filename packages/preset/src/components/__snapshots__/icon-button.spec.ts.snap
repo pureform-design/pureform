@@ -73,128 +73,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "className": "iconButton",
-    "compoundVariants": [
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + 0px)",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + 0px)",
-          },
-        },
-        "density": "0",
-        "size": "small",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -1))",
-          },
-        },
-        "density": "-1",
-        "size": "small",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -2))",
-          },
-        },
-        "density": "-2",
-        "size": "small",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + calc(token(spacing.1) * -3))",
-          },
-        },
-        "density": "-3",
-        "size": "small",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + 0px)",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + 0px)",
-          },
-        },
-        "density": "0",
-        "size": "medium",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -1))",
-          },
-        },
-        "density": "-1",
-        "size": "medium",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
-          },
-        },
-        "density": "-2",
-        "size": "medium",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -3))",
-          },
-        },
-        "density": "-3",
-        "size": "medium",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + 0px)",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + 0px)",
-          },
-        },
-        "density": "0",
-        "size": "large",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -1))",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -1))",
-          },
-        },
-        "density": "-1",
-        "size": "large",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -2))",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -2))",
-          },
-        },
-        "density": "-2",
-        "size": "large",
-      },
-      {
-        "css": {
-          "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -3))",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + calc(token(spacing.1) * -3))",
-          },
-        },
-        "density": "-3",
-        "size": "large",
-      },
-    ],
+    "compoundVariants": [],
     "defaultVariants": {
       "color": "primary",
       "density": "inherit",
@@ -267,11 +146,31 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         },
       },
       "density": {
-        "-1": {},
-        "-2": {},
-        "-3": {},
-        "0": {},
-        "inherit": {},
+        "-1": {
+          "root": {
+            "--components-iconButton-densityOffset": "calc(token(spacing.1) * -1)",
+          },
+        },
+        "-2": {
+          "root": {
+            "--components-iconButton-densityOffset": "calc(token(spacing.1) * -2)",
+          },
+        },
+        "-3": {
+          "root": {
+            "--components-iconButton-densityOffset": "calc(token(spacing.1) * -3)",
+          },
+        },
+        "0": {
+          "root": {
+            "--components-iconButton-densityOffset": "0px",
+          },
+        },
+        "inherit": {
+          "root": {
+            "--components-iconButton-densityOffset": "token(sizes.densityOffset)",
+          },
+        },
       },
       "shape": {
         "circle": {
@@ -302,20 +201,20 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       "size": {
         "large": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + token(sizes.densityOffset))",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + token(sizes.densityOffset))",
+            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
         "medium": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + token(sizes.densityOffset))",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + token(sizes.densityOffset))",
+            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
         "small": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + token(sizes.densityOffset))",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + token(sizes.densityOffset))",
+            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
       },

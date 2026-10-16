@@ -30,14 +30,12 @@ import {
     componentTokens,
     defaultDensities,
     defaultGroups,
-    dense,
-    densityCompounds,
-    densityMarkers,
     densitySteps,
+    densityTokenVariant,
+    DENSITY_TOKEN,
     groupTokens,
     iconBox,
     keysOf,
-    lower,
     mergeSlotStyles,
     pressableRoot,
     sys,
@@ -64,12 +62,16 @@ const { tokens, ref } = componentTokens("iconButton", {
     sizeMedium: sizeToken("controlMedium"),
     sizeLarge: sizeToken("controlLarge"),
     ...groupTokens(DEFAULT_GROUP),
+    ...DENSITY_TOKEN,
 });
 
 const size = (
     token: "sizeSmall" | "sizeMedium" | "sizeLarge",
 ): { root: StyleMap } => ({
-    root: { width: dense(ref(token)), height: dense(ref(token)) },
+    root: {
+        width: add(ref(token), ref("densityOffset")),
+        height: add(ref(token), ref("densityOffset")),
+    },
 });
 
 const pf = typed();
@@ -137,20 +139,8 @@ export const createIconButton = <
                         medium: size("sizeMedium"),
                         large: size("sizeLarge"),
                     },
-                    density: densityMarkers(densities),
+                    density: densityTokenVariant(densities),
                 },
-                compoundVariants: (
-                    ["Small", "Medium", "Large"] as const
-                ).flatMap((s) =>
-                    densityCompounds(
-                        densities,
-                        { size: lower(s) },
-                        (offset) => {
-                            const side = add(ref(`size${s}`), offset);
-                            return { root: { width: side, height: side } };
-                        },
-                    ),
-                ),
                 defaultVariants: {
                     color: "primary",
                     variant: "standard",
