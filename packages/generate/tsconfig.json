@@ -1,0 +1,4 @@
+{
+	"extends": ["@pureform/tsconfig/with-paths.json", "./tsconfig.project.json"],
+    "compilerOptions": {}
+}
