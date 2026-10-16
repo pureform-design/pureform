@@ -580,6 +580,13 @@ The design makes one setting, followed by everything that moves, on every target
       `STATE_TWEENS` (colors and elevation) always run, and `tweens(...)` gates only the
       moving properties it's given. This changes output on purpose, so it's checked
       against expected values rather than the before-and-after equivalence check.
+    - Built (p1b): `transitionMoves` and `valueTypeMoves` in `@pureform/core` decide what
+      moves, and the preset's `motionTransition(...parts)` drops those parts under
+      `reducedMotion` (`none` when nothing is left). The web rule is
+      `REDUCED_MOTION_RULES` in `@pureform/css-lowering`; a `full` provider nested in a
+      `reduce` one wins, for two levels. The Panda preset's `motionReduce` condition and the
+      Tailwind adapter's `motion-reduce` variant are replaced with it, so an app's own
+      reduced-motion styles follow the provider too.
 - **Server rendering.** The web rule is CSS, so the first paint is right. JS motion runs
   only after an interaction, so the hook can start from the provider's setting on the
   server and pick up the system value after mount without a mismatch.
