@@ -6,7 +6,13 @@ import { createMemo, createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
-import { mergeProps, normalizeProps, useMachine } from ".";
+import {
+    Key,
+    mergeProps,
+    normalizeProps,
+    useMachine,
+    useSyncExternalStore,
+} from ".";
 
 // The preset's `input` slot: a native input stretched invisibly over the whole control.
 const OVERLAY = {
@@ -231,6 +237,55 @@ describe("radio group through the overlaid native inputs", () => {
 });
 
 describe("the port's pieces", () => {
+    it("keys a list, keeping an item's element when the list reorders", async () => {
+        type Item = { id: string; label: string };
+        const [items, setItems] = createSignal<Item[]>([
+            { id: "a", label: "A" },
+            { id: "b", label: "B" },
+        ]);
+        const host = mount(() => (
+            <ul>
+                <Key each={items()} by="id">
+                    {(item) => <li>{item().label}</li>}
+                </Key>
+            </ul>
+        ));
+        const first = host.querySelector("li")!;
+        setItems([
+            { id: "b", label: "B" },
+            { id: "a", label: "A2" },
+        ]);
+        flush();
+        await settle();
+        const lis = [...host.querySelectorAll("li")];
+        expect(lis.map((li) => li.textContent)).toEqual(["B", "A2"]);
+        expect(lis[1]).toBe(first);
+    });
+
+    it("follows an external store once settled", async () => {
+        let value = 1;
+        const listeners = new Set<VoidFunction>();
+        const host = mount(() => {
+            const snapshot = useSyncExternalStore(
+                (onChange) => {
+                    listeners.add(onChange);
+                    return () => listeners.delete(onChange);
+                },
+                () => value,
+            );
+            return <p>{snapshot()}</p>;
+        });
+        await settle();
+        value = 2;
+        listeners.forEach((fn) => fn());
+        flush();
+        await settle();
+        expect(host.textContent).toBe("2");
+        dispose?.();
+        dispose = undefined;
+        expect(listeners.size).toBe(0);
+    });
+
     it("renames Zag's React-shaped props to Solid 2's", () => {
         const props = normalizeProps.element({
             tabIndex: 0,
