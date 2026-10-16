@@ -21,7 +21,6 @@ import {
     densitySteps,
     densityVariant,
     disabledColor,
-    groupRoles,
     iconBox,
     pressableRoot,
     sys,
@@ -167,30 +166,20 @@ export const createChip = <
                             root: fillRoot("elevated", TOKEN_SELECTED),
                         },
                     },
+                    // A group points the selected colors, which the fills and the icon read,
+                    // at its container roles.
                     color: colorVariant(groups, (g) => ({
-                        icon: { color: iconColor(g.onContainer) },
+                        root: {
+                            tokens: {
+                                selectedContainer: g.container,
+                                selectedContent: g.onContainer,
+                            },
+                        },
                     })),
                     density: densityVariant(densities, (offset) => ({
                         root: { height: add(ref("height"), offset) },
                     })),
                 },
-                // The selected colors sit in each fill's states, so a compound variant per fill and
-                // group replaces them in the later layer.
-                compoundVariants: groups
-                    .filter((group) => group !== DEFAULT_GROUP)
-                    .flatMap((group) =>
-                        (["outlined", "elevated"] as const).map((fill) => {
-                            const g = groupRoles(group);
-                            const root = fillRoot(fill, {
-                                container: g.container,
-                                content: g.onContainer,
-                            });
-                            return {
-                                match: { variant: fill, color: group },
-                                style: { root: { states: root.states ?? {} } },
-                            };
-                        }),
-                    ),
                 defaultVariants: {
                     variant: "outlined",
                     color: DEFAULT_GROUP,
