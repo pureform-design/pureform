@@ -1,0 +1,39 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/bundler"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-lib.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/vitest-config"
+    - "@pureform/core"
+    - "@pureform/generate"
+    - "@pureform/styling"
+
+cache:
+  key:
+    files:
+      append:
+        - client.d.ts
+
+tasks:
+  test:unit:
+    enabled: true
+
+  test:integration:
+    enabled: false
+
+  test:
+    enabled: true
+
+  build:
+    enabled: true
+
+  publish:
+    enabled: false
+
+meta:
+  publish: false
