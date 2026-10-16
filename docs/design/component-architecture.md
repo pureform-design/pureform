@@ -411,7 +411,7 @@ The design makes one setting, followed by everything that moves, on every target
   and our own machines read it; nothing calls `matchMedia` on its own.
 - **What reduces.** Movement stops: transitions, morphs, ripples, and token tweens such as
   a progress value apply at once. Kept: indeterminate progress, since its motion is the
-  only sign that work is going on (Material keeps it), and Zag's enter and exit
+  only sign that work is going on, and Zag's enter and exit
   animations, which need no change, because Zag's presence logic finishes at once when no
   animation runs.
 - **Server rendering.** The web rule is CSS, so the first paint is right. JS motion runs
