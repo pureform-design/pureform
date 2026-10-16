@@ -16,10 +16,6 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transform": "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "transform token(durations.short3) token(easings.standard)",
-      },
       "width": "200%",
     },
     "endHalf": {
@@ -34,6 +30,10 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
       "borderRadius": "50%",
       "height": "var(--components-circularProgress-size, 48px)",
       "position": "relative",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "--components-circularProgress-value token(durations.short3) token(easings.standard)",
+      },
       "width": "var(--components-circularProgress-size, 48px)",
     },
     "startArc": {
@@ -49,10 +49,6 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transform": "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "transform token(durations.short3) token(easings.standard)",
-      },
       "width": "200%",
     },
     "startHalf": {

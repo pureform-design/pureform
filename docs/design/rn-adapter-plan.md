@@ -278,6 +278,10 @@ overrides the primary color in either mode.
   pixels itself. On the web, where it runs real CSS transitions, logical properties are named
   as React Native Web writes them (`start` is `left`, left to right). It runs on the web
   without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
+- **Token transitions:** a component token with a `valueType` (`"number"`) can be named by
+  a transition. The web registers it with `@property`, so it moves and everything reading it
+  with it; `useComponentState` tweens an instance token's numbers the same way, selecting
+  again each frame. The circular progress moves its value, so both halves' arcs meet.
 - **Slow motion:** the provider's `timeScale` stretches every transition, animation, morph,
   and ripple the hooks return, for watching motion by eye.
 - **Metro:** `withPureform` from `@pureform/rn-adapter/metro` wraps an app's Metro config
