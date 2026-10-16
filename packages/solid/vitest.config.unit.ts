@@ -6,12 +6,19 @@ import solid from "@solidjs/vite-plugin";
 import { playwright } from "@vitest/browser-playwright";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 
+import { commands } from "./src/testing/commands";
 import baseConfig from "./vite.config";
 
 const executablePath = process.env.CHROMIUM_PATH;
 
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     plugins: [solid()],
+    // The library build leaves JSX to the app; the tests compile it, and TypeScript, here.
+    oxc: {},
+    // Optimized up front, so Vite doesn't reload a test when it finds them.
+    optimizeDeps: {
+        include: ["@zag-js/checkbox", "@zag-js/radio-group", "@zag-js/switch"],
+    },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },
     test: {
         testTimeout: 5000,
@@ -26,6 +33,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
                 launchOptions: executablePath ? { executablePath } : {},
             }),
             instances: [{ browser: "chromium" }],
+            commands,
         },
     },
 } satisfies UserWorkspaceConfig);
