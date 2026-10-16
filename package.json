@@ -44,6 +44,7 @@
         "@pureform/styling": "workspace:^",
         "@pureform/anatomy": "workspace:^",
         "@pureform/machines": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",

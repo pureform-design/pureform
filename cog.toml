@@ -58,6 +58,7 @@ include = [
     "packages/theme/**",
     "packages/type-utils/**",
     "packages/utils/**",
+    "packages/binding-core/**",
     # @anchor:new-core-train-package
 ]
 

@@ -134,6 +134,25 @@
         "vitest": "catalog:",
       },
     },
+    "packages/binding-core": {
+      "name": "@pureform/binding-core",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/core": "catalog:",
+        "@pureform/styling": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@pureform/core",
       "version": "0.0.0-semantically-released",
@@ -566,6 +585,7 @@
     "@pandacss/types": "^2.0.1",
     "@pandacss/vite": "^2.0.1",
     "@pureform/anatomy": "workspace:^",
+    "@pureform/binding-core": "workspace:^",
     "@pureform/core": "workspace:^",
     "@pureform/css-adapter": "workspace:^",
     "@pureform/css-lowering": "workspace:^",
@@ -1049,6 +1069,8 @@
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
 
     "@pureform/anatomy": ["@pureform/anatomy@workspace:packages/anatomy"],
+
+    "@pureform/binding-core": ["@pureform/binding-core@workspace:packages/binding-core"],
 
     "@pureform/browser-e2e-tests": ["@pureform/browser-e2e-tests@workspace:tests/browser-e2e-tests"],
 
