@@ -13,6 +13,8 @@ export { useFieldsetDisabled, useFormReset } from "./form";
 export type { FormResetOptions } from "./form";
 export { IconPartContext, useIconStyle } from "./icon-style";
 export { useReducedMotion } from "./motion";
+export { createPartContext } from "./part-context";
+export type { PartContext } from "./part-context";
 export { mergeRefs, slotPartProps, useComponent } from "./parts";
 export type {
     ComponentOf,

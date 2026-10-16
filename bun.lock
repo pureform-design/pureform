@@ -327,6 +327,7 @@
         "@pureform/anatomy": "catalog:",
         "@pureform/binding-core": "catalog:",
         "@pureform/machines": "catalog:",
+        "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:",
       },
       "devDependencies": {

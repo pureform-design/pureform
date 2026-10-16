@@ -1,10 +1,11 @@
 # @pureform/react
 
-pureform's bindings for React 19: the provider, the style registry's hooks, and the helpers
-components build their parts from. It mirrors `@pureform/solid`'s API with React's idioms
-(values instead of accessors, `useMemo`, `use()` for lazy entries, `useId`). The components
-themselves (button, checkbox, …) come next and are each "wire the anatomy to a machine to the
-registry". Machines run through `@zag-js/react`'s `useMachine` directly.
+pureform's bindings for React 19: the provider, the style registry's hooks, the helpers
+components build their parts from, and the components themselves (button and checkbox so far).
+It mirrors `@pureform/solid`'s API with React's idioms (values instead of accessors, `className`
+instead of `class`, `useMemo`, `use()` for lazy entries, `useId`). Each component wires its
+anatomy to a machine to the registry, and comes ready-made and as compound parts. Machines run
+through `@zag-js/react`'s `useMachine`.
 
 ## Where it sits
 
@@ -13,7 +14,7 @@ registry". Machines run through `@zag-js/react`'s `useMachine` directly.
         │              │          │            │
         └──────────────┴────┬─────┴────────────┘
                             │
-                    @pureform/react  ──► @zag-js/react
+                    @pureform/react  ──► @zag-js/react, @zag-js/core (types)
                             │
                  react 19, react-dom 19    (peers)
 ```
@@ -26,17 +27,21 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 
 ## Architecture
 
-| Module            | What it holds                                                                          |
-| ----------------- | -------------------------------------------------------------------------------------- |
-| `provider.tsx`    | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`          |
-| `classes.ts`      | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                 |
-| `parts.tsx`       | `useComponent` (a component's classes and parts), `slotPartProps`, `mergeRefs`         |
-| `props.ts`        | React's rules for merging a part's props: one `className` string (`cx`), style objects |
-| `controllable.ts` | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine         |
-| `form.ts`         | `useFormReset`, `useFieldsetDisabled`                                                  |
-| `motion.ts`       | `useReducedMotion`                                                                     |
-| `icon-style.ts`   | `useIconStyle`, and the context icon parts provide                                     |
-| `env.ts`          | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`            |
+| Module            | What it holds                                                                           |
+| ----------------- | --------------------------------------------------------------------------------------- |
+| `provider.tsx`    | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`           |
+| `classes.ts`      | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                  |
+| `parts.tsx`       | `useComponent` (a component's classes and parts), `slotPartProps`, `mergeRefs`          |
+| `props.ts`        | React's rules for merging a part's props: one `className` string (`cx`), style objects  |
+| `controllable.ts` | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine          |
+| `form.ts`         | `useFormReset`, `useFieldsetDisabled`                                                   |
+| `motion.ts`       | `useReducedMotion`                                                                      |
+| `icon-style.ts`   | `useIconStyle`, and the context icon parts provide                                      |
+| `part-context.ts` | `createPartContext`: the context Root shares with its parts, and the error outside Root |
+| `machine.ts`      | `useMachine`: Zag's, typed so a component can pass its optional props through           |
+| `button/`         | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`   |
+| `checkbox/`       | `@pureform/react/checkbox`: the same layout                                             |
+| `env.ts`          | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`             |
 
 ```
 Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► useClasses ──► registry entry
@@ -52,7 +57,71 @@ package only says how React joins classes (into `className`, `clsx`-style) and s
 
 ## Public API
 
-The entry starts with `"use client"`: every export is a hook or a component.
+Every entry starts with `"use client"`: every export is a hook or a component.
+
+### Components
+
+One subpath per component, so an app's bundle keeps only what it imports. Each export is the
+ready-made component, with its compound parts as properties. The API, parts, DOM, and behavior
+match `@pureform/solid`'s; one shared browser suite runs against both.
+
+```tsx
+import { Button } from "@pureform/react/button";
+import { Checkbox } from "@pureform/react/checkbox";
+
+<Button label="Save" icon={<SaveIcon />} variant="tonal" type="submit" />
+<Button
+    label="Bold"
+    defaultSelected={false} // a toggle: aria-pressed, onSelectedChange({ selected })
+    className={{ root: ["wide", { busy: saving }], label: "caps" }}
+    style={{ root: { marginTop: 8 } }}
+    testId="bold" // bold-root, bold-label, …
+    slotProps={{ icon: { title: "B" } }}
+    unstyled={{ label: true }}
+/>
+<Button.Root variant="text" onClick={save}>
+    <Button.TouchTarget />
+    <Button.Icon mirror><ArrowIcon /></Button.Icon>
+    <Button.Label>Next</Button.Label>
+</Button.Root>
+
+<Checkbox name="terms" aria-label="Accept the terms" defaultChecked />
+<Checkbox checked={agreed} onCheckedChange={(d) => setAgreed(d.checked === true)} />
+<Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
+    <Checkbox.TouchTarget />
+    <Checkbox.Input />
+    <Checkbox.Box>
+        <Checkbox.CheckIcon />
+        <Checkbox.IndeterminateIcon />
+    </Checkbox.Box>
+</Checkbox.Root>
+```
+
+| Component  | Parts (element)                                                                                      | Machine                     |
+| ---------- | ---------------------------------------------------------------------------------------------------- | --------------------------- |
+| `Button`   | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                           | `@pureform/machines/button` |
+| `Checkbox` | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon` | Zag's checkbox              |
+
+- **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
+  `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
+  `selected` or `checked`), `id` and `ids` (the machine finds its elements by id, so set them
+  here rather than on a part), `testId`, `unstyled`, `as`, `ref`, and the element's own props.
+  The lists live in `@pureform/binding-core` (`BUTTON_ROOT_PROPS`, `CHECKBOX_ROOT_PROPS`), shared
+  with Solid.
+- **Parts** take the element's props (and `ref`) and their own `unstyled`; `Button.Icon` takes
+  `mirror`. A part outside its Root throws, naming both.
+- **The ready-made** component takes Root's props, with `className`, `style`, and `slotProps`
+  keyed by part. `Button` takes `label`, `icon` (the icon part renders only when given), and
+  `mirrorIcon`. `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its
+  input.
+- **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
+  target toggles it. Name it with `aria-label`, or point a `<label htmlFor>` at `ids.input`;
+  don't wrap it in another label. The input carries every native state the CSS reads
+  (`:checked`, `:indeterminate`, `:disabled`, `aria-invalid`), and the form reset and fieldset
+  rule are the binding's (below).
+- **A controlled checkbox doesn't move** until its prop does: after a click, once Zag has sent the
+  change, the input is put back to the last committed value (`syncCheckedInput`), and the
+  owner's update, if any, then moves it with the machine.
 
 ### Provider
 
@@ -99,19 +168,31 @@ its boundary renders the fallback there (and warns in development).
 
 ### Building a component
 
-```tsx
-const ButtonContext = createContext<{ scope: ComponentScope<typeof buttonAnatomy>; api: … } | null>(null);
+The components above are the reference: `src/button/button.tsx` and `src/checkbox/checkbox.tsx`.
+In short:
 
-export function Root(props: RootProps) {
-    const { variant, tokens, disabled, as, testId, unstyled, ...rest } = props; // minus the controllable props
+```tsx
+const context = createPartContext<{ scope: ComponentScope<typeof buttonAnatomy>; api: … }>("Button");
+
+function Root(props: ButtonRootProps) {
     const id = useId();
     const dir = useDirection();
     const selected = useControllable("Button", "selected", props);
-    const service = useMachine(button.machine, { id, dir, disabled, ...selected.machineProps });
+    const service = useMachine(button.machine, {
+        id,
+        dir,
+        ...buttonMachineProps(props), // binding-core: the contract Solid shares
+        ...selected.machineProps,
+    });
     const api = button.connect(service, normalizeProps);
-    const scope = useComponent(buttonAnatomy, { selection: { variant, tokens }, testId, unstyled });
+    const scope = useComponent(buttonAnatomy, {
+        selection: buttonSelection(props),
+        testId: props.testId,
+        unstyled: props.unstyled,
+    });
+    const { as, ...rest } = omitProps(props, BUTTON_ROOT_PROPS); // Root's own props stay off the element
     return (
-        <ButtonContext value={{ scope, api }}>
+        <context.Provider value={{ scope, api }}>
             {scope.render("root", {
                 element: "button",
                 as,
@@ -119,23 +200,24 @@ export function Root(props: RootProps) {
                 states: { pressed: api.pressed },
                 props: rest,
             })}
-        </ButtonContext>
+        </context.Provider>
     );
 }
 
-export function Icon({ mirror, ...props }: PartProps & { mirror?: boolean }) {
-    const { scope, api } = use(ButtonContext)!;
+function Icon({ unstyled, mirror, ...props }: ButtonIconProps) {
+    const { scope, api } = context.use("Icon"); // throws outside Root
     return scope.render("icon", {
         element: "span",
         machine: api.getIconProps(),
         states: { mirrored: mirror },
+        unstyled,
         props,
     });
 }
 ```
 
-The full example, with a ready-made `Button` over `slotPartProps`, is
-`src/__fixtures__/button.tsx`.
+`useMachine` is `machine.ts`'s, which lets each machine prop be `undefined`; `omitProps` is in
+`props.ts`. `src/__fixtures__/button.tsx` is a smaller example the core specs use.
 
 - `scope.part(part, options)` returns the merged props to spread yourself; `scope.render` also
   renders the element (`as` overrides it), passes the user's `ref` (merged with `options.ref`
@@ -196,11 +278,15 @@ filled: false }`.
 
 Through the omni MCP (or `omni run`):
 
-- `build`: Vite library build into `dist/index.mjs` with declarations; React, Zag, and the
+- `build`: Vite library build into `dist/index.mjs`, `dist/button.mjs`, and `dist/checkbox.mjs`
+  (shared chunks beside them) with declarations; React, Zag, and the
   pureform packages stay external, and `process.env.NODE_ENV` is left for the app's bundler.
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`) with React
   Testing Library, and type checks. The specs use a fake registry
-  (`src/__fixtures__/registry.ts`) and the example button. Interactions go through
+  (`src/__fixtures__/registry.ts`, with button and checkbox factories that name the selection)
+  and the example button. The component specs mirror `@pureform/solid`'s case by case;
+  `src/testing/render.tsx` has `outside` (a value set from the test, as a Solid signal) and an
+  error boundary. Interactions go through
   `vitest/browser`'s `userEvent` wrapped in `act` (`src/testing/render.tsx`).
 
 ## Worth knowing
@@ -210,3 +296,6 @@ Through the omni MCP (or `omni run`):
 - Server rendering isn't exercised by these tests (p3c's hydration suite).
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
   transition.
+- **No link button yet:** `<Button.Root as="a">` renders an anchor, but the machine still writes
+  `type` and `disabled` on it.
+- Components aren't re-exported from the root entry; import them from their subpaths.

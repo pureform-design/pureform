@@ -33,6 +33,17 @@ export const combinePartProps = (
     sources: readonly (Readonly<Record<string, unknown>> | undefined)[],
 ): Record<string, unknown> => combineProps(sources, REACT_RULES);
 
+/** `props` without `keys`: what a Root passes to its element once it has taken its own props
+ *  (`BUTTON_ROOT_PROPS`). */
+export const omitProps = <P extends object, K extends keyof P>(
+    props: P,
+    keys: readonly K[],
+): Omit<P, K> => {
+    const rest = { ...props };
+    for (const key of keys) delete rest[key];
+    return rest;
+};
+
 /** Two parts' props merged, the inner one's taking precedence: how nested providers combine
  *  their `slotProps`. */
 export const mergePartProps = (outer: PartProps, inner: PartProps): PartProps =>

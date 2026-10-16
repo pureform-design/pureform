@@ -8,7 +8,7 @@ export default createConfig({
     overrides: {
         build: {
             rolldownOptions: {
-                // The one entry starts with "use client", which the bundle keeps at its top: every
+                // Every entry starts with "use client", which the bundle keeps at its top: every
                 // export is a hook or a component that renders on the client.
                 onLog(level, log, handler) {
                     if (log.code === "MODULE_LEVEL_DIRECTIVE") return;
@@ -18,6 +18,8 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
+                    button: "src/button/index.ts",
+                    checkbox: "src/checkbox/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
