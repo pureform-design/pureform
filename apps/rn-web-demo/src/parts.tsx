@@ -2,8 +2,8 @@
 // ripples, and glyphs standing in for icons.
 
 import type { State, Style } from "@pureform/rn-adapter";
-import { useRipple } from "@pureform/rn-adapter/animated";
-import { pressableState, useComponentStyles } from "@pureform/rn-adapter/react";
+import { pressableState, useComponentState } from "@pureform/rn-adapter/react";
+import { useSvgRipple } from "@pureform/rn-adapter/svg";
 import { useState } from "react";
 import type { ComponentProps } from "react";
 import { Animated, Pressable } from "react-native";
@@ -63,11 +63,13 @@ export const useInk = (
     state: State,
     options: { slot?: string; centered?: boolean; disabled?: boolean } = {},
 ) => {
-    const own = useComponentStyles(name, variants, state)[
-        options.slot ?? "root"
-    ];
+    const slot = options.slot ?? "root";
+    const { styles, drawings } = useComponentState(name, variants, state);
+    const own = styles[slot];
     const radius = own?.borderRadius;
-    return useRipple({
+    // Clipped to the surface's shape, where it draws one.
+    return useSvgRipple({
+        clip: drawings[slot],
         color: String(own?.color ?? "rgb(0, 0, 0)"),
         ...(typeof radius === "number" || typeof radius === "string"
             ? { radius }
@@ -80,7 +82,7 @@ export const useInk = (
 /** Pressable handlers with a ripple's added. */
 export const withInk = (
     handlers: ReturnType<typeof usePress>["handlers"],
-    ink: ReturnType<typeof useRipple>,
+    ink: ReturnType<typeof useSvgRipple>,
 ) => ({
     ...handlers,
     onPressIn: (event: { nativeEvent: { pageX: number; pageY: number } }) => {

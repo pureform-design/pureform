@@ -28,6 +28,7 @@ import {
     ListItem,
     Media,
     Radio,
+    SHAPES,
     Scrim,
     Separator,
     SupportingText,
@@ -89,6 +90,7 @@ function Page(props: { controls: ReactNode }) {
     const [on, setOn] = useState(true);
     const [size, setSize] = useState("medium");
     const [fit, setFit] = useState("Medium");
+    const [shape, setShape] = useState<(typeof SHAPES)[number]>("cookie4Sided");
     const [item, setItem] = useState(0);
     const [progress, setProgress] = useState<number | undefined>(40);
     const [name, setName] = useState("");
@@ -186,6 +188,28 @@ function Page(props: { controls: ReactNode }) {
                         variant="filled"
                         disabled
                     />
+                </View>
+            </Section>
+            <Section title="Shapes">
+                <Choices value={shape} options={SHAPES} onChange={setShape} />
+                <View style={styles.row}>
+                    {(["filled", "tonal", "outlined"] as const).map(
+                        (variant) => (
+                            <IconButton
+                                key={variant}
+                                variant={variant}
+                                shape={shape}
+                                size="large"
+                                label={`${variant} ${shape}`}
+                                glyph="✎"
+                            />
+                        ),
+                    )}
+                    <Fab glyph="+" size="large" shape={shape} />
+                    <Avatar initials="AL" size="large" shape={shape} />
+                    <View style={styles.picture}>
+                        <Media aspect="square" shape={shape} />
+                    </View>
                 </View>
             </Section>
             <Section title="Floating action buttons">
@@ -408,6 +432,7 @@ export function App() {
     const [mode, setMode] = useState<"precomputed" | "runtime">("precomputed");
     const [override, setOverride] = useState<keyof typeof OVERRIDES>("none");
     const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
+    const [drawing, setDrawing] = useState<"svg" | "no svg">("svg");
     const { width } = useWindowDimensions();
     const controls = (
         <View style={styles.section}>
@@ -432,6 +457,11 @@ export function App() {
                 onChange={setMotion}
             />
             <Choices
+                value={drawing}
+                options={["svg", "no svg"] as const}
+                onChange={setDrawing}
+            />
+            <Choices
                 value={override}
                 options={Object.keys(OVERRIDES)}
                 onChange={setOverride}
@@ -446,6 +476,7 @@ export function App() {
             overrides={OVERRIDES[override]!}
             reducedMotion={motion === "reduced motion"}
             width={width}
+            svg={drawing === "svg"}
         >
             <Page controls={controls} />
         </PureformProvider>
@@ -468,6 +499,7 @@ const styles = StyleSheet.create({
     // Tooltips fit their text, as inline elements do on the web.
     start: { alignItems: "flex-start" },
     bar: { width: 240 },
+    picture: { width: 96 },
     media: { width: 160, position: "relative" },
     // The scrim dims the picture, so it takes the picture's corners.
     clip: { overflow: "hidden", borderRadius: 12 },

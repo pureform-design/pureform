@@ -12,6 +12,21 @@ import type { Plugin } from "vite";
 import packageJson from "./package.json";
 
 const require = createRequire(import.meta.url);
+
+const RN_WEB = dirname(require.resolve("react-native-web/package.json"));
+
+const WEB_EXTENSIONS = [
+    ...[".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx"].map(
+        (ext) => `.web${ext}`,
+    ),
+    ".mjs",
+    ".js",
+    ".mts",
+    ".ts",
+    ".jsx",
+    ".tsx",
+    ".json",
+];
 import { BRAND_TOKENS, BRANDS, COMPONENTS, config } from "./src/config";
 
 const STYLES_ID = "virtual:pureform-rn";
@@ -76,13 +91,24 @@ export default createConfig({
     overrides: {
         plugins: [react(), pureformRn()],
         resolve: {
+            // React Native libraries such as react-native-svg pick their web build by these.
+            extensions: WEB_EXTENSIONS,
             // An absolute path, so the adapter's built files, outside this app, find it too.
             alias: {
-                "react-native": dirname(
-                    require.resolve("react-native-web/package.json"),
-                ),
+                "react-native": RN_WEB,
+                // React Native's asset registry, which react-native-svg reads for images.
+                "@react-native/assets-registry/registry": `${RN_WEB}/dist/modules/AssetRegistry/index.js`,
             },
         },
+        // react-native-svg imports native modules behind Android checks, which React Native
+        // Web doesn't export; they're never reached on the web.
+        optimizeDeps: {
+            rolldownOptions: {
+                resolve: { extensions: WEB_EXTENSIONS },
+                shimMissingExports: true,
+            },
+        },
+        build: { rolldownOptions: { shimMissingExports: true } },
         // Parts of React Native Web's Animated refer to Node's `global`.
         define: { global: "globalThis" },
     },

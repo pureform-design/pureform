@@ -3,7 +3,12 @@
 // markup does. The interactive ones animate their state changes and ripple when pressed.
 
 import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
-import { useComponentStyles, useTokens } from "@pureform/rn-adapter/react";
+import {
+    useComponentState,
+    useComponentStyles,
+    useTokens,
+} from "@pureform/rn-adapter/react";
+import { SvgDrawing } from "@pureform/rn-adapter/svg";
 import type { ReactNode } from "react";
 import { Animated, Image, Text, View } from "react-native";
 import type { ImageStyle } from "react-native";
@@ -22,6 +27,18 @@ import {
     withInk,
 } from "./parts";
 import type { Color, Group } from "./parts";
+
+/** A few of Material's shapes, for the shaped components. */
+export const SHAPES = [
+    "none",
+    "square",
+    "cookie4Sided",
+    "clover8Leaf",
+    "sunny",
+    "heart",
+    "pentagon",
+] as const;
+export type Shape = (typeof SHAPES)[number];
 
 export function Button(props: {
     label: string;
@@ -178,13 +195,16 @@ export function Avatar(props: {
     initials: string;
     size?: "small" | "medium" | "large";
     color?: Color;
+    shape?: Shape;
 }) {
-    const s = useComponentStyles("avatar", {
+    const { styles: s, drawings } = useComponentState("avatar", {
         size: props.size,
         color: props.color,
+        shape: props.shape,
     });
     return (
         <View role="img" aria-label={props.initials} style={view(s[""])}>
+            <SvgDrawing drawing={drawings[""]} />
             <Text style={text(ownText(s[""]))}>{props.initials}</Text>
         </View>
     );
@@ -220,24 +240,22 @@ export function IconButton(props: {
     label: string;
     variant?: "filled" | "tonal" | "outlined" | "standard" | "elevated";
     size?: "small" | "medium" | "large";
+    shape?: Shape;
     disabled?: boolean;
 }) {
     const { state, handlers } = usePress({ disabled: props.disabled ?? false });
-    const s = useAnimatedComponentStyles(
-        "iconButton",
-        { variant: props.variant, size: props.size },
-        state,
-    );
-    const ink = useInk(
-        "iconButton",
-        { variant: props.variant, size: props.size },
-        state,
-        {
-            slot: "container",
-            centered: true,
-            disabled: props.disabled ?? false,
-        },
-    );
+    const variants = {
+        variant: props.variant,
+        size: props.size,
+        shape: props.shape,
+    };
+    const s = useAnimatedComponentStyles("iconButton", variants, state);
+    const { drawings } = useComponentState("iconButton", variants, state);
+    const ink = useInk("iconButton", variants, state, {
+        slot: "container",
+        centered: true,
+        disabled: props.disabled ?? false,
+    });
     return (
         <AnimatedPressable
             {...withInk(handlers, ink)}
@@ -248,13 +266,16 @@ export function IconButton(props: {
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
             <Animated.View style={aview(s.container)}>
+                <SvgDrawing drawing={drawings.container} />
                 <Animated.View style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
                 </Animated.View>
                 {ink.layer}
             </Animated.View>
             {props.variant === "outlined" && (
-                <Animated.View pointerEvents="none" style={aview(s.outline)} />
+                <Animated.View pointerEvents="none" style={aview(s.outline)}>
+                    <SvgDrawing drawing={drawings.outline} />
+                </Animated.View>
             )}
         </AnimatedPressable>
     );
@@ -265,27 +286,18 @@ export function Fab(props: {
     label?: string;
     variant?: "tonal" | "filled" | "surface";
     size?: "small" | "medium" | "large";
+    shape?: Shape;
 }) {
     const { state, handlers } = usePress({});
-    const s = useAnimatedComponentStyles(
-        "fab",
-        {
-            variant: props.variant,
-            size: props.size,
-            extended: props.label ? "true" : "false",
-        },
-        state,
-    );
-    const ink = useInk(
-        "fab",
-        {
-            variant: props.variant,
-            size: props.size,
-            extended: props.label ? "true" : "false",
-        },
-        state,
-        { slot: "container" },
-    );
+    const variants = {
+        variant: props.variant,
+        size: props.size,
+        shape: props.shape,
+        extended: props.label ? "true" : "false",
+    };
+    const s = useAnimatedComponentStyles("fab", variants, state);
+    const { drawings } = useComponentState("fab", variants, state);
+    const ink = useInk("fab", variants, state, { slot: "container" });
     return (
         <AnimatedPressable
             {...withInk(handlers, ink)}
@@ -295,6 +307,7 @@ export function Fab(props: {
         >
             <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
             <Animated.View style={aview(s.container)}>
+                <SvgDrawing drawing={drawings.container} />
                 <Animated.View style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
                 </Animated.View>
@@ -468,13 +481,38 @@ export function Scrim() {
 }
 
 // A picture to show in media: a gradient drawn as an svg, so the demo needs no network. React
-// Native Web escapes inline svg markup itself, so it goes in as is.
-const PICTURE = `data:image/svg+xml;utf8,${'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><defs><linearGradient id="g" x2="1" y2="1"><stop offset="0" stop-color="#6750A4"/><stop offset="1" stop-color="#7D5260"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/><circle cx="3" cy="0.9" r="0.45" fill="#FFD8E4"/></svg>'}`;
+// Native Web escapes inline svg markup itself, so it goes in as is. It covers whatever box it's
+// drawn in itself, since a browser fits an svg picture by its own aspect ratio rule, not that
+// of the svg image showing it.
+const PICTURE = `data:image/svg+xml;utf8,${'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3" preserveAspectRatio="xMidYMid slice"><defs><linearGradient id="g" x2="1" y2="1"><stop offset="0" stop-color="#6750A4"/><stop offset="1" stop-color="#7D5260"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/><circle cx="3" cy="0.9" r="0.45" fill="#FFD8E4"/></svg>'}`;
 
-export function Media(props: { aspect?: "square" | "landscape" | "portrait" }) {
-    const { objectFit, ...style } = useComponentStyles("media", {
+export function Media(props: {
+    aspect?: "square" | "landscape" | "portrait";
+    shape?: Shape;
+}) {
+    const { styles, drawings } = useComponentState("media", {
         aspect: props.aspect,
-    })[""]!;
+        shape: props.shape,
+    });
+    const { objectFit, ...style } = styles[""]!;
+    // A shaped picture is drawn clipped to its shape; React Native's Image can't clip to one.
+    if (drawings[""]) {
+        return (
+            <View
+                role="img"
+                aria-label=""
+                style={view(style as typeof styles.root)}
+            >
+                <SvgDrawing
+                    drawing={drawings[""]}
+                    image={{
+                        uri: PICTURE,
+                        fit: objectFit === "contain" ? "contain" : "cover",
+                    }}
+                />
+            </View>
+        );
+    }
     return (
         <Image
             source={{ uri: PICTURE }}
