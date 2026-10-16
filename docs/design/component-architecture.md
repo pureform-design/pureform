@@ -1021,6 +1021,6 @@ Preset changes these designs need, independent of the steps above:
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
 React built in parallel with Solid; text field gets its own machine; lookups cost little
-once cached per selection (§2), so no phone measurement; state lives on the
-web as data attributes; too many variant combinations is solved by tokens a style sets
+once cached per selection (§2), so no phone measurement; on the web, states are matched by native
+pseudo-classes, then ARIA, then pureform's own `data-pf-*` attributes (§5.1); too many variant combinations is solved by tokens a style sets
 (§5.5), with fragments (§5.4) for the rest.
