@@ -335,12 +335,14 @@
       "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:",
       },
       "devDependencies": {
         "@pandacss/types": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",

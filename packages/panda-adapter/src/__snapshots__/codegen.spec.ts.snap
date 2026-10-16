@@ -1,0 +1,91 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the Panda codegen > keeps every variant of each component, and every theme, in staticCss 1`] = `
+"import type { Config } from "@pandacss/dev";
+
+export const staticCss = {
+    themes: ["teal", "dense"],
+    recipes: {
+        iconButton: ["*"],
+        icon: ["*"],
+        divider: ["*"],
+    },
+} satisfies NonNullable<Config["staticCss"]>;
+"
+`;
+
+exports[`the Panda codegen > maps slot classes, converts boolean groups, and adds instance tokens 1`] = `
+"import { selectionCache, withTokenStyle } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+import { iconButton as recipe } from "../../styled-system/recipes/icon-button";
+
+const vars = {
+    radius: "--pf-components-iconButton-radius",
+    gap: "--pf-components-iconButton-gap",
+} as const;
+
+const classes = selectionCache<Selection<"iconButton">, ClassSlots<"iconButton">>(
+    {
+        variants: ["variant", "toggle"],
+        defaults: {
+            variant: "filled",
+            toggle: "false",
+        },
+    },
+    (s) => {
+        const slots = recipe({
+            ...s,
+            toggle: s.toggle === "true" ? true : s.toggle === "false" ? false : s.toggle,
+        });
+        return {
+            root: { class: slots.root },
+            icon: { class: slots.icon },
+        };
+    },
+);
+
+export const iconButton: ClassFactory<"iconButton"> = (s) =>
+    withTokenStyle(classes(s), s.tokens, vars);
+"
+`;
+
+exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 1`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+import { icon as recipe } from "../../styled-system/recipes/icon";
+
+const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
+    {
+        variants: ["filled"],
+    },
+    (s) => {
+        const root = recipe({
+            ...s,
+            filled: s.filled === "true" ? true : s.filled === "false" ? false : s.filled,
+        });
+        return { root: { class: root } };
+    },
+);
+
+export const icon: ClassFactory<"icon"> = classes;
+"
+`;
+
+exports[`the Panda codegen > wraps a single-slot recipe's class string as the root's 2`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+import { divider as recipe } from "../../styled-system/recipes/divider";
+
+const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
+    {
+        variants: [],
+    },
+    (s) => ({ root: { class: recipe(s) } }),
+);
+
+export const divider: ClassFactory<"divider"> = classes;
+"
+`;
