@@ -12,7 +12,7 @@ depends only on `@pureform/core`.
 style map ──► style-map.ts ──► conditions.ts ──► compile-node.ts ──► CSS strings
                 (nesting)       (selectors,        (value nodes)
                                  at-rules)
-config.ts: component token vars, registered properties, slot ancestry
+config.ts: component and instance token vars, registered properties, slot ancestry
 runtime.ts: themeVars, a theme's custom properties at runtime
 ```
 
@@ -22,7 +22,7 @@ runtime.ts: themeVars, a theme's custom properties at runtime
 | `conditions.ts`   | Conditions to selectors or at-rules, and conditional values to nested objects. |
 | `style-map.ts`    | A whole style map to a nested style object.                                    |
 | `css.ts`          | Var names, token references, keyword and color formatting.                     |
-| `config.ts`       | Component token vars, `@property` registrations, slot ancestors.               |
+| `config.ts`       | Component token vars, instance token vars, `@property` registrations, slots.   |
 | `motion.ts`       | `REDUCED_MOTION_RULES`: where reduced motion holds, by system or provider.     |
 | `utilities.ts`    | Utility templates and argument substitution.                                   |
 | `runtime.ts`      | `themeVars`: a theme's vars, for switching themes at runtime.                  |
@@ -31,7 +31,9 @@ runtime.ts: themeVars, a theme's custom properties at runtime
 
 Everything is exported from the root, `@pureform/css-lowering`: `compileNodeToCSS`,
 `compileValue`, `compileConditional`, `conditionKey`, `compileStyleMap`, `themeVars`, and the
-helpers above.
+helpers above. `instanceTokenVars(name, spec, prefix)` names the CSS var of each of a
+component's instance tokens (a `dynamic` token's own path, else `components.<name>.<token>`);
+the web adapters' generated factories set them on the root.
 
 ```ts
 import { conditionKey } from "@pureform/css-lowering";

@@ -5,6 +5,7 @@ export { compileConditional, compileValue, conditionKey } from "./conditions";
 export type { CondObject } from "./conditions";
 export {
     componentTokenVars,
+    instanceTokenVars,
     registeredProperties,
     slotAncestors,
     usesColorScheme,
