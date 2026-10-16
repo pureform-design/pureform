@@ -2,8 +2,8 @@
 //
 // Each property value is compiled through `compileValue`, so a conditional becomes a nested
 // conditional object. `apply` passes through as utility invocations (declared first so explicit
-// properties win on conflict), `states` lower to condition keys, and `rawRules` emit the
-// target's raw nested selectors.
+// properties win on conflict), `tokens` set their custom properties, `states` lower to
+// condition keys, and `rawRules` emit the target's raw nested selectors.
 
 import type { StyleMap } from "@pureform/core/ast";
 import type { Condition, ValueNode } from "@pureform/core/ast";
@@ -11,6 +11,7 @@ import type { Condition, ValueNode } from "@pureform/core/ast";
 import { compileNodeToCSS } from "./compile-node";
 import { compileValue, conditionKey } from "./conditions";
 import type { LowerCtx } from "./context";
+import { varName } from "./css";
 
 type ApplyArg = string | ValueNode | Record<string, ValueNode> | ValueNode[];
 
@@ -44,8 +45,21 @@ export const compileStyleMap = (
     }
 
     for (const [key, value] of Object.entries(m)) {
-        if (key === "apply" || key === "states" || key === "rawRules") continue;
+        if (
+            key === "apply" ||
+            key === "states" ||
+            key === "rawRules" ||
+            key === "tokens"
+        )
+            continue;
         out[key] = compileValue(value as ValueNode, ctx);
+    }
+
+    // A token set here is its custom property, which the styles reading it, here and in every
+    // element inside, follow.
+    const tokens = m.tokens as Record<string, ValueNode> | undefined;
+    for (const [path, value] of Object.entries(tokens ?? {})) {
+        out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
     }
 
     const states = m.states as

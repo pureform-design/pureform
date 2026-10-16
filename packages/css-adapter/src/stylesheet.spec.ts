@@ -140,6 +140,18 @@ describe("compileCss (utilities)", () => {
         expect(ruleOf(css, ".box")).toContain("gap: var(--spacing-2);");
     });
 
+    it("sets tokens as custom properties, through states", () => {
+        const css = withBox({
+            tokens: { "components.box.accent": hex("#00f") },
+            states: {
+                hover: { tokens: { "components.box.accent": hex("#000") } },
+            },
+        });
+        expect(ruleOf(css, ".box")).toMatch(
+            /--components-box-accent: rgb\(0 0 255\);\n\s+&:is\(:hover, \[data-hover\]\) \{\n\s+--components-box-accent: rgb\(0 0 0\);/,
+        );
+    });
+
     it("lowers conditional values into nested rules", () => {
         const css = withBox({ color: when("hover", hex("#00f"), hex("#000")) });
         expect(ruleOf(css, ".box")).toMatch(
