@@ -38,7 +38,7 @@ const STATE =
 const EXPECTED: Record<Fixture["name"], { full: string; reduced: string }> = {
     button: { full: STATE, reduced: STATE },
     switchControl: {
-        full: "left, width, height, background-color",
+        full: "inset-inline-start, width, height, background-color",
         reduced: "background-color",
     },
     radio: { full: "transform, background-color", reduced: "background-color" },

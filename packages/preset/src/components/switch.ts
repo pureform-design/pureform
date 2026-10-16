@@ -88,7 +88,13 @@ const along = when()
     .on(CONTROL_CHECKED, ref("handleOn"))
     .else(ref("handleOff"));
 
-const centered = transform(translate(pct(-50), pct(-50)));
+// Centered on its inline start: the translation runs against the inline direction, so it
+// flips under rtl, where the start is on the right.
+const centered = when(
+    "rtl",
+    transform(translate(pct(50), pct(-50))),
+    transform(translate(pct(-50), pct(-50))),
+);
 
 /** The colors a switch takes from its color group. */
 interface SwitchColors {
@@ -180,18 +186,21 @@ export const createSwitch = <const G extends string = ColorGroup>(
                         stateLayer: {
                             position: absolute,
                             top: pct(50),
-                            left: along,
+                            insetInlineStart: along,
                             transform: centered,
                             width: ref("stateLayerSize"),
                             height: ref("stateLayerSize"),
                             borderRadius: radius("full"),
                             pointerEvents: none,
-                            transition: tweens("left", "backgroundColor"),
+                            transition: tweens(
+                                "insetInlineStart",
+                                "backgroundColor",
+                            ),
                         },
                         handle: {
                             position: absolute,
                             top: pct(50),
-                            left: along,
+                            insetInlineStart: along,
                             transform: centered,
                             display: inlineFlex,
                             alignItems: center,
@@ -207,7 +216,7 @@ export const createSwitch = <const G extends string = ColorGroup>(
                                 .on(CONTROL_PRESSED, ref("handleSizePressed"))
                                 .else(ref("handleSize")),
                             transition: tweens(
-                                "left",
+                                "insetInlineStart",
                                 "width",
                                 "height",
                                 "backgroundColor",

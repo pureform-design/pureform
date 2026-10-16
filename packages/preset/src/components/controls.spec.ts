@@ -73,12 +73,22 @@ describe("switchControl", () => {
             string,
             Record<string, string>
         >;
-        expect(handle.left?.[`.switchControl__root${CHECKED} &`]).toContain(
-            "handleOn",
-        );
+        expect(
+            handle.insetInlineStart?.[`.switchControl__root${CHECKED} &`],
+        ).toContain("handleOn");
         expect(handle.width?.[`.switchControl__root${CHECKED} &`]).toContain(
             "handleSizeChecked",
         );
+    });
+
+    it("centers the handle and state layer on their inline start, flipped under rtl", () => {
+        const { base } = slotRecipe(switchControl);
+        for (const slot of ["handle", "stateLayer"]) {
+            expect(base[slot]?.transform).toEqual({
+                base: "translate(-50%, -50%)",
+                _rtl: "translate(50%, -50%)",
+            });
+        }
     });
 });
 
