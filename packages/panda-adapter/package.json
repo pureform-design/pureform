@@ -14,17 +14,30 @@
                 "development": "./src/index.ts",
                 "default": "./dist/index.mjs"
             }
+        },
+        "./codegen": {
+            "types": "./dist/codegen.d.ts",
+            "import": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            },
+            "require": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            }
         }
     },
     "dependencies": {
         "@pureform/core": "catalog:",
-        "@pureform/css-lowering": "catalog:"
+        "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:"
     },
     "devDependencies": {
         "@pandacss/types": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
