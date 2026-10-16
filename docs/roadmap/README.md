@@ -115,11 +115,11 @@ while phase 3 builds components.
 |     | Subphase                                                                  | Depends on             | Output context                                       |
 | --- | ------------------------------------------------------------------------- | ---------------------- | ---------------------------------------------------- |
 | [x] | [p4a: `@pureform/generate` core](phases/p4a-generate-core.md)             | p1e, p2c               | [`context/p4a.md`](context/p4a.md)                   |
-| [ ] | [p4b: adapter codegen](phases/p4b-adapter-codegen.md), split in parallel: | p4a's interface commit |                                                      |
+| [x] | [p4b: adapter codegen](phases/p4b-adapter-codegen.md), split in parallel: | p4a's interface commit |                                                      |
 | [x] | &nbsp;&nbsp;p4b-panda                                                     |                        | [`context/p4b-panda.md`](context/p4b-panda.md)       |
 | [x] | &nbsp;&nbsp;p4b-css                                                       |                        | [`context/p4b-css.md`](context/p4b-css.md)           |
 | [x] | &nbsp;&nbsp;p4b-tailwind                                                  |                        | [`context/p4b-tailwind.md`](context/p4b-tailwind.md) |
-| [ ] | &nbsp;&nbsp;p4b-rn                                                        |                        | `context/p4b-rn.md`                                  |
+| [x] | &nbsp;&nbsp;p4b-rn                                                        |                        | [`context/p4b-rn.md`](context/p4b-rn.md)             |
 | [ ] | [p4c: bundler and CLI](phases/p4c-bundler-cli.md), split in parallel:     | p4a, p4b               |                                                      |
 | [ ] | &nbsp;&nbsp;p4c-bundler                                                   |                        | `context/p4c-bundler.md`                             |
 | [ ] | &nbsp;&nbsp;p4c-cli                                                       |                        | `context/p4c-cli.md`                                 |
