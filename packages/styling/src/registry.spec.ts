@@ -149,4 +149,11 @@ describe("createRegistry", () => {
         expect(registry.entry("chip").kind).toBe("static");
         expect(registry.entry("card").kind).toBe("lazy");
     });
+
+    it("records the train version the glue was made with", () => {
+        expect(createRegistry({ chip }).version).toBeUndefined();
+        expect(createRegistry({ chip }, { version: "0.4.0" }).version).toBe(
+            "0.4.0",
+        );
+    });
 });

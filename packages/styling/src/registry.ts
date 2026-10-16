@@ -71,7 +71,16 @@ export type LazyEntryName<E extends RegistryInput> = Exclude<
     StaticEntryName<E>
 >;
 
+/** What `createRegistry` takes besides the entries. */
+export interface RegistryOptions {
+    /** The core train's version the generated glue was made with. Bindings compare it with the
+     *  running `@pureform/styling`'s `VERSION` in development. */
+    version?: string;
+}
+
 export interface Registry<E extends RegistryInput = RegistryInput> {
+    /** The core train's version the glue was made with, when it recorded one. */
+    readonly version: string | undefined;
     /** Every entry's name, in the order given. */
     readonly names: readonly (keyof E & string)[];
     /** Whether the registry has an entry by this name. */
@@ -121,9 +130,11 @@ const lazyEntry = (name: string, input: LazyInput): LazyEntry => {
 
 /** A registry of factories by name: `createRegistry({ button, card: { lazy: () =>
  *  import("./web/card") } })`. A lazy loader's module gives its factory as the module itself,
- *  its default export, or its export named after the entry. */
+ *  its default export, or its export named after the entry. Generated glue also passes the
+ *  train's version: `createRegistry({ button }, { version })`. */
 export const createRegistry = <const E extends RegistryInput>(
     input: E,
+    options: RegistryOptions = {},
 ): Registry<E> => {
     const entries = new Map<string, RegistryEntry>();
     for (const [name, value] of Object.entries(input)) {
@@ -147,6 +158,7 @@ export const createRegistry = <const E extends RegistryInput>(
         );
     };
     return Object.freeze({
+        version: options.version,
         names,
         has: (name: string): name is keyof E & string => entries.has(name),
         entry: (name: string) => get(name),

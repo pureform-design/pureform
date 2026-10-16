@@ -9,6 +9,7 @@ export type {
     ComponentClasses,
     ComponentManifest,
 } from "./component-classes";
+export { VERSION } from "./package-version";
 export { createRegistry } from "./registry";
 export type {
     AnyFactory,
@@ -20,6 +21,7 @@ export type {
     Registry,
     RegistryEntry,
     RegistryInput,
+    RegistryOptions,
     StaticEntry,
     StaticEntryName,
 } from "./registry";
