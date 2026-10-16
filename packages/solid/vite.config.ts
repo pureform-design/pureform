@@ -16,6 +16,8 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
+                    button: "src/button/index.ts",
+                    checkbox: "src/checkbox/index.ts",
                     "internal/zag": "src/internal/zag/index.ts",
                 },
                 formats: ["es"],

@@ -16,6 +16,28 @@
                 "default": "./dist/index.jsx"
             }
         },
+        "./button": {
+            "types": "./dist/button/index.d.ts",
+            "solid": {
+                "development": "./src/button/index.ts",
+                "default": "./dist/button.jsx"
+            },
+            "import": {
+                "development": "./src/button/index.ts",
+                "default": "./dist/button.jsx"
+            }
+        },
+        "./checkbox": {
+            "types": "./dist/checkbox/index.d.ts",
+            "solid": {
+                "development": "./src/checkbox/index.ts",
+                "default": "./dist/checkbox.jsx"
+            },
+            "import": {
+                "development": "./src/checkbox/index.ts",
+                "default": "./dist/checkbox.jsx"
+            }
+        },
         "./internal/zag": {
             "types": "./dist/internal/zag/index.d.ts",
             "solid": {
