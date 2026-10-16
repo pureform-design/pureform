@@ -25,18 +25,22 @@ const snapshot = (host: HTMLElement) =>
         ),
     }));
 
-/** Renders the scene on the server and puts its HTML in a new host, before any hydration. */
-const serverRendered = async (scene: Scene) => {
+/** Renders the scene on the server and puts its HTML in a new host (inside `around`, marked
+ *  `data-host`), before any hydration. */
+const serverRendered = async (
+    scene: Scene,
+    around = `<div data-host></div>`,
+) => {
     const { html, head } = await renderOnServer(scene);
     runScripts(head);
-    const host = hostIn(`<div data-host></div>`);
+    const host = hostIn(around);
     host.innerHTML = html;
     return host;
 };
 
 /** Hydrates the server's HTML, and lists what hydration logged and changed. */
-const hydrate = async (scene: Scene) => {
-    const host = await serverRendered(scene);
+const hydrate = async (scene: Scene, around?: string) => {
+    const host = await serverRendered(scene, around);
     const before = snapshot(host);
     const console = watchConsole();
     try {
@@ -124,6 +128,30 @@ describe.each(stateful)("$component, state", (component) => {
         await state.act(host);
         await harness.settle();
         expect(state.read(host)).toEqual(state.to);
+    });
+});
+
+const controls = COMPONENTS.filter((component) => component.form);
+
+describe.each(controls)("$component, fieldsets", (component) => {
+    it.each([
+        [
+            "a disabled fieldset disables it",
+            `<fieldset disabled><div data-host></div></fieldset>`,
+            true,
+        ],
+        [
+            "the first legend of a disabled fieldset leaves it enabled",
+            `<fieldset disabled><legend><div data-host></div></legend></fieldset>`,
+            false,
+        ],
+    ])("hydrated: %s", async (_, around, disabled) => {
+        const { host, logged } = await hydrate(sceneOf(component, {}), around);
+        expect(logged).toEqual([]);
+        expect(component.form!.disabled(host)).toBe(disabled);
+        expect(component.form!.control(host).matches(":disabled")).toBe(
+            disabled,
+        );
     });
 });
 

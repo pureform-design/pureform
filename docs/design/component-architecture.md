@@ -583,6 +583,15 @@ hydration warning or on any class, `style`, `data-*`, or `aria-*` attribute
 that differs between the server's HTML and the hydrated DOM. It runs for each web target
 and in both color schemes, plus once with a runtime theme.
 
+**Built (p3c):** a browser command renders the scene in Node through a Vite server in SSR mode
+with the binding's plugin (`tests/component-suites`); the test puts the HTML in the page,
+hydrates it, and fails on any console warning or error, any element replaced, or any attribute
+changed (all of them, not only the four kinds). It runs in both color schemes on the Panda
+target; the other targets (p5a) and a runtime theme (p5b) are `todo`. Solid's client code must
+compile hydratable (`solid({ ssr: true })`, and in Vitest `solid: { hydratable: true }`, since
+the plugin compiles tests non-hydratable). An app that server-renders `@pureform/solid` keeps it
+in the server bundle (`ssr.noExternal`), since the package ships JSX.
+
 ### 5.8 Reduced motion
 
 Today the web follows `prefers-reduced-motion` in CSS, and the ripple checks it in JS;
@@ -1123,6 +1132,14 @@ icon only has to follow them.
 - **E2E:** `tests/browser-e2e-tests` selects by `testIds` and roles; a shared contract
   suite runs the same specs against the Solid build and, later, React and RN-web, so
   bindings stay behaviorally identical.
+- **Built (p3c):** the shared suites are `tests/component-suites`. Two Vitest projects (Solid,
+  React) run the same files; each aliases `#binding` to its harness, which mounts a scene (a
+  component, its props, the provider's `dir`) anywhere in the page, sets props as an owner would,
+  and hydrates server HTML. Each component is one framework-free case
+  (`src/components/<name>.ts`: examples, state, form, keyboard, unmirrored parts) that every
+  suite reads: controlled and uncontrolled state, forms, axe in both directions, the keyboard
+  (arrow keys in both directions), mirrored boxes and `dir` on every part, and server rendering.
+  The selection-by-test-id contract suite against RN-web stays in `tests/browser-e2e-tests`.
 
 ## 10. CLI
 
@@ -1227,8 +1244,10 @@ Preset changes these designs need, independent of the steps above:
 
 1. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
    radio group, with Zag's vanilla adapter and through the Solid 2 port (§8), except form
-   reset, which the bindings take over. The slider doesn't use Zag (§8). Left: disabled
-   fieldsets.
+   reset, which the bindings take over. The slider doesn't use Zag (§8). Closed (p3c): disabled
+   fieldsets follow the browser's rule in both bindings, checked by the shared forms suite
+   (a disabled fieldset, one around an enabled one, the first legend's exemption, and toggling,
+   for the checkbox and the button, mounted and hydrated).
 
 Decided:
 

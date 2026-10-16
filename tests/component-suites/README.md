@@ -40,14 +40,14 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
 
 ## Suites
 
-| File                           | What it checks                                                                                                                                                                                                                                            |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `controllable.e2e.test.ts`     | §9.4: uncontrolled state changes on its own; controlled state asks and moves only with the prop (or when the owner takes the change); one callback per user action, none for a prop change; the default is read once; switching warns once.               |
-| `forms.e2e.test.ts`            | §9.5: `FormData` entries (also through `form="id"` from outside the form); reset to the default, controlled and uncontrolled, with `reason: "reset"`; disabled fieldsets (nested, the first legend's exemption, toggled); `required`, `invalid`, `error`. |
-| `accessibility.e2e.test.ts`    | axe over every example, both directions, with the real styles (so contrast counts).                                                                                                                                                                       |
-| `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled; each key clicks it, changes its state, or does nothing; arrow keys in `ltr` and `rtl`.                                                                                                                   |
-| `direction.e2e.test.ts`        | §5.9: every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`).                                                 |
-| `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds.                                      |
+| File                           | What it checks                                                                                                                                                                                                                                                                                                 |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `controllable.e2e.test.ts`     | §9.4: uncontrolled state changes on its own; controlled state asks and moves only with the prop (or when the owner takes the change); one callback per user action, none for a prop change; the default is read once; switching warns once.                                                                    |
+| `forms.e2e.test.ts`            | §9.5: `FormData` entries (also through `form="id"` from outside the form); reset to the default, controlled and uncontrolled, with `reason: "reset"`; disabled fieldsets (nested, the first legend's exemption, toggled); `required`, `invalid`, `error`.                                                      |
+| `accessibility.e2e.test.ts`    | axe over every example, both directions, with the real styles (so contrast counts).                                                                                                                                                                                                                            |
+| `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled; each key clicks it, changes its state, or does nothing; arrow keys in `ltr` and `rtl`.                                                                                                                                                                        |
+| `direction.e2e.test.ts`        | §5.9: every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`).                                                                                                      |
+| `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule. |
 
 ## Adding a component
 
@@ -63,7 +63,8 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
     - `form` (if it's a form control): the native control, how the machine shows disabled, what it
       submits, and whether it resets, takes `required`, `invalid`, `error`;
     - `keyboard`: the focusable element, what each key does, and `arrows` by direction if arrow
-      keys do anything.
+      keys do anything;
+    - `unmirrored`: parts that don't point (a check mark), which must draw the same both ways.
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
 The registry must have the component: register it in `apps/solid-demo/.pureform` (until p4c
