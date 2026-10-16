@@ -41,8 +41,29 @@ Components get their styles by calling a factory from the registry with their se
   variant or state changes, over resolved styles cached per theme; the factory moves that
   cache to one shared table per component.
 
-A benchmark (§13) gates the decision: 10k lookups per frame under 1ms on a mid-range
-phone.
+**Measured** (button, default config, median of 15 runs of 10,000 lookups, on a desktop
+Ryzen 5 5600 under Node 26; `--jitless` stands in for Hermes, which has no JIT):
+
+| Lookup                                                   | With JIT | Without JIT |
+| -------------------------------------------------------- | -------- | ----------- |
+| Web today: the CSS adapter's `componentClasses`, 4 slots | 1.5 µs   | 4.0 µs      |
+| Web, cached per selection (key string and `Map.get`)     | 0.10 µs  | 0.18 µs     |
+| Native today: `selectWithTransitions`, uncached          | 11.7 µs  | 52 µs       |
+| Native, cached per selection (frozen, `Map.get`)         | 0.11 µs  | 0.21 µs     |
+
+- **The bet holds with a per-selection cache, and only with it.** On the web a press or
+  hover makes no lookup at all (§5.1), so lookups happen on mount and on a variant change;
+  even uncached, 1,000 mounts cost about 4 ms without a JIT. On React Native every state
+  change is a lookup, and uncached selection would cost about 52 ms for a 1,000-item list
+  without a JIT, before a phone's slowdown. So the native factory caches every selection
+  it has computed, keyed by its variants and states; the web factory caches too, since
+  it's cheap.
+- **The cache fills lazily.** Precomputing every combination isn't needed: a key's first
+  lookup selects and freezes, and every later one is a `Map.get`.
+- **The original gate**, 10,000 lookups per frame under 1 ms on a mid-range phone, was
+  stricter than any real frame needs: even cached lookups take 1 to 2 ms per 10,000 on
+  this desktop. What's left to measure is a real device under Hermes, in the React Native
+  demo (§13).
 
 ## 3. Package layout
 
@@ -170,7 +191,7 @@ On the web, interaction states are not part of the selection. The browser and th
 bindings mark them on the element, and the generated CSS matches them, so a press changes
 one attribute and calls nothing. Only a variant or token change calls the factory again.
 On React Native there are no selectors, so states are in the selection, and each change is
-one `Map.get` returning a cached, frozen object.
+one `Map.get` returning a cached, frozen object (measured in §2).
 
 **How the web matches a state, in order of preference:**
 
@@ -576,7 +597,8 @@ What's missing is one source of direction for JS, and a few styles that don't fl
       JS. Apps that set `<html dir>` pass the same value; it's a prop, so the server and
       client render the same thing (§5.7).
     - Zag: every machine gets `dir` from the provider, which drives arrow keys in tabs,
-      radio groups, sliders, menus, and navigation.
+      radio groups, menus, and navigation. The slider's native range input takes its
+      direction from the `dir` the provider writes.
     - React Native: the root default is `I18nManager.isRTL`, and selection gets
       `rtl` (the adapter's existing `rtl` state).
 - **Styles flip without JS.** Logical properties do it on both targets. Where there's no
@@ -683,14 +705,15 @@ internal API so the swap is local.
 
 Mapping of preset components:
 
-| Component                                                                                                    | Behavior                                                                                                                              |
-| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| checkbox, switch, radio group, slider, tabs, menu, dialog, tooltip, select, combobox (not in the preset yet) | Zag                                                                                                                                   |
-| button, icon button, FAB, chip (assist/filter/input/suggestion)                                              | own (simple; press, focus, toggle)                                                                                                    |
-| linear and circular progress                                                                                 | own (no interaction; `role=progressbar` and value props)                                                                              |
-| ripple, state layer                                                                                          | own: the ripple is already framework-free in `@pureform/js-effects`; `apps/solid-demo/src/lib/ripple.tsx` is the Solid wiring to port |
-| navigation bar/rail, segmented button (not in the preset yet)                                                | Zag `toggle-group`/`tabs` where it fits, else own                                                                                     |
-| text field                                                                                                   | Zag-free own machine: Material's floating label states don't map to Zag's                                                             |
+| Component                                                                                            | Behavior                                                                                                                                                                                                                                                                    |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| checkbox, switch, radio group, tabs, menu, dialog, tooltip, select, combobox (not in the preset yet) | Zag                                                                                                                                                                                                                                                                         |
+| slider                                                                                               | own: the preset draws it over a native `<input type="range">`, which already handles dragging, the keyboard, forms, screen readers, and direction; Zag's slider expects to own the pointer and a focusable thumb instead. A range slider with two thumbs would revisit this |
+| button, icon button, FAB, chip (assist/filter/input/suggestion)                                      | own (simple; press, focus, toggle)                                                                                                                                                                                                                                          |
+| linear and circular progress                                                                         | own (no interaction; `role=progressbar` and value props)                                                                                                                                                                                                                    |
+| ripple, state layer                                                                                  | own: the ripple is already framework-free in `@pureform/js-effects`; `apps/solid-demo/src/lib/ripple.tsx` is the Solid wiring to port                                                                                                                                       |
+| navigation bar/rail, segmented button (not in the preset yet)                                        | Zag `toggle-group`/`tabs` where it fits, else own                                                                                                                                                                                                                           |
+| text field                                                                                           | Zag-free own machine: Material's floating label states don't map to Zag's                                                                                                                                                                                                   |
 
 Our own machines use the same shape as Zag's (`machine`, `connect` returning part props),
 so bindings treat them uniformly.
@@ -790,8 +813,8 @@ component), Zag's shape, identical in Solid and React:
 - **Typed:** a `Controllable<"value", T>` helper writes the three props, and components
   with a value are generic over it (`Select<string[]>` when `multiple`).
 - **Own machines match Zag.** `@pureform/machines` uses the same controllable-state
-  helper Zag uses (`bindable`), so button toggles, chips, and the text field behave like
-  the Zag-backed ones.
+  helper Zag uses (`bindable`), so button toggles, chips, the slider, and the text field
+  behave like the Zag-backed ones.
 - **Server rendering:** the controlled or default value renders on the server as its
   attributes (§5.7).
 - **React Native:** the same props; a `name` does nothing.
@@ -806,10 +829,15 @@ validate, and disable with it, with no form library.
       so submitting, autofill, and the browser's validation work as is.
     - Checkbox, switch, radio, and slider: the preset already gives each an `input` slot,
       a native input stretched invisibly over the control that takes every interaction
-      (`controlInput`), so the CSS's `:checked` and `:disabled` work. Zag's hidden-input
-      props go on that slot, without Zag's visually-hidden inline style, which the slot's
-      style replaces. Whether Zag's machines accept interaction through that input rather
-      than their own control part is checked in the port (§13).
+      (`controlInput`), so the CSS's `:checked` and `:disabled` work. For checkbox,
+      switch, and radio group, Zag's hidden-input props go on that slot, without Zag's
+      visually-hidden inline style, which the slot's style replaces. Zag drives these
+      machines from that input's click and focus events, so this is the path it expects.
+      The slider is our own over its native range input (§8).
+    - **Verified** in Chromium with Zag 1.46 and its vanilla adapter: pointer clicks and
+      the keyboard (Space, arrow keys in the radio group) through the overlaid input
+      change the state, fire the callbacks once each, keep `:has(:checked)` in step, and
+      submit the right `FormData`.
     - Select: Zag's hidden `<select>`, so autofill fills it too, as an unstyled
       `HiddenSelect` part outside the slots; ready-made components render it themselves.
     - Values: checkbox and switch submit `value` (default `"on"`) when checked, a slider
@@ -821,8 +849,17 @@ validate, and disable with it, with no form library.
   controlled state it calls the change callback with `reason: "reset"`, and the owner
   decides. React 19 and Solid 2 form actions reset the form after submitting, so this
   path is common.
+    - **The bindings own it, not Zag.** In the same check, a reset did nothing for the
+      checkbox and switch: Zag sets the input's `defaultChecked` to the current state on
+      every render, so the native reset restores the current value, and Zag's own reset
+      tracking changed nothing. For the radio group the native reset cleared both
+      inputs while Zag kept its value, so the page and the machine disagreed.
+    - So the bindings set the native input's default from the component's `default*`
+      prop (not from the current state), listen for the form's `reset` event, and send
+      the machine the default themselves, after the browser's reset has run.
 - **Disabled fieldsets** disable every control in them. Zag tracks this with
-  `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`.
+  `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`. Its
+  reset half didn't hold up (above), so the fieldset half gets the same browser check.
 - **Validation.** Material's error look keys on the `invalid` state. On a text input's
   slots the CSS matches `aria-invalid` on the slot or inside it, and not `:invalid`, so an
   empty required field doesn't show an error before the user acts. Three ways in:
@@ -973,13 +1010,17 @@ Preset changes these designs need, independent of the steps above:
 
 ## 13. Risks and open questions
 
-1. **Lookup cost.** Benchmark before step 3 ends. Fallback: compile-time inlining of
-   static variant classes by the bundler plugin.
-2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
-   `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Zag over the preset's native inputs** (§9.5): confirm that Zag's checkbox, switch,
-   radio group, and slider work with interaction arriving through the preset's
-   overlaid native `input` slot.
+1. **Lookup cost** (§2): measured; the bet holds with a per-selection cache. Left: a
+   real phone under Hermes, in the React Native demo, once the native factory exists.
+   Fallback if it falls short: compile-time inlining of static variant classes by the
+   bundler plugin.
+2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Checked again in
+   October 2026: `@zag-js/solid` `latest` (1.46.0) and `next` (2.0.0-next.3) still peer on
+   `solid-js >=1.1.3` and depend on `@solid-primitives/keyed`, so the port stays needed.
+3. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
+   radio group, except form reset, which the bindings take over. The slider doesn't use
+   Zag (§8). Left: re-run the check through the Solid 2 port, since it was done with
+   Zag's vanilla adapter, and check disabled fieldsets.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
