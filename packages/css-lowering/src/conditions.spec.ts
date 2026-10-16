@@ -28,6 +28,7 @@ const STATES: PortableCondition[] = [
     "readOnly",
     "filled",
     "expanded",
+    "mirrored",
 ];
 
 const SLOT_STATES: SlotState[] = [
@@ -79,6 +80,10 @@ describe("state selectors", () => {
             "&:is(:disabled, [aria-disabled=true])",
         );
         expect(conditionKey("expanded", ctx)).toBe("&[aria-expanded=true]");
+    });
+
+    it("match a mirrored element on data-pf-mirror", () => {
+        expect(conditionKey("mirrored", ctx)).toBe("&[data-pf-mirror]");
     });
 
     it("agree between a condition and the slot state of the same name", () => {
