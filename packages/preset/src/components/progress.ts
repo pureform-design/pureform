@@ -140,12 +140,19 @@ export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
 
 export const linearProgress = createLinearProgress();
 
-const circular = componentTokens("circularProgress", {
-    activeColor: sys("primary"),
-    size: px(48),
-    thickness: px(4),
-    value: unitless(0),
-});
+// The value is a number that transitions, so both halves' arcs draw from one moving value
+// and meet at every frame; turning each arc on its own transition would open a gap between
+// them.
+const circular = componentTokens(
+    "circularProgress",
+    {
+        activeColor: sys("primary"),
+        size: px(48),
+        thickness: px(4),
+        value: unitless(0),
+    },
+    { value: "number" },
+);
 
 const DEG_PER_PERCENT = numeric(3.6, "deg");
 
@@ -184,7 +191,6 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         ),
         // Hidden until it has a share to show, so its anti-aliased edge never shows at the seam.
         opacity: clamp(unitless(0), sweep, unitless(1)),
-        transition: tweens("transform"),
     });
 
     return pf.slotComponent({
@@ -211,6 +217,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
                     width: ref("size"),
                     height: ref("size"),
                     borderRadius: circle,
+                    transition: tweens(circular.own("value")),
                 },
                 // The end half shows the first 50%, the start half the rest.
                 endHalf: half("End"),

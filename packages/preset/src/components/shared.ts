@@ -28,10 +28,12 @@ import {
 import type {
     Condition,
     AliasNode,
+    DynamicNode,
     ColorValue,
     SlotCondition,
     NumericValue,
     StyleMap,
+    ValueType,
     ValueNode,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
@@ -82,15 +84,23 @@ export const sys = (name: string): AliasNode => colorRole(name);
 export const componentTokens = <K extends string>(
     name: string,
     defaults: Record<K, ValueNode>,
-) => ({
-    tokens: Object.fromEntries(
+    /** The types of value tokens hold, for those whose changes transition:
+     *  `{ value: "number" }`. */
+    valueTypes: Partial<Record<K, ValueType>> = {},
+) => {
+    const tokens = Object.fromEntries(
         Object.entries<ValueNode>(defaults).map(([token, value]) => [
             token,
-            dynamic(["components", name, token], value),
+            dynamic(["components", name, token], value, valueTypes[token as K]),
         ]),
-    ) as Record<K, ValueNode>,
-    ref: (token: K): AliasNode => alias("components", name, token),
-});
+    ) as Record<K, DynamicNode>;
+    return {
+        tokens: tokens as Record<K, ValueNode>,
+        ref: (token: K): AliasNode => alias("components", name, token),
+        /** A token's own dynamic value, which a transition names to move it. */
+        own: (token: K): DynamicNode => tokens[token],
+    };
+};
 
 /** The tokens every outlined control shares: its stroke width and color. */
 export type OutlineTokens = "outlineWidth" | "outlineColor";
