@@ -45,6 +45,7 @@
         "@pureform/anatomy": "workspace:^",
         "@pureform/machines": "workspace:^",
         "@pureform/binding-core": "workspace:^",
+        "@pureform/react": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
@@ -76,6 +77,8 @@
         "@tanstack/solid-query": "^6.0.0-rc.4",
         "@tanstack/solid-router": "^2.0.0-rc.8",
         "@testing-library/jest-dom": "^7.0.0",
+        "@testing-library/dom": "^10.4.2",
+        "@testing-library/react": "^16.3.3",
         "@types/node": "^26.2.0",
         "@remix-run/cookie": "^0.5.4",
         "eslint-plugin-solid": "~0.18.0",
@@ -109,6 +112,7 @@
         "@zag-js/utils": "^1.46.0",
         "@zag-js/checkbox": "^1.46.0",
         "@zag-js/switch": "^1.46.0",
-        "@zag-js/radio-group": "^1.46.0"
+        "@zag-js/radio-group": "^1.46.0",
+        "@zag-js/react": "^1.46.0"
     }
 }

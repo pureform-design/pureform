@@ -92,4 +92,10 @@ include = ["packages/vitest-config/**"]
 path = "packages/release"
 include = ["packages/release/**"]
 
+[monorepo.packages."@pureform/react"]
+path = "packages/react"
+include = [
+    "packages/react/**",
+]
+
 #@anchor:new-typescript-package
