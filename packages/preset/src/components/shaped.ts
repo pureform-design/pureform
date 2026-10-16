@@ -27,7 +27,6 @@ import {
     transparent,
     linearGradient,
     stop,
-    transition,
     tween,
     unitless,
     when,
@@ -48,6 +47,7 @@ import { MATERIAL_SHAPES } from "../shapes";
 import {
     STATE_TWEENS,
     disabledColor,
+    motionTransition,
     slotStateLayer,
     stateTransition,
 } from "./shared";
@@ -61,14 +61,11 @@ const isMorph = (shape: ShapeGeometry | ShapeMorph): shape is ShapeMorph =>
     "from" in shape;
 
 // A morph changes shape over medium2 on the emphasized curve, as Material's shape morphs do,
-// along with the state colors; under reduced motion it changes at once.
-const morphTransition = when(
-    "reducedMotion",
-    none,
-    transition(
-        ...STATE_TWEENS,
-        tween("clipPath", duration("medium2"), easing("emphasized")),
-    ),
+// along with the state colors; under reduced motion the shape changes at once and the colors
+// still fade.
+const morphTransition = motionTransition(
+    ...STATE_TWEENS,
+    tween("clipPath", duration("medium2"), easing("emphasized")),
 );
 
 export const DEFAULT_SHAPES: Shapes = MATERIAL_SHAPES;

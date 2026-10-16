@@ -1,6 +1,6 @@
 // Building blocks shared by pureform's component specs.
 
-import { mergeStyles } from "@pureform/core";
+import { mergeStyles, transitionMoves } from "@pureform/core";
 import {
     absolute,
     add,
@@ -34,6 +34,7 @@ import type {
     SlotCondition,
     NumericValue,
     StyleMap,
+    TransitionPart,
     ValueType,
     ValueNode,
 } from "@pureform/core/ast";
@@ -283,8 +284,8 @@ export const fillVariant = (
 
 /** How a component eases between states: the state layer and colors over `short3`, and
  *  elevation over `medium1`, both on the standard curve. The motion tokens set both, so a
- *  theme's motion provider retimes every component. Under reduced motion, states change
- *  instantly. */
+ *  theme's motion provider retimes every component. Nothing here moves, so they run under
+ *  reduced motion too. */
 export const STATE_TWEENS = [
     tween("backgroundColor", duration("short3"), easing("standard")),
     tween("color", duration("short3"), easing("standard")),
@@ -293,22 +294,30 @@ export const STATE_TWEENS = [
     tween("boxShadow", duration("medium1"), easing("standard")),
 ];
 
-export const stateTransition = when(
-    "reducedMotion",
-    none,
-    transition(...STATE_TWEENS),
-);
+export const stateTransition = transition(...STATE_TWEENS);
 
-/** A transition of the given properties over `short3` on the standard curve, instant under
- *  reduced motion. For movement a component adds to its state colors. */
-export const tweens = (...properties: Parameters<typeof tween>[0][]) =>
-    when(
+/** A transition of the given parts that stops movement under reduced motion: the parts that
+ *  move, resize, or reshape drop out, and color, opacity, and elevation fades keep running.
+ *  Nothing left is `none`. */
+export const motionTransition = (
+    ...parts: TransitionPart[]
+): NonNullable<StyleMap["transition"]> => {
+    const fades = parts.filter((part) => !transitionMoves(part.property));
+    if (fades.length === parts.length) return transition(...parts);
+    return when(
         "reducedMotion",
-        none,
-        transition(
-            ...properties.map((property) =>
-                tween(property, duration("short3"), easing("standard")),
-            ),
+        fades.length > 0 ? transition(...fades) : none,
+        transition(...parts),
+    );
+};
+
+/** A transition of the given properties over `short3` on the standard curve. Under reduced
+ *  motion the moving ones change at once and the fades still run. For movement a component
+ *  adds to its state colors. */
+export const tweens = (...properties: TransitionPart["property"][]) =>
+    motionTransition(
+        ...properties.map((property) =>
+            tween(property, duration("short3"), easing("standard")),
         ),
     );
 

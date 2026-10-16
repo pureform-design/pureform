@@ -15,7 +15,6 @@ import {
     px,
     relative,
     slot,
-    transition,
     transparent,
     tween,
     unitless,
@@ -39,6 +38,7 @@ import {
 import {
     componentTokens,
     iconBox,
+    motionTransition,
     pressableRoot,
     slotStateLayer,
     stateTransition,
@@ -110,15 +110,12 @@ export const navColors = (
 // grows the same way in either writing direction.
 const grow = when().on(CURRENT, px(0)).else(pct(50));
 
-const growTransition = when(
-    "reducedMotion",
-    none,
-    transition(
-        tween("insetInlineStart", duration("medium2"), easing("emphasized")),
-        tween("insetInlineEnd", duration("medium2"), easing("emphasized")),
-        tween("opacity", duration("medium2"), easing("emphasized")),
-        tween("backgroundColor", duration("short3"), easing("standard")),
-    ),
+// Under reduced motion it appears at its full size, fading in.
+const growTransition = motionTransition(
+    tween("insetInlineStart", duration("medium2"), easing("emphasized")),
+    tween("insetInlineEnd", duration("medium2"), easing("emphasized")),
+    tween("opacity", duration("medium2"), easing("emphasized")),
+    tween("backgroundColor", duration("short3"), easing("standard")),
 );
 
 /** The parts' styles, over the component's tokens. `indicatorWidth` is the pill's width. */

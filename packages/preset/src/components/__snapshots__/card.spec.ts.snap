@@ -19,10 +19,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         "paddingInlineEnd": "var(--components-card-padding, token(spacing.4))",
         "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
         "position": "relative",
-        "transition": {
-          "_motionReduce": "none",
-          "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-        },
+        "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       },
       "touchTarget": {
         "height": "100%",
