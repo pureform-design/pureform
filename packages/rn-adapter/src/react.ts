@@ -21,6 +21,7 @@ interface Context {
     reducedMotion: boolean;
     width: number | undefined;
     svg: boolean;
+    timeScale: number;
 }
 
 const PureformContext = createContext<Context | undefined>(undefined);
@@ -41,6 +42,9 @@ export interface PureformProviderProps {
      *  `@pureform/rn-adapter/svg`, which needs `react-native-svg`. Without it, components
      *  take their rounded fallback and gradients drop. Default `false`. */
     svg?: boolean;
+    /** How much longer every transition and animation runs, for watching motion slowly: 10
+     *  runs it ten times slower. Default 1. */
+    timeScale?: number;
     /** Token or component token values to override, by key: `colors.primary`,
      *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
      *  hex or any of CSS's color functions but `hwb()` and `color-mix()`. */
@@ -69,6 +73,7 @@ export const PureformProvider = (props: PureformProviderProps) => {
     );
     const reducedMotion = props.reducedMotion ?? false;
     const svg = props.svg ?? false;
+    const timeScale = props.timeScale ?? 1;
     const value = useMemo(
         () => ({
             styles,
@@ -80,11 +85,40 @@ export const PureformProvider = (props: PureformProviderProps) => {
             reducedMotion,
             width: props.width,
             svg,
+            timeScale,
         }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
-        [resolved, tokens, scheme, reducedMotion, props.width, svg],
+        [resolved, tokens, scheme, reducedMotion, props.width, svg, timeScale],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
+};
+
+// A selection's motion, `by` times as long.
+const slowed = (selected: Selected, by: number): Selected => {
+    if (by === 1) return selected;
+    const time = <T extends { duration: number; delay: number }>(t: T): T => ({
+        ...t,
+        duration: t.duration * by,
+        delay: t.delay * by,
+    });
+    const map = <T, U>(record: Record<string, T>, f: (value: T) => U) =>
+        Object.fromEntries(Object.entries(record).map(([k, v]) => [k, f(v)]));
+    return {
+        ...selected,
+        transitions: map(selected.transitions, (list) => list.map(time)),
+        animations: map(selected.animations, time),
+        drawings: map(selected.drawings, (drawing) =>
+            drawing.transitions
+                ? {
+                      ...drawing,
+                      transitions: map(
+                          drawing.transitions,
+                          (t) => t && time(t),
+                      ),
+                  }
+                : drawing,
+        ),
+    };
 };
 
 const useContextOrThrow = (hook: string): Context => {
@@ -129,15 +163,18 @@ export const useComponentState = (
     const stateKey = JSON.stringify(state);
     return useMemo(
         () =>
-            selectWithTransitions(component, variants, {
-                scheme: context.scheme,
-                reducedMotion: context.reducedMotion,
-                svg: context.svg,
-                ...(context.width === undefined
-                    ? {}
-                    : { width: context.width }),
-                ...state,
-            }),
+            slowed(
+                selectWithTransitions(component, variants, {
+                    scheme: context.scheme,
+                    reducedMotion: context.reducedMotion,
+                    svg: context.svg,
+                    ...(context.width === undefined
+                        ? {}
+                        : { width: context.width }),
+                    ...state,
+                }),
+                context.timeScale,
+            ),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
         [
             component,
@@ -145,6 +182,7 @@ export const useComponentState = (
             context.reducedMotion,
             context.width,
             context.svg,
+            context.timeScale,
             variantKey,
             stateKey,
         ],

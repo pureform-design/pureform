@@ -7,6 +7,7 @@ import { precompute, runtimeStyles } from "./build";
 import {
     PureformProvider,
     pressableState,
+    useComponentState,
     useComponentStyles,
     useTokens,
 } from "./react";
@@ -164,5 +165,36 @@ describe("pressableState", () => {
             focus: true,
             focusVisible: true,
         });
+    });
+});
+
+describe("timeScale", () => {
+    it("stretches every transition by the provider's scale", () => {
+        const durations = (timeScale?: number) => {
+            const Probe = () =>
+                createElement(
+                    "pre",
+                    null,
+                    useComponentState("button", { variant: "filled" })
+                        .transitions.root!.map((t) => t.duration)
+                        .join(","),
+                );
+            return renderToString(
+                createElement(
+                    PureformProvider,
+                    {
+                        styles: precomputed,
+                        scheme: "light",
+                        ...(timeScale ? { timeScale } : {}),
+                    },
+                    createElement(Probe),
+                ),
+            ).replace(/^<pre>|<\/pre>$/g, "");
+        };
+        const normal = durations().split(",").map(Number);
+        expect(normal.length).toBeGreaterThan(0);
+        expect(durations(10).split(",").map(Number)).toEqual(
+            normal.map((d) => d * 10),
+        );
     });
 });

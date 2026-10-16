@@ -265,6 +265,8 @@ overrides the primary color in either mode.
   pixels itself. On the web, where it runs real CSS transitions, logical properties are named
   as React Native Web writes them (`start` is `left`, left to right). It runs on the web
   without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
+- **Slow motion:** the provider's `timeScale` stretches every transition, animation, morph,
+  and ripple the hooks return, for watching motion by eye.
 - **Not yet:** container queries, and running on a device.
 
 ## State transitions
