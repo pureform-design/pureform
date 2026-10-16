@@ -36,6 +36,7 @@ import {
     SHAPES,
     Scrim,
     Separator,
+    Swatch,
     SupportingText,
     Switch,
     Type,
@@ -217,6 +218,13 @@ function Page(props: { controls: ReactNode }) {
                     <View style={styles.picture}>
                         <Media aspect="square" shape={shape} />
                     </View>
+                </View>
+            </Section>
+            <Section title="Gradients">
+                <View style={styles.row}>
+                    {(["linear", "radial", "conic"] as const).map((kind) => (
+                        <Swatch key={kind} kind={kind} />
+                    ))}
                 </View>
             </Section>
             <Section title="Containers">

@@ -3,7 +3,18 @@
 // Native adapter covers.
 
 import { defineComponent } from "@pureform/core";
-import { containerSize, morph, px, when } from "@pureform/core/ast";
+import {
+    conicGradient,
+    containerSize,
+    linearGradient,
+    morph,
+    numeric,
+    pct,
+    px,
+    radialGradient,
+    stop,
+    when,
+} from "@pureform/core/ast";
 import { materialColor, materialShape } from "@pureform/material";
 import { MATERIAL_SHAPES, pureform } from "@pureform/preset";
 import { colorRole, radius, spacing, textStyle } from "@pureform/theme";
@@ -52,13 +63,45 @@ const panel = defineComponent({
     },
 });
 
+// A swatch of each gradient kind in the primary, tertiary, and secondary colors, which React
+// Native draws with SVG.
+const STOPS = [
+    stop(colorRole("primary")),
+    stop(colorRole("tertiary"), pct(50)),
+    stop(colorRole("secondary")),
+];
+const swatch = defineComponent({
+    name: "swatch",
+    recipe: {
+        base: {
+            width: px(96),
+            height: px(96),
+            borderRadius: radius("medium"),
+            overflow: { type: "keyword", value: "hidden" },
+        },
+        variants: {
+            kind: {
+                linear: {
+                    backgroundImage: linearGradient(STOPS, numeric(135, "deg")),
+                },
+                radial: { backgroundImage: radialGradient(STOPS) },
+                conic: {
+                    backgroundImage: conicGradient(STOPS, numeric(45, "deg")),
+                },
+            },
+        },
+        defaultVariants: { kind: "linear" },
+    },
+});
+
 export const config = {
     ...preset,
-    components: { ...preset.components, panel },
+    components: { ...preset.components, panel, swatch },
 };
 
 export const COMPONENTS = [
     "panel",
+    "swatch",
     "button",
     "card",
     "chip",

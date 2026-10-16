@@ -531,3 +531,19 @@ export function Panel(props: { children: ReactNode }) {
         </View>
     );
 }
+
+/** The config's gradient swatch, drawn with SVG. */
+export function Swatch(props: { kind: "linear" | "radial" | "conic" }) {
+    const { styles, drawings } = useComponentState("swatch", {
+        kind: props.kind,
+    });
+    return (
+        <View
+            role="img"
+            aria-label={`${props.kind} gradient`}
+            style={view(styles[""])}
+        >
+            <MSvgDrawing drawing={drawings[""]} />
+        </View>
+    );
+}
