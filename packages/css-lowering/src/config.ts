@@ -2,7 +2,7 @@
 // scheme, a theme's component token vars, and how a component's slots nest.
 
 import { tokenValue } from "@pureform/core";
-import type { ValueNode } from "@pureform/core/ast";
+import type { ValueNode, ValueType } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride } from "@pureform/core/types";
 
 import { compileNodeToCSS } from "./compile-node";
@@ -42,6 +42,47 @@ export const componentTokenVars = (
     }
     return vars;
 };
+
+// CSS's `@property` syntax for each value type.
+const SYNTAX: Record<ValueType, string> = {
+    number: "<number>",
+    length: "<length>",
+    percentage: "<percentage>",
+    lengthPercentage: "<length-percentage>",
+    angle: "<angle>",
+    time: "<time>",
+    color: "<color>",
+};
+
+/** A registered custom property: a component token with a value type, which CSS can
+ *  transition once it's registered with `@property`. */
+export interface RegisteredProperty {
+    name: string;
+    syntax: string;
+    initialValue: string;
+}
+
+/** The component tokens with a value type, to register as CSS custom properties. They
+ *  inherit, so a value set and moving on one element moves its descendants too. */
+export const registeredProperties = (
+    config: CoreConfig,
+    ctx: LowerCtx,
+): RegisteredProperty[] =>
+    Object.values(config.components ?? {}).flatMap((component) =>
+        Object.values(component.tokens ?? {}).flatMap((entry) => {
+            const node = tokenValue(entry) as ValueNode;
+            if (node.type !== "dynamic" || !node.valueType) return [];
+            return [
+                {
+                    name: varName(node.path, ctx.prefix),
+                    syntax: SYNTAX[node.valueType],
+                    initialValue: node.default
+                        ? compileNodeToCSS(node.default, ctx)
+                        : "",
+                },
+            ];
+        }),
+    );
 
 /** Each slot's ancestors in a component's structure, nearest first. */
 export const slotAncestors = (

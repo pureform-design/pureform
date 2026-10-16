@@ -128,7 +128,9 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
             return node.parts
                 .map((p) =>
                     [
-                        hyphenate(p.property),
+                        typeof p.property === "string"
+                            ? hyphenate(p.property)
+                            : varName(p.property.path, ctx.prefix),
                         compileNodeToCSS(p.duration, ctx),
                         p.easing ? compileNodeToCSS(p.easing, ctx) : null,
                         p.delay ? compileNodeToCSS(p.delay, ctx) : null,

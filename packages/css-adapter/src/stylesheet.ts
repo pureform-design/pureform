@@ -16,6 +16,7 @@ import {
     compileNodeToCSS,
     compileStyleMap,
     componentTokenVars,
+    registeredProperties,
     slotAncestors,
     tokenVarName,
     usesColorScheme,
@@ -98,6 +99,20 @@ const keyframes = (config: CoreConfig, ctx: LowerCtx): string[] =>
         }
         return printRule(`@keyframes ${name}`, body);
     });
+
+// Typed component tokens, registered so they transition. Registration is global, so these
+// sit outside the layers.
+const properties = (config: CoreConfig, ctx: LowerCtx): string[] =>
+    registeredProperties(config, ctx).flatMap(
+        ({ name, syntax, initialValue }) => [
+            `@property ${name} {`,
+            `    syntax: "${syntax}";`,
+            "    inherits: true;",
+            `    initial-value: ${initialValue};`,
+            "}",
+            "",
+        ],
+    );
 
 const tokenRules = (config: CoreConfig, ctx: LowerCtx, options: CssOptions) => [
     ...rule(
@@ -290,6 +305,7 @@ export const compileCss = (
                   `@layer ${layer}.reset, ${layer}.tokens, ${layer}.components;`,
                   "",
               ]),
+        ...properties(config, ctx),
         ...inLayer(sub("tokens"), tokenRules(config, ctx, options)),
         "",
         ...inLayer(sub("components"), componentRules(ctx, options)),

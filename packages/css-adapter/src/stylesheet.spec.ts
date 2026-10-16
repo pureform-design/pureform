@@ -147,3 +147,16 @@ describe("compileCss (utilities)", () => {
         );
     });
 });
+
+describe("compileCss (typed component tokens)", () => {
+    it("registers them with @property, outside the layers, so they transition", () => {
+        const css = compileCss(pureform());
+        expect(css).toContain(
+            '@property --components-circularProgress-value {\n    syntax: "<number>";\n    inherits: true;\n    initial-value: 0;\n}',
+        );
+        expect(css.indexOf("@property")).toBeLessThan(
+            css.indexOf("@layer pureform.tokens {"),
+        );
+        expect(css).toMatch(/transition: --components-circularProgress-value /);
+    });
+});
