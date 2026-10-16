@@ -15,6 +15,7 @@ import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { curve } from "./animate/curve";
+import { movingTokens, tokensAt } from "./motion";
 import { overridesFor, stylesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
@@ -255,7 +256,7 @@ const tokenTransitions = (selected: Selected): Map<string, Transition> => {
     return out;
 };
 
-// Instance tokens, their numbers moving to each new value over their transitions: the tokens
+// Instance tokens, each moving to its new value over their transitions: the tokens
 // as they are now, or `tokens` itself when nothing moves.
 const useMovingTokens = (
     tokens: ThemeValues | undefined,
@@ -265,12 +266,7 @@ const useMovingTokens = (
     const shown = useRef<ThemeValues | undefined>(tokens);
     const key = tokens ? JSON.stringify(tokens) : "";
     const movingFrom = (from: ThemeValues | undefined) =>
-        [...transitions].filter(
-            ([token]) =>
-                typeof tokens?.[token] === "number" &&
-                typeof from?.[token] === "number" &&
-                from[token] !== tokens[token],
-        );
+        movingTokens(from, tokens, transitions);
     // Until the tween's first frame, the tokens stay where they were, rather than jumping to
     // the new values for a frame.
     const held =
@@ -287,11 +283,7 @@ const useMovingTokens = (
         const timing = moving[0]![1];
         const progress = new Animated.Value(0);
         const listener = progress.addListener(({ value }) => {
-            const next = { ...tokens };
-            for (const [token] of moving) {
-                const a = from![token] as number;
-                next[token] = a + ((tokens[token] as number) - a) * value;
-            }
+            const next = tokensAt(from!, tokens, moving, value);
             shown.current = next;
             setNow(next);
         });
@@ -317,7 +309,8 @@ const useMovingTokens = (
 /** A component's styles per slot, and each slot's transitions, for its variants and state.
  *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
  *  one element: `{ "components.linearProgress.value": 40 }`. A token whose own value
- *  transitions moves to each new number, and the styles reading it with it. */
+ *  transitions moves to each new value, a number, color, length, angle, percentage or time,
+ *  and the styles reading it with it. */
 export const useComponentState = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
