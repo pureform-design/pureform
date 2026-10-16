@@ -526,6 +526,7 @@
         "@pureform/css-lowering": "catalog:",
         "@pureform/panda-adapter": "catalog:",
         "@pureform/rn-adapter": "catalog:",
+        "@pureform/styling": "catalog:",
         "@pureform/tailwind-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
