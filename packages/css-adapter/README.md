@@ -79,6 +79,10 @@ import { button } from "virtual:pureform/components";
 `buildCss` and the plugin also take `transform`, a `(css) => css` post-process, and `runtime`,
 where the generated modules import the runtime from.
 
+The runtime, `componentClasses`, lives in [`@pureform/styling`](../styling/README.md), the
+package every binding and generated factory uses at runtime. `@pureform/css-adapter/runtime`
+re-exports it (with `ComponentManifest`, `ComponentClasses`, `Choice`), and stays the default
+`runtime`, so generated modules and `.d.ts` files written before the move keep working.
 ## The stylesheet
 
 - **Layers:** `pureform.reset`, `pureform.tokens`, then `pureform.components`, which holds base

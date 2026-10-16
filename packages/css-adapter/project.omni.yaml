@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/vitest-config"
     - "@pureform/core"
     - "@pureform/css-lowering"
+    - "@pureform/styling"
     - "@pureform/material"
     - "@pureform/preset"
 
