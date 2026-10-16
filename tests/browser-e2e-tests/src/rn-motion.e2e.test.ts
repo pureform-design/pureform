@@ -1,6 +1,7 @@
 // State transitions through React Native Web: a button's root animated by useAnimatedComponentStyles
 // moves from its rest color to its hover color over the transition's duration, rather than at
-// once, and changes at once under reduced motion.
+// once, with or without reduced motion, since a color fade doesn't move anything. A progress
+// value, which does, moves over its transition and jumps under reduced motion.
 
 import type { PrecomputedStyles } from "@pureform/rn-adapter";
 import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
@@ -65,11 +66,14 @@ describe("useAnimatedComponentStyles", () => {
         root = createRoot(host);
     };
 
-    it("moves to the hover color over the transition", async () => {
+    it.each([
+        ["", false],
+        [" under reduced motion too", true],
+    ])("moves to the hover color over the transition%s", async (_, reduced) => {
         mount();
-        render(false, false);
+        render(false, reduced);
         const rest = background();
-        render(true, false);
+        render(true, reduced);
         await wait(40);
         const midway = background();
         await wait(400);
@@ -84,16 +88,62 @@ describe("useAnimatedComponentStyles", () => {
             expect(m[i]!).toBeLessThanOrEqual(Math.max(a[i]!, b[i]!));
         }
     });
+});
 
-    it("changes at once under reduced motion", async () => {
-        mount();
-        render(false, true);
-        const rest = background();
-        render(true, true);
-        const now = background();
+const Progress = (props: { value: number }) => {
+    const slots = useAnimatedComponentStyles(
+        "circularProgress",
+        { indeterminate: "false" },
+        {},
+        { "components.circularProgress.value": props.value },
+    );
+    return createElement(
+        Animated.View,
+        { style: slots.root as never },
+        createElement(
+            Animated.View,
+            { style: slots.endHalf as never },
+            createElement(Animated.View, {
+                testID: "arc",
+                style: slots.endArc as never,
+            }),
+        ),
+    );
+};
+
+describe("a progress value", () => {
+    const show = (value: number, reducedMotion: boolean) =>
+        flushSync(() =>
+            root!.render(
+                createElement(
+                    PureformProvider,
+                    { styles, scheme: "light", reducedMotion },
+                    createElement(Progress, { value }),
+                ),
+            ),
+        );
+    const arc = () =>
+        getComputedStyle(document.querySelector('[data-testid="arc"]')!)
+            .transform;
+
+    it.each([
+        ["moves over its transition", false],
+        ["jumps under reduced motion", true],
+    ])("%s", async (_, reduced) => {
+        host = document.createElement("div");
+        document.body.append(host);
+        root = createRoot(host);
+        show(10, reduced);
+        await wait(40);
+        const rest = arc();
+        show(40, reduced);
+        await wait(40);
+        const soon = arc();
         await wait(400);
-        expect(now).not.toBe(rest);
-        expect(background()).toBe(now);
+        const done = arc();
+        expect(done).not.toBe(rest);
+        if (reduced) expect(soon).toBe(done);
+        else expect(soon).not.toBe(done);
     });
 });
 

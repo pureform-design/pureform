@@ -62,4 +62,9 @@ export const forcePseudoClasses = async (
             forcedPseudoClasses: pseudoClasses,
         });
     }
+    // The state's transitions (color fades run even under reduced motion) finish at once, so
+    // computed styles show the state rather than partway to it.
+    for (const animation of frame.contentDocument?.getAnimations() ?? []) {
+        if ("transitionProperty" in animation) animation.finish();
+    }
 };
