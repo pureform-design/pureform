@@ -358,14 +358,25 @@ class. No script runs before paint.
 - **Whole themes** (from a seed color, or loaded at runtime): the provider generates both
   schemes' vars, on the server too, and writes one `<style>` block under the same scheme
   conditions the stylesheet uses, scoped to `[data-pf-theme="<hash>"]`. The hash is of
-  the theme's content, so the server and client agree on it and two providers with the
-  same theme share one block. The block goes into `<head>` through the framework's own
-  API: React 19's `<style href precedence>`, which hoists and dedupes, and Solid's asset
-  API (to confirm on Solid 2). Panda's `injectTheme` touches the DOM, so the Panda
-  factory exposes the theme's CSS as a string and the provider renders it the same way.
-- **The generators run on both sides.** They're pure, so the client regenerates the same
-  vars instead of reading serialized ones. If that turns out to be slow, the server can
-  serialize them into the page instead.
+  the theme's input (the seed and options), so the server and client agree on it without
+  generating anything, and two providers with the same theme share one block. The block
+  goes into `<head>` through the framework's own API, keyed by the hash so it's
+  deduplicated:
+    - Solid 2: `useHead` from `@solidjs/web`, which keeps head tags in step through
+      hydration. `@solidjs/meta@1.0.0-next.2` (peer `solid-js ^2.0.0-rc.0`) is a thin
+      `<Style key>` over it; the binding calls `useHead` directly, so apps don't need
+      `@solidjs/meta`.
+    - React 19: `<style href={hash} precedence="pureform">`, which hoists and dedupes.
+    - Panda's `injectTheme` touches the DOM, so the Panda factory exposes the theme's CSS
+      as a string and the provider renders it the same way.
+- **Hydrating a runtime theme: both options.** `PureformProvider`'s `hydrate` option
+  picks how the client gets a server-rendered theme:
+    - `"reuse"` (default on the web): the client keeps the server's `<style>` block and
+      generates nothing while hydrating; it only needs the hash, which comes from the
+      input. The generators load lazily, the first time the theme changes on the client.
+    - `"regenerate"`: the client runs the generators again while hydrating. They're pure,
+      so the vars match. Use it when code reads the theme's values in JS, or when the
+      server doesn't render the block (client-only routes).
 
 **Instance tokens** become inline CSS vars from the factory, so they render on the
 server. `@property` registrations are in the static stylesheet, so transitions work from
@@ -567,9 +578,8 @@ Deferred until there's demand:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Server rendering** (§5.7): confirm Solid 2's API for putting a `<style>` in
-   `<head>`, and measure whether regenerating seed themes on the client while hydrating is
-   cheap enough.
+3. **Server rendering** (§5.7): measure what `"regenerate"` costs while hydrating, to
+   decide whether `"reuse"` stays the default.
 4. **Not yet covered:** controlled and uncontrolled props (`checked`, `defaultChecked`,
    `onCheckedChange`) mapped onto Zag the same way in Solid and React; native form
    participation; `prefers-reduced-motion`, including token tweens on React Native;
