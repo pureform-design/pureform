@@ -11,6 +11,20 @@
                 "development": "./src/index.ts",
                 "default": "./dist/index.mjs"
             }
+        },
+        "./button": {
+            "types": "./dist/button/index.d.ts",
+            "import": {
+                "development": "./src/button/index.ts",
+                "default": "./dist/button.mjs"
+            }
+        },
+        "./checkbox": {
+            "types": "./dist/checkbox/index.d.ts",
+            "import": {
+                "development": "./src/checkbox/index.ts",
+                "default": "./dist/checkbox.mjs"
+            }
         }
     },
     "publishConfig": {
@@ -20,6 +34,7 @@
         "@pureform/anatomy": "catalog:",
         "@pureform/binding-core": "catalog:",
         "@pureform/machines": "catalog:",
+        "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:"
     },
     "devDependencies": {

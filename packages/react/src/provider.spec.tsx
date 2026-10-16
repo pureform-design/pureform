@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
-import { Component, type ReactNode, Suspense, useState } from "react";
-import { describe, expect, it, vi } from "vitest";
+import { Suspense, useState } from "react";
+import { describe, expect, it } from "vitest";
 
 import {
     PureformProvider,
@@ -12,33 +12,15 @@ import {
     usePureform,
 } from ".";
 import { deferredLoader, fakeRegistry } from "./__fixtures__/registry";
-import { interact, mount, mountAsync } from "./testing/render";
+import {
+    Errored,
+    interact,
+    mount,
+    mountAsync,
+    quietly,
+} from "./testing/render";
 
 const neverLoads = () => new Promise<never>(() => {});
-
-// React logs what an error boundary caught; the tests read the boundary instead.
-const quietly = (view: () => void) => {
-    const error = vi.spyOn(console, "error").mockImplementation(() => {});
-    try {
-        view();
-    } finally {
-        error.mockRestore();
-    }
-};
-
-class Errored extends Component<{ children: ReactNode }, { error: unknown }> {
-    override state: { error: unknown } = { error: undefined };
-    static getDerivedStateFromError(error: unknown) {
-        return { error };
-    }
-    override render() {
-        return this.state.error === undefined ? (
-            this.props.children
-        ) : (
-            <p data-testid="error">{String(this.state.error)}</p>
-        );
-    }
-}
 
 describe("PureformProvider", () => {
     it("writes dir, and data-pf-motion only when it isn't system, on a display: contents element", () => {

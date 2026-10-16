@@ -1,9 +1,10 @@
 // Rendering a view with React Testing Library, and waiting for React and the machines to settle.
 // Interactions run inside `act`, so React applies their updates before the test reads the page.
+// Also a value set from outside the view, and an error boundary for the tests that throw.
 
 import { act, cleanup, render } from "@testing-library/react";
-import type { ReactNode } from "react";
-import { afterEach } from "vitest";
+import { Component, type ReactNode, useState } from "react";
+import { afterEach, vi } from "vitest";
 
 afterEach(() => {
     cleanup();
@@ -37,3 +38,50 @@ export const interact = async (
     });
     await settle();
 };
+
+/** A value the test sets from outside the view, as a Solid test would with a signal:
+ *  `<value.Holder>{(v) => <Button selected={v} />}</value.Holder>`, then `await value.set(true)`. */
+export const outside = <T,>(initial: T) => {
+    const handle = { set: (_value: T) => {} };
+    function Holder(props: { children: (value: T) => ReactNode }): ReactNode {
+        const [value, setValue] = useState(initial);
+        handle.set = setValue;
+        return props.children(value);
+    }
+    return {
+        Holder,
+        set: (value: T): Promise<void> =>
+            act(async () => {
+                handle.set(value);
+            }),
+    };
+};
+
+/** Runs `view` with `console.error` silenced: React logs what an error boundary caught, and the
+ *  tests read the boundary instead. */
+export const quietly = (view: () => void): void => {
+    const error = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+        view();
+    } finally {
+        error.mockRestore();
+    }
+};
+
+/** An error boundary that renders the error it caught as `data-testid="error"`. */
+export class Errored extends Component<
+    { children: ReactNode },
+    { error: unknown }
+> {
+    override state: { error: unknown } = { error: undefined };
+    static getDerivedStateFromError(error: unknown) {
+        return { error };
+    }
+    override render(): ReactNode {
+        return this.state.error === undefined ? (
+            this.props.children
+        ) : (
+            <p data-testid="error">{String(this.state.error)}</p>
+        );
+    }
+}
