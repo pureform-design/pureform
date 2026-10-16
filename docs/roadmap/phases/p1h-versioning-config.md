@@ -3,7 +3,7 @@
 **Depends on:** nothing  
 **Runs in parallel with:** every other p1 subphase
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

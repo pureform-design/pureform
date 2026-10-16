@@ -3,7 +3,7 @@
 **Depends on:** p4a (the codegen interface commit)  
 **Runs in parallel with:** one subphase per adapter: p4b-panda, p4b-css, p4b-tailwind, p4b-rn, all parallel
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

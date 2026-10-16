@@ -3,7 +3,7 @@
 **Depends on:** p3a (and p3b for the React half)  
 **Runs in parallel with:** nothing; runs after p3a and p3b
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

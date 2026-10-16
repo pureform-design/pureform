@@ -3,7 +3,7 @@
 **Depends on:** p4c, p5a  
 **Runs in parallel with:** p8
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 
