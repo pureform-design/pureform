@@ -67,11 +67,14 @@ phone.
 @pureform/react             NEW, built alongside Solid. Same anatomy and machines.
 @pureform/react-native      Later. Moves component code out of rn-web-demo.
 
-@pureform/bundler           NEW. Vite/Rollup/esbuild/Metro plugin (unplugin): config
-                            loading, virtual registry module, style pruning. Exposes
-                            the generation step as `@pureform/bundler/generate`.
-@pureform/cli               NEW. The `pureform` bin (§10), a thin wrapper over
-                            `@pureform/bundler/generate`.
+@pureform/generate          NEW. The build step both tools share, with no bundler or CLI
+                            dependency: config loading, calling each adapter's
+                            `/codegen`, writing `.pureform/`, hashing for staleness, and
+                            the registry index.
+@pureform/bundler           NEW. Vite/Rollup/esbuild/Metro plugin (unplugin) over
+                            `@pureform/generate`: virtual registry module, dev
+                            regeneration, style pruning.
+@pureform/cli               NEW. The `pureform` bin (§10) over `@pureform/generate`.
 ```
 
 Rule for where code goes: if it compiles without importing a framework, it's not in
@@ -738,8 +741,8 @@ icon only has to follow them.
 ## 10. CLI
 
 `@pureform/cli` ships the `pureform` bin. It holds no generation logic of its own: it
-calls `@pureform/bundler/generate`, the same step the plugin runs, so the two can't
-produce different glue. A separate package keeps the command where users look for it and
+calls `@pureform/generate`, the same step the plugin runs, so the two can't produce
+different glue, and installing the CLI doesn't pull in the bundler plugin. A separate package keeps the command where users look for it and
 gives later commands a home without growing the plugin.
 
 - `pureform generate [--watch] [--check]`: writes the `.pureform/` glue and its type
@@ -763,8 +766,9 @@ Deferred until there's demand:
    `solid-demo` with the Panda target.
    Build `@pureform/react` alongside it from the start, so anything the two duplicate
    surfaces early and moves into the shared packages.
-4. Add `@pureform/bundler` with config loading and the virtual registry (no pruning), and
-   `@pureform/cli` with `pureform generate` over it.
+4. Add `@pureform/generate` (config loading, codegen, staleness), then
+   `@pureform/bundler` (virtual registry, no pruning) and `@pureform/cli`
+   (`pureform generate`) over it.
 5. Bring CSS and Tailwind targets to parity; switch `css-demo`/`tailwind-demo` to the
    components.
 6. Pruning (§7.3).
