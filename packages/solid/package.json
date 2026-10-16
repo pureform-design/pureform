@@ -1,0 +1,51 @@
+{
+    "name": "@pureform/solid",
+    "version": "0.0.0-semantically-released",
+    "description": "Solid 2 bindings for pureform",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./internal/zag": {
+            "types": "./dist/internal/zag/index.d.ts",
+            "import": {
+                "development": "./src/internal/zag/index.ts",
+                "default": "./dist/internal/zag.mjs"
+            }
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@zag-js/core": "catalog:",
+        "@zag-js/types": "catalog:",
+        "@zag-js/utils": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@solidjs/vite-plugin": "catalog:",
+        "@solidjs/web": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "@zag-js/checkbox": "catalog:",
+        "@zag-js/radio-group": "catalog:",
+        "@zag-js/switch": "catalog:",
+        "playwright": "catalog:",
+        "solid-js": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@solidjs/web": "2.0.0-rc.15",
+        "solid-js": "2.0.0-rc.15"
+    }
+}

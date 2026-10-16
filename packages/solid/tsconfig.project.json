@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "jsx": "preserve",
+        "jsxImportSource": "@solidjs/web",
+        "types": ["vite/client", "@vitest/browser-playwright"]
+    }
+}

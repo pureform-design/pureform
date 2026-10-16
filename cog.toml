@@ -112,6 +112,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/solid"]
+path = "packages/solid"
+include = [
+    "packages/solid/**",
+]
+public_api = true
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
