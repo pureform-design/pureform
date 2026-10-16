@@ -703,6 +703,28 @@ The adapter is small: `useMachine` (bind service, props, effects, refs), `normal
 tests through it. Drop the port when `@zag-js/solid` ships Solid 2 support; keep the same
 internal API so the swap is local.
 
+**Built** (`packages/solid/src/internal/zag`, from `@zag-js/solid` 1.46.0):
+
+- `useMachine` starts the machine in `onSettled` (Solid 1's `onMount`), and builds state
+  and events as plain objects instead of `mergeProps` results, keeping the bindable's
+  `ref` getter live.
+- `createBindable` reads `ref.current` through a getter rather than an effect that lags
+  a write, and boxes its signal's value, since Solid 2 treats a function passed to
+  `createSignal` as a computation.
+- `createTrack` uses Solid 2's split `createEffect(compute, effect)`.
+- `normalizeProps` also maps Zag's React-style camelCase attributes (`tabIndex`,
+  `readOnly`, `autoComplete`, …) to Solid 2's lowercase names, and keeps Zag's mapping of
+  `defaultChecked`/`defaultValue` to `checked`/`value`, since Zag passes the current state
+  there.
+- `useMachine` accepts `undefined` for any prop, which the repo's
+  `exactOptionalPropertyTypes` would otherwise reject, so components pass their optional
+  props straight through.
+- `Key` from `@solid-primitives/keyed` and `useSyncExternalStore` aren't ported; no
+  machine needs them.
+- Browser-mode tests run Zag's checkbox, switch, and radio group through the port in
+  Chromium, wired as the preset wires them (§9.5): pointer and keyboard input, focus
+  visibility, controlled props that only ask to change, callbacks, and `FormData`.
+
 Mapping of preset components:
 
 | Component                                                                                            | Behavior                                                                                                                                                                                                                                                                    |
@@ -980,7 +1002,7 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
    `@pureform/css-adapter/runtime`'s `componentClasses`, and `css-lowering`'s
    `themeVars`.
 2. Add `@pureform/anatomy` generated from the preset; test against the AST.
-3. Port Zag's Solid adapter to Solid 2; build checkbox and button end to end on
+3. Port Zag's Solid adapter to Solid 2 (done, §8); build checkbox and button end to end on
    `solid-demo` with the Panda target.
    Build `@pureform/react` alongside it from the start, so anything the two duplicate
    surfaces early and moves into the shared packages.
@@ -1011,9 +1033,9 @@ Preset changes these designs need, independent of the steps above:
 ## 13. Risks and open questions
 
 1. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
-   radio group, except form reset, which the bindings take over. The slider doesn't use
-   Zag (§8). Left: re-run the check through the Solid 2 port, since it was done with
-   Zag's vanilla adapter, and check disabled fieldsets.
+   radio group, with Zag's vanilla adapter and through the Solid 2 port (§8), except form
+   reset, which the bindings take over. The slider doesn't use Zag (§8). Left: disabled
+   fieldsets.
 
 Decided:
 
