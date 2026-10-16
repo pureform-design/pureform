@@ -11,6 +11,25 @@ relaxes these.
    say what was actually built, which can differ from the design.
 3. Check `git log --oneline -20` for work since those contexts were written.
 
+## Use the omni MCP first
+
+Prefer the omni MCP's tools over the shell whenever one fits; fall back to the shell only
+for what they can't do (git, formatting, linting, ad-hoc scripts).
+
+- **Builds and tests:** `task_run` (`build`, `test:unit`, `test:e2e`, `test`), not
+  `vite`, `vitest`, or `tsc` directly. It runs dependencies first and caches results.
+- **Workspace facts:** `workspace_info`, `project_list`, `project_config` (a project's
+  tasks and dependencies), and `hash_project`/`cache_stats` to see what changed.
+- **New packages:** `generator_list`, `generator_inspect`, `generator_validate_input`,
+  then `generator_run` with the `ts-package` generator, rather than copying a package by
+  hand. It also registers the package in `cog.toml`.
+- **Commands across projects:** `exec_command` with a directory filter, rather than a
+  shell loop over packages.
+- **Workspace tools:** `tool_list`, `tool_inspect`, `tool_run` for anything the workspace
+  defines.
+- **Ignore files and links:** `ignore_sync` after adding generated folders (such as
+  `.pureform/`), and `projection_status` when links look wrong.
+
 ## Working
 
 - **Commits:** one coherent unit per commit, with a Conventional Commits message
@@ -22,13 +41,14 @@ relaxes these.
   with `git show HEAD:apps/solid-demo/solid-env.d.ts > apps/solid-demo/solid-env.d.ts`).
 - **Before each commit:** `bunx oxfmt <paths>` from the repo root (no `..` in paths), then
   `bunx oxlint <paths>`, then the tests.
-- **Builds and tests** run through the omni MCP's `task_run` (`build`, `test:unit`,
-  `test:e2e`). A result with `ok: false` can still list completed tasks; check each
-  `exit_code` and any `skipped:DependeeTaskFailure`.
+- **Builds and tests** run through the omni MCP's `task_run`. A result with `ok: false`
+  can still list completed tasks; check each `exit_code` and any
+  `skipped:DependeeTaskFailure`. Its project filter may run the whole workspace; read
+  the results for the projects you changed.
 - **Browser tests** use Vitest browser mode (Chromium). `.env.local` sets
   `CHROMIUM_PATH`; outside omni, load it with `set -a; source .env.local; set +a`.
-- **New packages** are scaffolded with the omni `ts-package` generator. Dependencies go
-  through the root `package.json` catalog. Test projects live under `tests/`.
+- **New packages** are scaffolded with the omni `ts-package` generator (see above).
+  Dependencies go through the root `package.json` catalog. Test projects live under `tests/`.
 - **Rebuild a package's `dist`** after changing it; dependents and scripts read `dist`.
 - **Refactors must not change output.** Prove it with before-and-after equivalence on
   React Native and in Chromium (tooling: `/tmp/opencode/baseline.sh`,

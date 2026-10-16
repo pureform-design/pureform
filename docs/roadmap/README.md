@@ -1,7 +1,10 @@
 # Roadmap: components and style registry
 
 Builds the architecture in [the design doc](../design/component-architecture.md), in
-dependency order. Every phase follows the [conventions](conventions.md).
+dependency order. Every phase follows the [conventions](conventions.md). Use the omni MCP's
+tools as much as possible: `task_run` for builds and tests, the generators for new
+packages, and the workspace queries for project facts
+([details](conventions.md#use-the-omni-mcp-first)).
 
 **How to use this file**
 

@@ -3,7 +3,7 @@
 **Depends on:** p3c (layout and suites); p5a for non-Panda targets  
 **Runs in parallel with:** subphases p6a to p6e, in parallel
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

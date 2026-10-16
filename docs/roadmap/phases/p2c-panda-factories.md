@@ -3,7 +3,7 @@
 **Depends on:** p1a, p1e  
 **Runs in parallel with:** p2a, p2b
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

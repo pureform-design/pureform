@@ -3,7 +3,7 @@
 **Depends on:** p4a, p4b  
 **Runs in parallel with:** p4c-bundler and p4c-cli in parallel
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 

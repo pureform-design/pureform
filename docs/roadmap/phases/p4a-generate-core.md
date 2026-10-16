@@ -3,7 +3,7 @@
 **Depends on:** p1e, p2c (the factory shape)  
 **Runs in parallel with:** p3a, p3b, p3c (p4 doesn't need the components)
 
-Follow the [conventions](../conventions.md).
+Follow the [conventions](../conventions.md), and use the omni MCP as much as possible ([how](../conventions.md#use-the-omni-mcp-first)).
 
 ## Read first
 
