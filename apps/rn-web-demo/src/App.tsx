@@ -3,7 +3,11 @@
 // recomputes the state layers mixed over it in either mode.
 
 import type { Overrides } from "@pureform/rn-adapter";
-import { PureformProvider, useTokens } from "@pureform/rn-adapter/react";
+import {
+    PureformContainer,
+    PureformProvider,
+    useTokens,
+} from "@pureform/rn-adapter/react";
 import { Fragment, useState } from "react";
 import type { ReactNode } from "react";
 import {
@@ -27,6 +31,7 @@ import {
     LinearProgress,
     ListItem,
     Media,
+    Panel,
     Radio,
     SHAPES,
     Scrim,
@@ -212,6 +217,15 @@ function Page(props: { controls: ReactNode }) {
                     <View style={styles.picture}>
                         <Media aspect="square" shape={shape} />
                     </View>
+                </View>
+            </Section>
+            <Section title="Containers">
+                <View style={[styles.row, styles.top]}>
+                    {[240, 480].map((width) => (
+                        <PureformContainer key={width} style={{ width }}>
+                            <Panel>In a {width}px container</Panel>
+                        </PureformContainer>
+                    ))}
                 </View>
             </Section>
             <Section title="Floating action buttons">

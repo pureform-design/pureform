@@ -521,3 +521,13 @@ export function Media(props: {
         />
     );
 }
+
+/** The config's panel: roomy in a wide container, compact in a narrow one. */
+export function Panel(props: { children: ReactNode }) {
+    const s = useComponentStyles("panel")[""];
+    return (
+        <View style={view(s)}>
+            <Text style={text(ownText(s))}>{props.children}</Text>
+        </View>
+    );
+}

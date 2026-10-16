@@ -19,4 +19,5 @@ bun run dev
   or Reanimated, slow motion (ten times slower), drawing with SVG or not, and an override of the primary color. The shapes section draws icon
   buttons, a FAB, an avatar, and media in Material's shapes, with `SvgDrawing`, and ripples
   clip to them with `useSvgRipple`. `src/config.ts` adds two morphs, which pressable
-  components change into while pressed.
+  components change into while pressed, and a panel laid out by its container's width,
+  shown in a narrow and a wide `PureformContainer`.
