@@ -275,6 +275,13 @@ frozen result per selection with `selectionCache`, and adds instance tokens with
 `withTokenStyle`. The `staticCss` entries live in `.pureform/panda.ts`, a build-time module
 `panda.config.ts` spreads in, apart from the runtime modules, which import `styled-system/`.
 
+Built (p4b-panda): `@pureform/panda-adapter/codegen` generates those modules for every
+allow-listed component, single-slot recipes included (their class string becomes the root's).
+Each imports its recipe from the file Panda names after it (`recipes/icon-button`), and passes
+groups of `"true"` and `"false"` to it as booleans, since Panda compares them strictly. Its
+options are Panda's `outdir` and the preset's var `prefix`. `panda.ts` also lists every theme
+in `staticCss.themes`, since the theme is picked at run time too.
+
 **CSS and Tailwind:** plain lookup tables with no runtime dependency. Tailwind also gets
 `@source inline(...)` so it keeps the classes. This exists in part today: the CSS
 adapter's Vite plugin (which the Tailwind adapter's reuses) generates each component's
