@@ -1,12 +1,16 @@
 // Facts about a config that every adapter lowers the same way: whether it varies by color
-// scheme, a theme's component token vars, and how a component's slots nest.
+// scheme, a theme's component token vars, instance token vars, and how a component's slots nest.
 
 import { tokenValue } from "@pureform/core";
 import type { ValueNode, ValueType } from "@pureform/core/ast";
-import type { CoreConfig, ThemeOverride } from "@pureform/core/types";
+import type {
+    AnyComponentSpec,
+    CoreConfig,
+    ThemeOverride,
+} from "@pureform/core/types";
 
 import { compileNodeToCSS } from "./compile-node";
-import type { LowerCtx } from "./context";
+import type { LowerCtx, VarPrefix } from "./context";
 import { varName } from "./css";
 
 const hasSchemeCase = (node: ValueNode): boolean =>
@@ -42,6 +46,28 @@ export const componentTokenVars = (
     }
     return vars;
 };
+
+/** Each instance token's CSS var, by token: a `dynamic` token's own path, else the
+ *  component's var for it, as a theme override names it. A web factory sets these on the root
+ *  for `selection.tokens`. */
+export const instanceTokenVars = (
+    name: string,
+    spec: AnyComponentSpec,
+    prefix: VarPrefix | undefined,
+): Record<string, string> =>
+    Object.fromEntries(
+        Object.entries(spec.tokens ?? {}).map(([token, entry]) => {
+            const node = tokenValue(entry) as {
+                type?: string;
+                path?: string[];
+            };
+            const path =
+                node.type === "dynamic" && node.path
+                    ? node.path
+                    : ["components", name, token];
+            return [token, varName(path, prefix)];
+        }),
+    );
 
 // CSS's `@property` syntax for each value type.
 const SYNTAX: Record<ValueType, string> = {

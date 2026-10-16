@@ -3,10 +3,7 @@
 // component's CSS vars on the root. It needs no class name runtime and no manifest: the classes
 // are the ones `componentClasses` gives for the component's manifest.
 
-import { tokenValue } from "@pureform/core";
-import type { AnyComponentSpec } from "@pureform/core/types";
-import { varName } from "@pureform/css-lowering";
-import type { VarPrefix } from "@pureform/css-lowering";
+import { instanceTokenVars } from "@pureform/css-lowering";
 
 import type { ComponentManifest } from "../runtime";
 
@@ -23,26 +20,9 @@ const access = (object: string, name: string): string =>
 // Text inside a template literal, taken literally.
 const literal = (text: string): string => text.replace(/[\\`$]/g, "\\$&");
 
-/** Each instance token's CSS var: a `dynamic` token's own path, else the component's var for
- *  it, as a theme override names it. The same vars the Panda adapter's factories set. */
-export const tokenVars = (
-    name: string,
-    spec: AnyComponentSpec,
-    prefix: VarPrefix | undefined,
-): Record<string, string> =>
-    Object.fromEntries(
-        Object.entries(spec.tokens ?? {}).map(([token, entry]) => {
-            const node = tokenValue(entry) as {
-                type?: string;
-                path?: string[];
-            };
-            const path =
-                node.type === "dynamic" && node.path
-                    ? node.path
-                    : ["components", name, token];
-            return [token, varName(path, prefix)];
-        }),
-    );
+/** Each instance token's CSS var (`instanceTokenVars`, which every web adapter's factories
+ *  share). */
+export const tokenVars = instanceTokenVars;
 
 /** A slot's class expression over the normalized selection `s`: its own class, then
  *  `<class>--<group>_<value>` for each group, in the manifest's order. A group with no default

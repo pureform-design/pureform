@@ -179,7 +179,7 @@ export const button: ClassFactory<"button"> = (s) =>
 | `subsetConfig(config, components)`        | The config with only those components, in that order                              |
 | `factoryModule({ name, manifest, vars })` | One factory module's source                                                       |
 | `classExpression(base, manifest)`         | One slot's class expression over the selection `s`                                |
-| `tokenVars(name, spec, prefix)`           | Each instance token's CSS var                                                     |
+| `tokenVars(name, spec, prefix)`           | Each instance token's CSS var (`instanceTokenVars` from `css-lowering`)           |
 
 ## Options
 

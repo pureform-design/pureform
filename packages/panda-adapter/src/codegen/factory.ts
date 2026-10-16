@@ -2,10 +2,7 @@
 // cached result per selection, each slot's class string as `{ class }`, and instance tokens as
 // the component's CSS vars on the root.
 
-import { tokenValue } from "@pureform/core";
-import type { AnyComponentSpec } from "@pureform/core/types";
-import { varName } from "@pureform/css-lowering";
-import type { VarPrefix } from "@pureform/css-lowering";
+import { instanceTokenVars } from "@pureform/css-lowering";
 import type { ComponentShape } from "@pureform/generate";
 
 /** The file Panda writes a recipe to, under `<outdir>/recipes/`: the name split into words at
@@ -28,26 +25,9 @@ const access = (object: string, name: string): string =>
         ? `${object}.${name}`
         : `${object}[${JSON.stringify(name)}]`;
 
-/** Each instance token's CSS var: a `dynamic` token's own path, else the component's var for
- *  it, as a theme override names it. */
-export const tokenVars = (
-    name: string,
-    spec: AnyComponentSpec,
-    prefix: VarPrefix | undefined,
-): Record<string, string> =>
-    Object.fromEntries(
-        Object.entries(spec.tokens ?? {}).map(([token, entry]) => {
-            const node = tokenValue(entry) as {
-                type?: string;
-                path?: string[];
-            };
-            const path =
-                node.type === "dynamic" && node.path
-                    ? node.path
-                    : ["components", name, token];
-            return [token, varName(path, prefix)];
-        }),
-    );
+/** Each instance token's CSS var (`instanceTokenVars`, which every web adapter's factories
+ *  share). */
+export const tokenVars = instanceTokenVars;
 
 // Panda types a group with `"true"` or `"false"` values as a boolean and compares selections
 // strictly, while the cache hands over strings, so those values go back to booleans.
