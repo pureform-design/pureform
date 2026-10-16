@@ -847,6 +847,16 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
 - Parts read a `ButtonContext` created by `Root`: machine API, selection, and every
   slot's classes from one `useClasses` call (on React Native, styles from one
   `useStyles` call).
+- **Built (p3a), Solid:** one subpath per component (`@pureform/solid/button`,
+  `@pureform/solid/checkbox`). Its export is the ready-made component with the compound parts
+  as properties (`Object.assign`), so `Button` and `Button.Root` come from one import. Every AST
+  slot is a part, the touch target included (`Button.TouchTarget`). The ready-made button takes
+  `label`, `icon` (its part renders only when given), and `mirrorIcon`, not children. Root's own
+  props, how they map onto the selection and the machine, and the adjustments to Zag's part
+  props live in `@pureform/binding-core` (`src/components/`), so React reads the same lists.
+  Root's `id` is the machine's root id, since the machines find their elements by id. Variant
+  props are typed `VariantProp<"button", "variant">`: the app's registered values, or any value
+  while nothing is registered.
 
 ### 9.2 What every part does
 
@@ -935,6 +945,11 @@ component), Zag's shape, identical in Solid and React:
   `@pureform/binding-core`. Solid's `useControllable(component, name, props)` hands the machine
   the value, the default read once, and the callback; Zag already uses the same names. The
   warning fires once per instance.
+- **Built (p3a):** the browser toggles a checkbox's native input before the machine hears of
+  the click, and Zag writes the input only when its state changes, so a controlled checkbox
+  whose owner ignored the change kept the toggle. The binding puts the input back
+  (`syncCheckedInput` in `@pureform/binding-core/dom`) in a microtask after the click, once the
+  machine's send and the owner's update have run.
 
 ### 9.5 Forms
 
@@ -1012,6 +1027,12 @@ validate, and disable with it, with no form library.
   with `reason: "reset"`. Zag's fieldset tracking still runs too; components OR
   `useFieldsetDisabled` into `disabled`, which covers the missed outer fieldset but not the
   legend exemption.
+- **Built (p3a), checkbox:** Root is a `<label>` around the native input, as Zag's root props
+  expect, so a click on the touch target, outside the control, toggles it. The preset has no
+  label slot, so Zag's `aria-labelledby` (pointing at a label part) is dropped: the input is
+  named with `aria-label`, which the ready-made checkbox forwards to it, or by a `<label for>`
+  pointing at Root's `ids.input`. `readOnly` also sets `aria-readonly`. The marks drop Zag's
+  `hidden`, since the CSS shows each in its state with a transition.
 
 ### 9.6 Icons
 
