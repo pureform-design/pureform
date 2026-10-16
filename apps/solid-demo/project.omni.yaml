@@ -9,6 +9,7 @@ dependencies:
     - "@pureform/panda-adapter"
     - "@pureform/preset"
     - "@pureform/js-effects"
+    - "@pureform/styling"
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
@@ -19,6 +20,7 @@ cache:
       append:
         - panda.config.ts
         - vite.config.ts
+        - ".pureform/**/*"
 
 tasks:
   test:
