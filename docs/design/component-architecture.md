@@ -291,8 +291,17 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
 - **Button, as built:** 7 color variants and 5 fills replace 35 compounds. Every
   combination resolves identically on React Native (5,250 selections) and computes
   identically in Chromium (21,000 slot styles), and the CSS is 35.7 KB smaller.
-- **Next:** the same for iconButton, fab, chip, the fields, and list items; then size ×
-  density through token arithmetic (`height: add(token("height"), token("densityOffset"))`).
+- **Density:** components with sizes get a `densityOffset` token, the theme's by default.
+  Each `density` step sets it and each size adds it
+  (`height: add(token("height"), token("densityOffset"))`), so one rule per size covers
+  every step. `inherit` sets it back to the theme's offset, so a component inside a denser
+  one doesn't inherit its parent's token.
+- **Across the preset:** compounds went from 202 to 12, with output identical on both
+  targets. Built CSS is about 28% smaller raw (7% gzipped) on the CSS target and 34% (9%)
+  on Tailwind; React Native's precomputed styles are 12% smaller.
+- **What stays compound:** cases that need both conditions at once: the FAB's size with
+  its shape and with `extended`, each text input's fill with a leading icon, primary tabs
+  with an icon, and card (3).
 
 ### 5.6 Themes
 
@@ -499,14 +508,18 @@ Deferred until there's demand:
 
 1. **Lookup cost.** Benchmark before step 3 ends. Fallback: compile-time inlining of
    static variant classes by the bundler plugin.
-2. **Panda's extractor** can't follow the registry; we rely on `staticCss`, which can
-   bloat CSS without pruning. Is that acceptable in dev?
-3. **Solid 2 is RC.** API churn could break the Zag port; pin and track.
-4. **Variant explosion** for components with many variants: tokens a style sets (§5.5)
-   remove most compounds; fragments (§5.4) cover the rest.
-5. **SSR:** registry and provider must work during SSR and hydrate without style
-   mismatch, including runtime themes (write vars inline on the server).
-6. **Where state lives on the web:** data attributes (proposed) vs. selection.
+2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
+   `@zag-js/solid` supports Solid 2 before porting the adapter.
+3. **SSR:** registry and provider must work during SSR and hydrate without style
+   mismatch, including runtime themes (write vars inline on the server). Not designed yet.
+4. **Not yet covered:** controlled and uncontrolled props (`checked`, `defaultChecked`,
+   `onCheckedChange`) mapped onto Zag the same way in Solid and React; native form
+   participation; `prefers-reduced-motion`, including token tweens on React Native;
+   direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
+   committed and how stale glue is detected; and how packages are versioned together.
 
-Decided: factory generators live in each adapter's `/codegen` subpath; Panda `staticCss` bloat accepted until
-pruning; React built in parallel with Solid; text field gets its own machine.
+Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
+can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
+React built in parallel with Solid; text field gets its own machine; state lives on the
+web as data attributes; too many variant combinations is solved by tokens a style sets
+(§5.5), with fragments (§5.4) for the rest.
