@@ -1,6 +1,7 @@
 export interface TrackFormResetOptions {
-    /** Runs during the form's `reset` event, before the browser resets its controls. Set
-     *  native defaults here (`setNativeDefault`), so the page shows the default at once. */
+    /** Runs during the form's `reset` event, before the browser resets its controls and before
+     *  the form's other reset listeners (Zag's among them). Set native defaults here
+     *  (`setNativeDefault`), so the page shows the default at once. */
     onBeforeReset?: (() => void) | undefined;
     /** Runs once the browser's reset has run, unless a listener prevented it. Send the
      *  machine its default here, or call a controlled component's change callback. */
@@ -46,9 +47,10 @@ export function trackFormReset(
         timers.add(timer);
     };
 
-    form.addEventListener("reset", onResetEvent);
+    // In the capture phase, so it runs before listeners on the form itself.
+    form.addEventListener("reset", onResetEvent, { capture: true });
     return () => {
-        form.removeEventListener("reset", onResetEvent);
+        form.removeEventListener("reset", onResetEvent, { capture: true });
         for (const timer of timers) win.clearTimeout(timer);
         timers.clear();
     };

@@ -139,7 +139,10 @@ trackFormReset(input, {
 ```
 
 - `trackFormReset` calls `onReset` in the task after the `reset` event, once the browser has
-  reset the controls (microtasks can run before it does), and skips a prevented reset.
+  reset the controls (microtasks can run before it does), and skips a prevented reset. It
+  listens in the capture phase, so `onBeforeReset` runs before the form's other `reset`
+  listeners, Zag's own among them (a binding marks or drops the callbacks Zag's own reset
+  causes from there).
 - `trackFieldsetDisabled` follows every fieldset around the element, by the browser's rule
   (the first legend is exempt); Zag's `trackFormControl` reads only the closest one.
 - `trackFormControl` has Zag's shape, built on the two above.

@@ -104,6 +104,21 @@ describe("trackFormReset", () => {
         expect(seen).toEqual(["before:typed", "after:start"]);
     });
 
+    it("runs before the form's own reset listeners, such as Zag's", async () => {
+        html(`<form><input id="text"></form>`);
+        const seen: string[] = [];
+        $("form").addEventListener("reset", () => seen.push("form"));
+        cleanups.push(
+            trackFormReset($("#text"), {
+                onBeforeReset: () => seen.push("before"),
+                onReset: () => seen.push("after"),
+            }),
+        );
+        $<HTMLFormElement>("form").reset();
+        await settle();
+        expect(seen).toEqual(["before", "form", "after"]);
+    });
+
     it("follows a reset button the user clicks", async () => {
         html(
             `<form><input id="text" value="start"><button type="reset">Reset</button></form>`,
