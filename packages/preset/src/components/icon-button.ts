@@ -26,7 +26,7 @@ import {
 import type { Shapes } from "./shaped";
 import {
     DEFAULT_GROUP,
-    colorVariants,
+    colorTokenVariants,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -34,12 +34,14 @@ import {
     densityCompounds,
     densityMarkers,
     densitySteps,
-    entriesOf,
+    groupTokens,
     iconBox,
     keysOf,
     lower,
+    mergeSlotStyles,
     pressableRoot,
     sys,
+    tokenFillColors,
     touchTarget,
     variantsOf,
 } from "./shared";
@@ -61,6 +63,7 @@ const { tokens, ref } = componentTokens("iconButton", {
     sizeSmall: sizeToken("controlSmall"),
     sizeMedium: sizeToken("controlMedium"),
     sizeLarge: sizeToken("controlLarge"),
+    ...groupTokens(DEFAULT_GROUP),
 });
 
 const size = (
@@ -112,16 +115,17 @@ export const createIconButton = <
                     touchTarget,
                 },
                 variants: {
-                    color: colorVariants(groups),
+                    color: colorTokenVariants(groups),
                     variant: Object.fromEntries(
                         Object.entries(FILLS).map(([name, fill]) => [
                             name,
-                            {
-                                ...shapedElevation(fill),
-                                ...(fill === "outlined"
+                            mergeSlotStyles(
+                                shapedElevation(fill),
+                                fill === "outlined"
                                     ? { outline: shapedOutlineStroke(ref) }
-                                    : {}),
-                            },
+                                    : {},
+                                shapedColors(fill, tokenFillColors(fill, ref)),
+                            ),
                         ]),
                     ),
                     shape: shapeVariant(shapes, {
@@ -135,24 +139,18 @@ export const createIconButton = <
                     },
                     density: densityMarkers(densities),
                 },
-                compoundVariants: [
-                    ...entriesOf(FILLS).flatMap(([variant, fill]) =>
-                        groups.map((color) => ({
-                            match: { color, variant },
-                            style: shapedColors(fill, color),
-                        })),
+                compoundVariants: (
+                    ["Small", "Medium", "Large"] as const
+                ).flatMap((s) =>
+                    densityCompounds(
+                        densities,
+                        { size: lower(s) },
+                        (offset) => {
+                            const side = add(ref(`size${s}`), offset);
+                            return { root: { width: side, height: side } };
+                        },
                     ),
-                    ...(["Small", "Medium", "Large"] as const).flatMap((s) =>
-                        densityCompounds(
-                            densities,
-                            { size: lower(s) },
-                            (offset) => {
-                                const side = add(ref(`size${s}`), offset);
-                                return { root: { width: side, height: side } };
-                            },
-                        ),
-                    ),
-                ],
+                ),
                 defaultVariants: {
                     color: "primary",
                     variant: "standard",

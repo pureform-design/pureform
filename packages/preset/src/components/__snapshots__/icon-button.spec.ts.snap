@@ -75,741 +75,6 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
     "className": "iconButton",
     "compoundVariants": [
       {
-        "color": "primary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateHover))",
-              "base": "token(colors.primary)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onPrimary)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "secondary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateHover))",
-              "base": "token(colors.secondary)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onSecondary)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "tertiary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateHover))",
-              "base": "token(colors.tertiary)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onTertiary)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "success",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateHover))",
-              "base": "token(colors.success)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onSuccess)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "warning",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateHover))",
-              "base": "token(colors.warning)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onWarning)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "error",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateHover))",
-              "base": "token(colors.error)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onError)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "info",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateHover))",
-              "base": "token(colors.info)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onInfo)",
-          },
-        },
-        "variant": "filled",
-      },
-      {
-        "color": "primary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.primaryContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onPrimaryContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "secondary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.secondaryContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onSecondaryContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "tertiary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.tertiaryContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onTertiaryContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "success",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
-              "base": "token(colors.successContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onSuccessContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "warning",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
-              "base": "token(colors.warningContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onWarningContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "error",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
-              "base": "token(colors.errorContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onErrorContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "info",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
-              "base": "token(colors.infoContainer)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.onInfoContainer)",
-          },
-        },
-        "variant": "tonal",
-      },
-      {
-        "color": "primary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.primary)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "secondary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.secondary)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "tertiary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.tertiary)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "success",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.success)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "warning",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.warning)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "error",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.error)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "info",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.info)",
-          },
-        },
-        "variant": "outlined",
-      },
-      {
-        "color": "primary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.primary)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "secondary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.secondary)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "tertiary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.tertiary)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "success",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.success)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "warning",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.warning)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "error",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.error)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "info",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
-              "base": "transparent",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.info)",
-          },
-        },
-        "variant": "standard",
-      },
-      {
-        "color": "primary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.primary)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "secondary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.secondary)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "tertiary",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.tertiary)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "success",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.success)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "warning",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.warning)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "error",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.error)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
-        "color": "info",
-        "css": {
-          "container": {
-            "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.statePressed))",
-              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateHover))",
-              "base": "token(colors.surfaceContainerLow)",
-            },
-          },
-          "root": {
-            "_disabled": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            },
-            "color": "token(colors.info)",
-          },
-        },
-        "variant": "elevated",
-      },
-      {
         "css": {
           "root": {
             "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + 0px)",
@@ -950,25 +215,55 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
     "variants": {
       "color": {
         "error": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.error)",
+            "--components-iconButton-accentContainer": "token(colors.errorContainer)",
+            "--components-iconButton-onAccent": "token(colors.onError)",
+            "--components-iconButton-onAccentContainer": "token(colors.onErrorContainer)",
+          },
         },
         "info": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.info)",
+            "--components-iconButton-accentContainer": "token(colors.infoContainer)",
+            "--components-iconButton-onAccent": "token(colors.onInfo)",
+            "--components-iconButton-onAccentContainer": "token(colors.onInfoContainer)",
+          },
         },
         "primary": {
           "root": {},
         },
         "secondary": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.secondary)",
+            "--components-iconButton-accentContainer": "token(colors.secondaryContainer)",
+            "--components-iconButton-onAccent": "token(colors.onSecondary)",
+            "--components-iconButton-onAccentContainer": "token(colors.onSecondaryContainer)",
+          },
         },
         "success": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.success)",
+            "--components-iconButton-accentContainer": "token(colors.successContainer)",
+            "--components-iconButton-onAccent": "token(colors.onSuccess)",
+            "--components-iconButton-onAccentContainer": "token(colors.onSuccessContainer)",
+          },
         },
         "tertiary": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.tertiary)",
+            "--components-iconButton-accentContainer": "token(colors.tertiaryContainer)",
+            "--components-iconButton-onAccent": "token(colors.onTertiary)",
+            "--components-iconButton-onAccentContainer": "token(colors.onTertiaryContainer)",
+          },
         },
         "warning": {
-          "root": {},
+          "root": {
+            "--components-iconButton-accent": "token(colors.warning)",
+            "--components-iconButton-accentContainer": "token(colors.warningContainer)",
+            "--components-iconButton-onAccent": "token(colors.onWarning)",
+            "--components-iconButton-onAccentContainer": "token(colors.onWarningContainer)",
+          },
         },
       },
       "density": {
@@ -1027,6 +322,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       "variant": {
         "elevated": {
           "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerLow)",
+            },
             "backgroundImage": {
               ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
               ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel2), token(colors.elevationTintLevel2))",
@@ -1035,16 +337,25 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "_disabled": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "filterElevation": "level0",
             },
             "_hover": {
               "filterElevation": "level2",
             },
+            "color": "var(--components-iconButton-accent, token(colors.primary))",
             "filterElevation": "level1",
           },
         },
         "filled": {
           "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              "base": "var(--components-iconButton-accent, token(colors.primary))",
+            },
             "backgroundImage": {
               ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
               ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
@@ -1053,15 +364,26 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "_disabled": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "filterElevation": "level0",
             },
             "_hover": {
               "filterElevation": "level1",
             },
+            "color": "var(--components-iconButton-onAccent, token(colors.onPrimary))",
             "filterElevation": "level0",
           },
         },
         "outlined": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              "base": "transparent",
+            },
+          },
           "outline": {
             "borderColor": {
               ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
@@ -1071,10 +393,39 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
             "borderWidth": "var(--components-iconButton-outlineWidth, 1px)",
             "display": "flex",
           },
+          "root": {
+            "_disabled": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "color": "var(--components-iconButton-accent, token(colors.primary))",
+          },
         },
-        "standard": {},
+        "standard": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              "base": "transparent",
+            },
+          },
+          "root": {
+            "_disabled": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "color": "var(--components-iconButton-accent, token(colors.primary))",
+          },
+        },
         "tonal": {
           "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+              "base": "var(--components-iconButton-accentContainer, token(colors.primaryContainer))",
+            },
             "backgroundImage": {
               ".iconButton__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
               ".iconButton__root:is(:hover, [data-hover]) &": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
@@ -1083,11 +434,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "_disabled": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "filterElevation": "level0",
             },
             "_hover": {
               "filterElevation": "level1",
             },
+            "color": "var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer))",
             "filterElevation": "level0",
           },
         },

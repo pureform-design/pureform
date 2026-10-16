@@ -1,5 +1,6 @@
 // Building blocks shared by pureform's component specs.
 
+import { mergeStyles } from "@pureform/core";
 import {
     absolute,
     add,
@@ -143,30 +144,6 @@ export const touchTarget: StyleMap = {
 /** How a component variant fills its container, following the Material button family. */
 export type Fill = "filled" | "tonal" | "outlined" | "text" | "elevated";
 
-/** Container and content colors for one fill in one color group. */
-export const fillColors = (
-    fill: Fill,
-    group: string,
-): { container: ColorValue; content: ColorValue } => {
-    switch (fill) {
-        case "filled":
-            return { container: sys(group), content: on(group) };
-        case "tonal":
-            return {
-                container: sys(`${group}Container`),
-                content: on(`${group}Container`),
-            };
-        case "elevated":
-            return {
-                container: sys("surfaceContainerLow"),
-                content: sys(group),
-            };
-        case "outlined":
-        case "text":
-            return { container: transparent, content: sys(group) };
-    }
-};
-
 /** The roles a component's group tokens point at for a color group: its main and container
  *  colors, and the content drawn on each. */
 export const groupTokens = (group: string) => ({
@@ -196,75 +173,44 @@ export const colorTokenVariants = <G extends string>(
         ]),
     ) as Record<G, { root: StyleMap }>;
 
-/** A fill's root colors read through the group tokens, which the `color` variant points at a
- *  group: its state-layered container, its content color, and its disabled colors. One rule
- *  per fill draws every group, where colors set outright would need one per fill and group. */
+/** Container and content colors for one fill, read through the group tokens, which the
+ *  `color` variant points at a group. One rule per fill then draws every group, where colors
+ *  set outright would need one per fill and group. */
+export const tokenFillColors = (
+    fill: Fill,
+    token: (name: GroupToken) => AliasNode,
+): { container: ColorValue; content: ColorValue } => {
+    switch (fill) {
+        case "filled":
+            return { container: token("accent"), content: token("onAccent") };
+        case "tonal":
+            return {
+                container: token("accentContainer"),
+                content: token("onAccentContainer"),
+            };
+        case "elevated":
+            return {
+                container: sys("surfaceContainerLow"),
+                content: token("accent"),
+            };
+        case "outlined":
+        case "text":
+            return { container: transparent, content: token("accent") };
+    }
+};
+
+/** A fill's root colors read through the group tokens: its state-layered container, its
+ *  content color, and its disabled colors. */
 export const fillTokenColors = (
     fill: Fill,
     token: (name: GroupToken) => AliasNode,
 ): StyleMap => {
-    const [container, content]: [ColorValue, ColorValue] =
-        fill === "filled"
-            ? [token("accent"), token("onAccent")]
-            : fill === "tonal"
-              ? [token("accentContainer"), token("onAccentContainer")]
-              : fill === "elevated"
-                ? [sys("surfaceContainerLow"), token("accent")]
-                : [transparent, token("accent")];
+    const { container, content } = tokenFillColors(fill, token);
     return {
         ...interactiveColors(container, content),
         states: { disabled: disabledColors(fill) },
     };
 };
-
-/** One compound variant per color group and variant, setting the root's state-layered
- *  container, its content color, and its disabled colors. `fills` maps each variant name to
- *  how it fills. The disabled colors live here rather than on the variant because Panda puts
- *  compound variants in a cascade layer after the variants layer: a disabled color on the
- *  variant would lose to the compound's resting color. */
-export const colorCompounds = <F extends string, G extends string>(
-    fills: Record<F, Fill>,
-    groups: ColorGroups<G>,
-): { match: { color: G; variant: F }; style: SlotStyles }[] =>
-    entriesOf(fills).flatMap(([variant, fill]) =>
-        groups.map((color) => {
-            const { container, content } = fillColors(fill, color);
-            return {
-                match: { color, variant },
-                style: {
-                    root: {
-                        ...interactiveColors(container, content),
-                        states: { disabled: disabledColors(fill) },
-                    },
-                },
-            };
-        }),
-    );
-
-/** One compound variant per color group but the default, where `match` holds as well, styled
- *  for the group. The match keeps its literal values, so a typed recipe checks them. */
-export const groupCompounds = <
-    const M extends Record<string, string>,
-    S,
-    G extends string = string,
->(
-    groups: ColorGroups<G>,
-    match: M,
-    style: (group: G) => S,
-): { match: M & { color: G }; style: S }[] =>
-    groups
-        .filter((group) => group !== DEFAULT_GROUP)
-        .map((color) => ({ match: { ...match, color }, style: style(color) }));
-
-/** The `color` variant group: one empty entry per color group, so compound variants can match
- *  on it. */
-export const colorVariants = <G extends string>(
-    groups: ColorGroups<G>,
-): Record<G, { root: StyleMap }> =>
-    Object.fromEntries(groups.map((group) => [group, { root: {} }])) as Record<
-        G,
-        { root: StyleMap }
-    >;
 
 /** Disabled colors for a fill: Material draws a disabled control in the on-surface color, with
  *  a faint container for filled styles and a faint outline for the outlined style. */
@@ -306,8 +252,8 @@ export const fillElevation = (fill: Fill): StyleMap => {
     }
 };
 
-/** The variant-level root style for a fill: its outline and elevation. The colors come from
- *  `colorCompounds`, since they also depend on the color group. */
+/** The variant-level root style for a fill: its outline and elevation. Its colors come from
+ *  `fillTokenColors`. */
 export const fillVariant = (
     fill: Fill,
     ref: (token: OutlineTokens) => AliasNode,
@@ -420,6 +366,19 @@ export const colorVariant = <T, G extends string = string>(
             group === DEFAULT_GROUP ? {} : build(groupRoles(group)),
         ]),
     ) as Record<G, T | Record<string, never>>;
+
+/** Merge slot styles, slot by slot, their states too; later maps win per property. */
+export const mergeSlotStyles = (
+    ...maps: Record<string, StyleMap>[]
+): Record<string, StyleMap> => {
+    const out: Record<string, StyleMap> = {};
+    for (const map of maps) {
+        for (const [slot, style] of Object.entries(map)) {
+            out[slot] = out[slot] ? mergeStyles(out[slot], style) : style;
+        }
+    }
+    return out;
+};
 
 /** Merge slot styles, slot by slot; later maps win per property. */
 export const mergeSlots = (
