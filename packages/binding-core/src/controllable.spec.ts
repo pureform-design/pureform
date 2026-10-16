@@ -1,3 +1,4 @@
+import { createRegistry, VERSION } from "@pureform/styling";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import {
@@ -127,11 +128,24 @@ describe("warnOnce", () => {
 });
 
 describe("trainVersionMismatch", () => {
-    it("finds nothing until the glue records a version", () => {
+    it("passes a registry that recorded no version", () => {
         expect(trainVersionMismatch({})).toBeUndefined();
+        expect(trainVersionMismatch(undefined)).toBeUndefined();
     });
 
-    it.todo(
-        "warns when the glue's recorded train version differs from the runtime's (p4a)",
-    );
+    it("passes a registry made for the running version", () => {
+        expect(
+            trainVersionMismatch(createRegistry({}, { version: VERSION })),
+        ).toBeUndefined();
+    });
+
+    it("warns when the glue's recorded train version differs from the runtime's", () => {
+        const message = trainVersionMismatch(
+            createRegistry({}, { version: "0.3.0" }),
+            "0.4.1",
+        );
+        expect(message).toContain("made for core-train 0.3.0");
+        expect(message).toContain("@pureform/styling 0.4.1 is running");
+        expect(message).toContain("pureform generate");
+    });
 });
