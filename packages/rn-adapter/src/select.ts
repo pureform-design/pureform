@@ -58,6 +58,8 @@ export interface Drawing {
     /** The fill under the gradient, moved off the view's background to follow the shape. */
     fill?: string;
     gradient?: GradientValue;
+    /** How a change of shape morphs, and a change of fill blends, where they transition. */
+    transitions?: { shape?: Transition; fill?: Transition };
 }
 
 export type Style = Record<string, Value>;
@@ -319,6 +321,18 @@ export const selectWithTransitions = (
                 delete style.boxShadow;
             }
             if (gradient) drawing.gradient = gradient;
+            const timed = (property: string) =>
+                transitions[slot]!.find((t) => t.property === property);
+            const [morph, blend] = [
+                timed(SHAPE),
+                shape && timed("backgroundColor"),
+            ];
+            if (morph || blend) {
+                drawing.transitions = {
+                    ...(morph ? { shape: morph } : {}),
+                    ...(blend ? { fill: blend } : {}),
+                };
+            }
             drawings[slot] = drawing;
         }
     }

@@ -249,8 +249,12 @@ overrides the primary color in either mode.
   returns each slot's `drawings`: its shape with its fill, moved off the view, and its
   gradient. `SvgDrawing` measures its slot and draws them under the content; it can also draw a
   picture clipped to the shape, for media. Shapes and gradient stops keep their mix of pixels
-  and percentages until the box is known, and `geometry.ts` places them as CSS does. A shape
-  morph jumps between its shapes; animating it waits for the Reanimated binding.
+  and percentages until the box is known, and `geometry.ts` places them as CSS does.
+- **Shape morphs:** a `clipPath` transition reaches the slot's drawing, with its fill's
+  `backgroundColor` transition, since the fill left the view. `SvgDrawing` interpolates the
+  path's points over it, as `morph()` gives both shapes the same curves, and blends the fill,
+  each from wherever it is when the target changes. It runs on the JavaScript thread, with
+  either animation engine.
 - **React Native Web and react-native-svg in Vite:** resolve `.web.*` files first, shim the
   native modules it imports behind Android checks, and alias React Native's asset registry to
   React Native Web's.
@@ -261,7 +265,7 @@ overrides the primary color in either mode.
   pixels itself. On the web, where it runs real CSS transitions, logical properties are named
   as React Native Web writes them (`start` is `left`, left to right). It runs on the web
   without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
-- **Not yet:** shape morphs, container queries, and running on a device.
+- **Not yet:** container queries, and running on a device.
 
 ## State transitions
 

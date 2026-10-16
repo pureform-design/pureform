@@ -563,7 +563,11 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         }
         case "transition": {
             const parts = node.parts.flatMap((part) => {
-                const property = rnProperty(part.property);
+                // A shape's transition morphs what SVG draws.
+                const property =
+                    part.property === "clipPath"
+                        ? SHAPE
+                        : rnProperty(part.property);
                 return property ? [{ part, property }] : [];
             });
             const zero = { type: "numeric", value: 0, unit: "ms" } as const;

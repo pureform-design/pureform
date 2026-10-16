@@ -11,24 +11,50 @@ export interface Box {
 
 const round = (n: number) => Math.round(n * 1000) / 1000 + 0;
 
-/** A shape's SVG path data in a box of the given size. Percentages of x are of the width, and
- *  of y of the height, as in CSS's `shape()`. */
-export const shapePath = (shape: ShapeValue, box: Box): string => {
+/** A shape's points in a box of the given size, in order: each contour's start, then each
+ *  segment's control points and end. Percentages of x are of the width, and of y of the
+ *  height, as in CSS's `shape()`. Shapes of one structure, as a morph's are, give lists to
+ *  interpolate. */
+export const shapeCoordinates = (shape: ShapeValue, box: Box): number[] => {
+    const out: number[] = [];
     const at = ([x, y]: ShapePoint) =>
-        `${round(pixels(x, box.width))} ${round(pixels(y, box.height))}`;
+        out.push(pixels(x, box.width), pixels(y, box.height));
+    for (const contour of shape.contours) {
+        at(contour.from);
+        for (const segment of contour.segments) {
+            if (segment.op === "curve") {
+                at(segment.c1);
+                at(segment.c2);
+            }
+            at(segment.to);
+        }
+    }
+    return out;
+};
+
+/** SVG path data for a shape's structure at the given points, from `shapeCoordinates`. */
+export const pathAt = (
+    shape: ShapeValue,
+    coordinates: readonly number[],
+): string => {
+    let i = 0;
+    const at = () => `${round(coordinates[i++]!)} ${round(coordinates[i++]!)}`;
     return shape.contours
-        .map(
-            (contour) =>
-                `M ${at(contour.from)} ${contour.segments
-                    .map((segment) =>
-                        segment.op === "line"
-                            ? `L ${at(segment.to)}`
-                            : `C ${at(segment.c1)} ${at(segment.c2)} ${at(segment.to)}`,
-                    )
-                    .join(" ")} Z`,
-        )
+        .map((contour) => {
+            const start = `M ${at()}`;
+            const rest = contour.segments.map((segment) =>
+                segment.op === "line"
+                    ? `L ${at()}`
+                    : `C ${at()} ${at()} ${at()}`,
+            );
+            return `${start} ${rest.join(" ")} Z`;
+        })
         .join(" ");
 };
+
+/** A shape's SVG path data in a box of the given size. */
+export const shapePath = (shape: ShapeValue, box: Box): string =>
+    pathAt(shape, shapeCoordinates(shape, box));
 
 export interface GradientStop {
     /** From 0 to 1 along the gradient. */

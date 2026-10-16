@@ -1,8 +1,16 @@
+import { morph } from "@pureform/core/ast";
 import { pureform } from "@pureform/preset";
+import { MATERIAL_SHAPES } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
 
 import { precompute } from "./build";
-import { dropShadows, placeGradient, shapePath } from "./geometry";
+import {
+    dropShadows,
+    pathAt,
+    placeGradient,
+    shapeCoordinates,
+    shapePath,
+} from "./geometry";
 import { stylesFor } from "./resolve";
 import { selectWithTransitions } from "./select";
 
@@ -197,5 +205,34 @@ describe("drop shadows", () => {
         ).toBe(
             "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3)) drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.15))",
         );
+    });
+});
+
+describe("morphs", () => {
+    const config = pureform({
+        shapes: { pill: morph(MATERIAL_SHAPES.circle, MATERIAL_SHAPES.square) },
+    });
+    const button = stylesFor(
+        precompute(config, { components: ["iconButton"] }),
+        "base:light",
+    ).iconButton!;
+    const pick = (pressed: boolean) =>
+        selectWithTransitions(button, { shape: "pill" }, { svg: true, pressed })
+            .drawings.container!;
+
+    it("hands the drawing its shape's transition and its fill's, and changes shape when pressed", () => {
+        const [rest, pressed] = [pick(false), pick(true)];
+        expect(rest.transitions?.shape).toMatchObject({ property: "clipPath" });
+        expect(rest.transitions?.fill).toMatchObject({
+            property: "backgroundColor",
+        });
+        const box = { width: 40, height: 40 };
+        const [a, b] = [
+            shapeCoordinates(rest.shape!, box),
+            shapeCoordinates(pressed.shape!, box),
+        ];
+        expect(a.length).toBe(b.length);
+        expect(a).not.toEqual(b);
+        expect(pathAt(pressed.shape!, b)).toBe(shapePath(pressed.shape!, box));
     });
 });

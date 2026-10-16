@@ -333,6 +333,13 @@ describe("lowerRn transitions", () => {
                             easing: "linear",
                             delay: 0,
                         },
+                        // A shape's transition, for SVG to morph.
+                        {
+                            property: "clipPath",
+                            duration: 1,
+                            easing: "cubic-bezier(0.25, 0.1, 0.25, 1)",
+                            delay: 0,
+                        },
                     ],
                 },
             },
