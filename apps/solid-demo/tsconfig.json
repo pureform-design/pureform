@@ -22,5 +22,8 @@
       "$*": ["./styled-system/*"],
       "#*": ["./src/*"]
     }
-  }
+  },
+  // The base config includes `src` only; `.pureform/` holds the registry and the
+  // declarations that type it.
+  "include": ["src/**/*.*", ".pureform/**/*.*"]
 }

@@ -3,6 +3,7 @@ import basePreset from "@pandacss/preset-base";
 import pandaPreset from "@pandacss/preset-panda";
 import typographyPreset from "@pandacss/preset-typography";
 
+import { staticCss } from "./.pureform/panda";
 import { pureformPreset } from "./panda.pureform";
 
 export default defineConfig({
@@ -30,11 +31,12 @@ export default defineConfig({
     include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
 
     // The demo picks variants at runtime, which static extraction can't see, so emit every
-    // variant of the pureform recipes.
+    // variant of the pureform recipes: the registered components' through `.pureform/`, the
+    // rest listed here until they're registered.
     staticCss: {
         themes: ["teal", "sharp", "dense"],
         recipes: {
-            button: ["*"],
+            ...staticCss.recipes,
             iconButton: ["*"],
             card: ["*"],
             scrim: ["*"],
@@ -45,7 +47,6 @@ export default defineConfig({
             chip: ["*"],
             textField: ["*"],
             textArea: ["*"],
-            checkbox: ["*"],
             radio: ["*"],
             switchControl: ["*"],
             separator: ["*"],
