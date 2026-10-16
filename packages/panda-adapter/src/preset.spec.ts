@@ -271,4 +271,37 @@ describe("compilePreset (typed component tokens)", () => {
             initialValue: "0",
         });
     });
+
+    it("sets tokens a variant points elsewhere as custom properties", () => {
+        const meter = defineComponent({
+            name: "meter",
+            tokens: {
+                value: dynamic(
+                    ["components", "meter", "value"],
+                    numeric(0, "none"),
+                    "number",
+                ),
+            },
+            recipe: {
+                base: {},
+                variants: {
+                    full: {
+                        yes: {
+                            tokens: {
+                                "components.meter.value": numeric(1, "none"),
+                            },
+                        },
+                    },
+                },
+            },
+        });
+        const preset = compilePreset({
+            ...buttonConfig,
+            components: { ...buttonConfig.components, meter },
+        });
+        const recipe = obj(obj(obj(preset.theme).recipes).meter);
+        expect(obj(obj(recipe.variants).full).yes).toEqual({
+            "--components-meter-value": "1",
+        });
+    });
 });
