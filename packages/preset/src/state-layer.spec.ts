@@ -53,7 +53,7 @@ describe("stateLayer", () => {
         expect(() => defineConfig(config)).not.toThrow();
     });
 
-    it("lowers to a Panda conditional background", () => {
+    it("lowers to a conditional background keyed by selector", () => {
         const css = compileStyleMap(
             { backgroundColor: stateLayer({ base, content }) },
             pandaContext(config),
@@ -61,12 +61,13 @@ describe("stateLayer", () => {
         expect(css).toEqual({
             backgroundColor: {
                 base: "token(colors.brand)",
-                _hover: "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateHover))",
-                _focusVisible:
+                "&:is(:hover, [data-pf-hover])":
+                    "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateHover))",
+                "&:focus-visible":
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateFocus))",
-                _active:
+                "&:is(:active, [data-pf-active])":
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.statePressed))",
-                "&[data-dragging][data-dragging]":
+                "&[data-pf-dragging][data-pf-dragging]":
                     "color-mix(in srgb, token(colors.brand), token(colors.onBrand) token(opacity.stateDragged))",
             },
         });

@@ -6,8 +6,8 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
     "icon": {
       "alignItems": "center",
       "color": {
-        ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+        ".chip__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-chip-iconColor, token(colors.primary))",
       },
       "display": "inline-flex",
@@ -22,7 +22,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "labelLarge",
     },
     "root": {
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
       },
       "alignItems": "center",
@@ -37,7 +37,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -142,31 +142,31 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
     "variant": {
       "elevated": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
-              "base": "var(--components-chip-selectedContainer, token(colors.secondaryContainer))",
-            },
-            "borderColor": "transparent",
-            "color": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
-          },
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
-          "_hover": {
+          "&:is(:hover, [data-pf-hover])": {
             "shadowElevation": "level2",
           },
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
+              "base": "var(--components-chip-selectedContainer, token(colors.secondaryContainer))",
+            },
+            "borderColor": "transparent",
+            "color": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
+          },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
             "base": "var(--components-chip-elevatedContainer, token(colors.surfaceContainerLow))",
           },
           "color": "var(--components-chip-content, token(colors.onSurfaceVariant))",
@@ -175,27 +175,27 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlined": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-chip-selectedContainer, token(colors.secondaryContainer)), var(--components-chip-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
               "base": "var(--components-chip-selectedContainer, token(colors.secondaryContainer))",
             },
             "borderColor": "transparent",
             "color": "var(--components-chip-selectedContent, token(colors.onSecondaryContainer))",
           },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-chip-container, transparent), var(--components-chip-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
             "base": "var(--components-chip-container, transparent)",
           },
           "borderColor": "var(--components-chip-outlineColor, token(colors.outlineVariant))",

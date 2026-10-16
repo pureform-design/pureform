@@ -1,7 +1,7 @@
 // The pureform chip: Material's assist, filter, input, and suggestion chips share one shape.
 //
 // A chip is outlined by default, or `elevated` with no outline. Marking it selected
-// (`aria-selected="true"` or `data-selected`) fills it with the secondary container, as a
+// (`aria-selected="true"` or `aria-pressed="true"`) fills it with the secondary container, as a
 // selected filter or input chip. Render the icon slot only when there is an icon.
 
 import { typed } from "@pureform/core";
@@ -130,7 +130,7 @@ export const createChip = <
             name: "chip",
             $meta: {
                 description:
-                    "Material chip. Mark it selected with aria-selected or data-selected. Render the icon slot only when there is an icon.",
+                    "Material chip. Mark it selected with aria-selected or aria-pressed. Render the icon slot only when there is an icon.",
             },
             tokens,
             slots: ["root", "icon", "label", "touchTarget"],

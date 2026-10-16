@@ -231,6 +231,9 @@ slot-state table the preset mostly uses):
 - **Panda** maps conditions to its built-in keys (`_hover`, `_checked`, …), whose
   selectors include Zag's attributes. pureform's recipes stop using those keys and emit
   the same selectors as the other targets; an app's own `_hover` keeps Panda's meaning.
+- **The `data-pf-*` names** are exported as `STATE_ATTRIBUTES` from `@pureform/core`
+  (`hover`, `pressed`, `dragged`, `filled` to their attributes); `css-lowering` builds its
+  selectors from them and the bindings set them.
 - **Output changes on purpose**, so it's checked against fixtures (an element in each
   state, marked each allowed way, plus Zag's attributes alone, which must not match)
   rather than the before-and-after equivalence check. Shorter selectors also shrink the

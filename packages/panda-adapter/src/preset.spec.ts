@@ -79,8 +79,9 @@ describe("compilePreset (canonical button)", () => {
 
     it("lowers the opacity conditional and disabled state block", () => {
         const root = obj(obj(button().base).root);
-        expect(root.opacity).toEqual({ base: "1", _disabled: "0.38" });
-        expect(root._disabled).toMatchObject({ cursor: "not-allowed" });
+        const disabled = "&:is(:disabled, [aria-disabled=true])";
+        expect(root.opacity).toEqual({ base: "1", [disabled]: "0.38" });
+        expect(root[disabled]).toMatchObject({ cursor: "not-allowed" });
     });
 
     it("defines the elevation utility with its steps", () => {

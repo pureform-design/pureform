@@ -46,15 +46,14 @@ const recipe = (pandaPrefix?: string) => {
     return recipes.field!;
 };
 
-const FOCUS = ":is(:focus-within, [data-focused])";
-const INVALID =
-    ":is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])";
+const FOCUS = ":is(:focus-within)";
+const INVALID = ":is([aria-invalid=true], :has([aria-invalid=true]))";
 
 describe("slot conditions", () => {
     it("lowers a slot's own state onto itself", () => {
         expect(recipe().base.container?.color).toEqual({
             base: "rgb(0 0 0)",
-            "&:is(:hover, [data-hover])": "rgb(17 17 17)",
+            "&:is(:hover, [data-pf-hover])": "rgb(17 17 17)",
             [`&${FOCUS}${FOCUS}`]: "rgb(34 34 34)",
         });
     });
@@ -113,7 +112,7 @@ describe("slot conditions", () => {
         });
         const recipes = compilePreset(both).theme?.slotRecipes as Slots;
         const invalid = `${INVALID}${INVALID}${INVALID}${INVALID}`;
-        const hover = ":is(:hover, [data-hover])";
+        const hover = ":is(:hover, [data-pf-hover])";
         expect(recipes.box?.base.root?.color).toEqual({
             base: "rgb(0 0 0)",
             [`&${invalid}${hover}`]: "rgb(17 17 17)",
@@ -159,9 +158,9 @@ describe("selected and pressed slot states", () => {
         const recipes = compilePreset(chipLike).theme?.slotRecipes as Slots;
         expect(recipes.chipLike?.base.icon?.color).toEqual({
             base: "rgb(0 0 0)",
-            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &":
+            ".chipLike__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &":
                 "rgb(17 17 17)",
-            ".chipLike__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &":
+            ".chipLike__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &":
                 "rgb(34 34 34)",
         });
     });
@@ -194,10 +193,9 @@ describe("checked and indeterminate slot states", () => {
             },
         });
         const recipes = compilePreset(box).theme?.slotRecipes as Slots;
-        const CHECKED =
-            ":is(:checked, :has(:checked), [aria-checked=true], [data-checked])";
+        const CHECKED = ":is(:checked, :has(:checked), [aria-checked=true])";
         const MIXED =
-            ":is(:indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate])";
+            ":is(:indeterminate, :has(:indeterminate), [aria-checked=mixed])";
         expect(recipes.box?.base.mark?.color).toEqual({
             base: "rgb(0 0 0)",
             [`.box__root${CHECKED} &`]: "rgb(17 17 17)",
@@ -231,7 +229,7 @@ describe("expanded slot state", () => {
         const recipes = compilePreset(field).theme?.slotRecipes as Slots;
         expect(recipes.field?.base.arrow?.color).toEqual({
             base: "rgb(0 0 0)",
-            ".field__root:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &":
+            ".field__root:is([aria-expanded=true], :has([aria-expanded=true])) &":
                 "rgb(17 17 17)",
         });
     });

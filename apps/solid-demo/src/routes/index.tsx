@@ -444,9 +444,6 @@ function IndexRoute() {
                                             aria-pressed={
                                                 selected() ? "true" : "false"
                                             }
-                                            data-selected={
-                                                selected() ? "" : undefined
-                                            }
                                             onClick={() => {
                                                 setSelected(!selected());
                                             }}

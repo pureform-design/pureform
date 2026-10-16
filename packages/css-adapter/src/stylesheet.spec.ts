@@ -148,14 +148,14 @@ describe("compileCss (utilities)", () => {
             },
         });
         expect(ruleOf(css, ".box")).toMatch(
-            /--components-box-accent: rgb\(0 0 255\);\n\s+&:is\(:hover, \[data-hover\]\) \{\n\s+--components-box-accent: rgb\(0 0 0\);/,
+            /--components-box-accent: rgb\(0 0 255\);\n\s+&:is\(:hover, \[data-pf-hover\]\) \{\n\s+--components-box-accent: rgb\(0 0 0\);/,
         );
     });
 
     it("lowers conditional values into nested rules", () => {
         const css = withBox({ color: when("hover", hex("#00f"), hex("#000")) });
         expect(ruleOf(css, ".box")).toMatch(
-            /color: rgb\(0 0 0\);\n\s+&:is\(:hover, \[data-hover\]\) \{\n\s+color: rgb\(0 0 255\);/,
+            /color: rgb\(0 0 0\);\n\s+&:is\(:hover, \[data-pf-hover\]\) \{\n\s+color: rgb\(0 0 255\);/,
         );
     });
 });

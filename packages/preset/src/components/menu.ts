@@ -12,7 +12,7 @@
 //     <hr class={separator()} />
 //   </div>
 //
-// Mark the chosen item with `aria-selected` or `data-selected`, and an unavailable one with
+// Mark the chosen item with `aria-selected`, and an unavailable one with
 // `disabled` or `aria-disabled`.
 
 import { typed } from "@pureform/core";

@@ -18,7 +18,7 @@ describe("fab", () => {
     it("rests at level 3 and lifts to level 4 on hover", () => {
         expect(compiled()?.base?.root).toMatchObject({
             filterElevation: "level3",
-            _hover: { filterElevation: "level4" },
+            "&:is(:hover, [data-pf-hover])": { filterElevation: "level4" },
         });
     });
 

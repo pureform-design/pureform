@@ -229,44 +229,88 @@ describe("compileNodeToCSS composites", () => {
 });
 
 describe("compileValue conditionals", () => {
-    it("compiles a conditional to a Panda conditional object", () => {
+    it("compiles a conditional to a conditional object keyed by selector", () => {
         const node = when("disabled", unitless(0.38), unitless(1));
         expect(compileValue(node, ctx())).toEqual({
             base: "1",
-            _disabled: "0.38",
+            "&:is(:disabled, [aria-disabled=true])": "0.38",
         });
     });
 
-    it("lowers dragged to a data-dragging selector that outranks hover", () => {
+    it("keeps Panda's own keys only for color scheme, direction, and motion", () => {
+        expect(
+            compileValue(when("dark", unitless(1), unitless(0)), ctx()),
+        ).toEqual({
+            base: "0",
+            _dark: "1",
+        });
+        for (const state of [
+            "hover",
+            "pressed",
+            "checked",
+            "focusVisible",
+        ] as const) {
+            const keys = Object.keys(
+                compileValue(when(state, unitless(1), unitless(0)), ctx()),
+            );
+            expect(keys.every((key) => !key.startsWith("_"))).toBe(true);
+        }
+    });
+
+    it("lowers hover and pressed to the native state or a data-pf attribute", () => {
+        expect(
+            compileValue(when("hover", unitless(1), unitless(0)), ctx()),
+        ).toEqual({
+            base: "0",
+            "&:is(:hover, [data-pf-hover])": "1",
+        });
+        expect(
+            compileValue(when("pressed", unitless(1), unitless(0)), ctx()),
+        ).toEqual({
+            base: "0",
+            "&:is(:active, [data-pf-active])": "1",
+        });
+    });
+
+    it("lowers checked to the native state or aria-checked only", () => {
+        expect(
+            compileValue(when("checked", unitless(1), unitless(0)), ctx()),
+        ).toEqual({
+            base: "0",
+            "&:is(:checked, [aria-checked=true])": "1",
+        });
+    });
+
+    it("lowers dragged to a data-pf-dragging selector that outranks hover", () => {
         const node = when("dragged", unitless(0.16), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            "&[data-dragging][data-dragging]": "0.16",
+            "&[data-pf-dragging][data-pf-dragging]": "0.16",
         });
     });
 
-    it("lowers selected to aria-selected, aria-pressed, aria-current, or data-selected", () => {
+    it("lowers selected to aria-selected, aria-pressed, or aria-current", () => {
         const node = when("selected", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])":
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))":
                 "1",
         });
     });
 
-    it("lowers expanded to aria-expanded or data-expanded", () => {
+    it("lowers expanded to aria-expanded", () => {
         const node = when("expanded", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            "&:is([aria-expanded=true], [data-expanded])": "1",
+            "&[aria-expanded=true]": "1",
         });
     });
 
-    it("lowers filled to an input with a value, its container, or data-filled", () => {
+    it("lowers filled to an input with a value, its container, or data-pf-filled", () => {
         const node = when("filled", unitless(1), unitless(0));
         expect(compileValue(node, ctx())).toEqual({
             base: "0",
-            "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])":
+            "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled])":
                 "1",
         });
     });

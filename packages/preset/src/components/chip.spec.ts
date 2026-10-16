@@ -18,7 +18,7 @@ describe("chip", () => {
             expect(
                 JSON.stringify(
                     root?.[
-                        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])"
+                        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))"
                     ],
                 ),
             ).toContain("components-chip-selectedContainer");

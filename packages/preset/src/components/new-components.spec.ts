@@ -58,7 +58,7 @@ describe("tabs", () => {
     it("shows the indicator only on the selected tab", () => {
         const css = compilePreset(configWith(tabs)).theme?.slotRecipes?.tabs;
         expect(JSON.stringify(css?.base?.indicator)).toContain(
-            '.tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &":"1"',
+            '.tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &":"1"',
         );
     });
 });
@@ -120,7 +120,7 @@ describe("select", () => {
             ?.select;
         expect(css?.base?.trailingIcon?.transform).toEqual({
             base: "translateY(-50%)",
-            ".select__container:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &":
+            ".select__container:is([aria-expanded=true], :has([aria-expanded=true])) &":
                 "translateY(-50%) rotate(180deg)",
         });
         expect(

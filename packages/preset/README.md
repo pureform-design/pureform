@@ -27,6 +27,16 @@ pureform({
 Every component token is a CSS var with a default from the theme, for example
 `--components-button-radius`. Set it on the component or any ancestor to restyle it at runtime.
 
+## States
+
+Components read their states from the element: the native state first (`:hover`, `:checked`,
+`:disabled`, a focused input), then ARIA (`aria-checked`, `aria-selected`, `aria-pressed`,
+`aria-current`, `aria-expanded`, `aria-invalid`, `aria-disabled`), and only where neither
+covers it pureform's own attributes: `data-pf-hover`, `data-pf-active` (a keyboard press),
+`data-pf-dragging`, and `data-pf-filled` (a value outside a text input). Mark states with
+these; a behavior library's attributes, such as Zag's `data-state="checked"` or
+`data-selected`, don't style anything.
+
 ## Density
 
 Density makes controls more compact (or roomier), a grid unit off a component's height per
