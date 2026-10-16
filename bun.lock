@@ -205,6 +205,26 @@
         "vitest": "catalog:",
       },
     },
+    "packages/cli": {
+      "name": "@pureform/cli",
+      "version": "0.0.0-semantically-released",
+      "bin": {
+        "pureform": "./dist/pureform.mjs",
+      },
+      "dependencies": {
+        "@pureform/generate": "catalog:",
+        "jiti": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@pureform/core",
       "version": "0.0.0-semantically-released",
@@ -733,6 +753,7 @@
     "@pureform/anatomy": "workspace:^",
     "@pureform/binding-core": "workspace:^",
     "@pureform/bundler": "workspace:^",
+    "@pureform/cli": "workspace:^",
     "@pureform/core": "workspace:^",
     "@pureform/css-adapter": "workspace:^",
     "@pureform/css-lowering": "workspace:^",
@@ -1232,6 +1253,8 @@
     "@pureform/browser-e2e-tests": ["@pureform/browser-e2e-tests@workspace:tests/browser-e2e-tests"],
 
     "@pureform/bundler": ["@pureform/bundler@workspace:packages/bundler"],
+
+    "@pureform/cli": ["@pureform/cli@workspace:packages/cli"],
 
     "@pureform/component-suites": ["@pureform/component-suites@workspace:tests/component-suites"],
 

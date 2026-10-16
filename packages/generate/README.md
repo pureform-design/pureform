@@ -182,8 +182,8 @@ development when the running `@pureform/styling` differs (`trainVersionMismatch`
 `assertGlue(".pureform", { root, importer })` throws a `missing-glue` error naming both ways
 to generate the folder (`pureform generate`, or the bundler plugin) when the index is
 missing; `missingGlueMessage(outDir, importer)` gives the text. Nothing raises it on its own:
-the bundler plugin raises it when an import resolves into a missing folder, and the CLI
-and test setups call `assertGlue`.
+the bundler plugin raises it when an import resolves into a missing folder, and test setups
+can call `assertGlue`. (`pureform generate --check` reports a missing folder as out of date.)
 
 ### Generating again: the runner and the watcher
 
@@ -236,7 +236,7 @@ them, follows the dependencies each run finds, and keeps watching after a failed
 - **The hash depends on the JavaScript engine.** It covers the evaluated config, and the preset
   computes some values (a shape morph's curves) differently under Bun than under Node, so the
   same config hashes differently in each. Generate under one runtime (Node, as Vite runs the
-  bundler plugin). jiti transforms the config itself under both (`tryNative: false`), so at
+  bundler plugin, and as `pureform`'s bin runs). jiti transforms the config itself under both (`tryNative: false`), so at
   least functions' source doesn't differ.
 - **Files without a header** (`header: false`, for JSON) can't be told from the app's, so
   they're never removed or reported as extra.
