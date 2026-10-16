@@ -18,26 +18,27 @@ It depends on nothing else in the workspace.
 
 ## Architecture
 
-| Module                | What it holds                                                                                                                              |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `ast/nodes.ts`        | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes). |
-| `ast/helpers/`        | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                               |
-| `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                       |
-| `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                          |
-| `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                |
-| `path.ts`             | Path resolution (`getByPath`, `resolveAlias`) and `validateConfig`, which `defineConfig` runs.                                             |
-| `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                           |
-| `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                 |
+| Module                | What it holds                                                                                                                                |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ast/nodes.ts`        | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes).   |
+| `ast/helpers/`        | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                                 |
+| `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                         |
+| `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                            |
+| `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                  |
+| `path.ts`             | Path resolution (`getByPath`, `resolveAlias`) and `validateConfig`, which `defineConfig` runs.                                               |
+| `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                             |
+| `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                   |
+| `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops. |
 
 ## Public API
 
-| Entry                          | Exports                                                                  |
-| ------------------------------ | ------------------------------------------------------------------------ |
-| `@pureform/core`               | Builders, `typed`, path resolution, `STATE_ATTRIBUTES`, the schema types |
-| `@pureform/core/ast`           | Node types and every helper constructor                                  |
-| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                      |
-| `@pureform/core/types`         | The schema types alone                                                   |
-| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                 |
+| Entry                          | Exports                                                                                                         |
+| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `@pureform/core`               | Builders, `typed`, path resolution, `STATE_ATTRIBUTES`, `MOTION_ATTRIBUTE`, `transitionMoves`, the schema types |
+| `@pureform/core/ast`           | Node types and every helper constructor                                                                         |
+| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                             |
+| `@pureform/core/types`         | The schema types alone                                                                                          |
+| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                                                        |
 
 ```ts
 import { defineComponent } from "@pureform/core";
@@ -72,6 +73,23 @@ STATE_ATTRIBUTES.filled; //  "data-pf-filled"   a value outside a text input
 A binding sets exactly these; a behavior library's own attributes (Zag's `data-state`,
 `data-hover`, …) are never matched. See the design doc's
 [§5.1](../../docs/design/component-architecture.md#51-two-kinds-of-factory-pureformstyling).
+
+### Reduced motion
+
+Reduced motion stops movement only. `transitionMoves(property)` says whether a transition of a
+style property, or of a dynamic value, moves something: colors (any `…Color`), `fill`,
+`stroke`, `opacity`, `boxShadow`, `textShadow`, and `filter` fade and keep running; anything
+else, `"all"` included, moves. A dynamic value goes by its `valueType`
+(`valueTypeMoves`): lengths, percentages, angles, and numbers move; colors, times, and untyped
+values don't.
+
+```ts
+import { MOTION_ATTRIBUTE, transitionMoves } from "@pureform/core";
+
+transitionMoves("backgroundColor"); // false
+transitionMoves("insetInlineStart"); // true
+MOTION_ATTRIBUTE; // "data-pf-motion", set to "reduce" or "full" by a provider
+```
 
 ## Build and test
 

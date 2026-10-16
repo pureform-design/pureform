@@ -3,6 +3,7 @@
 // `./types`.
 export * from "./define";
 export { inlineStyles, mergeStyles } from "./inline";
+export * from "./motion";
 export * from "./path";
 export * from "./state-attributes";
 export * from "./typed";
