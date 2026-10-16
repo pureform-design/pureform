@@ -452,3 +452,70 @@ describe("typed variants and slots", () => {
         expectTypeOf(chip.slots).toEqualTypeOf<("root" | "label")[]>();
     });
 });
+
+describe("variant tokens", () => {
+    const accent = dynamic(["components", "chip", "accent"], hex("#6750a4"));
+    const chip = () =>
+        pf.slotComponent({
+            name: "chip",
+            slots: ["root", "label"],
+            structure: { root: ["label"] },
+            tokens: { accent },
+            variants: { tone: ["brand", "plain"] },
+            recipe: ({ token }) => ({
+                base: { root: { backgroundColor: token("accent") } },
+                variants: {
+                    tone: {
+                        brand: {
+                            root: {
+                                tokens: { accent: hex("#b3261e") },
+                                states: {
+                                    hover: {
+                                        tokens: { accent: hex("#8c1d18") },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            }),
+        });
+
+    it("set the component's own tokens by path, through states", () => {
+        const root = chip().recipe.variants!.tone!.brand!.root!;
+        expect(root.tokens).toEqual({
+            "components.chip.accent": hex("#b3261e"),
+        });
+        expect(root.states?.hover?.tokens).toEqual({
+            "components.chip.accent": hex("#8c1d18"),
+        });
+    });
+
+    it("take only the component's own token names", () => {
+        pf.slotComponent({
+            name: "chip",
+            slots: ["root"],
+            tokens: { accent },
+            recipe: () => ({
+                base: {
+                    // @ts-expect-error: not one of the chip's tokens
+                    root: { tokens: { other: hex("#000000") } },
+                },
+            }),
+        });
+    });
+
+    it("are only set on a root slot", () => {
+        expect(() =>
+            pf.slotComponent({
+                name: "chip",
+                slots: ["root", "label"],
+                structure: { root: ["label"] },
+                tokens: { accent },
+                recipe: () => ({
+                    base: { label: { tokens: { accent: hex("#000000") } } },
+                }),
+            }),
+        ).toThrow('slot "label" sets tokens');
+    });
+});

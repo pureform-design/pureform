@@ -211,6 +211,12 @@ export interface StyleMap {
      *  multi-property state changes; reach for `when(...)` when a single value varies (or the
      *  value itself is a token that differs per state). */
     states?: Partial<Record<PortableCondition, StyleMap>>;
+    /** Values for dynamic tokens, by dotted path (`components.button.accent`), set where this
+     *  style applies: a variant or state can point a component's own tokens elsewhere, and
+     *  every style reading them follows. The web sets each as its custom property; React
+     *  Native resolves the component again with them. Set them on a root slot, which every
+     *  slot inherits from. A typed component takes its own tokens by name. */
+    tokens?: Record<string, ValueNode>;
 
     /** Escape hatch for nested rules with no portable form: arbitrary descendant selectors
      *  (`& svg`), pseudo-elements (`&::before`, `&::placeholder`), or platform widget parts.

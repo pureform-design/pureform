@@ -255,6 +255,18 @@ type Variants<V extends VariantValues, Style> = {
     [G in keyof V]?: { [Value in V[G][number]]?: Style };
 };
 
+/** A style whose `tokens` set the component's own tokens, by name. */
+export type TypedStyle<T extends string> = Omit<
+    StyleMap,
+    "tokens" | "states"
+> & {
+    /** Values for the component's own tokens where this style applies. */
+    tokens?: { [K in T]?: ValueNode };
+    states?: {
+        [C in keyof NonNullable<StyleMap["states"]>]?: TypedStyle<T>;
+    };
+};
+
 /** The helpers a typed recipe receives. */
 export interface RecipeHelpers<C, T extends string> {
     /** A reference into the config. */
@@ -306,10 +318,10 @@ export type Named<N extends string, T, V = {}> = {
 export type Slotted<S extends string> = { slots: S[] };
 
 /** What a single-slot recipe returns. */
-type Recipe<V extends VariantValues> = {
-    base: StyleMap;
-    variants?: Variants<V, StyleMap>;
-    compoundVariants?: { match: Choice<V>; style: StyleMap }[];
+type Recipe<V extends VariantValues, T extends string> = {
+    base: TypedStyle<T>;
+    variants?: Variants<V, TypedStyle<T>>;
+    compoundVariants?: { match: Choice<V>; style: TypedStyle<T> }[];
     defaultVariants?: Choice<V>;
 };
 
@@ -334,15 +346,82 @@ interface TypedSlotComponentSpec<
 }
 
 /** What a slot recipe returns, styles keyed by slot. */
-type SlotRecipe<S extends string, V extends VariantValues> = {
-    base: { [K in S]?: StyleMap };
-    variants?: Variants<V, { [K in S]?: StyleMap }>;
+type SlotRecipe<S extends string, V extends VariantValues, T extends string> = {
+    base: { [K in S]?: TypedStyle<T> };
+    variants?: Variants<V, { [K in S]?: TypedStyle<T> }>;
     compoundVariants?: {
         match: Choice<V>;
-        style: { [K in S]?: StyleMap };
+        style: { [K in S]?: TypedStyle<T> };
     }[];
     defaultVariants?: Choice<V>;
 };
+
+// A style with its own tokens' names made into paths under the component, through its states
+// and raw rules.
+const qualify = (style: StyleMap, component: string): StyleMap => {
+    const { tokens, states, rawRules } = style;
+    if (!tokens && !states && !rawRules) return style;
+    const out: StyleMap = { ...style };
+    if (tokens) {
+        out.tokens = Object.fromEntries(
+            Object.entries(tokens).map(([name, value]) => [
+                ["components", component, name].join("."),
+                value,
+            ]),
+        );
+    }
+    if (states) {
+        out.states = Object.fromEntries(
+            Object.entries(states).map(([condition, sub]) => [
+                condition,
+                sub && qualify(sub, component),
+            ]),
+        );
+    }
+    if (rawRules) {
+        out.rawRules = Object.fromEntries(
+            Object.entries(rawRules).map(([target, rules]) => [
+                target,
+                Object.fromEntries(
+                    Object.entries(rules).map(([selector, sub]) => [
+                        selector,
+                        qualify(sub, component),
+                    ]),
+                ),
+            ]),
+        );
+    }
+    return out;
+};
+
+// Whether a style sets tokens anywhere, through its states and raw rules.
+const setsTokens = (style: StyleMap | undefined): boolean =>
+    !!style &&
+    (!!style.tokens ||
+        Object.values(style.states ?? {}).some(setsTokens) ||
+        Object.values(style.rawRules ?? {}).some((rules) =>
+            Object.values(rules).some(setsTokens),
+        ));
+
+// Each slot's style qualified, after checking only root slots set tokens: React Native resolves
+// a component at once, so a token set lower down couldn't stay in that slot's subtree as it
+// does on the web.
+const qualifySlots = (
+    bySlot: Record<string, StyleMap | undefined>,
+    component: string,
+    nested: ReadonlySet<string>,
+): Record<string, StyleMap> =>
+    Object.fromEntries(
+        Object.entries(bySlot).flatMap(([slot, style]) => {
+            if (!style) return [];
+            if (nested.has(slot) && setsTokens(style)) {
+                throw new Error(
+                    `${component}: slot "${slot}" sets tokens, which only a root slot can`,
+                );
+            }
+            return [[slot, qualify(style, component)]];
+        }),
+    );
 
 // Every declared variant value gets an entry, so a value the recipe leaves unstyled still
 // exists for compound variants and defaults to match.
@@ -363,6 +442,26 @@ const fillVariants = <Style>(
     }
     return out;
 };
+
+// Each variant value's style mapped through `fn`.
+const mapVariants = <In, Out>(
+    variants: object | undefined,
+    fn: (style: In) => Out,
+): Record<string, Record<string, Out>> | undefined =>
+    variants &&
+    Object.fromEntries(
+        Object.entries(
+            variants as Record<string, Record<string, In> | undefined>,
+        ).map(([group, values]) => [
+            group,
+            Object.fromEntries(
+                Object.entries(values ?? {}).map(([value, style]) => [
+                    value,
+                    fn(style),
+                ]),
+            ),
+        ]),
+    );
 
 const definedOnly = <T extends object>(object: T): T =>
     Object.fromEntries(
@@ -414,7 +513,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
             const N extends string,
             const T extends Record<string, Token<ValueNode>> = {},
             const V extends VariantValues = {},
-            R extends Recipe<NoInfer<V>> = Recipe<V>,
+            R extends Recipe<NoInfer<V>, Keys<NoInfer<T>>> = Recipe<V, Keys<T>>,
         >(
             spec: TypedComponentSpec<C, N, T, V, R>,
         ): ComponentSpec & Named<N, T, V> => {
@@ -422,27 +521,26 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                 alias,
                 token: (name) => rawAlias("components", spec.name, name),
             });
+            const own = (style: TypedStyle<Keys<T>>) =>
+                qualify(style as StyleMap, spec.name);
             return defineComponent(
                 definedOnly({
                     name: spec.name,
                     $meta: spec.$meta,
                     tokens: spec.tokens,
                     recipe: definedOnly({
-                        base: recipe.base,
+                        base: own(recipe.base),
                         variants: fillVariants<StyleMap>(
                             spec.variants,
-                            recipe.variants as Record<
-                                string,
-                                Record<string, StyleMap>
-                            >,
+                            mapVariants(recipe.variants, own),
                             () => ({}),
                         ),
-                        compoundVariants: recipe.compoundVariants as
-                            | {
-                                  match: Record<string, string>;
-                                  style: StyleMap;
-                              }[]
-                            | undefined,
+                        compoundVariants: recipe.compoundVariants?.map(
+                            (compound) => ({
+                                match: compound.match as Record<string, string>,
+                                style: own(compound.style),
+                            }),
+                        ),
                         defaultVariants: recipe.defaultVariants as
                             | Record<string, string>
                             | undefined,
@@ -458,7 +556,8 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
             const S extends string,
             const T extends Record<string, Token<ValueNode>> = {},
             const V extends VariantValues = {},
-            R extends SlotRecipe<NoInfer<S>, NoInfer<V>> = SlotRecipe<S, V>,
+            R extends SlotRecipe<NoInfer<S>, NoInfer<V>, Keys<NoInfer<T>>> =
+                SlotRecipe<S, V, Keys<T>>,
         >(
             spec: TypedSlotComponentSpec<C, N, S, T, V, R>,
         ): Omit<SlottedComponentSpec, "slots"> &
@@ -470,6 +569,13 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                 slot: (name, state) => rawSlot(name, state),
             });
             type Slots = Record<string, StyleMap>;
+            const nested = new Set<string>(
+                Object.values<string[] | undefined>(
+                    spec.structure ?? {},
+                ).flatMap((children) => children ?? []),
+            );
+            const own = (bySlot: object) =>
+                qualifySlots(bySlot as Slots, spec.name, nested);
             return defineSlotComponent(
                 definedOnly({
                     name: spec.name,
@@ -478,18 +584,18 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                     slots: spec.slots,
                     structure: spec.structure,
                     recipe: definedOnly({
-                        base: recipe.base as Slots,
+                        base: own(recipe.base),
                         variants: fillVariants<Slots>(
                             spec.variants,
-                            recipe.variants as Record<
-                                string,
-                                Record<string, Slots>
-                            >,
+                            mapVariants(recipe.variants, own),
                             () => ({ [spec.slots[0]!]: {} }),
                         ),
-                        compoundVariants: recipe.compoundVariants as
-                            | { match: Record<string, string>; style: Slots }[]
-                            | undefined,
+                        compoundVariants: recipe.compoundVariants?.map(
+                            (compound) => ({
+                                match: compound.match as Record<string, string>,
+                                style: own(compound.style),
+                            }),
+                        ),
                         defaultVariants: recipe.defaultVariants as
                             | Record<string, string>
                             | undefined,
