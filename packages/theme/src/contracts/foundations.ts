@@ -103,12 +103,15 @@ export type SizeRole = (typeof SIZE_ROLES)[number];
 
 /** Material's density steps, by name: how many grid units each adds to a dense component's
  *  height (negative to take them off). */
-export const MATERIAL_DENSITIES: Record<string, number> = {
+export const MATERIAL_DENSITIES = {
     "0": 0,
     "-1": -1,
     "-2": -2,
     "-3": -3,
-};
+} as const satisfies Record<string, number>;
+
+/** The name of one of Material's density steps. */
+export type MaterialDensity = keyof typeof MATERIAL_DENSITIES;
 
 /** The densest step components hold up at, in grid units: below it a filled text field's label
  *  and paddings would go negative, and a checkbox would shrink under its box. */
