@@ -8,5 +8,11 @@ import routes from "virtual:file-routes";
 
 // createAPIHandler serves the GET/POST/... exports of the modules under
 // src/api (mounted at /api — see the fileRoutes config in vite.config.ts)
-// and passes everything else down the chain.
-export default [createAPIHandler(routes)];
+// and passes everything else down the chain. The chain hands middleware the request event,
+// and the handler takes the request.
+const api = createAPIHandler(routes);
+
+export default [
+    (event: { request: Request }, next: () => Promise<Response>) =>
+        api(event.request, next),
+];
