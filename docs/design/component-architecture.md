@@ -1015,11 +1015,17 @@ Preset changes these designs need, independent of the steps above:
    Zag (§8). Left: re-run the check through the Solid 2 port, since it was done with
    Zag's vanilla adapter, and check disabled fieldsets.
 
-Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
-can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
-React built in parallel with Solid; text field gets its own machine; Solid 2 is treated
-as stable at RC, since breaking changes should be minor to fix, with the exact RC pinned
-(§11); lookups cost little
-once cached per selection (§2), so no phone measurement; on the web, states are matched by native
-pseudo-classes, then ARIA, then pureform's own `data-pf-*` attributes (§5.1); too many variant combinations is solved by tokens a style sets
-(§5.5), with fragments (§5.4) for the rest.
+Decided:
+
+- Factory generators live in each adapter's `/codegen` subpath.
+- Panda's extractor can't follow the registry, so we rely on `staticCss` and accept its
+  bloat until pruning.
+- React is built in parallel with Solid.
+- The text field gets its own machine.
+- Solid 2 is treated as stable at RC, since any breaking change should be minor to fix;
+  the exact RC is pinned (§11).
+- Lookups cost little once cached per selection (§2), so there's no phone measurement.
+- On the web, states are matched by native pseudo-classes, then ARIA, then pureform's own
+  `data-pf-*` attributes (§5.1).
+- Too many variant combinations is solved by tokens a style sets (§5.5), with fragments
+  (§5.4) for the rest.
