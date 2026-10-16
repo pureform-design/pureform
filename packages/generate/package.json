@@ -1,0 +1,35 @@
+{
+    "name": "@pureform/generate",
+    "version": "0.0.0-semantically-released",
+    "description": "The build step the bundler plugin and the CLI share: loads pureform.config.ts, runs the target adapter's codegen, and writes .pureform/",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:",
+        "jiti": "catalog:",
+        "oxc-parser": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/release": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

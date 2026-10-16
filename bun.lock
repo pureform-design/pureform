@@ -233,6 +233,25 @@
         "vitest": "catalog:",
       },
     },
+    "packages/generate": {
+      "name": "@pureform/generate",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "catalog:",
+        "jiti": "catalog:",
+        "oxc-parser": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/release": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/js-effects": {
       "name": "@pureform/js-effects",
       "version": "0.0.0-semantically-released",
@@ -656,6 +675,7 @@
     "@pureform/core": "workspace:^",
     "@pureform/css-adapter": "workspace:^",
     "@pureform/css-lowering": "workspace:^",
+    "@pureform/generate": "workspace:^",
     "@pureform/js-effects": "workspace:^",
     "@pureform/machines": "workspace:^",
     "@pureform/material": "workspace:^",
@@ -664,6 +684,7 @@
     "@pureform/panda-adapter": "workspace:^",
     "@pureform/preset": "workspace:^",
     "@pureform/react": "workspace:^",
+    "@pureform/release": "workspace:^",
     "@pureform/rn-adapter": "workspace:^",
     "@pureform/styling": "workspace:^",
     "@pureform/tailwind-adapter": "workspace:^",
@@ -713,6 +734,7 @@
     "eslint-plugin-solid": "~0.18.0",
     "filesystem-routing": "0.4.0",
     "jiti": "^2.7.0",
+    "oxc-parser": "^0.139.0",
     "jsdom": "^25.0.1",
     "metro": "^0.87.1",
     "oxfmt": "^0.71.0",
@@ -1152,6 +1174,8 @@
     "@pureform/css-demo": ["@pureform/css-demo@workspace:apps/css-demo"],
 
     "@pureform/css-lowering": ["@pureform/css-lowering@workspace:packages/css-lowering"],
+
+    "@pureform/generate": ["@pureform/generate@workspace:packages/generate"],
 
     "@pureform/js-effects": ["@pureform/js-effects@workspace:packages/js-effects"],
 

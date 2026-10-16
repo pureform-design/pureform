@@ -59,6 +59,7 @@ include = [
     "packages/type-utils/**",
     "packages/utils/**",
     "packages/binding-core/**",
+    "packages/generate/**",
     # @anchor:new-core-train-package
 ]
 
@@ -94,8 +95,6 @@ include = ["packages/release/**"]
 
 [monorepo.packages."@pureform/react"]
 path = "packages/react"
-include = [
-    "packages/react/**",
-]
+include = ["packages/react/**"]
 
 #@anchor:new-typescript-package
