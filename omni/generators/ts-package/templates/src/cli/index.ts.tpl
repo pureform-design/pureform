@@ -1,8 +1,8 @@
-{%- if inputs.shebang_executor == "node" %}
+{% if inputs.shebang_executor == "node" -%}
 #!/usr/bin/env node
-{%- elif inputs.shebang_executor == "bun" %}
+{% elif inputs.shebang_executor == "bun" -%}
 #!/usr/bin/env bun
-{%- elif inputs.shebang_executor == "deno" %}
+{% elif inputs.shebang_executor == "deno" -%}
 #!/usr/bin/env deno
 {% endif %}
 
