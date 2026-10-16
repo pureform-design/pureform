@@ -4,11 +4,9 @@
 import { compilePreset } from "@pureform/panda-adapter";
 
 import pureformConfig from "./pureform.config";
+import { PREFIX } from "./pureform.glue";
 
-export { pureformConfig };
-
-/** The var prefix the preset names component vars with; `.pureform/`'s factories use it too. */
-export const PREFIX = "pf";
+export { PREFIX, pureformConfig };
 
 export const pureformPreset = compilePreset(pureformConfig, {
     name: "pureform",

@@ -11,12 +11,19 @@ The demo is pureform's Panda target: `pureform.config.ts` composes the pureform 
 Panda's codegen writes the recipes into `styled-system/`.
 
 `.pureform/` holds the style registry the components read (design doc §5.2 and §6). It's
-generated, and committed: `scripts/generate.ts` runs `@pureform/generate` with the Panda
-adapter's codegen (`@pureform/panda-adapter/codegen`, with the preset's `prefix`) over every
-component of the config. Don't edit it; change the config and regenerate. Through omni,
-`prepare` runs the `generate` task (after building the packages it loads) and then `panda
-codegen`; by hand, `bun scripts/generate.ts` (or `--check` to compare without writing). p4c
-replaces the script with `pureform generate` and the bundler plugin.
+generated and not committed (`.gitignore`): the bundler plugin (`@pureform/bundler/vite`, first
+in `vite.config.ts`) runs `@pureform/generate` with the Panda adapter's codegen
+(`@pureform/panda-adapter/codegen`, with the preset's `prefix`) over every component of the
+config when `vite dev` or `vite build` starts, before Panda's own plugin reads `panda.config.ts`,
+and again in dev when `pureform.config.ts` or a file it imports changes. Its options live in
+`pureform.glue.ts`. Don't edit the folder; change the config.
+
+Steps without Vite need the folder too: Panda's codegen (`panda.config.ts` imports
+`.pureform/panda`), `tsc`, and the browser tests. Through omni, `prepare` runs the `generate`
+task (`node scripts/generate.ts`, after building the packages it loads, with the same options)
+and then `panda codegen`; by hand, `node scripts/generate.ts` (or `--check` to compare without
+writing). Run it under Node, as Vite does: the preset computes a shape morph differently under
+Bun, which changes the glue's hash. p4c-cli replaces the script with `pureform generate`.
 
 | File            | What it is                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- |
