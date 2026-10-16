@@ -430,6 +430,40 @@ The design makes one setting, followed by everything that moves, on every target
   `data-pf-motion` value, checking computed `transition` is `none` and that a ripple and a
   token tween don't run; React Native tests mock `AccessibilityInfo`.
 
+### 5.9 Direction
+
+The preset already uses logical properties (`paddingInline`, `insetInlineStart`) almost
+everywhere, and the AST has `ltr`/`rtl` conditions that lower to
+`:where([dir=rtl], :dir(rtl))` on the web and to `I18nManager.isRTL` on React Native.
+What's missing is one source of direction for JS, and a few styles that don't flip.
+
+- **Where direction comes from.** `PureformProvider` takes `dir="ltr" | "rtl"`,
+  inherited by nested providers, `"ltr"` at the root by default:
+    - Web: the provider writes `dir` on its element, so CSS and the browser agree with
+      JS. Apps that set `<html dir>` pass the same value; it's a prop, so the server and
+      client render the same thing (§5.7).
+    - Zag: every machine gets `dir` from the provider, which drives arrow keys in tabs,
+      radio groups, sliders, menus, and navigation.
+    - React Native: the root default is `I18nManager.isRTL`, and selection gets
+      `rtl` (the adapter's existing `rtl` state).
+- **Styles flip without JS.** Logical properties do it on both targets. Where there's no
+  logical property, the style says so with the `rtl` condition:
+    - The switch's handle and state layer sit with `left` and center with
+      `translate(-50%)`; they move to `insetInlineStart` with the translation flipped
+      under `rtl`.
+    - The linear progress's indeterminate keyframes run along `translateX`; an `rtl`
+      set runs them the other way.
+    - Symmetric uses (`left: 0` with `right: 0`, or centering with `left: 50%`) stay.
+- **Icons that point.** The icon slot takes `mirror`, which sets `data-pf-mirror` and
+  flips the icon with `scaleX(-1)` under `rtl`. Back arrows and chevrons set it; most icons
+  don't. The icon slot contract decides the rest.
+- **Guarded by a test.** A preset spec fails on a physical horizontal property
+  (`left`, `right`, `marginLeft`, `translateX`, …) unless it's symmetric or under a
+  direction condition.
+- **Testing.** Each component renders in Chromium both ways, and every slot's box in
+  `rtl` must mirror its `ltr` box across the root (`x' = width - x - w`). React Native
+  does the same through selection with `rtl`. Keyboard suites run in both directions.
+
 ## 6. Generated glue
 
 `pureform generate` (also run by the bundler plugin in dev and build) writes the factory
@@ -686,13 +720,20 @@ Deferred until there's demand:
 7. Move RN components out of `rn-web-demo` into `@pureform/react-native` on the same
    anatomy.
 
+Preset changes these designs need, independent of the steps above:
+
+- Reduced motion stops movement only (§5.8): gate each moving tween, not the whole
+  `transition`; React Native's token tweens check the token's value type.
+- Direction (§5.9): the switch handle on `insetInlineStart`, `rtl` keyframes for the
+  linear progress, the icon slot's `mirror`, and the physical property spec.
+
 ## 12. Risks and open questions
 
 1. **Lookup cost.** Benchmark before step 3 ends. Fallback: compile-time inlining of
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
+3. **Not yet covered:** the icon slot contract; whether `.pureform/` is
    committed and how stale glue is detected; and how packages are versioned together.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
