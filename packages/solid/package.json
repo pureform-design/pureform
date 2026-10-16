@@ -7,16 +7,24 @@
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
+            "solid": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.jsx"
+            },
             "import": {
                 "development": "./src/index.ts",
-                "default": "./dist/index.mjs"
+                "default": "./dist/index.jsx"
             }
         },
         "./internal/zag": {
             "types": "./dist/internal/zag/index.d.ts",
+            "solid": {
+                "development": "./src/internal/zag/index.ts",
+                "default": "./dist/internal/zag.jsx"
+            },
             "import": {
                 "development": "./src/internal/zag/index.ts",
-                "default": "./dist/internal/zag.mjs"
+                "default": "./dist/internal/zag.jsx"
             }
         }
     },
@@ -24,11 +32,15 @@
         "access": "public"
     },
     "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:",
+        "@pureform/machines": "catalog:",
         "@zag-js/core": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
     },
     "devDependencies": {
+        "@pureform/styling": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
@@ -45,6 +57,7 @@
         "vitest": "catalog:"
     },
     "peerDependencies": {
+        "@pureform/styling": "catalog:",
         "@solidjs/web": "2.0.0-rc.15",
         "solid-js": "2.0.0-rc.15"
     }

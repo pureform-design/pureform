@@ -1,0 +1,18 @@
+// `useReducedMotion()`: whether to reduce motion, from the nearest provider's `"reduce"` or
+// `"full"`, else the system's preference. It starts from `false` for the system (the server can't
+// know it) and picks the real value up after mount, which changes nothing rendered: JS motion only
+// runs after an interaction.
+
+import { resolveReducedMotion } from "@pureform/binding-core";
+import { subscribeReducedMotion } from "@pureform/binding-core/dom";
+import { type Accessor, createMemo, createSignal, onSettled } from "solid-js";
+
+import { usePureform } from "./provider";
+
+/** Whether to reduce motion: pass it to ripples, tweens, and machines that animate. */
+export function useReducedMotion(): Accessor<boolean> {
+    const state = usePureform();
+    const [system, setSystem] = createSignal(false);
+    onSettled(() => subscribeReducedMotion(setSystem));
+    return createMemo(() => resolveReducedMotion(state().motion, system()));
+}

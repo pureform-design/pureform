@@ -386,11 +386,15 @@
       "name": "@pureform/solid",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:",
+        "@pureform/machines": "catalog:",
         "@zag-js/core": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:",
       },
       "devDependencies": {
+        "@pureform/styling": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
@@ -407,6 +411,7 @@
         "vitest": "catalog:",
       },
       "peerDependencies": {
+        "@pureform/styling": "catalog:",
         "@solidjs/web": "2.0.0-rc.15",
         "solid-js": "2.0.0-rc.15",
       },

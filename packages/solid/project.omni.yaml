@@ -9,6 +9,10 @@ dependencies:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
+    - "@pureform/styling"
+    - "@pureform/anatomy"
+    - "@pureform/machines"
+    - "@pureform/binding-core"
 
 tasks:
   test:unit:
