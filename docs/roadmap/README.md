@@ -84,7 +84,7 @@ snapshots: land them one at a time, regenerating snapshots after each rebase.
 | [x] | [p1e: `@pureform/styling`](phases/p1e-styling.md)                                 | none                     | [`context/p1e.md`](context/p1e.md) |
 | [x] | [p1f: `@pureform/anatomy`](phases/p1f-anatomy.md)                                 | none (refresh after p1d) | [`context/p1f.md`](context/p1f.md) |
 | [x] | [p1g: `@pureform/machines`](phases/p1g-machines.md)                               | none                     | [`context/p1g.md`](context/p1g.md) |
-| [ ] | [p1h: versioning configuration](phases/p1h-versioning-config.md)                  | none                     | `context/p1h.md`                   |
+| [x] | [p1h: versioning configuration](phases/p1h-versioning-config.md)                  | none                     | [`context/p1h.md`](context/p1h.md) |
 
 ### Phase 2: binding foundations
 
