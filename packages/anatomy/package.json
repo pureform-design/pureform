@@ -1,0 +1,46 @@
+{
+    "name": "@pureform/anatomy",
+    "version": "0.0.0-semantically-released",
+    "description": "Each component's parts, part attributes, and test ids, generated from the preset's AST",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./derive": {
+            "types": "./dist/derive.d.ts",
+            "import": {
+                "development": "./src/derive.ts",
+                "default": "./dist/derive.mjs"
+            },
+            "require": {
+                "development": "./src/derive.ts",
+                "default": "./dist/derive.mjs"
+            }
+        }
+    },
+    "scripts": {
+        "generate": "bun --conditions=development ./scripts/generate.ts"
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/preset": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

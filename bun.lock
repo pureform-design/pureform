@@ -117,6 +117,22 @@
         "vite": "catalog:",
       },
     },
+    "packages/anatomy": {
+      "name": "@pureform/anatomy",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/preset": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@pureform/core",
       "version": "0.0.0-semantically-released",
@@ -508,6 +524,7 @@
     "@pandacss/preset-typography": "^2.0.1",
     "@pandacss/types": "^2.0.1",
     "@pandacss/vite": "^2.0.1",
+    "@pureform/anatomy": "workspace:^",
     "@pureform/core": "workspace:^",
     "@pureform/css-adapter": "workspace:^",
     "@pureform/css-lowering": "workspace:^",
@@ -985,6 +1002,8 @@
     "@parcel/watcher-win32-x64": ["@parcel/watcher-win32-x64@2.5.6", "", { "os": "win32", "cpu": "x64" }, "sha512-hbQlYcCq5dlAX9Qx+kFb0FHue6vbjlf0FrNzSKdYK2APUf7tGfGxQCk2ihEREmbR6ZMc0MVAD5RIX/41gpUzTw=="],
 
     "@polka/url": ["@polka/url@1.0.0-next.29", "", {}, "sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww=="],
+
+    "@pureform/anatomy": ["@pureform/anatomy@workspace:packages/anatomy"],
 
     "@pureform/browser-e2e-tests": ["@pureform/browser-e2e-tests@workspace:tests/browser-e2e-tests"],
 
