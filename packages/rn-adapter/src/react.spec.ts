@@ -198,3 +198,36 @@ describe("timeScale", () => {
         );
     });
 });
+
+describe("token transitions", () => {
+    it("name the token whose own value moves, which no style property takes", () => {
+        const config = pureform();
+        const styles = precompute(config, {
+            components: ["circularProgress"],
+            schemes: ["light"],
+        });
+        const Probe = () =>
+            createElement(
+                "pre",
+                null,
+                JSON.stringify(
+                    useComponentState(
+                        "circularProgress",
+                        {},
+                        {},
+                        {
+                            "components.circularProgress.value": 40,
+                        },
+                    ).transitions.root!.map((t) => t.property),
+                ),
+            );
+        const html = renderToString(
+            createElement(
+                PureformProvider,
+                { styles, scheme: "light" },
+                createElement(Probe),
+            ),
+        );
+        expect(html).toContain("--components.circularProgress.value");
+    });
+});
