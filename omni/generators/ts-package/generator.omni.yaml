@@ -74,6 +74,21 @@ inputs:
     message: Do you want to add integration tests?
     default: true
 
+  - if: "{{ inputs.package_type == 'lib' or inputs.package_type == 'script' }}"
+    name: release_group
+    type: string
+    message: How is this package versioned?
+    allowed:
+      - name: Core train (one version with every core package)
+        value: core-train
+      - name: Binding (its own version, peering on the core train)
+        value: binding
+      - name: Tooling (internal, its own version)
+        value: tooling
+      - name: Not released
+        value: none
+    default: core-train
+
   - name: package_version
     type: string
     message: What is the version of your package?
@@ -159,7 +174,16 @@ actions:
       - templates/vitest.config.unit.ts.tpl
       - templates/src/add.spec.ts.tpl
 
-  - type: prepend-content
+  - if: "{{ inputs.release_group | default(value='none') == 'core-train' }}"
+    type: prepend-content
+    target: cog_config
+    entries:
+      - content: |2-
+              "{{ vars.generated_dir }}/**",
+        pattern: "@anchor:new-core-train-package"
+
+  - if: "{{ inputs.release_group | default(value='none') == 'binding' or inputs.release_group | default(value='none') == 'tooling' }}"
+    type: prepend-content
     target: cog_config
     entries:
       - content: |
@@ -168,7 +192,6 @@ actions:
           include = [
               "{{ vars.generated_dir }}/**",
           ]
-          public_api = {{ inputs.published }}
         pattern: "@anchor:new-typescript-package"
 
   - type: transform-many
