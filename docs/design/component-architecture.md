@@ -296,7 +296,7 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   (`height: add(token("height"), token("densityOffset"))`), so one rule per size covers
   every step. `inherit` sets it back to the theme's offset, so a component inside a denser
   one doesn't inherit its parent's token.
-- **Across the preset:** compounds went from 202 to 12, with output identical on both
+- **Across the preset:** compounds went from 223 to 12, with output identical on both
   targets. Built CSS is about 28% smaller raw (7% gzipped) on the CSS target and 34% (9%)
   on Tailwind; React Native's precomputed styles are 12% smaller.
 - **What stays compound:** cases that need both conditions at once: the FAB's size with
