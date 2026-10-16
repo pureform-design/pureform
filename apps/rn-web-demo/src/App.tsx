@@ -37,6 +37,7 @@ import {
     Scrim,
     Separator,
     Swatch,
+    Tweens,
     SupportingText,
     Switch,
     Type,
@@ -96,6 +97,7 @@ function Page(props: { controls: ReactNode }) {
     const tokens = useTokens();
     const [checked, setChecked] = useState(true);
     const [on, setOn] = useState(true);
+    const [moved, setMoved] = useState(false);
     const [size, setSize] = useState("medium");
     const [fit, setFit] = useState("Medium");
     const [shape, setShape] = useState<(typeof SHAPES)[number]>("cookie4Sided");
@@ -225,6 +227,18 @@ function Page(props: { controls: ReactNode }) {
                     {(["linear", "radial", "conic"] as const).map((kind) => (
                         <Swatch key={kind} kind={kind} />
                     ))}
+                </View>
+            </Section>
+            <Section title="Token tweens">
+                <View style={styles.row}>
+                    <Chip
+                        label={moved ? "move back" : "move"}
+                        selected={moved}
+                        onPress={() => setMoved((m) => !m)}
+                    />
+                    <View style={styles.tweens}>
+                        <Tweens moved={moved} />
+                    </View>
                 </View>
             </Section>
             <Section title="Containers">
@@ -527,6 +541,14 @@ export function App() {
 const styles = StyleSheet.create({
     page: { padding: 32, gap: 32, minHeight: "100%" },
     section: { gap: 12 },
+    // Room for the square at its largest and turned, its diagonal, so the page doesn't move as
+    // it grows.
+    tweens: {
+        width: 160,
+        height: 160,
+        alignItems: "center",
+        justifyContent: "center",
+    },
     row: {
         flexDirection: "row",
         flexWrap: "wrap",
