@@ -205,11 +205,12 @@ export const stylesFor = (
     return set;
 };
 
-// Styles resolved with overrides, kept per set of them, so every instance whose variants set
-// the same tokens shares one resolution. A few sets are in use at a time; the cache empties
-// once many build up.
 const withOverrides = new WeakMap<Styles, Map<string, Resolved>>();
-const resolvedWith = (
+
+/** Styles resolved with overrides, kept per set of them, so every instance whose variants set
+ *  the same tokens, and every component under one provider, shares one resolution. A few sets
+ *  are in use at a time; the cache empties once many build up. */
+export const resolvedWith = (
     styles: Styles,
     key: string,
     overrides: ThemeValues,
