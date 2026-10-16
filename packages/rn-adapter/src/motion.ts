@@ -2,7 +2,10 @@
 // be tested on its own: easing curves, which value pairs interpolate, and the value partway
 // between two, for a change that interrupts another.
 
+import { valueTypeMoves } from "@pureform/core";
+
 import { formatColor, mixSrgb, parseColor } from "./rgba";
+import { TOKEN } from "./values";
 import type { Concrete, ThemeValues, Transition } from "./values";
 
 /** A transition's curve as Bézier points, or `linear`. */
@@ -195,6 +198,24 @@ export const sameUnits = (
     if (from === 0) return ["0%", to];
     if (to === 0) return [from, "0%"];
     return [from, to];
+};
+
+/** The tokens whose own values transition, by key, from a selection's transitions. Under
+ *  reduced motion a token that moves something (a length, angle, number, or percentage)
+ *  changes at once, and a color still fades. */
+export const tokenTransitions = (
+    transitions: Record<string, readonly Transition[]>,
+    reducedMotion: boolean,
+): Map<string, Transition> => {
+    const out = new Map<string, Transition>();
+    for (const list of Object.values(transitions)) {
+        for (const t of list) {
+            if (!t.property.startsWith(TOKEN)) continue;
+            if (reducedMotion && valueTypeMoves(t.valueType)) continue;
+            out.set(t.property.slice(TOKEN.length), t);
+        }
+    }
+    return out;
 };
 
 /** The tokens that changed to a value they can move to over their transitions: a number, a

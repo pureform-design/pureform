@@ -5,6 +5,8 @@
 // arrays and objects (a transform list) hold values too. Everything is JSON, so templates and
 // precomputed styles can be written to a module.
 
+import type { ValueType } from "@pureform/core/ast";
+
 import { formatColor, parseColor } from "./rgba";
 import { mixIn } from "./spaces";
 import type { MixSpace } from "./spaces";
@@ -25,6 +27,8 @@ export interface Transition {
     duration: number;
     easing: string;
     delay: number;
+    /** A token's type, for a tween of the token itself. */
+    valueType?: ValueType;
 }
 
 /** What names a token itself, before its key. A transition of it moves the token, and
