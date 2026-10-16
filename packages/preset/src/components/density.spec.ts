@@ -43,15 +43,22 @@ describe.each([
 describe("density", () => {
     it("moves the text area's paddings and label, not a fixed height", () => {
         const recipe = compilePreset(pureform()).theme?.slotRecipes?.textArea;
-        const compact = recipe?.compoundVariants?.find(
-            (c) => c.variant === "filled" && c.density === "-2",
-        )?.css as Record<string, Record<string, unknown>>;
-        expect(compact.container?.minHeight).toBe(
-            "calc(var(--components-textArea-height, 56px) + calc(token(spacing.1) * -2))",
+        expect(recipe?.variants?.density?.["-2"]).toEqual({
+            root: {
+                "--components-textArea-densityOffset":
+                    "calc(token(spacing.1) * -2)",
+            },
+        });
+        const filled = recipe?.variants?.variant?.filled as Record<
+            string,
+            Record<string, unknown>
+        >;
+        expect(filled.container?.minHeight).toBe(
+            "calc(var(--components-textArea-height, 56px) + var(--components-textArea-densityOffset, token(sizes.densityOffset)))",
         );
-        expect(compact.container).not.toHaveProperty("height");
-        expect(compact.input?.marginBlockStart).toBe(
-            "calc(token(spacing.6) + calc(calc(token(spacing.1) * -2) * 0.5))",
+        expect(filled.container).not.toHaveProperty("height");
+        expect(filled.input?.marginBlockStart).toBe(
+            "calc(token(spacing.6) + calc(var(--components-textArea-densityOffset, token(sizes.densityOffset)) * 0.5))",
         );
     });
 
@@ -63,15 +70,25 @@ describe("density", () => {
         });
     });
 
-    it("restates a button size one grid unit per step", () => {
-        const compound = compilePreset(
-            configWith(button),
-        ).theme?.slotRecipes?.button?.compoundVariants?.find(
-            (c) => c.size === "medium" && c.density === "-2",
+    it("sets a button's density offset one grid unit per step, which its sizes add", () => {
+        const recipe = compilePreset(configWith(button)).theme?.slotRecipes
+            ?.button;
+        expect(recipe?.variants?.density?.["-2"]).toEqual({
+            root: {
+                "--components-button-densityOffset":
+                    "calc(token(spacing.1) * -2)",
+            },
+        });
+        expect(recipe?.variants?.density?.inherit).toEqual({
+            root: {
+                "--components-button-densityOffset":
+                    "token(sizes.densityOffset)",
+            },
+        });
+        expect(recipe?.variants?.size?.medium?.root?.height).toBe(
+            "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
         );
-        expect(compound?.css?.root?.height).toBe(
-            "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + calc(token(spacing.1) * -2))",
-        );
+        expect(recipe?.compoundVariants ?? []).toHaveLength(0);
     });
 });
 

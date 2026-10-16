@@ -18,16 +18,14 @@ import {
     componentTokens,
     defaultDensities,
     defaultGroups,
-    dense,
-    densityCompounds,
-    densityMarkers,
+    DENSITY_TOKEN,
+    densityTokenVariant,
     densitySteps,
     fillTokenColors,
     fillVariant,
     groupTokens,
     iconBox,
     keysOf,
-    lower,
     pressableRoot,
     sys,
     touchTarget,
@@ -56,10 +54,10 @@ const { tokens } = componentTokens("button", {
     paddingMedium: spacing("6"),
     paddingLarge: spacing("8"),
     ...groupTokens(DEFAULT_GROUP),
+    ...DENSITY_TOKEN,
 });
 
 type Size = "Small" | "Medium" | "Large";
-const SIZES: Size[] = ["Small", "Medium", "Large"];
 
 const pf = typed();
 
@@ -90,7 +88,10 @@ export const createButton = <
             recipe: ({ token }) => {
                 const size = (s: Size): { root: StyleMap } => ({
                     root: {
-                        height: dense(token(`height${s}`)),
+                        height: add(
+                            token(`height${s}`),
+                            token("densityOffset"),
+                        ),
                         paddingInlineStart: token(`padding${s}`),
                         paddingInlineEnd: token(`padding${s}`),
                     },
@@ -135,19 +136,8 @@ export const createButton = <
                             medium: size("Medium"),
                             large: size("Large"),
                         },
-                        density: densityMarkers(densities),
+                        density: densityTokenVariant(densities),
                     },
-                    compoundVariants: SIZES.flatMap((s) =>
-                        densityCompounds(
-                            densities,
-                            { size: lower(s) },
-                            (offset) => ({
-                                root: {
-                                    height: add(token(`height${s}`), offset),
-                                },
-                            }),
-                        ),
-                    ),
                     defaultVariants: {
                         color: "primary",
                         variant: "filled",
