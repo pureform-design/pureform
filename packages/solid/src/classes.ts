@@ -4,7 +4,9 @@
 // Solid serializes for hydration), never to the factory.
 
 import {
-    requireRegistry,
+    classEntry,
+    lazyFactoryError,
+    serverLazyFactoryMessage,
     warnOnce,
     withDefaults,
 } from "@pureform/binding-core";
@@ -26,9 +28,7 @@ const entryOf = <N extends ComponentName>(
     name: N,
 ): RegistryEntry<ClassFactory<N>> => {
     const state = usePureform();
-    return untrack(() => requireRegistry(state()).entry(name)) as RegistryEntry<
-        ClassFactory<N>
-    >;
+    return untrack(() => classEntry(state(), name));
 };
 
 /** Each slot's classes for `selection`, over the provider's `defaults` for the component. The
@@ -61,9 +61,7 @@ export function useClassFactory<N extends StaticComponentName>(
 ): ClassFactory<N> {
     const entry = entryOf(name);
     if (entry.kind === "lazy") {
-        throw new Error(
-            `pureform: "${name}" loads on demand, so its factory isn't there yet. Use useLazyClassFactory("${name}"), or useClasses for classes.`,
-        );
+        throw lazyFactoryError(name);
     }
     return entry.factory;
 }
@@ -76,9 +74,7 @@ export function useLazyClassFactory<N extends LazyComponentName>(
 ): Accessor<ClassFactory<N>> {
     const entry = entryOf(name);
     if (isDev && isServer) {
-        warnOnce(
-            `pureform: useLazyClassFactory("${name}") ran during a server render. A factory can't be serialized, so its boundary renders the fallback on the server and loads on the client; use useClasses for classes that render on the server.`,
-        );
+        warnOnce(serverLazyFactoryMessage(name));
     }
     if (entry.kind === "static") {
         const { factory } = entry;

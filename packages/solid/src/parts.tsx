@@ -9,14 +9,7 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
-import { partAttributes } from "@pureform/anatomy";
-import {
-    forSlot,
-    isIconPart,
-    isUnstyled,
-    partClasses,
-    stateAttributes,
-} from "@pureform/binding-core";
+import { forSlot, isIconPart, partSources } from "@pureform/binding-core";
 import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
 import type { ClassSlots, ComponentName, Selection } from "@pureform/styling";
 import { dynamic } from "@solidjs/web";
@@ -85,18 +78,6 @@ export interface ComponentScope<A extends ComponentAnatomy> {
     render(part: PartName<A>, options: RenderOptions): JSX.Element;
 }
 
-const NOT_SPREAD = new Set(["children", "ref"]);
-
-const userProps = (props: object | undefined): Dict | undefined => {
-    if (!props) return undefined;
-    const source = props as Dict;
-    const picked: Record<string, unknown> = {};
-    for (const key of Object.keys(source)) {
-        if (!NOT_SPREAD.has(key)) picked[key] = source[key];
-    }
-    return picked;
-};
-
 /** Ties a component's anatomy to the registry, for Root to call once and share with its parts
  *  through context. */
 export function useComponent<A extends ComponentAnatomy>(
@@ -110,32 +91,22 @@ export function useComponent<A extends ComponentAnatomy>(
         anatomy,
         classes,
         part(part, partOptions = {}) {
-            const merged = createMemo(() => {
-                const unstyled =
-                    isUnstyled(options.unstyled?.(), part) ||
-                    partOptions.unstyled?.() === true;
-                const registry = unstyled
-                    ? undefined
-                    : partClasses(anatomy, part, classes(), false);
-                const provided = (
-                    state().slotProps as Record<
-                        string,
-                        Record<string, Dict | undefined> | undefined
-                    >
-                )[name]?.[part];
-                return combinePartProps([
-                    partOptions.machine?.() as Dict | undefined,
-                    partAttributes(
+            const merged = createMemo(() =>
+                combinePartProps(
+                    partSources({
                         anatomy,
                         part,
-                        options.testId?.(),
-                    ) as unknown as Dict,
-                    stateAttributes(partOptions.states?.()) as Dict,
-                    registry as Dict | undefined,
-                    provided,
-                    userProps(partOptions.props),
-                ]);
-            });
+                        machine: partOptions.machine?.(),
+                        states: partOptions.states?.(),
+                        testId: options.testId?.(),
+                        unstyled: options.unstyled?.(),
+                        partUnstyled: partOptions.unstyled?.(),
+                        classes: classes(),
+                        slotProps: state().slotProps,
+                        props: partOptions.props,
+                    }),
+                ),
+            );
             return merge(merged) as PartProps;
         },
         render(part, renderOptions) {
