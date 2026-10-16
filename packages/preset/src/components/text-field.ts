@@ -87,7 +87,6 @@ export const createTextField = <
                     ...density.variants,
                 },
                 compoundVariants: [
-                    ...color.compoundVariants,
                     ...icons.compoundVariants,
                     ...density.compoundVariants,
                 ],

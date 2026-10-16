@@ -173,7 +173,6 @@ export const createTextArea = <
                     density: densityMarkers(densities),
                 },
                 compoundVariants: [
-                    ...color.compoundVariants,
                     ...icons.compoundVariants,
                     ...(["filled", "outlined"] as const).flatMap((fill) =>
                         densityCompounds(

@@ -42,7 +42,6 @@ import {
 } from "@pureform/theme";
 
 import {
-    groupCompounds,
     iconBox,
     inputText,
     THEME_DENSITY,
@@ -51,7 +50,6 @@ import {
     densityMarkers,
     colorVariant,
     componentTokens,
-    groupRoles,
     disabledColor,
     stateTransition,
     sys,
@@ -339,25 +337,12 @@ export const fieldParts = (
         },
     } satisfies Record<string, Record<string, StyleMap>>;
 
-    // A color group sets the focus color. The label takes it as a variant; the indicator and
-    // stroke are already set by the fill variant, so a compound variant per fill and group
-    // replaces them in the later layer.
+    // A color group points the focus color, which the label, indicator, and stroke read, at
+    // its main color.
     const colors = (groups: ColorGroups) => ({
         color: colorVariant(groups, (g) => ({
-            label: { color: labelColor(g.main) },
+            root: { tokens: { focusColor: g.main } },
         })),
-        compoundVariants: [
-            ...groupCompounds(groups, { variant: "filled" }, (group) => ({
-                container: {
-                    boxShadow: indicatorShadow(groupRoles(group).main),
-                },
-            })),
-            ...groupCompounds(groups, { variant: "outlined" }, (group) => ({
-                container: {
-                    outlineColor: strokeColor(groupRoles(group).main),
-                },
-            })),
-        ],
     });
 
     // Icons sit centered on the container's height, at either end, as in Material's own text
