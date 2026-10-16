@@ -93,7 +93,7 @@ moves into a shared package.
 
 |     | Subphase                                                                      | Depends on                     | Output context                     |
 | --- | ----------------------------------------------------------------------------- | ------------------------------ | ---------------------------------- |
-| [ ] | [p2a: Solid binding core](phases/p2a-solid-core.md)                           | p1a, p1e, p1f, p1g (soft: p1b) | `context/p2a.md`                   |
+| [x] | [p2a: Solid binding core](phases/p2a-solid-core.md)                           | p1a, p1e, p1f, p1g (soft: p1b) | [`context/p2a.md`](context/p2a.md) |
 | [ ] | [p2b: React binding core](phases/p2b-react-core.md)                           | p1a, p1e, p1f, p1g (soft: p1b) | `context/p2b.md`                   |
 | [x] | [p2c: Panda factories for button and checkbox](phases/p2c-panda-factories.md) | p1a, p1e                       | [`context/p2c.md`](context/p2c.md) |
 
