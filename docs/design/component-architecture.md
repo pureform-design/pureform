@@ -409,11 +409,20 @@ The design makes one setting, followed by everything that moves, on every target
 - **One hook for JS motion.** `useReducedMotion()` in each binding combines the provider's
   setting with the media query (web) or the OS (native). The ripple, Animated token tweens,
   and our own machines read it; nothing calls `matchMedia` on its own.
-- **What reduces.** Movement stops: transitions, morphs, ripples, and token tweens such as
-  a progress value apply at once. Kept: indeterminate progress, since its motion is the
-  only sign that work is going on, and Zag's enter and exit
-  animations, which need no change, because Zag's presence logic finishes at once when no
-  animation runs.
+- **What reduces: movement only**, which is what `prefers-reduced-motion` asks for:
+    - Stops: anything that moves, resizes, or reshapes. Transitions of `transform`,
+      position, size (a progress bar's `width`), and `clip-path` (shape morphs); ripples;
+      and token tweens of lengths, angles, and numbers, such as a progress value.
+    - Keeps: color, opacity, and elevation (`box-shadow`) fades, so state changes stay
+      as smooth as without the setting; and token tweens of colors.
+    - Keeps: indeterminate progress, since its motion is the only sign that work is
+      going on.
+    - Zag's enter and exit animations need no change: Zag's presence logic finishes at
+      once when no animation runs.
+    - In the preset, the gate moves from the whole `transition` to each tween:
+      `STATE_TWEENS` (colors and elevation) always run, and `tweens(...)` gates only the
+      moving properties it's given. This changes output on purpose, so it's checked
+      against expected values rather than the before-and-after equivalence check.
 - **Server rendering.** The web rule is CSS, so the first paint is right. JS motion runs
   only after an interaction, so the hook can start from the provider's setting on the
   server and pick up the system value after mount without a mismatch.
