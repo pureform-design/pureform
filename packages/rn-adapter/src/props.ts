@@ -143,6 +143,8 @@ const DROPPED = new Set([
     "containerType",
     "containerName",
     "isolation",
+    // React Native has no variable font axes; an icon reads its fill another way.
+    "fontVariationSettings",
 ]);
 
 const SAME_SET = new Set<string>(SAME);

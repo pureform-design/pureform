@@ -351,6 +351,8 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 throw new Unsupported(`no React Native "${node.value}"`);
             return plain(value);
         }
+        case "fontVariation":
+            throw new Unsupported("variable font axes");
         case "fontFamily":
             return plain(
                 ctx.fontStack === "all"
