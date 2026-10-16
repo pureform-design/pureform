@@ -338,6 +338,21 @@ export const button: StyleFactory<"button"> = (s) =>
     )!;
 ```
 
+Built (p4b-rn): `@pureform/rn-adapter/codegen` writes `native/<name>.ts` per allow-listed
+component, a `NativeFactory<"name">` (`nativeFactory` from `@pureform/rn-adapter/factory`) over
+that component's own precomputed templates and values, parsed from a JSON string, and
+`native/theme-values.ts`, the themes' token values and formulas every module shares. Rather than
+a table written out, the module fills `selectionCache` lazily (§2): the key is each group's value
+and a bit per state the component's rules read, which the generated declarations list as its
+`states`. The theme isn't in the selection, so the environment a provider holds (theme, scheme,
+overrides, SVG drawing, and which width and container conditions hold) picks a table:
+`factory.for(environment)(selection)`; calling the factory itself is the base theme's light
+scheme. Each slot gives `style` and `drawing`, plus its `transitions`, `animation`, and `parent`,
+which token tweening and the animated hooks need. Instance tokens resolve the component again
+with them, cached per value. `rn-adapter`'s hooks select through the same factories, built over
+the provider's styles (`componentFactory`), so `useMovingTokens` works on them unchanged; the
+equivalence is checked against selection for every preset component and in the browser suite.
+
 ### 5.3 Hooks
 
 Each binding offers a pair: a hook components use, and a lower-level hook that returns
@@ -457,6 +472,10 @@ Each component's variants (and on native, states) are enumerated at build time, 
 key is built from them in a fixed order. For components whose variant product is large,
 the generated factory composes per-variant fragments instead of storing the full product:
 a class string concat on web, a shallow merge cached per key on native.
+
+Built (p4a, p4b): no factory stores a product. The web factories write each slot's classes as
+a template (or call Panda's recipe) and the native ones select from the precomputed styles,
+both only for keys looked up, inside `selectionCache`.
 
 `dynamic` component tokens (`components.circularProgress.value`) are props on the
 component, passed as `selection.tokens`. On the web, the factory returns them as CSS vars
