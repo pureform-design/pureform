@@ -18,6 +18,7 @@
         "react-native-worklets": "catalog:"
     },
     "devDependencies": {
+        "@pureform/core": "catalog:",
         "@pureform/material": "catalog:",
         "@pureform/preset": "catalog:",
         "@pureform/tsconfig": "catalog:",

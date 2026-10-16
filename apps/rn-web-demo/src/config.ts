@@ -1,10 +1,19 @@
-// The demo's pureform config: Material's defaults and a teal theme, and the components the
-// React Native adapter covers.
+// The demo's pureform config: Material's defaults and a teal theme, two shapes that morph when
+// pressed, and the components the React Native adapter covers.
 
+import { morph } from "@pureform/core/ast";
 import { materialColor, materialShape } from "@pureform/material";
-import { pureform } from "@pureform/preset";
+import { MATERIAL_SHAPES, pureform } from "@pureform/preset";
 
 export const config = pureform({
+    shapes: {
+        ...MATERIAL_SHAPES,
+        circleToSquare: morph(MATERIAL_SHAPES.circle, MATERIAL_SHAPES.square),
+        cookieToClover: morph(
+            MATERIAL_SHAPES.cookie4Sided,
+            MATERIAL_SHAPES.clover8Leaf,
+        ),
+    },
     themes: {
         teal: {
             color: materialColor({ seed: "#006A60" }),

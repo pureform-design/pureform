@@ -30,7 +30,8 @@ import {
 } from "./parts";
 import type { Color, Group } from "./parts";
 
-/** A few of Material's shapes, for the shaped components. */
+/** A few of Material's shapes, for the shaped components, and the config's two morphs, which
+ *  change shape while pressed. */
 export const SHAPES = [
     "none",
     "square",
@@ -39,6 +40,8 @@ export const SHAPES = [
     "sunny",
     "heart",
     "pentagon",
+    "circleToSquare",
+    "cookieToClover",
 ] as const;
 export type Shape = (typeof SHAPES)[number];
 
