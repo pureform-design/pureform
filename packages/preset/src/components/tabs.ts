@@ -33,7 +33,6 @@ import {
     colorVariant,
     componentTokens,
     defaultGroups,
-    groupCompounds,
     iconBox,
     pressableRoot,
     sys,
@@ -168,19 +167,20 @@ export const createTabs = <const G extends string = ColorGroup>(
                         },
                     },
                     icon: { true: {}, false: {} },
+                    // A group points the active and indicator colors at its main color.
+                    // Secondary tabs read their own active color, so they keep it.
                     color: colorVariant(groups, (g) => ({
-                        tab: tabColors(g.main),
-                        indicator: { backgroundColor: g.main },
+                        root: {
+                            tokens: {
+                                activeColor: g.main,
+                                indicatorColor: g.main,
+                            },
+                        },
                     })),
                 },
                 // Primary tabs stack the icon over the label and grow taller; secondary tabs keep the
                 // icon beside it.
                 compoundVariants: [
-                    // The color variant sets the active label too, so secondary tabs set theirs back in
-                    // the later layer.
-                    ...groupCompounds(groups, { variant: "secondary" }, () => ({
-                        tab: tabColors(ref("secondaryActiveColor")),
-                    })),
                     {
                         match: { variant: "primary", icon: "true" },
                         style: {
