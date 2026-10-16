@@ -13,11 +13,8 @@ describe("iconButton", () => {
     });
 
     it("draws the standard variant with no container", () => {
-        const standard = iconButton.recipe.compoundVariants?.find(
-            (c) =>
-                c.match.color === "primary" && c.match.variant === "standard",
-        );
-        expect(standard?.style.container?.backgroundColor).toMatchObject({
+        const standard = iconButton.recipe.variants?.variant?.standard;
+        expect(standard?.container?.backgroundColor).toMatchObject({
             type: "conditional",
             base: { type: "keyword", value: "transparent" },
         });

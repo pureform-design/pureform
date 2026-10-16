@@ -48,7 +48,6 @@ import { MATERIAL_SHAPES } from "../shapes";
 import {
     STATE_TWEENS,
     disabledColor,
-    fillColors,
     slotStateLayer,
     stateTransition,
 } from "./shared";
@@ -119,10 +118,8 @@ export const shapedOutlineStroke = (
  *  and the container (the fill, with its state layer, and the disabled fill). */
 export const shapedColors = (
     fill: Fill,
-    group: string,
-    container: ColorValue = fillColors(fill, group).container,
+    { container, content }: { container: ColorValue; content: ColorValue },
 ) => {
-    const { content } = fillColors(fill, group);
     const disabled =
         fill === "outlined" || fill === "text"
             ? transparent
