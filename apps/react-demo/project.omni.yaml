@@ -15,6 +15,7 @@ dependencies:
     - "@pureform/material"
     - "@pureform/theme"
     - "@pureform/core"
+    - "@pureform/generate"
 
 cache:
   key:
@@ -22,7 +23,9 @@ cache:
       append:
         - panda.config.ts
         - panda.pureform.ts
+        - pureform.config.ts
         - vite.config.ts
+        - "scripts/**/*"
         - index.html
         - ".pureform/**/*"
 
@@ -39,7 +42,16 @@ tasks:
   test:
     enabled: true
 
-  prepare: bun x panda codegen
+  # Writes `.pureform/` from `pureform.config.ts` with the built Panda adapter's codegen.
+  generate:
+    exec: bun scripts/generate.ts
+    dependencies:
+      - ^build
+
+  prepare:
+    exec: bun x panda codegen
+    dependencies:
+      - generate
 
   build:
     enabled: true

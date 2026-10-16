@@ -6,20 +6,24 @@
 
 ## pureform in this demo
 
-The demo is pureform's Panda target: `panda.pureform.ts` composes the pureform config and
-compiles it to a Panda preset, and `panda.config.ts` adds the preset, so Panda's `prepare`
-task (`panda codegen`) writes the recipes into `styled-system/`.
+The demo is pureform's Panda target: `pureform.config.ts` composes the pureform config,
+`panda.pureform.ts` compiles it to a Panda preset, and `panda.config.ts` adds the preset, so
+Panda's codegen writes the recipes into `styled-system/`.
 
-`.pureform/` holds the style registry the components read (design doc §5.2 and §6). It is
-hand-written for now, in the shape `pureform generate` will write, and the generator replaces
-the whole folder (p4b-panda writes the modules, p4c moves the demo onto them):
+`.pureform/` holds the style registry the components read (design doc §5.2 and §6). It's
+generated, and committed: `scripts/generate.ts` runs `@pureform/generate` with the Panda
+adapter's codegen (`@pureform/panda-adapter/codegen`, with the preset's `prefix`) over every
+component of the config. Don't edit it; change the config and regenerate. Through omni,
+`prepare` runs the `generate` task (after building the packages it loads) and then `panda
+codegen`; by hand, `bun scripts/generate.ts` (or `--check` to compare without writing). p4c
+replaces the script with `pureform generate` and the bundler plugin.
 
-| File                               | What it is                                                                                                       |
-| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `web/button.ts`, `web/checkbox.ts` | `ClassFactory` modules over Panda's slot recipes: `{ [slot]: { class, style? } }` per selection, cached, frozen. |
-| `index.ts`                         | `registry = createRegistry({ button, checkbox })`, `themes`, `Components`.                                       |
-| `registry.d.ts`                    | Augments `@pureform/styling`'s `ComponentRegistry` with each component's variants, slots, and instance tokens.   |
-| `panda.ts`                         | `staticCss` entries that keep every variant's classes; `panda.config.ts` spreads them in.                        |
+| File            | What it is                                                                                                                |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `web/<name>.ts` | A `ClassFactory` module per component over Panda's recipe: `{ [slot]: { class, style? } }` per selection, cached, frozen. |
+| `index.ts`      | `registry` (every component, static), `version`, `themes`, `Components`.                                                  |
+| `registry.d.ts` | Augments `@pureform/styling`'s `ComponentRegistry` with each component's variants, slots, and instance tokens.            |
+| `panda.ts`      | `staticCss`: every variant of every component, and every theme; `panda.config.ts` uses it as its `staticCss`.             |
 
 ```ts
 import { registry } from "./.pureform";
@@ -36,8 +40,8 @@ if (entry.kind === "static") {
 ```
 
 `tsconfig.json` includes `.pureform/` explicitly, since the base config includes only `src`.
-`tests/browser-e2e-tests` checks the factories against Panda's output
-(`panda-factories.e2e.test.ts`).
+`tests/browser-e2e-tests` checks every factory against Panda's output for every variant
+combination (`panda-factories.e2e.test.ts`).
 
 ### The components page
 

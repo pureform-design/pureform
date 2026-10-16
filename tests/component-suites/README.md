@@ -67,8 +67,9 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
     - `unmirrored`: parts that don't point (a check mark), which must draw the same both ways.
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
-The registry must have the component: register it in `apps/solid-demo/.pureform` (until p4c
-generates it). A part of the case left out skips the cases that need it.
+The registry must have the component: `apps/solid-demo/.pureform` is generated with every
+component of the demo's config, so a component the config has is already there. A part of the
+case left out skips the cases that need it.
 
 ## Running
 

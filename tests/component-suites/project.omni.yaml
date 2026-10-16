@@ -22,6 +22,7 @@ cache:
         - "../../apps/solid-demo/.pureform/**/*"
         - "../../apps/solid-demo/panda.config.ts"
         - "../../apps/solid-demo/panda.pureform.ts"
+        - "../../apps/solid-demo/pureform.config.ts"
         - "../../apps/solid-demo/src/App.css"
         - "../../tests/browser-e2e-tests/src/mirror.ts"
 
