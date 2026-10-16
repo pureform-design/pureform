@@ -1,0 +1,54 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/react-demo"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-app.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/react"
+    - "@pureform/styling"
+    - "@pureform/panda-adapter"
+    - "@pureform/preset"
+    - "@pureform/material"
+    - "@pureform/theme"
+    - "@pureform/core"
+
+cache:
+  key:
+    files:
+      append:
+        - panda.config.ts
+        - panda.pureform.ts
+        - vite.config.ts
+        - index.html
+        - ".pureform/**/*"
+
+tasks:
+  test:unit:
+    enabled: false
+
+  test:integration:
+    enabled: false
+
+  test:e2e:
+    enabled: false
+
+  test:
+    enabled: true
+
+  prepare: bun x panda codegen
+
+  build:
+    enabled: true
+    dependencies:
+      append:
+        - prepare
+
+  publish:
+    enabled: false
+
+meta:
+  publish: false
