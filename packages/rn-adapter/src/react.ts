@@ -15,24 +15,18 @@ import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { curve } from "./animate/curve";
-import type { ComponentStyles } from "./lower";
+import { componentFactory } from "./factory";
 import { movingTokens, tokenTransitions, tokensAt } from "./motion";
-import {
-    overridesFor,
-    stylesFor,
-    themeKey,
-    withDerived,
-    withSetTokens,
-} from "./resolve";
+import { overridesFor, resolvedWith, themeKey, withDerived } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
-import { selectWithTransitions } from "./select";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import type { ThemeValues, Transition, Value } from "./values";
+import type { ThemeValues, Transition } from "./values";
 
 interface Context {
     styles: Styles;
     key: string;
+    theme: string | undefined;
     overrides: ThemeValues;
     resolved: Resolved;
     tokens: ThemeValues;
@@ -78,7 +72,7 @@ export const PureformProvider = (props: PureformProviderProps) => {
     // Overrides are compared by contents, so an inline object doesn't recompute every render.
     const overrideKey = JSON.stringify(overrides ?? {});
     const resolved = useMemo(
-        () => stylesFor(styles, key, overrides),
+        () => resolvedWith(styles, key, overrides),
         [styles, key, overrideKey],
     );
     const tokens = useMemo(
@@ -95,6 +89,7 @@ export const PureformProvider = (props: PureformProviderProps) => {
         () => ({
             styles,
             key,
+            theme,
             overrides,
             resolved,
             tokens,
@@ -104,7 +99,16 @@ export const PureformProvider = (props: PureformProviderProps) => {
             svg,
             timeScale,
         }),
-        [resolved, tokens, scheme, reducedMotion, props.width, svg, timeScale],
+        [
+            resolved,
+            tokens,
+            theme,
+            scheme,
+            reducedMotion,
+            props.width,
+            svg,
+            timeScale,
+        ],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
 };
@@ -196,7 +200,8 @@ export const useReducedMotion = (): boolean =>
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
 
-// The selection for given token values.
+// The selection for given token values, from the component's factory over the provider's
+// styles: one cached, frozen selection per variants and state.
 const useSelected = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
@@ -205,60 +210,38 @@ const useSelected = (
 ): Selected => {
     const context = useContextOrThrow("useComponentStyles");
     const containers = useContext(ContainerContext);
-    const tokenKey = tokens ? JSON.stringify(tokens) : "";
-    const own = useMemo(
+    const factory = componentFactory(context.styles, name);
+    const {
+        scheme = context.scheme,
+        svg = context.svg,
+        width = context.width,
+        containers: within = containers,
+        ...states
+    } = state;
+    const at = useMemo(
         () =>
-            tokens
-                ? stylesFor(context.styles, context.key, {
-                      ...context.overrides,
-                      ...overridesFor(tokens, context.scheme),
-                  })[name]
-                : undefined,
-        [context.styles, context.key, context.overrides, name, tokenKey],
+            factory.for({
+                ...(context.theme === undefined
+                    ? {}
+                    : { theme: context.theme }),
+                scheme,
+                overrides: context.overrides,
+                svg,
+                ...(width === undefined ? {} : { width }),
+                containers: within,
+            }),
+        [factory, context.theme, scheme, context.overrides, svg, width, within],
     );
-    const component = own ?? context.resolved[name];
-    if (!component) throw new Error(`no styles for component "${name}"`);
-    const variantKey = JSON.stringify(variants);
-    const stateKey = JSON.stringify(state);
-    return useMemo(() => {
-        const selectFrom = (styles: ComponentStyles<Value>) =>
-            slowed(
-                selectWithTransitions(styles, variants, {
-                    scheme: context.scheme,
-                    reducedMotion: context.reducedMotion,
-                    svg: context.svg,
-                    ...(context.width === undefined
-                        ? {}
-                        : { width: context.width }),
-                    containers,
-                    ...state,
-                }),
-                context.timeScale,
-            );
-        return withSetTokens(selectFrom(component), selectFrom, {
-            styles: context.styles,
-            key: context.key,
-            name,
-            scheme: context.scheme,
-            overrides: context.overrides,
-            ...(tokens ? { tokens } : {}),
-        });
-    }, [
-        component,
-        context.scheme,
-        context.reducedMotion,
-        context.width,
-        context.svg,
-        context.timeScale,
-        containers,
-        variantKey,
-        stateKey,
-        context.styles,
-        context.key,
-        context.overrides,
-        tokenKey,
-        name,
-    ]);
+    const selected = at.selected({
+        reducedMotion: context.reducedMotion,
+        ...states,
+        ...variants,
+        ...(tokens ? { tokens } : {}),
+    });
+    return useMemo(
+        () => slowed(selected, context.timeScale),
+        [selected, context.timeScale],
+    );
 };
 
 // Instance tokens, each moving to its new value over their transitions: the tokens
