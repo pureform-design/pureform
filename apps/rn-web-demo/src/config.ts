@@ -1,11 +1,18 @@
 // The demo's pureform config: Material's defaults and a teal theme, two shapes that morph when
-// pressed, a panel that lays out by its container's width, and the components the React
+// pressed, a panel that lays out by its container's width, a square whose typed tokens tween,
+// and the components the React
 // Native adapter covers.
 
-import { defineComponent } from "@pureform/core";
+import { defineComponent, defineSlotComponent } from "@pureform/core";
 import {
+    alias,
     conicGradient,
     containerSize,
+    dynamic,
+    rotate,
+    transform,
+    transition,
+    tween,
     linearGradient,
     morph,
     numeric,
@@ -17,7 +24,14 @@ import {
 } from "@pureform/core/ast";
 import { materialColor, materialShape } from "@pureform/material";
 import { MATERIAL_SHAPES, pureform } from "@pureform/preset";
-import { colorRole, radius, spacing, textStyle } from "@pureform/theme";
+import {
+    colorRole,
+    duration,
+    easing,
+    radius,
+    spacing,
+    textStyle,
+} from "@pureform/theme";
 
 const preset = pureform({
     shapes: {
@@ -94,14 +108,65 @@ const swatch = defineComponent({
     },
 });
 
+// A square whose tokens each hold a type of value that moves: its size a length, its color a
+// color, its turn an angle, its opacity a number, and its bar's fill a percentage. Set them on
+// one instance, and each new value tweens.
+const TWEENS = {
+    size: dynamic(["components", "tweens", "size"], px(64), "length"),
+    tint: dynamic(
+        ["components", "tweens", "tint"],
+        colorRole("primary"),
+        "color",
+    ),
+    turn: dynamic(["components", "tweens", "turn"], numeric(0, "deg"), "angle"),
+    level: dynamic(
+        ["components", "tweens", "level"],
+        numeric(1, "none"),
+        "number",
+    ),
+    fill: dynamic(["components", "tweens", "fill"], pct(50), "percentage"),
+};
+const token = (name: keyof typeof TWEENS) =>
+    alias("components", "tweens", name);
+const tweens = defineSlotComponent({
+    name: "tweens",
+    tokens: TWEENS,
+    slots: ["root", "bar"],
+    structure: { root: ["bar"] },
+    recipe: {
+        base: {
+            root: {
+                width: token("size"),
+                height: token("size"),
+                borderRadius: radius("small"),
+                backgroundColor: token("tint"),
+                opacity: token("level"),
+                transform: transform(rotate(token("turn"))),
+                overflow: { type: "keyword", value: "hidden" },
+                transition: transition(
+                    ...Object.values(TWEENS).map((value) =>
+                        tween(value, duration("long2"), easing("emphasized")),
+                    ),
+                ),
+            },
+            bar: {
+                width: token("fill"),
+                height: px(8),
+                backgroundColor: colorRole("onPrimary"),
+            },
+        },
+    },
+});
+
 export const config = {
     ...preset,
-    components: { ...preset.components, panel, swatch },
+    components: { ...preset.components, panel, swatch, tweens },
 };
 
 export const COMPONENTS = [
     "panel",
     "swatch",
+    "tweens",
     "button",
     "card",
     "chip",

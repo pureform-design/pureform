@@ -547,3 +547,37 @@ export function Swatch(props: { kind: "linear" | "radial" | "conic" }) {
         </View>
     );
 }
+
+// The square's two sets of token values, one of each type.
+const TWEEN_VALUES = {
+    rest: {
+        "components.tweens.size": 64,
+        "components.tweens.tint": "rgba(0, 106, 96, 1)",
+        "components.tweens.turn": "0deg",
+        "components.tweens.level": 1,
+        "components.tweens.fill": "20%",
+    },
+    moved: {
+        "components.tweens.size": 112,
+        "components.tweens.tint": "rgba(176, 0, 32, 1)",
+        "components.tweens.turn": "135deg",
+        "components.tweens.level": 0.5,
+        "components.tweens.fill": "90%",
+    },
+};
+
+/** The config's square whose typed tokens tween: its size, color, turn, opacity, and bar's
+ *  fill move each time `moved` changes. */
+export function Tweens(props: { moved: boolean }) {
+    const s = useMotionStyles(
+        "tweens",
+        {},
+        {},
+        TWEEN_VALUES[props.moved ? "moved" : "rest"],
+    );
+    return (
+        <MView role="img" aria-label="tweened square" style={aview(s.root)}>
+            <MView style={aview(s.bar)} />
+        </MView>
+    );
+}

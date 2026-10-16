@@ -20,4 +20,5 @@ bun run dev
   buttons, a FAB, an avatar, and media in Material's shapes, with `SvgDrawing`, and ripples
   clip to them with `useSvgRipple`. `src/config.ts` adds two morphs, which pressable
   components change into while pressed, and a panel laid out by its container's width,
-  shown in a narrow and a wide `PureformContainer`, and a swatch of each gradient kind.
+  shown in a narrow and a wide `PureformContainer`, a swatch of each gradient kind, and a square whose typed tokens (a length, a color, an
+  angle, a number, and a percentage) tween when the demo sets new values on it.
