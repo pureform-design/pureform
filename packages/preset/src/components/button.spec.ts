@@ -17,27 +17,41 @@ describe("button", () => {
         expect(() => configWith(button)).not.toThrow();
     });
 
-    it("pairs every color group with every fill", () => {
+    it("draws every group with one rule per fill, through its group tokens", () => {
         const colors = button.recipe.compoundVariants?.filter(
             (c) => c.match.color !== undefined,
         );
-        expect(colors).toHaveLength(7 * 5);
+        expect(colors).toHaveLength(0);
+        expect(button.recipe.variants?.color?.secondary?.root?.tokens).toEqual({
+            "components.button.accent": {
+                type: "alias",
+                path: ["semanticTokens", "colors", "secondary"],
+            },
+            "components.button.onAccent": {
+                type: "alias",
+                path: ["semanticTokens", "colors", "onSecondary"],
+            },
+            "components.button.accentContainer": {
+                type: "alias",
+                path: ["semanticTokens", "colors", "secondaryContainer"],
+            },
+            "components.button.onAccentContainer": {
+                type: "alias",
+                path: ["semanticTokens", "colors", "onSecondaryContainer"],
+            },
+        });
+        expect(button.recipe.variants?.color?.primary).toEqual({ root: {} });
     });
 
-    it("tints a filled primary button with its on-color on hover", () => {
-        const filledPrimary = button.recipe.compoundVariants?.find(
-            (c) => c.match.color === "primary" && c.match.variant === "filled",
-        );
-        expect(filledPrimary?.style.root?.color).toEqual({
+    it("tints a filled button with its on-color on hover, through its tokens", () => {
+        const filled = button.recipe.variants?.variant?.filled?.root;
+        expect(filled?.color).toEqual({
             type: "alias",
-            path: ["semanticTokens", "colors", "onPrimary"],
+            path: ["components", "button", "onAccent"],
         });
-        expect(filledPrimary?.style.root?.backgroundColor).toMatchObject({
+        expect(filled?.backgroundColor).toMatchObject({
             type: "conditional",
-            base: {
-                type: "alias",
-                path: ["semanticTokens", "colors", "primary"],
-            },
+            base: { type: "alias", path: ["components", "button", "accent"] },
         });
     });
 

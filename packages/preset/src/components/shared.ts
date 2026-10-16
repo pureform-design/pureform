@@ -167,6 +167,56 @@ export const fillColors = (
     }
 };
 
+/** The roles a component's group tokens point at for a color group: its main and container
+ *  colors, and the content drawn on each. */
+export const groupTokens = (group: string) => ({
+    accent: sys(group),
+    onAccent: on(group),
+    accentContainer: sys(`${group}Container`),
+    onAccentContainer: on(`${group}Container`),
+});
+
+/** A component token naming one of a group's roles. */
+export type GroupToken = keyof ReturnType<typeof groupTokens>;
+
+/** The `color` variant group for a component with group tokens: each group points them at its
+ *  roles, except the default group, which the tokens' defaults already name. */
+export const colorTokenVariants = <G extends string>(
+    groups: ColorGroups<G>,
+): Record<G, { root: StyleMap }> =>
+    Object.fromEntries(
+        groups.map((group): [G, { root: StyleMap }] => [
+            group,
+            {
+                root:
+                    group === DEFAULT_GROUP
+                        ? {}
+                        : { tokens: groupTokens(group) },
+            },
+        ]),
+    ) as Record<G, { root: StyleMap }>;
+
+/** A fill's root colors read through the group tokens, which the `color` variant points at a
+ *  group: its state-layered container, its content color, and its disabled colors. One rule
+ *  per fill draws every group, where colors set outright would need one per fill and group. */
+export const fillTokenColors = (
+    fill: Fill,
+    token: (name: GroupToken) => AliasNode,
+): StyleMap => {
+    const [container, content]: [ColorValue, ColorValue] =
+        fill === "filled"
+            ? [token("accent"), token("onAccent")]
+            : fill === "tonal"
+              ? [token("accentContainer"), token("onAccentContainer")]
+              : fill === "elevated"
+                ? [sys("surfaceContainerLow"), token("accent")]
+                : [transparent, token("accent")];
+    return {
+        ...interactiveColors(container, content),
+        states: { disabled: disabledColors(fill) },
+    };
+};
+
 /** One compound variant per color group and variant, setting the root's state-layered
  *  container, its content color, and its disabled colors. `fills` maps each variant name to
  *  how it fills. The disabled colors live here rather than on the variant because Panda puts

@@ -125,13 +125,10 @@ describe("pureform color options", () => {
         }
     });
 
-    it("compiles the custom group's compound colors", () => {
+    it("points the button's group tokens at the custom group's colors", () => {
         const recipe = compilePreset(config).theme?.slotRecipes?.button;
-        const compound = recipe?.compoundVariants?.find(
-            (c) => c.color === "coral" && c.variant === "filled",
-        );
-        expect(compound?.css?.root).toMatchObject({
-            color: "token(colors.onCoral)",
+        expect(recipe?.variants?.color?.coral?.root).toMatchObject({
+            "--components-button-onAccent": "token(colors.onCoral)",
         });
     });
 
