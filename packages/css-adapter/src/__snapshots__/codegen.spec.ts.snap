@@ -1,0 +1,72 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`the CSS codegen > gives a single-slot component's class to the root 1`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+const classes = selectionCache<Selection<"icon">, ClassSlots<"icon">>(
+    {
+        variants: ["filled"],
+    },
+    (s) => ({
+        root: {
+            class: \`icon\${s.filled === undefined ? "" : \` icon--filled_\${s.filled}\`}\`,
+        },
+    }),
+);
+
+export const icon: ClassFactory<"icon"> = classes;
+"
+`;
+
+exports[`the CSS codegen > gives a single-slot component's class to the root 2`] = `
+"import { selectionCache } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+const classes = selectionCache<Selection<"divider">, ClassSlots<"divider">>(
+    {
+        variants: [],
+    },
+    () => ({
+        root: {
+            class: "divider",
+        },
+    }),
+);
+
+export const divider: ClassFactory<"divider"> = classes;
+"
+`;
+
+exports[`the CSS codegen > writes each slot's classes over the selection, and adds instance tokens 1`] = `
+"import { selectionCache, withTokenStyle } from "@pureform/styling";
+import type { ClassFactory, ClassSlots, Selection } from "@pureform/styling";
+
+const vars = {
+    radius: "--pf-components-iconButton-radius",
+    gap: "--pf-components-iconButton-gap",
+} as const;
+
+const classes = selectionCache<Selection<"iconButton">, ClassSlots<"iconButton">>(
+    {
+        variants: ["variant", "toggle", "size", "icon-side"],
+        defaults: {
+            variant: "filled",
+            toggle: "false",
+            "icon-side": "start",
+        },
+    },
+    (s) => ({
+        root: {
+            class: \`pf-iconButton__root pf-iconButton__root--variant_\${s.variant} pf-iconButton__root--toggle_\${s.toggle}\${s.size === undefined ? "" : \` pf-iconButton__root--size_\${s.size}\`} pf-iconButton__root--icon-side_\${s["icon-side"]}\`,
+        },
+        icon: {
+            class: \`pf-iconButton__icon pf-iconButton__icon--variant_\${s.variant} pf-iconButton__icon--toggle_\${s.toggle}\${s.size === undefined ? "" : \` pf-iconButton__icon--size_\${s.size}\`} pf-iconButton__icon--icon-side_\${s["icon-side"]}\`,
+        },
+    }),
+);
+
+export const iconButton: ClassFactory<"iconButton"> = (s) =>
+    withTokenStyle(classes(s), s.tokens, vars);
+"
+`;

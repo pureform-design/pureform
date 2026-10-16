@@ -13,6 +13,7 @@ export default createConfig({
                     runtime: "src/runtime.ts",
                     build: "src/build.ts",
                     vite: "src/vite.ts",
+                    codegen: "src/codegen.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

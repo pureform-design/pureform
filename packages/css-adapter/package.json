@@ -48,11 +48,23 @@
                 "default": "./dist/vite.mjs"
             }
         },
+        "./codegen": {
+            "types": "./dist/codegen.d.ts",
+            "import": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            },
+            "require": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            }
+        },
         "./reset.css": "./reset.css"
     },
     "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:",
         "@pureform/styling": "catalog:"
     },
     "devDependencies": {
