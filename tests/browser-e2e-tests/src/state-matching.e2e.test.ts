@@ -226,6 +226,16 @@ const CASES: Case[] = [
     ),
     condition("disabled", DISABLED, ZAG.disabled),
     condition(
+        "mirrored",
+        [
+            {
+                way: attr("mirrored"),
+                html: `<span class="fx" ${attr("mirrored")}></span>`,
+            },
+        ],
+        [`<span class="fx" data-mirror data-mirrored></span>`],
+    ),
+    condition(
         "readOnly",
         [
             { way: ":read-only", html: `<input class="fx" readonly>` },
