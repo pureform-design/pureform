@@ -9,6 +9,7 @@ export default defineConfig({
         "./**/routeTree.gen.ts",
         "./**/styled-system/**/*",
         "./**/styled-system-studio/**/*",
+        "**/.pureform/**",
         "./**/.cache/**/*",
         "./**/.git/**/*",
         "./**/.svn/**/*",
