@@ -792,6 +792,21 @@ first: the bundler plugin when it resolves an import into the missing folder (p4
 CLI, or a test setup. `generate` also returns a hint when the app's `tsconfig.json` doesn't
 include the folder, since TypeScript's globs skip dot folders.
 
+Built (p4c-bundler) in `@pureform/bundler`: one unplugin plugin (`/vite`, `/rollup`,
+`/rolldown`, `/esbuild`) with the options of `generate` (`target`, `options`, `components`,
+`lazy`, `config`, `outDir`, `root`) plus `watch`. In Vite it generates in the `config` hook, so
+the glue exists before any plugin's `configResolved` (Panda's reads `.pureform/panda.ts`
+there); elsewhere in `buildStart`. It regenerates on `watchChange` of the config or a file it
+imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types from
+`@pureform/bundler/client`), and raises the missing-glue error for that id or a relative import
+into a missing folder. Metro gets `withPureformGlue(config, options)` from `/metro` instead of
+a plugin: it generates before Metro starts, keeps a watcher, and adds the id to
+`resolveRequest`. The regeneration loop (`createGlueRunner`, `watchGlue`) lives in
+`@pureform/generate`, for the CLI's `--watch` too. `solid-demo` no longer commits
+`.pureform/`; `react-demo` still does. The hash covers the evaluated config, which the preset
+computes slightly differently under Bun and Node (a shape morph), so one app should generate
+under one runtime.
+
 The app registers it once:
 `<PureformProvider registry={registry}>`. Components read it from context. Tests can pass
 a fake registry.
