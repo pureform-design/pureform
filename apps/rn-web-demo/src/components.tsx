@@ -2,13 +2,16 @@
 // tracks its interaction state, asks for its slots' styles, and lays the slots out as the web
 // markup does. The interactive ones animate their state changes and ripple when pressed.
 
+import type { Transition } from "@pureform/rn-adapter";
+import { curve } from "@pureform/rn-adapter/animated";
 import {
     useComponentState,
     useComponentStyles,
     useTokens,
 } from "@pureform/rn-adapter/react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Image, Text, View } from "react-native";
+import { Animated, Image, Text, View } from "react-native";
 import type { ImageStyle } from "react-native";
 
 import {
@@ -434,33 +437,65 @@ export function LinearProgress(props: {
     );
 }
 
+// A number moving to each new target over a transition, a frame at a time.
+function useTweened(target: number, timing: Transition | undefined) {
+    const [now, setNow] = useState(target);
+    const [value] = useState(() => new Animated.Value(target));
+    useEffect(() => {
+        const id = value.addListener(({ value: v }) => setNow(v));
+        return () => value.removeListener(id);
+    }, [value]);
+    useEffect(() => {
+        if (!timing) {
+            value.setValue(target);
+            return;
+        }
+        const run = Animated.timing(value, {
+            toValue: target,
+            duration: timing.duration,
+            delay: timing.delay,
+            easing: curve(timing.easing),
+            useNativeDriver: false,
+        });
+        run.start();
+        return () => run.stop();
+    }, [target]);
+    return now;
+}
+
 export function CircularProgress(props: {
     value?: number | undefined;
     color?: Group;
 }) {
-    const s = useMotionStyles(
+    const variants = {
+        color: props.color,
+        indeterminate: props.value === undefined ? "true" : "false",
+    };
+    // The value moves, rather than each half's arc: turning both arcs at once would draw the
+    // second half before the first fills, leaving a gap between them.
+    const timing = useComponentState("circularProgress", variants).transitions
+        .endArc?.[0];
+    const value = useTweened(props.value ?? 0, timing);
+    const { styles: s } = useComponentState(
         "circularProgress",
-        {
-            color: props.color,
-            indeterminate: props.value === undefined ? "true" : "false",
-        },
+        variants,
         {},
         {
-            "components.circularProgress.value": props.value ?? 0,
+            "components.circularProgress.value": value,
         },
     );
     return (
         <MView
             role="progressbar"
             aria-valuenow={props.value}
-            style={aview(s.root)}
+            style={aview(useMotionStyles("circularProgress", variants).root)}
         >
-            <MView style={aview(s.endHalf)}>
-                <MView style={aview(s.endArc)} />
-            </MView>
-            <MView style={aview(s.startHalf)}>
-                <MView style={aview(s.startArc)} />
-            </MView>
+            <View style={view(s.endHalf)}>
+                <View style={view(s.endArc)} />
+            </View>
+            <View style={view(s.startHalf)}>
+                <View style={view(s.startArc)} />
+            </View>
         </MView>
     );
 }
