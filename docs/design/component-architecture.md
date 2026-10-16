@@ -772,6 +772,14 @@ Mapping of preset components:
 Our own machines use the same shape as Zag's (`machine`, `connect` returning part props),
 so bindings treat them uniformly.
 
+**Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
+(`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
+Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
+group are re-exported; the rest follow with their components. Own machines: `button` (states
+`idle` and `pressed`; focus, hover, and an optional toggle on `selected`), `ripple` (the
+js-effects ripple attached to the layer's parent, reading its props at each press), and stubs
+for `textField` and `slider`. The specs run them through Zag's vanilla adapter in Chromium.
+
 ## 9. Components
 
 ### 9.1 Anatomy
@@ -922,8 +930,21 @@ validate, and disable with it, with no form library.
       prop (not from the current state), listen for the form's `reset` event, and send
       the machine the default themselves, after the browser's reset has run.
 - **Disabled fieldsets** disable every control in them. Zag tracks this with
-  `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`. Its
-  reset half didn't hold up (above), so the fieldset half gets the same browser check.
+  `trackFormControl` from `@zag-js/dom-query`. Its reset half didn't hold up (above), so
+  the fieldset half got the same browser check; our own machines use pureform's
+  `trackFormControl` instead, in the same shape (below).
+- **Decided in building it** (`@pureform/machines/form`, p1g):
+    - `trackFormReset(element, { onBeforeReset, onReset })` calls `onReset` in the task after
+      the `reset` event: microtasks can run before the browser resets the controls, so a
+      microtask is too early.
+    - The native default is what a reset should show: the `default*` value when uncontrolled,
+      the controlled value otherwise (the owner decides, and the input mustn't move). The
+      binding writes it with `setNativeDefault` after Zag's props, which write the current
+      state, and again in `onBeforeReset`, so the browser's own reset already shows it.
+    - The fieldset half didn't hold up either: Zag reads only the closest fieldset, missing
+      an enabled fieldset inside a disabled one and the first-legend exemption.
+      `trackFieldsetDisabled` follows every fieldset around the control by the browser's
+      rule, checked against `:disabled`; `trackFormControl` keeps Zag's shape over both.
 - **Validation.** Material's error look keys on the `invalid` state. On a text input's
   slots the CSS matches `aria-invalid` on the slot or inside it, and not `:invalid`, so an
   empty required field doesn't show an error before the user acts. Three ways in:
