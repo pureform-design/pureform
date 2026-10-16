@@ -14,11 +14,14 @@ compiles the other adapters' stylesheets in Node through browser commands (`src/
 | `state-matching.e2e.test.ts` | For each state, an element marked each allowed way (native, ARIA, `data-pf-*`) matches the lowered selector, and Zag's attributes alone don't. Panda lowers to the same. |
 | `parity.e2e.test.ts`         | The CSS and Tailwind adapters compute the same styles as the Panda preset, at every variant value and in each state.                                                     |
 | `rn-parity.e2e.test.ts`      | The React Native adapter, through React Native Web, computes the same key styles as the CSS adapter.                                                                     |
-| `rn-motion.e2e.test.ts`      | A React Native state change animates over the transition's duration, and changes at once under reduced motion.                                                           |
+| `rn-motion.e2e.test.ts`      | A React Native color change fades over the transition's duration, with or without reduced motion; a progress value moves, and jumps under reduced motion.                |
+| `reduced-motion.e2e.test.ts` | Under each way of asking for reduced motion (the system, a `data-pf-motion` provider, nested providers), computed `transition` keeps the fades and drops movement.       |
 | `visual.e2e.test.tsx`        | A screenshot per demo section, plus measured layout rules.                                                                                                               |
 
 `src/force-pseudo.ts` forces pseudo-classes through the DevTools protocol, for states no
-attribute can set on many elements at once (focus).
+attribute can set on many elements at once (focus), and finishes the transitions that start.
+The `emulateReducedMotion` command (`src/commands.ts`) switches `prefers-reduced-motion` on
+the page.
 
 ## Running
 
@@ -27,6 +30,10 @@ codegen). `.env.local` at the repo root sets `CHROMIUM_PATH` to use a system Chr
 Playwright's download.
 
 ## Worth knowing
+
+- The browser context emulates reduced motion for every suite. Color fades still run under
+  it, so a test that changes a state after rendering waits for, or finishes, the transitions
+  before reading computed styles.
 
 - States in the parity suites are set through their ARIA or `data-pf-*` attributes on every
   element, so element and slot conditions both apply.

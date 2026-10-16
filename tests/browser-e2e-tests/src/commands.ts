@@ -42,7 +42,12 @@ const adapterCss: BrowserCommand<
 const rnStyles: BrowserCommand<[]> = () =>
     precompute(pureformConfig, { components: RN_COMPONENTS, fontStack: "all" });
 
-export const commands = { adapterCss, rnStyles };
+// Emulated on the whole page, so every frame in it follows.
+const emulateReducedMotion: BrowserCommand<
+    [value: "reduce" | "no-preference"]
+> = (context, value) => context.page.emulateMedia({ reducedMotion: value });
+
+export const commands = { adapterCss, rnStyles, emulateReducedMotion };
 
 declare module "vitest/browser" {
     interface BrowserCommands {
@@ -53,5 +58,9 @@ declare module "vitest/browser" {
         ) => Promise<string>;
         /** The React Native adapter's precomputed styles for the demo's config. */
         rnStyles: () => Promise<PrecomputedStyles>;
+        /** Emulate `prefers-reduced-motion` on the page. */
+        emulateReducedMotion: (
+            value: "reduce" | "no-preference",
+        ) => Promise<void>;
     }
 }
