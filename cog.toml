@@ -61,6 +61,7 @@ include = [
     "packages/binding-core/**",
     "packages/generate/**",
     "packages/bundler/**",
+    "packages/cli/**",
     # @anchor:new-core-train-package
 ]
 

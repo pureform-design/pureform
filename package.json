@@ -54,6 +54,7 @@
         "@pureform/preset": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/bundler": "workspace:^",
+        "@pureform/cli": "workspace:^",
         "@pureform/release": "workspace:^",
         "typescript": "^7.0.2",
         "@typescript/typescript6": "^6.0.2",

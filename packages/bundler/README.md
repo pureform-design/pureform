@@ -80,6 +80,20 @@ import { registry } from "virtual:pureform/registry"; // resolves to .pureform/i
 // or: import { registry } from "../.pureform";
 ```
 
+Keeping the options in a glue file lets `pureform generate` (`@pureform/cli`) use them too,
+for steps without a bundler: the command reads the `glue` export of `pureform.glue.ts`.
+
+```ts
+// pureform.glue.ts
+export const glue = {
+    target: "panda",
+    options: { prefix: "pf" },
+} satisfies PureformPluginOptions<PandaCodegenOptions>;
+
+// vite.config.ts
+plugins: [pureform(glue), pandacss()];
+```
+
 For TypeScript, add `"@pureform/bundler/client"` to `types` (the registry typed by the
 generated `registry.d.ts`, which the tsconfig must include), or map the id to the index with
 `paths` (`"virtual:pureform/registry": ["./.pureform/index.ts"]`) for the index's own types,
@@ -139,5 +153,5 @@ bundle still exits), and resolves `virtual:pureform/registry` before the config'
   serving `virtual:pureform/components`): `css-demo` and `tailwind-demo` still read class
   strings from them, and moving those demos onto the registry is p5a's.
 - **Generate under one runtime.** The glue's hash covers the evaluated config, which the preset
-  computes slightly differently under Bun than under Node; Vite runs the plugin under Node, so
-  run scripts that generate the same glue under Node too.
+  computes slightly differently under Bun than under Node; Vite runs the plugin under Node, and
+  so does `pureform generate` (its bin's shebang, which `bun x` follows).
