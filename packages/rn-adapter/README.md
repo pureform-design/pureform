@@ -71,12 +71,21 @@ const slots = useAnimatedComponentStyles(
 ## Reduced motion
 
 The provider's `reducedMotion` prop (default `false`) selects the styles' `reducedMotion`
-cases, so selection drops the transitions that move (a switch handle's `left`, a progress
+cases, so selection drops the transitions that move (a switch handle's `start`, a progress
 indicator's `width`) and keeps the color, opacity, and elevation fades, as the web does. A
 token's own tween carries its `valueType` from the lowering; under reduced motion,
 `tokenTransitions` (in `motion.ts`) skips lengths, percentages, angles, and numbers and keeps
 colors. Ripples don't start under reduced motion. The `motion="system" | "reduce" | "full"`
 setting and reading `AccessibilityInfo` are planned for `@pureform/react-native` (roadmap p8).
+
+## Direction
+
+Logical properties lower to React Native's (`insetInlineStart` to `start`), which flip with
+`I18nManager.isRTL`. Styles with no logical form use the `ltr` and `rtl` conditions, which
+selection matches from the `rtl` state: pass `{ rtl: true }` and the switch's handle centers
+from the other side, and the indeterminate linear progress runs `linearProgressSlideRtl`
+(`src/direction.spec.ts`). Nothing sets `rtl` for you yet: the provider's `dir`, defaulting to
+`I18nManager.isRTL`, is planned for `@pureform/react-native` (roadmap p8).
 
 ## Build and test
 

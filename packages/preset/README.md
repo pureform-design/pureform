@@ -56,6 +56,29 @@ Specs build their transitions with the helpers in `components/shared.ts`:
   (`transitionMoves` from `@pureform/core` decides), and none left is `none`. `tweens` and
   shape morphs build on it.
 
+## Direction
+
+Components follow the writing direction (`dir="rtl"` on an ancestor on the web, the `rtl`
+state on React Native) without anything set on them. Specs use logical properties
+(`insetInlineStart`, `paddingInline`, `borderInlineEndColor`), which flip on their own. Where
+there's no logical form, the style says so with the `rtl` condition:
+
+- The switch's handle and state layer sit on `insetInlineStart` and center on it with a
+  translation that flips under `rtl`.
+- The indeterminate linear progress runs `linearProgressSlide`, or `linearProgressSlideRtl`
+  under `rtl`; both are in `PROGRESS_KEYFRAMES`.
+
+`src/direction.spec.ts` guards this: it fails on a physical horizontal style (`left`, `right`,
+`marginLeft`, `borderTopLeftRadius`, `translateX`, a `left` keyword, …) in any component, the
+base styles, or the keyframes. It lets through symmetric uses (`left: 0` with `right: 0` or
+`width: 100%`, centering with `left: 50%` and `translate(-50%, …)`), anything under an `ltr` or
+`rtl` condition (a `when("rtl", …)` value, a `states.rtl` block, keyframes only such an
+animation names), and the entries in its `ALLOWED` list, each with a reason. Today that's the
+ripple, placed from pointer coordinates. To allow a new exception, add an entry there.
+
+The native input of the checkbox, radio, switch, and slider resets its margins, since the
+browser's defaults are physical and would shift it off the control.
+
 ## Density
 
 Density makes controls more compact (or roomier), a grid unit off a component's height per
