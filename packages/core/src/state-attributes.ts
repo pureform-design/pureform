@@ -1,5 +1,5 @@
 // The data attributes the web bindings set for the states that neither a native pseudo-class nor
-// an ARIA attribute covers. The web adapters' selectors match exactly these names, so a binding
+// an ARIA attribute covers, and for the `mirrored` marking. The web adapters' selectors match exactly these names, so a binding
 // that sets them styles the same as the browser's own states.
 
 /** The `data-pf-*` attribute the bindings set for each state, by the state's name. Every other
@@ -14,6 +14,9 @@ export const STATE_ATTRIBUTES = {
     dragged: "data-pf-dragging",
     /** A control holding a value outside a text input, such as a select. */
     filled: "data-pf-filled",
+    /** An element that flips under `rtl`, such as an icon that points; the bindings set it from
+     *  the icon's `mirror` prop. */
+    mirrored: "data-pf-mirror",
 } as const;
 
 /** A state the bindings mark with a `data-pf-*` attribute. */

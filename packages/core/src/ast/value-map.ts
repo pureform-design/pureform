@@ -12,6 +12,7 @@ import type {
     EasingNode,
     FilterNode,
     FontFamilyNode,
+    FontVariationNode,
     GradientNode,
     KeywordNode,
     LiteralScalarNode,
@@ -44,6 +45,7 @@ export interface LeafNodeMap {
     animation: AnimationNode;
     easing: EasingNode;
     fontFamily: FontFamilyNode;
+    fontVariation: FontVariationNode;
 }
 
 export type ValueKind = keyof LeafNodeMap;

@@ -52,6 +52,8 @@ type Keyword<V extends string = string> =
     | ValueNodeMap["literal"];
 /** Family stack, or a literal / alias. */
 type Font = ValueNodeMap["fontFamily" | "literal"];
+/** A variable font's axis settings, or a literal / alias. */
+type FontVariation = ValueNodeMap["fontVariation" | "literal"];
 /** Composite box-shadow / elevation, or a `none` reset. */
 type Shadow = ValueNodeMap["shadow"] | KeywordNode<"none">;
 type Gradient = ValueNodeMap["gradient" | "literal"];
@@ -158,6 +160,8 @@ export interface StyleMap {
     fontFamily?: Font;
     fontSize?: Dimension;
     letterSpacing?: Dimension;
+    /** A variable font's axes, such as Material Symbols' `FILL`. Web only. */
+    fontVariationSettings?: FontVariation;
     // e.g. alias("textStyles", "body"), a RefNode
     textStyle?: Keyword;
     // backgrounds & effects

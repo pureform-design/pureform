@@ -16,6 +16,7 @@ export type ValueNode =
     | PlatformNode
     | ConditionalNode
     | FontFamilyNode
+    | FontVariationNode
     | ColorMixNode
     | ShadowNode
     | GradientNode
@@ -296,6 +297,14 @@ export interface FontFamilyNode {
     generic?: "sans-serif" | "serif" | "monospace" | "cursive" | "system-ui";
 }
 
+/** A variable font's axis settings, by four-letter axis tag: `{ FILL: unitless(1) }` is
+ *  Material Symbols drawn filled. Web lowers it to `font-variation-settings` (`"FILL" 1`);
+ *  React Native has no variable font axes and drops it. Leaf-kind "fontVariation". */
+export interface FontVariationNode {
+    type: "fontVariation";
+    axes: Record<string, NumericValue>;
+}
+
 /** Composite box-shadow: an ordered stack of layers, since Material elevation is several
  *  layered shadows, not one. Web joins layers into a single `box-shadow`. A native adapter
  *  maps to its own elevation model (or reads the layers), typically through `platform()`.
@@ -396,6 +405,11 @@ export type ColorSchemeCondition = "dark" | "light";
  *  Lowers to `[dir=rtl]` or `:dir(rtl)` on web, or `I18nManager.isRTL` on native. */
 export type DirectionCondition = "ltr" | "rtl";
 
+/** An element marked to flip with the writing direction, such as an icon that points (a back
+ *  arrow, a chevron). The web matches the `data-pf-mirror` attribute the bindings set; a native
+ *  binding reports it as the `mirrored` state. */
+export type MarkCondition = "mirrored";
+
 /** Portable non-size media features (color scheme is its own axis above). */
 export type MediaCondition =
     | "reducedMotion"
@@ -421,6 +435,7 @@ export type PortableCondition =
     | FormCondition
     | ColorSchemeCondition
     | DirectionCondition
+    | MarkCondition
     | MediaCondition
     | FeatureCondition;
 
