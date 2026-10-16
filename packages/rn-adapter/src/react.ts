@@ -5,19 +5,23 @@ import {
     createContext,
     createElement,
     useContext,
+    useEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 import type { ReactNode } from "react";
-import { View } from "react-native";
+import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
+import { curve } from "./animate/curve";
 import { overridesFor, stylesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import type { ThemeValues } from "./values";
+import { TOKEN_TRANSITION } from "./values";
+import type { ThemeValues, Transition } from "./values";
 
 interface Context {
     styles: Styles;
@@ -185,10 +189,8 @@ export const useReducedMotion = (): boolean =>
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
 
-/** A component's styles per slot, and each slot's transitions, for its variants and state.
- *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
- *  one element: `{ "components.linearProgress.value": 40 }`. */
-export const useComponentState = (
+// The selection for given token values.
+const useSelected = (
     name: string,
     variants: Record<string, string | boolean | undefined> = {},
     state: State = {},
@@ -238,6 +240,94 @@ export const useComponentState = (
             stateKey,
         ],
     );
+};
+
+// A token value's transition, as selection names it, by the token's key.
+const tokenTransitions = (selected: Selected): Map<string, Transition> => {
+    const out = new Map<string, Transition>();
+    for (const list of Object.values(selected.transitions)) {
+        for (const t of list) {
+            if (t.property.startsWith(TOKEN_TRANSITION)) {
+                out.set(t.property.slice(TOKEN_TRANSITION.length), t);
+            }
+        }
+    }
+    return out;
+};
+
+// Instance tokens, their numbers moving to each new value over their transitions: the tokens
+// as they are now, or `tokens` itself when nothing moves.
+const useMovingTokens = (
+    tokens: ThemeValues | undefined,
+    transitions: Map<string, Transition>,
+): ThemeValues | undefined => {
+    const [now, setNow] = useState<ThemeValues>();
+    const shown = useRef<ThemeValues | undefined>(tokens);
+    const key = tokens ? JSON.stringify(tokens) : "";
+    const movingFrom = (from: ThemeValues | undefined) =>
+        [...transitions].filter(
+            ([token]) =>
+                typeof tokens?.[token] === "number" &&
+                typeof from?.[token] === "number" &&
+                from[token] !== tokens[token],
+        );
+    // Until the tween's first frame, the tokens stay where they were, rather than jumping to
+    // the new values for a frame.
+    const held =
+        movingFrom(shown.current).length > 0 ? shown.current : undefined;
+    useEffect(() => {
+        const from = shown.current;
+        const moving = movingFrom(from);
+        if (!tokens || moving.length === 0) {
+            shown.current = tokens;
+            setNow(undefined);
+            return;
+        }
+        // One clock for every moving token, on the first one's timing.
+        const timing = moving[0]![1];
+        const progress = new Animated.Value(0);
+        const listener = progress.addListener(({ value }) => {
+            const next = { ...tokens };
+            for (const [token] of moving) {
+                const a = from![token] as number;
+                next[token] = a + ((tokens[token] as number) - a) * value;
+            }
+            shown.current = next;
+            setNow(next);
+        });
+        Animated.timing(progress, {
+            toValue: 1,
+            duration: timing.duration,
+            delay: timing.delay,
+            easing: curve(timing.easing),
+            useNativeDriver: false,
+        }).start(({ finished }) => {
+            if (!finished) return;
+            shown.current = tokens;
+            setNow(undefined);
+        });
+        return () => {
+            progress.removeListener(listener);
+            progress.stopAnimation();
+        };
+    }, [key]);
+    return now ?? held ?? tokens;
+};
+
+/** A component's styles per slot, and each slot's transitions, for its variants and state.
+ *  `tokens` gives this one instance its own token values, as the web sets a CSS variable on
+ *  one element: `{ "components.linearProgress.value": 40 }`. A token whose own value
+ *  transitions moves to each new number, and the styles reading it with it. */
+export const useComponentState = (
+    name: string,
+    variants: Record<string, string | boolean | undefined> = {},
+    state: State = {},
+    tokens?: ThemeValues,
+): Selected => {
+    const target = useSelected(name, variants, state, tokens);
+    const moving = useMovingTokens(tokens, tokenTransitions(target));
+    const now = useSelected(name, variants, state, moving);
+    return moving === tokens ? target : now;
 };
 
 /** A component's styles per slot, or its one style under `""` without slots. */

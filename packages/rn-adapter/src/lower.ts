@@ -22,7 +22,14 @@ import { PERCENT_OK, rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
 import { MIX_SPACES } from "./spaces";
 import type { MixSpace } from "./spaces";
-import { ANIMATION, DROP_SHADOW, SHAPE, TINT, TRANSITION } from "./values";
+import {
+    ANIMATION,
+    DROP_SHADOW,
+    SHAPE,
+    TINT,
+    TOKEN_TRANSITION,
+    TRANSITION,
+} from "./values";
 import type { Value } from "./values";
 
 /** Options for lowering. */
@@ -573,11 +580,14 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         }
         case "transition": {
             const parts = node.parts.flatMap((part) => {
-                // A shape's transition morphs what SVG draws.
+                // A shape's transition morphs what SVG draws, and a dynamic value's moves the
+                // token itself, which the hooks tween.
                 const property =
-                    part.property === "clipPath"
-                        ? SHAPE
-                        : rnProperty(part.property);
+                    typeof part.property !== "string"
+                        ? `${TOKEN_TRANSITION}${part.property.path.join(".")}`
+                        : part.property === "clipPath"
+                          ? SHAPE
+                          : rnProperty(part.property);
                 return property ? [{ part, property }] : [];
             });
             const zero = { type: "numeric", value: 0, unit: "ms" } as const;

@@ -2,6 +2,7 @@
 // takes on a view's style and runs on the UI thread. Kept apart from Reanimated, so it's plain
 // data: the Reanimated entry turns the curves into its easing objects.
 
+import { TOKEN_TRANSITION } from "./values";
 import type { Animation, Transition } from "./values";
 
 /** CSS's transition and animation properties for a style, with curves as CSS writes them. */
@@ -36,7 +37,10 @@ export const cssMotion = (
     animation?: Animation,
     drawn: ReadonlySet<string> = new Set(["clipPath"]),
 ): CssMotion => {
-    const own = transitions.filter((t) => !drawn.has(t.property));
+    const own = transitions.filter(
+        (t) =>
+            !drawn.has(t.property) && !t.property.startsWith(TOKEN_TRANSITION),
+    );
     return {
         ...(own.length > 0
             ? {
