@@ -14,9 +14,11 @@ import {
     alias,
     colorMix,
     dynamic,
+    fontVariations,
     none,
     pct,
     px,
+    scaleX,
     solid,
     transform,
     transition,
@@ -34,6 +36,7 @@ import type {
     SlotCondition,
     NumericValue,
     StyleMap,
+    TransformOp,
     TransitionPart,
     ValueType,
     ValueNode,
@@ -402,9 +405,35 @@ export const mergeSlots = (
     return out;
 };
 
+/** Material Symbols' fill axis for an icon slot: `rest` (0 or 1, a component's `iconFill`
+ *  token), or `filled.fill` while `filled.on` holds, such as the current destination. Icon
+ *  fonts read it; an svg icon ignores it. */
+export const iconFill = (
+    rest: NumericValue,
+    filled?: { on: Condition | Condition[]; fill: NumericValue },
+): NonNullable<StyleMap["fontVariationSettings"]> =>
+    filled
+        ? when(
+              filled.on,
+              fontVariations({ FILL: filled.fill }),
+              fontVariations({ FILL: rest }),
+          )
+        : fontVariations({ FILL: rest });
+
 /** An icon slot of the given size: a box that centers its content, and sets the font size so
- *  a glyph or icon-font icon fills it like an svg would. */
-export const iconBox = (size: NonNullable<StyleMap["width"]>): StyleMap => ({
+ *  a glyph or icon-font icon fills it like an svg would. `fill` sets Material Symbols' fill
+ *  axis (see `iconFill`). An icon marked `mirrored` (`data-pf-mirror` on the web) flips under
+ *  `rtl`, after the slot's own `transform`, if it has one. */
+export const iconBox = (
+    size: NonNullable<StyleMap["width"]>,
+    {
+        fill,
+        transform: moved = [],
+    }: {
+        fill?: StyleMap["fontVariationSettings"];
+        transform?: TransformOp[];
+    } = {},
+): StyleMap => ({
     display: inlineFlex,
     alignItems: center,
     justifyContent: center,
@@ -413,6 +442,17 @@ export const iconBox = (size: NonNullable<StyleMap["width"]>): StyleMap => ({
     height: size,
     fontSize: size,
     lineHeight: unitless(1),
+    ...(fill ? { fontVariationSettings: fill } : {}),
+    ...(moved.length > 0 ? { transform: transform(...moved) } : {}),
+    states: {
+        rtl: {
+            states: {
+                mirrored: {
+                    transform: transform(...moved, scaleX(unitless(-1))),
+                },
+            },
+        },
+    },
 });
 
 /** The root every pressable component shares: the focus ring and state transition, a
@@ -458,12 +498,17 @@ export const inputText = (color: ColorValue): StyleMap => ({
 
 /** A state layer that follows another slot: `base` tinted with `content` while `slotName` is
  *  hovered, focused, or pressed. `selected` gives the colors once a state such as `checked` or
- *  `selected` holds: its tint color, and its container if it fills. A disabled slot shows no
- *  tint. */
+ *  `selected` holds: its tint color, its container if it fills, and its container while
+ *  disabled if that differs. A disabled slot shows no tint. */
 export const slotStateLayer = (
     slotName: string,
     rest: { base: ColorValue; content: ColorValue; disabled?: ColorValue },
-    selected?: { state: SlotCondition; base?: ColorValue; content: ColorValue },
+    selected?: {
+        state: SlotCondition;
+        base?: ColorValue;
+        content: ColorValue;
+        disabled?: ColorValue;
+    },
 ) => {
     const layer = when();
     for (const [state, level] of [
@@ -485,9 +530,14 @@ export const slotStateLayer = (
         }
     }
     if (selected?.base) layer.on(selected.state, selected.base);
-    return layer
-        .on(slot(slotName, "disabled"), rest.disabled ?? rest.base)
-        .else(rest.base);
+    layer.on(slot(slotName, "disabled"), rest.disabled ?? rest.base);
+    if (selected?.disabled) {
+        layer.on(
+            [selected.state, slot(slotName, "disabled")],
+            selected.disabled,
+        );
+    }
+    return layer.else(rest.base);
 };
 
 /** Density steps by name: grid units each adds to a dense component's height. The theme's

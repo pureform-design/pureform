@@ -3,7 +3,8 @@
 //
 // Mark the current destination with `aria-current="page"` (or `aria-selected`). The pill takes
 // the state layer while its destination is hovered, focused, or pressed; inside it, the active
-// indicator grows from the center to fill it once the destination is current.
+// indicator grows from the center to fill it once the destination is current, and an icon font
+// draws the icon filled.
 
 import {
     absolute,
@@ -38,6 +39,7 @@ import {
 import {
     componentTokens,
     iconBox,
+    iconFill,
     motionTransition,
     pressableRoot,
     slotStateLayer,
@@ -54,6 +56,9 @@ export const NAV_TOKENS = {
     labelColor: sys("onSurfaceVariant"),
     stateLayerColor: sys("onSurface"),
     iconSize: sizeToken("iconMedium"),
+    // Material draws the current destination's icon filled.
+    iconFill: unitless(0),
+    activeIconFill: unitless(1),
     indicatorHeight: px(32),
     gap: spacing("1"),
 } satisfies Record<string, ValueNode>;
@@ -168,7 +173,12 @@ export const navParts = (
         } satisfies StyleMap,
         // Positioned, so it paints over the active indicator before it.
         icon: {
-            ...iconBox(ref("iconSize")),
+            ...iconBox(ref("iconSize"), {
+                fill: iconFill(ref("iconFill"), {
+                    on: CURRENT,
+                    fill: ref("activeIconFill"),
+                }),
+            }),
             position: relative,
         } satisfies StyleMap,
         label: {

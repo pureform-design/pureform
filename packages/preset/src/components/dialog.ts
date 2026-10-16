@@ -15,11 +15,20 @@
 //   </dialog>
 
 import { typed } from "@pureform/core";
-import { auto, center, column, end, flex, px, row } from "@pureform/core/ast";
+import {
+    auto,
+    center,
+    column,
+    end,
+    flex,
+    px,
+    row,
+    unitless,
+} from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import { size as sizeToken } from "@pureform/theme";
 
-import { componentTokens, iconBox, surface, sys } from "./shared";
+import { componentTokens, iconBox, iconFill, surface, sys } from "./shared";
 
 const { tokens, ref } = componentTokens("dialog", {
     container: sys("surfaceContainerHigh"),
@@ -27,6 +36,7 @@ const { tokens, ref } = componentTokens("dialog", {
     bodyColor: sys("onSurfaceVariant"),
     iconColor: sys("secondary"),
     iconSize: sizeToken("iconMedium"),
+    iconFill: unitless(0),
     radius: radius("extraLarge"),
     padding: spacing("6"),
     gap: spacing("4"),
@@ -63,7 +73,12 @@ export const dialog = pf.slotComponent({
                 minWidth: ref("minWidth"),
                 maxWidth: ref("maxWidth"),
             },
-            icon: { ...iconBox(ref("iconSize")), color: ref("iconColor") },
+            icon: {
+                ...iconBox(ref("iconSize"), {
+                    fill: iconFill(ref("iconFill")),
+                }),
+                color: ref("iconColor"),
+            },
             headline: {
                 textStyle: textStyle("headlineSmall"),
                 color: ref("headlineColor"),

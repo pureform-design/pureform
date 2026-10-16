@@ -4,9 +4,15 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "display": "inline-flex",
       "fontSize": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "fontVariationSettings": ""FILL" var(--components-button-iconFill, 0)",
       "height": "var(--components-button-iconSize, token(sizes.iconSmall))",
       "justifyContent": "center",
       "lineHeight": "1",

@@ -7,9 +7,22 @@
 //     <span class={container}><span class={icon}>…</span></span>
 //     <span class={outline} />
 //   </button>
+//
+// A toggle icon button sets `toggle: "true"` and marks its state with `aria-pressed`: it rests
+// in Material's unselected colors and takes the selected ones, with its icon filled, once
+// `aria-pressed="true"`.
 
 import { typed } from "@pureform/core";
-import { px, add } from "@pureform/core/ast";
+import {
+    add,
+    flex,
+    none,
+    px,
+    slot,
+    transparent,
+    unitless,
+    when,
+} from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
@@ -23,7 +36,7 @@ import {
     shapedOutlineStroke,
     shapeVariant,
 } from "./shaped";
-import type { Shapes } from "./shaped";
+import type { ShapedFill, Shapes } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -32,9 +45,11 @@ import {
     defaultGroups,
     densitySteps,
     densityTokenVariant,
+    entriesOf,
     DENSITY_TOKEN,
     groupTokens,
     iconBox,
+    iconFill,
     keysOf,
     mergeSlotStyles,
     pressableRoot,
@@ -56,6 +71,9 @@ const FILLS = {
 const { tokens, ref } = componentTokens("iconButton", {
     radius: radius("full"),
     iconSize: sizeToken("iconMedium"),
+    // Material draws a selected toggle's icon filled.
+    iconFill: unitless(0),
+    selectedIconFill: unitless(1),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     sizeSmall: sizeToken("controlSmall"),
@@ -74,6 +92,68 @@ const size = (
     },
 });
 
+const SELECTED = slot("root", "selected");
+
+/** A toggle's colors per fill, off and on, as Material's toggle icon buttons draw them. */
+const toggleColors = (
+    fill: Fill,
+): { unselected: ShapedFill; selected: ShapedFill } => {
+    switch (fill) {
+        case "text":
+            return {
+                unselected: {
+                    container: transparent,
+                    content: sys("onSurfaceVariant"),
+                },
+                selected: { container: transparent, content: ref("accent") },
+            };
+        case "filled":
+            return {
+                unselected: {
+                    container: sys("surfaceContainerHighest"),
+                    content: ref("accent"),
+                },
+                selected: {
+                    container: ref("accent"),
+                    content: ref("onAccent"),
+                },
+            };
+        case "tonal":
+            return {
+                unselected: {
+                    container: sys("surfaceContainerHighest"),
+                    content: sys("onSurfaceVariant"),
+                },
+                selected: {
+                    container: ref("accentContainer"),
+                    content: ref("onAccentContainer"),
+                },
+            };
+        case "outlined":
+            return {
+                unselected: {
+                    container: transparent,
+                    content: sys("onSurfaceVariant"),
+                },
+                selected: {
+                    container: sys("inverseSurface"),
+                    content: sys("inverseOnSurface"),
+                },
+            };
+        case "elevated":
+            return {
+                unselected: {
+                    container: sys("surfaceContainerLow"),
+                    content: ref("accent"),
+                },
+                selected: {
+                    container: ref("accent"),
+                    content: ref("onAccent"),
+                },
+            };
+    }
+};
+
 const pf = typed();
 
 /** Build the iconButton with a `color` variant per group in `groups`. */
@@ -90,7 +170,7 @@ export const createIconButton = <
             name: "iconButton",
             $meta: {
                 description:
-                    "Material icon button holding a single icon. Put the icon in the container; render the outline slot for the outlined variant. shape clips the container to one of the theme's shapes.",
+                    'Material icon button holding a single icon. Put the icon in the container; render the outline slot for the outlined variant. shape clips the container to one of the theme\'s shapes. A toggle sets toggle to "true" and marks itself selected with aria-pressed="true".',
             },
             tokens,
             slots: ["root", "touchTarget", "container", "icon", "outline"],
@@ -103,6 +183,7 @@ export const createIconButton = <
                 variant: keysOf(FILLS),
                 shape: ["none", ...Object.keys(shapes)],
                 size: ["small", "medium", "large"],
+                toggle: ["false", "true"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
@@ -112,7 +193,12 @@ export const createIconButton = <
                         borderRadius: ref("radius"),
                     },
                     container: shapedContainer(ref("radius")),
-                    icon: iconBox(ref("iconSize")),
+                    icon: iconBox(ref("iconSize"), {
+                        fill: iconFill(ref("iconFill"), {
+                            on: SELECTED,
+                            fill: ref("selectedIconFill"),
+                        }),
+                    }),
                     outline: shapedOutline(ref("radius")),
                     touchTarget,
                 },
@@ -139,12 +225,32 @@ export const createIconButton = <
                         medium: size("sizeMedium"),
                         large: size("sizeLarge"),
                     },
+                    toggle: { false: {}, true: {} },
                     density: densityTokenVariant(densities),
                 },
+                // A toggle rests in the unselected colors and takes the selected ones once
+                // pressed on; a selected outlined toggle fills instead of drawing its outline.
+                compoundVariants: entriesOf(FILLS).map(([name, fill]) => {
+                    const { unselected, selected } = toggleColors(fill);
+                    return {
+                        match: { variant: name, toggle: "true" as const },
+                        style: mergeSlotStyles(
+                            shapedColors(fill, unselected, selected),
+                            fill === "outlined"
+                                ? {
+                                      outline: {
+                                          display: when(SELECTED, none, flex),
+                                      },
+                                  }
+                                : {},
+                        ),
+                    };
+                }),
                 defaultVariants: {
                     color: "primary",
                     variant: "standard",
                     size: "medium",
+                    toggle: "false",
                     density: "inherit",
                     shape: "none",
                 },

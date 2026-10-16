@@ -14,6 +14,7 @@ import {
     relative,
     row,
     slot,
+    unitless,
     when,
 } from "@pureform/core/ast";
 import type {
@@ -30,6 +31,7 @@ import {
     disabledColor,
     focusRing,
     iconBox,
+    iconFill,
     stateTransition,
     sys,
 } from "./shared";
@@ -44,6 +46,7 @@ export const ROW_TOKENS = {
     selectedContainer: sys("secondaryContainer"),
     selectedContent: sys("onSecondaryContainer"),
     iconSize: sizeToken("iconMedium"),
+    iconFill: unitless(0),
 } satisfies Record<string, ValueNode>;
 
 export type RowToken = keyof typeof ROW_TOKENS;
@@ -121,7 +124,7 @@ export const rowParts = (
     };
 
     const part = (color: ColorValue): StyleMap => ({
-        ...iconBox(ref("iconSize")),
+        ...iconBox(ref("iconSize"), { fill: iconFill(ref("iconFill")) }),
         color: partColor(color),
     });
 

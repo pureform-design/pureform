@@ -72,6 +72,7 @@ export const DEFAULT_SHAPES: Shapes = MATERIAL_SHAPES;
 
 const DISABLED = slot("root", "disabled");
 const PRESSED = slot("root", "pressed");
+const SELECTED = slot("root", "selected");
 
 /** The container: it fills the root, draws the fill, and lays out the content. */
 export const shapedContainer = (radius: NumericValue): StyleMap => ({
@@ -111,11 +112,20 @@ export const shapedOutlineStroke = (
     ),
 });
 
+/** A container and the content drawn on it. */
+export interface ShapedFill {
+    container: ColorValue;
+    content: ColorValue;
+}
+
 /** A fill's colors, split between the root (the content color the icon and label inherit)
- *  and the container (the fill, with its state layer, and the disabled fill). */
+ *  and the container (the fill, with its state layer, and the disabled fill). `selected` gives
+ *  the colors once the root is selected (a toggle that's on); a selected container keeps a
+ *  faint fill when disabled. */
 export const shapedColors = (
     fill: Fill,
-    { container, content }: { container: ColorValue; content: ColorValue },
+    { container, content }: ShapedFill,
+    selected?: ShapedFill,
 ) => {
     const disabled =
         fill === "outlined" || fill === "text"
@@ -124,14 +134,25 @@ export const shapedColors = (
     return {
         root: {
             color: content,
-            states: { disabled: { color: disabledColor("disabledContent") } },
+            states: {
+                ...(selected ? { selected: { color: selected.content } } : {}),
+                disabled: { color: disabledColor("disabledContent") },
+            },
         },
         container: {
-            backgroundColor: slotStateLayer("root", {
-                base: container,
-                content,
-                disabled,
-            }),
+            backgroundColor: slotStateLayer(
+                "root",
+                { base: container, content, disabled },
+                selected && {
+                    state: SELECTED,
+                    base: selected.container,
+                    content: selected.content,
+                    disabled:
+                        selected.container === transparent
+                            ? transparent
+                            : disabledColor("disabledContainer"),
+                },
+            ),
         },
     } satisfies Record<string, StyleMap>;
 };

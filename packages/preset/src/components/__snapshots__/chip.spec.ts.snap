@@ -4,6 +4,11 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".chip__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -12,6 +17,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-chip-iconSize, token(sizes.iconSmall))",
+      "fontVariationSettings": ""FILL" var(--components-chip-iconFill, 0)",
       "height": "var(--components-chip-iconSize, token(sizes.iconSmall))",
       "justifyContent": "center",
       "lineHeight": "1",

@@ -7,6 +7,7 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "current",
+    "filled": "inherit",
     "size": "medium",
   },
   "jsx": [
@@ -37,8 +38,22 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
         "color": "token(colors.warning)",
       },
     },
+    "filled": {
+      "false": {
+        "fontVariationSettings": ""FILL" 0",
+      },
+      "inherit": {},
+      "true": {
+        "fontVariationSettings": ""FILL" 1",
+      },
+    },
     "size": {
       "large": {
+        "_rtl": {
+          "&[data-pf-mirror]": {
+            "transform": "scaleX(-1)",
+          },
+        },
         "alignItems": "center",
         "display": "inline-flex",
         "fontSize": "var(--components-icon-sizeLarge, 36px)",
@@ -49,6 +64,11 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
         "width": "var(--components-icon-sizeLarge, 36px)",
       },
       "medium": {
+        "_rtl": {
+          "&[data-pf-mirror]": {
+            "transform": "scaleX(-1)",
+          },
+        },
         "alignItems": "center",
         "display": "inline-flex",
         "fontSize": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
@@ -59,6 +79,11 @@ exports[`icon > compiles to a stable Panda recipe 1`] = `
         "width": "var(--components-icon-sizeMedium, token(sizes.iconMedium))",
       },
       "small": {
+        "_rtl": {
+          "&[data-pf-mirror]": {
+            "transform": "scaleX(-1)",
+          },
+        },
         "alignItems": "center",
         "display": "inline-flex",
         "fontSize": "var(--components-icon-sizeSmall, token(sizes.iconSmall))",
