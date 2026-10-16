@@ -26,16 +26,17 @@ import {
 import type { Shapes } from "./shaped";
 import {
     DEFAULT_GROUP,
-    colorVariants,
+    colorTokenVariants,
     componentTokens,
     defaultGroups,
     entriesOf,
-    fillColors,
+    groupTokens,
     iconBox,
     keysOf,
     lower,
     pressableRoot,
     sys,
+    tokenFillColors,
     touchTarget,
     variantsOf,
 } from "./shared";
@@ -58,6 +59,7 @@ const { tokens, ref } = componentTokens("fab", {
     iconSizeLarge: px(36),
     gap: spacing("3"),
     padding: spacing("4"),
+    ...groupTokens(DEFAULT_GROUP),
 });
 
 type Size = "Small" | "Medium" | "Large";
@@ -130,9 +132,20 @@ export const createFab = <const G extends string = ColorGroup>(
                     touchTarget,
                 },
                 variants: {
-                    color: colorVariants(groups),
+                    color: colorTokenVariants(groups),
                     variant: Object.fromEntries(
-                        Object.keys(FILLS).map((name) => [name, { root: {} }]),
+                        entriesOf(FILLS).map(([name, fill]) => {
+                            const colors = tokenFillColors(fill, ref);
+                            // Material's surface FAB sits on the high surface container.
+                            const container =
+                                name === "surface"
+                                    ? sys("surfaceContainerHigh")
+                                    : colors.container;
+                            return [
+                                name,
+                                shapedColors(fill, { ...colors, container }),
+                            ];
+                        }),
                     ),
                     size: {
                         small: fabSize("Small"),
@@ -153,20 +166,6 @@ export const createFab = <const G extends string = ColorGroup>(
                     }),
                 },
                 compoundVariants: [
-                    ...entriesOf(FILLS).flatMap(([variant, fill]) =>
-                        groups.map((color) => {
-                            const colors = fillColors(fill, color);
-                            // Material's surface FAB sits on the high surface container.
-                            const container =
-                                variant === "surface"
-                                    ? sys("surfaceContainerHigh")
-                                    : colors.container;
-                            return {
-                                match: { color, variant },
-                                style: shapedColors(fill, color, container),
-                            };
-                        }),
-                    ),
                     // The container's radius follows the size only when unshaped. A shape sets
                     // its own, and as a variant it would tie with the size's, leaving the order
                     // of their rules to decide.

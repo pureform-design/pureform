@@ -77,447 +77,6 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
   "className": "fab",
   "compoundVariants": [
     {
-      "color": "primary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.primaryContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onPrimaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.secondaryContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onSecondaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.tertiaryContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onTertiaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "success",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
-            "base": "token(colors.successContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onSuccessContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
-            "base": "token(colors.warningContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onWarningContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "error",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
-            "base": "token(colors.errorContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onErrorContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "info",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
-            "base": "token(colors.infoContainer)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onInfoContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateHover))",
-            "base": "token(colors.primary)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onPrimary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateHover))",
-            "base": "token(colors.secondary)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onSecondary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateHover))",
-            "base": "token(colors.tertiary)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onTertiary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "success",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateHover))",
-            "base": "token(colors.success)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onSuccess)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateHover))",
-            "base": "token(colors.warning)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onWarning)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "error",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateHover))",
-            "base": "token(colors.error)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onError)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "info",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateHover))",
-            "base": "token(colors.info)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.onInfo)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.primary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.primary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.primary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.primary)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.secondary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.secondary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.secondary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.secondary)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.tertiary) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.tertiary) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.tertiary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.tertiary)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "success",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.success) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.success) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.success) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.success)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.warning) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.warning) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.warning) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.warning)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "error",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.error) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.error) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.error) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.error)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
-      "color": "info",
-      "css": {
-        "container": {
-          "backgroundColor": {
-            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.info) token(opacity.statePressed))",
-            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.info) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), token(colors.info) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerHigh)",
-          },
-        },
-        "root": {
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "color": "token(colors.info)",
-        },
-      },
-      "variant": "surface",
-    },
-    {
       "css": {
         "container": {
           "borderRadius": "var(--components-fab-radiusSmall, token(radii.medium))",
@@ -583,25 +142,55 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
   "variants": {
     "color": {
       "error": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.error)",
+          "--components-fab-accentContainer": "token(colors.errorContainer)",
+          "--components-fab-onAccent": "token(colors.onError)",
+          "--components-fab-onAccentContainer": "token(colors.onErrorContainer)",
+        },
       },
       "info": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.info)",
+          "--components-fab-accentContainer": "token(colors.infoContainer)",
+          "--components-fab-onAccent": "token(colors.onInfo)",
+          "--components-fab-onAccentContainer": "token(colors.onInfoContainer)",
+        },
       },
       "primary": {
         "root": {},
       },
       "secondary": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.secondary)",
+          "--components-fab-accentContainer": "token(colors.secondaryContainer)",
+          "--components-fab-onAccent": "token(colors.onSecondary)",
+          "--components-fab-onAccentContainer": "token(colors.onSecondaryContainer)",
+        },
       },
       "success": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.success)",
+          "--components-fab-accentContainer": "token(colors.successContainer)",
+          "--components-fab-onAccent": "token(colors.onSuccess)",
+          "--components-fab-onAccentContainer": "token(colors.onSuccessContainer)",
+        },
       },
       "tertiary": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.tertiary)",
+          "--components-fab-accentContainer": "token(colors.tertiaryContainer)",
+          "--components-fab-onAccent": "token(colors.onTertiary)",
+          "--components-fab-onAccentContainer": "token(colors.onTertiaryContainer)",
+        },
       },
       "warning": {
-        "root": {},
+        "root": {
+          "--components-fab-accent": "token(colors.warning)",
+          "--components-fab-accentContainer": "token(colors.warningContainer)",
+          "--components-fab-onAccent": "token(colors.onWarning)",
+          "--components-fab-onAccentContainer": "token(colors.onWarningContainer)",
+        },
       },
     },
     "extended": {
@@ -659,13 +248,55 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     },
     "variant": {
       "filled": {
-        "root": {},
+        "container": {
+          "backgroundColor": {
+            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+            "base": "var(--components-fab-accent, token(colors.primary))",
+          },
+        },
+        "root": {
+          "_disabled": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "color": "var(--components-fab-onAccent, token(colors.onPrimary))",
+        },
       },
       "surface": {
-        "root": {},
+        "container": {
+          "backgroundColor": {
+            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.statePressed))",
+            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.stateFocus))",
+            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.stateHover))",
+            "base": "token(colors.surfaceContainerHigh)",
+          },
+        },
+        "root": {
+          "_disabled": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "color": "var(--components-fab-accent, token(colors.primary))",
+        },
       },
       "tonal": {
-        "root": {},
+        "container": {
+          "backgroundColor": {
+            ".fab__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+            ".fab__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
+            ".fab__root:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+            "base": "var(--components-fab-accentContainer, token(colors.primaryContainer))",
+          },
+        },
+        "root": {
+          "_disabled": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "color": "var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer))",
+        },
       },
     },
   },
