@@ -7,7 +7,7 @@
 // there is one; the root's gap spaces it from the label.
 
 import { typed } from "@pureform/core";
-import { px, add } from "@pureform/core/ast";
+import { px, add, unitless } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
@@ -25,6 +25,7 @@ import {
     fillVariant,
     groupTokens,
     iconBox,
+    iconFill,
     keysOf,
     pressableRoot,
     sys,
@@ -45,6 +46,7 @@ const { tokens } = componentTokens("button", {
     radius: radius("full"),
     gap: spacing("2"),
     iconSize: sizeToken("iconSmall"),
+    iconFill: unitless(0),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     heightSmall: sizeToken("controlSmall"),
@@ -104,7 +106,9 @@ export const createButton = <
                             borderRadius: token("radius"),
                         },
                         label: { textStyle: textStyle("labelLarge") },
-                        icon: iconBox(token("iconSize")),
+                        icon: iconBox(token("iconSize"), {
+                            fill: iconFill(token("iconFill")),
+                        }),
                         touchTarget,
                     },
                     variants: {

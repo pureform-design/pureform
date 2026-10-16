@@ -12,7 +12,7 @@
 //   </button>
 
 import { typed } from "@pureform/core";
-import { none, px } from "@pureform/core/ast";
+import { none, px, unitless } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
@@ -32,6 +32,7 @@ import {
     entriesOf,
     groupTokens,
     iconBox,
+    iconFill,
     keysOf,
     lower,
     pressableRoot,
@@ -56,6 +57,7 @@ const { tokens, ref } = componentTokens("fab", {
     radiusMedium: radius("large"),
     radiusLarge: radius("extraLarge"),
     iconSize: sizeToken("iconMedium"),
+    iconFill: unitless(0),
     iconSizeLarge: px(36),
     gap: spacing("3"),
     padding: spacing("4"),
@@ -127,7 +129,9 @@ export const createFab = <const G extends string = ColorGroup>(
                         ...elevation.container,
                         gap: ref("gap"),
                     },
-                    icon: iconBox(ref("iconSize")),
+                    icon: iconBox(ref("iconSize"), {
+                        fill: iconFill(ref("iconFill")),
+                    }),
                     label: { textStyle: textStyle("labelLarge") },
                     touchTarget,
                 },

@@ -5,7 +5,15 @@
 // selected filter or input chip. Render the icon slot only when there is an icon.
 
 import { typed } from "@pureform/core";
-import { px, solid, transparent, slot, when, add } from "@pureform/core/ast";
+import {
+    px,
+    solid,
+    transparent,
+    slot,
+    when,
+    add,
+    unitless,
+} from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
@@ -22,6 +30,7 @@ import {
     densityVariant,
     disabledColor,
     iconBox,
+    iconFill,
     pressableRoot,
     sys,
     touchTarget,
@@ -35,6 +44,7 @@ const { tokens, ref } = componentTokens("chip", {
     gap: spacing("2"),
     padding: spacing("4"),
     iconSize: sizeToken("iconSmall"),
+    iconFill: unitless(0),
     iconColor: sys("primary"),
     outlineWidth: px(1),
     outlineColor: sys("outlineVariant"),
@@ -151,7 +161,9 @@ export const createChip = <
                         borderRadius: ref("radius"),
                     },
                     icon: {
-                        ...iconBox(ref("iconSize")),
+                        ...iconBox(ref("iconSize"), {
+                            fill: iconFill(ref("iconFill")),
+                        }),
                         color: iconColor(ref("selectedContent")),
                     },
                     label: { textStyle: textStyle("labelLarge") },

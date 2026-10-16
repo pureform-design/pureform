@@ -34,6 +34,7 @@ import {
     componentTokens,
     defaultGroups,
     iconBox,
+    iconFill,
     pressableRoot,
     sys,
     variantsOf,
@@ -53,6 +54,7 @@ const { tokens, ref } = componentTokens("tabs", {
     heightWithIcon: px(64),
     paddingInline: spacing("4"),
     iconSize: sizeToken("iconMedium"),
+    iconFill: unitless(0),
     indicatorHeight: px(3),
     secondaryIndicatorHeight: px(2),
 });
@@ -133,7 +135,9 @@ export const createTabs = <const G extends string = ColorGroup>(
                         paddingInlineEnd: ref("paddingInline"),
                         gap: spacing("2"),
                     },
-                    icon: iconBox(ref("iconSize")),
+                    icon: iconBox(ref("iconSize"), {
+                        fill: iconFill(ref("iconFill")),
+                    }),
                     label: { textStyle: textStyle("titleSmall") },
                     indicator: {
                         position: absolute,

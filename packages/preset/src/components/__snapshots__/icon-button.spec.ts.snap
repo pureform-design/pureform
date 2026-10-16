@@ -15,9 +15,18 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       },
       "icon": {
+        "_rtl": {
+          "&[data-pf-mirror]": {
+            "transform": "scaleX(-1)",
+          },
+        },
         "alignItems": "center",
         "display": "inline-flex",
         "fontSize": "var(--components-iconButton-iconSize, token(sizes.iconMedium))",
+        "fontVariationSettings": {
+          ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": ""FILL" var(--components-iconButton-selectedIconFill, 1)",
+          "base": ""FILL" var(--components-iconButton-iconFill, 0)",
+        },
         "height": "var(--components-iconButton-iconSize, token(sizes.iconMedium))",
         "justifyContent": "center",
         "lineHeight": "1",
@@ -67,12 +76,165 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "className": "iconButton",
-    "compoundVariants": [],
+    "compoundVariants": [
+      {
+        "css": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accent, token(colors.primary))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerHighest)",
+            },
+          },
+          "root": {
+            "&:is(:disabled, [aria-disabled=true])": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+              "color": "var(--components-iconButton-onAccent, token(colors.onPrimary))",
+            },
+            "color": "var(--components-iconButton-accent, token(colors.primary))",
+          },
+        },
+        "toggle": true,
+        "variant": "filled",
+      },
+      {
+        "css": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accentContainer, token(colors.primaryContainer))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerHighest)",
+            },
+          },
+          "root": {
+            "&:is(:disabled, [aria-disabled=true])": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+              "color": "var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer))",
+            },
+            "color": "token(colors.onSurfaceVariant)",
+          },
+        },
+        "toggle": true,
+        "variant": "tonal",
+      },
+      {
+        "css": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.inverseSurface)",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.stateFocus))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.stateHover))",
+              "base": "transparent",
+            },
+          },
+          "outline": {
+            "display": {
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "none",
+              "base": "flex",
+            },
+          },
+          "root": {
+            "&:is(:disabled, [aria-disabled=true])": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+              "color": "token(colors.inverseOnSurface)",
+            },
+            "color": "token(colors.onSurfaceVariant)",
+          },
+        },
+        "toggle": true,
+        "variant": "outlined",
+      },
+      {
+        "css": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "transparent",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              "base": "transparent",
+            },
+          },
+          "root": {
+            "&:is(:disabled, [aria-disabled=true])": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+              "color": "var(--components-iconButton-accent, token(colors.primary))",
+            },
+            "color": "token(colors.onSurfaceVariant)",
+          },
+        },
+        "toggle": true,
+        "variant": "standard",
+      },
+      {
+        "css": {
+          "container": {
+            "backgroundColor": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accent, token(colors.primary))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              "base": "token(colors.surfaceContainerLow)",
+            },
+          },
+          "root": {
+            "&:is(:disabled, [aria-disabled=true])": {
+              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            },
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+              "color": "var(--components-iconButton-onAccent, token(colors.onPrimary))",
+            },
+            "color": "var(--components-iconButton-accent, token(colors.primary))",
+          },
+        },
+        "toggle": true,
+        "variant": "elevated",
+      },
+    ],
     "defaultVariants": {
       "color": "primary",
       "density": "inherit",
       "shape": "none",
       "size": "medium",
+      "toggle": false,
       "variant": "standard",
     },
     "jsx": [
@@ -211,6 +373,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
             "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
+      },
+      "toggle": {
+        "false": {},
+        "true": {},
       },
       "variant": {
         "elevated": {

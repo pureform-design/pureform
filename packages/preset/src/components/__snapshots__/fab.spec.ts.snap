@@ -20,9 +20,15 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "display": "inline-flex",
       "fontSize": "var(--components-fab-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-fab-iconFill, 0)",
       "height": "var(--components-fab-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",

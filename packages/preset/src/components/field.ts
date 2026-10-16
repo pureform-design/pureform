@@ -43,6 +43,7 @@ import {
 
 import {
     iconBox,
+    iconFill,
     inputText,
     DENSITY_TOKEN,
     densityTokenVariant,
@@ -76,6 +77,7 @@ export const FIELD_TOKENS = {
     iconSize: sizeToken("iconMedium"),
     iconInset: spacing("3"),
     iconColor: sys("onSurfaceVariant"),
+    iconFill: unitless(0),
     // The icon inset, the icon, and the gap before the text.
     textInsetWithIcon: px(52),
     ...DENSITY_TOKEN,
@@ -349,9 +351,11 @@ export const fieldParts = (
     const icon = (side: "Start" | "End"): StyleMap => ({
         position: absolute,
         top: pct(50),
-        transform: transform(translateY(pct(-50))),
         [`insetInline${side}`]: ref("iconInset"),
-        ...iconBox(ref("iconSize")),
+        ...iconBox(ref("iconSize"), {
+            fill: iconFill(ref("iconFill")),
+            transform: [translateY(pct(-50))],
+        }),
         color: when()
             .on(DISABLED, disabledColor("disabledContent"))
             .else(ref("iconColor")),

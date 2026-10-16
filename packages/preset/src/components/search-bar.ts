@@ -11,7 +11,16 @@
 //   </label>
 
 import { typed } from "@pureform/core";
-import { center, flex, pct, px, relative, row, slot } from "@pureform/core/ast";
+import {
+    center,
+    flex,
+    pct,
+    px,
+    relative,
+    row,
+    slot,
+    unitless,
+} from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
@@ -19,6 +28,7 @@ import {
     componentTokens,
     focusRing,
     iconBox,
+    iconFill,
     inputText,
     stateTransition,
     surface,
@@ -36,6 +46,7 @@ const { tokens, ref } = componentTokens("searchBar", {
     paddingInline: spacing("4"),
     gap: spacing("4"),
     iconSize: sizeToken("iconMedium"),
+    iconFill: unitless(0),
 });
 
 const pf = typed();
@@ -70,7 +81,9 @@ export const searchBar = pf.slotComponent({
                 }),
             },
             leading: {
-                ...iconBox(ref("iconSize")),
+                ...iconBox(ref("iconSize"), {
+                    fill: iconFill(ref("iconFill")),
+                }),
                 color: ref("leadingColor"),
             },
             input: {
@@ -83,7 +96,9 @@ export const searchBar = pf.slotComponent({
                 },
             },
             trailing: {
-                ...iconBox(ref("iconSize")),
+                ...iconBox(ref("iconSize"), {
+                    fill: iconFill(ref("iconFill")),
+                }),
                 color: ref("trailingColor"),
             },
         },

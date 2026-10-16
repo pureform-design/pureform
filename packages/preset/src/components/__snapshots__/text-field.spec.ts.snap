@@ -54,6 +54,11 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "leadingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".textField__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -61,6 +66,7 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-textField-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-textField-iconFill, 0)",
       "height": "var(--components-textField-iconSize, token(sizes.iconMedium))",
       "insetInlineStart": "var(--components-textField-iconInset, token(spacing.3))",
       "justifyContent": "center",
@@ -89,6 +95,11 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodySmall",
     },
     "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".textField__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -97,6 +108,7 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-textField-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-textField-iconFill, 0)",
       "height": "var(--components-textField-iconSize, token(sizes.iconMedium))",
       "insetInlineEnd": "var(--components-textField-iconInset, token(spacing.3))",
       "justifyContent": "center",

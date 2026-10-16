@@ -206,10 +206,16 @@ exports[`dialog > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "headlineSmall",
     },
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": "var(--components-dialog-iconColor, token(colors.secondary))",
       "display": "inline-flex",
       "fontSize": "var(--components-dialog-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dialog-iconFill, 0)",
       "height": "var(--components-dialog-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -383,6 +389,11 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodyLarge",
     },
     "leading": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -391,6 +402,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-listItem-iconFill, 0)",
       "height": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -435,6 +447,11 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodyMedium",
     },
     "trailing": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -443,6 +460,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-listItem-iconFill, 0)",
       "height": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -658,6 +676,11 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "width": "100%",
     },
     "itemLeading": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -666,6 +689,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-menu-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-menu-iconFill, 0)",
       "height": "var(--components-menu-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -673,6 +697,11 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-menu-iconSize, token(sizes.iconMedium))",
     },
     "itemTrailing": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -681,6 +710,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-menu-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-menu-iconFill, 0)",
       "height": "var(--components-menu-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -957,9 +987,18 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "display": "inline-flex",
       "fontSize": "var(--components-navigationBar-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": {
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": ""FILL" var(--components-navigationBar-activeIconFill, 1)",
+        "base": ""FILL" var(--components-navigationBar-iconFill, 0)",
+      },
       "height": "var(--components-navigationBar-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -1193,9 +1232,18 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "display": "inline-flex",
       "fontSize": "var(--components-navigationRail-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": {
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": ""FILL" var(--components-navigationRail-activeIconFill, 1)",
+        "base": ""FILL" var(--components-navigationRail-iconFill, 0)",
+      },
       "height": "var(--components-navigationRail-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -1413,10 +1461,16 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "width": "100%",
     },
     "leading": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": "var(--components-searchBar-leadingColor, token(colors.onSurface))",
       "display": "inline-flex",
       "fontSize": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-searchBar-iconFill, 0)",
       "height": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -1452,10 +1506,16 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "trailing": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": "var(--components-searchBar-trailingColor, token(colors.onSurfaceVariant))",
       "display": "inline-flex",
       "fontSize": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-searchBar-iconFill, 0)",
       "height": "var(--components-searchBar-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
@@ -1534,6 +1594,11 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "leadingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -1541,6 +1606,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-select-iconFill, 0)",
       "height": "var(--components-select-iconSize, token(sizes.iconMedium))",
       "insetInlineStart": "var(--components-select-iconInset, token(spacing.3))",
       "justifyContent": "center",
@@ -1569,6 +1635,11 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodySmall",
     },
     "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "color": {
         ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -1577,6 +1648,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "inline-flex",
       "fontSize": "var(--components-select-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-select-iconFill, 0)",
       "height": "var(--components-select-iconSize, token(sizes.iconMedium))",
       "insetInlineEnd": "var(--components-select-iconInset, token(spacing.3))",
       "justifyContent": "center",
@@ -2187,9 +2259,15 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "icon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
       "alignItems": "center",
       "display": "inline-flex",
       "fontSize": "var(--components-tabs-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-tabs-iconFill, 0)",
       "height": "var(--components-tabs-iconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "lineHeight": "1",
