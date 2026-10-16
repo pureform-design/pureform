@@ -18,6 +18,18 @@ packages, and the workspace queries for project facts
   phases after it read that file first. A phase can't start until the output contexts of
   everything it depends on exist.
 - Tick a phase and link its output context when it lands.
+- **Keep context small, even with subagents.** A phase can run long. When a session's
+  context is getting large (long tool output, many files read, a long debugging loop),
+  compact it rather than waiting for the automatic compaction near the limit:
+    1. First write down progress, so the summary can't lose it: commit finished work and
+       draft the output context (`context/<phase-id>.md`, marked as a draft).
+    2. Then compact: `opencode api post /api/session/<session-id>/compact --data '{}'`
+       (it runs at the next safe point; see
+       [compaction](https://opencode.ai/v2/docs/compaction/)).
+    3. After it, reread the phase file and the draft before continuing.
+
+    Orchestrators do the same: hand each phase to a fresh subagent with the phase file and
+    its dependencies' output contexts, not the orchestrator's own history.
 
 ## Already done
 
