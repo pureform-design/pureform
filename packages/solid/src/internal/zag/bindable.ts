@@ -14,8 +14,9 @@ import {
 export function createBindable<T>(
     props: Accessor<BindableParams<T>>,
 ): Bindable<T> {
-    const initial = props().value ?? props().defaultValue;
-    const eq = props().isEqual ?? Object.is;
+    // Read once, at creation.
+    const initial = untrack(() => props().value ?? props().defaultValue);
+    const eq = untrack(() => props().isEqual ?? Object.is);
 
     // Boxed, since Solid 2 treats a function passed to `createSignal` as a computation.
     const [value, setValue] = createSignal<{ v: T }>({ v: initial as T });

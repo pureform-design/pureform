@@ -313,6 +313,20 @@ describe("the port's pieces", () => {
         );
     });
 
+    it("writes ARIA booleans as strings, which Solid 2 would write as empty attributes", () => {
+        expect(
+            normalizeProps.element({
+                "aria-hidden": true,
+                "aria-checked": false,
+                "aria-label": "x",
+            } as never),
+        ).toEqual({
+            "aria-hidden": "true",
+            "aria-checked": "false",
+            "aria-label": "x",
+        });
+    });
+
     it("merges classes and handlers, and lets later sources win otherwise", () => {
         const first = vi.fn();
         const second = vi.fn();
