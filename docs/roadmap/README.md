@@ -104,7 +104,7 @@ p3a and p3b run in parallel; p3c follows them.
 |     | Subphase                                                                            | Depends on | Output context                     |
 | --- | ----------------------------------------------------------------------------------- | ---------- | ---------------------------------- |
 | [x] | [p3a: Solid button and checkbox](phases/p3a-solid-button-checkbox.md)               | p2a, p2c   | [`context/p3a.md`](context/p3a.md) |
-| [ ] | [p3b: React button and checkbox](phases/p3b-react-button-checkbox.md)               | p2b, p2c   | `context/p3b.md`                   |
+| [x] | [p3b: React button and checkbox](phases/p3b-react-button-checkbox.md)               | p2b, p2c   | [`context/p3b.md`](context/p3b.md) |
 | [ ] | [p3c: demo wiring and shared browser suites](phases/p3c-first-components-suites.md) | p3a, p3b   | `context/p3c.md`                   |
 
 ### Phase 4: generation (can run alongside phase 3)
