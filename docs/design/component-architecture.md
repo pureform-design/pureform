@@ -40,7 +40,7 @@ Components get their styles by calling a factory from the registry with their se
   existing `useComponentState`/`useSelected` path in `rn-adapter` already does this and
   is the proof of the bet.
 
-A benchmark (§12) gates the decision: 10k lookups per frame under 1ms on a mid-range
+A benchmark (§13) gates the decision: 10k lookups per frame under 1ms on a mid-range
 phone.
 
 ## 3. Package layout
@@ -827,7 +827,42 @@ Deferred until there's demand:
 - `doctor`: checking the config is importable from build and runtime, and the glue is
   fresh.
 
-## 11. Migration from what exists
+## 11. Versioning
+
+Two groups, versioned differently, both under Conventional Commits and cocogitto
+(`cog.toml`) as today:
+
+- **The core train, in lockstep.** Every package that shares the AST format, the
+  generated glue, or the factory types carries one version and is bumped together from the
+  global tag: `core`, `theme`, `material`, `preset`, `css-lowering`, every `*-adapter`,
+  `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines`, `generate`,
+  `bundler`, and `cli`. Users never match these by hand, and a mismatch between them is
+  what breaks builds.
+- **Bindings, independent.** `@pureform/solid`, `@pureform/react`, and
+  `@pureform/react-native` follow their framework's pace and their own fixes, with their
+  own package tags. Each declares the core train it works with as a peer range
+  (`"@pureform/styling": "^0.4"`), and a train release that breaks them bumps that range
+  in a binding release.
+- **Tooling** (`tsconfig`, `vite-config`, `vitest-config`, the oxlint and oxfmt configs) is
+  internal and keeps its own versions; it isn't part of either group.
+- **Before 1.0:** a breaking change bumps the minor and everything else the patch, so
+  `^0.y` only takes compatible releases.
+- **Framework peers:** while Solid 2 is a release candidate, `@pureform/solid` peers on
+  the exact RC it's tested with, and moves to `^2` when Solid 2 is stable. React peers on
+  `^19`.
+- **Mismatch detection:**
+    - Build: `@pureform/generate` fails when installed core-train packages differ in
+      version, or when an installed binding's peer range excludes the train, naming the
+      packages and the versions to install.
+    - Runtime, in development: the generated glue records the train's version, and each
+      binding warns once if the runtime `@pureform/styling` differs from it, which means
+      the glue is stale or two copies are installed. Production skips the check.
+- **Changes to `cog.toml`:** the train's packages move from per-package tags to the
+  global tag (its bump hook sets every train package's version), bindings keep package
+  tags, and packages missing from `cog.toml` today (`theme`, `material`, `utils`,
+  `js-effects`, `type-utils`) join the train.
+
+## 12. Migration from what exists
 
 1. Extract `@pureform/styling` from `rn-adapter`'s `useSelected`/selection code and the
    Panda/CSS adapters' runtime bits.
@@ -851,16 +886,17 @@ Preset changes these designs need, independent of the steps above:
   `transition`; React Native's token tweens check the token's value type.
 - Direction (§5.9): the switch handle on `insetInlineStart`, `rtl` keyframes for the
   linear progress, the icon slot's `mirror`, and the physical property spec.
+- Versioning (§11): the `cog.toml` changes, the train check in `@pureform/generate`, and
+  the development warning in the bindings.
 - Icons (§9.6): the icon slots' `fill` token and `font-variation-settings`, set by the
   states Material draws filled.
 
-## 12. Risks and open questions
+## 13. Risks and open questions
 
 1. **Lookup cost.** Benchmark before step 3 ends. Fallback: compile-time inlining of
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** how packages are versioned together.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
