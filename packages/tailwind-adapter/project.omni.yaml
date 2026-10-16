@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/core"
     - "@pureform/css-adapter"
     - "@pureform/css-lowering"
+    - "@pureform/generate"
     - "@pureform/material"
     - "@pureform/preset"
 

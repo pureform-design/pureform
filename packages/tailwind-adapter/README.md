@@ -12,7 +12,9 @@ CSS inside Tailwind's components layer, so utilities override components.
 ```
 
 The components' CSS is the CSS adapter's, so components look the same as with plain CSS and
-the Panda preset. `apps/tailwind-demo` uses it.
+the Panda preset. `apps/tailwind-demo` uses it. The `/codegen` subpath is what
+`@pureform/generate` loads for the `tailwind` target; it also depends on `@pureform/generate`
+and reuses the CSS adapter's codegen.
 
 ## Architecture
 
@@ -20,16 +22,18 @@ the Panda preset. `apps/tailwind-demo` uses it.
 | ------------- | ------------------------------------------------------------------------------------------------------- |
 | `tailwind.ts` | `toTailwind`: the config as Tailwind's pieces (theme, variants, components); `tailwindCss` writes them. |
 | `vite.ts`     | `pureformTailwind`: a Vite plugin writing the stylesheet to a file before Tailwind's plugin reads it.   |
+| `codegen.ts`  | `codegen`: the `tailwind` target's factory modules and stylesheet, for `@pureform/generate`.            |
 
 The theme is `@theme inline`: each Tailwind variable names the pureform var it stands for, so a
 dark scheme or a named theme switches utilities and components alike.
 
 ## Public API
 
-| Entry                             | Exports                                                         |
-| --------------------------------- | --------------------------------------------------------------- |
-| `@pureform/tailwind-adapter`      | `compileTailwind`, `toTailwind`, `tailwindCss`, and their types |
-| `@pureform/tailwind-adapter/vite` | `pureformTailwind`                                              |
+| Entry                                | Exports                                                         |
+| ------------------------------------ | --------------------------------------------------------------- |
+| `@pureform/tailwind-adapter`         | `compileTailwind`, `toTailwind`, `tailwindCss`, and their types |
+| `@pureform/tailwind-adapter/vite`    | `pureformTailwind`                                              |
+| `@pureform/tailwind-adapter/codegen` | `codegen`, `TailwindCodegenOptions`, `STYLESHEET_FILE`          |
 
 ```ts
 // vite.config.ts
@@ -48,6 +52,32 @@ Options are the CSS adapter's, plus `palette` (map the raw palette too), `replac
 Tailwind's defaults in the namespaces pureform fills), and `themeVariant` (a named theme's
 variant name, `theme-<name>` by default).
 
+## Codegen
+
+`@pureform/tailwind-adapter/codegen` exports `codegen`, the `CodegenAdapter` named `tailwind`
+(platform `web`) that `generate({ target: "tailwind" })` loads. For the allow-listed components
+(`components`, all by default) it writes, under `.pureform/`:
+
+- **`web/<name>.ts`**: the CSS adapter's `ClassFactory` modules, byte for byte (its
+  `componentModules`), since the Tailwind stylesheet keeps the CSS adapter's class names. See
+  [the CSS adapter's codegen](../css-adapter/README.md#generated-glue-codegen).
+- **`styles.css`**: `compileTailwind` over the config with only those components (tokens,
+  themes, variants, and keyframes stay). The app imports it after Tailwind:
+
+    ```css
+    @import "tailwindcss";
+    @import "../.pureform/styles.css";
+    ```
+
+Its options are `TailwindOptions` (`classPrefix` and `prefix` name the factories' classes and
+vars too). `generate` adds `index.ts` and `registry.d.ts`.
+
+There's no `@source inline(...)`: Tailwind v4 generates only utilities from the classes its
+scanner sees, and keeps every rule of the components layer as written, so the factories'
+classes need no listing. Listing them would only make utilities of any class that happens to
+share a utility's name. The spec checks both: every component rule survives Tailwind's compiler
+with no candidates, and the generated modules give the scanner nothing to make utilities of.
+
 ## Variants
 
 | Variant         | Applies                                                                                                                                                                                                    |
@@ -63,7 +93,9 @@ Tailwind's own `motion-safe` still reads only the system.
 Through the omni MCP (or `omni run`):
 
 - `build`: Vite library build into `dist/`.
-- `test:unit`: Vitest, including builds through Tailwind's compiler.
+- `test:unit`: Vitest, including builds through Tailwind's compiler. `codegen.spec.ts`
+  generates the preset's glue into a temp app and checks every selection of every component
+  against the Vite plugin's classes, and the stylesheet against the plugin's.
 
 `tests/browser-e2e-tests` checks it computes the same styles as the Panda preset, and the
 reduced motion fixtures.

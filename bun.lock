@@ -526,6 +526,7 @@
         "@pureform/core": "catalog:",
         "@pureform/css-adapter": "catalog:",
         "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:",
       },
       "devDependencies": {
         "@pureform/material": "catalog:",

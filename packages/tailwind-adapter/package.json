@@ -25,12 +25,24 @@
                 "development": "./src/vite.ts",
                 "default": "./dist/vite.mjs"
             }
+        },
+        "./codegen": {
+            "types": "./dist/codegen.d.ts",
+            "import": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            },
+            "require": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            }
         }
     },
     "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/css-adapter": "catalog:",
-        "@pureform/css-lowering": "catalog:"
+        "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:"
     },
     "devDependencies": {
         "@pureform/material": "catalog:",
