@@ -166,5 +166,12 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
                 .filter((f): f is string => Boolean(f))
                 .map((f) => (/\s/.test(f) ? `"${f}"` : f))
                 .join(", ");
+        case "fontVariation":
+            return Object.entries(node.axes)
+                .map(
+                    ([axis, value]) =>
+                        `"${axis}" ${compileNodeToCSS(value, ctx)}`,
+                )
+                .join(", ");
     }
 };

@@ -8,6 +8,7 @@ import {
     dynamic,
     easing,
     fontFamily,
+    fontVariations,
     hex,
     inlineFlex,
     linearGradient,
@@ -225,6 +226,20 @@ describe("compileNodeToCSS composites", () => {
                 ctx(),
             ),
         }).toMatchSnapshot();
+    });
+});
+
+describe("compileNodeToCSS font variations", () => {
+    it("writes each axis as its quoted tag and value", () => {
+        expect(
+            compileNodeToCSS(
+                fontVariations({
+                    FILL: dynamic(["components", "icon", "fill"], unitless(0)),
+                    wght: unitless(400),
+                }),
+                ctx(),
+            ),
+        ).toBe('"FILL" var(--components-icon-fill, 0), "wght" 400');
     });
 });
 
