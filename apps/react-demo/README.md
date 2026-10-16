@@ -3,8 +3,7 @@
 `@pureform/react` on the Panda target: a single page with the button and checkbox in their
 variants and states (sizes, colors, icons, a toggle, a composed button, an indeterminate parent
 checkbox, and a form that submits and resets), with a switch between left to right and right to
-left. It's the React counterpart of `solid-demo`'s components, and what p3c's shared suites can
-render React against.
+left. It's the React counterpart of `solid-demo`'s components page (`/components`).
 
 ```sh
 bun x panda codegen   # writes styled-system/, which .pureform/ imports
@@ -41,4 +40,5 @@ Through omni, `build` runs `prepare` (`panda codegen`) first.
 
 - Theme switching and runtime overrides wait for p5b; the provider's `theme` prop does nothing yet.
 - No tests of its own: the components are tested in `@pureform/react`, and the shared browser
-  suites (p3c) cover the cross-cutting rules.
+  suites in `tests/component-suites` cover the cross-cutting rules for React and Solid together
+  (they render with `solid-demo`'s registry, which matches this one).
