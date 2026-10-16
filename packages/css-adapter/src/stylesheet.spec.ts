@@ -53,6 +53,17 @@ describe("compileCss (full pureform config)", () => {
         );
     });
 
+    it("reduces motion as the system asks unless a provider's attribute overrides it", () => {
+        const handle = ruleOf(css, ".switchControl__handle");
+        expect(handle).toMatch(
+            /@media \(prefers-reduced-motion: reduce\) \{\n\s+&:not\(\[data-pf-motion=full\] \*\) \{\n\s+transition: background-color [^;]*;/,
+        );
+        expect(handle).toMatch(
+            /\[data-pf-motion=reduce\] &:not\(\[data-pf-motion=reduce\] \[data-pf-motion=full\] \*\) \{\n\s+transition: background-color [^;]*;/,
+        );
+        expect(css).not.toContain("@motion");
+    });
+
     it("sets a named theme's tokens under its attribute", () => {
         expect(ruleOf(css, '[data-theme="beveled"]')).toContain(
             "--components-button-corner: bevel;",

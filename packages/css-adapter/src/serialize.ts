@@ -5,9 +5,13 @@
 // conditional value is turned inside out: its base stays on the rule, and each case goes into
 // the nested rule for its key, merged with any other property under the same key.
 
-import { hyphenate } from "@pureform/css-lowering";
+import {
+    REDUCED_MOTION_RULES,
+    ROOT_REDUCED_MOTION_RULES,
+    hyphenate,
+} from "@pureform/css-lowering";
 
-import { DARK, LIGHT } from "./options";
+import { DARK, LIGHT, REDUCED_MOTION } from "./options";
 
 /** A rule: its declarations, then its nested rules by selector or at-rule. */
 export interface Block {
@@ -17,11 +21,11 @@ export interface Block {
 
 export const block = (): Block => ({ decls: [], rules: new Map() });
 
-/** Where a color scheme condition applies, relative to the rule it's in. */
+/** Where a color scheme or reduced motion condition applies, relative to the rule it's in. */
 export type SchemeRules = Record<string, string[][]>;
 
 /** Inside an element's rule: under a scheme class on an ancestor, or the system scheme when
- *  the root doesn't set the other. */
+ *  the root doesn't set the other; and reduced motion as a provider or the system sets it. */
 export const ELEMENT_SCHEMES: SchemeRules = {
     [DARK]: [
         [".dark &"],
@@ -31,6 +35,7 @@ export const ELEMENT_SCHEMES: SchemeRules = {
         [".light &"],
         ["@media (prefers-color-scheme: light)", ":root:not(.dark) &"],
     ],
+    [REDUCED_MOTION]: REDUCED_MOTION_RULES.map((path) => [...path]),
 };
 
 /** Inside the root's rule, where the scheme class sits on the root itself. */
@@ -43,6 +48,7 @@ export const ROOT_SCHEMES: SchemeRules = {
         ["&.light"],
         ["@media (prefers-color-scheme: light)", "&:not(.dark)"],
     ],
+    [REDUCED_MOTION]: ROOT_REDUCED_MOTION_RULES.map((path) => [...path]),
 };
 
 // A key that starts a nested rule rather than naming a property.

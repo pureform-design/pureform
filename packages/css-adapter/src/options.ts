@@ -20,14 +20,16 @@ export interface CssOptions {
     target?: string;
 }
 
-// Color scheme conditions match more than one rule, so they lower to a placeholder key that
-// the serializer expands to each rule.
+// Color scheme and reduced motion conditions match more than one rule, so they lower to a
+// placeholder key that the serializer expands to each rule.
 export const DARK = "@scheme dark";
 export const LIGHT = "@scheme light";
+export const REDUCED_MOTION = "@motion reduce";
 
 const SCHEME_KEY: Partial<Record<PortableCondition, string>> = {
     dark: DARK,
     light: LIGHT,
+    reducedMotion: REDUCED_MOTION,
 };
 
 /** The lowering context for the CSS adapter. */

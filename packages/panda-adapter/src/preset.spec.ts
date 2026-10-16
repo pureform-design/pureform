@@ -179,6 +179,16 @@ describe("compilePreset (color schemes)", () => {
         });
         expect(compilePreset(buttonConfig).globalCss).toBeUndefined();
     });
+
+    it("reduces motion as the system asks unless a provider's attribute overrides it", () => {
+        expect(obj(obj(preset.conditions).extend).motionReduce).toEqual({
+            "@media (prefers-reduced-motion: reduce)": {
+                "&:not([data-pf-motion=full] *)": "@slot",
+            },
+            "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)":
+                "@slot",
+        });
+    });
 });
 
 describe("compilePreset (themes)", () => {

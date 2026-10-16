@@ -66,10 +66,11 @@ describe("toTailwind", () => {
         );
     });
 
-    it("adds variants for the color schemes and each named theme", () => {
+    it("adds variants for the color schemes, reduced motion, and each named theme", () => {
         expect(variants.map((v) => v.name)).toEqual([
             "dark",
             "light",
+            "motion-reduce",
             "theme-teal",
         ]);
         const named = toTailwind(config, {
@@ -80,6 +81,21 @@ describe("toTailwind", () => {
             name: "teal",
             paths: [
                 ['&:where([data-pf-theme="teal"], [data-pf-theme="teal"] *)'],
+            ],
+        });
+    });
+
+    it("reduces motion as the system asks unless a provider's attribute overrides it", () => {
+        expect(variants.find((v) => v.name === "motion-reduce")).toEqual({
+            name: "motion-reduce",
+            paths: [
+                [
+                    "@media (prefers-reduced-motion: reduce)",
+                    "&:not([data-pf-motion=full] *)",
+                ],
+                [
+                    "[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)",
+                ],
             ],
         });
     });
@@ -126,6 +142,16 @@ describe("compileTailwind", () => {
         );
         expect(out).toContain(
             '.theme-teal\\:bg-primary:where([data-theme="teal"], [data-theme="teal"] *)',
+        );
+    });
+
+    it("replaces Tailwind's motion-reduce variant with the provider-aware one", async () => {
+        const out = await build(css, ["motion-reduce:transition-none"]);
+        expect(out).toMatch(
+            /@media \(prefers-reduced-motion: reduce\) \{\s*\.motion-reduce\\:transition-none:not\(\[data-pf-motion=full\] \*\)/,
+        );
+        expect(out).toContain(
+            "[data-pf-motion=reduce] .motion-reduce\\:transition-none:not([data-pf-motion=reduce] [data-pf-motion=full] *)",
         );
     });
 

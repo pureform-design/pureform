@@ -87,6 +87,10 @@ where the generated modules import the runtime from.
 - **Tokens** are CSS vars on `:root`. Dark values apply under a `.dark` class on the root, or
   with the system's dark scheme unless the root has `.light`. Named themes apply under their
   attribute: `<div data-theme="teal">`.
+- **Reduced motion** follows the system's `prefers-reduced-motion`, unless a provider's
+  `data-pf-motion="full"` sits on an ancestor; `data-pf-motion="reduce"` reduces it whatever
+  the system says ([the rules](../css-lowering/README.md#reduced-motion)). Only movement
+  stops; color, opacity, and elevation fades keep running.
 - **Component tokens** are vars too, such as `--components-button-radius`: set one on a
   component or any ancestor to restyle it.
 
