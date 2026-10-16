@@ -211,12 +211,13 @@ export const button: StyleFactory<"button"> = (s) =>
 
 ### 5.3 Hooks
 
-Each binding offers a pair: a hook components use, and the lower-level hook it's built on.
+Each binding offers a pair: a hook components use, and a lower-level hook that returns
+the factory itself. Both read the same registry entry.
 
 |                | Web (Solid, React)                           | React Native                               |
 | -------------- | -------------------------------------------- | ------------------------------------------ |
 | Components use | `useClasses(name, selection)` → slot classes | `useStyles(name, selection)` → slot styles |
-| Built on       | `useClassFactory(name)` → the factory        | `useStyleFactory(name)` → the factory      |
+| Lower level    | `useClassFactory(name)` → the factory        | `useStyleFactory(name)` → the factory      |
 
 - `useClasses` memoizes the call: in Solid it takes an accessor and returns a memo; in
   React it takes the selection object and uses `useMemo`. Components can't forget the memo
