@@ -366,7 +366,7 @@ export interface PlatformNode {
 }
 
 /** Pointer / focus / interactivity states. CSS has no dragging pseudo-class, so `dragged`
- *  matches a `data-dragging` attribute that the drag code sets on the element. */
+ *  matches a `data-pf-dragging` attribute that the drag code sets on the element. */
 export type InteractionCondition =
     | "hover"
     | "focus"
@@ -488,9 +488,9 @@ export interface ContainerSizeCondition {
  *  read its own state; reading another slot's needs the component to declare `structure`,
  *  and that slot must be an ancestor there. The web lowers it to selectors on the slot's
  *  element (`:focus-within`, `:has(...)`); a native binding passes the component's state to
- *  each slot. Each state can also be set by hand with a data attribute on the slot:
- *  `data-hover`, `data-selected`, `data-checked`, `data-indeterminate`, `data-pressed`,
- *  `data-focused`, `data-focus-visible`, `data-filled`, `data-invalid`, `data-disabled`. */
+ *  each slot. The web reads each state from a native pseudo-class or an ARIA attribute where
+ *  one covers it, and otherwise from the `data-pf-*` attributes in `STATE_ATTRIBUTES`
+ *  (`data-pf-hover`, `data-pf-active`, `data-pf-filled`). */
 export interface SlotCondition {
     type: "slot";
     slot: string;
