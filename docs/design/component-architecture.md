@@ -336,10 +336,28 @@ so hydration changes nothing and the first paint is styled, in either color sche
   state between calls. The server and the client get the same classes and vars from the
   same input. A contract test calls each generated factory in Node and in the browser and
   compares.
-- **The registry is synchronous.** Entries are static imports, so a component has its
-  factory on its first render on the server and while hydrating. A lazy entry would
-  render without classes and patch them in later. Code splitting comes from the component
-  modules (§7) and pruning, not from the registry.
+- **The registry is static by default; lazy entries suspend.** A static entry gives a
+  component its factory on its first render, on the server and while hydrating. A lazy
+  entry works too, as long as the lookup waits rather than returning nothing:
+    - The lookup is an async memo that resolves to the **classes**, not the factory.
+      Solid 2 serializes every async memo's result for hydration, and a factory is a
+      function, which can't be serialized: resolving to it crashes the server render.
+      Classes are plain data.
+    - With Solid's default `ssrSource: "server"`, the client adopts the server's classes
+      and doesn't load the entry while hydrating. It loads the entry the first time the
+      selection changes.
+    - The component needs a `<Loading>` boundary around it.
+    - A lazy entry behind a synchronous lookup renders without classes on the server and
+      patches them in after loading: an unstyled flash, and Solid doesn't warn about it.
+- **Code splitting is per component.** A component module imports its factory
+  statically, and the app splits with the framework's `lazy()`. The factory travels in
+  the component's chunk, so this needs no async lookup and no extra request.
+- **Verified in Solid 2** (rc.15, `@solidjs/vite-plugin` start mode, streaming render): a
+  static entry, a lazy entry with the async lookup, and a `lazy()` component whose factory
+  is a static import all render their classes on the server, hydrate with the same classes,
+  respond to clicks, and log nothing. The async lookup's chunk loaded only when its variant
+  changed after hydration. The sync lookup over a lazy entry rendered no class on the
+  server.
 - **Nothing is module-level.** The registry, theme, and overrides come from
   `PureformProvider`'s context, so concurrent requests can't leak into each other.
 - **Interaction states start off.** Machines render their initial state on the server
@@ -391,8 +409,9 @@ the first paint.
 extraction works as it does today. Animated tweens start once mounted, from the rendered
 values.
 
-**Testing.** A browser-mode suite renders each component on the server, hydrates it, and
-fails on any hydration warning or on any class, `style`, `data-*`, or `aria-*` attribute
+**Testing.** Solid doesn't warn when hydration changes an attribute, so the suite compares
+the DOM itself. It renders each component on the server, hydrates it, and fails on any
+hydration warning or on any class, `style`, `data-*`, or `aria-*` attribute
 that differs between the server's HTML and the hydrated DOM. It runs for each web target
 and in both color schemes, plus once with a runtime theme.
 
@@ -484,8 +503,9 @@ export const themes = ["teal"] as const;
 export type Components = "button" | "checkbox"; // augments typing
 ```
 
-- Per-component modules keep it tree-shakable. The index imports them statically, so
-  the first render needs no await, on the server too (§5.7).
+- Per-component modules keep it tree-shakable. The index imports them statically by
+  default, so the first render needs no await, on the server too. A lazy entry is an
+  option, looked up asynchronously (§5.7).
 - A `.d.ts` augments `@pureform/styling`'s `ComponentRegistry` interface, so `Button`'s
   variant props type-check against the user's config, not the preset's defaults.
 - Generated files live in `.pureform/`, like Panda's `styled-system/`.
