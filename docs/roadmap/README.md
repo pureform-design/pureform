@@ -120,9 +120,9 @@ while phase 3 builds components.
 | [x] | &nbsp;&nbsp;p4b-css                                                       |                        | [`context/p4b-css.md`](context/p4b-css.md)           |
 | [x] | &nbsp;&nbsp;p4b-tailwind                                                  |                        | [`context/p4b-tailwind.md`](context/p4b-tailwind.md) |
 | [x] | &nbsp;&nbsp;p4b-rn                                                        |                        | [`context/p4b-rn.md`](context/p4b-rn.md)             |
-| [ ] | [p4c: bundler and CLI](phases/p4c-bundler-cli.md), split in parallel:     | p4a, p4b               |                                                      |
+| [x] | [p4c: bundler and CLI](phases/p4c-bundler-cli.md), split in parallel:     | p4a, p4b               |                                                      |
 | [x] | &nbsp;&nbsp;p4c-bundler                                                   |                        | [`context/p4c-bundler.md`](context/p4c-bundler.md)   |
-| [ ] | &nbsp;&nbsp;p4c-cli                                                       |                        | `context/p4c-cli.md`                                 |
+| [x] | &nbsp;&nbsp;p4c-cli                                                       |                        | [`context/p4c-cli.md`](context/p4c-cli.md)           |
 
 ### Phase 5: targets and runtime themes
 
