@@ -61,320 +61,7 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
     },
   },
   "className": "chip",
-  "compoundVariants": [
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.secondaryContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onSecondaryContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.secondaryContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onSecondaryContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.tertiaryContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onTertiaryContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
-              "base": "token(colors.tertiaryContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onTertiaryContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
-              "base": "token(colors.successContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onSuccessContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
-              "base": "token(colors.successContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onSuccessContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
-              "base": "token(colors.warningContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onWarningContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
-              "base": "token(colors.warningContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onWarningContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
-              "base": "token(colors.errorContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onErrorContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
-              "base": "token(colors.errorContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onErrorContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
-              "base": "token(colors.infoContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onInfoContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-            "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
-              "base": "token(colors.infoContainer)",
-            },
-            "borderColor": "transparent",
-            "color": "token(colors.onInfoContainer)",
-          },
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "shadowElevation": "level0",
-          },
-          "_hover": {
-            "shadowElevation": "level2",
-          },
-        },
-      },
-      "variant": "elevated",
-    },
-  ],
+  "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
     "density": "inherit",
@@ -392,58 +79,40 @@ exports[`chip > compiles to a stable Panda slot recipe 1`] = `
   "variants": {
     "color": {
       "error": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.errorContainer)",
+          "--components-chip-selectedContent": "token(colors.onErrorContainer)",
         },
       },
       "info": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.infoContainer)",
+          "--components-chip-selectedContent": "token(colors.onInfoContainer)",
         },
       },
       "primary": {},
       "secondary": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.secondaryContainer)",
+          "--components-chip-selectedContent": "token(colors.onSecondaryContainer)",
         },
       },
       "success": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.successContainer)",
+          "--components-chip-selectedContent": "token(colors.onSuccessContainer)",
         },
       },
       "tertiary": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.tertiaryContainer)",
+          "--components-chip-selectedContent": "token(colors.onTertiaryContainer)",
         },
       },
       "warning": {
-        "icon": {
-          "color": {
-            ".chip__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".chip__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
-            "base": "var(--components-chip-iconColor, token(colors.primary))",
-          },
+        "root": {
+          "--components-chip-selectedContainer": "token(colors.warningContainer)",
+          "--components-chip-selectedContent": "token(colors.onWarningContainer)",
         },
       },
     },

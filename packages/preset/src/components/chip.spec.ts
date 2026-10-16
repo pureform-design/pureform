@@ -48,10 +48,12 @@ describe("chip", () => {
 
 describe("chip color", () => {
     it("colors a selected chip with its group's container", () => {
-        const error = compiled()?.compoundVariants?.find(
-            (c) => c.color === "error" && c.variant === "outlined",
+        const error = JSON.stringify(compiled()?.variants?.color?.error);
+        expect(error).toContain(
+            '"--components-chip-selectedContainer":"token(colors.errorContainer)"',
         );
-        expect(JSON.stringify(error?.css)).toContain("errorContainer");
-        expect(JSON.stringify(error?.css)).toContain("onErrorContainer");
+        expect(error).toContain(
+            '"--components-chip-selectedContent":"token(colors.onErrorContainer)"',
+        );
     });
 });
