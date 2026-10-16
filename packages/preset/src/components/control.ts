@@ -57,13 +57,19 @@ export const controlRoot = (
     height: size,
 });
 
-/** The native input, invisible over the whole control and taking every interaction. */
+/** The native input, invisible over the whole control and taking every interaction. Its
+ *  margins are reset, since the browser's default checkbox margins are physical and would
+ *  shift it off the control, more so in right to left. */
 export const controlInput: StyleMap = {
     position: absolute,
     top: px(0),
     left: px(0),
     width: pct(100),
     height: pct(100),
+    marginBlockStart: px(0),
+    marginBlockEnd: px(0),
+    marginInlineStart: px(0),
+    marginInlineEnd: px(0),
     opacity: unitless(0),
     cursor: pointer,
 };
