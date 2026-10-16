@@ -1,0 +1,49 @@
+{
+    "name": "@pureform/react",
+    "version": "0.0.0-semantically-released",
+    "description": "React bindings for pureform",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:",
+        "@pureform/machines": "catalog:",
+        "@zag-js/react": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/styling": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@testing-library/dom": "catalog:",
+        "@testing-library/react": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "@zag-js/checkbox": "catalog:",
+        "playwright": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@pureform/styling": "catalog:",
+        "react": "^19.0.0",
+        "react-dom": "^19.0.0"
+    }
+}
