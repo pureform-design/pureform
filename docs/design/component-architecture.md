@@ -479,12 +479,28 @@ export const themes = ["teal"] as const;
 export type Components = "button" | "checkbox"; // augments typing
 ```
 
-- Per-component modules keep it tree-shakable. By default the index imports them
-  statically, so the first render needs no await; lazy imports are an option for code
-  splitting.
+- Per-component modules keep it tree-shakable. The index imports them statically, so
+  the first render needs no await, on the server too (§5.7).
 - A `.d.ts` augments `@pureform/styling`'s `ComponentRegistry` interface, so `Button`'s
   variant props type-check against the user's config, not the preset's defaults.
-- Generated files live in `.pureform/` (git-ignored), like Panda's `styled-system/`.
+- Generated files live in `.pureform/`, like Panda's `styled-system/`.
+
+**Committing it is the app's choice; the advice is not to.** It's glue derived from the
+config and the installed packages, so committing it only adds diffs to review. Either way:
+
+- **Not committed (recommended):** add `.pureform/` to `.gitignore`. The bundler plugin
+  writes it when dev or build starts; for steps without a bundler (`tsc`, lint, tests),
+  run `pureform generate` first, for example from the `prepare` script. `pureform
+generate` doesn't edit `.gitignore` itself; it prints the line to add when it finds the
+  folder unignored in a git repository.
+- **Committed:** `pureform generate --check` exits non-zero when the folder differs from
+  what it would write, for CI.
+- **Staleness.** Every generated file starts with a header holding a hash of the config,
+  the build-tool options, and the pureform package versions. The plugin and `generate`
+  rewrite only when it differs, so unchanged glue doesn't trigger a rebuild, and `--check`
+  compares hashes before contents.
+- **Missing glue.** If `.pureform/` is missing, importing it fails with a message naming
+  `pureform generate` and the bundler plugin, rather than a bare module-not-found.
 
 The app registers it once:
 `<PureformProvider registry={registry}>`. Components read it from context. Tests can pass
@@ -764,8 +780,7 @@ Preset changes these designs need, independent of the steps above:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** whether `.pureform/` is
-   committed and how stale glue is detected; and how packages are versioned together.
+3. **Not yet covered:** how packages are versioned together.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
