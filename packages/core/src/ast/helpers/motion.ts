@@ -2,6 +2,7 @@
 import type {
     AnimationNode,
     CubicBezierEasingNode,
+    DynamicNode,
     EasingValue,
     KeywordEasingNode,
     NumericValue,
@@ -32,7 +33,7 @@ export const steps = (
  *  `delay` accept a numeric or an alias into `durations`; `ease` an `EasingNode` or an
  *  `easings` alias. */
 export const tween = (
-    property: string,
+    property: string | DynamicNode,
     duration: NumericValue,
     ease?: EasingValue,
     delay?: NumericValue,

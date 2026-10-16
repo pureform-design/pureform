@@ -331,7 +331,21 @@ export interface DynamicNode {
      *  `var(--name, <default>)`). Nest another `dynamic` here to build a multi-level fallback
      *  chain. This differs from `PlatformNode.default`, which is a build-time selection. */
     default?: ValueNode;
+    /** The type of value it holds. A target can register it as that type (the web as an
+     *  `@property`), so its changes interpolate and a transition can name it. */
+    valueType?: ValueType;
 }
+
+/** The type of value a dynamic value holds: a number, a length, a percentage, either of those
+ *  two, an angle, a time, or a color. */
+export type ValueType =
+    | "number"
+    | "length"
+    | "percentage"
+    | "lengthPercentage"
+    | "angle"
+    | "time"
+    | "color";
 
 /** Escape hatch for values that cannot be expressed portably, for example CSS `100vh` or a
  *  native shadow object. It maps an adapter target id to a raw value, plus a required portable
@@ -670,7 +684,9 @@ export interface TransitionNode {
 }
 
 export interface TransitionPart {
-    property: string;
+    /** A style property, or a dynamic value with a `valueType`, which moves itself
+     *  and so everything reading it. */
+    property: string | DynamicNode;
     /** ms or s numeric, or `alias("durations", ...)`. */
     duration: NumericValue;
     /** EasingNode or `alias("easings", ...)`. */
