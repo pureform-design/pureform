@@ -18,6 +18,7 @@
         "@pureform/material": "catalog:",
         "@pureform/panda-adapter": "catalog:",
         "@pureform/preset": "catalog:",
+        "@pureform/solid": "catalog:",
         "@pureform/styling": "catalog:",
         "@pureform/theme": "catalog:",
         "@remix-run/cookie": "catalog:",

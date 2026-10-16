@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/component-suites"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-test.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/vitest-config"
+    - "@pureform/anatomy"
+    - "@pureform/styling"
+    - "@pureform/solid"
+    - "@pureform/react"
+    - "@pureform/site"
+
+cache:
+  key:
+    files:
+      append:
+        - "../../apps/solid-demo/.pureform/**/*"
+        - "../../apps/solid-demo/panda.config.ts"
+        - "../../apps/solid-demo/panda.pureform.ts"
+        - "../../apps/solid-demo/src/App.css"
+        - "../../tests/browser-e2e-tests/src/mirror.ts"
+
+tasks:
+  test:e2e:
+    enabled: true
+    # The demo's Panda codegen writes the styled-system the registry and stylesheet import.
+    dependencies:
+      append:
+        - ^prepare
