@@ -674,7 +674,36 @@ validate, and disable with it, with no form library.
   initial values (§5.7), so a form submits correctly even before scripts load.
 - **React Native** has no forms; apps use the controlled props (§9.4).
 
-### 9.6 Testing
+### 9.6 Icons
+
+pureform ships no icon set. An icon is whatever the app renders: an SVG component, a
+Material Symbols glyph, an image. The icon slot owns its size, color, and direction; the
+icon only has to follow them.
+
+- **Web contract: `1em` and `currentColor`.** The icon slot (`iconBox`) sets
+  `width`, `height`, and `font-size` to the icon size, and the slot's color. An SVG with
+  `width="1em" height="1em" fill="currentColor"` (what Material Symbols' SVGs, Iconify,
+  and `unplugin-icons` produce) or a font glyph then fits with no props. The AST has no
+  child selectors, and none are added for this.
+- **React Native contract: a hook.** Nothing inherits there, so the icon part provides
+  `useIconStyle()` → `{ size, color }`, and icon components take them as props
+  (`<MyIcon size={size} color={color} />`). The web bindings offer the same hook for icon
+  libraries that want numbers.
+- **Material Symbols' axes.** Material draws some states with a filled icon, such as the
+  active navigation destination. Icon slots get a `fill` token (0 or 1) that those states
+  set, written as `font-variation-settings: "FILL" <fill>` for icon fonts. SVG icons can't
+  read it, so `useIconStyle()` also returns `filled`, for apps that swap the SVG.
+- **Placement.** Compound parts (`Button.Icon`, `TextField.LeadingIcon`), or props on the
+  ready-made component (`icon`, `leadingIcon`, `trailingIcon`) taking any element. A slot
+  renders only when given, and the root gets the data attribute that the icon-dependent
+  styles match (the fields' and tabs' remaining compounds, §5.5).
+- **Direction:** `mirror` flips an icon that points under `rtl` (§5.9).
+- **Accessibility.** Icons in a slot are decorative: `aria-hidden="true"`. The standalone
+  `Icon` takes `label`, which makes it `role="img"` with that name. Icon-only components
+  (icon button, FAB without text) require `aria-label` or `aria-labelledby` in their
+  types, and in development they warn if both are missing at runtime.
+
+### 9.7 Testing
 
 - **Machines and anatomy:** Vitest unit tests, no DOM.
 - **Solid components:** Vitest browser mode (existing setup), with
@@ -733,7 +762,7 @@ Preset changes these designs need, independent of the steps above:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** the icon slot contract; whether `.pureform/` is
+3. **Not yet covered:** whether `.pureform/` is
    committed and how stale glue is detected; and how packages are versioned together.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
