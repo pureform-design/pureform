@@ -49,6 +49,20 @@ for what they can't do (git, formatting, linting, ad-hoc scripts).
   `CHROMIUM_PATH`; outside omni, load it with `set -a; source .env.local; set +a`.
 - **New packages** are scaffolded with the omni `ts-package` generator (see above).
   Dependencies go through the root `package.json` catalog. Test projects live under `tests/`.
+- **Package READMEs:** every package a phase creates gets a `README.md`, and every
+  package a phase changes gets its `README.md` updated (created if missing). Write it for
+  a person new to the package, in plain language:
+    - what the package is for, in a sentence or two, and where it sits among the others
+      (what it depends on, what depends on it);
+    - its architecture: the main modules and how they fit together, with a small diagram
+      when it helps;
+    - its public API at a glance (entry points and subpaths, with a short example);
+    - how to build and test it (the omni tasks);
+    - anything surprising: stubs, deliberate limits, links to the design doc sections.
+
+    Keep it current with the code; the output context records what changed, the README
+    describes what is.
+
 - **Rebuild a package's `dist`** after changing it; dependents and scripts read `dist`.
 - **Refactors must not change output.** Prove it with before-and-after equivalence on
   React Native and in Chromium (tooling: `/tmp/opencode/baseline.sh`,
@@ -94,5 +108,8 @@ The commands and tests that show it works.
 
 Traps, conventions established, and anything the dependent phases must know.
 ```
+
+Before writing it, make sure the `README.md` of every package the phase created or
+changed is current.
 
 Then tick the phase in `docs/roadmap/README.md` and link its output context there.
