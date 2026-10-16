@@ -36,7 +36,7 @@
         "@pandacss/preset-typography": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/bundler": "catalog:",
-        "@pureform/generate": "catalog:",
+        "@pureform/cli": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",

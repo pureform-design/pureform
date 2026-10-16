@@ -1,6 +1,6 @@
 // How the demo generates `.pureform/`: the bundler plugin in `vite.config.ts` (on dev and
-// build) and `scripts/generate.ts` (the omni `generate` task, before Panda's codegen) both
-// take these options.
+// build) takes these options, and `pureform generate` (the omni `generate` task, before Panda's
+// codegen) reads them from this file's `glue` export.
 
 import type { PureformPluginOptions } from "@pureform/bundler";
 import type { PandaCodegenOptions } from "@pureform/panda-adapter/codegen";
