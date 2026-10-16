@@ -18,20 +18,23 @@
 import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { spacing, textStyle } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
 import {
-    groupCompounds,
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
-    groupRoles,
+    defaultDensities,
+    defaultGroups,
     dense,
     densityCompounds,
     densityMarkers,
-    DEFAULT_DENSITIES,
+    densitySteps,
+    groupCompounds,
+    groupRoles,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const pf = typed();
 
@@ -59,114 +62,130 @@ const lines = (height: LineHeight) => ({
 
 /** Build the list item with a `color` variant per group in `groups`. A group colors the
  *  selected item and its parts with the group's container; at rest, every item is neutral. */
-export const createListItem = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createListItem = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) =>
-    pf.slotComponent({
-        name: "listItem",
-        $meta: {
-            description:
-                "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or data-selected.",
-        },
-        tokens,
-        slots: [
-            "root",
-            "leading",
-            "content",
-            "overline",
-            "headline",
-            "supportingText",
-            "trailing",
-            "trailingText",
-        ],
-        structure: {
-            root: ["leading", "content", "trailing", "trailingText"],
-            content: ["overline", "headline", "supportingText"],
-        },
-        variants: {
-            lines: ["one", "two", "three"],
-            interactive: ["true", "false"],
-            density: ["inherit", ...Object.keys(densities)],
-            color: groups,
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    ...parts.row,
-                    gap: ref("gap"),
-                    paddingInlineStart: ref("paddingInline"),
-                    paddingInlineEnd: ref("paddingInline"),
-                    paddingBlockStart: spacing("2"),
-                    paddingBlockEnd: spacing("2"),
-                },
-                leading: parts.leading,
-                content: {
-                    display: flex,
-                    flexDirection: column,
-                    width: pct(100),
-                },
-                overline: {
-                    textStyle: textStyle("labelSmall"),
-                    color: parts.supportingText.color,
-                },
-                headline: { textStyle: textStyle("bodyLarge") },
-                supportingText: parts.supportingText,
-                trailing: parts.trailing,
-                trailingText: parts.trailingText("labelSmall"),
+    variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
+        pf.slotComponent({
+            name: "listItem",
+            $meta: {
+                description:
+                    "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or data-selected.",
+            },
+            tokens,
+            slots: [
+                "root",
+                "leading",
+                "content",
+                "overline",
+                "headline",
+                "supportingText",
+                "trailing",
+                "trailingText",
+            ],
+            structure: {
+                root: ["leading", "content", "trailing", "trailingText"],
+                content: ["overline", "headline", "supportingText"],
             },
             variants: {
-                lines: {
-                    one: lines("heightOne"),
-                    two: lines("heightTwo"),
-                    // Material tops the leading and trailing parts in a three-line item.
-                    three: {
-                        root: {
-                            minHeight: dense(ref("heightThree")),
-                            alignItems: start,
-                            paddingBlockStart: spacing("3"),
-                            paddingBlockEnd: spacing("3"),
+                lines: ["one", "two", "three"],
+                interactive: ["true", "false"],
+                density: densitySteps<string>(densities),
+                color: groups as ColorGroups,
+            },
+            recipe: () => ({
+                base: {
+                    root: {
+                        ...parts.row,
+                        gap: ref("gap"),
+                        paddingInlineStart: ref("paddingInline"),
+                        paddingInlineEnd: ref("paddingInline"),
+                        paddingBlockStart: spacing("2"),
+                        paddingBlockEnd: spacing("2"),
+                    },
+                    leading: parts.leading,
+                    content: {
+                        display: flex,
+                        flexDirection: column,
+                        width: pct(100),
+                    },
+                    overline: {
+                        textStyle: textStyle("labelSmall"),
+                        color: parts.supportingText.color,
+                    },
+                    headline: { textStyle: textStyle("bodyLarge") },
+                    supportingText: parts.supportingText,
+                    trailing: parts.trailing,
+                    trailingText: parts.trailingText("labelSmall"),
+                },
+                variants: {
+                    lines: {
+                        one: lines("heightOne"),
+                        two: lines("heightTwo"),
+                        // Material tops the leading and trailing parts in a three-line item.
+                        three: {
+                            root: {
+                                minHeight: dense(ref("heightThree")),
+                                alignItems: start,
+                                paddingBlockStart: spacing("3"),
+                                paddingBlockEnd: spacing("3"),
+                            },
                         },
                     },
+                    interactive: {
+                        true: { root: parts.interactive },
+                        false: {},
+                    },
+                    density: densityMarkers(densities),
+                    color: colorVariant(groups, (g) => {
+                        const c = rowGroupColors(ref, "root", g);
+                        return {
+                            root: c.row,
+                            leading: c.leading,
+                            trailing: c.trailing,
+                            overline: c.supportingText,
+                            supportingText: c.supportingText,
+                        };
+                    }),
                 },
-                interactive: {
-                    true: { root: parts.interactive },
-                    false: {},
+                // An interactive item's selected colors sit in the interactive variant, so a compound
+                // variant per group replaces them in the later layer.
+                compoundVariants: [
+                    ...groupCompounds(
+                        groups,
+                        { interactive: "true" },
+                        (group) => ({
+                            root: rowGroupColors(ref, "root", groupRoles(group))
+                                .interactive,
+                        }),
+                    ),
+                    ...(
+                        Object.entries(LINES) as [
+                            keyof typeof LINES,
+                            LineHeight,
+                        ][]
+                    ).flatMap(([count, height]) =>
+                        densityCompounds(
+                            densities,
+                            { lines: count },
+                            (offset) => ({
+                                root: { minHeight: add(ref(height), offset) },
+                            }),
+                        ),
+                    ),
+                ],
+                defaultVariants: {
+                    lines: "one",
+                    interactive: "false",
+                    color: DEFAULT_GROUP,
+                    density: "inherit",
                 },
-                density: densityMarkers(densities),
-                color: colorVariant(groups, (g) => {
-                    const c = rowGroupColors(ref, "root", g);
-                    return {
-                        root: c.row,
-                        leading: c.leading,
-                        trailing: c.trailing,
-                        overline: c.supportingText,
-                        supportingText: c.supportingText,
-                    };
-                }),
-            },
-            // An interactive item's selected colors sit in the interactive variant, so a compound
-            // variant per group replaces them in the later layer.
-            compoundVariants: [
-                ...groupCompounds(groups, { interactive: "true" }, (group) => ({
-                    root: rowGroupColors(ref, "root", groupRoles(group))
-                        .interactive,
-                })),
-                ...(
-                    Object.entries(LINES) as [keyof typeof LINES, LineHeight][]
-                ).flatMap(([count, height]) =>
-                    densityCompounds(densities, { lines: count }, (offset) => ({
-                        root: { minHeight: add(ref(height), offset) },
-                    })),
-                ),
-            ],
-            defaultVariants: {
-                lines: "one",
-                interactive: "false",
-                color: DEFAULT_GROUP,
-                density: "inherit",
-            },
+            }),
         }),
-    });
+    );
 
 export const listItem = createListItem();

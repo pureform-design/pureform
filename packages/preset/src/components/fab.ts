@@ -25,19 +25,21 @@ import {
 } from "./shaped";
 import type { Shapes } from "./shaped";
 import {
-    entriesOf,
-    keysOf,
-    lower,
-    COLOR_GROUPS,
+    DEFAULT_GROUP,
     colorVariants,
     componentTokens,
+    defaultGroups,
+    entriesOf,
     fillColors,
+    iconBox,
+    keysOf,
+    lower,
+    pressableRoot,
     sys,
     touchTarget,
-    iconBox,
-    pressableRoot,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Fill } from "./shared";
+import type { ColorGroup, ColorGroups, Fill } from "./shared";
 
 const FILLS = {
     tonal: "tonal",
@@ -81,113 +83,121 @@ const elevation = shapedElevationLevels("level3", "level4");
 const pf = typed();
 
 /** Build the FAB with a `color` variant per group in `groups`. */
-export const createFab = (
-    groups: ColorGroups = COLOR_GROUPS,
+export const createFab = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
     shapes: Shapes = DEFAULT_SHAPES,
 ) =>
-    pf.slotComponent({
-        name: "fab",
-        $meta: {
-            description:
-                "Material floating action button. Put the icon, and the label for an extended FAB, in the container. shape clips the container to one of the theme's shapes.",
-        },
-        tokens,
-        slots: ["root", "touchTarget", "container", "icon", "label"],
-        structure: {
-            root: ["touchTarget", "container"],
-            container: ["icon", "label"],
-        },
-        variants: {
-            color: groups,
-            variant: keysOf(FILLS),
-            size: ["small", "medium", "large"],
-            extended: ["true", "false"],
-            shape: ["none", ...Object.keys(shapes)],
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    ...pressableRoot,
-                    ...elevation.root,
-                    states: {
-                        ...elevation.root.states,
-                        disabled: {
-                            ...elevation.root.states.disabled,
-                            pointerEvents: none,
-                        },
-                    },
-                },
-                container: {
-                    ...shapedContainer(ref("radiusMedium")),
-                    ...elevation.container,
-                    gap: ref("gap"),
-                },
-                icon: iconBox(ref("iconSize")),
-                label: { textStyle: textStyle("labelLarge") },
-                touchTarget,
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.slotComponent({
+            name: "fab",
+            $meta: {
+                description:
+                    "Material floating action button. Put the icon, and the label for an extended FAB, in the container. shape clips the container to one of the theme's shapes.",
+            },
+            tokens,
+            slots: ["root", "touchTarget", "container", "icon", "label"],
+            structure: {
+                root: ["touchTarget", "container"],
+                container: ["icon", "label"],
             },
             variants: {
-                color: colorVariants(groups),
-                variant: Object.fromEntries(
-                    Object.keys(FILLS).map((name) => [name, { root: {} }]),
-                ),
-                size: {
-                    small: fabSize("Small"),
-                    medium: fabSize("Medium"),
-                    large: fabSize("Large"),
-                },
-                extended: {
-                    true: {
-                        container: {
-                            paddingInlineStart: ref("padding"),
-                            paddingInlineEnd: ref("padding"),
+                color: groups as ColorGroups,
+                variant: keysOf(FILLS),
+                size: ["small", "medium", "large"],
+                extended: ["true", "false"],
+                shape: ["none", ...Object.keys(shapes)],
+            },
+            recipe: () => ({
+                base: {
+                    root: {
+                        ...pressableRoot,
+                        ...elevation.root,
+                        states: {
+                            ...elevation.root.states,
+                            disabled: {
+                                ...elevation.root.states.disabled,
+                                pointerEvents: none,
+                            },
                         },
                     },
-                    false: { root: {} },
+                    container: {
+                        ...shapedContainer(ref("radiusMedium")),
+                        ...elevation.container,
+                        gap: ref("gap"),
+                    },
+                    icon: iconBox(ref("iconSize")),
+                    label: { textStyle: textStyle("labelLarge") },
+                    touchTarget,
                 },
-                shape: shapeVariant(shapes, { radius: ref("radiusMedium") }),
-            },
-            compoundVariants: [
-                ...entriesOf(FILLS).flatMap(([variant, fill]) =>
-                    groups.map((color) => {
-                        const colors = fillColors(fill, color);
-                        // Material's surface FAB sits on the high surface container.
-                        const container =
-                            variant === "surface"
-                                ? sys("surfaceContainerHigh")
-                                : colors.container;
-                        return {
-                            match: { color, variant },
-                            style: shapedColors(fill, color, container),
-                        };
+                variants: {
+                    color: colorVariants(groups),
+                    variant: Object.fromEntries(
+                        Object.keys(FILLS).map((name) => [name, { root: {} }]),
+                    ),
+                    size: {
+                        small: fabSize("Small"),
+                        medium: fabSize("Medium"),
+                        large: fabSize("Large"),
+                    },
+                    extended: {
+                        true: {
+                            container: {
+                                paddingInlineStart: ref("padding"),
+                                paddingInlineEnd: ref("padding"),
+                            },
+                        },
+                        false: { root: {} },
+                    },
+                    shape: shapeVariant(shapes, {
+                        radius: ref("radiusMedium"),
                     }),
-                ),
-                // The container's radius follows the size only when unshaped. A shape sets
-                // its own, and as a variant it would tie with the size's, leaving the order
-                // of their rules to decide.
-                ...(["Small", "Medium", "Large"] as const).map((s) => ({
-                    match: { size: lower(s), shape: "none" as const },
-                    style: { container: { borderRadius: ref(`radius${s}`) } },
-                })),
-                ...(["small", "large"] as const).map((size) => ({
-                    match: { size, extended: "false" as const },
-                    style: {
-                        root: {
-                            width: ref(
-                                size === "small" ? "sizeSmall" : "sizeLarge",
-                            ),
+                },
+                compoundVariants: [
+                    ...entriesOf(FILLS).flatMap(([variant, fill]) =>
+                        groups.map((color) => {
+                            const colors = fillColors(fill, color);
+                            // Material's surface FAB sits on the high surface container.
+                            const container =
+                                variant === "surface"
+                                    ? sys("surfaceContainerHigh")
+                                    : colors.container;
+                            return {
+                                match: { color, variant },
+                                style: shapedColors(fill, color, container),
+                            };
+                        }),
+                    ),
+                    // The container's radius follows the size only when unshaped. A shape sets
+                    // its own, and as a variant it would tie with the size's, leaving the order
+                    // of their rules to decide.
+                    ...(["Small", "Medium", "Large"] as const).map((s) => ({
+                        match: { size: lower(s), shape: "none" as const },
+                        style: {
+                            container: { borderRadius: ref(`radius${s}`) },
                         },
-                    },
-                })),
-            ],
-            defaultVariants: {
-                color: "primary",
-                variant: "tonal",
-                size: "medium",
-                extended: "false",
-                shape: "none",
-            },
+                    })),
+                    ...(["small", "large"] as const).map((size) => ({
+                        match: { size, extended: "false" as const },
+                        style: {
+                            root: {
+                                width: ref(
+                                    size === "small"
+                                        ? "sizeSmall"
+                                        : "sizeLarge",
+                                ),
+                            },
+                        },
+                    })),
+                ],
+                defaultVariants: {
+                    color: "primary",
+                    variant: "tonal",
+                    size: "medium",
+                    extended: "false",
+                    shape: "none",
+                },
+            }),
         }),
-    });
+    );
 
 export const fab = createFab();

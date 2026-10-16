@@ -5,8 +5,15 @@ import { typed } from "@pureform/core";
 import { px } from "@pureform/core/ast";
 import { size as sizeToken } from "@pureform/theme";
 
-import { COLOR_GROUPS, componentTokens, iconBox, sys } from "./shared";
-import type { ColorGroups } from "./shared";
+import {
+    DEFAULT_GROUP,
+    componentTokens,
+    defaultGroups,
+    iconBox,
+    sys,
+    variantsOf,
+} from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
@@ -18,35 +25,42 @@ const { tokens, ref } = componentTokens("icon", {
 
 /** Build the icon with a `color` variant per group in `groups`. With no color it takes the
  *  surrounding text color. */
-export const createIcon = (groups: ColorGroups = COLOR_GROUPS) =>
-    pf.component({
-        name: "icon",
-        $meta: {
-            description:
-                "An icon box at an icon size that centers its glyph or svg. color tints it with a color group.",
-        },
-        tokens,
-        variants: {
-            size: ["small", "medium", "large"],
-            color: ["current", ...groups],
-        },
-        recipe: () => ({
-            base: {},
-            variants: {
-                size: {
-                    small: iconBox(ref("sizeSmall")),
-                    medium: iconBox(ref("sizeMedium")),
-                    large: iconBox(ref("sizeLarge")),
-                },
-                color: {
-                    current: {},
-                    ...Object.fromEntries(
-                        groups.map((group) => [group, { color: sys(group) }]),
-                    ),
-                },
+export const createIcon = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) =>
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.component({
+            name: "icon",
+            $meta: {
+                description:
+                    "An icon box at an icon size that centers its glyph or svg. color tints it with a color group.",
             },
-            defaultVariants: { size: "medium", color: "current" },
+            tokens,
+            variants: {
+                size: ["small", "medium", "large"],
+                color: ["current", ...groups],
+            },
+            recipe: () => ({
+                base: {},
+                variants: {
+                    size: {
+                        small: iconBox(ref("sizeSmall")),
+                        medium: iconBox(ref("sizeMedium")),
+                        large: iconBox(ref("sizeLarge")),
+                    },
+                    color: {
+                        current: {},
+                        ...Object.fromEntries(
+                            groups.map((group) => [
+                                group,
+                                { color: sys(group) },
+                            ]),
+                        ),
+                    },
+                },
+                defaultVariants: { size: "medium", color: "current" },
+            }),
         }),
-    });
+    );
 
 export const icon = createIcon();

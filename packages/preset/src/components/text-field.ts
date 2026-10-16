@@ -20,10 +20,17 @@
 
 import { typed } from "@pureform/core";
 import { pct } from "@pureform/core/ast";
+import type { MaterialDensity } from "@pureform/theme";
 
 import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
-import { COLOR_GROUPS, DEFAULT_DENSITIES, DEFAULT_GROUP } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import {
+    DEFAULT_GROUP,
+    defaultDensities,
+    defaultGroups,
+    densitySteps,
+    variantsOf,
+} from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField");
 
@@ -37,54 +44,62 @@ const pf = typed();
 
 /** Build the text field with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
-export const createTextField = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createTextField = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) => {
     const color = colors(groups);
     const density = densityParts(densities);
-    return pf.slotComponent({
-        name: "textField",
-        $meta: {
-            description:
-                "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
-        },
-        tokens,
-        slots: [...FIELD_SLOTS],
-        structure: FIELD_STRUCTURE,
-        variants: {
-            variant: ["filled", "outlined"],
-            color: groups,
-            leadingIcon: ["true", "false"],
-            trailingIcon: ["true", "false"],
-            density: ["inherit", ...Object.keys(densities)],
-        },
-        recipe: () => ({
-            base: {
-                ...base,
-                ...icons.base,
-                container: { ...base.container, height: density.height },
-                input: { ...base.input, height: pct(100) },
+    return variantsOf<{
+        color: G | typeof DEFAULT_GROUP;
+        density: "inherit" | D;
+    }>()(
+        pf.slotComponent({
+            name: "textField",
+            $meta: {
+                description:
+                    "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
             },
+            tokens,
+            slots: [...FIELD_SLOTS],
+            structure: FIELD_STRUCTURE,
             variants: {
-                variant,
-                color: color.color,
-                ...icons.variants,
-                ...density.variants,
+                variant: ["filled", "outlined"],
+                color: groups as ColorGroups,
+                leadingIcon: ["true", "false"],
+                trailingIcon: ["true", "false"],
+                density: densitySteps<string>(densities),
             },
-            compoundVariants: [
-                ...color.compoundVariants,
-                ...icons.compoundVariants,
-                ...density.compoundVariants,
-            ],
-            defaultVariants: {
-                color: DEFAULT_GROUP,
-                variant: "filled",
-                ...icons.defaultVariants,
-                ...density.defaultVariants,
-            },
+            recipe: () => ({
+                base: {
+                    ...base,
+                    ...icons.base,
+                    container: { ...base.container, height: density.height },
+                    input: { ...base.input, height: pct(100) },
+                },
+                variants: {
+                    variant,
+                    color: color.color,
+                    ...icons.variants,
+                    ...density.variants,
+                },
+                compoundVariants: [
+                    ...color.compoundVariants,
+                    ...icons.compoundVariants,
+                    ...density.compoundVariants,
+                ],
+                defaultVariants: {
+                    color: DEFAULT_GROUP,
+                    variant: "filled",
+                    ...icons.defaultVariants,
+                    ...density.defaultVariants,
+                },
+            }),
         }),
-    });
+    );
 };
 
 export const textField = createTextField();

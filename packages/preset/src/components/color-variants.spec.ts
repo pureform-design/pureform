@@ -1,3 +1,4 @@
+import type { SlottedComponentSpec } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
 import { createCheckbox } from "./checkbox";
@@ -35,7 +36,7 @@ describe.each([
     ["navigationBar", createNavigationBar],
     ["navigationRail", createNavigationRail],
 ] as const)("%s color", (_, create) => {
-    const spec = create(GROUPS);
+    const spec = (create as (groups: string[]) => SlottedComponentSpec)(GROUPS);
 
     it("has a color variant per group, defaulting to primary", () => {
         expect(Object.keys(spec.recipe.variants?.color ?? {})).toEqual(GROUPS);
