@@ -217,7 +217,7 @@ export interface RippleOptions {
 export interface Ripples {
     handlers: {
         onPressIn: (event: {
-            nativeEvent: { pageX: number; pageY: number };
+            nativeEvent: { pageX?: number; pageY?: number };
         }) => void;
         onPressOut: () => void;
     };
@@ -262,13 +262,17 @@ export const useRippleDrawn = (
     return {
         handlers: {
             onPressIn: (event: {
-                nativeEvent: { pageX: number; pageY: number };
+                nativeEvent: { pageX?: number; pageY?: number };
             }) => {
                 if (options.disabled || reducedMotion) return;
                 const { pageX, pageY } = event.nativeEvent;
+                // A press with no pointer, from a key or an assistive technology, ripples from
+                // the center, as the web's keyboard clicks do.
+                const pointer =
+                    Number.isFinite(pageX) && Number.isFinite(pageY);
                 controller.current?.press(
-                    { x: pageX, y: pageY },
-                    options.centered ?? false,
+                    { x: pageX ?? 0, y: pageY ?? 0 },
+                    (options.centered ?? false) || !pointer,
                 );
             },
             onPressOut: () => controller.current?.release(),
