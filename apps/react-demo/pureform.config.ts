@@ -1,6 +1,6 @@
 // The demo's pureform config, a copy of `apps/solid-demo`'s: Material's defaults, a monospace
 // text style, and three named themes. `panda.pureform.ts` compiles it into the Panda preset,
-// and `scripts/generate.ts` writes `.pureform/` from it.
+// and `pureform generate` (or the bundler plugin) writes `.pureform/` from it.
 
 import { morph } from "@pureform/core/ast";
 import {

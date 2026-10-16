@@ -20,10 +20,11 @@ and again in dev when `pureform.config.ts` or a file it imports changes. Its opt
 
 Steps without Vite need the folder too: Panda's codegen (`panda.config.ts` imports
 `.pureform/panda`), `tsc`, and the browser tests. Through omni, `prepare` runs the `generate`
-task (`node scripts/generate.ts`, after building the packages it loads, with the same options)
-and then `panda codegen`; by hand, `node scripts/generate.ts` (or `--check` to compare without
-writing). Run it under Node, as Vite does: the preset computes a shape morph differently under
-Bun, which changes the glue's hash. p4c-cli replaces the script with `pureform generate`.
+task (`bun x pureform generate`, from `@pureform/cli`, after building the packages it loads)
+and then `panda codegen`; by hand, `bun x pureform generate` (`--watch` to keep it current,
+`--check` to compare without writing). The command reads the same options from
+`pureform.glue.ts`. It runs under Node, as Vite does (`bun x` follows the bin's shebang): the
+preset computes a shape morph differently under Bun, which changes the glue's hash.
 
 | File            | What it is                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- |
