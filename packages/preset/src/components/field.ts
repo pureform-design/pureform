@@ -44,10 +44,8 @@ import {
 import {
     iconBox,
     inputText,
-    THEME_DENSITY,
-    dense,
-    densityCompounds,
-    densityMarkers,
+    DENSITY_TOKEN,
+    densityTokenVariant,
     colorVariant,
     componentTokens,
     disabledColor,
@@ -80,6 +78,7 @@ export const FIELD_TOKENS = {
     iconColor: sys("onSurfaceVariant"),
     // The icon inset, the icon, and the gap before the text.
     textInsetWithIcon: px(52),
+    ...DENSITY_TOKEN,
 } satisfies Record<string, ValueNode>;
 
 export type FieldToken = keyof typeof FIELD_TOKENS;
@@ -309,7 +308,7 @@ export const fieldParts = (
             },
         } satisfies Record<string, Record<string, StyleMap>>;
     };
-    const themeSized = sized(density ? THEME_DENSITY : undefined);
+    const themeSized = sized(density ? ref("densityOffset") : undefined);
 
     const variant = {
         filled: {
@@ -415,18 +414,11 @@ export const fieldParts = (
         },
     };
 
-    // The density variant over the given steps, and a compound per fill and step restating the
-    // sizes, since the fill variant sets them too. A component with a fixed height reads it at
-    // the theme's density through `height`.
+    // The density variant over the given steps, each setting the density token the fills'
+    // sizes and the container's `height` read.
     const densityParts = (steps: Densities) => ({
-        height: dense(ref("height")),
-        variants: { density: densityMarkers(steps) },
-        compoundVariants: (["filled", "outlined"] as const).flatMap((fill) =>
-            densityCompounds(steps, { variant: fill }, (offset) => ({
-                ...sized(offset)[fill],
-                container: { height: add(ref("height"), offset) },
-            })),
-        ),
+        height: add(ref("height"), ref("densityOffset")),
+        variants: { density: densityTokenVariant(steps) },
         defaultVariants: { density: "inherit" as const },
     });
 

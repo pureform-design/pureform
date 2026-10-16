@@ -4,7 +4,7 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "container": {
-      "height": "calc(var(--components-textField-height, 56px) + token(sizes.densityOffset))",
+      "height": "calc(var(--components-textField-height, 56px) + var(--components-textField-densityOffset, token(sizes.densityOffset)))",
       "position": "relative",
       "transition": {
         "_motionReduce": "none",
@@ -126,138 +126,6 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       "leadingIcon": true,
       "variant": "outlined",
     },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + 0px)",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(0px * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(0px * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
-            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "0",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -1))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -1) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-1",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -2))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -2) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-2",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -3))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -3) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-3",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + 0px)",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(0px * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(0px * 0.5))",
-        },
-      },
-      "density": "0",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -1))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -1) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -1) * 0.5))",
-        },
-      },
-      "density": "-1",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -2))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -2) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -2) * 0.5))",
-        },
-      },
-      "density": "-2",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-textField-height, 56px) + calc(token(spacing.1) * -3))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -3) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -3) * 0.5))",
-        },
-      },
-      "density": "-3",
-      "variant": "outlined",
-    },
   ],
   "defaultVariants": {
     "color": "primary",
@@ -313,11 +181,31 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "density": {
-      "-1": {},
-      "-2": {},
-      "-3": {},
-      "0": {},
-      "inherit": {},
+      "-1": {
+        "root": {
+          "--components-textField-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-textField-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-textField-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-textField-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-textField-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
     },
     "leadingIcon": {
       "false": {},
@@ -357,13 +245,13 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
         "label": {
           "top": {
-            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
-            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
+            ".textField__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".textField__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
             "base": "50%",
           },
           "transform": {
@@ -401,8 +289,8 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(token(sizes.densityOffset) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-textField-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
         "label": {
           "backgroundColor": {

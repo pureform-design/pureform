@@ -37,11 +37,9 @@ import {
 } from "./field";
 import {
     DEFAULT_GROUP,
-    THEME_DENSITY,
     defaultDensities,
     defaultGroups,
-    densityCompounds,
-    densityMarkers,
+    densityTokenVariant,
     densitySteps,
     variantsOf,
 } from "./shared";
@@ -84,7 +82,7 @@ const sized = (offset: NumericValue) => {
         },
     } satisfies Record<string, Record<string, StyleMap>>;
 };
-const themeSized = sized(THEME_DENSITY);
+const themeSized = sized(ref("densityOffset"));
 
 const pf = typed();
 
@@ -170,18 +168,9 @@ export const createTextArea = <
                             },
                         },
                     },
-                    density: densityMarkers(densities),
+                    density: densityTokenVariant(densities),
                 },
-                compoundVariants: [
-                    ...icons.compoundVariants,
-                    ...(["filled", "outlined"] as const).flatMap((fill) =>
-                        densityCompounds(
-                            densities,
-                            { variant: fill },
-                            (offset) => sized(offset)[fill],
-                        ),
-                    ),
-                ],
+                compoundVariants: [...icons.compoundVariants],
                 defaultVariants: {
                     variant: "filled",
                     color: DEFAULT_GROUP,

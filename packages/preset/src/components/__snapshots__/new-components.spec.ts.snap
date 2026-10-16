@@ -458,116 +458,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
   },
   "className": "listItem",
-  "compoundVariants": [
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + 0px)",
-        },
-      },
-      "density": "0",
-      "lines": "one",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + calc(token(spacing.1) * -1))",
-        },
-      },
-      "density": "-1",
-      "lines": "one",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + calc(token(spacing.1) * -2))",
-        },
-      },
-      "density": "-2",
-      "lines": "one",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + calc(token(spacing.1) * -3))",
-        },
-      },
-      "density": "-3",
-      "lines": "one",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + 0px)",
-        },
-      },
-      "density": "0",
-      "lines": "two",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + calc(token(spacing.1) * -1))",
-        },
-      },
-      "density": "-1",
-      "lines": "two",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + calc(token(spacing.1) * -2))",
-        },
-      },
-      "density": "-2",
-      "lines": "two",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + calc(token(spacing.1) * -3))",
-        },
-      },
-      "density": "-3",
-      "lines": "two",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + 0px)",
-        },
-      },
-      "density": "0",
-      "lines": "three",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + calc(token(spacing.1) * -1))",
-        },
-      },
-      "density": "-1",
-      "lines": "three",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + calc(token(spacing.1) * -2))",
-        },
-      },
-      "density": "-2",
-      "lines": "three",
-    },
-    {
-      "css": {
-        "root": {
-          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + calc(token(spacing.1) * -3))",
-        },
-      },
-      "density": "-3",
-      "lines": "three",
-    },
-  ],
+  "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
     "density": "inherit",
@@ -628,11 +519,31 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "density": {
-      "-1": {},
-      "-2": {},
-      "-3": {},
-      "0": {},
-      "inherit": {},
+      "-1": {
+        "root": {
+          "--components-listItem-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-listItem-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-listItem-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-listItem-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-listItem-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
     },
     "interactive": {
       "false": {},
@@ -673,20 +584,20 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "lines": {
       "one": {
         "root": {
-          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + token(sizes.densityOffset))",
+          "minHeight": "calc(var(--components-listItem-heightOne, 56px) + var(--components-listItem-densityOffset, token(sizes.densityOffset)))",
         },
       },
       "three": {
         "root": {
           "alignItems": "start",
-          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + token(sizes.densityOffset))",
+          "minHeight": "calc(var(--components-listItem-heightThree, 88px) + var(--components-listItem-densityOffset, token(sizes.densityOffset)))",
           "paddingBlockEnd": "token(spacing.3)",
           "paddingBlockStart": "token(spacing.3)",
         },
       },
       "two": {
         "root": {
-          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + token(sizes.densityOffset))",
+          "minHeight": "calc(var(--components-listItem-heightTwo, 72px) + var(--components-listItem-densityOffset, token(sizes.densityOffset)))",
         },
       },
     },
@@ -1590,7 +1501,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "container": {
-      "height": "calc(var(--components-select-height, 56px) + token(sizes.densityOffset))",
+      "height": "calc(var(--components-select-height, 56px) + var(--components-select-densityOffset, token(sizes.densityOffset)))",
       "position": "relative",
       "transition": {
         "_motionReduce": "none",
@@ -1720,138 +1631,6 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "leadingIcon": true,
       "variant": "outlined",
     },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + 0px)",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(0px * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(0px * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(0px * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "0",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -1))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -1) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -1) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-1",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -2))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -2) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -2) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-2",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -3))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(calc(token(spacing.1) * -3) * 0.5))",
-        },
-        "label": {
-          "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(calc(token(spacing.1) * -3) * 0.5))",
-            "base": "50%",
-          },
-        },
-      },
-      "density": "-3",
-      "variant": "filled",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + 0px)",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(0px * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(0px * 0.5))",
-        },
-      },
-      "density": "0",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -1))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -1) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -1) * 0.5))",
-        },
-      },
-      "density": "-1",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -2))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -2) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -2) * 0.5))",
-        },
-      },
-      "density": "-2",
-      "variant": "outlined",
-    },
-    {
-      "css": {
-        "container": {
-          "height": "calc(var(--components-select-height, 56px) + calc(token(spacing.1) * -3))",
-        },
-        "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -3) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(calc(token(spacing.1) * -3) * 0.5))",
-        },
-      },
-      "density": "-3",
-      "variant": "outlined",
-    },
   ],
   "defaultVariants": {
     "color": "primary",
@@ -1907,11 +1686,31 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "density": {
-      "-1": {},
-      "-2": {},
-      "-3": {},
-      "0": {},
-      "inherit": {},
+      "-1": {
+        "root": {
+          "--components-select-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-select-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-select-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-select-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-select-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
     },
     "leadingIcon": {
       "false": {},
@@ -1951,13 +1750,13 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "input": {
-          "paddingBlockEnd": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.6) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
         "label": {
           "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(token(sizes.densityOffset) * 0.5))",
+            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
             "base": "50%",
           },
           "transform": {
@@ -1995,8 +1794,8 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "input": {
-          "paddingBlockEnd": "calc(token(spacing.4) + calc(token(sizes.densityOffset) * 0.5))",
-          "paddingBlockStart": "calc(token(spacing.4) + calc(token(sizes.densityOffset) * 0.5))",
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
         "label": {
           "backgroundColor": {
