@@ -87,6 +87,11 @@ Ryzen 5 5600 under Node 26; `--jitless` stands in for Hermes, which has no JIT):
                             time by `@pureform/generate`, that emits ClassFactory (web) or
                             StyleFactory (native) modules into `.pureform/`.
 
+@pureform/binding-core      NEW (p2a). What every binding shares without a framework:
+                            provider options and nesting, selections over defaults,
+                            part attributes and props merging, controllable state,
+                            reduced motion, measuring an icon slot.
+
 @pureform/solid             NEW. Solid 2 bindings: provider, useClasses, compound
                             components. Includes internal Zag glue for Solid 2 (§8).
 @pureform/react             NEW, built alongside Solid. Same anatomy and machines.
@@ -364,6 +369,13 @@ function useClasses(name, selection) {
   `useLazyClassFactory` warns when it runs during a server render.
 - **Preloading:** `registry.preload(name)` starts loading a lazy entry early, from a
   router loader or on hover, so its first change doesn't wait on the network.
+- **Built (p2a), Solid:** as sketched. `useClasses` also lays the selection over the
+  provider's `defaults` for the component (`withDefaults` in `@pureform/binding-core`), and
+  reads the entry's kind once per instance. `useLazyClassFactory` boxes the factory in an async
+  memo with `ssrSource: "client"`. Components rarely call `useClasses` directly: Root calls
+  `useComponent(anatomy, { selection, testId, unstyled })`, which makes the one call and builds
+  every part (§9.2). With nothing registered (a binding's own build), `Selection` takes any
+  group and `tokens`, and every group and token takes `undefined` for its default.
 
 ```tsx
 // Solid
@@ -609,6 +621,11 @@ The design makes one setting, followed by everything that moves, on every target
 - **Testing.** Browser-mode tests emulate `prefers-reduced-motion` and set each
   `data-pf-motion` value, checking computed `transition` is `none` and that a ripple and a
   token tween don't run; React Native tests mock `AccessibilityInfo`.
+- **Built (p2a):** the provider resolves `motion` as the CSS does: the nearest `"reduce"` or
+  `"full"`, else `"system"`, so an explicit `"system"` inside a `"reduce"` provider keeps
+  `"reduce"` (it writes no attribute, and the CSS can't say "system"). `useReducedMotion()`
+  starts from `false` for the system and subscribes after mount (`subscribeReducedMotion` in
+  `@pureform/binding-core/dom`).
 
 ### 5.9 Direction
 
@@ -849,6 +866,15 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
       `save-touch-target`. `testIds.iconButton.touchTarget` keeps the AST's names.
     - Each part records whether it's an icon that takes `mirror`: any of its styles reads
       the `mirrored` state.
+- **Built (p2a), Solid:** `useComponent` returns a scope whose `part(name, options)` merges the
+  sources above, plus the provider's `slotProps` between the registry and the user, and whose
+  `render(name, { element, as, machine, states, props })` renders it. Classes join registry
+  first (Solid's array form), styles merge (a string style is parsed), handlers all run, other
+  keys take the last defined value. `combineProps` in `@pureform/binding-core` holds these
+  rules, with the class and style joins passed in, so React shares them. Polymorphism is the
+  `as` prop only, no render prop. An icon part provides its element to `useIconStyle()`, which
+  measures it after mount and re-reads when the component's attributes change, a transition in
+  it ends, or it resizes.
 
 ### 9.3 Configurability
 
@@ -896,6 +922,10 @@ component), Zag's shape, identical in Solid and React:
 - **Server rendering:** the controlled or default value renders on the server as its
   attributes (§5.7).
 - **React Native:** the same props; a `name` does nothing.
+- **Built (p2a):** `Controllable<N, T>` and the switch warning live in
+  `@pureform/binding-core`. Solid's `useControllable(component, name, props)` hands the machine
+  the value, the default read once, and the callback; Zag already uses the same names. The
+  warning fires once per instance.
 
 ### 9.5 Forms
 
@@ -963,6 +993,16 @@ validate, and disable with it, with no form library.
 - **Before hydration** the server's HTML holds the native and hidden inputs with their
   initial values (§5.7), so a form submits correctly even before scripts load.
 - **React Native** has no forms; apps use the controlled props (§9.4).
+- **Built (p2a):** Solid's `useFormReset(input, { resetsTo, onBeforeReset, onReset })` and
+  `useFieldsetDisabled(input)` wrap the helpers above. Zag's checkbox, switch, and radio group
+  still reset themselves during the `reset` event, to their value at creation, which for a
+  controlled component isn't the default. So `trackFormReset` now listens in the capture phase,
+  and `onBeforeReset` opens a window until the next task in which those callbacks are marked
+  `reason: "reset"` when uncontrolled (the value at creation is the default) and dropped when
+  controlled; the binding's own send after the browser's reset then reports the real default
+  with `reason: "reset"`. Zag's fieldset tracking still runs too; components OR
+  `useFieldsetDisabled` into `disabled`, which covers the missed outer fieldset but not the
+  legend exemption.
 
 ### 9.6 Icons
 
