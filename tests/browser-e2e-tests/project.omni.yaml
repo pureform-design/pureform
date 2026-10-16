@@ -15,6 +15,7 @@ dependencies:
     - "@pureform/css-adapter"
     - "@pureform/tailwind-adapter"
     - "@pureform/rn-adapter"
+    - "@pureform/styling"
     - "@pureform/site"
 
 cache:
@@ -23,6 +24,7 @@ cache:
       append:
         - "src/__screenshots__/**/*"
         - "../../apps/solid-demo/src/**/*"
+        - "../../apps/solid-demo/.pureform/**/*"
         - "../../apps/solid-demo/panda.config.ts"
         - "../../apps/solid-demo/panda.pureform.ts"
 
