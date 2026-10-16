@@ -59,6 +59,11 @@ function fixture(): string {
         lock += lockEntry(path, name);
     }
     writeFileSync(join(root, "bun.lock"), `${lock}  },\n}\n`);
+    mkdirSync(join(root, "packages/core/src"));
+    writeFileSync(
+        join(root, "packages/core/src/package-version.ts"),
+        'export const VERSION = "0.1.0";\n',
+    );
     return root;
 }
 
@@ -73,10 +78,14 @@ describe("setVersion", () => {
         const root = fixture();
         expect(setVersion(root, CORE_TRAIN, "0.2.0")).toEqual([
             "packages/core/package.json",
+            "packages/core/src/package-version.ts",
             "packages/theme/package.json",
             "bun.lock",
         ]);
         expect(versionOf(root, "packages/core")).toBe("0.2.0");
+        expect(read(root, "packages/core/src/package-version.ts")).toBe(
+            'export const VERSION = "0.2.0";\n',
+        );
         expect(versionOf(root, "packages/theme")).toBe("0.2.0");
         expect(versionOf(root, "packages/solid")).toBe("0.1.0");
         expect(read(root, "bun.lock")).toContain(
@@ -101,7 +110,7 @@ describe("setVersion", () => {
         const root = fixture();
         expect(
             setVersion(root, CORE_TRAIN, "0.2.0", { dryRun: true }),
-        ).toHaveLength(3);
+        ).toHaveLength(4);
         expect(versionOf(root, "packages/core")).toBe("0.1.0");
         expect(read(root, "bun.lock")).not.toContain("0.2.0");
     });
@@ -110,6 +119,23 @@ describe("setVersion", () => {
         expect(() => setVersion(fixture(), "@scope/demo", "0.2.0")).toThrow(
             "no package @scope/demo",
         );
+    });
+});
+
+describe("readWorkspace", () => {
+    test("reads each package's src/package-version.ts when it has one", () => {
+        const packages = readWorkspace(fixture());
+        expect(
+            packages.find((entry) => entry.path === "packages/core"),
+        ).toEqual({
+            path: "packages/core",
+            name: "@scope/core",
+            version: "0.1.0",
+            sourceVersion: "0.1.0",
+        });
+        expect(
+            packages.find((entry) => entry.path === "packages/theme"),
+        ).not.toHaveProperty("sourceVersion");
     });
 });
 
@@ -151,6 +177,8 @@ describe("this repository", () => {
                 "@pureform/styling",
                 "@pureform/anatomy",
                 "@pureform/machines",
+                "@pureform/binding-core",
+                "@pureform/generate",
             ]),
         );
     });

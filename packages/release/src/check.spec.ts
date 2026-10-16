@@ -102,4 +102,18 @@ describe("checkRelease", () => {
             "the core-train's packages differ in version: 0.2.0 (@scope/core); 0.1.0 (@scope/theme)",
         ]);
     });
+
+    test("finds a src/package-version.ts that differs from package.json", () => {
+        const cog = [
+            train("packages/core", "packages/theme"),
+            own("@scope/solid", "packages/solid"),
+        ];
+        const workspace = [
+            ...WORKSPACE.slice(1),
+            { ...pkg("packages/core", "@scope/core"), sourceVersion: "0.0.9" },
+        ];
+        expect(checkRelease(cog, workspace)).toEqual([
+            "@scope/core's src/package-version.ts says 0.0.9, and its package.json 0.1.0",
+        ]);
+    });
 });
