@@ -48,8 +48,8 @@ describe("registered components", () => {
 
     it("types variants, with booleans for true and false groups", () => {
         expectTypeOf<Variants<"button">>().toEqualTypeOf<{
-            variant?: "filled" | "text";
-            toggle?: "true" | "false" | boolean;
+            variant?: "filled" | "text" | undefined;
+            toggle?: "true" | "false" | boolean | undefined;
         }>();
         const ok: Variants<"button"> = { variant: "text", toggle: true };
         // @ts-expect-error a value the group doesn't have
@@ -96,7 +96,7 @@ describe("registered components", () => {
 
     it("types instance tokens", () => {
         expectTypeOf<InstanceTokens<"button">>().toEqualTypeOf<{
-            accent?: TokenValue;
+            accent?: TokenValue | undefined;
         }>();
         expectTypeOf<InstanceTokens<"card">>().toEqualTypeOf<{}>();
         const selection: Selection<"button"> = {
@@ -158,11 +158,11 @@ describe("components described by shape", () => {
 
     it("types them as a registered one", () => {
         expectTypeOf<Variants<Progress>>().toEqualTypeOf<{
-            indeterminate?: "true" | "false" | boolean;
+            indeterminate?: "true" | "false" | boolean | undefined;
         }>();
         expectTypeOf<SlotOf<Progress>>().toEqualTypeOf<"root" | "indicator">();
         expectTypeOf<InstanceTokens<Progress>>().toEqualTypeOf<{
-            value?: TokenValue;
+            value?: TokenValue | undefined;
         }>();
     });
 

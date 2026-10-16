@@ -62,7 +62,9 @@ export type StaticComponentName = {
 }[ComponentName];
 
 /** The registered components whose entries load on demand. */
-export type LazyComponentName = Exclude<ComponentName, StaticComponentName>;
+export type LazyComponentName = [keyof ComponentRegistry] extends [never]
+    ? string
+    : Exclude<ComponentName, StaticComponentName>;
 
 interface OpenShape {
     variants: Record<string, string>;
@@ -88,10 +90,21 @@ type VariantMap<C extends ComponentRef> =
 /** A variant group's value: one of its strings, or a boolean for a `"true" | "false"` group. */
 export type VariantValue<V> = V | ("true" extends V ? boolean : never);
 
-/** A component's variant selection. Groups left out take their default. */
-export type Variants<C extends ComponentRef> = {
-    [G in keyof VariantMap<C>]?: VariantValue<VariantMap<C>[G]>;
-};
+/** A component's variant selection. Groups left out or `undefined` take their default. A
+ *  component that isn't registered takes any group, and `tokens`. */
+export type Variants<C extends ComponentRef> =
+    string extends keyof VariantMap<C>
+        ? {
+              [group: string]:
+                  | VariantValue<string>
+                  | InstanceTokens<C>
+                  | undefined;
+          }
+        : {
+              [G in keyof VariantMap<C>]?:
+                  | VariantValue<VariantMap<C>[G]>
+                  | undefined;
+          };
 
 /** A component's slot names. A single-slot component has `"root"`. */
 export type SlotOf<C extends ComponentRef> =
@@ -113,12 +126,12 @@ export type TokenValue = string | number;
 
 /** The `dynamic` tokens an instance sets, such as a circular progress's `value`. */
 export type InstanceTokens<C extends ComponentRef> = {
-    [T in TokenOf<C>]?: TokenValue;
+    [T in TokenOf<C>]?: TokenValue | undefined;
 };
 
 /** What a factory takes: variants, plus the instance's tokens. */
 export type Selection<C extends ComponentRef> = Variants<C> & {
-    tokens?: InstanceTokens<C>;
+    tokens?: InstanceTokens<C> | undefined;
 };
 
 /** CSS custom properties for an element's `style`. */
