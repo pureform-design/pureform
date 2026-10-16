@@ -359,7 +359,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "indicator": {
-          "animation": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlide",
+          "animation": {
+            "_rtl": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlideRtl",
+            "base": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlide",
+          },
           "width": "var(--components-linearProgress-indeterminateWidth, 40%)",
         },
       },

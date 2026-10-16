@@ -750,18 +750,21 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleSizeChecked, 24px)",
         "base": "var(--components-switchControl-handleSize, 16px)",
       },
-      "justifyContent": "center",
-      "left": {
+      "insetInlineStart": {
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleOn, 36px)",
         "base": "var(--components-switchControl-handleOff, 16px)",
       },
+      "justifyContent": "center",
       "pointerEvents": "none",
       "position": "absolute",
       "top": "50%",
-      "transform": "translate(-50%, -50%)",
+      "transform": {
+        "_rtl": "translate(50%, -50%)",
+        "base": "translate(-50%, -50%)",
+      },
       "transition": {
         "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-        "base": "left token(durations.short3) token(easings.standard), width token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(durations.short3) token(easings.standard), width token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
       },
       "width": {
         ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
@@ -821,17 +824,20 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       },
       "borderRadius": "token(radii.full)",
       "height": "var(--components-switchControl-stateLayerSize, token(sizes.controlMedium))",
-      "left": {
+      "insetInlineStart": {
         ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-handleOn, 36px)",
         "base": "var(--components-switchControl-handleOff, 16px)",
       },
       "pointerEvents": "none",
       "position": "absolute",
       "top": "50%",
-      "transform": "translate(-50%, -50%)",
+      "transform": {
+        "_rtl": "translate(50%, -50%)",
+        "base": "translate(-50%, -50%)",
+      },
       "transition": {
         "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-        "base": "left token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-switchControl-stateLayerSize, token(sizes.controlMedium))",
     },

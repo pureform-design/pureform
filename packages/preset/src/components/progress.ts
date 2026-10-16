@@ -36,6 +36,7 @@ import {
     translateX,
     transparent,
     unitless,
+    when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { duration, easing, radius } from "@pureform/theme";
@@ -58,10 +59,15 @@ const pf = typed();
  *  config. */
 export const PROGRESS_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     // The indicator enters from the start and leaves past the end; translate is relative to
-    // its own width, a fraction of the track's.
+    // its own width, a fraction of the track's. Translation is physical, so right to left
+    // runs the other way.
     linearProgressSlide: {
         from: { transform: transform(translateX(pct(-100))) },
         to: { transform: transform(translateX(pct(250))) },
+    },
+    linearProgressSlideRtl: {
+        from: { transform: transform(translateX(pct(100))) },
+        to: { transform: transform(translateX(pct(-250))) },
     },
     circularProgressSpin: {
         from: { transform: transform(rotate(numeric(0, "deg"))) },
@@ -76,6 +82,14 @@ const linear = componentTokens("linearProgress", {
     value: unitless(0),
     indeterminateWidth: pct(40),
 });
+
+const slide = (name: string) =>
+    animation({
+        name,
+        duration: duration("extraLong4"),
+        easing: easing("standard"),
+        iterations: "infinite",
+    });
 
 /** Build the linear progress indicator with a `color` variant per group in `groups`. */
 export const createLinearProgress = <const G extends string = ColorGroup>(
@@ -122,12 +136,11 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         true: {
                             indicator: {
                                 width: ref("indeterminateWidth"),
-                                animation: animation({
-                                    name: "linearProgressSlide",
-                                    duration: duration("extraLong4"),
-                                    easing: easing("standard"),
-                                    iterations: "infinite",
-                                }),
+                                animation: when(
+                                    "rtl",
+                                    slide("linearProgressSlideRtl"),
+                                    slide("linearProgressSlide"),
+                                ),
                             },
                         },
                         false: {},

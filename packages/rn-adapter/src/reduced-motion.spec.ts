@@ -52,7 +52,7 @@ describe("selection under reduced motion", () => {
 
     it("drops a switch handle's movement and keeps its color", () => {
         expect(properties("switchControl", "handle", false)).toEqual([
-            "left",
+            "start",
             "width",
             "height",
             "backgroundColor",
