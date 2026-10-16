@@ -335,6 +335,22 @@
         "solid-js": "2.0.0-rc.15",
       },
     },
+    "packages/styling": {
+      "name": "@pureform/styling",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/core": "catalog:",
+        "@pureform/css-lowering": "catalog:",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/tailwind-adapter": {
       "name": "@pureform/tailwind-adapter",
       "version": "0.0.0-semantically-released",
@@ -501,6 +517,7 @@
     "@pureform/panda-adapter": "workspace:^",
     "@pureform/preset": "workspace:^",
     "@pureform/rn-adapter": "workspace:^",
+    "@pureform/styling": "workspace:^",
     "@pureform/tailwind-adapter": "workspace:^",
     "@pureform/theme": "workspace:^",
     "@pureform/tsconfig": "workspace:^",
@@ -995,6 +1012,8 @@
     "@pureform/rn-web-demo": ["@pureform/rn-web-demo@workspace:apps/rn-web-demo"],
 
     "@pureform/solid": ["@pureform/solid@workspace:packages/solid"],
+
+    "@pureform/styling": ["@pureform/styling@workspace:packages/styling"],
 
     "@pureform/tailwind-adapter": ["@pureform/tailwind-adapter@workspace:packages/tailwind-adapter"],
 
