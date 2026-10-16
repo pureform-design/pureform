@@ -23,6 +23,7 @@ runtime.ts: themeVars, a theme's custom properties at runtime
 | `style-map.ts`    | A whole style map to a nested style object.                                    |
 | `css.ts`          | Var names, token references, keyword and color formatting.                     |
 | `config.ts`       | Component token vars, `@property` registrations, slot ancestors.               |
+| `motion.ts`       | `REDUCED_MOTION_RULES`: where reduced motion holds, by system or provider.     |
 | `utilities.ts`    | Utility templates and argument substitution.                                   |
 | `runtime.ts`      | `themeVars`: a theme's vars, for switching themes at runtime.                  |
 
@@ -97,6 +98,21 @@ disabled.
 
 The Chromium fixtures in `tests/browser-e2e-tests/src/state-matching.e2e.test.ts` check every
 row: each allowed marking matches, and Zag's attributes alone don't.
+
+## Reduced motion
+
+`reducedMotion` lowers to `@media (prefers-reduced-motion: reduce)` by default. An adapter
+that follows a provider's setting expands it into `REDUCED_MOTION_RULES` instead, as all three
+web adapters do. Each rule is a path from the styled element:
+
+| Path                                                                             | When                                      |
+| -------------------------------------------------------------------------------- | ----------------------------------------- |
+| `@media (prefers-reduced-motion: reduce)` then `&:not([data-pf-motion=full] *)`  | the system asks, and no `full` provider   |
+| `[data-pf-motion=reduce] &:not([data-pf-motion=reduce] [data-pf-motion=full] *)` | a `reduce` provider, with no `full` in it |
+
+`ROOT_REDUCED_MOTION_RULES` are the same for the root's own rule. The attribute's name is
+`MOTION_ATTRIBUTE` from `@pureform/core`. Nested providers resolve to the nearer one for two
+levels; a third level (`reduce` in `full` in `reduce`) isn't told apart.
 
 ## Build and test
 

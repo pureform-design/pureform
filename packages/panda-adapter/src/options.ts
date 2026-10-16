@@ -26,8 +26,8 @@ export const tokenFn = (ref: string): string => `token(${ref})`;
  *  `{colors.brand}`, even inside a `var()` fallback. */
 export const tokenCurly = (ref: string): string => `{${ref}}`;
 
-// Conditions Panda builds in, by their `_` keys. pureform's dark and light are Panda conditions
-// the preset declares. Interaction and form states are left out: Panda's own keys (`_hover`,
+// Conditions Panda builds in, by their `_` keys. pureform's dark, light, and motionReduce are
+// Panda conditions the preset declares. Interaction and form states are left out: Panda's own keys (`_hover`,
 // `_checked`, …) also match a behavior library's `data-*` attributes, so pureform's recipes
 // emit the same selectors as the other targets instead. An app's own `_hover` keeps Panda's
 // meaning.

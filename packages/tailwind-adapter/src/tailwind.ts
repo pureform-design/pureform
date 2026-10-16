@@ -1,6 +1,6 @@
 // A pureform config as Tailwind v4's pieces: theme variables in Tailwind's namespaces, custom
-// variants for the color schemes and named themes, and the CSS adapter's stylesheet inside
-// Tailwind's components layer, so utilities override components.
+// variants for the color schemes, reduced motion, and named themes, and the CSS adapter's
+// stylesheet inside Tailwind's components layer, so utilities override components.
 //
 // The theme is `@theme inline`: each Tailwind variable names the pureform var it stands for, and
 // utilities read that var directly. Dark and named themes then switch utilities and components
@@ -12,6 +12,7 @@ import type { CoreConfig, Token } from "@pureform/core/types";
 import { compileCss } from "@pureform/css-adapter";
 import type { CssOptions } from "@pureform/css-adapter";
 import {
+    REDUCED_MOTION_RULES,
     compileNodeToCSS,
     hyphenate,
     usesColorScheme,
@@ -144,6 +145,13 @@ const schemeVariants = (config: CoreConfig): TailwindVariant[] =>
           })
         : [];
 
+// Tailwind's own `motion-reduce` reads only the system preference; pureform's follows a
+// provider's `data-pf-motion` too, as the components do.
+const MOTION_VARIANT: TailwindVariant = {
+    name: "motion-reduce",
+    paths: REDUCED_MOTION_RULES.map((path) => [...path]),
+};
+
 /** Turn a config into Tailwind's pieces. */
 export const toTailwind = (
     config: CoreConfig,
@@ -193,6 +201,7 @@ export const toTailwind = (
         clear: options.replace ? [...clear] : [],
         variants: [
             ...schemeVariants(config),
+            MOTION_VARIANT,
             ...Object.keys(config.themes ?? {}).map((name) => ({
                 name: themeVariant(name),
                 paths: [[ELEMENT(`[${attribute}="${name}"]`)]],

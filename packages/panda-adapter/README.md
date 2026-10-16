@@ -53,8 +53,12 @@ instead, such as `&:is(:checked, [aria-checked=true])`: the native pseudo-class,
 a `data-pf-*` attribute ([the full table](../css-lowering/README.md#how-states-match)). An
 app's own `_hover` in its own styles keeps Panda's meaning.
 
-Panda keys are still used where they mean the same thing on every target: `_dark` and `_light`
-(conditions the preset declares), `_ltr`, `_rtl`, and `_motionReduce`, plus breakpoints by name.
+Panda keys are still used where they mean the same thing on every target: `_dark`, `_light`,
+and `_motionReduce` (conditions the preset declares), `_ltr`, and `_rtl`, plus breakpoints by
+name. The preset's `motionReduce` replaces Panda's: it follows the system's
+`prefers-reduced-motion` unless a `data-pf-motion` attribute on an ancestor overrides it
+([the rules](../css-lowering/README.md#reduced-motion)), so an app's own `_motionReduce`
+follows the provider too. Panda's `_motionSafe` still reads only the system.
 
 ## Build and test
 

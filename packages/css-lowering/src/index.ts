@@ -21,6 +21,7 @@ export {
     varTokenRef,
 } from "./css";
 export type { AliasTarget } from "./css";
+export { REDUCED_MOTION_RULES, ROOT_REDUCED_MOTION_RULES } from "./motion";
 export { themeVars } from "./runtime";
 export type { ThemeVarsOptions } from "./runtime";
 export { compileStyleMap } from "./style-map";

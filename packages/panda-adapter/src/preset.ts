@@ -5,6 +5,7 @@ import { validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 import {
+    REDUCED_MOTION_RULES,
     componentTokenVars,
     registeredProperties,
     usesColorScheme,
@@ -60,6 +61,24 @@ const COLOR_SCHEME_CONDITIONS = {
         },
         ".light &": "@slot",
     },
+};
+
+type ConditionRules = { [key: string]: "@slot" | ConditionRules };
+
+// Panda's `motionReduce` reads only the system preference, so the preset replaces it with
+// pureform's, which a provider's `data-pf-motion` overrides either way.
+const MOTION_CONDITIONS = {
+    motionReduce: REDUCED_MOTION_RULES.reduce<ConditionRules>((rules, path) => {
+        let at = rules;
+        path.forEach((key, index) => {
+            if (index === path.length - 1) {
+                at[key] = "@slot";
+            } else {
+                at = (at[key] ??= {}) as ConditionRules;
+            }
+        });
+        return rules;
+    }, {}),
 };
 
 // Tell the browser which schemes the page supports, so its own controls and scrollbars match.
@@ -137,7 +156,9 @@ export const compilePreset = (
             recipes,
             slotRecipes,
         }),
-        conditions: { extend: COLOR_SCHEME_CONDITIONS },
+        conditions: {
+            extend: { ...COLOR_SCHEME_CONDITIONS, ...MOTION_CONDITIONS },
+        },
         globalCss: (() => {
             const css = {
                 ...colorSchemeCss(config),
