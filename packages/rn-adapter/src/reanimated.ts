@@ -15,8 +15,8 @@ import type { ThemeValues } from "./values";
 export { cssMotion } from "./css-motion";
 export type { CssMotion } from "./css-motion";
 
-// A CSS curve as Reanimated's: a cubic Bézier as its easing object, `linear` as is.
-const easing = (curve: string) => {
+/** A CSS curve as Reanimated's: a cubic Bézier as its easing object, `linear` as is. */
+export const cssEasing = (curve: string) => {
     const points = easingPoints(curve);
     return points === "linear" ? "linear" : cubicBezier(...points);
 };
@@ -89,13 +89,13 @@ export const useReanimatedComponentStyles = (
                                 ? {
                                       transitionTimingFunction:
                                           motion.transitionTimingFunction.map(
-                                              easing,
+                                              cssEasing,
                                           ),
                                   }
                                 : {}),
                             ...(motion.animationTimingFunction
                                 ? {
-                                      animationTimingFunction: easing(
+                                      animationTimingFunction: cssEasing(
                                           motion.animationTimingFunction,
                                       ),
                                   }

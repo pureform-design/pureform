@@ -18,7 +18,7 @@ import {
     useRef,
     useState,
 } from "react";
-import type { ReactElement, ReactNode, Ref } from "react";
+import type { ComponentType, ReactElement, ReactNode, Ref } from "react";
 import { Animated, Easing } from "react-native";
 
 import { animatable, blend } from "../motion";
@@ -32,58 +32,92 @@ const PRESSED_OPACITY = 0.1;
 type Box = { left: number; top: number; width: number; height: number };
 export type { Box as RippleBox };
 
-/** One ripple: where it starts and ends in its layer, its grow from 0 to 1, and its fade from
- *  1 to 0. */
+/** One ripple: where it starts and ends in its layer, and, once released, how long it waits
+ *  before it fades. */
 export interface Ripple {
     id: number;
     geometry: RippleGeometry;
-    grow: Animated.Value;
-    fade: Animated.Value;
+    release?: number;
 }
 
-/** How a layer draws its ripples: in a box of the layer's size, the last a press measured,
- *  with `color` the ripple's. `native` says whether the native driver can run what it
- *  animates, which it can for a view's transforms and opacity but not an SVG's props. */
+/** What draws one ripple: it grows when it mounts, fades once released, and calls `done`
+ *  when it has faded. `color` is the ripple's. */
+export interface RippleProps {
+    ripple: Ripple;
+    color: string;
+    timing: RippleTiming;
+    done: () => void;
+}
+
+/** How a layer draws its ripples: each as `Ripple` draws it, all of them inside what `draw`
+ *  wraps them in, in a box of the layer's size, the last a press measured. */
 export interface RippleDrawing {
-    draw: (ripples: Ripple[], box: Box, color: string) => ReactNode;
-    native: boolean;
+    Ripple: ComponentType<RippleProps>;
+    draw?: (ripples: ReactNode[], box: Box) => ReactNode;
     /** Take the surface's color as is, for a drawing that applies the ripple's opacity
      *  itself, rather than the color at that opacity. */
     surfaceColor?: boolean;
 }
 
-// Each ripple a disc, placed at the press point and moved by transforms alone, which the
-// native driver can run on a device. Its edge is hard: a soft one needs SVG.
-export const DISCS: RippleDrawing = {
-    native: true,
-    draw: (ripples, _box, color) =>
-        ripples.map(({ id, geometry, grow, fade }) => {
-            const { size, scale, start, end } = geometry;
-            const along = (from: number, to: number) =>
-                grow.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [from, to],
-                });
-            return createElement(Animated.View, {
-                key: id,
-                style: {
-                    position: "absolute",
-                    left: start.x,
-                    top: start.y,
-                    width: size,
-                    height: size,
-                    borderRadius: size / 2,
-                    backgroundColor: color,
-                    opacity: fade,
-                    transform: [
-                        { translateX: along(0, end.x - start.x) },
-                        { translateY: along(0, end.y - start.y) },
-                        { scale: along(1, scale) },
-                    ],
-                },
-            });
-        }),
+/** A ripple's grow from 0 to 1 and fade from 1 to 0 with Animated, on the native thread
+ *  where `native` allows: a view's transforms and opacity, not an SVG's props. */
+export const useRippleMotion = (
+    { ripple, timing, done }: RippleProps,
+    native: boolean,
+) => {
+    const [grow] = useState(() => new Animated.Value(0));
+    const [fade] = useState(() => new Animated.Value(1));
+    const driver = NATIVE_DRIVER && native;
+    useEffect(() => {
+        Animated.timing(grow, {
+            toValue: 1,
+            duration: timing.grow,
+            easing: curve(timing.easing),
+            useNativeDriver: driver,
+        }).start();
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+    useEffect(() => {
+        if (ripple.release === undefined) return;
+        Animated.timing(fade, {
+            toValue: 0,
+            duration: timing.fade,
+            delay: ripple.release,
+            easing: Easing.linear,
+            useNativeDriver: driver,
+        }).start(({ finished }) => finished && done());
+        // oxlint-disable-next-line react-hooks/exhaustive-deps
+    }, [ripple.release]);
+    return { grow, fade };
 };
+
+// A disc, placed at the press point and moved by transforms alone, which the native driver
+// can run on a device. Its edge is hard: a soft one needs SVG.
+const Disc = (props: RippleProps) => {
+    const { grow, fade } = useRippleMotion(props, true);
+    const { size, scale, start, end } = props.ripple.geometry;
+    const along = (from: number, to: number) =>
+        grow.interpolate({ inputRange: [0, 1], outputRange: [from, to] });
+    return createElement(Animated.View, {
+        style: {
+            position: "absolute",
+            left: start.x,
+            top: start.y,
+            width: size,
+            height: size,
+            borderRadius: size / 2,
+            backgroundColor: props.color,
+            opacity: fade,
+            transform: [
+                { translateX: along(0, end.x - start.x) },
+                { translateY: along(0, end.y - start.y) },
+                { scale: along(1, scale) },
+            ],
+        },
+    });
+};
+
+export const DISCS: RippleDrawing = { Ripple: Disc };
 
 /** What the layer does for the hook: grow a ripple from a point in it, and release it. */
 interface Controller {
@@ -134,10 +168,9 @@ const RippleLayer = (props: {
 }) => {
     const [ripples, setRipples] = useState<Ripple[]>([]);
     const [box, setBox] = useState<Box>();
-    const native = NATIVE_DRIVER && props.drawing.native;
     const node = useRef<unknown>(null);
     const ids = useRef(0);
-    const { timing } = props;
+    const { timing, drawing } = props;
     // One ripple held at a time, released no sooner than half its grow.
     const [press] = useState(() => ripplePress());
     useImperativeHandle(props.controller, () => ({
@@ -151,46 +184,42 @@ const RippleLayer = (props: {
                         ? last
                         : box,
                 );
-                const ripple: Ripple = {
-                    id: ids.current++,
-                    geometry: rippleGeometry(box, origin),
-                    grow: new Animated.Value(0),
-                    fade: new Animated.Value(1),
-                };
+                const id = ids.current++;
                 press.begin(
                     {
                         release: (delay) =>
-                            Animated.timing(ripple.fade, {
-                                toValue: 0,
-                                duration: timing.fade,
-                                delay,
-                                easing: Easing.linear,
-                                useNativeDriver: native,
-                            }).start(() =>
-                                setRipples((list) =>
-                                    list.filter((r) => r !== ripple),
+                            setRipples((list) =>
+                                list.map((r) =>
+                                    r.id === id ? { ...r, release: delay } : r,
                                 ),
                             ),
                     },
                     timing,
                 );
-                setRipples((list) => [...list, ripple]);
-                Animated.timing(ripple.grow, {
-                    toValue: 1,
-                    duration: timing.grow,
-                    easing: curve(timing.easing),
-                    useNativeDriver: native,
-                }).start();
+                setRipples((list) => [
+                    ...list,
+                    { id, geometry: rippleGeometry(box, origin) },
+                ]);
             }),
         release: press.end,
     }));
 
     useEffect(() => () => press.end(), [press]);
 
+    const drawn = ripples.map((ripple) =>
+        createElement(drawing.Ripple, {
+            key: ripple.id,
+            ripple,
+            color: props.color,
+            timing,
+            done: () =>
+                setRipples((list) => list.filter((r) => r.id !== ripple.id)),
+        }),
+    );
     return createElement(
         Animated.View,
         { ref: node as never, pointerEvents: "none", style: props.style },
-        box && props.drawing.draw(ripples, box, props.color),
+        box && (drawing.draw ? drawing.draw(drawn, box) : drawn),
     );
 };
 

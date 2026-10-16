@@ -243,7 +243,8 @@ overrides the primary color in either mode.
   margin. Percentages are reported where React Native takes none.
 - **Ripples:** `useRipple` grows and fades press ripples as the web's `ripple()` does, timed by
   the ripple component's transition, as solid discs. `useSvgRipple` draws them with their soft
-  edge and clips them to the surface's shape.
+  edge and clips them to the surface's shape. Each ripple is a component that grows when it
+  mounts and fades when released, so a drawing brings its own animation engine.
 - **SVG:** `@pureform/rn-adapter/svg`, with `react-native-svg` as an optional peer. The
   provider's `svg` turns on the `clipShape` feature's cases as an `svg` state, and selection
   returns each slot's `drawings`: its shape with its fill, moved off the view, and its
@@ -253,8 +254,14 @@ overrides the primary color in either mode.
 - **Shape morphs:** a `clipPath` transition reaches the slot's drawing, with its fill's
   `backgroundColor` transition, since the fill left the view. `SvgDrawing` interpolates the
   path's points over it, as `morph()` gives both shapes the same curves, and blends the fill,
-  each from wherever it is when the target changes. It runs on the JavaScript thread, with
-  either animation engine.
+  each from wherever it is when the target changes, on the JavaScript thread.
+- **Reanimated SVG:** `@pureform/rn-adapter/reanimated-svg` moves the same drawings on the UI
+  thread. `ReanimatedSvgDrawing` puts CSS transitions on each path's `d` and `fill`, and
+  `useReanimatedSvgRipple` grows each ripple through a keyframe animation of its circle and
+  fades its group through an opacity transition. Each keeps its animation props unchanged,
+  since Reanimated restarts an animation whose props change, and waits out a release's delay
+  itself. Ripples are drawn one component per surface, so a morph that changes the clip
+  doesn't remount them.
 - **React Native Web and react-native-svg in Vite:** resolve `.web.*` files first, shim the
   native modules it imports behind Android checks, and alias React Native's asset registry to
   React Native Web's.

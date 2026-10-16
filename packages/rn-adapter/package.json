@@ -58,6 +58,17 @@
                 "development": "./src/reanimated.ts",
                 "default": "./dist/reanimated.mjs"
             }
+        },
+        "./reanimated-svg": {
+            "types": "./dist/reanimated-svg.d.ts",
+            "import": {
+                "development": "./src/reanimated-svg.ts",
+                "default": "./dist/reanimated-svg.mjs"
+            },
+            "require": {
+                "development": "./src/reanimated-svg.ts",
+                "default": "./dist/reanimated-svg.mjs"
+            }
         }
     },
     "dependencies": {

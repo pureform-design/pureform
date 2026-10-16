@@ -14,6 +14,7 @@ export default createConfig({
                     animated: "src/animated.ts",
                     svg: "src/svg.ts",
                     reanimated: "src/reanimated.ts",
+                    "reanimated-svg": "src/reanimated-svg.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
