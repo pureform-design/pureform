@@ -18,6 +18,28 @@ const defined = (
     return merged;
 };
 
+const signatureOf = (value: Dict): string => {
+    const parts: string[] = [];
+    for (const key of Object.keys(value).sort()) {
+        const item = value[key];
+        if (item === undefined) continue;
+        parts.push(
+            `${JSON.stringify(key)}:${
+                item !== null && typeof item === "object"
+                    ? `{${signatureOf(item as Dict)}}`
+                    : JSON.stringify(item)
+            }`,
+        );
+    }
+    return parts.join(",");
+};
+
+/** A string that's equal for two selections exactly when they select the same: keys in any
+ *  order, `undefined` keys left out, tokens compared by value. Bindings whose selection is a new
+ *  object every render (React) memoize on it. */
+export const selectionSignature = (selection: object): string =>
+    signatureOf(selection as Dict);
+
 /** `selection` over `defaults`: keys `selection` leaves `undefined` take the default, and tokens
  *  merge the same way. Returns `selection` itself when there are no defaults. */
 export const withDefaults = <C extends ComponentRef = ComponentName>(

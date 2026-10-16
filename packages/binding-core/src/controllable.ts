@@ -129,3 +129,10 @@ export const createChangeReason = (): ChangeReasonTracker => {
         },
     };
 };
+
+/** The machine props for one controllable value: `{ checked, defaultChecked, onCheckedChange }`. */
+export type ControllableMachineProps<N extends string, T, D extends object> = {
+    [K in N]: T | undefined;
+} & { [K in DefaultName<N>]: T | undefined } & {
+    [K in ChangeName<N>]: (details: D) => void;
+};

@@ -2,6 +2,8 @@
 // providers combine, selections over defaults, part attributes and props merging, controllable
 // state, and reduced motion. DOM-only helpers are at `@pureform/binding-core/dom`.
 
+export { cx } from "./class-names";
+export type { ClassDictionary, ClassValue } from "./class-names";
 export {
     controllableNames,
     controlSwitchMessage,
@@ -14,9 +16,15 @@ export type {
     ChangeReason,
     ChangeReasonTracker,
     Controllable,
+    ControllableMachineProps,
     ControllableNames,
     DefaultName,
 } from "./controllable";
+export {
+    classEntry,
+    lazyFactoryError,
+    serverLazyFactoryMessage,
+} from "./entries";
 export { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 export type { IconStyle } from "./icon-style";
 export {
@@ -30,9 +38,17 @@ export {
     isIconPart,
     isUnstyled,
     partClasses,
+    partSources,
+    spreadableProps,
     stateAttributes,
 } from "./parts";
-export type { PartStates, SlotKeyed, StateAttributes, Unstyled } from "./parts";
+export type {
+    PartSourcesInput,
+    PartStates,
+    SlotKeyed,
+    StateAttributes,
+    Unstyled,
+} from "./parts";
 export { combineProps, mergeStyleObjects } from "./props";
 export type { CombineRules } from "./props";
 export {
@@ -54,6 +70,6 @@ export type {
     ThemeName,
     ThemeOverrides,
 } from "./provider";
-export { withDefaults } from "./selection";
+export { selectionSignature, withDefaults } from "./selection";
 export { trainVersionMismatch } from "./version";
 export { warnOnce } from "./warn";

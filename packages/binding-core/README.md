@@ -21,18 +21,20 @@ framework: context, memos, effects, and rendering.
 
 ## Architecture
 
-| Module            | What it holds                                                                                            |
-| ----------------- | -------------------------------------------------------------------------------------------------------- |
-| `provider.ts`     | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `requireRegistry` |
-| `selection.ts`    | `withDefaults`: a selection over the provider's defaults                                                 |
-| `parts.ts`        | `stateAttributes` (`data-pf-*`), `partClasses`, slot-keyed props (`forSlot`, `isUnstyled`), `isIconPart` |
-| `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles   |
-| `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                |
-| `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                           |
-| `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                        |
-| `version.ts`      | `trainVersionMismatch`, a stub until `@pureform/generate` records the train's version (p4a)              |
-| `warn.ts`         | `warnOnce`                                                                                               |
-| `dom.ts`          | The DOM half, on its own subpath: the system's reduced-motion preference, and measuring an icon slot     |
+| Module            | What it holds                                                                                                           |
+| ----------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `provider.ts`     | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `requireRegistry`                |
+| `selection.ts`    | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                        |
+| `entries.ts`      | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                            |
+| `parts.ts`        | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart` |
+| `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                  |
+| `class-names.ts`  | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                               |
+| `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                               |
+| `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                          |
+| `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                       |
+| `version.ts`      | `trainVersionMismatch`, a stub until `@pureform/generate` records the train's version (p4a)                             |
+| `warn.ts`         | `warnOnce`                                                                                                              |
+| `dom.ts`          | The DOM half, on its own subpath: the system's reduced-motion preference, and measuring an icon slot                    |
 
 The root entry uses no DOM API, so React Native can import it.
 
@@ -53,15 +55,23 @@ resolveProvider(parent, own, merge?): ProviderState<P>;
 providerAttributes(own, state): { dir; "data-pf-motion": "reduce" | "full" | undefined };
 requireRegistry(state): AnyRegistry;     // throws, naming PureformProvider, when there's none
 withDefaults(defaults, selection): Selection<C>;
+selectionSignature(selection): string;   // equal exactly when two selections select the same
+classEntry(state, name): RegistryEntry<ClassFactory<N>>;
+lazyFactoryError(name): Error; serverLazyFactoryMessage(name): string;
 
 // Parts
 stateAttributes({ pressed: true, hover: false }) // { "data-pf-active": "", "data-pf-hover": undefined }
 partClasses(anatomy, part, slots, unstyled?): SlotClasses | undefined;
+partSources({ anatomy, part, machine, states, testId, unstyled, partUnstyled, classes, slotProps, props })
+    // [machine, part attributes, state attributes, registry, provider slotProps, user props]
+spreadableProps(props);                  // without children and ref
+cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
 combineProps(sources, rules): Record<string, unknown>;
 
 // Controllable state
 type Controllable<"checked", boolean>    // checked, defaultChecked, onCheckedChange({ checked, reason? })
+type ControllableMachineProps<"checked", boolean, D> // what a binding hands the machine
 controllableNames("checked")             // { value, defaultValue: "defaultChecked", onChange: "onCheckedChange" }
 createControlTracker(component, name, initiallyControlled, warn): (controlled: boolean) => void;
 createChangeReason(): { during(update); untilNextTask({ drop? }); report(callback, details) };

@@ -6,12 +6,14 @@ import {
     isIconPart,
     isUnstyled,
     partClasses,
+    partSources,
+    spreadableProps,
     stateAttributes,
 } from "./parts";
 import type { StateAttributes } from "./parts";
 import { combineProps, mergeStyleObjects } from "./props";
 import type { CombineRules } from "./props";
-import { withDefaults } from "./selection";
+import { selectionSignature, withDefaults } from "./selection";
 
 describe("stateAttributes", () => {
     it("writes an empty attribute for a state that's on, and none for one that's off", () => {
@@ -80,6 +82,75 @@ describe("slot-keyed props", () => {
     it("knows the icon parts", () => {
         expect(isIconPart(buttonAnatomy, "icon")).toBe(true);
         expect(isIconPart(buttonAnatomy, "label")).toBe(false);
+    });
+});
+
+describe("spreadableProps", () => {
+    it("leaves out children and ref", () => {
+        expect(
+            spreadableProps({ id: "a", children: "x", ref: () => {} }),
+        ).toEqual({ id: "a" });
+        expect(spreadableProps(undefined)).toBeUndefined();
+    });
+});
+
+describe("partSources", () => {
+    const classes = {
+        root: { class: "r", style: { "--pf-a": "1" } },
+        label: { class: "l" },
+    } as const;
+    const slotProps = { button: { root: { title: "provided" } } };
+
+    it("lists the machine, attributes, states, registry, provider, and user, in order", () => {
+        const machine = { id: "button:1", "data-scope": "button" };
+        expect(
+            partSources({
+                anatomy: buttonAnatomy,
+                part: "root",
+                machine,
+                states: { pressed: true },
+                testId: "save",
+                classes,
+                slotProps,
+                props: { title: "user", children: "x" },
+            }),
+        ).toEqual([
+            machine,
+            {
+                "data-scope": "button",
+                "data-pf-part": "root",
+                "data-testid": "save-root",
+            },
+            { "data-pf-active": "" },
+            classes.root,
+            { title: "provided" },
+            { title: "user" },
+        ]);
+    });
+
+    it("drops the registry's classes for an unstyled part, from Root or its own", () => {
+        const base = { anatomy: buttonAnatomy, classes, slotProps } as const;
+        expect(
+            partSources({ ...base, part: "root", unstyled: true })[3],
+        ).toBeUndefined();
+        expect(
+            partSources({
+                ...base,
+                part: "label",
+                unstyled: { label: true },
+            })[3],
+        ).toBeUndefined();
+        expect(
+            partSources({
+                ...base,
+                part: "root",
+                unstyled: { label: true },
+            })[3],
+        ).toBe(classes.root);
+        expect(
+            partSources({ ...base, part: "label", partUnstyled: true })[3],
+        ).toBeUndefined();
+        expect(partSources({ ...base, part: "label" })[4]).toBeUndefined();
     });
 });
 
@@ -198,5 +269,33 @@ describe("withDefaults", () => {
             size: "s",
             tokens: { gap: 1 },
         });
+    });
+});
+
+describe("selectionSignature", () => {
+    it("is equal for the same selection, whatever the key order", () => {
+        expect(
+            selectionSignature({
+                variant: "text",
+                size: undefined,
+                tokens: { b: 2, a: "1" },
+            }),
+        ).toBe(
+            selectionSignature({ tokens: { a: "1", b: 2 }, variant: "text" }),
+        );
+    });
+
+    it("differs when a value or token differs", () => {
+        const base = selectionSignature({ variant: "text", tokens: { a: 1 } });
+        expect(
+            selectionSignature({ variant: "filled", tokens: { a: 1 } }),
+        ).not.toBe(base);
+        expect(
+            selectionSignature({ variant: "text", tokens: { a: 2 } }),
+        ).not.toBe(base);
+        expect(selectionSignature({ variant: "text" })).not.toBe(base);
+        expect(selectionSignature({ toggle: true })).not.toBe(
+            selectionSignature({ toggle: "true" }),
+        );
     });
 });

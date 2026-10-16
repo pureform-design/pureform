@@ -1,7 +1,12 @@
 // What a part carries besides its machine's props: its `data-pf-*` state attributes, its classes
 // from the registry, and the slot-keyed props of ready-made components.
 
-import type { ComponentAnatomy, PartName } from "@pureform/anatomy";
+import type {
+    ComponentAnatomy,
+    PartName,
+    TestIdOverride,
+} from "@pureform/anatomy";
+import { partAttributes } from "@pureform/anatomy";
 import type { AttributeState, StateAttribute } from "@pureform/core";
 import { STATE_ATTRIBUTES } from "@pureform/core";
 import type { SlotClasses } from "@pureform/styling";
@@ -75,3 +80,72 @@ export const isIconPart = <A extends ComponentAnatomy>(
     part: PartName<A>,
 ): boolean =>
     (anatomy.parts as ComponentAnatomy["parts"])[part]?.mirror === true;
+
+type Dict = Readonly<Record<string, unknown>>;
+
+const NOT_SPREAD = new Set(["children", "ref"]);
+
+/** A part's user props without `children` and `ref`, which the binding places itself. */
+export const spreadableProps = (
+    props: object | undefined,
+): Dict | undefined => {
+    if (!props) return undefined;
+    const source = props as Dict;
+    const picked: Record<string, unknown> = {};
+    for (const key of Object.keys(source)) {
+        if (!NOT_SPREAD.has(key)) picked[key] = source[key];
+    }
+    return picked;
+};
+
+/** What one part merges, besides the binding's rules for joining them. */
+export interface PartSourcesInput<A extends ComponentAnatomy> {
+    readonly anatomy: A;
+    readonly part: PartName<A>;
+    /** The machine's props for the part (`api.getRootProps()`). */
+    readonly machine?: object | undefined;
+    /** The states the part marks with `data-pf-*` attributes. */
+    readonly states?: PartStates | undefined;
+    /** Root's `testId`. */
+    readonly testId?: TestIdOverride<PartName<A>> | undefined;
+    /** Root's `unstyled`, for every part or some. */
+    readonly unstyled?: Unstyled<PartName<A>> | undefined;
+    /** The part's own `unstyled`. */
+    readonly partUnstyled?: boolean | undefined;
+    /** Every slot's classes, from the registry. */
+    readonly classes?: Readonly<Record<string, SlotClasses>> | undefined;
+    /** The provider's `slotProps`, by component and slot. */
+    readonly slotProps?: object | undefined;
+    /** The user's props for the part; `children` and `ref` are left out. */
+    readonly props?: object | undefined;
+}
+
+/** A part's props sources, in the order they merge: the machine's part props, the anatomy's
+ *  `data-scope`/`data-pf-part`/`data-testid`, the `data-pf-*` state attributes, the registry's
+ *  class and token style (unless unstyled), the provider's `slotProps` for the part, and the
+ *  user's props. Pass them to `combineProps` with the binding's rules. */
+export const partSources = <A extends ComponentAnatomy>(
+    input: PartSourcesInput<A>,
+): readonly (Dict | undefined)[] => {
+    const { anatomy, part } = input;
+    const unstyled =
+        isUnstyled(input.unstyled, part) || input.partUnstyled === true;
+    const provided = (
+        input.slotProps as
+            | Readonly<
+                  Record<
+                      string,
+                      Readonly<Record<string, Dict | undefined>> | undefined
+                  >
+              >
+            | undefined
+    )?.[anatomy.name]?.[part];
+    return [
+        input.machine as Dict | undefined,
+        partAttributes(anatomy, part, input.testId) as unknown as Dict,
+        stateAttributes(input.states) as Dict,
+        partClasses(anatomy, part, input.classes, unstyled) as Dict | undefined,
+        provided,
+        spreadableProps(input.props),
+    ];
+};
