@@ -755,6 +755,8 @@ Preset changes these designs need, independent of the steps above:
   `transition`; React Native's token tweens check the token's value type.
 - Direction (§5.9): the switch handle on `insetInlineStart`, `rtl` keyframes for the
   linear progress, the icon slot's `mirror`, and the physical property spec.
+- Icons (§9.6): the icon slots' `fill` token and `font-variation-settings`, set by the
+  states Material draws filled.
 
 ## 12. Risks and open questions
 
