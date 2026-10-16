@@ -1,0 +1,46 @@
+{
+    "name": "@pureform/binding-core",
+    "version": "0.0.0-semantically-released",
+    "description": "Framework-free pieces the Solid, React, and React Native bindings share",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./dom": {
+            "types": "./dist/dom.d.ts",
+            "import": {
+                "development": "./src/dom.ts",
+                "default": "./dist/dom.mjs"
+            },
+            "require": {
+                "development": "./src/dom.ts",
+                "default": "./dist/dom.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/core": "catalog:",
+        "@pureform/styling": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}
