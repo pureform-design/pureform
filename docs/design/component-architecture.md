@@ -88,13 +88,38 @@ are build time, `styling` is runtime, and a production bundle never imports an a
 import { defineConfig } from "@pureform/core";
 import { pureform } from "@pureform/preset";
 
+export default defineConfig(pureform({ themes: { teal: {/* … */} } }));
+```
+
+The config is the design system as pure data: tokens, themes, shapes, components. It
+says nothing about how it's built. Whatever consumes it decides that, through its own
+options:
+
+```ts
+// panda.config.ts
+import config from "./pureform.config";
+import { pureformPreset } from "@pureform/panda-adapter";
 export default defineConfig({
-    ...pureform({ themes: { teal: {/* … */} } }),
-    target: "panda", // "panda" | "tailwind" | "css" | "native"
+    presets: [pureformPreset(config)],
     prefix: "pf",
-    components: ["button", "checkbox", "circularProgress"], // optional allow-list (§7)
+});
+
+// vite.config.ts
+import pureform from "@pureform/bundler/vite";
+export default defineConfig({
+    plugins: [
+        pureform({
+            config: "./pureform.config.ts",
+            target: "panda", // "panda" | "tailwind" | "css"; Metro implies "native"
+            components: ["button", "checkbox"], // optional allow-list (§7)
+        }),
+    ],
 });
 ```
+
+- **Build options belong to the build tool.** The target, var and class prefixes, and the
+  allow-list are options of the adapter or the bundler plugin, not fields of the config.
+  The same config can then feed a Panda web app and a Metro app at once.
 
 - **Import rules.** The config must be importable by Node (build tools) and by the browser
   bundle. It may only import pureform packages and pure data. No `fs`, no env reads at top
@@ -299,7 +324,7 @@ Three layers, cheapest first:
    (`@pureform/solid/button`, `.pureform/web/button`), `sideEffects: false`, no
    barrel re-exports in runtime entries. The root `@pureform/solid` re-exports for DX,
    and is fine under modern bundlers because nothing has side effects.
-2. **Allow-list.** `components` in the config limits what's generated: CSS, Panda
+2. **Allow-list.** The bundler plugin's `components` option limits what's generated: CSS, Panda
    `staticCss`, Tailwind sources, and registry entries. Default: everything.
 3. **Usage-based pruning (bundler plugin).** In build mode, `@pureform/bundler`:
     - collects which components are imported from `@pureform/solid` (module graph, after
