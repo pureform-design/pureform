@@ -166,13 +166,54 @@ type StyleFactory<C> = (selection: Selection<C> & States<C>) => {
 …), `SlotOf<C>`, and `InstanceTokens<C>` are typed from the AST via `defineComponent`'s
 inference, reusing the AST's condition names.
 
-On the web, interaction states are not part of the selection. Machines set them as data
-attributes (`data-active` for a press, `data-hover`, `data-focus-visible`, as Zag does),
-and the generated CSS already matches them (`pressed` lowers to
-`:is(:active, [data-active])`), so a press changes one attribute and calls nothing. Only
-a variant or token change calls the factory again. On React Native there are no
-selectors, so states are in the selection, and each change is one `Map.get` returning a
-cached, frozen object.
+On the web, interaction states are not part of the selection. The browser and the
+bindings mark them on the element, and the generated CSS matches them, so a press changes
+one attribute and calls nothing. Only a variant or token change calls the factory again.
+On React Native there are no selectors, so states are in the selection, and each change is
+one `Map.get` returning a cached, frozen object.
+
+**How the web matches a state, in order of preference:**
+
+1. **A native pseudo-class** (`:hover`, `:active`, `:focus-visible`, `:checked`,
+   `:disabled`, `:placeholder-shown`, through `:has()` for a state inside the slot). It
+   works before hydration, without our JS, and for plain-CSS and Tailwind users.
+2. **An ARIA attribute** (`aria-checked`, `aria-selected`, `aria-pressed`,
+   `aria-current`, `aria-expanded`, `aria-invalid`, `aria-disabled`, `aria-readonly`).
+   Accessibility needs it set anyway, and it's a standard name, not a behavior library's.
+3. **Our own `data-pf-*` attribute**, only where neither covers the state. The bindings
+   set it; Zag's `data-*` attributes aren't matched, so swapping or upgrading Zag can't
+   change styling.
+
+State classes computed in JS were considered and rejected: they'd style nothing before
+hydration, need our JS for plain-CSS users, cost a JS update per hover and press, and push
+each state to every slot that reads it, where a descendant selector does that today.
+
+Review of `css-lowering`'s lowering against these rules (the condition table, and the
+slot-state table the preset mostly uses):
+
+| State           | Native                                     | ARIA                                            | `data-pf-*`        | Change from today                                                                         |
+| --------------- | ------------------------------------------ | ----------------------------------------------- | ------------------ | ----------------------------------------------------------------------------------------- |
+| `hover`         | `:hover`                                   |                                                 | `data-pf-hover`    | `data-hover` → `data-pf-hover` (hover driven by another element, such as a label)         |
+| `pressed`       | `:active`                                  |                                                 | `data-pf-active`   | Condition matched `data-active`, slot state `data-pressed`; one name now (keyboard press) |
+| `focusVisible`  | `:focus-visible` (`:has()` within)         |                                                 |                    | Drop `data-focus-visible`                                                                 |
+| `focusWithin`   | `:focus-within`                            |                                                 |                    | Drop `data-focused`; condition `focus` drops `data-focus`                                 |
+| `dragged`       |                                            |                                                 | `data-pf-dragging` | `data-dragging` → `data-pf-dragging`                                                      |
+| `filled`        | `:not(:placeholder-shown)` on an input     |                                                 | `data-pf-filled`   | `data-filled` → `data-pf-filled` (a select's value isn't in an input)                     |
+| `checked`       | `:checked`                                 | `aria-checked=true`                             |                    | Drop `data-checked` and `data-state="checked"`                                            |
+| `indeterminate` | `:indeterminate`                           | `aria-checked=mixed`                            |                    | Drop `data-indeterminate`                                                                 |
+| `selected`      |                                            | `aria-selected`, `aria-pressed`, `aria-current` |                    | Drop `data-selected`                                                                      |
+| `expanded`      |                                            | `aria-expanded`                                 |                    | Drop `data-expanded`                                                                      |
+| `invalid`       | `:invalid` (condition only; not on fields) | `aria-invalid=true`                             |                    | Drop `data-invalid`                                                                       |
+| `disabled`      | `:disabled`                                | `aria-disabled=true`                            |                    | Drop `data-disabled` and `[disabled]`; the slot state gains `aria-disabled`               |
+| `readOnly`      | `:read-only`                               | `aria-readonly=true`                            |                    | Drop `data-read-only`                                                                     |
+
+- **Panda** maps conditions to its built-in keys (`_hover`, `_checked`, …), whose
+  selectors include Zag's attributes. pureform's recipes stop using those keys and emit
+  the same selectors as the other targets; an app's own `_hover` keeps Panda's meaning.
+- **Output changes on purpose**, so it's checked against fixtures (an element in each
+  state, marked each allowed way, plus Zag's attributes alone, which must not match)
+  rather than the before-and-after equivalence check. Shorter selectors also shrink the
+  CSS.
 
 ### 5.2 Generated factories per target
 
@@ -287,7 +328,7 @@ function useClasses(name, selection) {
 ```tsx
 // Solid
 function Root(props) {
-    const api = useButtonMachine(props); // data-pressed, data-focus-visible, aria-*
+    const api = useButtonMachine(props); // aria-*, data-pf-active, data-pf-hover
     const slots = useClasses("button", () => ({ variant: props.variant }));
     return (
         <button
@@ -703,8 +744,8 @@ so bindings treat them uniformly.
   part out of registry styles.
 - **Stable test ids:** `data-testid` defaults to `pf-<component>-<part>` (`pf-button-root`),
   overridable by `testId` on Root, which prefixes every part (`save-root`, `save-label`).
-  Also always present: `data-pf-part`, and state attributes (`data-active`,
-  `data-disabled`) usable as selectors. Exported `testIds.button.root` constants from
+  Also always present: `data-pf-part`, and the ARIA and `data-pf-*` state attributes
+  (§5.1), usable as selectors. Exported `testIds.button.root` constants from
   `@pureform/anatomy` so tests don't hard-code strings.
 - **Per-instance styling hooks:** `tokens={{ value: 40 }}` sets instance tokens (§5.4).
 
@@ -728,9 +769,8 @@ component), Zag's shape, identical in Solid and React:
 ```
 
 - **Names come from the AST's states**, so the prop and the style state match, and the
-  CSS matches the attributes Zag sets (`checked` → Zag's `data-state="checked"` →
-  `slot("root", "checked")`, whose lowering also takes `:checked`, `data-checked`, and
-  `aria-checked`):
+  CSS reads the state from the native element or ARIA (§5.1): `checked` →
+  `:checked` or `aria-checked` → `slot("root", "checked")`:
 
     | Prop       | Components                                                                                                                  |
     | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
@@ -775,9 +815,8 @@ validate, and disable with it, with no form library.
     - Values: checkbox and switch submit `value` (default `"on"`) when checked, a slider
       its number, a multiple select one entry per value.
 - **Props:** `name`, `form` (a form's id, for a control outside it), `required`,
-  `disabled`, and `readOnly`, forwarded to the native element. Zag marks read-only with
-  `data-readonly`, while the `readOnly` lowering matches `data-read-only`; the lowering
-  takes both.
+  `disabled`, and `readOnly`, forwarded to the native element, so `:read-only` and
+  `:disabled` match (§5.1).
 - **Reset.** A form reset puts uncontrolled state back to its `default*` value. On
   controlled state it calls the change callback with `reason: "reset"`, and the owner
   decides. React 19 and Solid 2 form actions reset the form after submitting, so this
@@ -785,9 +824,8 @@ validate, and disable with it, with no form library.
 - **Disabled fieldsets** disable every control in them. Zag tracks this with
   `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`.
 - **Validation.** Material's error look keys on the `invalid` state. On a text input's
-  slots the CSS matches `aria-invalid` or `data-invalid` on the slot or inside it, and not
-  `:invalid`, so an empty required field doesn't show an error before the user acts.
-  Three ways in:
+  slots the CSS matches `aria-invalid` on the slot or inside it, and not `:invalid`, so an
+  empty required field doesn't show an error before the user acts. Three ways in:
     - `invalid` (boolean): the app decides; nothing else changes.
     - `error` (string): sets `invalid`, shows the text as supporting text, and calls
       `setCustomValidity`, so the browser blocks submitting and its validation APIs agree.
@@ -929,7 +967,9 @@ Preset changes these designs need, independent of the steps above:
 - Icons (§9.6): the icon slots' `fill` token and `font-variation-settings`, set by the
   states Material draws filled.
 - State (§9.4): a `selected` state on the icon button, for toggle icon buttons.
-- Lowering (§9.5): `readOnly` also matches Zag's `data-readonly`.
+- State matching (§5.1): rework `css-lowering`'s condition and slot-state tables to
+  native, then ARIA, then `data-pf-*`, as the review table lists; Panda recipes stop
+  using its built-in state keys; the bindings set the `data-pf-*` attributes.
 
 ## 13. Risks and open questions
 
