@@ -1,0 +1,25 @@
+{
+    "name": "@pureform/release",
+    "version": "0.0.0-semantically-released",
+    "private": true,
+    "description": "Release tooling: sets versions for the core train and each package, and checks cog.toml",
+    "type": "module",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

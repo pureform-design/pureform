@@ -1,0 +1,164 @@
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { describe, expect, test } from "vitest";
+
+import { CORE_TRAIN } from "./cog";
+import {
+    checkRepository,
+    findRoot,
+    readCog,
+    readWorkspace,
+    releasePaths,
+    setVersion,
+} from "./workspace";
+
+const COG = `
+[monorepo.packages.core-train]
+path = "."
+include = [
+    "packages/core/**",
+    "packages/theme/**",
+]
+
+[monorepo.packages."@scope/solid"]
+path = "packages/solid"
+include = ["packages/solid/**"]
+`;
+
+function manifest(name: string): string {
+    return `{\n    "name": "${name}",\n    "version": "0.1.0"\n}\n`;
+}
+
+function lockEntry(path: string, name: string): string {
+    return `    "${path}": {\n      "name": "${name}",\n      "version": "0.1.0",\n    },\n`;
+}
+
+function fixture(): string {
+    const root = mkdtempSync(join(tmpdir(), "pureform-release-"));
+    const packages = [
+        ["packages/core", "@scope/core"],
+        ["packages/theme", "@scope/theme"],
+        ["packages/solid", "@scope/solid"],
+        ["apps/demo", "@scope/demo"],
+    ] as const;
+    writeFileSync(join(root, "cog.toml"), COG);
+    writeFileSync(
+        join(root, "package.json"),
+        JSON.stringify({
+            name: "@scope/root",
+            workspaces: ["packages/*", "apps/*", "tests/*"],
+        }),
+    );
+    let lock = '{\n  "workspaces": {\n';
+    for (const [path, name] of packages) {
+        mkdirSync(join(root, path), { recursive: true });
+        writeFileSync(join(root, path, "package.json"), manifest(name));
+        lock += lockEntry(path, name);
+    }
+    writeFileSync(join(root, "bun.lock"), `${lock}  },\n}\n`);
+    return root;
+}
+
+const read = (root: string, file: string) =>
+    readFileSync(join(root, file), "utf8");
+const versionOf = (root: string, path: string) =>
+    (JSON.parse(read(root, `${path}/package.json`)) as { version: string })
+        .version;
+
+describe("setVersion", () => {
+    test("sets every train package and its lockfile entries together", () => {
+        const root = fixture();
+        expect(setVersion(root, CORE_TRAIN, "0.2.0")).toEqual([
+            "packages/core/package.json",
+            "packages/theme/package.json",
+            "bun.lock",
+        ]);
+        expect(versionOf(root, "packages/core")).toBe("0.2.0");
+        expect(versionOf(root, "packages/theme")).toBe("0.2.0");
+        expect(versionOf(root, "packages/solid")).toBe("0.1.0");
+        expect(read(root, "bun.lock")).toContain(
+            '"name": "@scope/theme",\n      "version": "0.2.0"',
+        );
+        expect(read(root, "bun.lock")).toContain(
+            '"name": "@scope/solid",\n      "version": "0.1.0"',
+        );
+    });
+
+    test("sets a binding alone", () => {
+        const root = fixture();
+        expect(setVersion(root, "@scope/solid", "0.4.0")).toEqual([
+            "packages/solid/package.json",
+            "bun.lock",
+        ]);
+        expect(versionOf(root, "packages/solid")).toBe("0.4.0");
+        expect(versionOf(root, "packages/core")).toBe("0.1.0");
+    });
+
+    test("writes nothing in a dry run", () => {
+        const root = fixture();
+        expect(
+            setVersion(root, CORE_TRAIN, "0.2.0", { dryRun: true }),
+        ).toHaveLength(3);
+        expect(versionOf(root, "packages/core")).toBe("0.1.0");
+        expect(read(root, "bun.lock")).not.toContain("0.2.0");
+    });
+
+    test("fails for a package cog.toml doesn't know", () => {
+        expect(() => setVersion(fixture(), "@scope/demo", "0.2.0")).toThrow(
+            "no package @scope/demo",
+        );
+    });
+});
+
+describe("findRoot", () => {
+    test("walks up to the directory holding cog.toml", () => {
+        const root = fixture();
+        expect(findRoot(join(root, "packages/core"))).toBe(root);
+    });
+});
+
+describe("this repository", () => {
+    const root = findRoot(fileURLToPath(new URL(".", import.meta.url)));
+
+    test("cog.toml and the workspace agree", () => {
+        expect(checkRepository(root)).toEqual([]);
+    });
+
+    test("the core train holds the packages the design lists", () => {
+        const names = new Map(
+            readWorkspace(root).map((entry) => [entry.path, entry.name]),
+        );
+        const train = releasePaths(readCog(root), CORE_TRAIN).map((path) =>
+            names.get(path),
+        );
+        expect(train).toEqual(
+            expect.arrayContaining([
+                "@pureform/core",
+                "@pureform/theme",
+                "@pureform/material",
+                "@pureform/preset",
+                "@pureform/css-lowering",
+                "@pureform/css-adapter",
+                "@pureform/panda-adapter",
+                "@pureform/tailwind-adapter",
+                "@pureform/rn-adapter",
+                "@pureform/js-effects",
+                "@pureform/utils",
+                "@pureform/type-utils",
+                "@pureform/styling",
+                "@pureform/anatomy",
+                "@pureform/machines",
+            ]),
+        );
+    });
+
+    test("bindings keep their own versions", () => {
+        const names = new Set(readCog(root).map((entry) => entry.name));
+        expect(names).toContain("@pureform/solid");
+        const train = releasePaths(readCog(root), CORE_TRAIN);
+        expect(train).not.toContain("packages/solid");
+    });
+});

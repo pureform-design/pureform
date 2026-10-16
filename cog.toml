@@ -3,19 +3,21 @@ ignore_merge_commits = true
 ignore_fixup_commits = true
 disable_changelog = false
 disable_bump_commit = false
-generate_mono_repository_global_tag = true
+# Versioning, as in docs/design/component-architecture.md: the core train is one package,
+# `core-train`, so its packages share one version and one tag. Bindings and tooling get
+# their own tags. No global tag: cocogitto skips it when no package bumps, and it would
+# also count commits to apps, tests, and docs.
+generate_mono_repository_global_tag = false
 generate_mono_repository_package_tags = true
 branch_whitelist = []
 skip_ci = "[skip ci]"
 skip_untracked = false
-pre_bump_hooks = [
-    "bun x @omni-oss/set-version {{version}}",
-    "git add package.json",
-]
-post_bump_hooks = ["git push origin {{version_tag}}"]
+pre_bump_hooks = []
+post_bump_hooks = []
+# Sets the version in package.json and bun.lock: every train package for `core-train`,
+# the package itself otherwise.
 pre_package_bump_hooks = [
-    "bun x @omni-oss/set-version {{version}}",
-    "git add .",
+    "bun \"$(git rev-parse --show-toplevel)/packages/release/src/cli.ts\" set-version {{package}} {{version}}",
 ]
 post_package_bump_hooks = ["git push origin {{version_tag}}"]
 tag_prefix = "v"
@@ -35,129 +37,58 @@ authors = []
 
 [bump_profiles]
 
-[monorepo.packages."@pureform/core"]
-path = "packages/core"
-include = [
-    "packages/core/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/panda-adapter"]
-path = "packages/panda-adapter"
-include = [
-    "packages/panda-adapter/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/preset"]
-path = "packages/preset"
-include = [
-    "packages/preset/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/css-lowering"]
-path = "packages/css-lowering"
-include = [
-    "packages/css-lowering/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/css-adapter"]
-path = "packages/css-adapter"
-include = [
-    "packages/css-adapter/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/css-demo"]
-path = "apps/css-demo"
-include = [
-    "apps/css-demo/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/tailwind-demo"]
-path = "apps/tailwind-demo"
-include = [
-    "apps/tailwind-demo/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/tailwind-adapter"]
-path = "packages/tailwind-adapter"
-include = [
-    "packages/tailwind-adapter/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/browser-e2e-tests"]
-path = "tests/browser-e2e-tests"
-include = [
-    "tests/browser-e2e-tests/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/rn-adapter"]
-path = "packages/rn-adapter"
-include = [
-    "packages/rn-adapter/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/rn-web-demo"]
-path = "apps/rn-web-demo"
-include = [
-    "apps/rn-web-demo/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/solid"]
-path = "packages/solid"
-include = [
-    "packages/solid/**",
-]
-public_api = true
-
-[monorepo.packages."@pureform/styling"]
-path = "packages/styling"
-include = [
-    "packages/styling/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/anatomy"]
-path = "packages/anatomy"
+# The core train: every package that shares the AST format, the generated glue, or the
+# factory types. A commit touching any of them bumps them all together.
+[monorepo.packages.core-train]
+path = "."
+changelog_path = "CHANGELOG.md"
 include = [
     "packages/anatomy/**",
-]
-public_api = false
-
-[monorepo.packages."@pureform/machines"]
-path = "packages/machines"
-include = [
+    "packages/core/**",
+    "packages/css-adapter/**",
+    "packages/css-lowering/**",
+    "packages/js-effects/**",
     "packages/machines/**",
+    "packages/material/**",
+    "packages/panda-adapter/**",
+    "packages/preset/**",
+    "packages/rn-adapter/**",
+    "packages/styling/**",
+    "packages/tailwind-adapter/**",
+    "packages/theme/**",
+    "packages/type-utils/**",
+    "packages/utils/**",
+    # @anchor:new-core-train-package
 ]
-public_api = false
+
+# Bindings: their own version, peering on a core train range.
+[monorepo.packages."@pureform/solid"]
+path = "packages/solid"
+include = ["packages/solid/**"]
+
+# Tooling: internal, with its own versions.
+[monorepo.packages."@pureform/oxfmt-config"]
+path = "packages/oxfmt-config"
+include = ["packages/oxfmt-config/**"]
+
+[monorepo.packages."@pureform/oxlint-config"]
+path = "packages/oxlint-config"
+include = ["packages/oxlint-config/**"]
+
+[monorepo.packages."@pureform/tsconfig"]
+path = "packages/tsconfig"
+include = ["packages/tsconfig/**"]
+
+[monorepo.packages."@pureform/vite-config"]
+path = "packages/vite-config"
+include = ["packages/vite-config/**"]
+
+[monorepo.packages."@pureform/vitest-config"]
+path = "packages/vitest-config"
+include = ["packages/vitest-config/**"]
+
+[monorepo.packages."@pureform/release"]
+path = "packages/release"
+include = ["packages/release/**"]
 
 #@anchor:new-typescript-package
-
-[monorepo.packages.root]
-bump_order = 10000
-path = "."
-changelog_path = "CHANGELOG.root.md"
-include = [
-    "package.json",
-    "bun.lock",
-    "LICENSE",
-    "README.md",
-    "workspace.omni.yaml",
-    "vitest.workspace.ts",
-]
-public_api = false
-pre_bump_hooks = [
-    # force regenarate lockfile
-    "rm bun.lock",
-    "bun install --lockfile-only",
-    "git add package.json bun.lock",
-]
