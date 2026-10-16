@@ -68,11 +68,13 @@ export interface ShapeValue {
     }[];
 }
 
-/** A linear or radial gradient. A stop's position may mix pixels and percentages of the
- *  gradient's length, so it's placed once the box's size is known. */
+/** A linear, radial, or conic gradient. A stop's position may mix pixels and percentages of
+ *  the gradient's length, so it's placed once the box's size is known; a conic gradient's are
+ *  angles or percentages of a turn. */
 export interface GradientValue {
-    kind: "linear" | "radial";
-    /** A linear gradient's direction, in degrees: 180 runs top to bottom, as in CSS. */
+    kind: "linear" | "radial" | "conic";
+    /** A linear gradient's direction, in degrees: 180 runs top to bottom, as in CSS. A conic
+     *  gradient's starting angle, clockwise from the top. */
     angle?: Value;
     /** How far a radial gradient reaches. */
     extent?:

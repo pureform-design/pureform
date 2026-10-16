@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import { precompute } from "./build";
 import {
+    colorAt,
+    conicWedges,
     dropShadows,
     pathAt,
     placeGradient,
@@ -234,5 +236,48 @@ describe("morphs", () => {
         expect(a.length).toBe(b.length);
         expect(a).not.toEqual(b);
         expect(pathAt(pressed.shape!, b)).toBe(shapePath(pressed.shape!, box));
+    });
+});
+
+describe("conic gradients", () => {
+    const placed = placeGradient(
+        {
+            kind: "conic",
+            angle: "90deg",
+            stops: [
+                { color: "rgb(255, 0, 0)" },
+                { color: "rgb(0, 0, 255)", at: "180deg" },
+                { color: "rgb(0, 0, 255)", at: "75%" },
+                { color: "rgb(255, 0, 0)" },
+            ],
+        },
+        { width: 100, height: 100 },
+    );
+
+    it("places stops by their share of a turn, from the starting angle", () => {
+        expect(placed).toMatchObject({
+            kind: "conic",
+            from: 90,
+            stops: [
+                { offset: 0 },
+                { offset: 0.5 },
+                { offset: 0.75 },
+                { offset: 1 },
+            ],
+        });
+        if (placed.kind !== "conic") return;
+        expect(colorAt(placed.stops, 0.25)).toBe("rgba(128, 0, 128, 1)");
+        expect(colorAt(placed.stops, 0.6)).toBe("rgba(0, 0, 255, 1)");
+    });
+
+    it("draws wedges from the center, merging runs of one color", () => {
+        if (placed.kind !== "conic") return;
+        const wedges = conicWedges(placed, { width: 100, height: 100 }, 36);
+        // The blue quarter is one wedge; the blends are a wedge per step.
+        expect(
+            wedges.filter((w) => w.color === "rgba(0, 0, 255, 1)"),
+        ).toHaveLength(1);
+        expect(wedges.length).toBeLessThan(36);
+        expect(wedges[0]!.d).toMatch(/^M 50 50 L /);
     });
 });

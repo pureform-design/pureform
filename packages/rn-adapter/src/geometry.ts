@@ -1,6 +1,7 @@
 // Shapes and gradients at a box's size, as SVG draws them. A selected drawing keeps the lengths
 // that mix pixels and percentages until the box is laid out; these place them as CSS would.
 
+import { animatable, blend } from "./motion";
 import type { GradientValue, ShapePoint, ShapeValue, Value } from "./values";
 import { colorWith, pixels } from "./values";
 
@@ -73,7 +74,13 @@ export type PlacedGradient =
           y2: number;
           stops: GradientStop[];
       }
-    | { kind: "radial"; r: number; stops: GradientStop[] };
+    | { kind: "radial"; r: number; stops: GradientStop[] }
+    | {
+          kind: "conic";
+          /** The starting angle, in degrees clockwise from the top. */
+          from: number;
+          stops: GradientStop[];
+      };
 
 const degrees = (angle: Value | undefined): number => {
     if (angle === undefined) return 180;
@@ -129,6 +136,25 @@ export const placeGradient = (
     current = "rgb(0, 0, 0)",
 ): PlacedGradient => {
     const { width, height } = box;
+    if (gradient.kind === "conic") {
+        // Positions are angles, or percentages of a turn; their share of the turn places them.
+        const turn = gradient.stops.map((stop) =>
+            stop.at === undefined
+                ? stop
+                : {
+                      ...stop,
+                      at:
+                          typeof stop.at === "string" && stop.at.endsWith("%")
+                              ? stop.at
+                              : `${(degrees(stop.at) / 360) * 100}%`,
+                  },
+        );
+        return {
+            kind: "conic",
+            from: degrees(gradient.angle ?? 0),
+            stops: offsets(turn, 1, current),
+        };
+    }
     if (gradient.kind === "radial") {
         // An ellipse through the corners keeps the sides' proportions, scaled by √2.
         const corner =
@@ -195,3 +221,59 @@ export const dropShadows = (boxShadow: string): string =>
             );
         })
         .join(" ");
+
+/** A gradient's color `t` of the way along it, blended between the stops around it as CSS
+ *  blends them, and the end stops' beyond them. */
+export const colorAt = (stops: readonly GradientStop[], t: number): string => {
+    const after = stops.findIndex((stop) => stop.offset >= t);
+    if (after <= 0) return stops[after === 0 ? 0 : stops.length - 1]!.color;
+    const [a, b] = [stops[after - 1]!, stops[after]!];
+    const span = b.offset - a.offset;
+    return span <= 0
+        ? b.color
+        : String(
+              blend(
+                  animatable(a.color),
+                  animatable(b.color),
+                  (t - a.offset) / span,
+              ),
+          );
+};
+
+/** A conic gradient as wedges around the box's center, which SVG can draw: each a slice of
+ *  the turn in the color at its middle, overlapping the next a little so no seam shows, and
+ *  runs of one color merged into one wedge. */
+export const conicWedges = (
+    placed: Extract<PlacedGradient, { kind: "conic" }>,
+    box: Box,
+    steps = 360,
+): { d: string; color: string }[] => {
+    const [cx, cy] = [box.width / 2, box.height / 2];
+    const reach = Math.hypot(box.width, box.height) / 2 + 1;
+    const at = (degree: number) => {
+        const a = (degree * Math.PI) / 180;
+        return `${round(cx + reach * Math.sin(a))} ${round(cy - reach * Math.cos(a))}`;
+    };
+    const runs: { start: number; end: number; color: string }[] = [];
+    for (let i = 0; i < steps; i++) {
+        const color = colorAt(placed.stops, (i + 0.5) / steps);
+        const last = runs.at(-1);
+        if (last?.color === color) last.end = i + 1;
+        else runs.push({ start: i, end: i + 1, color });
+    }
+    const step = 360 / steps;
+    return runs.map(({ start, end, color }) => {
+        const [a, b] = [
+            placed.from + start * step - 0.5,
+            placed.from + end * step + 0.5,
+        ];
+        // An arc's worth of points, so a wide run stays a wedge and not a triangle.
+        const points = [];
+        for (let degree = a; degree < b; degree += 30)
+            points.push(`L ${at(degree)}`);
+        return {
+            d: `M ${round(cx)} ${round(cy)} ${points.join(" ")} L ${at(b)} Z`,
+            color,
+        };
+    });
+};

@@ -19,7 +19,7 @@ import Svg, {
 import type { PathProps } from "react-native-svg";
 
 import type { RippleDrawing, RippleProps } from "./animate/ripple";
-import { placeGradient, shapePath } from "./geometry";
+import { colorAt, conicWedges, placeGradient, shapePath } from "./geometry";
 import type { Box, PlacedGradient } from "./geometry";
 import type { Drawing } from "./select";
 import type { GradientValue, ShapeValue } from "./values";
@@ -27,7 +27,10 @@ import type { GradientValue, ShapeValue } from "./values";
 /** An id for SVG references, unique to the component. */
 export const useSvgId = () => `pf${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
 
-export const gradientElement = (id: string, placed: PlacedGradient) => {
+export const gradientElement = (
+    id: string,
+    placed: Exclude<PlacedGradient, { kind: "conic" }>,
+) => {
     const stops = placed.stops.map((stop, i) =>
         h(Stop, { key: i, offset: stop.offset, stopColor: stop.color }),
     );
@@ -102,13 +105,44 @@ export const drawingSvg = (props: {
     const fillRule = drawing.shape?.fillRule ?? "nonzero";
     const placed =
         drawing.gradient && placeGradient(drawing.gradient, box, props.color);
+    // SVG has no conic gradient: one is wedges around the center, clipped to the shape or the
+    // box. They're drawn without anti-aliasing, which would let the background through where
+    // they meet, over the gradient's middle color for a renderer that anti-aliases anyway.
+    const conic =
+        placed?.kind === "conic" &&
+        h(
+            G,
+            { clipPath: `url(#${id}conic)` },
+            h(Rect, {
+                width: box.width,
+                height: box.height,
+                fill: colorAt(placed.stops, 0.5),
+            }),
+            ...conicWedges(placed, box).map(({ d: wedge, color }, i) =>
+                // react-native-svg passes the hint on to the page, and devices ignore it.
+                h(Path, {
+                    key: i,
+                    d: wedge,
+                    fill: color,
+                    ...({ shapeRendering: "crispEdges" } as object),
+                }),
+            ),
+        );
     return h(
         Svg,
         { width: box.width, height: box.height },
         h(
             Defs,
             null,
-            placed && gradientElement(id, placed),
+            placed && placed.kind !== "conic" && gradientElement(id, placed),
+            conic &&
+                h(
+                    ClipPath,
+                    { id: `${id}conic` },
+                    d
+                        ? h(Path, { d, fillRule })
+                        : h(Rect, { width: box.width, height: box.height }),
+                ),
             image &&
                 d &&
                 h(ClipPath, { id: `${id}clip` }, h(Path, { d, fillRule })),
@@ -127,19 +161,20 @@ export const drawingSvg = (props: {
                           : "xMidYMid slice",
                 ...(d ? { clipPath: `url(#${id}clip)` } : {}),
             }),
-        placed &&
-            (d
-                ? h(ShapePath, {
-                      d,
-                      fill: `url(#${id})`,
-                      fillRule,
-                      ...props.motion,
-                  })
-                : h(Rect, {
-                      width: box.width,
-                      height: box.height,
-                      fill: `url(#${id})`,
-                  })),
+        conic ||
+            (placed &&
+                (d
+                    ? h(ShapePath, {
+                          d,
+                          fill: `url(#${id})`,
+                          fillRule,
+                          ...props.motion,
+                      })
+                    : h(Rect, {
+                          width: box.width,
+                          height: box.height,
+                          fill: `url(#${id})`,
+                      }))),
     );
 };
 
@@ -177,7 +212,7 @@ export const svgRipple =
                         gradient,
                         { width: size, height: size },
                         props.color,
-                    ),
+                    ) as Exclude<PlacedGradient, { kind: "conic" }>,
                 ),
             ),
             h(Circle, {

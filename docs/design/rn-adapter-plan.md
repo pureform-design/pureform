@@ -201,8 +201,10 @@ overrides the primary color in either mode.
   the config isn't recomputed, and override colors are `rgb()`/`rgba()` or hex, which the
   runtime parses without a color library.
 - **One-color background images,** Material's elevation tints, become a tint composited over
-  the background color when a component's styles are picked. Other linear and radial
-  gradients draw with SVG; conic ones are reported.
+  the background color when a component's styles are picked. Other gradients draw with SVG.
+  SVG has no conic gradient, so a conic one is wedges around the center, a degree each, in the
+  color at its middle, with runs of one color merged, drawn without anti-aliasing over the
+  gradient's middle color so no seams show.
 - **Unitless line heights** multiply the slot's font size once it's known.
 - **`fontStack: "all"`** keeps a font family's whole stack for React Native Web, which passes
   it to CSS. Native takes the first family.

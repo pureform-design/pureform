@@ -460,7 +460,8 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         }
         case "gradient": {
             // A gradient of one color is a layer of that color, as Material paints elevation
-            // tints, which the background color can take. Others are drawn with SVG.
+            // tints, which the background color can take. Others are drawn with SVG, a conic one
+            // as wedges around its center.
             const [first, ...rest] = node.stops;
             const same = JSON.stringify(first?.color);
             if (
@@ -469,9 +470,6 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 rest.every((stop) => JSON.stringify(stop.color) === same)
             ) {
                 return lowerNode(first.color, ctx);
-            }
-            if (node.kind === "conic") {
-                throw new Unsupported("no conic gradients, even with SVG");
             }
             const { kind, extent } = node;
             const parts: ValueNode[] = [
