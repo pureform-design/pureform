@@ -314,6 +314,16 @@ and no manifest. The classes equal `componentClasses`' for every selection of th
 Its options are `CssOptions` (`classPrefix`, `prefix`, …). The Vite plugin and
 `virtual:pureform/components` stay until the bundler plugin replaces them.
 
+Built (p4b-tailwind): `@pureform/tailwind-adapter/codegen` writes the CSS adapter's modules
+unchanged (the Tailwind stylesheet keeps its class names), and `styles.css`, `compileTailwind`
+for the allow-listed components, which the app imports after `tailwindcss`. Its options are
+`TailwindOptions`. It writes **no `@source inline(...)`**: that was a Tailwind v3 need, when
+custom rules in `@layer components` were dropped unless the scanner saw their classes. Tailwind
+v4 keeps every rule outside its utilities as written and makes utilities only from what it
+scans, so the factories' classes survive without being listed (checked through Tailwind's
+compiler with no candidates), and listing them would only make utilities of a class that
+shares a utility's name.
+
 **Native:** a precomputed table. Metro's `withPureform` already precomputes each theme's
 resolved component styles, which `rn-adapter`'s `useSelected` selects from at runtime;
 the factory adds the per-selection table on top. Token tweening (`useMovingTokens`)
@@ -776,7 +786,8 @@ Three layers, cheapest first:
    barrel re-exports in runtime entries. The root `@pureform/solid` re-exports for DX,
    and is fine under modern bundlers because nothing has side effects.
 2. **Allow-list.** The bundler plugin's `components` option limits what's generated:
-   CSS, Panda `staticCss`, Tailwind sources, and registry entries. Default: everything.
+   CSS, Panda `staticCss`, the Tailwind stylesheet, and registry entries. Default:
+   everything.
 3. **Usage-based pruning (bundler plugin).** In build mode, `@pureform/bundler`:
     - collects which components are imported from `@pureform/solid` (module graph, after
       tree shaking, via `moduleParsed`/`generateBundle`),
@@ -784,8 +795,9 @@ Three layers, cheapest first:
       light JSX scan; any dynamic value marks that variant "all",
     - regenerates the registry and the CSS for only those components and variants.
       Dev mode skips pruning (everything available, fast HMR).
-      CSS target: emits the pruned stylesheet. Panda: narrows `staticCss`. Tailwind: narrows
-      `@source inline`. Native/Metro: narrows the precomputed tables.
+      CSS and Tailwind targets: emit the pruned stylesheet (Tailwind has no `@source inline`
+      to narrow, §5.2). Panda: narrows `staticCss`. Native/Metro: narrows the precomputed
+      tables.
 
 Pruning is a safety-off switch: if the scan fails or sees `useClassFactory(dynamicName)`, it
 keeps everything and warns.
