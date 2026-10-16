@@ -603,11 +603,17 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
             return product(
                 fields.map((n) => lowerNode(n as ValueNode, ctx)),
                 (values) =>
-                    parts.map(({ property }, i) => ({
+                    parts.map(({ part, property }, i) => ({
                         property,
                         duration: values[i * 3]!,
                         easing: values[i * 3 + 1]!,
                         delay: values[i * 3 + 2]!,
+                        // A token's tween carries its type, so reduced motion can stop the
+                        // ones that move.
+                        ...(typeof part.property !== "string" &&
+                        part.property.valueType
+                            ? { valueType: part.property.valueType }
+                            : {}),
                     })),
             );
         }

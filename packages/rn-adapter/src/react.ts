@@ -16,7 +16,7 @@ import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { curve } from "./animate/curve";
 import type { ComponentStyles } from "./lower";
-import { movingTokens, tokensAt } from "./motion";
+import { movingTokens, tokenTransitions, tokensAt } from "./motion";
 import {
     overridesFor,
     stylesFor,
@@ -28,7 +28,6 @@ import type { Overrides, Resolved, Styles } from "./resolve";
 import { selectWithTransitions } from "./select";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import { TOKEN } from "./values";
 import type { ThemeValues, Transition, Value } from "./values";
 
 interface Context {
@@ -262,19 +261,6 @@ const useSelected = (
     ]);
 };
 
-// A token value's transition, as selection names it, by the token's key.
-const tokenTransitions = (selected: Selected): Map<string, Transition> => {
-    const out = new Map<string, Transition>();
-    for (const list of Object.values(selected.transitions)) {
-        for (const t of list) {
-            if (t.property.startsWith(TOKEN)) {
-                out.set(t.property.slice(TOKEN.length), t);
-            }
-        }
-    }
-    return out;
-};
-
 // Instance tokens, each moving to its new value over their transitions: the tokens
 // as they are now, or `tokens` itself when nothing moves.
 const useMovingTokens = (
@@ -337,7 +323,10 @@ export const useComponentState = (
     tokens?: ThemeValues,
 ): Selected => {
     const target = useSelected(name, variants, state, tokens);
-    const moving = useMovingTokens(tokens, tokenTransitions(target));
+    const moving = useMovingTokens(
+        tokens,
+        tokenTransitions(target.transitions, useReducedMotion()),
+    );
     const now = useSelected(name, variants, state, moving);
     return moving === tokens ? target : now;
 };
