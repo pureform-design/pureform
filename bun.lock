@@ -202,6 +202,7 @@
       "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/css-lowering": "catalog:",
+        "@pureform/generate": "catalog:",
         "@pureform/styling": "catalog:",
       },
       "devDependencies": {

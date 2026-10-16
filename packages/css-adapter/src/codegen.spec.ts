@@ -1,0 +1,501 @@
+import { spawnSync } from "node:child_process";
+import {
+    mkdirSync,
+    mkdtempSync,
+    readFileSync,
+    rmSync,
+    symlinkSync,
+    writeFileSync,
+} from "node:fs";
+import { createRequire } from "node:module";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+import { px } from "@pureform/core/ast";
+import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
+import { generate } from "@pureform/generate";
+import type { CodegenContext, ComponentShape } from "@pureform/generate";
+import { componentShape } from "@pureform/generate";
+import { pureform } from "@pureform/preset";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+
+import { manifestOf } from "./classes";
+import { STYLESHEET_FILE, codegen, subsetConfig, tokenVars } from "./codegen";
+import type { CssCodegenOptions } from "./codegen";
+import { componentClasses } from "./runtime";
+import { compileCss } from "./stylesheet";
+
+// A slotted button with a boolean group, a group with no default, a group whose name isn't an
+// identifier, and tokens (one with a theme var only); a single-slot icon with a value that
+// needs escaping in a template; and a divider with no groups.
+const config = (): CoreConfig =>
+    ({
+        tokens: {},
+        semanticTokens: {},
+        themes: { teal: {}, dense: {} },
+        components: {
+            iconButton: {
+                kind: "slotComponent",
+                name: "iconButton",
+                slots: ["root", "icon"],
+                tokens: {
+                    radius: {
+                        type: "dynamic",
+                        path: ["components", "iconButton", "radius"],
+                    },
+                    gap: { $value: { type: "raw", value: "8px" } },
+                },
+                recipe: {
+                    base: { root: { width: px(40) }, icon: {} },
+                    variants: {
+                        variant: {
+                            filled: { root: { width: px(48) } },
+                            text: {},
+                        },
+                        toggle: { true: {}, false: {} },
+                        size: { small: {}, large: {} },
+                        "icon-side": { start: {}, end: {} },
+                    },
+                    defaultVariants: {
+                        variant: "filled",
+                        toggle: "false",
+                        "icon-side": "start",
+                    },
+                },
+            },
+            icon: {
+                kind: "component",
+                name: "icon",
+                recipe: {
+                    base: { width: px(24) },
+                    variants: {
+                        filled: { true: {}, false: {}, "a`${b}": {} },
+                    },
+                },
+            },
+            divider: {
+                kind: "component",
+                name: "divider",
+                recipe: { base: { height: px(1) } },
+            },
+        },
+    }) as unknown as CoreConfig;
+
+const context = (
+    options: CssCodegenOptions = {},
+    components: readonly string[] = ["iconButton", "icon", "divider"],
+    loaded: CoreConfig = config(),
+): CodegenContext<CssCodegenOptions> => ({
+    config: loaded,
+    components,
+    options,
+    root: "/app",
+    outDir: "/app/.pureform",
+    shape: (name: string): ComponentShape =>
+        componentShape(loaded.components[name]!),
+    importPath: (from, to) => `${"../".repeat(from.split("/").length)}${to}`,
+});
+
+const run = async (
+    options: CssCodegenOptions = {},
+    components?: readonly string[],
+) => {
+    const output = await codegen.codegen(context(options, components));
+    const files = Object.fromEntries(
+        [...output.components, ...(output.files ?? [])].map((file) => [
+            file.path,
+            file.contents,
+        ]),
+    );
+    return { output, files };
+};
+
+// Temp app roots that can import what they generate: `@pureform/styling` links to this
+// workspace's package.
+const STYLING = fileURLToPath(new URL("../../styling", import.meta.url));
+const TSCONFIG = fileURLToPath(
+    new URL("../../tsconfig/base.json", import.meta.url),
+);
+const TSC = join(
+    createRequire(import.meta.url).resolve("typescript/package.json"),
+    "..",
+    "bin",
+    "tsc",
+);
+const roots: string[] = [];
+
+const appRoot = (): string => {
+    const root = mkdtempSync(join(tmpdir(), "pureform-css-"));
+    roots.push(root);
+    mkdirSync(join(root, "node_modules", "@pureform"), { recursive: true });
+    symlinkSync(
+        STYLING,
+        join(root, "node_modules", "@pureform", "styling"),
+        "dir",
+    );
+    return root;
+};
+
+afterAll(() => {
+    for (const root of roots) rmSync(root, { recursive: true, force: true });
+});
+
+type Factory = (
+    selection: object,
+) => Record<string, { class: string; style?: Record<string, string> }>;
+
+interface Glue {
+    registry: { names: readonly string[]; entry(name: string): unknown };
+}
+
+const factoryOf = (glue: Glue, name: string): Factory =>
+    (glue.registry.entry(name) as { factory: Factory }).factory;
+
+// Every combination of every group's values.
+const selections = (
+    variants: Readonly<Record<string, readonly string[]>>,
+): Record<string, string>[] =>
+    Object.entries(variants).reduce<Record<string, string>[]>(
+        (all, [group, values]) =>
+            all.flatMap((selection) =>
+                values.map((value) => ({ ...selection, [group]: value })),
+            ),
+        [{}],
+    );
+
+// The classes the old runtime gives, as slots.
+const runtimeSlots = (
+    spec: AnyComponentSpec,
+    options: CssCodegenOptions,
+): ((selection: object) => Record<string, string>) => {
+    const classes = componentClasses(manifestOf(spec, options)) as (
+        choice: object,
+    ) => string | Record<string, string>;
+    return (selection) => {
+        const result = classes(selection);
+        return typeof result === "string" ? { root: result } : result;
+    };
+};
+
+const slotClasses = (slots: ReturnType<Factory>): Record<string, string> =>
+    Object.fromEntries(
+        Object.entries(slots).map(([slot, value]) => [slot, value.class]),
+    );
+
+describe("the CSS codegen", () => {
+    it("is a web adapter named css", () => {
+        expect(codegen.name).toBe("css");
+        expect(codegen.platform).toBe("web");
+    });
+
+    it("writes a factory module per component, and styles.css", async () => {
+        const { output } = await run();
+        expect(output.components.map(({ name, path }) => [name, path])).toEqual(
+            [
+                ["iconButton", "web/iconButton.ts"],
+                ["icon", "web/icon.ts"],
+                ["divider", "web/divider.ts"],
+            ],
+        );
+        expect(output.files?.map((file) => file.path)).toEqual([
+            STYLESHEET_FILE,
+        ]);
+    });
+
+    it("writes each slot's classes over the selection, and adds instance tokens", async () => {
+        const { files } = await run({ classPrefix: "pf", prefix: "pf" });
+        expect(files["web/iconButton.ts"]).toMatchSnapshot();
+    });
+
+    it("gives a single-slot component's class to the root", async () => {
+        const { files } = await run();
+        expect(files["web/icon.ts"]).toMatchSnapshot();
+        expect(files["web/divider.ts"]).toMatchSnapshot();
+    });
+
+    it("names each token's var by its dynamic path, else the component's var", async () => {
+        const { files } = await run({ prefix: { components: "x" } });
+        expect(files["web/iconButton.ts"]).toContain(
+            'radius: "--x-components-iconButton-radius",',
+        );
+        expect(files["web/iconButton.ts"]).toContain(
+            'gap: "--x-components-iconButton-gap",',
+        );
+    });
+
+    it("compiles the stylesheet for the given components only, with the options", async () => {
+        const options = { classPrefix: "pf", layer: false } as const;
+        const { files } = await run(options, ["icon"]);
+        expect(Object.keys(files)).toEqual(["web/icon.ts", STYLESHEET_FILE]);
+        expect(files[STYLESHEET_FILE]).toBe(
+            compileCss(subsetConfig(config(), ["icon"]), options),
+        );
+        expect(files[STYLESHEET_FILE]).toContain(".pf-icon {");
+        expect(files[STYLESHEET_FILE]).not.toContain("iconButton");
+    });
+
+    it("gives the same output for the same input", async () => {
+        expect((await run({ prefix: "pf" })).files).toEqual(
+            (await run({ prefix: "pf" })).files,
+        );
+    });
+});
+
+describe("subsetConfig", () => {
+    it("keeps the given components, in that order", () => {
+        const subset = subsetConfig(config(), ["divider", "icon"]);
+        expect(Object.keys(subset.components)).toEqual(["divider", "icon"]);
+        expect(subset.themes).toEqual(config().themes);
+    });
+});
+
+describe("generate with the CSS target", () => {
+    const generateInto = async (
+        root: string,
+        loaded: CoreConfig,
+        options: CssCodegenOptions,
+        components?: readonly string[],
+        check = false,
+    ) =>
+        generate<CssCodegenOptions>({
+            root,
+            config: loaded,
+            target: codegen,
+            options,
+            ...(components ? { components } : {}),
+            check,
+            trainCheck: false,
+        });
+
+    it("writes the factories, the stylesheet, the index, and the declarations", async () => {
+        const root = appRoot();
+        const result = await generateInto(root, config(), { prefix: "pf" }, [
+            "iconButton",
+        ]);
+        expect(result.files.map(({ path, status }) => [path, status])).toEqual([
+            ["web/iconButton.ts", "written"],
+            [STYLESHEET_FILE, "written"],
+            ["index.ts", "written"],
+            ["registry.d.ts", "written"],
+        ]);
+        const read = (path: string) =>
+            readFileSync(join(root, ".pureform", path), "utf8");
+        expect(read(STYLESHEET_FILE)).toMatch(
+            /^\/\* Generated by pureform: do not edit\. .* \*\/\n\/\* pureform-hash: [0-9a-f]{16} \*\/\n\n@layer pureform\.reset/,
+        );
+        expect(read("index.ts")).toContain(
+            'import { iconButton } from "./web/iconButton";',
+        );
+        const check = await generateInto(
+            root,
+            config(),
+            { prefix: "pf" },
+            ["iconButton"],
+            true,
+        );
+        expect(check.ok).toBe(true);
+    });
+
+    it("gives the old runtime's classes for every selection of a small config", async () => {
+        const root = appRoot();
+        const loaded = config();
+        await generateInto(root, loaded, { classPrefix: "pf" });
+        const glue = (await import(
+            /* @vite-ignore */ join(root, ".pureform", "index.ts")
+        )) as Glue;
+        for (const name of ["iconButton", "icon", "divider"]) {
+            const spec = loaded.components[name]!;
+            const factory = factoryOf(glue, name);
+            const old = runtimeSlots(spec, { classPrefix: "pf" });
+            const groups = componentShape(spec).variants;
+            for (const selection of [{}, ...selections(groups)]) {
+                expect(slotClasses(factory(selection))).toEqual(old(selection));
+            }
+        }
+        // A group with no default is left out until it's chosen.
+        expect(factoryOf(glue, "iconButton")({}).root!.class).not.toContain(
+            "size_",
+        );
+        expect(factoryOf(glue, "icon")({ filled: "a`${b}" }).root!.class).toBe(
+            "pf-icon pf-icon--filled_a`${b}",
+        );
+    });
+
+    describe("over the preset", () => {
+        const options = { classPrefix: "pf", prefix: "pf" } as const;
+        const preset = pureform();
+        let root: string;
+        let glue: Glue;
+        beforeAll(async () => {
+            root = appRoot();
+            await generateInto(root, preset, options);
+            glue = (await import(
+                /* @vite-ignore */ join(root, ".pureform", "index.ts")
+            )) as Glue;
+        }, 60_000);
+        const stylesheet = () =>
+            readFileSync(join(root, ".pureform", STYLESHEET_FILE), "utf8");
+
+        it("registers every component", { timeout: 60_000 }, async () => {
+            expect(glue.registry.names).toEqual(Object.keys(preset.components));
+        });
+
+        it(
+            "gives the old runtime's classes for every combination of every group's values",
+            { timeout: 60_000 },
+            async () => {
+                let count = 0;
+                for (const [name, spec] of Object.entries(preset.components)) {
+                    const factory = factoryOf(glue, name);
+                    const old = runtimeSlots(spec, options);
+                    const groups = componentShape(spec).variants;
+                    // Booleans share the cached result of their strings.
+                    const flags = Object.entries(groups).filter(([, values]) =>
+                        values.includes("true"),
+                    );
+                    for (const selection of selections(groups)) {
+                        const result = factory(selection);
+                        const expected = old(selection);
+                        if (
+                            JSON.stringify(slotClasses(result)) !==
+                            JSON.stringify(expected)
+                        ) {
+                            expect(slotClasses(result)).toEqual(expected);
+                        }
+                        const typed = Object.fromEntries(
+                            Object.entries(selection).map(([group, value]) => [
+                                group,
+                                flags.some(([flag]) => flag === group)
+                                    ? value === "true"
+                                        ? true
+                                        : value === "false"
+                                          ? false
+                                          : value
+                                    : value,
+                            ]),
+                        );
+                        expect(factory(typed)).toBe(result);
+                        count++;
+                    }
+                    // The defaults share the `{}` result, frozen.
+                    expect(factory(componentShape(spec).defaults)).toBe(
+                        factory({}),
+                    );
+                    expect(Object.isFrozen(factory({}).root)).toBe(true);
+                }
+                expect(count).toBeGreaterThan(40_000);
+            },
+        );
+
+        it(
+            "writes the stylesheet compileCss writes for the config",
+            { timeout: 60_000 },
+            async () => {
+                expect(stylesheet().split("\n\n").slice(1).join("\n\n")).toBe(
+                    compileCss(preset, options),
+                );
+            },
+        );
+
+        it(
+            "sets each instance token's var on the root, which the stylesheet reads",
+            { timeout: 60_000 },
+            async () => {
+                const css = stylesheet();
+                // Tokens the preset declares but no style reads yet.
+                const unread = new Set([
+                    "--pf-components-slider-stateLayerColor",
+                    "--pf-components-menu-supportingColor",
+                ]);
+                for (const [name, spec] of Object.entries(preset.components)) {
+                    const factory = factoryOf(glue, name);
+                    expect(factory({ tokens: {} })).toBe(factory({}));
+                    for (const [token, cssVar] of Object.entries(
+                        tokenVars(name, spec, options.prefix),
+                    )) {
+                        expect(
+                            factory({ tokens: { [token]: "3px" } }).root!.style,
+                        ).toEqual({ [cssVar]: "3px" });
+                        expect(
+                            css.includes(`var(${cssVar}`),
+                            `${name}.${token} (${cssVar})`,
+                        ).toBe(!unread.has(cssVar));
+                    }
+                }
+            },
+        );
+
+        it(
+            "returns every class the stylesheet styles",
+            { timeout: 60_000 },
+            async () => {
+                const styled = new Set(
+                    [...stylesheet().matchAll(/\.(pf-[\w-]+)/g)].map(
+                        ([, name]) => name!,
+                    ),
+                );
+                const returned = new Set<string>();
+                for (const [name, spec] of Object.entries(preset.components)) {
+                    const factory = factoryOf(glue, name);
+                    for (const selection of selections(
+                        componentShape(spec).variants,
+                    )) {
+                        for (const slot of Object.values(factory(selection))) {
+                            for (const c of slot.class.split(" "))
+                                returned.add(c);
+                        }
+                    }
+                }
+                expect([...styled].filter((c) => !returned.has(c))).toEqual([]);
+            },
+        );
+
+        it(
+            "type-checks, with the registry typed from the config",
+            { timeout: 120_000 },
+            async () => {
+                writeFileSync(
+                    join(root, "app.ts"),
+                    [
+                        'import { registry } from "./.pureform";',
+                        "",
+                        'export const filled: string = registry.entry("button").factory({ variant: "filled", tokens: { radius: 4 } }).label.class;',
+                        'export const toggled = registry.entry("iconButton").factory({ toggle: true });',
+                        "// @ts-expect-error: not a button variant",
+                        'registry.entry("button").factory({ variant: "nope" });',
+                        "// @ts-expect-error: not a checkbox slot",
+                        'void registry.entry("checkbox").factory({}).label;',
+                        "",
+                    ].join("\n"),
+                );
+                writeFileSync(
+                    join(root, "tsconfig.json"),
+                    JSON.stringify({
+                        extends: TSCONFIG,
+                        compilerOptions: { noEmit: true, types: [] },
+                        include: ["app.ts", ".pureform/**/*.*"],
+                    }),
+                );
+                // TypeScript 7 has no compiler API, so this runs its `tsc`.
+                const output = spawnSync(
+                    process.execPath,
+                    [TSC, "-p", root, "--pretty", "false", "--listFilesOnly"],
+                    { encoding: "utf8" },
+                );
+                expect(
+                    output.stdout
+                        .split("\n")
+                        .filter((file) => file.includes("/.pureform/web/")),
+                ).toHaveLength(Object.keys(preset.components).length);
+                const checked = spawnSync(
+                    process.execPath,
+                    [TSC, "-p", root, "--pretty", "false"],
+                    { encoding: "utf8" },
+                );
+                const messages = checked.stdout.split("\n").filter(Boolean);
+                expect(messages).toEqual([]);
+            },
+        );
+    });
+});
