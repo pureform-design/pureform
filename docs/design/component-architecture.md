@@ -261,6 +261,12 @@ import { button as recipe } from "../../styled-system/recipes";
 export const button: ClassFactory<"button"> = (s) => recipe(s);
 ```
 
+Built (p2c), hand-written in `apps/solid-demo/.pureform/` until p4b-panda generates it: Panda's
+recipe returns a class string per slot, so the factory maps each to `{ class }`, caches one
+frozen result per selection with `selectionCache`, and adds instance tokens with
+`withTokenStyle`. The `staticCss` entries live in `.pureform/panda.ts`, a build-time module
+`panda.config.ts` spreads in, apart from the runtime modules, which import `styled-system/`.
+
 **CSS and Tailwind:** plain lookup tables with no runtime dependency. Tailwind also gets
 `@source inline(...)` so it keeps the classes. This exists in part today: the CSS
 adapter's Vite plugin (which the Tailwind adapter's reuses) generates each component's
