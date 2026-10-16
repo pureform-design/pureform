@@ -303,6 +303,17 @@ export const button: ClassFactory<"button"> = ({ variant: v = "filled" }) => ({
 });
 ```
 
+Built (p4b-css): `@pureform/css-adapter/codegen` generates a module per allow-listed
+component, and `styles.css`, the stylesheet compiled for those components only (tokens,
+themes, and keyframes always). Every slot of a CSS adapter component carries
+`<slot class>--<group>_<value>` for every group, so rather than a table per value the module
+writes each slot's classes as a template over the selection, inside `selectionCache` (one
+frozen result per selection) with `withTokenStyle` for instance tokens. It imports only those
+two helpers from `@pureform/styling`, which the registry needs anyway: no class name runtime
+and no manifest. The classes equal `componentClasses`' for every selection of the preset.
+Its options are `CssOptions` (`classPrefix`, `prefix`, …). The Vite plugin and
+`virtual:pureform/components` stay until the bundler plugin replaces them.
+
 **Native:** a precomputed table. Metro's `withPureform` already precomputes each theme's
 resolved component styles, which `rn-adapter`'s `useSelected` selects from at runtime;
 the factory adds the per-selection table on top. Token tweening (`useMovingTokens`)
