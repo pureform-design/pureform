@@ -52,6 +52,7 @@ export const checkbox: ComponentCase = {
         "read-only": { readOnly: true, defaultChecked: true },
         required: { required: true, name: "terms" },
     },
+    unmirrored: ["check-icon", "indeterminate-icon"],
     state: { prop: "checked", from: false, to: true, act: click, read },
     form: {
         control: input,

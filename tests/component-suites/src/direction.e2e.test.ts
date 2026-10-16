@@ -1,6 +1,7 @@
 // Direction (design doc §5.9), for every example of every component: the provider's `dir` reaches
 // every part the machine marks, and right to left mirrors left to right: each part's box in `rtl`
-// is its `ltr` box mirrored across the root (`x' = width - x - w`). Arrow keys in both directions
+// is its `ltr` box mirrored across the root (`x' = width - x - w`), while parts that don't point
+// (a check mark) draw the same both ways. Arrow keys in both directions
 // are in the keyboard suite.
 
 import { describe, expect, it } from "vitest";
@@ -16,6 +17,19 @@ import type { ComponentCase } from "./components";
 import { mountCase } from "./harness/page";
 import type { SceneProps } from "./harness/scene";
 
+/** Physical styles that draw a part's shape. */
+const DRAWN = [
+    "borderTopWidth",
+    "borderRightWidth",
+    "borderBottomWidth",
+    "borderLeftWidth",
+    "borderTopLeftRadius",
+    "borderTopRightRadius",
+    "borderBottomRightRadius",
+    "borderBottomLeftRadius",
+    "transform",
+] as const;
+
 /** Every part's box against the root, by part name, rendered in `dir`. */
 const measure = async (
     component: ComponentCase,
@@ -30,7 +44,17 @@ const measure = async (
             (part) => [part.dataset.pfPart!, part],
         ),
     );
+    const drawn = Object.fromEntries(
+        (component.unmirrored ?? []).map((name) => {
+            const style = getComputedStyle(parts[name]!);
+            return [
+                name,
+                Object.fromEntries(DRAWN.map((key) => [key, style[key]])),
+            ];
+        }),
+    );
     const measured = {
+        drawn,
         width: root.getBoundingClientRect().width,
         boxes: boxesWithin(root, parts),
         dirs: [...scene.host.querySelectorAll("[dir]")].map((element) =>
@@ -55,6 +79,8 @@ describe.each(COMPONENTS)("$component", (component) => {
             expect(mirrorMismatches(ltr.boxes, rtl.boxes, ltr.width)).toEqual(
                 [],
             );
+            // Parts that don't point (a check mark) draw the same both ways.
+            expect(rtl.drawn).toEqual(ltr.drawn);
         },
     );
 });
