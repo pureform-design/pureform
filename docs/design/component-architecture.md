@@ -691,9 +691,9 @@ keeps everything and warns.
 
 ## 8. Behavior: Zag.js and Solid 2
 
-Checked October 2026: `solid-js@next` is `2.0.0-rc.15`; `@zag-js/solid@next` is
-`2.0.0-next.3`, but its peer is `solid-js >=1.1.3` and it depends on
-`@solid-primitives/keyed`, i.e. it targets Solid 1's API (stores, `createEffect` shape,
+Checked October 2026: `solid-js@next` is `2.0.0-rc.15`; `@zag-js/solid` `latest`
+(1.46.0) and `next` (2.0.0-next.3) both peer on `solid-js >=1.1.3` and depend on
+`@solid-primitives/keyed`, i.e. they target Solid 1's API (stores, `createEffect` shape,
 `mergeProps`/`splitProps`). Solid 2 changes those.
 
 Decision: **use the framework-free Zag packages** (`@zag-js/core` plus each machine, e.g.
@@ -1010,17 +1010,16 @@ Preset changes these designs need, independent of the steps above:
 
 ## 13. Risks and open questions
 
-1. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Checked again in
-   October 2026: `@zag-js/solid` `latest` (1.46.0) and `next` (2.0.0-next.3) still peer on
-   `solid-js >=1.1.3` and depend on `@solid-primitives/keyed`, so the port stays needed.
-2. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
+1. **Zag over the preset's native inputs** (§9.5): verified for checkbox, switch, and
    radio group, except form reset, which the bindings take over. The slider doesn't use
    Zag (§8). Left: re-run the check through the Solid 2 port, since it was done with
    Zag's vanilla adapter, and check disabled fieldsets.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
-React built in parallel with Solid; text field gets its own machine; lookups cost little
+React built in parallel with Solid; text field gets its own machine; Solid 2 is treated
+as stable at RC, since breaking changes should be minor to fix, with the exact RC pinned
+(§11); lookups cost little
 once cached per selection (§2), so no phone measurement; on the web, states are matched by native
 pseudo-classes, then ARIA, then pureform's own `data-pf-*` attributes (§5.1); too many variant combinations is solved by tokens a style sets
 (§5.5), with fragments (§5.4) for the rest.
