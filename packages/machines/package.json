@@ -1,0 +1,94 @@
+{
+    "name": "@pureform/machines",
+    "version": "0.0.0-semantically-released",
+    "description": "Framework-free behavior: Zag machines and pureform's own, in Zag's shape",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./button": {
+            "types": "./dist/button/index.d.ts",
+            "import": {
+                "development": "./src/button/index.ts",
+                "default": "./dist/button.mjs"
+            }
+        },
+        "./checkbox": {
+            "types": "./dist/checkbox.d.ts",
+            "import": {
+                "development": "./src/checkbox.ts",
+                "default": "./dist/checkbox.mjs"
+            }
+        },
+        "./switch": {
+            "types": "./dist/switch.d.ts",
+            "import": {
+                "development": "./src/switch.ts",
+                "default": "./dist/switch.mjs"
+            }
+        },
+        "./radio-group": {
+            "types": "./dist/radio-group.d.ts",
+            "import": {
+                "development": "./src/radio-group.ts",
+                "default": "./dist/radio-group.mjs"
+            }
+        },
+        "./ripple": {
+            "types": "./dist/ripple/index.d.ts",
+            "import": {
+                "development": "./src/ripple/index.ts",
+                "default": "./dist/ripple.mjs"
+            }
+        },
+        "./text-field": {
+            "types": "./dist/text-field/index.d.ts",
+            "import": {
+                "development": "./src/text-field/index.ts",
+                "default": "./dist/text-field.mjs"
+            }
+        },
+        "./slider": {
+            "types": "./dist/slider/index.d.ts",
+            "import": {
+                "development": "./src/slider/index.ts",
+                "default": "./dist/slider.mjs"
+            }
+        },
+        "./form": {
+            "types": "./dist/form/index.d.ts",
+            "import": {
+                "development": "./src/form/index.ts",
+                "default": "./dist/form.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/js-effects": "catalog:",
+        "@zag-js/anatomy": "catalog:",
+        "@zag-js/checkbox": "catalog:",
+        "@zag-js/core": "catalog:",
+        "@zag-js/dom-query": "catalog:",
+        "@zag-js/radio-group": "catalog:",
+        "@zag-js/switch": "catalog:",
+        "@zag-js/types": "catalog:",
+        "@zag-js/utils": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "@zag-js/vanilla": "catalog:",
+        "playwright": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

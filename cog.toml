@@ -133,6 +133,13 @@ include = [
 ]
 public_api = false
 
+[monorepo.packages."@pureform/machines"]
+path = "packages/machines"
+include = [
+    "packages/machines/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]
