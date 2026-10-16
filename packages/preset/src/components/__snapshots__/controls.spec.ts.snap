@@ -39,7 +39,14 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
         ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-checkbox-errorIconColor, token(colors.onError))",
         "base": "var(--components-checkbox-iconColor, token(colors.onPrimary))",
       },
-      "borderInlineEndWidth": "var(--components-checkbox-markThickness, 2px)",
+      "borderInlineEndWidth": {
+        "_rtl": "0px",
+        "base": "var(--components-checkbox-markThickness, 2px)",
+      },
+      "borderInlineStartWidth": {
+        "_rtl": "var(--components-checkbox-markThickness, 2px)",
+        "base": "0px",
+      },
       "borderStyle": "solid",
       "borderWidth": "0px",
       "height": "var(--components-checkbox-checkHeight, 11px)",

@@ -79,6 +79,9 @@ base styles, or the keyframes. It lets through symmetric uses (`left: 0` with `r
 animation names), and the entries in its `ALLOWED` list, each with a reason. Today that's the
 ripple, placed from pointer coordinates. To allow a new exception, add an entry there.
 
+Not everything should flip: a check mark doesn't point. The checkbox draws it with its inline-end
+border, swapped to the inline-start one under `rtl`, so the stroke stays on the physical right.
+
 The native input of the checkbox, radio, switch, and slider resets its margins, since the
 browser's defaults are physical and would shift it off the control.
 

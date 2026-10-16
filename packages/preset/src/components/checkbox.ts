@@ -201,7 +201,18 @@ export const createCheckbox = <
                             height: ref("checkHeight"),
                             borderStyle: solid,
                             borderWidth: px(0),
-                            borderInlineEndWidth: ref("markThickness"),
+                            // A check mark doesn't point, so its stroke stays on the
+                            // physical right under rtl rather than following the inline end.
+                            borderInlineStartWidth: when(
+                                "rtl",
+                                ref("markThickness"),
+                                px(0),
+                            ),
+                            borderInlineEndWidth: when(
+                                "rtl",
+                                px(0),
+                                ref("markThickness"),
+                            ),
                             borderBlockEndWidth: ref("markThickness"),
                             transform: transform(
                                 translateY(px(-1)),
