@@ -18,10 +18,7 @@ describe("button", () => {
     });
 
     it("draws every group with one rule per fill, through its group tokens", () => {
-        const colors = button.recipe.compoundVariants?.filter(
-            (c) => c.match.color !== undefined,
-        );
-        expect(colors).toHaveLength(0);
+        expect(button.recipe.compoundVariants ?? []).toHaveLength(0);
         expect(button.recipe.variants?.color?.secondary?.root?.tokens).toEqual({
             "components.button.accent": {
                 type: "alias",

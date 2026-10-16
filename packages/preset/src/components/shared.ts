@@ -509,6 +509,25 @@ export const dense = (value: NumericValue): NumericValue =>
 
 type SlotStyles = Record<string, StyleMap>;
 
+/** A component's density token: the offset its sizes add, the theme's unless a `density` step
+ *  sets it. */
+export const DENSITY_TOKEN = { densityOffset: THEME_DENSITY };
+
+/** The `density` variant for a component with the density token: each step sets it, so one
+ *  rule per size reads every step, where sizes set outright would need one per size and
+ *  step. `inherit` sets it back to the theme's, so a component inside a denser one still
+ *  follows the theme rather than inheriting its parent's token. */
+export const densityTokenVariant = <D extends string>(
+    densities: Densities<D>,
+): Record<"inherit" | D, { root: StyleMap }> =>
+    Object.fromEntries([
+        ["inherit", { root: { tokens: { densityOffset: THEME_DENSITY } } }],
+        ...entriesOf(densities).map(([name, units]) => [
+            name,
+            { root: { tokens: { densityOffset: densityOffset(units) } } },
+        ]),
+    ]) as Record<"inherit" | D, { root: StyleMap }>;
+
 /** A `density` variant: `inherit` follows the theme, and each step restates the sized styles
  *  at its offset. For a component whose sizes depend on no other variant. */
 export const densityVariant = <D extends string>(
@@ -525,15 +544,6 @@ export const densityVariant = <D extends string>(
         ),
     }) as Record<"inherit" | D, SlotStyles>;
 
-/** A `density` variant whose steps only name themselves, for a component whose sizes depend on
- *  another variant; `densityCompounds` then restates them per that variant's value. */
-export const densityMarkers = <D extends string>(
-    densities: Densities<D>,
-): Record<"inherit" | D, SlotStyles> =>
-    Object.fromEntries(
-        densitySteps(densities).map((name) => [name, {}]),
-    ) as Record<"inherit" | D, SlotStyles>;
-
 /** An object's keys, typed as its declared names rather than `string`. */
 export const keysOf = <T extends object>(object: T) =>
     Object.keys(object) as (keyof T & string)[];
@@ -545,18 +555,3 @@ export const entriesOf = <T extends object>(object: T) =>
 /** A name in lower case, typed as such, for a variant value made from a token suffix. */
 export const lower = <S extends string>(name: S) =>
     name.toLowerCase() as Lowercase<S>;
-
-/** One compound variant per density step, restating the sized styles where `match` holds.
- *  The match keeps its literal values, so a typed recipe checks them. */
-export const densityCompounds = <
-    const M extends Record<string, string>,
-    D extends string = string,
->(
-    densities: Record<D, number>,
-    match: M,
-    sized: (offset: NumericValue) => SlotStyles,
-): { match: M & { density: D }; style: SlotStyles }[] =>
-    (Object.entries(densities) as [D, number][]).map(([density, units]) => ({
-        match: { ...match, density },
-        style: sized(densityOffset(units)),
-    }));

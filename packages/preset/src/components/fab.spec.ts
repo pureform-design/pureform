@@ -45,9 +45,9 @@ describe("fab", () => {
 
     it("puts the surface FAB on the high surface container", () => {
         const surface = fab.recipe.variants?.variant?.surface;
-        expect(
-            JSON.stringify(surface?.container?.backgroundColor),
-        ).toContain("surfaceContainerHigh");
+        expect(JSON.stringify(surface?.container?.backgroundColor)).toContain(
+            "surfaceContainerHigh",
+        );
     });
 
     it("offers the given color groups", () => {
