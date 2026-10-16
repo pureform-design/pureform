@@ -1217,6 +1217,19 @@ without growing the plugin.
   declarations without a bundler, for `tsc`, lint, and tests, or before a dev server
   starts; `--check` verifies committed glue (§6).
 
+Built (p4c-cli) in `@pureform/cli`: the bin runs under Node (its shebang), as Vite runs the
+plugin, so both hash the evaluated config alike. The command and the plugin share their
+options through a glue file: `pureform.glue.ts` in the app's root exports them as `glue` (or by
+default), the app's bundler config passes that object to the plugin, and `pureform generate`
+loads it with jiti; flags (`--target`, `--options <json>`, `--components`, `--lazy`,
+`--config`, `--out-dir`, `--root`, `--glue`, `--no-train-check`) override it, and without a
+glue file `--target` is required. `--check` exits 1 when anything is missing, stale, modified,
+or extra. `--watch` is `watchGlue` from `@pureform/generate`, and starts over when the glue
+file changes. The `.gitignore` hint is printed once after a write, when git neither ignores the
+folder nor tracks any of it (tracking means the app commits it on purpose). Flags are parsed
+with Node's `parseArgs`, so the bin needs nothing beyond `@pureform/generate` and jiti. Both
+demos' omni `generate` tasks run `bun x pureform generate`.
+
 Deferred until there's demand:
 
 - `init`: one-time wiring of the config, bundler, and provider (a README covers it).
