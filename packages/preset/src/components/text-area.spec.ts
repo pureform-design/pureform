@@ -29,7 +29,7 @@ describe("textArea", () => {
         const { base, variants } = compile(textArea, "textArea");
         expect(variants.variant?.filled?.container).toMatchObject({
             minHeight:
-                "calc(var(--components-textArea-height, 56px) + token(sizes.densityOffset))",
+                "calc(var(--components-textArea-height, 56px) + var(--components-textArea-densityOffset, token(sizes.densityOffset)))",
         });
         expect(base.container).not.toHaveProperty("height");
         expect(base.input).toMatchObject({ resize: "vertical" });
@@ -39,7 +39,7 @@ describe("textArea", () => {
         const label = compile(textArea, "textArea").variants.variant?.filled
             ?.label as Record<string, Record<string, string>>;
         expect(label.top?.base).toBe(
-            "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(token(sizes.densityOffset) * 0.5))",
+            "calc(calc(var(--components-textArea-height, 56px) * 0.5) + calc(var(--components-textArea-densityOffset, token(sizes.densityOffset)) * 0.5))",
         );
     });
 

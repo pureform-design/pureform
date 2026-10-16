@@ -108,10 +108,7 @@ export const createSelect = <
                     ...icons.variants,
                     ...density.variants,
                 },
-                compoundVariants: [
-                    ...icons.compoundVariants,
-                    ...density.compoundVariants,
-                ],
+                compoundVariants: [...icons.compoundVariants],
                 // The arrow is always there.
                 defaultVariants: {
                     color: DEFAULT_GROUP,

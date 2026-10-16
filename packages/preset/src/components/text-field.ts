@@ -86,10 +86,7 @@ export const createTextField = <
                     ...icons.variants,
                     ...density.variants,
                 },
-                compoundVariants: [
-                    ...icons.compoundVariants,
-                    ...density.compoundVariants,
-                ],
+                compoundVariants: [...icons.compoundVariants],
                 defaultVariants: {
                     color: DEFAULT_GROUP,
                     variant: "filled",
