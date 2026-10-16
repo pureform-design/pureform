@@ -27,8 +27,8 @@ Non-goals: shadcn-style copying of source, and a standalone CLI (§10).
 
 ## 2. Bet: registry lookups are cheap
 
-Every render of every slot calls `registry.get(component, slot, selection)`. This only
-works if the lookup is a few property reads. The design keeps it so:
+Components get their styles by calling a factory from the registry with their selection
+(§5). This only works if the call is a few property reads. The design keeps it so:
 
 - Variant and state selection is precomputed at build time into a flat table per
   component, keyed by a small integer or short string (§5.3).
@@ -50,21 +50,20 @@ phone.
 @pureform/theme, material   contracts, providers (exist)
 @pureform/preset            Material components as AST (exists)
 
-@pureform/styling           NEW. Registry contract and runtime: StyleRegistry, StyleFactory,
-                            selection encoding, instance tokens, theme scope resolution.
-                            Framework- and target-free.
+@pureform/styling           NEW. Types and a tiny registry: ClassFactory, StyleFactory,
+                            Selection, instance tokens. Framework- and target-free.
 @pureform/anatomy           NEW. Per component: parts, their roles, data attributes,
                             test ids, prop contract, state shape. Pure TS, no framework.
 @pureform/machines          NEW. Behavior: Zag.js machines re-exported, plus our own
                             (ripple, state layer, morphing shapes, Material-specific
                             controls). Framework-free.
 
-@pureform/style-panda       Factories from Panda recipes (move out of panda-adapter's
-@pureform/style-tailwind    runtime side), Tailwind classes, plain CSS classes, RN styles.
-@pureform/style-css         Each implements StyleFactory. Generated glue (§6) wires them.
-@pureform/style-native      (Wraps rn-adapter's selection.)
+@pureform/style-panda       Code generators for each target's factories (§5.2), run at
+@pureform/style-tailwind    build time by `@pureform/bundler`. They emit ClassFactory
+@pureform/style-css         (web) or StyleFactory (native) modules into `.pureform/`, plus
+@pureform/style-native      any small runtime helpers those modules import.
 
-@pureform/solid             NEW. Solid 2 bindings: provider, useStyles, compound
+@pureform/solid             NEW. Solid 2 bindings: provider, useClasses, compound
                             components. Includes internal Zag glue for Solid 2 (§8).
 @pureform/react             NEW, built alongside Solid. Same anatomy and machines.
 @pureform/react-native      Later. Moves component code out of rn-web-demo.
@@ -79,8 +78,8 @@ Rule for where code goes: if it compiles without importing a framework, it's not
 registry", typically under 80 lines.
 
 Adapters (`panda-adapter`, `css-adapter`, `tailwind-adapter`, `rn-adapter`) stay build-time
-compilers. The `style-*` packages are their runtime halves, so a production bundle never
-pulls a compiler in.
+compilers. The `style-*` packages turn their output into factory modules, so a production
+bundle never pulls a compiler in.
 
 ## 4. `pureform.config.ts`
 
@@ -109,66 +108,141 @@ export default defineConfig({
 
 ## 5. Style registry
 
-### 5.1 Contract (`@pureform/styling`)
+### 5.1 Two kinds of factory (`@pureform/styling`)
+
+Web frameworks already apply class strings well, and a class string is the cheapest thing
+a lookup can return. React Native has no classes. So the registry serves two kinds of
+factory over one selection type:
 
 ```ts
-interface SlotStyle {
-    class?: string; // web
-    style?: Record<string, string>; // web: CSS vars for instance tokens
-    native?: object; // RN: resolved style object
-    drawing?: Drawing; // SVG drawings (RN, and web where needed)
+type Selection<C> = Variants<C> & { tokens?: InstanceTokens<C> };
+
+/** Web: class strings per slot, plus CSS vars for instance tokens. */
+type ClassFactory<C> = (selection: Selection<C>) => {
+    [S in SlotOf<C>]: { class: string; style?: Record<`--${string}`, string> };
+};
+
+/** React Native: resolved style objects per slot; states are part of the selection. */
+type StyleFactory<C> = (selection: Selection<C> & States<C>) => {
+    [S in SlotOf<C>]: { style: object; drawing?: Drawing };
+};
+```
+
+`Variants<C>`, `States<C>` (`hovered`, `pressed`, `focusVisible`, `disabled`,
+`selected`, …), `SlotOf<C>`, and `InstanceTokens<C>` are typed from the AST via
+`defineComponent`'s inference, reusing Material's names.
+
+On the web, interaction states are not part of the selection. Machines set them as data
+attributes (`data-pressed`, as Zag already does), and the generated CSS matches them, so a
+press changes one attribute and calls nothing. Only a variant or token change calls the
+factory again. On React Native there are no selectors, so states are in the selection,
+and each change is one `Map.get` returning a cached, frozen object.
+
+### 5.2 Generated factories per target
+
+**Panda:** a thin wrapper over Panda's own `sva`. Panda's static extractor can't see
+through it, so the generator also emits `staticCss` for every variant of every registered
+component (or only the allow-listed ones, §7); accepted until pruning lands.
+
+```ts
+// .pureform/web/button.ts (generated)
+import { button as recipe } from "../../styled-system/recipes";
+export const button: ClassFactory<"button"> = (s) => recipe(s);
+```
+
+**CSS and Tailwind:** plain lookup tables with no runtime dependency. Tailwind also gets
+`@source inline(...)` so it keeps the classes.
+
+```ts
+// .pureform/web/button.ts (generated)
+const base = { root: "pf-button__root", label: "pf-button__label" };
+const variant = {
+    filled: { root: "pf-button--filled" },
+    outlined: { root: "pf-button--outlined" },
+};
+export const button: ClassFactory<"button"> = ({ variant: v = "filled" }) => ({
+    root: { class: `${base.root} ${variant[v].root}` },
+    label: { class: base.label },
+});
+```
+
+**Native:** a precomputed table, generated by Metro's `withPureform`, the same data
+`rn-adapter`'s `useSelected` reads today. Token tweening (`useMovingTokens`) wraps it.
+
+```ts
+// .pureform/native/button.ts (generated)
+import { table } from "./button.table"; // key → frozen styles
+export const button: StyleFactory<"button"> = (s) =>
+    table.get(
+        `${s.variant ?? "filled"}|${s.pressed ? 1 : 0}|${s.disabled ? 1 : 0}`,
+    )!;
+```
+
+### 5.3 Hooks
+
+Each binding offers a pair: a hook components use, and the lower-level hook it's built on.
+
+|                | Web (Solid, React)                           | React Native                               |
+| -------------- | -------------------------------------------- | ------------------------------------------ |
+| Components use | `useClasses(name, selection)` → slot classes | `useStyles(name, selection)` → slot styles |
+| Built on       | `useClassFactory(name)` → the factory        | `useStyleFactory(name)` → the factory      |
+
+- `useClasses` memoizes the call: in Solid it takes an accessor and returns a memo; in
+  React it takes the selection object and uses `useMemo`. Components can't forget the memo
+  or get it wrong.
+- `useClassFactory` is for calling the factory outside a component, or for several
+  selections at once, such as one preview per variant in a picker.
+
+```tsx
+// Solid
+function Root(props) {
+    const api = useButtonMachine(props); // data-pressed, data-focus-visible, aria-*
+    const slots = useClasses("button", () => ({ variant: props.variant }));
+    return (
+        <button
+            {...api.rootProps}
+            class={[slots().root.class, props.class]}
+            data-testid={testId(props, "root")}
+        >
+            <Ctx value={{ api, slots }}>{props.children}</Ctx>
+        </button>
+    );
 }
 
-interface StyleFactory<C extends ComponentName> {
-    slots: readonly SlotOf<C>[];
-    select(
-        selection: Selection<C>,
-        tokens?: InstanceTokens<C>,
-    ): Record<SlotOf<C>, SlotStyle>;
-}
-
-interface StyleRegistry {
-    get<C extends ComponentName>(name: C): StyleFactory<C> | undefined;
-    register<C extends ComponentName>(name: C, factory: StyleFactory<C>): void;
+// React Native
+function Root(props) {
+    const api = useButtonMachine(props);
+    const slots = useStyles("button", {
+        variant: props.variant,
+        pressed: api.pressed,
+        disabled: props.disabled,
+    });
+    return (
+        <Pressable {...api.rootProps} style={[slots.root.style, props.style]} />
+    );
 }
 ```
 
-`Selection<C>` is the union of a component's variants and its states (`hovered`,
-`pressed`, `focusVisible`, `disabled`, `selected`, …), typed from the AST via
-`defineComponent`'s inference, reusing Material's names.
+|                                      | Web                             | React Native                  |
+| ------------------------------------ | ------------------------------- | ----------------------------- |
+| Selection type, slot names, test ids | shared                          | shared                        |
+| Factory                              | `ClassFactory`: class strings   | `StyleFactory`: style objects |
+| States                               | data attributes, matched in CSS | part of the selection         |
+| Instance tokens                      | CSS vars in `style`             | merged into styles, tweened   |
+| Cost of a state change               | none                            | one `Map.get`                 |
 
-### 5.2 Factories per target
+### 5.4 Selection encoding and instance tokens
 
-- **Panda:** wraps the generated `sva`/`cva` recipe. Panda's static extractor can't see
-  through the registry, so the generator emits `staticCss` for every variant of every
-  registered component (or only the allow-listed ones, §7). States come from data
-  attributes (`[data-pressed]`), not recipe variants, so the class set stays small.
-- **Tailwind:** a generated table of class strings per slot per variant, using the
-  Tailwind adapter's output, plus `@source inline(...)` so Tailwind keeps them.
-- **CSS:** the CSS adapter already emits classes; the factory maps selection to
-  class names (`pf-button__root pf-button--filled`).
-- **Native:** wraps `rn-adapter`'s `useSelected` path: a precomputed table of resolved
-  styles keyed by selection, plus token tweening (`useMovingTokens`).
-
-On the web, states are expressed as data attributes on the element and matched in CSS, so
-a state change costs no lookup at all; only variant changes re-select. On native,
-states are part of the selection.
-
-### 5.3 Selection encoding
-
-Each component's variants and states are enumerated at build time. The selection key is
-built from them in a fixed order (`"filled|md|pressed"`) and looked up in a `Map`. For
-components whose variant product is large, the factory composes per-variant fragments
-instead of storing the full product (a class string concat on web, a shallow merge cached
-per key on native).
-
-### 5.4 Instance tokens
+Each component's variants (and on native, states) are enumerated at build time, and the
+key is built from them in a fixed order. For components whose variant product is large,
+the generated factory composes per-variant fragments instead of storing the full product:
+a class string concat on web, a shallow merge cached per key on native.
 
 `dynamic` component tokens (`components.circularProgress.value`) are props on the
-component. On the web they become inline CSS vars on the root (registered with
-`@property` when they have a `valueType`, so they transition). On native, they feed the
-existing token tween. The component code doesn't know which: it passes `tokens` to
-`select`.
+component, passed as `selection.tokens`. On the web, the factory returns them as CSS vars
+for the root's `style` (registered with `@property` when they have a `valueType`, so they
+transition). On native, they're merged into the styles and tweened. The component code
+doesn't know which.
 
 ### 5.5 Themes
 
@@ -191,22 +265,23 @@ existing token tween. The component code doesn't know which: it passes `tokens` 
 
 ## 6. Generated glue
 
-`pureform generate` (also run by the bundler plugin in dev and build) writes, or serves as
-a virtual module `virtual:pureform/registry`:
+`pureform generate` (also run by the bundler plugin in dev and build) writes the factory
+modules of §5.2 to `.pureform/`, and an index, also served as the virtual module
+`virtual:pureform/registry`:
 
 ```ts
 // generated: do not edit
 import { createRegistry } from "@pureform/styling";
-import { button } from "@pureform/style-panda/button"; // per-component entry
-import { buttonTable } from "./.pureform/panda/button"; // precomputed selection table
 export const registry = createRegistry({
-    button: () => button(buttonTable), // lazy: built on first get
+    button: () => import("./web/button").then((m) => m.button), // or a static import
 });
 export const themes = ["teal"] as const;
 export type Components = "button" | "checkbox"; // augments typing
 ```
 
-- Per-component imports and lazy factories keep it tree-shakable.
+- Per-component modules keep it tree-shakable. By default the index imports them
+  statically, so the first render needs no await; lazy imports are an option for code
+  splitting.
 - A `.d.ts` augments `@pureform/styling`'s `ComponentRegistry` interface, so `Button`'s
   variant props type-check against the user's config, not the preset's defaults.
 - Generated files live in `.pureform/` (git-ignored), like Panda's `styled-system/`.
@@ -220,7 +295,7 @@ a fake registry.
 Three layers, cheapest first:
 
 1. **Package layout.** One subpath export per component in every package
-   (`@pureform/solid/button`, `@pureform/style-css/button`), `sideEffects: false`, no
+   (`@pureform/solid/button`, `.pureform/web/button`), `sideEffects: false`, no
    barrel re-exports in runtime entries. The root `@pureform/solid` re-exports for DX,
    and is fine under modern bundlers because nothing has side effects.
 2. **Allow-list.** `components` in the config limits what's generated: CSS, Panda
@@ -235,7 +310,7 @@ Three layers, cheapest first:
       CSS target: emits the pruned stylesheet. Panda: narrows `staticCss`. Tailwind: narrows
       `@source inline`. Native/Metro: narrows the precomputed tables.
 
-Pruning is a safety-off switch: if the scan fails or sees `registry.get(dynamicName)`, it
+Pruning is a safety-off switch: if the scan fails or sees `useClassFactory(dynamicName)`, it
 keeps everything and warns.
 
 ## 8. Behavior: Zag.js and Solid 2
