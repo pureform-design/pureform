@@ -15,10 +15,8 @@ const slotRecipe = (spec: SlottedComponentSpec) => {
     return recipes[spec.name]!;
 };
 
-const CHECKED =
-    ":is(:checked, :has(:checked), [aria-checked=true], [data-checked])";
-const INVALID =
-    ":is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])";
+const CHECKED = ":is(:checked, :has(:checked), [aria-checked=true])";
+const INVALID = ":is([aria-invalid=true], :has([aria-invalid=true]))";
 
 describe.each([checkbox, radio, switchControl])("$name", (spec) => {
     it("validates against a full pureform config", () => {

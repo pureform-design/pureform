@@ -13,7 +13,7 @@
 //   </li>
 //
 // Set `interactive` when the item is clickable (a button or link, or `tabindex`); it then takes
-// a state layer and the focus ring. Mark it selected with `aria-selected` or `data-selected`.
+// a state layer and the focus ring. Mark it selected with `aria-selected` or `aria-current`.
 
 import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
@@ -66,7 +66,7 @@ export const createListItem = <
             name: "listItem",
             $meta: {
                 description:
-                    "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or data-selected.",
+                    "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or aria-current.",
             },
             tokens,
             slots: [

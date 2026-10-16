@@ -2,7 +2,7 @@
 // text, and an optional trailing part.
 //
 // A row takes a state layer of its content color when it is interactive, fills with the
-// selected colors once marked selected (`aria-selected` or `data-selected`), and dims when
+// selected colors once marked selected (`aria-selected` or `aria-current`), and dims when
 // disabled. The parts inside follow the row through slot conditions, so `rowParts` takes the
 // row's slot name.
 

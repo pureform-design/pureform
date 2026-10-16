@@ -24,7 +24,7 @@ const tint = (base: ColorValue, content: ColorValue, role: StateRole) =>
  *  drag. Each state reads its opacity from the theme's state contract. Panda writes the
  *  later rules after the earlier ones, so a pressed component shows the press tint while the
  *  pointer is over it, and a dragged one shows the drag tint. Drag code marks the element with
- *  `data-dragging`. */
+ *  `data-pf-dragging`. */
 export const stateLayer = ({
     base,
     content,

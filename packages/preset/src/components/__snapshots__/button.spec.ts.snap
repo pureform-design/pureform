@@ -17,7 +17,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "labelLarge",
     },
     "root": {
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
       },
       "alignItems": "center",
@@ -31,7 +31,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -176,19 +176,19 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
     "variant": {
       "elevated": {
         "root": {
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
-          "_hover": {
+          "&:is(:hover, [data-pf-hover])": {
             "shadowElevation": "level2",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
             "base": "token(colors.surfaceContainerLow)",
           },
           "color": "var(--components-button-accent, token(colors.primary))",
@@ -197,19 +197,19 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "filled": {
         "root": {
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
-          "_hover": {
+          "&:is(:hover, [data-pf-hover])": {
             "shadowElevation": "level1",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateDragged))",
             "base": "var(--components-button-accent, token(colors.primary))",
           },
           "color": "var(--components-button-onAccent, token(colors.onPrimary))",
@@ -218,16 +218,16 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlined": {
         "root": {
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "transparent",
             "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
             "base": "transparent",
           },
           "borderColor": "var(--components-button-outlineColor, token(colors.outline))",
@@ -238,15 +238,15 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "text": {
         "root": {
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "transparent",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
             "base": "transparent",
           },
           "color": "var(--components-button-accent, token(colors.primary))",
@@ -254,19 +254,19 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "tonal": {
         "root": {
-          "_disabled": {
+          "&:is(:disabled, [aria-disabled=true])": {
             "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
-          "_hover": {
+          "&:is(:hover, [data-pf-hover])": {
             "shadowElevation": "level1",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateDragged))",
             "base": "var(--components-button-accentContainer, token(colors.primaryContainer))",
           },
           "color": "var(--components-button-onAccentContainer, token(colors.onPrimaryContainer))",

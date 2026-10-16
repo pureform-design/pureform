@@ -10,7 +10,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         "outlineColor": "token(colors.secondary)",
         "outlineOffset": "2px",
         "outlineStyle": {
-          "_focusVisible": "solid",
+          "&:focus-visible": "solid",
           "base": "none",
         },
         "outlineWidth": "3px",
@@ -40,19 +40,19 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
       {
         "css": {
           "root": {
-            "_disabled": {
+            "&:is(:disabled, [aria-disabled=true])": {
               "backgroundColor": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), token(colors.onSurface) token(opacity.disabledContainer))",
               "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "shadowElevation": "level0",
             },
-            "_hover": {
+            "&:is(:hover, [data-pf-hover])": {
               "shadowElevation": "level2",
             },
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-card-elevatedContainer, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "base": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
             },
           },
@@ -63,19 +63,19 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
       {
         "css": {
           "root": {
-            "_disabled": {
+            "&:is(:disabled, [aria-disabled=true])": {
               "backgroundColor": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), token(colors.onSurface) token(opacity.disabledContainer))",
               "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "shadowElevation": "level0",
             },
-            "_hover": {
+            "&:is(:hover, [data-pf-hover])": {
               "shadowElevation": "level1",
             },
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-card-filledContainer, token(colors.surfaceContainerHighest)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "base": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
             },
           },
@@ -86,20 +86,20 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
       {
         "css": {
           "root": {
-            "_disabled": {
+            "&:is(:disabled, [aria-disabled=true])": {
               "backgroundColor": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), token(colors.onSurface) token(opacity.disabledContainer))",
               "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
               "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
               "shadowElevation": "level0",
             },
-            "_hover": {
+            "&:is(:hover, [data-pf-hover])": {
               "shadowElevation": "level1",
             },
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-card-outlinedContainer, token(colors.surface)), var(--components-card-content, token(colors.onSurface)) token(opacity.stateDragged))",
               "base": "var(--components-card-outlinedContainer, token(colors.surface))",
             },
           },
@@ -126,7 +126,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         },
         "true": {
           "root": {
-            "_disabled": {
+            "&:is(:disabled, [aria-disabled=true])": {
               "pointerEvents": "none",
             },
             "cursor": "pointer",

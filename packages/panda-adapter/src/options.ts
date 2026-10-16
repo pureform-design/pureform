@@ -27,17 +27,11 @@ export const tokenFn = (ref: string): string => `token(${ref})`;
 export const tokenCurly = (ref: string): string => `{${ref}}`;
 
 // Conditions Panda builds in, by their `_` keys. pureform's dark and light are Panda conditions
-// the preset declares.
+// the preset declares. Interaction and form states are left out: Panda's own keys (`_hover`,
+// `_checked`, …) also match a behavior library's `data-*` attributes, so pureform's recipes
+// emit the same selectors as the other targets instead. An app's own `_hover` keeps Panda's
+// meaning.
 const CONDITION_KEY: Partial<Record<PortableCondition, string>> = {
-    hover: "_hover",
-    focus: "_focus",
-    focusVisible: "_focusVisible",
-    active: "_active",
-    pressed: "_active",
-    disabled: "_disabled",
-    checked: "_checked",
-    invalid: "_invalid",
-    readOnly: "_readOnly",
     dark: "_dark",
     light: "_light",
     ltr: "_ltr",

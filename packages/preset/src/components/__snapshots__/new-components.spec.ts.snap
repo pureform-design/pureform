@@ -382,8 +382,8 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "leading": {
       "alignItems": "center",
       "color": {
-        ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -396,19 +396,19 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
     "overline": {
       "color": {
-        ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "labelSmall",
     },
     "root": {
-      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
         "backgroundColor": "var(--components-listItem-selectedContainer, token(colors.secondaryContainer))",
         "color": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
-      },
-      "_disabled": {
-        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
       },
       "alignItems": "center",
       "backgroundColor": "var(--components-listItem-container, token(colors.surface))",
@@ -428,8 +428,8 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
     "supportingText": {
       "color": {
-        ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "bodyMedium",
@@ -437,8 +437,8 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "trailing": {
       "alignItems": "center",
       "color": {
-        ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -451,7 +451,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     },
     "trailingText": {
       "color": {
-        ".listItem__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "labelSmall",
@@ -549,32 +549,32 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "root": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "pointerEvents": "none",
+          },
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-listItem-selectedContainer, token(colors.secondaryContainer)), var(--components-listItem-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
               "base": "var(--components-listItem-selectedContainer, token(colors.secondaryContainer))",
             },
             "color": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
           },
-          "_disabled": {
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "pointerEvents": "none",
-          },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-listItem-container, token(colors.surface)), var(--components-listItem-content, token(colors.onSurface)) token(opacity.stateDragged))",
             "base": "var(--components-listItem-container, token(colors.surface))",
           },
           "cursor": "pointer",
           "outlineColor": "token(colors.secondary)",
           "outlineOffset": "2px",
           "outlineStyle": {
-            "_focusVisible": "solid",
+            "&:focus-visible": "solid",
             "base": "none",
           },
           "outlineWidth": "3px",
@@ -609,26 +609,26 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "item": {
-      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "pointerEvents": "none",
+      },
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
         "backgroundColor": {
-          "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
-          "_active": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
-          "_focusVisible": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
-          "_hover": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+          "&:focus-visible": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateFocus))",
+          "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.statePressed))",
+          "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateHover))",
+          "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) token(opacity.stateDragged))",
           "base": "var(--components-menu-selectedContainer, token(colors.secondaryContainer))",
         },
         "color": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
       },
-      "_disabled": {
-        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        "pointerEvents": "none",
-      },
       "alignItems": "center",
       "backgroundColor": {
-        "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateDragged))",
-        "_active": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.statePressed))",
-        "_focusVisible": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateFocus))",
-        "_hover": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateHover))",
+        "&:focus-visible": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateFocus))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.statePressed))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateHover))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-menu-container, token(colors.surfaceContainer)), var(--components-menu-content, token(colors.onSurface)) token(opacity.stateDragged))",
         "base": "var(--components-menu-container, token(colors.surfaceContainer))",
       },
       "borderWidth": "0px",
@@ -642,7 +642,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -663,8 +663,8 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "itemLeading": {
       "alignItems": "center",
       "color": {
-        ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -678,8 +678,8 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "itemTrailing": {
       "alignItems": "center",
       "color": {
-        ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -692,7 +692,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     },
     "itemTrailingText": {
       "color": {
-        ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "labelLarge",
@@ -731,12 +731,12 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "color": {
       "error": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
               "base": "token(colors.errorContainer)",
             },
             "color": "token(colors.onErrorContainer)",
@@ -744,27 +744,27 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "info": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
               "base": "token(colors.infoContainer)",
             },
             "color": "token(colors.onInfoContainer)",
@@ -772,15 +772,15 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -788,12 +788,12 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "primary": {},
       "secondary": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
               "base": "token(colors.secondaryContainer)",
             },
             "color": "token(colors.onSecondaryContainer)",
@@ -801,27 +801,27 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "success": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
               "base": "token(colors.successContainer)",
             },
             "color": "token(colors.onSuccessContainer)",
@@ -829,27 +829,27 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "tertiary": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
               "base": "token(colors.tertiaryContainer)",
             },
             "color": "token(colors.onTertiaryContainer)",
@@ -857,27 +857,27 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
       },
       "warning": {
         "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
               "base": "token(colors.warningContainer)",
             },
             "color": "token(colors.onWarningContainer)",
@@ -885,15 +885,15 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
         "itemTrailing": {
           "color": {
-            ".menu__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -931,24 +931,24 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "activeIndicator": {
       "backgroundColor": {
-        ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
-        ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
+        ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "var(--components-navigationBar-indicatorColor, token(colors.secondaryContainer))",
       },
       "borderRadius": "token(radii.full)",
       "bottom": "0px",
       "insetInlineEnd": {
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "0px",
         "base": "50%",
       },
       "insetInlineStart": {
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "0px",
         "base": "50%",
       },
       "opacity": {
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "1",
         "base": "0",
       },
       "pointerEvents": "none",
@@ -973,15 +973,15 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
     "indicator": {
       "alignItems": "center",
       "backgroundColor": {
-        ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-        ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+        ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
       "color": {
-        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-navigationBar-activeIconColor, token(colors.onSecondaryContainer))",
+        ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-navigationBar-activeIconColor, token(colors.onSecondaryContainer))",
         "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
@@ -995,11 +995,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-navigationBar-indicatorWidth, 64px)",
     },
     "item": {
-      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-        "color": "var(--components-navigationBar-activeLabelColor, token(colors.onSurface))",
-      },
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
+      },
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+        "color": "var(--components-navigationBar-activeLabelColor, token(colors.onSurface))",
       },
       "alignItems": "center",
       "backgroundColor": "transparent",
@@ -1017,7 +1017,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -1063,16 +1063,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "error": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.errorContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.errorContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.errorContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1080,16 +1080,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "info": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.infoContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.infoContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.infoContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1098,16 +1098,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "secondary": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.secondaryContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.secondaryContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.secondaryContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1115,16 +1115,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "success": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.successContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.successContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.successContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1132,16 +1132,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "tertiary": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.tertiaryContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.tertiaryContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.tertiaryContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1149,16 +1149,16 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "warning": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationBar__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationBar__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.warningContainer)",
-            ".navigationBar__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationBar__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationBar__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationBar__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.warningContainer)",
+            ".navigationBar__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationBar__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationBar-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.warningContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
+            ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1173,24 +1173,24 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "activeIndicator": {
       "backgroundColor": {
-        ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
-        ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
+        ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer)), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "var(--components-navigationRail-indicatorColor, token(colors.secondaryContainer))",
       },
       "borderRadius": "token(radii.full)",
       "bottom": "0px",
       "insetInlineEnd": {
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "0px",
         "base": "50%",
       },
       "insetInlineStart": {
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "0px",
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "0px",
         "base": "50%",
       },
       "opacity": {
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "1",
         "base": "0",
       },
       "pointerEvents": "none",
@@ -1215,15 +1215,15 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
     "indicator": {
       "alignItems": "center",
       "backgroundColor": {
-        ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-        ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-        ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+        ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+        ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+        ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
       "color": {
-        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "var(--components-navigationRail-activeIconColor, token(colors.onSecondaryContainer))",
+        ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-navigationRail-activeIconColor, token(colors.onSecondaryContainer))",
         "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
@@ -1237,11 +1237,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-navigationRail-indicatorWidth, 56px)",
     },
     "item": {
-      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
-        "color": "var(--components-navigationRail-activeLabelColor, token(colors.onSurface))",
-      },
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
+      },
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+        "color": "var(--components-navigationRail-activeLabelColor, token(colors.onSurface))",
       },
       "alignItems": "center",
       "backgroundColor": "transparent",
@@ -1256,7 +1256,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -1304,16 +1304,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "error": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.errorContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.errorContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.errorContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.errorContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onErrorContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1321,16 +1321,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "info": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.infoContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.infoContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.infoContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.infoContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onInfoContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1339,16 +1339,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "secondary": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.secondaryContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.secondaryContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.secondaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.secondaryContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSecondaryContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1356,16 +1356,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "success": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.successContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.successContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.successContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.successContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onSuccessContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1373,16 +1373,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "tertiary": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.tertiaryContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.tertiaryContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.tertiaryContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.tertiaryContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onTertiaryContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1390,16 +1390,16 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "warning": {
         "activeIndicator": {
           "backgroundColor": {
-            ".navigationRail__item:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
-            ".navigationRail__item:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "token(colors.warningContainer)",
-            ".navigationRail__item:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
-            ".navigationRail__item:is(:hover, [data-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
+            ".navigationRail__item:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.statePressed))",
+            ".navigationRail__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "token(colors.warningContainer)",
+            ".navigationRail__item:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateFocus))",
+            ".navigationRail__item:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.warningContainer), var(--components-navigationRail-stateLayerColor, token(colors.onSurface)) token(opacity.stateHover))",
             "base": "token(colors.warningContainer)",
           },
         },
         "indicator": {
           "color": {
-            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "token(colors.onWarningContainer)",
+            ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1416,7 +1416,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "&::placeholder": {
         "color": "var(--components-searchBar-placeholderColor, token(colors.onSurfaceVariant))",
       },
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
       },
       "backgroundColor": "transparent",
@@ -1441,10 +1441,10 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
     "root": {
       "alignItems": "center",
       "backgroundColor": {
-        "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateDragged))",
-        "_active": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.statePressed))",
-        "_focusVisible": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateFocus))",
-        "_hover": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateHover))",
+        "&:focus-visible": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateFocus))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.statePressed))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateHover))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-searchBar-container, token(colors.surfaceContainerHigh)), var(--components-searchBar-inputColor, token(colors.onSurface)) token(opacity.stateDragged))",
         "base": "var(--components-searchBar-container, token(colors.surfaceContainerHigh))",
       },
       "borderRadius": "var(--components-searchBar-radius, token(radii.full))",
@@ -1456,7 +1456,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "&:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible])": "solid",
+        "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -1509,7 +1509,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "input": {
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
       },
       "backgroundColor": "transparent",
@@ -1525,25 +1525,25 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     },
     "label": {
       "color": {
-        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-focusColor, token(colors.primary))",
-        ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__container:is(:focus-within):is(:focus-within) &": "var(--components-select-focusColor, token(colors.primary))",
+        ".select__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-select-errorColor, token(colors.error))",
         "base": "var(--components-select-labelColor, token(colors.onSurfaceVariant))",
       },
       "fontSize": {
-        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(fontSizes.bodySmall)",
-        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(fontSizes.bodySmall)",
+        ".select__container:is(:focus-within):is(:focus-within) &": "token(fontSizes.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(fontSizes.bodySmall)",
         "base": "token(fontSizes.bodyLarge)",
       },
       "insetInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
       "letterSpacing": {
-        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(letterSpacings.bodySmall)",
-        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(letterSpacings.bodySmall)",
+        ".select__container:is(:focus-within):is(:focus-within) &": "token(letterSpacings.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(letterSpacings.bodySmall)",
         "base": "token(letterSpacings.bodyLarge)",
       },
       "lineHeight": {
-        ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(lineHeights.bodySmall)",
-        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(lineHeights.bodySmall)",
+        ".select__container:is(:focus-within):is(:focus-within) &": "token(lineHeights.bodySmall)",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(lineHeights.bodySmall)",
         "base": "token(lineHeights.bodyLarge)",
       },
       "pointerEvents": "none",
@@ -1557,7 +1557,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     "leadingIcon": {
       "alignItems": "center",
       "color": {
-        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-select-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -1578,8 +1578,8 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     },
     "supportingText": {
       "color": {
-        ".select__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".select__root:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        ".select__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-select-errorColor, token(colors.error))",
         "base": "var(--components-select-supportingColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
@@ -1592,8 +1592,8 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     "trailingIcon": {
       "alignItems": "center",
       "color": {
-        ".select__container:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-        ".select__container:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]) &": "var(--components-select-errorColor, token(colors.error))",
+        ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".select__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-select-errorColor, token(colors.error))",
         "base": "var(--components-select-iconColor, token(colors.onSurfaceVariant))",
       },
       "display": "inline-flex",
@@ -1606,7 +1606,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "50%",
       "transform": {
-        ".select__container:is([aria-expanded=true], :has([aria-expanded=true]), [data-expanded]) &": "translateY(-50%) rotate(180deg)",
+        ".select__container:is([aria-expanded=true], :has([aria-expanded=true])) &": "translateY(-50%) rotate(180deg)",
         "base": "translateY(-50%)",
       },
       "transition": {
@@ -1622,8 +1622,8 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "css": {
         "label": {
           "insetInlineStart": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-paddingInline, token(spacing.4))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "var(--components-select-paddingInline, token(spacing.4))",
+            ".select__container:is(:focus-within):is(:focus-within) &": "var(--components-select-paddingInline, token(spacing.4))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-select-paddingInline, token(spacing.4))",
             "base": "var(--components-select-textInsetWithIcon, 52px)",
           },
         },
@@ -1735,17 +1735,17 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "filled": {
         "container": {
           "backgroundColor": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
             "base": "var(--components-select-container, token(colors.surfaceContainerHighest))",
           },
           "borderStartEndRadius": "var(--components-select-radius, token(radii.extraSmall))",
           "borderStartStartRadius": "var(--components-select-radius, token(radii.extraSmall))",
           "boxShadow": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-focusColor, token(colors.primary))",
-            "&:is(:hover, [data-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-select-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-select-errorColor, token(colors.error))",
             "base": "inset 0px calc(var(--components-select-indicatorWidth, 1px) * -1) 0px 0px var(--components-select-indicatorColor, token(colors.onSurfaceVariant))",
           },
         },
@@ -1755,13 +1755,13 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
         },
         "label": {
           "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".select__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
             "base": "50%",
           },
           "transform": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "none",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "none",
+            ".select__container:is(:focus-within):is(:focus-within) &": "none",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "none",
             "base": "translateY(-50%)",
           },
         },
@@ -1770,26 +1770,26 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
         "container": {
           "borderRadius": "var(--components-select-radius, token(radii.extraSmall))",
           "outlineColor": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusColor, token(colors.primary))",
-            "&:is(:hover, [data-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-errorColor, token(colors.error))",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-errorColor, token(colors.error))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-select-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "var(--components-select-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-select-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-select-errorColor, token(colors.error))",
             "base": "var(--components-select-outlineColor, token(colors.outline))",
           },
           "outlineOffset": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
-            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
+            "&:is(:focus-within):is(:focus-within)": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "calc(var(--components-select-focusIndicatorWidth, 2px) * -1)",
             "base": "calc(var(--components-select-indicatorWidth, 1px) * -1)",
           },
           "outlineStyle": "solid",
           "outlineWidth": {
-            "&:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled])": "var(--components-select-indicatorWidth, 1px)",
-            "&:is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusIndicatorWidth, 2px)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])": "var(--components-select-indicatorWidth, 1px)",
-            "&:is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid]):is(:focus-within, [data-focused]):is(:focus-within, [data-focused])": "var(--components-select-focusIndicatorWidth, 2px)",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-select-indicatorWidth, 1px)",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-select-focusIndicatorWidth, 2px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-select-indicatorWidth, 1px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-select-focusIndicatorWidth, 2px)",
             "base": "var(--components-select-indicatorWidth, 1px)",
           },
         },
@@ -1799,28 +1799,28 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
         },
         "label": {
           "backgroundColor": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "var(--components-select-labelBackground, token(colors.surface))",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "var(--components-select-labelBackground, token(colors.surface))",
+            ".select__container:is(:focus-within):is(:focus-within) &": "var(--components-select-labelBackground, token(colors.surface))",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-select-labelBackground, token(colors.surface))",
             "base": "transparent",
           },
           "marginInlineStart": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "calc(token(spacing.1) * -1)",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "calc(token(spacing.1) * -1)",
+            ".select__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.1) * -1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.1) * -1)",
             "base": "0px",
           },
           "paddingInlineEnd": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.1)",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.1)",
+            ".select__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
             "base": "0px",
           },
           "paddingInlineStart": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "token(spacing.1)",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "token(spacing.1)",
+            ".select__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
             "base": "0px",
           },
           "top": {
-            ".select__container:is(:focus-within, [data-focused]):is(:focus-within, [data-focused]) &": "0px",
-            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]) &": "0px",
+            ".select__container:is(:focus-within):is(:focus-within) &": "0px",
+            ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "0px",
             "base": "50%",
           },
           "transform": "translateY(-50%)",
@@ -1836,7 +1836,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "activeTrack": {
       "backgroundColor": {
-        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-slider-activeColor, token(colors.primary))",
       },
       "borderRadius": "token(radii.full)",
@@ -1844,7 +1844,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "insetInlineStart": "0px",
       "position": "absolute",
       "transition": {
-        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
           "_motionReduce": "none",
           "base": "background-color token(durations.short3) token(easings.standard)",
         },
@@ -1857,7 +1857,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
     },
     "handle": {
       "backgroundColor": {
-        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "base": "var(--components-slider-activeColor, token(colors.primary))",
       },
       "borderRadius": "token(radii.full)",
@@ -1866,7 +1866,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "solid",
+        ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -1875,7 +1875,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
           "_motionReduce": "none",
           "base": "background-color token(durations.short3) token(easings.standard)",
         },
@@ -1904,10 +1904,10 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
     },
     "stateLayer": {
       "backgroundColor": {
-        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.statePressed))",
-        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-        ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateFocus))",
-        ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateHover))",
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.statePressed))",
+        ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+        ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateFocus))",
+        ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-slider-activeColor, token(colors.primary)) token(opacity.stateHover))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
@@ -1918,7 +1918,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": {
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
           "_motionReduce": "none",
           "base": "background-color token(durations.short3) token(easings.standard)",
         },
@@ -1931,7 +1931,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
     },
     "track": {
       "backgroundColor": {
-        ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+        ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
         "base": "var(--components-slider-trackColor, token(colors.secondaryContainer))",
       },
       "borderRadius": "token(radii.full)",
@@ -1962,22 +1962,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "error": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.error)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.error)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -1985,22 +1985,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "info": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.info)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.info)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -2009,22 +2009,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "secondary": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.secondary)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.secondary)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -2032,22 +2032,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "success": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.success)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.success)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -2055,22 +2055,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "tertiary": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.tertiary)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.tertiary)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -2078,22 +2078,22 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "warning": {
         "activeTrack": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.warning)",
           },
         },
         "handle": {
           "backgroundColor": {
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "base": "token(colors.warning)",
           },
         },
         "stateLayer": {
           "backgroundColor": {
-            ".slider__root:is(:active, [data-pressed]):is(:active, [data-pressed]):is(:active, [data-pressed]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
-            ".slider__root:is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]):is(:disabled, :has(:disabled), [data-disabled]) &": "transparent",
-            ".slider__root:is(:focus-visible, :has(:focus-visible), [data-focus-visible]):is(:focus-visible, :has(:focus-visible), [data-focus-visible]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
-            ".slider__root:is(:hover, [data-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
+            ".slider__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
+            ".slider__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
+            ".slider__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
             "base": "transparent",
           },
         },
@@ -2107,15 +2107,15 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "action": {
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
       },
       "alignItems": "center",
       "backgroundColor": {
-        "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateDragged))",
-        "_active": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.statePressed))",
-        "_focusVisible": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateFocus))",
-        "_hover": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateHover))",
+        "&:focus-visible": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateFocus))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.statePressed))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateHover))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-actionColor, token(colors.inversePrimary)) token(opacity.stateDragged))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
@@ -2129,7 +2129,7 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -2143,15 +2143,15 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "close": {
-      "_disabled": {
+      "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
       },
       "alignItems": "center",
       "backgroundColor": {
-        "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateDragged))",
-        "_active": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.statePressed))",
-        "_focusVisible": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateFocus))",
-        "_hover": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateHover))",
+        "&:focus-visible": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateFocus))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.statePressed))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateHover))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-snackbar-content, token(colors.inverseOnSurface)) token(opacity.stateDragged))",
         "base": "transparent",
       },
       "borderRadius": "token(radii.full)",
@@ -2167,7 +2167,7 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -2237,7 +2237,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "insetInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
       "insetInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
       "opacity": {
-        ".tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]) &": "1",
+        ".tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "1",
         "base": "0",
       },
       "position": "absolute",
@@ -2251,25 +2251,25 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
     },
     "tab": {
-      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
         "backgroundColor": {
-          "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateDragged))",
-          "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.statePressed))",
-          "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateFocus))",
-          "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateHover))",
+          "&:focus-visible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateFocus))",
+          "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.statePressed))",
+          "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateHover))",
+          "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-activeColor, token(colors.primary)) token(opacity.stateDragged))",
           "base": "var(--components-tabs-container, token(colors.surface))",
         },
         "color": "var(--components-tabs-activeColor, token(colors.primary))",
       },
-      "_disabled": {
-        "pointerEvents": "none",
-      },
       "alignItems": "center",
       "backgroundColor": {
-        "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
-        "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
-        "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
-        "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+        "&:focus-visible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
         "base": "var(--components-tabs-container, token(colors.surface))",
       },
       "borderWidth": "0px",
@@ -2287,7 +2287,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "outlineColor": "token(colors.secondary)",
       "outlineOffset": "2px",
       "outlineStyle": {
-        "_focusVisible": "solid",
+        "&:focus-visible": "solid",
         "base": "none",
       },
       "outlineWidth": "3px",
@@ -2384,21 +2384,21 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "insetInlineStart": "0px",
         },
         "tab": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
-              "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
-              "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
-              "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
-              "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "&:focus-visible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateFocus))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.statePressed))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateHover))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-secondaryActiveColor, token(colors.onSurface)) token(opacity.stateDragged))",
               "base": "var(--components-tabs-container, token(colors.surface))",
             },
             "color": "var(--components-tabs-secondaryActiveColor, token(colors.onSurface))",
           },
           "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&:focus-visible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateFocus))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.statePressed))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateHover))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) token(opacity.stateDragged))",
             "base": "var(--components-tabs-container, token(colors.surface))",
           },
           "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",

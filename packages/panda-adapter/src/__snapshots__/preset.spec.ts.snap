@@ -59,11 +59,11 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
             "width": "token(sizes.iconMd)",
           },
           "root": {
-            "_disabled": {
+            "&:is(:disabled, [aria-disabled=true])": {
               "cursor": "not-allowed",
               "shadowElevation": "level0",
             },
-            "_hover": {
+            "&:is(:hover, [data-pf-hover])": {
               "shadowElevation": "level2",
             },
             "alignItems": "center",
@@ -76,7 +76,7 @@ exports[`compilePreset (canonical button) > produces a stable Panda preset shape
             "gap": "token(spacing.2)",
             "justifyContent": "center",
             "opacity": {
-              "_disabled": "0.38",
+              "&:is(:disabled, [aria-disabled=true])": "0.38",
               "base": "1",
             },
             "shadowElevation": "level1",

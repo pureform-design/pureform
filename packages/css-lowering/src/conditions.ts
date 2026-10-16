@@ -2,9 +2,9 @@
 //
 // A `ConditionalNode` in a value slot compiles to a conditional value object (`{ base, key:
 // value }`) rather than a flat string. Each key is a selector or an at-rule, or the target's
-// own key where it has one (Panda's `_hover`, a named breakpoint), through the context's hooks.
+// own key where it has one (Panda's `_dark`, a named breakpoint), through the context's hooks.
 
-import { getByPath, tokenValue } from "@pureform/core";
+import { STATE_ATTRIBUTES, getByPath, tokenValue } from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
@@ -18,33 +18,41 @@ import { compileNodeToCSS } from "./compile-node";
 import type { LowerCtx } from "./context";
 import { aliasTarget } from "./css";
 
-// Interaction, form, and direction conditions as selectors. The ones a target commonly builds in
-// (hover, focus, disabled) match Panda's built-ins, so either adapter styles the same elements.
+// Interaction, form, and direction conditions as selectors. Each state matches a native
+// pseudo-class first, then an ARIA attribute, and only where neither covers it a `data-pf-*`
+// attribute the bindings set. A behavior library's own attributes (`data-state`, `data-hover`)
+// are never matched, so swapping it can't change styling.
+const { hover, pressed, dragged, filled } = STATE_ATTRIBUTES;
+
+// A text input holding a value, or an element containing one. CSS sees a value through
+// `:placeholder-shown`, so the input needs a placeholder (a single space works when none
+// should show).
+const HAS_VALUE =
+    ":is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown))";
+
+// aria-pressed marks a toggle button (a filter chip) and aria-current the current page in
+// navigation, so selected matches both, as the selected slot state does.
+const SELECTED =
+    "[aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])";
+
 const CONDITION_SELECTOR: Record<string, string> = {
-    hover: "&:is(:hover, [data-hover])",
-    focus: "&:is(:focus, [data-focus])",
-    focusVisible: "&:is(:focus-visible, [data-focus-visible])",
-    active: "&:is(:active, [data-active])",
-    pressed: "&:is(:active, [data-active])",
+    hover: `&:is(:hover, [${hover}])`,
+    focus: "&:focus",
+    focusVisible: "&:focus-visible",
+    active: `&:is(:active, [${pressed}])`,
+    pressed: `&:is(:active, [${pressed}])`,
     // Repeating the attribute raises specificity above hover, focus, and pressed, so the drag
     // tint wins wherever the rules are ordered; the pointer is over the element while dragging.
-    dragged: "&[data-dragging][data-dragging]",
-    disabled:
-        "&:is(:disabled, [disabled], [data-disabled], [aria-disabled=true])",
-    // aria-pressed marks a toggle button (a filter chip) and aria-current the current page in
-    // navigation, so selected matches both, as the selected slot state does.
-    selected:
-        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected])",
-    checked:
-        '&:is(:checked, [data-checked], [aria-checked=true], [data-state="checked"])',
-    invalid: "&:is(:invalid, [data-invalid], [aria-invalid=true])",
-    readOnly: "&:is(:read-only, [data-read-only], [aria-readonly=true])",
-    // An input or textarea with a value, or an element containing one, or anything marked
-    // `data-filled`. CSS sees a value through `:placeholder-shown`, so the input needs a
-    // placeholder (a single space works when none should show).
-    filled: "&:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])",
-    // A control whose popup is open, or anything marked data-expanded.
-    expanded: "&:is([aria-expanded=true], [data-expanded])",
+    dragged: `&[${dragged}][${dragged}]`,
+    disabled: "&:is(:disabled, [aria-disabled=true])",
+    selected: `&:is(${SELECTED})`,
+    checked: "&:is(:checked, [aria-checked=true])",
+    invalid: "&:is(:invalid, [aria-invalid=true])",
+    readOnly: "&:is(:read-only, [aria-readonly=true])",
+    // A value that isn't in a text input, such as a select's, is marked by the binding.
+    filled: `&:is(${HAS_VALUE}, [${filled}])`,
+    // A control whose popup is open.
+    expanded: "&[aria-expanded=true]",
     ltr: ":where([dir=ltr], :dir(ltr)) &",
     rtl: ":where([dir=rtl], :dir(rtl)) &",
 };
@@ -65,43 +73,41 @@ const MEDIA_RULE: Record<string, string> = {
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
 // Repeating raises specificity, so a later state wins wherever the rules are ordered: hover,
-// filled, selected, checked, and expanded, then indeterminate and focus, then pressed, then invalid, then disabled. Selected
-// combines with the later states through an AND case rather than outranking them. Each also takes a data attribute, for custom
-// controls and native-like bindings that set the state by hand.
+// filled, selected, checked, and expanded, then indeterminate and focus, then pressed, then
+// invalid, then disabled. Selected combines with the later states through an AND case rather
+// than outranking them. The matches follow the conditions above: native, then ARIA, then
+// `data-pf-*`, each on the slot or, for a state of a control inside it, through `:has()`.
 const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
-    hover: { match: ":hover, [data-hover]", rank: 1 },
-    filled: {
-        match: ":is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled]",
-        rank: 1,
-    },
-    selected: {
-        match: "[aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]), [data-selected]",
-        rank: 1,
-    },
+    hover: { match: `:hover, [${hover}]`, rank: 1 },
+    filled: { match: `${HAS_VALUE}, [${filled}]`, rank: 1 },
+    selected: { match: SELECTED, rank: 1 },
     checked: {
-        match: ":checked, :has(:checked), [aria-checked=true], [data-checked]",
+        match: ":checked, :has(:checked), [aria-checked=true]",
         rank: 1,
     },
     expanded: {
-        match: "[aria-expanded=true], :has([aria-expanded=true]), [data-expanded]",
+        match: "[aria-expanded=true], :has([aria-expanded=true])",
         rank: 1,
     },
     // Above checked, so a box that is both shows the dash.
     indeterminate: {
-        match: ":indeterminate, :has(:indeterminate), [aria-checked=mixed], [data-indeterminate]",
+        match: ":indeterminate, :has(:indeterminate), [aria-checked=mixed]",
         rank: 2,
     },
-    focusWithin: { match: ":focus-within, [data-focused]", rank: 2 },
+    focusWithin: { match: ":focus-within", rank: 2 },
     focusVisibleWithin: {
-        match: ":focus-visible, :has(:focus-visible), [data-focus-visible]",
+        match: ":focus-visible, :has(:focus-visible)",
         rank: 2,
     },
-    pressed: { match: ":active, [data-pressed]", rank: 3 },
+    pressed: { match: `:active, [${pressed}]`, rank: 3 },
     invalid: {
-        match: "[aria-invalid=true], :has([aria-invalid=true]), [data-invalid]",
+        match: "[aria-invalid=true], :has([aria-invalid=true])",
         rank: 4,
     },
-    disabled: { match: ":disabled, :has(:disabled), [data-disabled]", rank: 5 },
+    disabled: {
+        match: ":disabled, :has(:disabled), [aria-disabled=true]",
+        rank: 5,
+    },
 };
 
 // The selector for a slot state: on the styled slot itself, or on an ancestor slot's class.

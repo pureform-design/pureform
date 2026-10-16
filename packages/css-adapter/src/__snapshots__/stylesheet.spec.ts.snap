@@ -56,12 +56,12 @@ exports[`compileCss > compiles to a stable stylesheet 1`] = `
             color: var(--ui-button-fg, var(--components-button-fg, var(--colors-on-brand)));
             opacity: 1;
             transition: all var(--durations-fast) var(--easings-standard);
-            &:is(:disabled, [disabled], [data-disabled], [aria-disabled=true]) {
+            &:is(:disabled, [aria-disabled=true]) {
                 opacity: 0.38;
                 box-shadow: none;
                 cursor: not-allowed;
             }
-            &:is(:hover, [data-hover]) {
+            &:is(:hover, [data-pf-hover]) {
                 box-shadow: 0px 2px 6px rgb(0 0 0 / 0.2), 0px 1px 2px rgb(0 0 0 / 0.12);
             }
         }

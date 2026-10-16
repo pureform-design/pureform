@@ -4,11 +4,10 @@ import { describe, expect, it } from "vitest";
 import { configWith } from "../__fixtures__/config";
 import { textField } from "./text-field";
 
-const FOCUS = ":is(:focus-within, [data-focused])";
+const FOCUS = ":is(:focus-within)";
 const FILLED =
-    ":is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-filled])";
-const INVALID =
-    ":is([aria-invalid=true], :has([aria-invalid=true]), [data-invalid])";
+    ":is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled])";
+const INVALID = ":is([aria-invalid=true], :has([aria-invalid=true]))";
 
 const compiled = () =>
     compilePreset(configWith(textField)).theme?.slotRecipes?.textField;

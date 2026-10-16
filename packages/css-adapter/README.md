@@ -139,7 +139,19 @@ await buildCss(config, {
 Lightning CSS can't lower `@layer`, `shape()`, or `corner-shape`; components that use the last
 two fall back to rounded corners where they're missing.
 
+## States
+
+Interaction and form states are matched on the element, so a state change costs no JS: the
+native pseudo-class first (`:hover`, `:checked`, `:disabled`, …), then an ARIA attribute
+(`aria-checked`, `aria-selected`, `aria-disabled`, …), and only where neither covers it one of
+pureform's attributes (`data-pf-hover`, `data-pf-active`, `data-pf-dragging`,
+`data-pf-filled`; the names are `STATE_ATTRIBUTES` in `@pureform/core`). A behavior library's
+own attributes (`data-state`, `data-hover`, …) aren't matched. The full table is in
+[`@pureform/css-lowering`](../css-lowering/README.md#how-states-match).
+
 ## Parity with the Panda adapter
 
 Both adapters lower through `@pureform/css-lowering`, and the demo's end-to-end suite renders
 every component at each variant value with each adapter and requires the same computed styles.
+States are compared the same way, set through their ARIA or `data-pf-*` attributes, with focus
+forced through DevTools.
