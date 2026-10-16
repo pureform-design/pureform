@@ -44,11 +44,9 @@ describe("fab", () => {
     });
 
     it("puts the surface FAB on the high surface container", () => {
-        const surface = fab.recipe.compoundVariants?.find(
-            (c) => c.match.variant === "surface" && c.match.color === "primary",
-        );
+        const surface = fab.recipe.variants?.variant?.surface;
         expect(
-            JSON.stringify(surface?.style.container?.backgroundColor),
+            JSON.stringify(surface?.container?.backgroundColor),
         ).toContain("surfaceContainerHigh");
     });
 
