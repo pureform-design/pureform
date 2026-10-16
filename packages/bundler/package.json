@@ -1,0 +1,94 @@
+{
+    "name": "@pureform/bundler",
+    "version": "0.0.0-semantically-released",
+    "description": "The pureform bundler plugin (Vite, Rollup, Rolldown, esbuild, Metro) over @pureform/generate: writes .pureform/ when dev or build starts, serves virtual:pureform/registry, and regenerates in dev",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./vite": {
+            "types": "./dist/vite.d.ts",
+            "import": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            },
+            "require": {
+                "development": "./src/vite.ts",
+                "default": "./dist/vite.mjs"
+            }
+        },
+        "./rollup": {
+            "types": "./dist/rollup.d.ts",
+            "import": {
+                "development": "./src/rollup.ts",
+                "default": "./dist/rollup.mjs"
+            },
+            "require": {
+                "development": "./src/rollup.ts",
+                "default": "./dist/rollup.mjs"
+            }
+        },
+        "./rolldown": {
+            "types": "./dist/rolldown.d.ts",
+            "import": {
+                "development": "./src/rolldown.ts",
+                "default": "./dist/rolldown.mjs"
+            },
+            "require": {
+                "development": "./src/rolldown.ts",
+                "default": "./dist/rolldown.mjs"
+            }
+        },
+        "./esbuild": {
+            "types": "./dist/esbuild.d.ts",
+            "import": {
+                "development": "./src/esbuild.ts",
+                "default": "./dist/esbuild.mjs"
+            },
+            "require": {
+                "development": "./src/esbuild.ts",
+                "default": "./dist/esbuild.mjs"
+            }
+        },
+        "./metro": {
+            "types": "./dist/metro.d.ts",
+            "import": {
+                "development": "./src/metro.ts",
+                "default": "./dist/metro.mjs"
+            },
+            "require": {
+                "development": "./src/metro.ts",
+                "default": "./dist/metro.mjs"
+            }
+        },
+        "./client": {
+            "types": "./client.d.ts"
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:",
+        "@pureform/generate": "catalog:",
+        "@pureform/styling": "catalog:",
+        "unplugin": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "rolldown": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}
