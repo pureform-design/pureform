@@ -20,7 +20,7 @@ import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { rowGroupColors, rowParts, rowTokens } from "./list";
+import { rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -30,8 +30,6 @@ import {
     densityCompounds,
     densityMarkers,
     densitySteps,
-    groupCompounds,
-    groupRoles,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
@@ -141,43 +139,24 @@ export const createListItem = <
                         false: {},
                     },
                     density: densityMarkers(densities),
-                    color: colorVariant(groups, (g) => {
-                        const c = rowGroupColors(ref, "root", g);
-                        return {
-                            root: c.row,
-                            leading: c.leading,
-                            trailing: c.trailing,
-                            overline: c.supportingText,
-                            supportingText: c.supportingText,
-                        };
-                    }),
+                    // A group points the selected colors, which the row and its parts read,
+                    // at its container roles.
+                    color: colorVariant(groups, (g) => ({
+                        root: {
+                            tokens: {
+                                selectedContainer: g.container,
+                                selectedContent: g.onContainer,
+                            },
+                        },
+                    })),
                 },
-                // An interactive item's selected colors sit in the interactive variant, so a compound
-                // variant per group replaces them in the later layer.
-                compoundVariants: [
-                    ...groupCompounds(
-                        groups,
-                        { interactive: "true" },
-                        (group) => ({
-                            root: rowGroupColors(ref, "root", groupRoles(group))
-                                .interactive,
-                        }),
-                    ),
-                    ...(
-                        Object.entries(LINES) as [
-                            keyof typeof LINES,
-                            LineHeight,
-                        ][]
-                    ).flatMap(([count, height]) =>
-                        densityCompounds(
-                            densities,
-                            { lines: count },
-                            (offset) => ({
-                                root: { minHeight: add(ref(height), offset) },
-                            }),
-                        ),
-                    ),
-                ],
+                compoundVariants: (
+                    Object.entries(LINES) as [keyof typeof LINES, LineHeight][]
+                ).flatMap(([count, height]) =>
+                    densityCompounds(densities, { lines: count }, (offset) => ({
+                        root: { minHeight: add(ref(height), offset) },
+                    })),
+                ),
                 defaultVariants: {
                     lines: "one",
                     interactive: "false",
