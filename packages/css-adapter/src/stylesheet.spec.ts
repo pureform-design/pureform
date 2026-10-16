@@ -64,7 +64,7 @@ describe("compileCss (full pureform config)", () => {
     it("gives each variant value a class, and chains compound variant classes", () => {
         expect(css).toContain(".button__root--variant_tonal {");
         expect(css).toContain(
-            ".textField__container--variant_outlined.textField__container--color_error {",
+            ".fab__container--size_small.fab__container--shape_none {",
         );
     });
 
