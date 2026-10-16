@@ -300,6 +300,19 @@
         "vitest": "catalog:",
       },
     },
+    "packages/release": {
+      "name": "@pureform/release",
+      "version": "0.0.0-semantically-released",
+      "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:",
+      },
+    },
     "packages/rn-adapter": {
       "name": "@pureform/rn-adapter",
       "version": "0.0.0-semantically-released",
@@ -1058,6 +1071,8 @@
     "@pureform/panda-adapter": ["@pureform/panda-adapter@workspace:packages/panda-adapter"],
 
     "@pureform/preset": ["@pureform/preset@workspace:packages/preset"],
+
+    "@pureform/release": ["@pureform/release@workspace:packages/release"],
 
     "@pureform/rn-adapter": ["@pureform/rn-adapter@workspace:packages/rn-adapter"],
 
