@@ -41,15 +41,16 @@ import type { StyleMap } from "@pureform/core/ast";
 import { duration, easing, radius } from "@pureform/theme";
 
 import {
-    COLOR_GROUPS,
     DEFAULT_GROUP,
+    circle,
     colorVariant,
     componentTokens,
+    defaultGroups,
     sys,
     tweens,
-    circle,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
@@ -77,65 +78,72 @@ const linear = componentTokens("linearProgress", {
 });
 
 /** Build the linear progress indicator with a `color` variant per group in `groups`. */
-export const createLinearProgress = (groups: ColorGroups = COLOR_GROUPS) => {
+export const createLinearProgress = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) => {
     const { ref } = linear;
-    return pf.slotComponent({
-        name: "linearProgress",
-        $meta: {
-            description:
-                "Material linear progress. Set the value token (0 to 100), or turn on indeterminate.",
-        },
-        tokens: linear.tokens,
-        slots: ["root", "indicator"],
-        structure: { root: ["indicator"] },
-        variants: {
-            indeterminate: ["true", "false"],
-            color: groups,
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    position: relative,
-                    overflow: hidden,
-                    width: pct(100),
-                    height: ref("height"),
-                    borderRadius: radius("full"),
-                    backgroundColor: ref("trackColor"),
-                },
-                indicator: {
-                    position: absolute,
-                    top: px(0),
-                    insetInlineStart: px(0),
-                    height: pct(100),
-                    width: mul(ref("value"), pct(1)),
-                    borderRadius: radius("full"),
-                    backgroundColor: ref("activeColor"),
-                    transition: tweens("width"),
-                },
+    return variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.slotComponent({
+            name: "linearProgress",
+            $meta: {
+                description:
+                    "Material linear progress. Set the value token (0 to 100), or turn on indeterminate.",
             },
+            tokens: linear.tokens,
+            slots: ["root", "indicator"],
+            structure: { root: ["indicator"] },
             variants: {
-                indeterminate: {
-                    true: {
-                        indicator: {
-                            width: ref("indeterminateWidth"),
-                            animation: animation({
-                                name: "linearProgressSlide",
-                                duration: duration("extraLong4"),
-                                easing: easing("standard"),
-                                iterations: "infinite",
-                            }),
-                        },
-                    },
-                    false: {},
-                },
-                color: colorVariant(groups, (g) => ({
-                    root: { backgroundColor: g.container },
-                    indicator: { backgroundColor: g.main },
-                })),
+                indeterminate: ["true", "false"],
+                color: groups as ColorGroups,
             },
-            defaultVariants: { indeterminate: "false", color: DEFAULT_GROUP },
+            recipe: () => ({
+                base: {
+                    root: {
+                        position: relative,
+                        overflow: hidden,
+                        width: pct(100),
+                        height: ref("height"),
+                        borderRadius: radius("full"),
+                        backgroundColor: ref("trackColor"),
+                    },
+                    indicator: {
+                        position: absolute,
+                        top: px(0),
+                        insetInlineStart: px(0),
+                        height: pct(100),
+                        width: mul(ref("value"), pct(1)),
+                        borderRadius: radius("full"),
+                        backgroundColor: ref("activeColor"),
+                        transition: tweens("width"),
+                    },
+                },
+                variants: {
+                    indeterminate: {
+                        true: {
+                            indicator: {
+                                width: ref("indeterminateWidth"),
+                                animation: animation({
+                                    name: "linearProgressSlide",
+                                    duration: duration("extraLong4"),
+                                    easing: easing("standard"),
+                                    iterations: "infinite",
+                                }),
+                            },
+                        },
+                        false: {},
+                    },
+                    color: colorVariant(groups, (g) => ({
+                        root: { backgroundColor: g.container },
+                        indicator: { backgroundColor: g.main },
+                    })),
+                },
+                defaultVariants: {
+                    indeterminate: "false",
+                    color: DEFAULT_GROUP,
+                },
+            }),
         }),
-    });
+    );
 };
 
 export const linearProgress = createLinearProgress();
@@ -157,7 +165,9 @@ const circular = componentTokens(
 const DEG_PER_PERCENT = numeric(3.6, "deg");
 
 /** Build the circular progress indicator with a `color` variant per group in `groups`. */
-export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
+export const createCircularProgress = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) => {
     const { ref } = circular;
 
     // A half of the circle, clipping a ring whose two colored sides make a half-circle arc.
@@ -208,7 +218,7 @@ export const createCircularProgress = (groups: ColorGroups = COLOR_GROUPS) => {
         },
         variants: {
             indeterminate: ["true", "false"],
-            color: groups,
+            color: groups as ColorGroups,
         },
         recipe: () => ({
             base: {

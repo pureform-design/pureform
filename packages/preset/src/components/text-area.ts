@@ -26,6 +26,7 @@ import {
 } from "@pureform/core/ast";
 import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import {
     FIELD_SLOTS,
@@ -35,14 +36,16 @@ import {
     floated,
 } from "./field";
 import {
-    COLOR_GROUPS,
-    DEFAULT_DENSITIES,
     DEFAULT_GROUP,
     THEME_DENSITY,
+    defaultDensities,
+    defaultGroups,
     densityCompounds,
     densityMarkers,
+    densitySteps,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("textArea");
 
@@ -87,101 +90,109 @@ const pf = typed();
 
 /** Build the text area with a `color` variant per group in `groups`, setting its focus
  *  color. Errors keep the error color. */
-export const createTextArea = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createTextArea = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) => {
     const color = colors(groups);
-    return pf.slotComponent({
-        name: "textArea",
-        $meta: {
-            description:
-                "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one.",
-        },
-        tokens,
-        slots: [...FIELD_SLOTS],
-        structure: FIELD_STRUCTURE,
-        variants: {
-            color: groups,
-            leadingIcon: ["true", "false"],
-            trailingIcon: ["true", "false"],
-            autoGrow: ["true", "false"],
-            variant: ["filled", "outlined"],
-            density: ["inherit", ...Object.keys(densities)],
-        },
-        recipe: () => ({
-            base: {
-                ...base,
-                ...icons.base,
-                container: {
-                    ...base.container,
-                    display: flex,
-                },
-                input: { ...base.input, resize: vertical },
+    return variantsOf<{
+        color: G | typeof DEFAULT_GROUP;
+        density: "inherit" | D;
+    }>()(
+        pf.slotComponent({
+            name: "textArea",
+            $meta: {
+                description:
+                    "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one.",
             },
+            tokens,
+            slots: [...FIELD_SLOTS],
+            structure: FIELD_STRUCTURE,
             variants: {
-                color: color.color,
-                ...icons.variants,
-                // Grow with the text instead of scrolling. Browsers without field-sizing keep
-                // the rows' height.
-                autoGrow: {
-                    true: { input: { fieldSizing: content, resize: none } },
-                    false: {},
-                },
-                variant: {
-                    filled: {
-                        ...variant.filled,
-                        container: {
-                            ...variant.filled.container,
-                            ...themeSized.filled.container,
-                        },
-                        input: {
-                            ...variant.filled.input,
-                            ...themeSized.filled.input,
-                        },
-                        label: {
-                            ...variant.filled.label,
-                            ...themeSized.filled.label,
-                        },
-                    },
-                    outlined: {
-                        ...variant.outlined,
-                        container: {
-                            ...variant.outlined.container,
-                            ...themeSized.outlined.container,
-                        },
-                        input: {
-                            ...variant.outlined.input,
-                            ...themeSized.outlined.input,
-                        },
-                        label: {
-                            ...variant.outlined.label,
-                            ...themeSized.outlined.label,
-                        },
-                    },
-                },
-                density: densityMarkers(densities),
+                color: groups as ColorGroups,
+                leadingIcon: ["true", "false"],
+                trailingIcon: ["true", "false"],
+                autoGrow: ["true", "false"],
+                variant: ["filled", "outlined"],
+                density: densitySteps<string>(densities),
             },
-            compoundVariants: [
-                ...color.compoundVariants,
-                ...icons.compoundVariants,
-                ...(["filled", "outlined"] as const).flatMap((fill) =>
-                    densityCompounds(
-                        densities,
-                        { variant: fill },
-                        (offset) => sized(offset)[fill],
+            recipe: () => ({
+                base: {
+                    ...base,
+                    ...icons.base,
+                    container: {
+                        ...base.container,
+                        display: flex,
+                    },
+                    input: { ...base.input, resize: vertical },
+                },
+                variants: {
+                    color: color.color,
+                    ...icons.variants,
+                    // Grow with the text instead of scrolling. Browsers without field-sizing keep
+                    // the rows' height.
+                    autoGrow: {
+                        true: { input: { fieldSizing: content, resize: none } },
+                        false: {},
+                    },
+                    variant: {
+                        filled: {
+                            ...variant.filled,
+                            container: {
+                                ...variant.filled.container,
+                                ...themeSized.filled.container,
+                            },
+                            input: {
+                                ...variant.filled.input,
+                                ...themeSized.filled.input,
+                            },
+                            label: {
+                                ...variant.filled.label,
+                                ...themeSized.filled.label,
+                            },
+                        },
+                        outlined: {
+                            ...variant.outlined,
+                            container: {
+                                ...variant.outlined.container,
+                                ...themeSized.outlined.container,
+                            },
+                            input: {
+                                ...variant.outlined.input,
+                                ...themeSized.outlined.input,
+                            },
+                            label: {
+                                ...variant.outlined.label,
+                                ...themeSized.outlined.label,
+                            },
+                        },
+                    },
+                    density: densityMarkers(densities),
+                },
+                compoundVariants: [
+                    ...color.compoundVariants,
+                    ...icons.compoundVariants,
+                    ...(["filled", "outlined"] as const).flatMap((fill) =>
+                        densityCompounds(
+                            densities,
+                            { variant: fill },
+                            (offset) => sized(offset)[fill],
+                        ),
                     ),
-                ),
-            ],
-            defaultVariants: {
-                variant: "filled",
-                color: DEFAULT_GROUP,
-                autoGrow: "false",
-                ...icons.defaultVariants,
-                density: "inherit",
-            },
+                ],
+                defaultVariants: {
+                    variant: "filled",
+                    color: DEFAULT_GROUP,
+                    autoGrow: "false",
+                    ...icons.defaultVariants,
+                    density: "inherit",
+                },
+            }),
         }),
-    });
+    );
 };
 
 export const textArea = createTextArea();

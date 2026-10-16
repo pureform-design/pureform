@@ -26,6 +26,7 @@ import {
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
 import { size as sizeToken } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import {
     CONTROL_CHECKED,
@@ -38,22 +39,24 @@ import {
     CONTROL_FOCUS,
 } from "./control";
 import {
-    COLOR_GROUPS,
     DEFAULT_GROUP,
+    circle,
     colorVariant,
     componentTokens,
-    mergeSlots,
+    defaultDensities,
+    defaultGroups,
+    dense,
+    densitySteps,
+    densityVariant,
     disabledColor,
+    focusRing,
+    mergeSlots,
     stateTransition,
     sys,
     tweens,
-    focusRing,
-    dense,
-    densityVariant,
-    DEFAULT_DENSITIES,
-    circle,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const pf = typed();
 
@@ -83,72 +86,80 @@ const colored = (checked: ColorValue) => ({
 });
 
 /** Build the radio button with a `color` variant per group in `groups`. */
-export const createRadio = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createRadio = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) =>
-    pf.slotComponent({
-        name: "radio",
-        $meta: {
-            description:
-                "Material radio button over a native input. Group radios with a shared name.",
-        },
-        tokens,
-        slots: ["root", "touchTarget", "input", "ring", "dot"],
-        structure: {
-            root: ["touchTarget", "input", "ring"],
-            ring: ["dot"],
-        },
-        variants: {
-            density: ["inherit", ...Object.keys(densities)],
-            color: groups,
-        },
-        recipe: () => ({
-            base: mergeSlots(
-                {
-                    root: {
-                        ...focusRing(CONTROL_FOCUS),
-                        ...controlRoot(dense(ref("size"))),
-                        transition: stateTransition,
-                        borderRadius: circle,
-                        cursor: pointer,
-                    },
-                    touchTarget: controlTouchTarget,
-                    input: controlInput,
-                    ring: {
-                        transition: stateTransition,
-                        position: absolute,
-                        display: inlineFlex,
-                        alignItems: center,
-                        justifyContent: center,
-                        width: ref("ringSize"),
-                        height: ref("ringSize"),
-                        borderRadius: circle,
-                        borderStyle: solid,
-                        borderWidth: ref("borderWidth"),
-                        pointerEvents: none,
-                    },
-                    dot: {
-                        width: ref("dotSize"),
-                        height: ref("dotSize"),
-                        borderRadius: circle,
-                        transform: when()
-                            .on(CONTROL_CHECKED, transform(scale(unitless(1))))
-                            .else(transform(scale(unitless(0)))),
-                        transition: tweens("transform", "backgroundColor"),
-                    },
-                },
-                colored(ref("checkedColor")),
-            ),
-            variants: {
-                density: densityVariant(densities, (offset) => {
-                    const side = add(ref("size"), offset);
-                    return { root: { width: side, height: side } };
-                }),
-                color: colorVariant(groups, (g) => colored(g.main)),
+    variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
+        pf.slotComponent({
+            name: "radio",
+            $meta: {
+                description:
+                    "Material radio button over a native input. Group radios with a shared name.",
             },
-            defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
+            tokens,
+            slots: ["root", "touchTarget", "input", "ring", "dot"],
+            structure: {
+                root: ["touchTarget", "input", "ring"],
+                ring: ["dot"],
+            },
+            variants: {
+                density: densitySteps<string>(densities),
+                color: groups as ColorGroups,
+            },
+            recipe: () => ({
+                base: mergeSlots(
+                    {
+                        root: {
+                            ...focusRing(CONTROL_FOCUS),
+                            ...controlRoot(dense(ref("size"))),
+                            transition: stateTransition,
+                            borderRadius: circle,
+                            cursor: pointer,
+                        },
+                        touchTarget: controlTouchTarget,
+                        input: controlInput,
+                        ring: {
+                            transition: stateTransition,
+                            position: absolute,
+                            display: inlineFlex,
+                            alignItems: center,
+                            justifyContent: center,
+                            width: ref("ringSize"),
+                            height: ref("ringSize"),
+                            borderRadius: circle,
+                            borderStyle: solid,
+                            borderWidth: ref("borderWidth"),
+                            pointerEvents: none,
+                        },
+                        dot: {
+                            width: ref("dotSize"),
+                            height: ref("dotSize"),
+                            borderRadius: circle,
+                            transform: when()
+                                .on(
+                                    CONTROL_CHECKED,
+                                    transform(scale(unitless(1))),
+                                )
+                                .else(transform(scale(unitless(0)))),
+                            transition: tweens("transform", "backgroundColor"),
+                        },
+                    },
+                    colored(ref("checkedColor")),
+                ),
+                variants: {
+                    density: densityVariant(densities, (offset) => {
+                        const side = add(ref("size"), offset);
+                        return { root: { width: side, height: side } };
+                    }),
+                    color: colorVariant(groups, (g) => colored(g.main)),
+                },
+                defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
+            }),
         }),
-    });
+    );
 
 export const radio = createRadio();

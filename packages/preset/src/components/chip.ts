@@ -8,24 +8,27 @@ import { typed } from "@pureform/core";
 import { px, solid, transparent, slot, when, add } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 import {
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
     componentTokens,
-    groupRoles,
+    defaultDensities,
+    defaultGroups,
+    dense,
+    densitySteps,
+    densityVariant,
     disabledColor,
-    sys,
-    touchTarget,
+    groupRoles,
     iconBox,
     pressableRoot,
-    dense,
-    densityVariant,
-    DEFAULT_DENSITIES,
+    sys,
+    touchTarget,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {
     height: sizeToken("controlSmall"),
@@ -116,76 +119,85 @@ const pf = typed();
 
 /** Build the chip with a `color` variant per group in `groups`. A group colors the selected
  *  chip: its container and content, and the icon. At rest, every chip is neutral. */
-export const createChip = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createChip = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) =>
-    pf.slotComponent({
-        name: "chip",
-        $meta: {
-            description:
-                "Material chip. Mark it selected with aria-selected or data-selected. Render the icon slot only when there is an icon.",
-        },
-        tokens,
-        slots: ["root", "icon", "label", "touchTarget"],
-        structure: { root: ["touchTarget", "icon", "label"] },
-        variants: {
-            variant: ["outlined", "elevated"],
-            color: groups,
-            density: ["inherit", ...Object.keys(densities)],
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    ...pressableRoot,
-                    gap: ref("gap"),
-                    height: dense(ref("height")),
-                    paddingInlineStart: ref("padding"),
-                    paddingInlineEnd: ref("padding"),
-                    borderRadius: ref("radius"),
-                },
-                icon: {
-                    ...iconBox(ref("iconSize")),
-                    color: iconColor(ref("selectedContent")),
-                },
-                label: { textStyle: textStyle("labelLarge") },
-                touchTarget,
+    variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
+        pf.slotComponent({
+            name: "chip",
+            $meta: {
+                description:
+                    "Material chip. Mark it selected with aria-selected or data-selected. Render the icon slot only when there is an icon.",
             },
+            tokens,
+            slots: ["root", "icon", "label", "touchTarget"],
+            structure: { root: ["touchTarget", "icon", "label"] },
             variants: {
-                variant: {
-                    outlined: { root: fillRoot("outlined", TOKEN_SELECTED) },
-                    elevated: { root: fillRoot("elevated", TOKEN_SELECTED) },
+                variant: ["outlined", "elevated"],
+                color: groups as ColorGroups,
+                density: densitySteps<string>(densities),
+            },
+            recipe: () => ({
+                base: {
+                    root: {
+                        ...pressableRoot,
+                        gap: ref("gap"),
+                        height: dense(ref("height")),
+                        paddingInlineStart: ref("padding"),
+                        paddingInlineEnd: ref("padding"),
+                        borderRadius: ref("radius"),
+                    },
+                    icon: {
+                        ...iconBox(ref("iconSize")),
+                        color: iconColor(ref("selectedContent")),
+                    },
+                    label: { textStyle: textStyle("labelLarge") },
+                    touchTarget,
                 },
-                color: colorVariant(groups, (g) => ({
-                    icon: { color: iconColor(g.onContainer) },
-                })),
-                density: densityVariant(densities, (offset) => ({
-                    root: { height: add(ref("height"), offset) },
-                })),
-            },
-            // The selected colors sit in each fill's states, so a compound variant per fill and
-            // group replaces them in the later layer.
-            compoundVariants: groups
-                .filter((group) => group !== DEFAULT_GROUP)
-                .flatMap((group) =>
-                    (["outlined", "elevated"] as const).map((fill) => {
-                        const g = groupRoles(group);
-                        const root = fillRoot(fill, {
-                            container: g.container,
-                            content: g.onContainer,
-                        });
-                        return {
-                            match: { variant: fill, color: group },
-                            style: { root: { states: root.states ?? {} } },
-                        };
-                    }),
-                ),
-            defaultVariants: {
-                variant: "outlined",
-                color: DEFAULT_GROUP,
-                density: "inherit",
-            },
+                variants: {
+                    variant: {
+                        outlined: {
+                            root: fillRoot("outlined", TOKEN_SELECTED),
+                        },
+                        elevated: {
+                            root: fillRoot("elevated", TOKEN_SELECTED),
+                        },
+                    },
+                    color: colorVariant(groups, (g) => ({
+                        icon: { color: iconColor(g.onContainer) },
+                    })),
+                    density: densityVariant(densities, (offset) => ({
+                        root: { height: add(ref("height"), offset) },
+                    })),
+                },
+                // The selected colors sit in each fill's states, so a compound variant per fill and
+                // group replaces them in the later layer.
+                compoundVariants: groups
+                    .filter((group) => group !== DEFAULT_GROUP)
+                    .flatMap((group) =>
+                        (["outlined", "elevated"] as const).map((fill) => {
+                            const g = groupRoles(group);
+                            const root = fillRoot(fill, {
+                                container: g.container,
+                                content: g.onContainer,
+                            });
+                            return {
+                                match: { variant: fill, color: group },
+                                style: { root: { states: root.states ?? {} } },
+                            };
+                        }),
+                    ),
+                defaultVariants: {
+                    variant: "outlined",
+                    color: DEFAULT_GROUP,
+                    density: "inherit",
+                },
+            }),
         }),
-    });
+    );
 
 export const chip = createChip();

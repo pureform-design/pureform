@@ -7,25 +7,29 @@ import { typed } from "@pureform/core";
 import { px, add } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import {
-    keysOf,
-    COLOR_GROUPS,
+    DEFAULT_GROUP,
     colorCompounds,
     colorVariants,
     componentTokens,
-    fillVariant,
-    sys,
-    touchTarget,
-    iconBox,
-    pressableRoot,
+    defaultDensities,
+    defaultGroups,
     dense,
     densityCompounds,
-    lower,
     densityMarkers,
-    DEFAULT_DENSITIES,
+    densitySteps,
+    fillVariant,
+    iconBox,
+    keysOf,
+    lower,
+    pressableRoot,
+    sys,
+    touchTarget,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Fill, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
 
 const FILLS = {
     filled: "filled",
@@ -55,81 +59,89 @@ const SIZES: Size[] = ["Small", "Medium", "Large"];
 const pf = typed();
 
 /** Build the button with a `color` variant per group in `groups`. */
-export const createButton = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createButton = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) =>
-    pf.slotComponent({
-        name: "button",
-        $meta: {
-            description:
-                "Material common button. Render the icon slot only when there is an icon.",
-        },
-        tokens,
-        slots: ["root", "label", "icon", "touchTarget"],
-        structure: { root: ["touchTarget", "icon", "label"] },
-        variants: {
-            color: groups,
-            variant: keysOf(FILLS),
-            size: ["small", "medium", "large"],
-            density: ["inherit", ...Object.keys(densities)],
-        },
-        recipe: ({ token }) => {
-            const size = (s: Size): { root: StyleMap } => ({
-                root: {
-                    height: dense(token(`height${s}`)),
-                    paddingInlineStart: token(`padding${s}`),
-                    paddingInlineEnd: token(`padding${s}`),
-                },
-            });
-            return {
-                base: {
+    variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
+        pf.slotComponent({
+            name: "button",
+            $meta: {
+                description:
+                    "Material common button. Render the icon slot only when there is an icon.",
+            },
+            tokens,
+            slots: ["root", "label", "icon", "touchTarget"],
+            structure: { root: ["touchTarget", "icon", "label"] },
+            variants: {
+                color: groups as ColorGroups,
+                variant: keysOf(FILLS),
+                size: ["small", "medium", "large"],
+                density: densitySteps<string>(densities),
+            },
+            recipe: ({ token }) => {
+                const size = (s: Size): { root: StyleMap } => ({
                     root: {
-                        ...pressableRoot,
-                        gap: token("gap"),
-                        borderRadius: token("radius"),
+                        height: dense(token(`height${s}`)),
+                        paddingInlineStart: token(`padding${s}`),
+                        paddingInlineEnd: token(`padding${s}`),
                     },
-                    label: { textStyle: textStyle("labelLarge") },
-                    icon: iconBox(token("iconSize")),
-                    touchTarget,
-                },
-                variants: {
-                    color: colorVariants(groups),
-                    variant: Object.fromEntries(
-                        Object.entries(FILLS).map(([name, fill]) => [
-                            name,
-                            fillVariant(fill, token),
-                        ]),
-                    ),
-                    size: {
-                        small: size("Small"),
-                        medium: size("Medium"),
-                        large: size("Large"),
+                });
+                return {
+                    base: {
+                        root: {
+                            ...pressableRoot,
+                            gap: token("gap"),
+                            borderRadius: token("radius"),
+                        },
+                        label: { textStyle: textStyle("labelLarge") },
+                        icon: iconBox(token("iconSize")),
+                        touchTarget,
                     },
-                    density: densityMarkers(densities),
-                },
-                compoundVariants: [
-                    ...colorCompounds(FILLS, groups),
-                    ...SIZES.flatMap((s) =>
-                        densityCompounds(
-                            densities,
-                            { size: lower(s) },
-                            (offset) => ({
-                                root: {
-                                    height: add(token(`height${s}`), offset),
-                                },
-                            }),
+                    variants: {
+                        color: colorVariants(groups),
+                        variant: Object.fromEntries(
+                            Object.entries(FILLS).map(([name, fill]) => [
+                                name,
+                                fillVariant(fill, token),
+                            ]),
                         ),
-                    ),
-                ],
-                defaultVariants: {
-                    color: "primary",
-                    variant: "filled",
-                    size: "medium",
-                    density: "inherit",
-                },
-            };
-        },
-    });
+                        size: {
+                            small: size("Small"),
+                            medium: size("Medium"),
+                            large: size("Large"),
+                        },
+                        density: densityMarkers(densities),
+                    },
+                    compoundVariants: [
+                        ...colorCompounds(FILLS, groups),
+                        ...SIZES.flatMap((s) =>
+                            densityCompounds(
+                                densities,
+                                { size: lower(s) },
+                                (offset) => ({
+                                    root: {
+                                        height: add(
+                                            token(`height${s}`),
+                                            offset,
+                                        ),
+                                    },
+                                }),
+                            ),
+                        ),
+                    ],
+                    defaultVariants: {
+                        color: "primary",
+                        variant: "filled",
+                        size: "medium",
+                        density: "inherit",
+                    },
+                };
+            },
+        }),
+    );
 
 export const button = createButton();

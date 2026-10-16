@@ -36,18 +36,19 @@ import { radius, size as sizeToken } from "@pureform/theme";
 
 import { controlInput } from "./control";
 import {
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
     componentTokens,
+    defaultGroups,
     disabledColor,
     focusRing,
     mergeSlots,
     slotStateLayer,
     sys,
     tweens,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const { tokens, ref } = componentTokens("slider", {
     activeColor: sys("primary"),
@@ -105,69 +106,73 @@ const colored = (active: ColorValue) => ({
 const pf = typed();
 
 /** Build the slider with a `color` variant per group in `groups`. */
-export const createSlider = (groups: ColorGroups = COLOR_GROUPS) =>
-    pf.slotComponent({
-        name: "slider",
-        $meta: {
-            description:
-                "Material slider over a native range input. Keep the value token (0 to 100) in step with the input.",
-        },
-        tokens,
-        slots: [
-            "root",
-            "track",
-            "activeTrack",
-            "stateLayer",
-            "handle",
-            "input",
-        ],
-        structure: {
-            root: ["track", "activeTrack", "stateLayer", "handle", "input"],
-        },
-        variants: { color: groups },
-        recipe: () => ({
-            base: mergeSlots(
-                {
-                    root: {
-                        position: relative,
-                        display: flex,
-                        alignItems: center,
-                        width: pct(100),
-                        height: ref("height"),
-                    },
-                    track: {
-                        position: absolute,
-                        insetInlineStart: px(0),
-                        insetInlineEnd: px(0),
-                        height: ref("trackHeight"),
-                        borderRadius: radius("full"),
-                        ...unlessDisabled(
-                            ref("trackColor"),
-                            "disabledContainer",
-                        ),
-                    },
-                    activeTrack: {
-                        position: absolute,
-                        insetInlineStart: px(0),
-                        width: mul(ref("value"), pct(1)),
-                        height: ref("trackHeight"),
-                        borderRadius: radius("full"),
-                        transition: follows("width"),
-                    },
-                    stateLayer: atValue(ref("stateLayerSize")),
-                    handle: {
-                        ...atValue(ref("handleSize")),
-                        ...focusRing(slot("root", "focusVisibleWithin")),
-                    },
-                    input: controlInput,
-                },
-                colored(ref("activeColor")),
-            ),
-            variants: {
-                color: colorVariant(groups, (g) => colored(g.main)),
+export const createSlider = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) =>
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.slotComponent({
+            name: "slider",
+            $meta: {
+                description:
+                    "Material slider over a native range input. Keep the value token (0 to 100) in step with the input.",
             },
-            defaultVariants: { color: DEFAULT_GROUP },
+            tokens,
+            slots: [
+                "root",
+                "track",
+                "activeTrack",
+                "stateLayer",
+                "handle",
+                "input",
+            ],
+            structure: {
+                root: ["track", "activeTrack", "stateLayer", "handle", "input"],
+            },
+            variants: { color: groups as ColorGroups },
+            recipe: () => ({
+                base: mergeSlots(
+                    {
+                        root: {
+                            position: relative,
+                            display: flex,
+                            alignItems: center,
+                            width: pct(100),
+                            height: ref("height"),
+                        },
+                        track: {
+                            position: absolute,
+                            insetInlineStart: px(0),
+                            insetInlineEnd: px(0),
+                            height: ref("trackHeight"),
+                            borderRadius: radius("full"),
+                            ...unlessDisabled(
+                                ref("trackColor"),
+                                "disabledContainer",
+                            ),
+                        },
+                        activeTrack: {
+                            position: absolute,
+                            insetInlineStart: px(0),
+                            width: mul(ref("value"), pct(1)),
+                            height: ref("trackHeight"),
+                            borderRadius: radius("full"),
+                            transition: follows("width"),
+                        },
+                        stateLayer: atValue(ref("stateLayerSize")),
+                        handle: {
+                            ...atValue(ref("handleSize")),
+                            ...focusRing(slot("root", "focusVisibleWithin")),
+                        },
+                        input: controlInput,
+                    },
+                    colored(ref("activeColor")),
+                ),
+                variants: {
+                    color: colorVariant(groups, (g) => colored(g.main)),
+                },
+                defaultVariants: { color: DEFAULT_GROUP },
+            }),
         }),
-    });
+    );
 
 export const slider = createSlider();

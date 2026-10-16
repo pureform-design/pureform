@@ -36,9 +36,9 @@ import type {
     ValueType,
     ValueNode,
 } from "@pureform/core/ast";
-import type { CoreConfig } from "@pureform/core/types";
 import {
     MATERIAL_DENSITIES,
+    type MaterialDensity,
     colorRole,
     duration,
     easing,
@@ -69,7 +69,11 @@ export type ColorGroup = (typeof COLOR_GROUPS)[number];
 
 /** The color groups a component offers through its `color` variant. The built-in groups by
  *  default; `pureform()` passes the palette's groups, including custom ones. */
-export type ColorGroups = readonly string[];
+export type ColorGroups<G extends string = string> = readonly G[];
+
+/** The built-in groups, as a factory's default for the group names it's typed by. */
+export const defaultGroups = <G extends string>() =>
+    COLOR_GROUPS as ColorGroups as ColorGroups<G>;
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
@@ -163,22 +167,16 @@ export const fillColors = (
     }
 };
 
-type SlottedSpec = Extract<
-    CoreConfig["components"][string],
-    { kind: "slotComponent" }
->;
-type CompoundVariants = NonNullable<SlottedSpec["recipe"]["compoundVariants"]>;
-
 /** One compound variant per color group and variant, setting the root's state-layered
  *  container, its content color, and its disabled colors. `fills` maps each variant name to
  *  how it fills. The disabled colors live here rather than on the variant because Panda puts
  *  compound variants in a cascade layer after the variants layer: a disabled color on the
  *  variant would lose to the compound's resting color. */
-export const colorCompounds = (
-    fills: Record<string, Fill>,
-    groups: ColorGroups = COLOR_GROUPS,
-): CompoundVariants =>
-    Object.entries(fills).flatMap(([variant, fill]) =>
+export const colorCompounds = <F extends string, G extends string>(
+    fills: Record<F, Fill>,
+    groups: ColorGroups<G>,
+): { match: { color: G; variant: F }; style: SlotStyles }[] =>
+    entriesOf(fills).flatMap(([variant, fill]) =>
         groups.map((color) => {
             const { container, content } = fillColors(fill, color);
             return {
@@ -195,21 +193,28 @@ export const colorCompounds = (
 
 /** One compound variant per color group but the default, where `match` holds as well, styled
  *  for the group. The match keeps its literal values, so a typed recipe checks them. */
-export const groupCompounds = <const M extends Record<string, string>, S>(
-    groups: ColorGroups,
+export const groupCompounds = <
+    const M extends Record<string, string>,
+    S,
+    G extends string = string,
+>(
+    groups: ColorGroups<G>,
     match: M,
-    style: (group: string) => S,
-): { match: M & { color: string }; style: S }[] =>
+    style: (group: G) => S,
+): { match: M & { color: G }; style: S }[] =>
     groups
         .filter((group) => group !== DEFAULT_GROUP)
         .map((color) => ({ match: { ...match, color }, style: style(color) }));
 
 /** The `color` variant group: one empty entry per color group, so compound variants can match
  *  on it. */
-export const colorVariants = (
-    groups: ColorGroups = COLOR_GROUPS,
-): Record<string, { root: StyleMap }> =>
-    Object.fromEntries(groups.map((group) => [group, { root: {} }]));
+export const colorVariants = <G extends string>(
+    groups: ColorGroups<G>,
+): Record<G, { root: StyleMap }> =>
+    Object.fromEntries(groups.map((group) => [group, { root: {} }])) as Record<
+        G,
+        { root: StyleMap }
+    >;
 
 /** Disabled colors for a fill: Material draws a disabled control in the on-surface color, with
  *  a faint container for filled styles and a faint outline for the outlined style. */
@@ -336,18 +341,35 @@ export const groupRoles = (group: string) => ({
  *  variant entry stays empty and the tokens keep working. */
 export const DEFAULT_GROUP = "primary";
 
+/** A factory's component, with its variants typed by what it was built with: the color groups
+ *  and density steps it was given. Its recipe is checked against plain strings, since
+ *  TypeScript can't relate styles keyed by a generic group to the variant's own keys. */
+export const variantsOf =
+    <V extends Record<string, string>>() =>
+    <S extends { readonly $variants?: object }>(spec: S): WithVariants<S, V> =>
+        spec as Omit<S, "$variants"> as WithVariants<S, V>;
+
+/** A spec whose variants' types are replaced by `V`'s, rather than intersected with them,
+ *  which would fold a type like `"0" | (string & {})` into `string`. */
+type WithVariants<S extends { readonly $variants?: object }, V> = Omit<
+    S,
+    "$variants"
+> & {
+    readonly $variants?: Omit<NonNullable<S["$variants"]>, keyof V> & V;
+};
+
 /** A `color` variant group: an entry per group, built from that group's roles, except the
  *  default group, which the base already draws. */
-export const colorVariant = <T>(
-    groups: ColorGroups,
+export const colorVariant = <T, G extends string = string>(
+    groups: ColorGroups<G>,
     build: (roles: ReturnType<typeof groupRoles>) => T,
-): Record<string, T | Record<string, never>> =>
+): Record<G, T | Record<string, never>> =>
     Object.fromEntries(
         groups.map((group) => [
             group,
             group === DEFAULT_GROUP ? {} : build(groupRoles(group)),
         ]),
-    );
+    ) as Record<G, T | Record<string, never>>;
 
 /** Merge slot styles, slot by slot; later maps win per property. */
 export const mergeSlots = (
@@ -452,9 +474,18 @@ export const slotStateLayer = (
 
 /** Density steps by name: grid units each adds to a dense component's height. The theme's
  *  layout declares them; Material's `"0"` to `"-3"` by default. */
-export type Densities = Record<string, number>;
+export type Densities<D extends string = string> = Record<D, number>;
 
-export const DEFAULT_DENSITIES: Densities = MATERIAL_DENSITIES;
+export const DEFAULT_DENSITIES: Densities<MaterialDensity> = MATERIAL_DENSITIES;
+
+/** Material's steps, as a factory's default for the step names it's typed by. */
+export const defaultDensities = <D extends string>() =>
+    DEFAULT_DENSITIES as Densities as Densities<D>;
+
+/** A `density` variant's values: `inherit`, then each step's name. */
+export const densitySteps = <D extends string>(
+    densities: Densities<D>,
+): ("inherit" | D)[] => ["inherit", ...keysOf(densities)];
 
 /** The theme's density offset, which `density` on the layout provider sets. */
 export const THEME_DENSITY: NumericValue = size("densityOffset");
@@ -471,27 +502,28 @@ type SlotStyles = Record<string, StyleMap>;
 
 /** A `density` variant: `inherit` follows the theme, and each step restates the sized styles
  *  at its offset. For a component whose sizes depend on no other variant. */
-export const densityVariant = (
-    densities: Densities,
+export const densityVariant = <D extends string>(
+    densities: Densities<D>,
     sized: (offset: NumericValue) => SlotStyles,
-): Record<string, SlotStyles> => ({
-    inherit: {},
-    ...Object.fromEntries(
-        Object.entries(densities).map(([name, units]) => [
-            name,
-            sized(densityOffset(units)),
-        ]),
-    ),
-});
+): Record<"inherit" | D, SlotStyles> =>
+    ({
+        inherit: {},
+        ...Object.fromEntries(
+            entriesOf(densities).map(([name, units]) => [
+                name,
+                sized(densityOffset(units)),
+            ]),
+        ),
+    }) as Record<"inherit" | D, SlotStyles>;
 
 /** A `density` variant whose steps only name themselves, for a component whose sizes depend on
  *  another variant; `densityCompounds` then restates them per that variant's value. */
-export const densityMarkers = (
-    densities: Densities,
-): Record<string, SlotStyles> =>
+export const densityMarkers = <D extends string>(
+    densities: Densities<D>,
+): Record<"inherit" | D, SlotStyles> =>
     Object.fromEntries(
-        ["inherit", ...Object.keys(densities)].map((name) => [name, {}]),
-    );
+        densitySteps(densities).map((name) => [name, {}]),
+    ) as Record<"inherit" | D, SlotStyles>;
 
 /** An object's keys, typed as its declared names rather than `string`. */
 export const keysOf = <T extends object>(object: T) =>

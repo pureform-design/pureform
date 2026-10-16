@@ -10,8 +10,14 @@ import { column, flex } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { colorRole, spacing, textStyle } from "@pureform/theme";
 
-import { COLOR_GROUPS, componentTokens, sys } from "./shared";
-import type { ColorGroups } from "./shared";
+import {
+    DEFAULT_GROUP,
+    componentTokens,
+    defaultGroups,
+    sys,
+    variantsOf,
+} from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
@@ -31,36 +37,40 @@ const { tokens, ref } = componentTokens("supportingText", {
 
 /** Build the supporting text with `neutral` and a `tone` per group in `groups`. `error` reads
  *  the `errorColor` token, so it can be restyled on its own. */
-export const createSupportingText = (groups: ColorGroups = COLOR_GROUPS) =>
-    pf.component({
-        name: "supportingText",
-        $meta: {
-            description:
-                "Helper or error text under a control. tone sets its color: any color group, such as error.",
-        },
-        tokens,
-        variants: {
-            tone: [
-                "neutral",
-                "error",
-                ...groups.filter((group) => group !== "error"),
-            ],
-        },
-        recipe: () => ({
-            base: { ...supportingTextStyle, color: ref("color") },
-            variants: {
-                tone: {
-                    neutral: {},
-                    error: { color: ref("errorColor") },
-                    ...Object.fromEntries(
-                        groups
-                            .filter((group) => group !== "error")
-                            .map((group) => [group, { color: sys(group) }]),
-                    ),
-                },
+export const createSupportingText = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) =>
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.component({
+            name: "supportingText",
+            $meta: {
+                description:
+                    "Helper or error text under a control. tone sets its color: any color group, such as error.",
             },
-            defaultVariants: { tone: "neutral" },
+            tokens,
+            variants: {
+                tone: [
+                    "neutral",
+                    "error",
+                    ...groups.filter((group) => group !== "error"),
+                ],
+            },
+            recipe: () => ({
+                base: { ...supportingTextStyle, color: ref("color") },
+                variants: {
+                    tone: {
+                        neutral: {},
+                        error: { color: ref("errorColor") },
+                        ...Object.fromEntries(
+                            groups
+                                .filter((group) => group !== "error")
+                                .map((group) => [group, { color: sys(group) }]),
+                        ),
+                    },
+                },
+                defaultVariants: { tone: "neutral" },
+            }),
         }),
-    });
+    );
 
 export const supportingText = createSupportingText();

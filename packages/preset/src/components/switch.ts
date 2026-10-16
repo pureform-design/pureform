@@ -43,18 +43,19 @@ import {
     CONTROL_FOCUS,
 } from "./control";
 import {
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
     componentTokens,
-    mergeSlots,
+    defaultGroups,
     disabledColor,
+    focusRing,
+    mergeSlots,
     stateTransition,
     sys,
     tweens,
-    focusRing,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
@@ -125,118 +126,122 @@ const colored = (c: SwitchColors) => ({
 });
 
 /** Build the switch with a `color` variant per group in `groups`. */
-export const createSwitch = (groups: ColorGroups = COLOR_GROUPS) =>
-    pf.slotComponent({
-        name: "switchControl",
-        $meta: {
-            description:
-                'Material switch over a native checkbox with role="switch". An icon in the handle shows when it is on.',
-        },
-        tokens,
-        slots: [
-            "root",
-            "touchTarget",
-            "input",
-            "track",
-            "stateLayer",
-            "handle",
-            "icon",
-        ],
-        structure: {
-            root: ["touchTarget", "input", "track"],
-            track: ["stateLayer", "handle"],
-            handle: ["icon"],
-        },
-        variants: { color: groups },
-        recipe: () => ({
-            base: mergeSlots(
-                {
-                    root: {
-                        ...focusRing(CONTROL_FOCUS),
-                        borderRadius: radius("full"),
-                        position: relative,
-                        display: inlineFlex,
-                        cursor: pointer,
-                        width: ref("trackWidth"),
-                        height: ref("trackHeight"),
+export const createSwitch = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) =>
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.slotComponent({
+            name: "switchControl",
+            $meta: {
+                description:
+                    'Material switch over a native checkbox with role="switch". An icon in the handle shows when it is on.',
+            },
+            tokens,
+            slots: [
+                "root",
+                "touchTarget",
+                "input",
+                "track",
+                "stateLayer",
+                "handle",
+                "icon",
+            ],
+            structure: {
+                root: ["touchTarget", "input", "track"],
+                track: ["stateLayer", "handle"],
+                handle: ["icon"],
+            },
+            variants: { color: groups as ColorGroups },
+            recipe: () => ({
+                base: mergeSlots(
+                    {
+                        root: {
+                            ...focusRing(CONTROL_FOCUS),
+                            borderRadius: radius("full"),
+                            position: relative,
+                            display: inlineFlex,
+                            cursor: pointer,
+                            width: ref("trackWidth"),
+                            height: ref("trackHeight"),
+                        },
+                        touchTarget: controlTouchTarget,
+                        // Above the track, so it takes every click.
+                        input: { ...controlInput, zIndex: unitless(1) },
+                        track: {
+                            transition: stateTransition,
+                            position: relative,
+                            width: pct(100),
+                            height: pct(100),
+                            borderRadius: radius("full"),
+                            outlineStyle: solid,
+                            outlineOffset: px(0),
+                            outlineWidth: ref("outlineWidth"),
+                        },
+                        stateLayer: {
+                            position: absolute,
+                            top: pct(50),
+                            left: along,
+                            transform: centered,
+                            width: ref("stateLayerSize"),
+                            height: ref("stateLayerSize"),
+                            borderRadius: radius("full"),
+                            pointerEvents: none,
+                            transition: tweens("left", "backgroundColor"),
+                        },
+                        handle: {
+                            position: absolute,
+                            top: pct(50),
+                            left: along,
+                            transform: centered,
+                            display: inlineFlex,
+                            alignItems: center,
+                            justifyContent: center,
+                            borderRadius: radius("full"),
+                            pointerEvents: none,
+                            width: when()
+                                .on(CONTROL_CHECKED, ref("handleSizeChecked"))
+                                .on(CONTROL_PRESSED, ref("handleSizePressed"))
+                                .else(ref("handleSize")),
+                            height: when()
+                                .on(CONTROL_CHECKED, ref("handleSizeChecked"))
+                                .on(CONTROL_PRESSED, ref("handleSizePressed"))
+                                .else(ref("handleSize")),
+                            transition: tweens(
+                                "left",
+                                "width",
+                                "height",
+                                "backgroundColor",
+                            ),
+                        },
+                        icon: {
+                            display: inlineFlex,
+                            fontSize: ref("iconSize"),
+                            lineHeight: unitless(1),
+                            opacity: when()
+                                .on(CONTROL_CHECKED, unitless(1))
+                                .else(unitless(0)),
+                        },
                     },
-                    touchTarget: controlTouchTarget,
-                    // Above the track, so it takes every click.
-                    input: { ...controlInput, zIndex: unitless(1) },
-                    track: {
-                        transition: stateTransition,
-                        position: relative,
-                        width: pct(100),
-                        height: pct(100),
-                        borderRadius: radius("full"),
-                        outlineStyle: solid,
-                        outlineOffset: px(0),
-                        outlineWidth: ref("outlineWidth"),
-                    },
-                    stateLayer: {
-                        position: absolute,
-                        top: pct(50),
-                        left: along,
-                        transform: centered,
-                        width: ref("stateLayerSize"),
-                        height: ref("stateLayerSize"),
-                        borderRadius: radius("full"),
-                        pointerEvents: none,
-                        transition: tweens("left", "backgroundColor"),
-                    },
-                    handle: {
-                        position: absolute,
-                        top: pct(50),
-                        left: along,
-                        transform: centered,
-                        display: inlineFlex,
-                        alignItems: center,
-                        justifyContent: center,
-                        borderRadius: radius("full"),
-                        pointerEvents: none,
-                        width: when()
-                            .on(CONTROL_CHECKED, ref("handleSizeChecked"))
-                            .on(CONTROL_PRESSED, ref("handleSizePressed"))
-                            .else(ref("handleSize")),
-                        height: when()
-                            .on(CONTROL_CHECKED, ref("handleSizeChecked"))
-                            .on(CONTROL_PRESSED, ref("handleSizePressed"))
-                            .else(ref("handleSize")),
-                        transition: tweens(
-                            "left",
-                            "width",
-                            "height",
-                            "backgroundColor",
-                        ),
-                    },
-                    icon: {
-                        display: inlineFlex,
-                        fontSize: ref("iconSize"),
-                        lineHeight: unitless(1),
-                        opacity: when()
-                            .on(CONTROL_CHECKED, unitless(1))
-                            .else(unitless(0)),
-                    },
-                },
-                colored({
-                    track: ref("checkedTrackColor"),
-                    handle: ref("checkedHandleColor"),
-                    handleHover: ref("checkedHandleHoverColor"),
-                    icon: ref("iconColor"),
-                }),
-            ),
-            variants: {
-                color: colorVariant(groups, (g) =>
                     colored({
-                        track: g.main,
-                        handle: g.on,
-                        handleHover: g.container,
-                        icon: g.onContainer,
+                        track: ref("checkedTrackColor"),
+                        handle: ref("checkedHandleColor"),
+                        handleHover: ref("checkedHandleHoverColor"),
+                        icon: ref("iconColor"),
                     }),
                 ),
-            },
-            defaultVariants: { color: DEFAULT_GROUP },
+                variants: {
+                    color: colorVariant(groups, (g) =>
+                        colored({
+                            track: g.main,
+                            handle: g.on,
+                            handleHover: g.container,
+                            icon: g.onContainer,
+                        }),
+                    ),
+                },
+                defaultVariants: { color: DEFAULT_GROUP },
+            }),
         }),
-    });
+    );
 
 export const switchControl = createSwitch();

@@ -18,19 +18,22 @@
 import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
+import type { MaterialDensity } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
 import {
-    surface,
-    sys,
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
+    defaultDensities,
+    defaultGroups,
     dense,
+    densitySteps,
     densityVariant,
-    DEFAULT_DENSITIES,
+    surface,
+    sys,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups, Densities } from "./shared";
+import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const pf = typed();
 
@@ -49,85 +52,90 @@ const parts = rowParts(ref, "item");
 
 /** Build the menu with a `color` variant per group in `groups`. A group colors the selected
  *  item with the group's container. */
-export const createMenu = (
-    groups: ColorGroups = COLOR_GROUPS,
-    densities: Densities = DEFAULT_DENSITIES,
+export const createMenu = <
+    const G extends string = ColorGroup,
+    D extends string = MaterialDensity,
+>(
+    groups: ColorGroups<G> = defaultGroups(),
+    densities: Densities<D> = defaultDensities(),
 ) =>
-    pf.slotComponent({
-        name: "menu",
-        $meta: {
-            description:
-                "Material menu and its items. Separate groups with the separator component; mark the chosen item with aria-selected.",
-        },
-        tokens,
-        slots: [
-            "root",
-            "item",
-            "itemLeading",
-            "itemLabel",
-            "itemTrailing",
-            "itemTrailingText",
-        ],
-        structure: {
-            root: ["item"],
-            item: [
+    variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
+        pf.slotComponent({
+            name: "menu",
+            $meta: {
+                description:
+                    "Material menu and its items. Separate groups with the separator component; mark the chosen item with aria-selected.",
+            },
+            tokens,
+            slots: [
+                "root",
+                "item",
                 "itemLeading",
                 "itemLabel",
                 "itemTrailing",
                 "itemTrailingText",
             ],
-        },
-        variants: {
-            density: ["inherit", ...Object.keys(densities)],
-            color: groups,
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    ...surface(ref("container"), ref("content"), "level2"),
-                    display: flex,
-                    flexDirection: column,
-                    borderRadius: ref("radius"),
-                    paddingBlockStart: ref("paddingBlock"),
-                    paddingBlockEnd: ref("paddingBlock"),
-                    minWidth: ref("minWidth"),
-                    maxWidth: ref("maxWidth"),
-                },
-                item: {
-                    ...parts.row,
-                    ...parts.interactive,
-                    gap: ref("gap"),
-                    width: pct(100),
-                    height: dense(ref("itemHeight")),
-                    paddingInlineStart: ref("itemPaddingInline"),
-                    paddingInlineEnd: ref("itemPaddingInline"),
-                    borderWidth: px(0),
-                    justifyContent: start,
-                },
-                itemLeading: parts.leading,
-                itemLabel: {
-                    textStyle: textStyle("labelLarge"),
-                    width: pct(100),
-                    textAlign: start,
-                },
-                itemTrailing: parts.trailing,
-                itemTrailingText: parts.trailingText("labelLarge"),
+            structure: {
+                root: ["item"],
+                item: [
+                    "itemLeading",
+                    "itemLabel",
+                    "itemTrailing",
+                    "itemTrailingText",
+                ],
             },
             variants: {
-                density: densityVariant(densities, (offset) => ({
-                    item: { height: add(ref("itemHeight"), offset) },
-                })),
-                color: colorVariant(groups, (g) => {
-                    const c = rowGroupColors(ref, "item", g);
-                    return {
-                        item: c.interactive,
-                        itemLeading: c.leading,
-                        itemTrailing: c.trailing,
-                    };
-                }),
+                density: densitySteps<string>(densities),
+                color: groups as ColorGroups,
             },
-            defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
+            recipe: () => ({
+                base: {
+                    root: {
+                        ...surface(ref("container"), ref("content"), "level2"),
+                        display: flex,
+                        flexDirection: column,
+                        borderRadius: ref("radius"),
+                        paddingBlockStart: ref("paddingBlock"),
+                        paddingBlockEnd: ref("paddingBlock"),
+                        minWidth: ref("minWidth"),
+                        maxWidth: ref("maxWidth"),
+                    },
+                    item: {
+                        ...parts.row,
+                        ...parts.interactive,
+                        gap: ref("gap"),
+                        width: pct(100),
+                        height: dense(ref("itemHeight")),
+                        paddingInlineStart: ref("itemPaddingInline"),
+                        paddingInlineEnd: ref("itemPaddingInline"),
+                        borderWidth: px(0),
+                        justifyContent: start,
+                    },
+                    itemLeading: parts.leading,
+                    itemLabel: {
+                        textStyle: textStyle("labelLarge"),
+                        width: pct(100),
+                        textAlign: start,
+                    },
+                    itemTrailing: parts.trailing,
+                    itemTrailingText: parts.trailingText("labelLarge"),
+                },
+                variants: {
+                    density: densityVariant(densities, (offset) => ({
+                        item: { height: add(ref("itemHeight"), offset) },
+                    })),
+                    color: colorVariant(groups, (g) => {
+                        const c = rowGroupColors(ref, "item", g);
+                        return {
+                            item: c.interactive,
+                            itemLeading: c.leading,
+                            itemTrailing: c.trailing,
+                        };
+                    }),
+                },
+                defaultVariants: { color: DEFAULT_GROUP, density: "inherit" },
+            }),
         }),
-    });
+    );
 
 export const menu = createMenu();

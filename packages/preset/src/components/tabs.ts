@@ -29,16 +29,17 @@ import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import { stateLayer } from "../state-layer";
 import {
-    groupCompounds,
-    COLOR_GROUPS,
     DEFAULT_GROUP,
     colorVariant,
     componentTokens,
+    defaultGroups,
+    groupCompounds,
     iconBox,
     pressableRoot,
     sys,
+    variantsOf,
 } from "./shared";
-import type { ColorGroups } from "./shared";
+import type { ColorGroup, ColorGroups } from "./shared";
 
 const pf = typed();
 
@@ -79,119 +80,125 @@ const tabColors = (active: ColorValue) => ({
 
 /** Build the tabs with a `color` variant per group in `groups`. A group colors the indicator
  *  and a primary tab's active label and icon; a secondary tab's active label stays neutral. */
-export const createTabs = (groups: ColorGroups = COLOR_GROUPS) =>
-    pf.slotComponent({
-        name: "tabs",
-        $meta: {
-            description:
-                "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons.",
-        },
-        tokens,
-        slots: ["root", "tab", "icon", "label", "indicator"],
-        structure: {
-            root: ["tab"],
-            tab: ["icon", "label", "indicator"],
-        },
-        variants: {
-            variant: ["primary", "secondary"],
-            icon: ["true", "false"],
-            color: groups,
-        },
-        recipe: () => ({
-            base: {
-                root: {
-                    display: flex,
-                    flexDirection: row,
-                    backgroundColor: ref("container"),
-                },
-                // Tabs share the list's width equally.
-                tab: {
-                    ...pressableRoot,
-                    ...tabColors(ref("activeColor")),
-                    states: {
-                        ...pressableRoot.states,
-                        ...tabColors(ref("activeColor")).states,
-                    },
-                    flexBasis: px(0),
-                    flexGrow: unitless(1),
-                    minWidth: px(0),
-                    height: ref("height"),
-                    // The divider under the tabs: an inset shadow on each tab, so it takes no space
-                    // and draws over the tab's state layer.
-                    boxShadow: shadow({
-                        x: px(0),
-                        y: px(-1),
-                        blur: px(0),
-                        spread: px(0),
-                        color: ref("dividerColor"),
-                        inset: true,
-                    }),
-                    paddingInlineStart: ref("paddingInline"),
-                    paddingInlineEnd: ref("paddingInline"),
-                    gap: spacing("2"),
-                },
-                icon: iconBox(ref("iconSize")),
-                label: { textStyle: textStyle("titleSmall") },
-                indicator: {
-                    position: absolute,
-                    bottom: px(0),
-                    insetInlineStart: ref("paddingInline"),
-                    insetInlineEnd: ref("paddingInline"),
-                    height: ref("indicatorHeight"),
-                    borderStartStartRadius: radius("extraSmall"),
-                    borderStartEndRadius: radius("extraSmall"),
-                    backgroundColor: ref("indicatorColor"),
-                    opacity: when().on(SELECTED, unitless(1)).else(unitless(0)),
-                },
+export const createTabs = <const G extends string = ColorGroup>(
+    groups: ColorGroups<G> = defaultGroups(),
+) =>
+    variantsOf<{ color: G | typeof DEFAULT_GROUP }>()(
+        pf.slotComponent({
+            name: "tabs",
+            $meta: {
+                description:
+                    "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons.",
+            },
+            tokens,
+            slots: ["root", "tab", "icon", "label", "indicator"],
+            structure: {
+                root: ["tab"],
+                tab: ["icon", "label", "indicator"],
             },
             variants: {
-                variant: {
-                    primary: {},
-                    // A secondary tab's indicator spans the tab, square, and its label stays neutral.
-                    secondary: {
-                        tab: {
-                            ...tabColors(ref("secondaryActiveColor")),
+                variant: ["primary", "secondary"],
+                icon: ["true", "false"],
+                color: groups as ColorGroups,
+            },
+            recipe: () => ({
+                base: {
+                    root: {
+                        display: flex,
+                        flexDirection: row,
+                        backgroundColor: ref("container"),
+                    },
+                    // Tabs share the list's width equally.
+                    tab: {
+                        ...pressableRoot,
+                        ...tabColors(ref("activeColor")),
+                        states: {
+                            ...pressableRoot.states,
+                            ...tabColors(ref("activeColor")).states,
                         },
-                        indicator: {
-                            insetInlineStart: px(0),
-                            insetInlineEnd: px(0),
-                            height: ref("secondaryIndicatorHeight"),
-                            borderStartStartRadius: px(0),
-                            borderStartEndRadius: px(0),
-                        },
+                        flexBasis: px(0),
+                        flexGrow: unitless(1),
+                        minWidth: px(0),
+                        height: ref("height"),
+                        // The divider under the tabs: an inset shadow on each tab, so it takes no space
+                        // and draws over the tab's state layer.
+                        boxShadow: shadow({
+                            x: px(0),
+                            y: px(-1),
+                            blur: px(0),
+                            spread: px(0),
+                            color: ref("dividerColor"),
+                            inset: true,
+                        }),
+                        paddingInlineStart: ref("paddingInline"),
+                        paddingInlineEnd: ref("paddingInline"),
+                        gap: spacing("2"),
+                    },
+                    icon: iconBox(ref("iconSize")),
+                    label: { textStyle: textStyle("titleSmall") },
+                    indicator: {
+                        position: absolute,
+                        bottom: px(0),
+                        insetInlineStart: ref("paddingInline"),
+                        insetInlineEnd: ref("paddingInline"),
+                        height: ref("indicatorHeight"),
+                        borderStartStartRadius: radius("extraSmall"),
+                        borderStartEndRadius: radius("extraSmall"),
+                        backgroundColor: ref("indicatorColor"),
+                        opacity: when()
+                            .on(SELECTED, unitless(1))
+                            .else(unitless(0)),
                     },
                 },
-                icon: { true: {}, false: {} },
-                color: colorVariant(groups, (g) => ({
-                    tab: tabColors(g.main),
-                    indicator: { backgroundColor: g.main },
-                })),
-            },
-            // Primary tabs stack the icon over the label and grow taller; secondary tabs keep the
-            // icon beside it.
-            compoundVariants: [
-                // The color variant sets the active label too, so secondary tabs set theirs back in
-                // the later layer.
-                ...groupCompounds(groups, { variant: "secondary" }, () => ({
-                    tab: tabColors(ref("secondaryActiveColor")),
-                })),
-                {
-                    match: { variant: "primary", icon: "true" },
-                    style: {
-                        tab: {
-                            flexDirection: column,
-                            gap: px(2),
-                            height: ref("heightWithIcon"),
+                variants: {
+                    variant: {
+                        primary: {},
+                        // A secondary tab's indicator spans the tab, square, and its label stays neutral.
+                        secondary: {
+                            tab: {
+                                ...tabColors(ref("secondaryActiveColor")),
+                            },
+                            indicator: {
+                                insetInlineStart: px(0),
+                                insetInlineEnd: px(0),
+                                height: ref("secondaryIndicatorHeight"),
+                                borderStartStartRadius: px(0),
+                                borderStartEndRadius: px(0),
+                            },
                         },
                     },
+                    icon: { true: {}, false: {} },
+                    color: colorVariant(groups, (g) => ({
+                        tab: tabColors(g.main),
+                        indicator: { backgroundColor: g.main },
+                    })),
                 },
-            ],
-            defaultVariants: {
-                variant: "primary",
-                icon: "false",
-                color: DEFAULT_GROUP,
-            },
+                // Primary tabs stack the icon over the label and grow taller; secondary tabs keep the
+                // icon beside it.
+                compoundVariants: [
+                    // The color variant sets the active label too, so secondary tabs set theirs back in
+                    // the later layer.
+                    ...groupCompounds(groups, { variant: "secondary" }, () => ({
+                        tab: tabColors(ref("secondaryActiveColor")),
+                    })),
+                    {
+                        match: { variant: "primary", icon: "true" },
+                        style: {
+                            tab: {
+                                flexDirection: column,
+                                gap: px(2),
+                                height: ref("heightWithIcon"),
+                            },
+                        },
+                    },
+                ],
+                defaultVariants: {
+                    variant: "primary",
+                    icon: "false",
+                    color: DEFAULT_GROUP,
+                },
+            }),
         }),
-    });
+    );
 
 export const tabs = createTabs();

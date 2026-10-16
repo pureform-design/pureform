@@ -28,6 +28,7 @@ import {
 import { ContractError, fontRole, resolveTheme } from "@pureform/theme";
 import type {
     BaseColorGroup,
+    MaterialDensity,
     ColorProvider,
     ElevationProvider,
     LayoutProvider,
@@ -70,6 +71,7 @@ import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
 import { DEFAULT_SHAPES } from "./components/shaped";
 import type { Shapes } from "./components/shaped";
+import type { Densities } from "./components/shared";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSupportingText } from "./components/supporting-text";
@@ -94,14 +96,14 @@ type ThemeConfig = Theme<string, string, string>["config"];
  *  for its color groups. */
 export interface ComponentsContext<G extends string> {
     theme: ResolvedTheme<G>;
-    defaults: DefaultComponents;
+    defaults: DefaultComponents<G>;
 }
 
 export interface PureformOptions<
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
-    TComponents extends ComponentMap = DefaultComponents,
+    TComponents extends ComponentMap = DefaultComponents<G>,
 > {
     /** Default `materialColor()`. Its groups become each component's `color` variant. */
     color?: ColorProvider<G>;
@@ -232,7 +234,7 @@ export type PureformConfig<
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
-    TComponents extends ComponentMap = DefaultComponents,
+    TComponents extends ComponentMap = DefaultComponents<G>,
 > = CoreConfig &
     ThemeVocabulary<G, TFont, TStyle> & {
         /** The components, typed by name and token, so `typed(config)` offers
@@ -246,33 +248,40 @@ type ComponentMap = Record<string, AnyComponentSpec | undefined>;
 
 /** pureform's components, built for a theme's color groups, density steps, typescale, and
  *  corner, and the given shapes. */
-const defaultComponents = (
-    theme: ResolvedTheme<string, string, string>,
+const defaultComponents = <G extends string>(
+    theme: ResolvedTheme<G, string, string>,
     shapes: Shapes,
     cornerToken: boolean,
 ) => {
-    const densities = theme.layout.densities;
+    // Material's steps, typed so their names autocomplete; a layout provider may add its own.
+    // The step type goes explicitly, since inferring it from the record widens it to `string`.
+    type Step = MaterialDensity | (string & {});
+    const densities = theme.layout.densities as Densities<Step>;
     const components = {
-        button: createButton(theme.color.groups, densities),
-        iconButton: createIconButton(theme.color.groups, densities, shapes),
+        button: createButton<G, Step>(theme.color.groups, densities),
+        iconButton: createIconButton<G, Step>(
+            theme.color.groups,
+            densities,
+            shapes,
+        ),
         fab: createFab(theme.color.groups, shapes),
         avatar: createAvatar(theme.color.groups, shapes),
         media: createMedia(shapes),
-        chip: createChip(theme.color.groups, densities),
-        textField: createTextField(theme.color.groups, densities),
-        textArea: createTextArea(theme.color.groups, densities),
+        chip: createChip<G, Step>(theme.color.groups, densities),
+        textField: createTextField<G, Step>(theme.color.groups, densities),
+        textArea: createTextArea<G, Step>(theme.color.groups, densities),
         searchBar,
-        select: createSelect(theme.color.groups, densities),
+        select: createSelect<G, Step>(theme.color.groups, densities),
         supportingText: createSupportingText(theme.color.groups),
-        checkbox: createCheckbox(theme.color.groups, densities),
-        radio: createRadio(theme.color.groups, densities),
+        checkbox: createCheckbox<G, Step>(theme.color.groups, densities),
+        radio: createRadio<G, Step>(theme.color.groups, densities),
         switchControl: createSwitch(theme.color.groups),
         slider: createSlider(theme.color.groups),
         linearProgress: createLinearProgress(theme.color.groups),
         circularProgress: createCircularProgress(theme.color.groups),
         separator,
-        listItem: createListItem(theme.color.groups, densities),
-        menu: createMenu(theme.color.groups, densities),
+        listItem: createListItem<G, Step>(theme.color.groups, densities),
+        menu: createMenu<G, Step>(theme.color.groups, densities),
         tabs: createTabs(theme.color.groups),
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
@@ -295,7 +304,9 @@ const defaultComponents = (
 };
 
 /** pureform's default components, by name. */
-export type DefaultComponents = ReturnType<typeof defaultComponents>;
+export type DefaultComponents<G extends string = BaseColorGroup> = ReturnType<
+    typeof defaultComponents<G>
+>;
 
 /** The components a config holds: the ones a `components` function returns, less any it
  *  set to `undefined`. */
@@ -312,7 +323,7 @@ export const pureform = <
     G extends string = BaseColorGroup,
     TFont extends string = never,
     TStyle extends string = never,
-    TComponents extends ComponentMap = DefaultComponents,
+    TComponents extends ComponentMap = DefaultComponents<G>,
 >(
     options: PureformOptions<G, TFont, TStyle, TComponents> = {},
 ): PureformConfig<G, TFont, TStyle, TComponents> => {
