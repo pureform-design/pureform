@@ -3,4 +3,5 @@
 
 export { useAnimatedComponentStyles } from "./animate/styles";
 export { useRipple } from "./animate/ripple";
+export type { RippleOptions, Ripples } from "./animate/ripple";
 export type { State, Style } from "./select";

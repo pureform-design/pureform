@@ -19,14 +19,14 @@ import Svg, {
 import type { CircleProps } from "react-native-svg";
 
 import { DISCS, useRippleDrawn } from "./animate/ripple";
-import type { RippleDrawing, RippleOptions } from "./animate/ripple";
+import type { RippleDrawing, RippleOptions, Ripples } from "./animate/ripple";
 import { placeGradient, shapePath } from "./geometry";
 import type { Box, PlacedGradient } from "./geometry";
 import { useComponentState } from "./react";
 import type { Drawing } from "./select";
 
 export { placeGradient, shapePath } from "./geometry";
-export type { RippleOptions } from "./animate/ripple";
+export type { RippleOptions, Ripples } from "./animate/ripple";
 export type { Box, GradientStop, PlacedGradient } from "./geometry";
 
 const gradientElement = (id: string, placed: PlacedGradient) => {
@@ -144,7 +144,7 @@ export const useSvgRipple = (
         /** The surface's drawing, from its `drawings`, to clip the ripples to its shape. */
         clip?: Drawing | undefined;
     },
-) => {
+): Ripples => {
     const gradient = useComponentState("ripple").drawings.ripple?.gradient;
     const shape = options.clip?.shape;
     const id = `pf${useId().replace(/[^a-zA-Z0-9]/g, "")}`;

@@ -47,6 +47,17 @@
                 "development": "./src/svg.ts",
                 "default": "./dist/svg.mjs"
             }
+        },
+        "./reanimated": {
+            "types": "./dist/reanimated.d.ts",
+            "import": {
+                "development": "./src/reanimated.ts",
+                "default": "./dist/reanimated.mjs"
+            },
+            "require": {
+                "development": "./src/reanimated.ts",
+                "default": "./dist/reanimated.mjs"
+            }
         }
     },
     "dependencies": {
@@ -66,7 +77,9 @@
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-native": "catalog:",
+        "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:",
+        "react-native-worklets": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
@@ -74,6 +87,7 @@
     "peerDependencies": {
         "react": "catalog:",
         "react-native": "catalog:",
+        "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:"
     },
     "peerDependenciesMeta": {
@@ -84,6 +98,9 @@
             "optional": true
         },
         "react-native-svg": {
+            "optional": true
+        },
+        "react-native-reanimated": {
             "optional": true
         }
     }

@@ -254,6 +254,13 @@ overrides the primary color in either mode.
 - **React Native Web and react-native-svg in Vite:** resolve `.web.*` files first, shim the
   native modules it imports behind Android checks, and alias React Native's asset registry to
   React Native Web's.
+- **Reanimated:** `@pureform/rn-adapter/reanimated`, with `react-native-reanimated` 4 as an
+  optional peer. `useReanimatedComponentStyles` returns each slot's style with its
+  transitions and keyframe animation as CSS's animation properties (`cssMotion`), which
+  Reanimated runs on the UI thread, interpolating colors, transforms, and percentages against
+  pixels itself. On the web, where it runs real CSS transitions, logical properties are named
+  as React Native Web writes them (`start` is `left`, left to right). It runs on the web
+  without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
 - **Not yet:** shape morphs, container queries, and running on a device.
 
 ## State transitions

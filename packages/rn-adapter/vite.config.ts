@@ -13,6 +13,7 @@ export default createConfig({
                     react: "src/react.ts",
                     animated: "src/animated.ts",
                     svg: "src/svg.ts",
+                    reanimated: "src/reanimated.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

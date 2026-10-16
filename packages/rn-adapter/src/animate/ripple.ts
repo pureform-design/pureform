@@ -18,7 +18,7 @@ import {
     useRef,
     useState,
 } from "react";
-import type { ReactNode, Ref } from "react";
+import type { ReactElement, ReactNode, Ref } from "react";
 import { Animated, Easing } from "react-native";
 
 import { animatable, blend } from "../motion";
@@ -201,7 +201,7 @@ const RippleLayer = (props: {
  *  a radial gradient, which `useSvgRipple` from `@pureform/rn-adapter/svg` draws. On React
  *  Native Web, give the pressable `delayPressIn={0}`: by default it holds a press's start for
  *  50ms, which delays the ripple. */
-export const useRipple = (options: RippleOptions) =>
+export const useRipple = (options: RippleOptions): Ripples =>
     useRippleDrawn(options, DISCS);
 
 export interface RippleOptions {
@@ -213,10 +213,21 @@ export interface RippleOptions {
 }
 
 /** As `useRipple`, drawing the ripples its own way. */
+/** A surface's ripples: handlers for its pressable, and the layer to render inside it. */
+export interface Ripples {
+    handlers: {
+        onPressIn: (event: {
+            nativeEvent: { pageX: number; pageY: number };
+        }) => void;
+        onPressOut: () => void;
+    };
+    layer: ReactElement;
+}
+
 export const useRippleDrawn = (
     options: RippleOptions,
     drawing: RippleDrawing,
-) => {
+): Ripples => {
     const { styles, transitions } = useComponentState("ripple");
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
