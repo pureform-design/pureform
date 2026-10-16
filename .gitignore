@@ -2,6 +2,9 @@ node_modules
 .turbo
 coverage
 dist
+# Machine-specific settings, such as CHROMIUM_PATH for the browser tests
+.env.local
+.env.*.local
 
 # @@omni-managed:begin (managed by `omni ignore sync`; do not edit by hand)
 /.omni/cache/**
