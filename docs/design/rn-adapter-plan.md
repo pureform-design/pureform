@@ -280,6 +280,14 @@ overrides the primary color in either mode.
   without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
 - **Slow motion:** the provider's `timeScale` stretches every transition, animation, morph,
   and ripple the hooks return, for watching motion by eye.
+- **Metro:** `withPureform` from `@pureform/rn-adapter/metro` wraps an app's Metro config
+  (React Native's or Expo's) with pureform's Babel transformer. A `*.pureform.*` file
+  default-exports `precompute(config, options)`; the transformer runs it in Node through jiti
+  and bundles the styles it returns, so the app ships the data and none of the lowering, as
+  the Vite plugin does on the web. Every other file goes through the transformer it wrapped.
+  Metro caches a file's transform by its own contents, so `watch` lists the files the config
+  reads, which key the cache: a change precomputes again on Metro's next start. An
+  integration test bundles a fixture app with Metro and runs the bundle.
 - **Not yet:** running on a device.
 
 ## State transitions

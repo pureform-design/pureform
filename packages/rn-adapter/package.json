@@ -69,22 +69,52 @@
                 "development": "./src/reanimated-svg.ts",
                 "default": "./dist/reanimated-svg.mjs"
             }
+        },
+        "./metro": {
+            "types": "./dist/metro.d.ts",
+            "import": {
+                "development": "./src/metro.ts",
+                "default": "./dist/metro.mjs"
+            },
+            "require": {
+                "development": "./src/metro.ts",
+                "default": "./dist/metro.mjs"
+            }
+        },
+        "./metro-transformer": {
+            "types": "./dist/metro-transformer.d.ts",
+            "import": {
+                "development": "./src/metro-transformer.ts",
+                "default": "./dist/metro-transformer.mjs"
+            },
+            "require": {
+                "development": "./src/metro-transformer.ts",
+                "default": "./dist/metro-transformer.mjs"
+            }
         }
     },
     "dependencies": {
         "@pureform/core": "catalog:",
         "@pureform/js-effects": "catalog:",
-        "chroma-js": "catalog:"
+        "chroma-js": "catalog:",
+        "jiti": "catalog:"
     },
     "devDependencies": {
+        "@babel/core": "catalog:",
+        "@babel/runtime": "catalog:",
         "@pureform/material": "catalog:",
         "@pureform/preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "@react-native/babel-preset": "catalog:",
+        "@react-native/metro-babel-transformer": "catalog:",
+        "@react-native/metro-config": "catalog:",
         "@types/chroma-js": "catalog:",
+        "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
+        "metro": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-native": "catalog:",

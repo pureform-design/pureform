@@ -15,6 +15,8 @@ export default createConfig({
                     svg: "src/svg.ts",
                     reanimated: "src/reanimated.ts",
                     "reanimated-svg": "src/reanimated-svg.ts",
+                    metro: "src/metro.ts",
+                    "metro-transformer": "src/metro-transformer.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
