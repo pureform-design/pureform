@@ -91,7 +91,7 @@ with `width`, `height`, and `font-size`, and the component sets its color, so an
 
 For icon fonts such as Material Symbols, every icon slot also sets the `FILL` axis,
 `font-variation-settings: "FILL" <fill>`, from its component's `iconFill` token (`0` by
-default; `--components-<name>-icon-fill` restyles it at runtime). The states Material draws
+default; `--components-<name>-iconFill` restyles it at runtime). The states Material draws
 filled switch to a second token:
 
 | Component                         | State                                        | Token              |

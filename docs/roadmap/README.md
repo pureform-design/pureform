@@ -80,7 +80,7 @@ snapshots: land them one at a time, regenerating snapshots after each rebase.
 | [x] | [p1a: match states on native, ARIA, then `data-pf`](phases/p1a-state-matching.md) | none                     | [`context/p1a.md`](context/p1a.md) |
 | [x] | [p1b: reduced motion stops movement only](phases/p1b-reduced-motion.md)           | none                     | [`context/p1b.md`](context/p1b.md) |
 | [x] | [p1c: styles that flip with direction](phases/p1c-direction.md)                   | none                     | [`context/p1c.md`](context/p1c.md) |
-| [ ] | [p1d: icon fill, mirror, toggle icon button](phases/p1d-icons.md)                 | none                     | `context/p1d.md`                   |
+| [x] | [p1d: icon fill, mirror, toggle icon button](phases/p1d-icons.md)                 | none                     | [`context/p1d.md`](context/p1d.md) |
 | [ ] | [p1e: `@pureform/styling`](phases/p1e-styling.md)                                 | none                     | `context/p1e.md`                   |
 | [ ] | [p1f: `@pureform/anatomy`](phases/p1f-anatomy.md)                                 | none (refresh after p1d) | `context/p1f.md`                   |
 | [ ] | [p1g: `@pureform/machines`](phases/p1g-machines.md)                               | none                     | `context/p1g.md`                   |
