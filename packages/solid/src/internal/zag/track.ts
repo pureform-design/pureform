@@ -3,7 +3,7 @@
 // the dependencies, and the effect half compares and runs.
 
 import { isEqual, isFunction } from "@zag-js/utils";
-import { createEffect } from "solid-js";
+import { createEffect, untrack } from "solid-js";
 
 const access = <T>(v: T | (() => T)): T => (isFunction(v) ? v() : v);
 
@@ -12,7 +12,8 @@ export const createTrack = (deps: unknown[], effect: VoidFunction) => {
         () => deps.map((d) => access(d)),
         (next, prev) => {
             if (prev === undefined) return;
-            if (next.some((value, i) => !isEqual(prev[i], value))) effect();
+            if (next.some((value, i) => !isEqual(prev[i], value)))
+                untrack(effect);
         },
     );
 };
