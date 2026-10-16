@@ -15,7 +15,7 @@ export const Route = createFileRoute("/components")({
 });
 
 // The button and checkbox from `@pureform/solid` in their variants and states, styled by the
-// Panda target through the hand-written registry in `.pureform/`. React's demo
+// Panda target through the registry generated in `.pureform/`. React's demo
 // (`apps/react-demo`) renders the same page.
 
 const VARIANTS = ["filled", "tonal", "outlined", "text", "elevated"] as const;

@@ -27,6 +27,7 @@ cache:
         - "../../apps/solid-demo/.pureform/**/*"
         - "../../apps/solid-demo/panda.config.ts"
         - "../../apps/solid-demo/panda.pureform.ts"
+        - "../../apps/solid-demo/pureform.config.ts"
 
 tasks:
   test:e2e:

@@ -22,12 +22,10 @@ export default defineConfig({
 
     include: ["./src/**/*.{js,jsx,ts,tsx}"],
 
-    // Variants picked through the registry are invisible to Panda's extractor, so the
-    // registered components' `staticCss` from `.pureform/` keeps every one.
-    staticCss: {
-        themes: ["teal", "sharp", "dense"],
-        recipes: { ...staticCss.recipes },
-    },
+    // Variants and themes picked at run time are invisible to Panda's extractor, so
+    // `.pureform/` (generated from `pureform.config.ts` for the registered components) lists
+    // every variant of each, and every theme.
+    staticCss,
 
     outdir: "./styled-system",
 });

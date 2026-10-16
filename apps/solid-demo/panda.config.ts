@@ -30,45 +30,10 @@ export default defineConfig({
     // Where to look for your css declarations
     include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
 
-    // The demo picks variants at runtime, which static extraction can't see, so emit every
-    // variant of the pureform recipes: the registered components' through `.pureform/`, the
-    // rest listed here until they're registered.
-    staticCss: {
-        themes: ["teal", "sharp", "dense"],
-        recipes: {
-            ...staticCss.recipes,
-            iconButton: ["*"],
-            card: ["*"],
-            scrim: ["*"],
-            ripple: ["*"],
-            fab: ["*"],
-            avatar: ["*"],
-            media: ["*"],
-            chip: ["*"],
-            textField: ["*"],
-            textArea: ["*"],
-            radio: ["*"],
-            switchControl: ["*"],
-            separator: ["*"],
-            supportingText: ["*"],
-            text: ["*"],
-            icon: ["*"],
-            searchBar: ["*"],
-            select: ["*"],
-            snackbar: ["*"],
-            tooltip: ["*"],
-            slider: ["*"],
-            linearProgress: ["*"],
-            circularProgress: ["*"],
-            navigationBar: ["*"],
-            navigationRail: ["*"],
-            listItem: ["*"],
-            menu: ["*"],
-            tabs: ["*"],
-            dialog: ["*"],
-            touchTarget: ["*"],
-        },
-    },
+    // The demo picks variants and themes at run time, which static extraction can't see, so
+    // `.pureform/` (generated from `pureform.config.ts`) lists every variant of every pureform
+    // recipe, and every theme.
+    staticCss,
 
     // Files to exclude
     exclude: [],

@@ -1,5 +1,5 @@
 // The button and checkbox in their variants and states, styled by the Panda target through the
-// hand-written registry in `.pureform/`.
+// registry generated in `.pureform/`.
 
 import type { Direction } from "@pureform/react";
 import { PureformProvider } from "@pureform/react";
