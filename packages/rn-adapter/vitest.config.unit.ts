@@ -4,6 +4,8 @@ import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 import baseConfig from "./vite.config";
 
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
+    // React Native's own source is Flow, which Node can't run; React Native Web stands in.
+    resolve: { alias: { "react-native": "react-native-web" } },
     test: {
         testTimeout: 1000,
         include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],

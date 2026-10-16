@@ -139,6 +139,9 @@ const DROPPED = new Set([
     "caretColor",
     "touchAction",
     "contain",
+    // A PureformContainer establishes a container, with its name.
+    "containerType",
+    "containerName",
     "isolation",
 ]);
 

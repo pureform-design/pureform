@@ -90,6 +90,7 @@
         "react-native": "catalog:",
         "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:",
+        "react-native-web": "catalog:",
         "react-native-worklets": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

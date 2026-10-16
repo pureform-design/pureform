@@ -27,6 +27,7 @@ import { pureform } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
 
 import { lowerRn } from "./lower";
+import { select } from "./select";
 
 const configWith = (root: StyleMap, extra: Partial<CoreConfig> = {}) =>
     ({
@@ -462,11 +463,76 @@ describe("lowerRn percentages", () => {
     });
 });
 
+describe("lowerRn container conditions", () => {
+    it("bounds the nearest container's width, or a named one's", () => {
+        const { rules } = rulesOf(
+            {
+                width: when(
+                    { type: "containerSize", min: px(600) } as never,
+                    px(10),
+                    px(5),
+                ),
+                height: when(
+                    {
+                        type: "containerBreakpoint",
+                        until: "md",
+                        container: "card",
+                    } as never,
+                    px(2),
+                    px(1),
+                ),
+            } as StyleMap,
+            { breakpoints: { md: px(768) } },
+        );
+        expect(rules).toEqual([
+            { when: [], specificity: 0, style: { width: 5, height: 1 } },
+            { when: ["container>=600"], specificity: 0, style: { width: 10 } },
+            {
+                when: ["container@card<768"],
+                specificity: 0,
+                style: { height: 2 },
+            },
+        ]);
+    });
+
+    it("hold by the widths selection gets, and not without one", () => {
+        const { components } = lowerRn(
+            configWith({
+                width: when(
+                    { type: "containerSize", min: px(600) } as never,
+                    px(10),
+                    px(5),
+                ),
+                height: when(
+                    {
+                        type: "containerSize",
+                        max: px(300),
+                        container: "card",
+                    } as never,
+                    px(2),
+                    px(1),
+                ),
+            } as StyleMap),
+        );
+        const box = (containers?: Record<string, number>) =>
+            select(components.box!, {}, containers ? { containers } : {})[""];
+        expect(box()).toMatchObject({ width: 5, height: 1 });
+        expect(box({ "": 700 })).toMatchObject({ width: 10, height: 1 });
+        expect(box({ "": 200, card: 200 })).toMatchObject({
+            width: 5,
+            height: 2,
+        });
+    });
+});
+
 describe("lowerRn diagnostics", () => {
     it("drops what React Native can't do, and says so", () => {
         const { rules, diagnostics } = rulesOf({
             width: when(
-                { type: "containerSize", min: px(600) } as never,
+                {
+                    type: "rawCondition",
+                    by: { css: "@supports (x: y)" },
+                } as never,
                 px(10),
                 px(5),
             ),
@@ -478,7 +544,7 @@ describe("lowerRn diagnostics", () => {
         } as unknown as StyleMap);
         expect(rules).toEqual([]);
         expect(diagnostics).toEqual([
-            "box: width: no React Native equivalent for a containerSize condition",
+            "box: width: no React Native equivalent for a rawCondition condition",
             "box: backgroundImage: no conic gradients, even with SVG",
             'box: no React Native property for "gridTemplateColumns"',
         ]);

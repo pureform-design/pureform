@@ -237,7 +237,11 @@ overrides the primary color in either mode.
 - **Derived tokens:** building keeps the formula of each token that reads others, and an
   override recomputes those that read it, directly or through others.
 - **Viewport conditions** hold by the window's width, which the provider takes from
-  `useWindowDimensions`. Container queries are still reported.
+  `useWindowDimensions`.
+- **Container conditions** lower to bounds on the nearest container's width, or a named
+  one's, and hold by the widths of the `PureformContainer`s around a component, which measure
+  themselves. A component first renders without them, and again once its container is laid
+  out. `containerType` and `containerName` drop, since the component plays their part.
 - **Every component but the ripple** passes parity, and the demo shows them all. A sum of a
   percentage and pixels, as the slider positions its handle, puts the pixels on the inset's
   margin. Percentages are reported where React Native takes none.
@@ -274,7 +278,7 @@ overrides the primary color in either mode.
   without the Worklets Babel plugin, given React Native's `__DEV__`. Ripples stay on Animated.
 - **Slow motion:** the provider's `timeScale` stretches every transition, animation, morph,
   and ripple the hooks return, for watching motion by eye.
-- **Not yet:** container queries, and running on a device.
+- **Not yet:** running on a device.
 
 ## State transitions
 

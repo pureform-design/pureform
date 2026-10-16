@@ -1,8 +1,16 @@
 // React bindings: a provider holding the styles, the scheme, the named theme, and runtime
 // overrides, and a hook returning a component's styles for its variants and state.
 
-import { createContext, createElement, useContext, useMemo } from "react";
+import {
+    createContext,
+    createElement,
+    useContext,
+    useMemo,
+    useState,
+} from "react";
 import type { ReactNode } from "react";
+import { View } from "react-native";
+import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { overridesFor, stylesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Resolved, Styles } from "./resolve";
@@ -121,6 +129,51 @@ const slowed = (selected: Selected, by: number): Selected => {
     };
 };
 
+// The widths of the containers around a component: the nearest under "", and named ones by
+// name.
+const ContainerContext = createContext<Record<string, number>>({});
+
+export interface PureformContainerProps extends ViewProps {
+    /** The container's name, for conditions on a named container. It's still the nearest
+     *  container for conditions that name none. */
+    name?: string;
+    style?: StyleProp<ViewStyle>;
+    children?: ReactNode;
+}
+
+/** A view whose width container conditions inside it hold by, as CSS's `container-type:
+ *  inline-size` does. It measures itself, so what's inside first renders without its width,
+ *  and again once it's laid out. */
+export const PureformContainer = ({
+    name,
+    children,
+    onLayout,
+    ...props
+}: PureformContainerProps) => {
+    const outer = useContext(ContainerContext);
+    const [width, setWidth] = useState<number>();
+    const widths = useMemo(
+        () =>
+            width === undefined
+                ? outer
+                : { ...outer, "": width, ...(name ? { [name]: width } : {}) },
+        [outer, width, name],
+    );
+    return createElement(
+        View,
+        {
+            ...props,
+            onLayout: (
+                event: Parameters<NonNullable<ViewProps["onLayout"]>>[0],
+            ) => {
+                setWidth(event.nativeEvent.layout.width);
+                onLayout?.(event);
+            },
+        },
+        createElement(ContainerContext.Provider, { value: widths }, children),
+    );
+};
+
 const useContextOrThrow = (hook: string): Context => {
     const context = useContext(PureformContext);
     if (!context) throw new Error(`${hook} needs a PureformProvider`);
@@ -145,6 +198,7 @@ export const useComponentState = (
     tokens?: ThemeValues,
 ): Selected => {
     const context = useContextOrThrow("useComponentStyles");
+    const containers = useContext(ContainerContext);
     const tokenKey = tokens ? JSON.stringify(tokens) : "";
     const own = useMemo(
         () =>
@@ -171,6 +225,7 @@ export const useComponentState = (
                     ...(context.width === undefined
                         ? {}
                         : { width: context.width }),
+                    containers,
                     ...state,
                 }),
                 context.timeScale,
@@ -183,6 +238,7 @@ export const useComponentState = (
             context.width,
             context.svg,
             context.timeScale,
+            containers,
             variantKey,
             stateKey,
         ],

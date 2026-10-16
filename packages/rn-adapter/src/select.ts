@@ -46,6 +46,10 @@ export interface State {
     scheme?: "light" | "dark";
     /** The window's width, for viewport conditions. Without it, none of them hold. */
     width?: number;
+    /** The widths of the containers around the component, for container conditions: the
+     *  nearest under `""`, and named ones by name. A condition on a container without a width
+     *  doesn't hold. */
+    containers?: Record<string, number>;
     /** Whether the app draws with SVG, for shapes and gradients. Without it, components take
      *  their rounded fallback and gradients drop. */
     svg?: boolean;
@@ -87,21 +91,20 @@ const activeStates = (state: State): Set<string> => {
     return active;
 };
 
-const WIDTH = /^width(>=|<=|<)(-?[\d.]+)$/;
+const BOUND = /^(width|container(?:@(.+?))?)(>=|<=|<)(-?[\d.]+)$/;
 
-// Whether a state holds: one of the component's, or a bound on the window's width.
-const holds = (
-    name: string,
-    active: Set<string>,
-    width: number | undefined,
-) => {
-    const bound = WIDTH.exec(name);
+// Whether a state holds: one of the component's, or a bound on the window's width or a
+// container's.
+const holds = (name: string, active: Set<string>, state: State) => {
+    const bound = BOUND.exec(name);
     if (!bound) return active.has(name);
+    const width =
+        bound[1] === "width" ? state.width : state.containers?.[bound[2] ?? ""];
     if (width === undefined) return false;
-    const n = Number(bound[2]);
-    return bound[1] === ">="
+    const n = Number(bound[4]);
+    return bound[3] === ">="
         ? width >= n
-        : bound[1] === "<="
+        : bound[3] === "<="
           ? width <= n
           : width < n;
 };
@@ -241,7 +244,7 @@ export const selectWithTransitions = (
                 continue;
             const list = bySlot.get(entry.slot) ?? [];
             for (const rule of entry.rules) {
-                if (rule.when.every((s) => holds(s, active, state.width)))
+                if (rule.when.every((s) => holds(s, active, state)))
                     list.push(rule);
             }
             bySlot.set(entry.slot, list);

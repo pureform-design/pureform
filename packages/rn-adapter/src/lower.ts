@@ -127,7 +127,9 @@ const conditionStates = (
     }
     if (
         condition.type === "viewportSize" ||
-        condition.type === "viewportBreakpoint"
+        condition.type === "viewportBreakpoint" ||
+        condition.type === "containerSize" ||
+        condition.type === "containerBreakpoint"
     ) {
         const px = (node: NumericScalarNode | undefined) => {
             if (!node) return undefined;
@@ -144,19 +146,29 @@ const conditionStates = (
             if (!node) throw new Unsupported(`no breakpoint named "${name}"`);
             return px(node);
         };
-        // Media queries add no specificity in CSS: a later rule wins, as cases follow the base.
+        // The window's width, or a container's: the nearest, or one by its name.
+        const of =
+            condition.type === "containerSize" ||
+            condition.type === "containerBreakpoint"
+                ? condition.container
+                    ? `container@${condition.container}`
+                    : "container"
+                : "width";
+        // Media and container queries add no specificity in CSS: a later rule wins, as cases
+        // follow the base.
         const when =
-            condition.type === "viewportSize"
+            condition.type === "viewportSize" ||
+            condition.type === "containerSize"
                 ? [
-                      ...(condition.min ? [`width>=${px(condition.min)}`] : []),
-                      ...(condition.max ? [`width<=${px(condition.max)}`] : []),
+                      ...(condition.min ? [`${of}>=${px(condition.min)}`] : []),
+                      ...(condition.max ? [`${of}<=${px(condition.max)}`] : []),
                   ]
                 : [
                       ...(condition.from
-                          ? [`width>=${breakpoint(condition.from)}`]
+                          ? [`${of}>=${breakpoint(condition.from)}`]
                           : []),
                       ...(condition.until
-                          ? [`width<${breakpoint(condition.until)}`]
+                          ? [`${of}<${breakpoint(condition.until)}`]
                           : []),
                   ];
         return { when, specificity: 0 };
