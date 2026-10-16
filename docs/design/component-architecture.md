@@ -1048,18 +1048,18 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
 (`cog.toml`) as today:
 
 - **The core train, in lockstep.** Every package that shares the AST format, the
-  generated glue, or the factory types carries one version and is bumped together from the
-  global tag: `core`, `theme`, `material`, `preset`, `css-lowering`, every `*-adapter`,
-  `js-effects`, `utils`, `type-utils`, `styling`, `anatomy`, `machines`, `generate`,
-  `bundler`, and `cli`. Users never match these by hand, and a mismatch between them is
+  generated glue, or the factory types carries one version and is bumped together as one
+  cocogitto package, `core-train` (tag `core-train-vX`): `core`, `theme`, `material`,
+  `preset`, `css-lowering`, every `*-adapter`, `js-effects`, `utils`, `type-utils`,
+  `styling`, `anatomy`, `machines`, `generate`, `bundler`, and `cli`. Users never match these by hand, and a mismatch between them is
   what breaks builds.
 - **Bindings, independent.** `@pureform/solid`, `@pureform/react`, and
   `@pureform/react-native` follow their framework's pace and their own fixes, with their
   own package tags. Each declares the core train it works with as a peer range
   (`"@pureform/styling": "^0.4"`), and a train release that breaks them bumps that range
   in a binding release.
-- **Tooling** (`tsconfig`, `vite-config`, `vitest-config`, the oxlint and oxfmt configs) is
-  internal and keeps its own versions; it isn't part of either group.
+- **Tooling** (`tsconfig`, `vite-config`, `vitest-config`, the oxlint and oxfmt configs,
+  `release`) is internal and keeps its own versions; it isn't part of either group.
 - **Before 1.0:** a breaking change bumps the minor and everything else the patch, so
   `^0.y` only takes compatible releases.
 - **Framework peers:** while Solid 2 is a release candidate, `@pureform/solid` peers on
@@ -1072,10 +1072,13 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
     - Runtime, in development: the generated glue records the train's version, and each
       binding warns once if the runtime `@pureform/styling` differs from it, which means
       the glue is stale or two copies are installed. Production skips the check.
-- **Changes to `cog.toml`:** the train's packages move from per-package tags to the
-  global tag (its bump hook sets every train package's version), bindings keep package
-  tags, and packages missing from `cog.toml` today (`theme`, `material`, `utils`,
-  `js-effects`, `type-utils`) join the train.
+- **`cog.toml`:** the train is one package, `core-train`, whose `include` lists every train
+  package's directory; a commit touching any of them bumps the whole train, and its bump
+  hook (`@pureform/release`) sets every train package's version in `package.json` and
+  `bun.lock`. Bindings and tooling keep their own package tags; apps and tests aren't in
+  `cog.toml`. There is no global tag: cocogitto skips the global bump when no package
+  bumps, so a train-only change would never release, and the global tag also counts commits
+  to apps, tests, and docs.
 
 ## 12. Migration from what exists
 
