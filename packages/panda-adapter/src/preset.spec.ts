@@ -2,6 +2,7 @@ import { defineComponent } from "@pureform/core";
 import {
     alias,
     cubicBezier,
+    dynamic,
     fontFamily,
     hex,
     numeric,
@@ -243,6 +244,31 @@ describe("compilePreset (theme component tokens)", () => {
         );
         expect(obj(preset.globalCss)["[data-panda-theme=brand]"]).toEqual({
             "--pf-components-button-radius": "2px",
+        });
+    });
+});
+
+describe("compilePreset (typed component tokens)", () => {
+    it("registers them as global vars, so they transition", () => {
+        const meter = defineComponent({
+            name: "meter",
+            tokens: {
+                value: dynamic(
+                    ["components", "meter", "value"],
+                    numeric(0, "none"),
+                    "number",
+                ),
+            },
+            recipe: { base: {} },
+        });
+        const preset = compilePreset({
+            ...buttonConfig,
+            components: { ...buttonConfig.components, meter },
+        }) as unknown as { globalVars: Record<string, unknown> };
+        expect(preset.globalVars["--components-meter-value"]).toEqual({
+            syntax: "<number>",
+            inherits: true,
+            initialValue: "0",
         });
     });
 });

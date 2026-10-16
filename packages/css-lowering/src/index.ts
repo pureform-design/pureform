@@ -3,7 +3,13 @@
 export { compileNodeToCSS } from "./compile-node";
 export { compileConditional, compileValue, conditionKey } from "./conditions";
 export type { CondObject } from "./conditions";
-export { componentTokenVars, slotAncestors, usesColorScheme } from "./config";
+export {
+    componentTokenVars,
+    registeredProperties,
+    slotAncestors,
+    usesColorScheme,
+} from "./config";
+export type { RegisteredProperty } from "./config";
 export type { LowerCtx, VarPrefix } from "./context";
 export {
     KEYWORD_CSS,

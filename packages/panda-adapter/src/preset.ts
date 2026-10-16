@@ -4,7 +4,11 @@ import type { Preset } from "@pandacss/types";
 import { validateConfig } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
-import { componentTokenVars, usesColorScheme } from "@pureform/css-lowering";
+import {
+    componentTokenVars,
+    registeredProperties,
+    usesColorScheme,
+} from "@pureform/css-lowering";
 
 import { pandaContext, tokenCurly } from "./options";
 import type { CompileCtx, CompileOptions } from "./options";
@@ -140,6 +144,18 @@ export const compilePreset = (
                 ...themeComponentVars(config, ctx),
             };
             return Object.keys(css).length > 0 ? css : undefined;
+        })(),
+        // Typed component tokens, registered so they transition.
+        globalVars: (() => {
+            const vars = registeredProperties(config, ctx);
+            return vars.length > 0
+                ? Object.fromEntries(
+                      vars.map(({ name, syntax, initialValue }) => [
+                          name,
+                          { syntax, inherits: true, initialValue },
+                      ]),
+                  )
+                : undefined;
         })(),
         utilities: compileUtilities(ctx),
         themes,
