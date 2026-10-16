@@ -119,6 +119,13 @@ include = [
 ]
 public_api = true
 
+[monorepo.packages."@pureform/styling"]
+path = "packages/styling"
+include = [
+    "packages/styling/**",
+]
+public_api = false
+
 #@anchor:new-typescript-package
 
 [monorepo.packages.root]

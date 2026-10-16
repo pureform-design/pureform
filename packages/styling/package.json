@@ -1,0 +1,43 @@
+{
+    "name": "@pureform/styling",
+    "version": "0.0.0-semantically-released",
+    "description": "Framework- and target-free style registry: factory types, the registry, and selection caches",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./theme-vars": {
+            "types": "./dist/theme-vars.d.ts",
+            "import": {
+                "development": "./src/theme-vars.ts",
+                "default": "./dist/theme-vars.mjs"
+            },
+            "require": {
+                "development": "./src/theme-vars.ts",
+                "default": "./dist/theme-vars.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/core": "catalog:",
+        "@pureform/css-lowering": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}
