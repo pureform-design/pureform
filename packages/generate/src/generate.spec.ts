@@ -601,5 +601,24 @@ describe("generate", () => {
             });
             expect(included.hints).toEqual([]);
         });
+
+        it("reads the tsconfigs a tsconfig extends by a relative path", async () => {
+            const root = tempRoot();
+            writeTree(root, {
+                "tsconfig.json": `{\n    // comments are fine\n    "extends": ["@pureform/tsconfig/base.json", "./tsconfig.project.json"]\n}\n`,
+                "tsconfig.project.json": {
+                    extends: "./tsconfig.include",
+                },
+                "tsconfig.include.json": {
+                    include: ["src", ".pureform/**/*.*"],
+                },
+            });
+            const result = await generate({
+                root,
+                config: fixtureConfig(),
+                target: fakeAdapter(),
+            });
+            expect(result.hints).toEqual([]);
+        });
     });
 });

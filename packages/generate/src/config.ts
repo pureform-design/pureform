@@ -55,10 +55,13 @@ export const loadConfig = async (
             formatImportViolations(imports.violations, options.root),
         );
     }
+    // jiti transforms the config itself under every runtime (it imports natively under Bun by
+    // default): the hash reads functions' source, which must not depend on who ran the build.
     const jiti = createJiti(pathToFileURL(file).href, {
         moduleCache: false,
         fsCache: false,
         interopDefault: false,
+        tryNative: false,
     });
     let loaded: unknown;
     try {
