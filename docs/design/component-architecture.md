@@ -391,6 +391,36 @@ fails on any hydration warning or on any class, `style`, `data-*`, or `aria-*` a
 that differs between the server's HTML and the hydrated DOM. It runs for each web target
 and in both color schemes, plus once with a runtime theme.
 
+### 5.8 Reduced motion
+
+Today the web follows `prefers-reduced-motion` in CSS, and the ripple checks it in JS;
+React Native only follows a `reducedMotion` prop on its provider, which defaults to off.
+The design makes one setting, followed by everything that moves, on every target:
+
+- **One setting, the system's by default.** `PureformProvider` takes
+  `motion="system" | "reduce" | "full"`, defaulting to `"system"`, so an app can offer
+  its own switch and nest it like a theme.
+    - Web: the stylesheet's `reducedMotion` condition becomes
+      `@media (prefers-reduced-motion: reduce)` on `:not([data-pf-motion="full"])`, or
+      `[data-pf-motion="reduce"]` on an ancestor, the same pattern as `.light`/`.dark`
+      (§5.7). The provider writes the attribute only when it isn't `"system"`.
+    - React Native: `"system"` reads `AccessibilityInfo.isReduceMotionEnabled()` and
+      follows its `reduceMotionChanged` event; the existing prop maps to `"reduce"`/`"full"`.
+- **One hook for JS motion.** `useReducedMotion()` in each binding combines the provider's
+  setting with the media query (web) or the OS (native). The ripple, Animated token tweens,
+  and our own machines read it; nothing calls `matchMedia` on its own.
+- **What reduces.** Movement stops: transitions, morphs, ripples, and token tweens such as
+  a progress value apply at once. Kept: indeterminate progress, since its motion is the
+  only sign that work is going on (Material keeps it), and Zag's enter and exit
+  animations, which need no change, because Zag's presence logic finishes at once when no
+  animation runs.
+- **Server rendering.** The web rule is CSS, so the first paint is right. JS motion runs
+  only after an interaction, so the hook can start from the provider's setting on the
+  server and pick up the system value after mount without a mismatch.
+- **Testing.** Browser-mode tests emulate `prefers-reduced-motion` and set each
+  `data-pf-motion` value, checking computed `transition` is `none` and that a ripple and a
+  token tween don't run; React Native tests mock `AccessibilityInfo`.
+
 ## 6. Generated glue
 
 `pureform generate` (also run by the bundler plugin in dev and build) writes the factory
@@ -653,8 +683,7 @@ Deferred until there's demand:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **Not yet covered:** `prefers-reduced-motion`, including token tweens on React Native;
-   direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
+3. **Not yet covered:** direction (`dir`) for Zag and RTL; the icon slot contract; whether `.pureform/` is
    committed and how stale glue is detected; and how packages are versioned together.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
