@@ -1,5 +1,8 @@
 // The pureform button: Material's common button in five fills and seven color groups.
 //
+// Each color group points the button's group tokens at its roles, and each fill reads them, so
+// every pairing of fill and group comes from two rules rather than one of its own.
+//
 // The icon slot is styled but never toggled by a variant. Render the icon element only when
 // there is one; the root's gap spaces it from the label.
 
@@ -11,8 +14,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import {
     DEFAULT_GROUP,
-    colorCompounds,
-    colorVariants,
+    colorTokenVariants,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -20,7 +22,9 @@ import {
     densityCompounds,
     densityMarkers,
     densitySteps,
+    fillTokenColors,
     fillVariant,
+    groupTokens,
     iconBox,
     keysOf,
     lower,
@@ -51,6 +55,7 @@ const { tokens } = componentTokens("button", {
     paddingSmall: spacing("4"),
     paddingMedium: spacing("6"),
     paddingLarge: spacing("8"),
+    ...groupTokens(DEFAULT_GROUP),
 });
 
 type Size = "Small" | "Medium" | "Large";
@@ -102,12 +107,28 @@ export const createButton = <
                         touchTarget,
                     },
                     variants: {
-                        color: colorVariants(groups),
+                        color: colorTokenVariants(groups),
                         variant: Object.fromEntries(
-                            Object.entries(FILLS).map(([name, fill]) => [
-                                name,
-                                fillVariant(fill, token),
-                            ]),
+                            Object.entries(FILLS).map(([name, fill]) => {
+                                const { root } = fillVariant(fill, token);
+                                const colors = fillTokenColors(fill, token);
+                                return [
+                                    name,
+                                    {
+                                        root: {
+                                            ...root,
+                                            ...colors,
+                                            states: {
+                                                ...root.states,
+                                                disabled: {
+                                                    ...root.states?.disabled,
+                                                    ...colors.states?.disabled,
+                                                },
+                                            },
+                                        },
+                                    },
+                                ];
+                            }),
                         ),
                         size: {
                             small: size("Small"),
@@ -116,23 +137,17 @@ export const createButton = <
                         },
                         density: densityMarkers(densities),
                     },
-                    compoundVariants: [
-                        ...colorCompounds(FILLS, groups),
-                        ...SIZES.flatMap((s) =>
-                            densityCompounds(
-                                densities,
-                                { size: lower(s) },
-                                (offset) => ({
-                                    root: {
-                                        height: add(
-                                            token(`height${s}`),
-                                            offset,
-                                        ),
-                                    },
-                                }),
-                            ),
+                    compoundVariants: SIZES.flatMap((s) =>
+                        densityCompounds(
+                            densities,
+                            { size: lower(s) },
+                            (offset) => ({
+                                root: {
+                                    height: add(token(`height${s}`), offset),
+                                },
+                            }),
                         ),
-                    ],
+                    ),
                     defaultVariants: {
                         color: "primary",
                         variant: "filled",

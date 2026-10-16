@@ -55,713 +55,6 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
   "className": "button",
   "compoundVariants": [
     {
-      "color": "primary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.primary), token(colors.onPrimary) token(opacity.stateHover))",
-            "base": "token(colors.primary)",
-          },
-          "color": "token(colors.onPrimary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.secondary), token(colors.onSecondary) token(opacity.stateHover))",
-            "base": "token(colors.secondary)",
-          },
-          "color": "token(colors.onSecondary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.tertiary), token(colors.onTertiary) token(opacity.stateHover))",
-            "base": "token(colors.tertiary)",
-          },
-          "color": "token(colors.onTertiary)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.success), token(colors.onSuccess) token(opacity.stateHover))",
-            "base": "token(colors.success)",
-          },
-          "color": "token(colors.onSuccess)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.warning), token(colors.onWarning) token(opacity.stateHover))",
-            "base": "token(colors.warning)",
-          },
-          "color": "token(colors.onWarning)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.error), token(colors.onError) token(opacity.stateHover))",
-            "base": "token(colors.error)",
-          },
-          "color": "token(colors.onError)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.info), token(colors.onInfo) token(opacity.stateHover))",
-            "base": "token(colors.info)",
-          },
-          "color": "token(colors.onInfo)",
-        },
-      },
-      "variant": "filled",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.primaryContainer), token(colors.onPrimaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.primaryContainer)",
-          },
-          "color": "token(colors.onPrimaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.secondaryContainer)",
-          },
-          "color": "token(colors.onSecondaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) token(opacity.stateHover))",
-            "base": "token(colors.tertiaryContainer)",
-          },
-          "color": "token(colors.onTertiaryContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) token(opacity.stateHover))",
-            "base": "token(colors.successContainer)",
-          },
-          "color": "token(colors.onSuccessContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) token(opacity.stateHover))",
-            "base": "token(colors.warningContainer)",
-          },
-          "color": "token(colors.onWarningContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) token(opacity.stateHover))",
-            "base": "token(colors.errorContainer)",
-          },
-          "color": "token(colors.onErrorContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) token(opacity.stateHover))",
-            "base": "token(colors.infoContainer)",
-          },
-          "color": "token(colors.onInfoContainer)",
-        },
-      },
-      "variant": "tonal",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.primary)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.secondary)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.tertiary)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.success)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.warning)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.error)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.info)",
-        },
-      },
-      "variant": "outlined",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.primary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.primary)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.secondary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.secondary)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.tertiary) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.tertiary)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.success) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.success) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.success)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.warning) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.warning)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.error) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.error) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.error)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "transparent",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, transparent, token(colors.info) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, transparent, token(colors.info) token(opacity.stateHover))",
-            "base": "transparent",
-          },
-          "color": "token(colors.info)",
-        },
-      },
-      "variant": "text",
-    },
-    {
-      "color": "primary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.primary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.primary)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "secondary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.secondary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.secondary)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "tertiary",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.tertiary) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.tertiary)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "success",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.success) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.success)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "warning",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.warning) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.warning)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "error",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.error) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.error)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
-      "color": "info",
-      "css": {
-        "root": {
-          "_disabled": {
-            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
-          },
-          "backgroundColor": {
-            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateDragged))",
-            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.statePressed))",
-            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateFocus))",
-            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), token(colors.info) token(opacity.stateHover))",
-            "base": "token(colors.surfaceContainerLow)",
-          },
-          "color": "token(colors.info)",
-        },
-      },
-      "variant": "elevated",
-    },
-    {
       "css": {
         "root": {
           "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + 0px)",
@@ -888,25 +181,55 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
   "variants": {
     "color": {
       "error": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.error)",
+          "--components-button-accentContainer": "token(colors.errorContainer)",
+          "--components-button-onAccent": "token(colors.onError)",
+          "--components-button-onAccentContainer": "token(colors.onErrorContainer)",
+        },
       },
       "info": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.info)",
+          "--components-button-accentContainer": "token(colors.infoContainer)",
+          "--components-button-onAccent": "token(colors.onInfo)",
+          "--components-button-onAccentContainer": "token(colors.onInfoContainer)",
+        },
       },
       "primary": {
         "root": {},
       },
       "secondary": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.secondary)",
+          "--components-button-accentContainer": "token(colors.secondaryContainer)",
+          "--components-button-onAccent": "token(colors.onSecondary)",
+          "--components-button-onAccentContainer": "token(colors.onSecondaryContainer)",
+        },
       },
       "success": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.success)",
+          "--components-button-accentContainer": "token(colors.successContainer)",
+          "--components-button-onAccent": "token(colors.onSuccess)",
+          "--components-button-onAccentContainer": "token(colors.onSuccessContainer)",
+        },
       },
       "tertiary": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.tertiary)",
+          "--components-button-accentContainer": "token(colors.tertiaryContainer)",
+          "--components-button-onAccent": "token(colors.onTertiary)",
+          "--components-button-onAccentContainer": "token(colors.onTertiaryContainer)",
+        },
       },
       "warning": {
-        "root": {},
+        "root": {
+          "--components-button-accent": "token(colors.warning)",
+          "--components-button-accentContainer": "token(colors.warningContainer)",
+          "--components-button-onAccent": "token(colors.onWarning)",
+          "--components-button-onAccentContainer": "token(colors.onWarningContainer)",
+        },
       },
     },
     "density": {
@@ -943,46 +266,99 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "elevated": {
         "root": {
           "_disabled": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
           "_hover": {
             "shadowElevation": "level2",
           },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "base": "token(colors.surfaceContainerLow)",
+          },
+          "color": "var(--components-button-accent, token(colors.primary))",
           "shadowElevation": "level1",
         },
       },
       "filled": {
         "root": {
           "_disabled": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
           "_hover": {
             "shadowElevation": "level1",
           },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+            "base": "var(--components-button-accent, token(colors.primary))",
+          },
+          "color": "var(--components-button-onAccent, token(colors.onPrimary))",
           "shadowElevation": "level0",
         },
       },
       "outlined": {
         "root": {
-          "_disabled": {},
+          "_disabled": {
+            "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "base": "transparent",
+          },
           "borderColor": "var(--components-button-outlineColor, token(colors.outline))",
           "borderStyle": "solid",
           "borderWidth": "var(--components-button-outlineWidth, 1px)",
+          "color": "var(--components-button-accent, token(colors.primary))",
         },
       },
       "text": {
         "root": {
-          "_disabled": {},
+          "_disabled": {
+            "backgroundColor": "transparent",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) token(opacity.stateHover))",
+            "base": "transparent",
+          },
+          "color": "var(--components-button-accent, token(colors.primary))",
         },
       },
       "tonal": {
         "root": {
           "_disabled": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             "shadowElevation": "level0",
           },
           "_hover": {
             "shadowElevation": "level1",
           },
+          "backgroundColor": {
+            "&[data-dragging][data-dragging]": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateDragged))",
+            "_active": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+            "_focusVisible": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
+            "_hover": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+            "base": "var(--components-button-accentContainer, token(colors.primaryContainer))",
+          },
+          "color": "var(--components-button-onAccentContainer, token(colors.onPrimaryContainer))",
           "shadowElevation": "level0",
         },
       },
