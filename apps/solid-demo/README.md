@@ -39,6 +39,23 @@ if (entry.kind === "static") {
 `tests/browser-e2e-tests` checks the factories against Panda's output
 (`panda-factories.e2e.test.ts`).
 
+### The components page
+
+`/components` (`src/routes/components.tsx`) renders `@pureform/solid`'s button and checkbox in
+`PureformProvider` with the registry above: every button variant, sizes with icons, colors, a
+mirrored icon, a toggle, a composed button, every checkbox state, an indeterminate parent over
+three children, a form that submits and resets (with a checkbox in a disabled fieldset), and a
+switch between left to right and right to left. It renders on the server and hydrates, like the
+rest of the app. `apps/react-demo` is the same page in React.
+
+`vite.config.ts` keeps `@pureform/*` in the server bundle (`ssr.noExternal`): `@pureform/solid`
+ships JSX for the app's Solid plugin to compile, and in development the workspace packages
+resolve to TypeScript sources Node can't load. An app using `@pureform/solid` with server
+rendering needs the same for `@pureform/solid`.
+
+The cross-cutting rules (state, forms, accessibility, keyboard, direction, server rendering) are
+checked against Solid and React by `tests/component-suites`.
+
 ## Who owns what
 
 - **Solid + the plugin** own the RPC (`'use server'` functions compiled to typed fetches), the single-flight envelope, serialization, the turnkey entries, `src/Document.tsx`, sessions, and typed env.

@@ -52,6 +52,12 @@ export default defineConfig({
     resolve: {
         tsconfigPaths: true,
     },
+    ssr: {
+        // pureform's packages go through Vite on the server too: `@pureform/solid` ships JSX
+        // for the app's Solid plugin to compile, and in development every workspace package
+        // resolves to its TypeScript sources, which Node can't load.
+        noExternal: [/^@pureform\//],
+    },
     server: {
         port: 3000,
     },

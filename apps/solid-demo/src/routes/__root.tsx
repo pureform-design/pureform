@@ -20,6 +20,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
                 <Link to="/">Home</Link>
                 <Link to="/tokens">Tokens</Link>
                 <Link to="/providers">Providers</Link>
+                <Link to="/components">Components</Link>
             </nav>
             <Outlet />
         </>
