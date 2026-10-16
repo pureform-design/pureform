@@ -68,7 +68,12 @@ STATE_ATTRIBUTES.hover; //   "data-pf-hover"    hover driven by another element
 STATE_ATTRIBUTES.pressed; // "data-pf-active"   a press :active misses (keyboard)
 STATE_ATTRIBUTES.dragged; // "data-pf-dragging"
 STATE_ATTRIBUTES.filled; //  "data-pf-filled"   a value outside a text input
+STATE_ATTRIBUTES.mirrored; // "data-pf-mirror"  an icon that points, flipped under rtl
 ```
+
+`mirrored` isn't a state the user changes but a marking: the `mirrored` condition (one of
+the portable conditions, beside `rtl`) holds on an element that should flip with the writing
+direction. The web matches `data-pf-mirror`; React Native reads the `mirrored` state.
 
 A binding sets exactly these; a behavior library's own attributes (Zag's `data-state`,
 `data-hover`, …) are never matched. See the design doc's
@@ -90,6 +95,20 @@ transitionMoves("backgroundColor"); // false
 transitionMoves("insetInlineStart"); // true
 MOTION_ATTRIBUTE; // "data-pf-motion", set to "reduce" or "full" by a provider
 ```
+
+### Variable fonts
+
+`fontVariationSettings` takes `fontVariations({ AXIS: value })`, a variable font's axes by
+four-letter tag. Icon fonts use it for Material Symbols' fill:
+
+```ts
+import { fontVariations, unitless } from "@pureform/core/ast";
+
+fontVariations({ FILL: unitless(1) }); // web: "FILL" 1
+```
+
+The web writes it as `font-variation-settings`; React Native has no variable font axes and
+drops it.
 
 ## Build and test
 

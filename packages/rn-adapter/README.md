@@ -87,6 +87,17 @@ from the other side, and the indeterminate linear progress runs `linearProgressS
 (`src/direction.spec.ts`). Nothing sets `rtl` for you yet: the provider's `dir`, defaulting to
 `I18nManager.isRTL`, is planned for `@pureform/react-native` (roadmap p8).
 
+An icon that points flips under `rtl` when it's marked: pass `{ rtl: true, mirrored: true }`
+and the icon slot gets `transform: [{ scaleX: -1 }]` (after its own transform, such as a field
+icon's centering). The state is the component's, so a component with two icons resolves the
+marked one separately; the icon part doing that is planned for p8.
+
+## Icon fonts
+
+React Native has no variable font axes: `fontVariationSettings` (Material Symbols' `FILL`,
+which the web reads) drops without a diagnostic. An app that swaps a filled icon in needs the
+fill another way; `useIconStyle()` returning `filled` is planned for p8.
+
 ## Build and test
 
 Through the omni MCP (or `omni run`):

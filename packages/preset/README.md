@@ -79,6 +79,30 @@ ripple, placed from pointer coordinates. To allow a new exception, add an entry 
 The native input of the checkbox, radio, switch, and slider resets its margins, since the
 browser's defaults are physical and would shift it off the control.
 
+An icon that points (a back arrow, a chevron) flips under `rtl` when marked with
+`data-pf-mirror` (`STATE_ATTRIBUTES.mirrored`): every icon slot and the standalone `icon` take
+`scaleX(-1)` then, after their own transform. Most icons don't point; leave them unmarked.
+
+## Icons
+
+pureform ships no icons. An icon slot (`iconBox` in `components/shared.ts`) sizes its content
+with `width`, `height`, and `font-size`, and the component sets its color, so an svg with
+`width="1em" height="1em" fill="currentColor"` or an icon font fits.
+
+For icon fonts such as Material Symbols, every icon slot also sets the `FILL` axis,
+`font-variation-settings: "FILL" <fill>`, from its component's `iconFill` token (`0` by
+default; `--components-<name>-icon-fill` restyles it at runtime). The states Material draws
+filled switch to a second token:
+
+| Component                         | State                                        | Token              |
+| --------------------------------- | -------------------------------------------- | ------------------ |
+| `navigationBar`, `navigationRail` | the current destination (`aria-current`)     | `activeIconFill`   |
+| `iconButton`                      | selected (`aria-pressed="true"` on a toggle) | `selectedIconFill` |
+
+`font-variation-settings` is one property, so the slot's `FILL` replaces axes an app sets on an
+ancestor; set other axes (`wght`, `opsz`) on the icon element itself. An svg ignores the axis.
+React Native drops it (it has no variable font axes).
+
 ## Density
 
 Density makes controls more compact (or roomier), a grid unit off a component's height per
@@ -147,7 +171,18 @@ target first, and render the icon slot only when there is an icon.
 - `button`: `variant` is `filled`, `tonal`, `outlined`, `text`, or `elevated`; `size` is
   `small`, `medium`, or `large`.
 - `iconButton`: `variant` is `standard`, `filled`, `tonal`, `outlined`, or `elevated`. Give it
-  an `aria-label`.
+  an `aria-label`. For a toggle icon button, set `toggle: "true"` and `aria-pressed`: it rests
+  in Material's unselected colors and takes the selected ones, with its icon filled, while
+  `aria-pressed="true"`.
+
+| `variant`  | Unselected                                    | Selected                                         |
+| ---------- | --------------------------------------------- | ------------------------------------------------ |
+| `standard` | `onSurfaceVariant` icon, no container         | the group's color for the icon                   |
+| `filled`   | `surfaceContainerHighest`, group color        | the group's color, `on` color (as untoggled)     |
+| `tonal`    | `surfaceContainerHighest`, `onSurfaceVariant` | the group's container colors (as untoggled)      |
+| `outlined` | outline, `onSurfaceVariant` icon              | `inverseSurface`, `inverseOnSurface`, no outline |
+| `elevated` | as untoggled                                  | the group's color, `on` color                    |
+
 - `fab`: `variant` is `tonal`, `filled`, or `surface`; `size` is `small`, `medium`, or
   `large`. Set `extended` and render the label for an extended FAB.
 
@@ -422,7 +457,7 @@ focus ring on the whole bar.
 
 `navigationBar` (bottom, destinations side by side) and `navigationRail` (a narrow column)
 share their markup. Mark the current destination with `aria-current="page"`; `color` fills its
-pill with a group's container.
+pill with a group's container, and an icon font draws its icon filled.
 
 ```html
 <nav class="{root}">
@@ -539,7 +574,8 @@ number from 0 to 100 (prefixed like every var, for example `--components-slider-
 - `supportingText`: helper text beside any control. `tone` is `neutral`, `error`, or a color
   group; it doesn't detect errors, so set `tone` yourself.
 - `icon`: centers a glyph, icon-font icon, or svg. `size` is `small`, `medium`, or `large`;
-  `color` is `current` or a color group.
+  `color` is `current` or a color group; `filled` is `inherit` (follow the icon slot it sits
+  in), `false`, or `true`.
 - `touchTarget`: grows a small custom control's hit area to the minimum. Put it inside a
   positioned element.
 - `ripple`: the layer `@pureform/js-effects` draws its ripple into.

@@ -624,7 +624,8 @@ What's missing is one source of direction for JS, and a few styles that don't fl
       coordinates, which are physical anyway.
 - **Icons that point.** The icon slot takes `mirror`, which sets `data-pf-mirror` and
   flips the icon with `scaleX(-1)` under `rtl`. Back arrows and chevrons set it; most icons
-  don't. The icon slot contract decides the rest.
+  don't. The icon slot contract decides the rest. Built as the portable `mirrored`
+  condition (`STATE_ATTRIBUTES.mirrored`), which every icon slot reads under `rtl`.
 - **Guarded by a test.** A preset spec fails on a physical horizontal property
   (`left`, `right`, `marginLeft`, `translateX`, …) unless it's symmetric or under a
   direction condition.
@@ -841,7 +842,7 @@ component), Zag's shape, identical in Solid and React:
     | Prop       | Components                                                                                                                  |
     | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
     | `checked`  | checkbox (`boolean \| "indeterminate"`), switch                                                                             |
-    | `selected` | chip, toggle icon button (needs a `selected` state in the preset)                                                           |
+    | `selected` | chip, toggle icon button (`toggle: "true"` and `aria-pressed`)                                                              |
     | `value`    | text field, text area, select, slider, radio group, tabs, navigation bar and rail, segmented button (not in the preset yet) |
     | `open`     | menu, dialog, tooltip, select                                                                                               |
 
@@ -943,6 +944,24 @@ icon only has to follow them.
   (`leadingIcon: "true"` on the fields, `icon: "true"` on tabs), which the remaining
   compounds read (§5.5).
 - **Direction:** `mirror` flips an icon that points under `rtl` (§5.9).
+- **Decided in building it:**
+    - The fill token is each component's `iconFill` (`0`), read by every icon slot through
+      `iconBox` as `fontVariationSettings: fontVariations({ FILL: … })`, a new AST value
+      (`fontVariations`). Only root slots can set tokens, so a state doesn't set `iconFill`;
+      the icon slot switches to a second token while the state holds: `activeIconFill` on
+      the current navigation destination, `selectedIconFill` on a selected icon button, both
+      `1`. The standalone `icon` sets no fill unless `filled: "true" | "false"`, so it
+      follows the slot it sits in. React Native drops the property.
+    - `mirror` is an attribute, not a variant: a component can hold two icons and only one
+      points. The binding sets `data-pf-mirror` (web) or the `mirrored` state (React
+      Native) on the icon part; the `mirrored` condition matches it, and every icon slot
+      flips with `scaleX(-1)` under `rtl` after its own transform.
+    - A toggle icon button takes `toggle: "true"`: Material draws an unselected toggle
+      differently from a plain icon button, so the binding sets the variant whenever
+      `selected` or `defaultSelected` is given, and marks the state with `aria-pressed`. The
+      unselected and selected colors per fill follow Material's toggle icon buttons through
+      the color group's tokens; `elevated`, which Material doesn't toggle, selects to the
+      group's color.
 - **Accessibility.** Icons in a slot are decorative: `aria-hidden="true"`. The standalone
   `Icon` takes `label`, which makes it `role="img"` with that name. Icon-only components
   (icon button, FAB without text) require `aria-label` or `aria-labelledby` in their

@@ -18,7 +18,7 @@ runtime.ts: themeVars, a theme's custom properties at runtime
 
 | Module            | What it does                                                                   |
 | ----------------- | ------------------------------------------------------------------------------ |
-| `compile-node.ts` | One value node to a CSS value: units, colors, math, shapes, references.        |
+| `compile-node.ts` | One value node to a CSS value: units, colors, math, shapes, font axes, refs.   |
 | `conditions.ts`   | Conditions to selectors or at-rules, and conditional values to nested objects. |
 | `style-map.ts`    | A whole style map to a nested style object.                                    |
 | `css.ts`          | Var names, token references, keyword and color formatting.                     |
@@ -75,6 +75,7 @@ Conditions (`when("hover", …)`), on the styled element:
 | `invalid`          | `&:is(:invalid, [aria-invalid=true])`                                                       |
 | `disabled`         | `&:is(:disabled, [aria-disabled=true])`                                                     |
 | `readOnly`         | `&:is(:read-only, [aria-readonly=true])`                                                    |
+| `mirrored`         | `&[data-pf-mirror]` (a marking, not a state: an icon that flips under `rtl`)                |
 
 Slot states (`slot("root", "checked")`) match on the slot's element, or on an ancestor slot's
 class, and also through `:has()` for a control inside the slot. Each repeats its `:is()` to
