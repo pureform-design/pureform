@@ -5,6 +5,7 @@ import {
     observeIconStyle,
     readIconStyle,
     subscribeReducedMotion,
+    syncCheckedInput,
     systemReducedMotion,
 } from "./dom";
 import type { IconStyle } from "./icon-style";
@@ -91,5 +92,19 @@ describe("icon style", () => {
         root.removeAttribute("aria-pressed");
         await frame();
         expect(seen).toHaveLength(count);
+    });
+});
+
+describe("syncCheckedInput", () => {
+    it("puts the input's checked and indeterminate back to the machine's state", () => {
+        const input = document.createElement("input");
+        input.type = "checkbox";
+        input.checked = true;
+        syncCheckedInput(input, false);
+        expect(input.checked).toBe(false);
+        syncCheckedInput(input, "indeterminate");
+        expect([input.checked, input.indeterminate]).toEqual([false, true]);
+        syncCheckedInput(input, true);
+        expect([input.checked, input.indeterminate]).toEqual([true, false]);
     });
 });

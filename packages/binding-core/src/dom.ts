@@ -1,5 +1,6 @@
-// The DOM half: the system's reduced-motion preference and an icon slot's measured style. Only
-// call these in the browser, after mount; the root entry stays free of DOM use for React Native.
+// The DOM half: the system's reduced-motion preference, an icon slot's measured style, and a
+// native checkbox kept in step with its machine. Only call these in the browser, after mount; the
+// root entry stays free of DOM use for React Native.
 
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 import type { IconStyle } from "./icon-style";
@@ -82,4 +83,17 @@ export const observeIconStyle = (
         root.removeEventListener("transitionend", update);
         root.removeEventListener("transitioncancel", update);
     };
+};
+
+/** Puts a native checkbox back in step with its machine's state: after a click on a controlled
+ *  checkbox whose owner didn't take the change, the browser has toggled the input anyway. Call it
+ *  once the machine and the owner have handled the click. */
+export const syncCheckedInput = (
+    input: HTMLInputElement,
+    checked: boolean | "indeterminate",
+): void => {
+    const on = checked === true;
+    const mixed = checked === "indeterminate";
+    if (input.checked !== on) input.checked = on;
+    if (input.indeterminate !== mixed) input.indeterminate = mixed;
 };

@@ -5,6 +5,7 @@ import {
     forSlot,
     isIconPart,
     isUnstyled,
+    outsideRootMessage,
     partClasses,
     partSources,
     spreadableProps,
@@ -296,6 +297,14 @@ describe("selectionSignature", () => {
         expect(selectionSignature({ variant: "text" })).not.toBe(base);
         expect(selectionSignature({ toggle: true })).not.toBe(
             selectionSignature({ toggle: "true" }),
+        );
+    });
+});
+
+describe("outsideRootMessage", () => {
+    it("names the part and its Root", () => {
+        expect(outsideRootMessage("Button", "Label")).toMatch(
+            /^pureform: <Button.Label> must be inside <Button.Root>/,
         );
     });
 });

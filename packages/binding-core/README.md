@@ -4,7 +4,8 @@ The framework-free half of pureform's bindings. Everything `@pureform/solid` and
 `@pureform/react` (and later `@pureform/react-native`) would otherwise write twice lives here:
 what `PureformProvider` takes and how nested providers combine, selections over the provider's
 defaults, a part's state attributes and how its props merge, controllable state, reduced
-motion, and an icon slot's measured style.
+motion, an icon slot's measured style, and each component's contract: the props Root takes and
+how they map onto the selection and the machine.
 
 ## Where it sits
 
@@ -30,11 +31,12 @@ framework: context, memos, effects, and rendering.
 | `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                  |
 | `class-names.ts`  | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                               |
 | `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                               |
+| `components/`     | One file per component's contract (`button.ts`, `checkbox.ts`), and `VariantProp` (`variants.ts`)                       |
 | `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                          |
 | `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                       |
 | `version.ts`      | `trainVersionMismatch`, a stub until `@pureform/generate` records the train's version (p4a)                             |
 | `warn.ts`         | `warnOnce`                                                                                                              |
-| `dom.ts`          | The DOM half, on its own subpath: the system's reduced-motion preference, and measuring an icon slot                    |
+| `dom.ts`          | The DOM half, on its own subpath: reduced motion, measuring an icon slot, a checkbox input kept in step                 |
 
 The root entry uses no DOM API, so React Native can import it.
 
@@ -68,6 +70,7 @@ spreadableProps(props);                  // without children and ref
 cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
 combineProps(sources, rules): Record<string, unknown>;
+outsideRootMessage("Button", "Label");   // the error for a compound part outside its Root
 
 // Controllable state
 type Controllable<"checked", boolean>    // checked, defaultChecked, onCheckedChange({ checked, reason? })
@@ -92,6 +95,41 @@ user): classes collect under the first of `rules.classKeys` and join with `rules
 (Solid: an array; React: a string), styles join with `rules.joinStyles`, `on*` handlers all
 run in order, and any other key takes the last value that isn't `undefined`.
 
+### Component contracts
+
+Each component the bindings build has a file in `src/components/` that both bindings read, so
+their props and behavior can't drift:
+
+```ts
+// A variant group's prop: the registry's values once an app's declarations augment it
+type VariantProp<"button", "variant">    // "filled" | "tonal" | … ; any value while unregistered
+
+// Button
+interface ButtonRootOwnProps             // color, variant, size, density, tokens, disabled, type,
+                                         // name, value, form, toggle, id, ids, selected,
+                                         // defaultSelected, onSelectedChange, testId, unstyled
+BUTTON_ROOT_PROPS                        // its keys, kept off the root element
+buttonSelection(props): Selection<"button">;
+buttonMachineProps(props);               // the machine's props; Root's `id` is the root's id
+interface ButtonContentProps<Node>       // the ready-made button's label, icon, mirrorIcon
+BUTTON_CONTENT_PROPS
+
+// Checkbox
+type CheckedState = boolean | "indeterminate";
+interface CheckboxRootOwnProps           // color, density, tokens, disabled, invalid, required,
+                                         // readOnly, name, form, value, id, ids, checked,
+                                         // defaultChecked, onCheckedChange, testId, unstyled
+CHECKBOX_ROOT_PROPS; CHECKBOX_INPUT_LABEL_PROPS; // aria-label, -labelledby, -describedby
+checkboxSelection(props); checkboxMachineProps(props, fieldsetDisabled);
+checkboxNativeDefault(resetsTo): boolean;          // what a form reset shows natively
+checkboxResetState(defaultChecked): CheckedState;  // what the binding sends after a reset
+checkboxInputProps(zagHiddenInputProps, readOnly); // without Zag's style and aria-labelledby
+checkboxMarkProps(zagIndicatorProps);              // without `hidden`: the CSS shows each mark
+```
+
+A component's props are typed with these, so an app whose generated declarations register the
+button gets `variant?: "filled" | "tonal" | …` on every binding's button.
+
 ### `@pureform/binding-core/dom`
 
 ```ts
@@ -99,7 +137,11 @@ systemReducedMotion(): boolean;
 subscribeReducedMotion(onChange): () => void;  // calls at once, then on each change
 readIconStyle(element): IconStyle;             // font-size, color, the FILL axis
 observeIconStyle(element, onChange): () => void;
+syncCheckedInput(input, checked);              // a native checkbox back to the machine's state
 ```
+
+`syncCheckedInput` is for after a click: the browser toggles the input before the machine hears
+of it, so a controlled checkbox whose owner ignores the change would otherwise show the toggle.
 
 `observeIconStyle` re-reads after an attribute changes anywhere in the icon's component (its
 `data-scope` root), after a transition there ends, and when the slot resizes.
