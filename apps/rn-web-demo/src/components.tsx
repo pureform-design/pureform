@@ -7,12 +7,12 @@ import {
     useComponentStyles,
     useTokens,
 } from "@pureform/rn-adapter/react";
-import { SvgDrawing } from "@pureform/rn-adapter/svg";
 import type { ReactNode } from "react";
 import { Image, Text, View } from "react-native";
 import type { ImageStyle } from "react-native";
 
 import {
+    MSvgDrawing,
     atext,
     aview,
     Glyph,
@@ -203,7 +203,7 @@ export function Avatar(props: {
     });
     return (
         <View role="img" aria-label={props.initials} style={view(s[""])}>
-            <SvgDrawing drawing={drawings[""]} />
+            <MSvgDrawing drawing={drawings[""]} />
             <Text style={text(ownText(s[""]))}>{props.initials}</Text>
         </View>
     );
@@ -265,7 +265,7 @@ export function IconButton(props: {
         >
             <MView pointerEvents="none" style={aview(s.touchTarget)} />
             <MView style={aview(s.container)}>
-                <SvgDrawing drawing={drawings.container} />
+                <MSvgDrawing drawing={drawings.container} />
                 <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
                 </MView>
@@ -273,7 +273,7 @@ export function IconButton(props: {
             </MView>
             {props.variant === "outlined" && (
                 <MView pointerEvents="none" style={aview(s.outline)}>
-                    <SvgDrawing drawing={drawings.outline} />
+                    <MSvgDrawing drawing={drawings.outline} />
                 </MView>
             )}
         </MPressable>
@@ -306,7 +306,7 @@ export function Fab(props: {
         >
             <MView pointerEvents="none" style={aview(s.touchTarget)} />
             <MView style={aview(s.container)}>
-                <SvgDrawing drawing={drawings.container} />
+                <MSvgDrawing drawing={drawings.container} />
                 <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
                 </MView>
@@ -502,7 +502,7 @@ export function Media(props: {
                 aria-label=""
                 style={view(style as typeof styles.root)}
             >
-                <SvgDrawing
+                <MSvgDrawing
                     drawing={drawings[""]}
                     image={{
                         uri: PICTURE,

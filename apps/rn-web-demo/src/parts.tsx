@@ -5,7 +5,11 @@ import type { State, Style } from "@pureform/rn-adapter";
 import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import { pressableState, useComponentState } from "@pureform/rn-adapter/react";
 import { useReanimatedComponentStyles } from "@pureform/rn-adapter/reanimated";
-import { useSvgRipple } from "@pureform/rn-adapter/svg";
+import {
+    ReanimatedSvgDrawing,
+    useReanimatedSvgRipple,
+} from "@pureform/rn-adapter/reanimated-svg";
+import { SvgDrawing, useSvgRipple } from "@pureform/rn-adapter/svg";
 import { createContext, createElement, useContext, useState } from "react";
 import type { ComponentProps, ComponentType } from "react";
 import { Animated, Pressable, TextInput } from "react-native";
@@ -54,6 +58,7 @@ const either =
             );
 
 export const MView = either(Animated.View, Reanimated.View);
+export const MSvgDrawing = either(SvgDrawing, ReanimatedSvgDrawing);
 export const MText = either(Animated.Text, Reanimated.Text);
 export const MTextInput = either(
     Animated.createAnimatedComponent(TextInput),
@@ -107,8 +112,8 @@ export const useInk = (
     const { styles, drawings } = useComponentState(name, variants, state);
     const own = styles[slot];
     const radius = own?.borderRadius;
-    // Clipped to the surface's shape, where it draws one.
-    return useSvgRipple({
+    // Clipped to the surface's shape, where it draws one, and moved by the chosen engine.
+    const ripple = {
         clip: drawings[slot],
         color: String(own?.color ?? "rgb(0, 0, 0)"),
         ...(typeof radius === "number" || typeof radius === "string"
@@ -116,7 +121,10 @@ export const useInk = (
             : {}),
         ...(options.centered ? { centered: true } : {}),
         ...(options.disabled ? { disabled: true } : {}),
-    });
+    };
+    const animated = useSvgRipple(ripple);
+    const reanimated = useReanimatedSvgRipple(ripple);
+    return useContext(MotionContext) === "Reanimated" ? reanimated : animated;
 };
 
 /** Pressable handlers with a ripple's added. */
