@@ -1,0 +1,32 @@
+{
+    "name": "@pureform/component-suites",
+    "version": "0.0.0-semantically-released",
+    "private": true,
+    "description": "Shared browser suites that run against the Solid and React bindings",
+    "type": "module",
+    "devDependencies": {
+        "@pandacss/vite": "catalog:",
+        "@pureform/anatomy": "catalog:",
+        "@pureform/react": "catalog:",
+        "@pureform/solid": "catalog:",
+        "@pureform/styling": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@solidjs/vite-plugin": "catalog:",
+        "@solidjs/web": "catalog:",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "axe-core": "catalog:",
+        "playwright": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "solid-js": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    }
+}

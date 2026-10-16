@@ -1,0 +1,15 @@
+{
+    "compilerOptions": {
+        "outDir": "./dist",
+        "rootDir": "../..",
+        "noEmit": true,
+        "jsx": "preserve",
+        "jsxImportSource": "@solidjs/web",
+        "types": ["vite/client", "node", "@vitest/browser-playwright"],
+        "paths": {
+            "@/*": ["./src/*"],
+            "#binding": ["./src/bindings/solid/harness.tsx"]
+        }
+    },
+    "include": ["src", "../../apps/solid-demo/.pureform/**/*.*"]
+}
