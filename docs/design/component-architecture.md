@@ -857,6 +857,10 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   Root's `id` is the machine's root id, since the machines find their elements by id. Variant
   props are typed `VariantProp<"button", "variant">`: the app's registered values, or any value
   while nothing is registered.
+- **Built (p3b), React:** the same subpaths (`@pureform/react/button`, `@pureform/react/checkbox`),
+  export shape, parts, elements, and DOM order, on the same binding-core lists. Slot-keyed
+  classes are `className`, content props take `ReactNode`, and parts take a `ref`. Components
+  call a `useMachine` wrapper that lets each machine prop be `undefined`, as Solid's port does.
 
 ### 9.2 What every part does
 
@@ -950,6 +954,11 @@ component), Zag's shape, identical in Solid and React:
   whose owner ignored the change kept the toggle. The binding puts the input back
   (`syncCheckedInput` in `@pureform/binding-core/dom`) in a microtask after the click, once the
   machine's send and the owner's update have run.
+- **Built (p3b), React:** the restore runs in a microtask after Zag's queued send, but the
+  owner's update may render before or after it. So it doesn't read the machine (whose
+  uncontrolled value only updates on render); when controlled, it puts the input back to the
+  value last committed (read through a ref), and the owner's update, if any, moves it with the
+  machine's own sync. Uncontrolled, the browser's toggle already is the new state.
 
 ### 9.5 Forms
 
