@@ -201,7 +201,8 @@ overrides the primary color in either mode.
   the config isn't recomputed, and override colors are `rgb()`/`rgba()` or hex, which the
   runtime parses without a color library.
 - **One-color background images,** Material's elevation tints, become a tint composited over
-  the background color when a component's styles are picked. Other gradients are dropped.
+  the background color when a component's styles are picked. Other linear and radial
+  gradients draw with SVG; conic ones are reported.
 - **Unitless line heights** multiply the slot's font size once it's known.
 - **`fontStack: "all"`** keeps a font family's whole stack for React Native Web, which passes
   it to CSS. Native takes the first family.
@@ -213,7 +214,9 @@ overrides the primary color in either mode.
 - **CSS's defaults:** a slot asking for flex runs in a row unless it names a direction; a flex
   box's slots shrink to fit; and a slot drawing an outline lifts over its neighbors, as CSS
   paints outlines last.
-- **Drop shadow filters** become box shadows, since shapes fall back to rounded boxes.
+- **Drop shadow filters** become box shadows where shapes fall back to rounded boxes, and stay
+  `drop-shadow()` filters with SVG, so they follow the shapes. React Native draws filters on
+  Android and the web, so on iOS a shaped component has no shadow.
 - **Raw rules** for other targets add nothing; ones for React Native are reported.
 - **Color mixes** run in srgb, hsl, oklab, oklch, lab, lch, and display-p3, in plain math that
   matches Chromium's `color-mix()`; HCT is reported. Override colors may use any of CSS's color
@@ -239,9 +242,19 @@ overrides the primary color in either mode.
   percentage and pixels, as the slider positions its handle, puts the pixels on the inset's
   margin. Percentages are reported where React Native takes none.
 - **Ripples:** `useRipple` grows and fades press ripples as the web's `ripple()` does, timed by
-  the ripple component's transition. They're solid discs: the soft edge needs SVG.
-- **Not yet:** shapes and multi-color gradients, and the ripple's soft edge, which need SVG
-  or a gradient package; container queries; and running on a device.
+  the ripple component's transition, as solid discs. `useSvgRipple` draws them with their soft
+  edge and clips them to the surface's shape.
+- **SVG:** `@pureform/rn-adapter/svg`, with `react-native-svg` as an optional peer. The
+  provider's `svg` turns on the `clipShape` feature's cases as an `svg` state, and selection
+  returns each slot's `drawings`: its shape with its fill, moved off the view, and its
+  gradient. `SvgDrawing` measures its slot and draws them under the content; it can also draw a
+  picture clipped to the shape, for media. Shapes and gradient stops keep their mix of pixels
+  and percentages until the box is known, and `geometry.ts` places them as CSS does. A shape
+  morph jumps between its shapes; animating it waits for the Reanimated binding.
+- **React Native Web and react-native-svg in Vite:** resolve `.web.*` files first, shim the
+  native modules it imports behind Android checks, and alias React Native's asset registry to
+  React Native Web's.
+- **Not yet:** shape morphs, container queries, and running on a device.
 
 ## State transitions
 

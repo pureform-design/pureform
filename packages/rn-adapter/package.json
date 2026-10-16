@@ -36,6 +36,17 @@
                 "development": "./src/animated.ts",
                 "default": "./dist/animated.mjs"
             }
+        },
+        "./svg": {
+            "types": "./dist/svg.d.ts",
+            "import": {
+                "development": "./src/svg.ts",
+                "default": "./dist/svg.mjs"
+            },
+            "require": {
+                "development": "./src/svg.ts",
+                "default": "./dist/svg.mjs"
+            }
         }
     },
     "dependencies": {
@@ -55,19 +66,24 @@
         "react": "catalog:",
         "react-dom": "catalog:",
         "react-native": "catalog:",
+        "react-native-svg": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
     },
     "peerDependencies": {
         "react": "catalog:",
-        "react-native": "catalog:"
+        "react-native": "catalog:",
+        "react-native-svg": "catalog:"
     },
     "peerDependenciesMeta": {
         "react": {
             "optional": true
         },
         "react-native": {
+            "optional": true
+        },
+        "react-native-svg": {
             "optional": true
         }
     }

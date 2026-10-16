@@ -238,7 +238,7 @@ describe("lowerRn raw rules", () => {
 });
 
 describe("lowerRn filters", () => {
-    it("casts drop shadows as box shadows, and reports other filters", () => {
+    it("keeps drop shadows apart from box shadows, and reports other filters", () => {
         const layer = { x: px(0), y: px(2), blur: px(4), color: rgb(0, 0, 0) };
         const shadow = rulesOf({
             filter: when("disabled", { type: "literal", value: "none" }, {
@@ -251,7 +251,7 @@ describe("lowerRn filters", () => {
                 when: [],
                 specificity: 0,
                 style: {
-                    boxShadow: {
+                    dropShadow: {
                         $shadow: [
                             {
                                 x: 0,
@@ -267,7 +267,7 @@ describe("lowerRn filters", () => {
             {
                 when: ["disabled"],
                 specificity: 1,
-                style: { boxShadow: "none" },
+                style: { dropShadow: "none" },
             },
         ]);
         const blur = rulesOf({

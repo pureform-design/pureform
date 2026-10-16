@@ -131,3 +131,41 @@ export const placeGradient = (
         stops: offsets(gradient.stops, Math.max(length, 1e-6), current),
     };
 };
+
+// Split a list on its top-level commas, keeping `rgba(a, b, c, d)` whole.
+const layers = (list: string): string[] => {
+    const out: string[] = [];
+    let depth = 0;
+    let current = "";
+    for (const char of list) {
+        if (char === "(") depth++;
+        if (char === ")") depth--;
+        if (char === "," && depth === 0) {
+            out.push(current.trim());
+            current = "";
+        } else current += char;
+    }
+    if (current.trim()) out.push(current.trim());
+    return out;
+};
+
+/** A box shadow as CSS `drop-shadow()` filters, which follow what's drawn: each outer layer's
+ *  offsets, blur, and color. Spreads and inset layers have no drop shadow, and drop. */
+export const dropShadows = (boxShadow: string): string =>
+    layers(boxShadow)
+        .filter((layer) => !layer.startsWith("inset"))
+        .map((layer) => {
+            const color =
+                /(rgba?|hsla?|oklch|oklab|lab|lch|color)\(.*\)$|#\w+$|[a-z]+$/i.exec(
+                    layer,
+                )?.[0] ?? "";
+            const [x = "0", y = "0", blur = "0"] = layer
+                .slice(0, layer.length - color.length)
+                .trim()
+                .split(/\s+/);
+            return `drop-shadow(${x} ${y} ${blur} ${color})`.replace(
+                / \)$/,
+                ")",
+            );
+        })
+        .join(" ");

@@ -22,7 +22,7 @@ import { PERCENT_OK, rnKeyword, rnProperty } from "./props";
 import { formatColor } from "./rgba";
 import { MIX_SPACES } from "./spaces";
 import type { MixSpace } from "./spaces";
-import { ANIMATION, SHAPE, TINT, TRANSITION } from "./values";
+import { ANIMATION, DROP_SHADOW, SHAPE, TINT, TRANSITION } from "./values";
 import type { Value } from "./values";
 
 /** Options for lowering. */
@@ -662,7 +662,7 @@ const lowerStyle = (
                   : property === "animation"
                     ? ANIMATION
                     : property === "filter"
-                      ? "boxShadow"
+                      ? DROP_SHADOW
                       : property === "clipPath"
                         ? SHAPE
                         : rnProperty(property);

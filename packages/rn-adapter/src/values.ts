@@ -46,6 +46,10 @@ export interface Animation {
     }[];
 }
 
+/** A drop shadow, which selection makes a filter where the app draws with SVG, so it follows
+ *  the shapes, and a box shadow elsewhere. */
+export const DROP_SHADOW = "dropShadow";
+
 /** A slot's clip shape, which selection returns beside its style for an SVG to draw. */
 export const SHAPE = "clipPath";
 

@@ -5,9 +5,17 @@
 // do. Inherited properties then pass from each slot to its children, which CSS does and React
 // Native doesn't outside nested text.
 
+import { dropShadows } from "./geometry";
 import type { ComponentStyles } from "./lower";
 import { compositeOver, formatColor, parseColor } from "./rgba";
-import { ANIMATION, SHAPE, TINT, TRANSITION, isPercentOffset } from "./values";
+import {
+    ANIMATION,
+    DROP_SHADOW,
+    SHAPE,
+    TINT,
+    TRANSITION,
+    isPercentOffset,
+} from "./values";
 import type {
     Animation,
     GradientValue,
@@ -108,7 +116,21 @@ const INSET_MARGIN: Record<string, string> = {
 // Turn what CSS reads differently into React Native's terms: `none` line styles (no line),
 // a tint layered over the background, a line height relative to the font size, no shadow,
 // a flex box's direction, and an outline over its neighbors.
-const settle = (style: Style): Style => {
+const settle = (style: Style, svg: boolean): Style => {
+    // A drop shadow follows what's drawn. With SVG drawing the shapes, that's a filter, which
+    // React Native draws on Android and the web; without, the box is what's drawn.
+    const drop = style[DROP_SHADOW];
+    delete style[DROP_SHADOW];
+    if (typeof drop === "string" && drop !== "none") {
+        if (svg) style.filter = dropShadows(drop);
+        else {
+            const own = style.boxShadow;
+            style.boxShadow =
+                typeof own === "string" && own !== "none"
+                    ? `${own}, ${drop}`
+                    : drop;
+        }
+    }
     const tint = style[TINT];
     if (typeof tint === "string") {
         const below = style.backgroundColor;
@@ -285,7 +307,7 @@ export const selectWithTransitions = (
                 ? (tint as unknown as GradientValue)
                 : undefined;
         if (gradient) delete style[TINT];
-        settle(style);
+        settle(style, state.svg === true);
         if (state.svg && (shape || gradient)) {
             const drawing: Drawing = {};
             if (shape) {
@@ -293,6 +315,8 @@ export const selectWithTransitions = (
                 const fill = style.backgroundColor;
                 if (typeof fill === "string") drawing.fill = fill;
                 delete style.backgroundColor;
+                // CSS clips a box shadow away with the box.
+                delete style.boxShadow;
             }
             if (gradient) drawing.gradient = gradient;
             drawings[slot] = drawing;

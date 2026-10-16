@@ -20,6 +20,7 @@ interface Context {
     scheme: Scheme;
     reducedMotion: boolean;
     width: number | undefined;
+    svg: boolean;
 }
 
 const PureformContext = createContext<Context | undefined>(undefined);
@@ -36,6 +37,10 @@ export interface PureformProviderProps {
     /** The window's width, for viewport conditions, as an app reads it from
      *  `useWindowDimensions`. Without it, none of them hold. */
     width?: number;
+    /** Whether the app draws shapes and gradients with SVG, through `SvgDrawing` from
+     *  `@pureform/rn-adapter/svg`, which needs `react-native-svg`. Without it, components
+     *  take their rounded fallback and gradients drop. Default `false`. */
+    svg?: boolean;
     /** Token or component token values to override, by key: `colors.primary`,
      *  `components.button.container`, for both schemes or as `{ light, dark }`. Colors are
      *  hex or any of CSS's color functions but `hwb()` and `color-mix()`. */
@@ -63,6 +68,7 @@ export const PureformProvider = (props: PureformProviderProps) => {
         [styles, key, overrideKey],
     );
     const reducedMotion = props.reducedMotion ?? false;
+    const svg = props.svg ?? false;
     const value = useMemo(
         () => ({
             styles,
@@ -73,9 +79,10 @@ export const PureformProvider = (props: PureformProviderProps) => {
             scheme,
             reducedMotion,
             width: props.width,
+            svg,
         }),
         // oxlint-disable-next-line react-hooks/exhaustive-deps
-        [resolved, tokens, scheme, reducedMotion, props.width],
+        [resolved, tokens, scheme, reducedMotion, props.width, svg],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
 };
@@ -125,6 +132,7 @@ export const useComponentState = (
             selectWithTransitions(component, variants, {
                 scheme: context.scheme,
                 reducedMotion: context.reducedMotion,
+                svg: context.svg,
                 ...(context.width === undefined
                     ? {}
                     : { width: context.width }),
@@ -136,6 +144,7 @@ export const useComponentState = (
             context.scheme,
             context.reducedMotion,
             context.width,
+            context.svg,
             variantKey,
             stateKey,
         ],

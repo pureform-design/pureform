@@ -2,7 +2,7 @@ import { pureform } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
 
 import { precompute } from "./build";
-import { placeGradient, shapePath } from "./geometry";
+import { dropShadows, placeGradient, shapePath } from "./geometry";
 import { stylesFor } from "./resolve";
 import { selectWithTransitions } from "./select";
 
@@ -169,5 +169,33 @@ describe("drawings", () => {
                 { offset: 1, color: "transparent" },
             ],
         });
+    });
+});
+
+describe("drop shadows", () => {
+    it("follow the shapes as a filter under the svg state, and the box without it", () => {
+        const fab = (svg: boolean) =>
+            selectWithTransitions(
+                stylesFor(
+                    precompute(pureform(), { components: ["fab"] }),
+                    "base:light",
+                ).fab!,
+                { shape: "heart" },
+                { svg },
+            ).styles.root!;
+        expect(fab(false).boxShadow).toMatch(/^0px 3px 5px 0px rgba\(/);
+        expect(fab(false).filter).toBeUndefined();
+        expect(fab(true).filter).toMatch(/^drop-shadow\(/);
+        expect(fab(true).boxShadow).toBeUndefined();
+    });
+
+    it("turns a box shadow's outer layers into drop shadows", () => {
+        expect(
+            dropShadows(
+                "0px 1px 2px 0px rgba(0, 0, 0, 0.3), inset 0 0 1px red, 0px 2px 6px 2px rgba(0, 0, 0, 0.15)",
+            ),
+        ).toBe(
+            "drop-shadow(0px 1px 2px rgba(0, 0, 0, 0.3)) drop-shadow(0px 2px 6px rgba(0, 0, 0, 0.15))",
+        );
     });
 });
