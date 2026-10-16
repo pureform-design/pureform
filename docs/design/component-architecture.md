@@ -221,8 +221,55 @@ Each binding offers a pair: a hook components use, and the lower-level hook it's
 - `useClasses` memoizes the call: in Solid it takes an accessor and returns a memo; in
   React it takes the selection object and uses `useMemo`. Components can't forget the memo
   or get it wrong.
-- `useClassFactory` is for calling the factory outside a component, or for several
-  selections at once, such as one preview per variant in a picker.
+- `useClassFactory` is for calling the factory outside rendering: tests, event handlers,
+  scripts. Several selections at once, such as one preview per variant in a picker, call
+  `useClasses` once per selection instead, so they work with lazy entries too:
+
+    ```tsx
+    <For each={variants}>
+        {(v) => (
+            <Preview slots={useClasses("button", () => ({ variant: v }))} />
+        )}
+    </For>
+    ```
+
+**Static and lazy entries.** Each registry entry's kind is fixed when `.pureform/` is
+generated, not by whether its chunk has loaded, so the server and the client always take
+the same path and hydration sees the same shape of value (§5.7).
+
+```ts
+// Solid, roughly
+function useClasses(name, selection) {
+    const entry = useRegistry().entry(name);
+    if (entry.kind === "static")
+        return createMemo(() => entry.factory(selection())); // sync, no boundary
+    return createMemo(async () => {
+        const s = selection(); // tracked before the await
+        return (await entry.load())(s); // resolves to classes, which serialize
+    });
+}
+```
+
+- **`useClasses`, static entry:** a plain memo. Nothing suspends, and no boundary is
+  needed.
+- **`useClasses`, lazy entry:** always an async memo, even when another component has
+  already loaded the chunk. The component's code doesn't change; it needs a `<Loading>`
+  (Solid) or `<Suspense>` (React) boundary somewhere above it.
+    - Server: waits for the chunk and streams the classes.
+    - Solid client: adopts the serialized classes, and loads the chunk the first time the
+      selection changes.
+    - React client: React doesn't serialize the value, so `use(promise)` holds that
+      boundary's hydration until the chunk loads, then hydrates with the same classes.
+      There is no flash or mismatch, but hydration waits on the chunk.
+- **`useClassFactory`, static entry:** returns the factory; works everywhere.
+- **`useClassFactory`, lazy entry:** client-only, since a function can't be serialized.
+  It's a separate hook, `useLazyClassFactory`, which suspends with
+  `ssrSource: "client"`: the server renders the boundary's fallback, and the client loads
+  the chunk after hydrating. The generated registry types `useClassFactory` to accept only
+  static names, so the client-only behavior shows where it's called, and in development
+  `useLazyClassFactory` warns when it runs during a server render.
+- **Preloading:** `registry.preload(name)` starts loading a lazy entry early, from a
+  router loader or on hover, so its first change doesn't wait on the network.
 
 ```tsx
 // Solid
@@ -347,6 +394,8 @@ so hydration changes nothing and the first paint is styled, in either color sche
       and doesn't load the entry while hydrating. It loads the entry the first time the
       selection changes.
     - The component needs a `<Loading>` boundary around it.
+    - `useClasses` takes this path for every lazy entry, and `useClassFactory` accepts
+      only static ones (§5.3).
     - A lazy entry behind a synchronous lookup renders without classes on the server and
       patches them in after loading: an unstyled flash, and Solid doesn't warn about it.
 - **Code splitting is per component.** A component module imports its factory
