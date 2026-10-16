@@ -9,7 +9,12 @@ export default createConfig({
         // JSX stays as written: an app's Solid plugin compiles it for the DOM or the server.
         oxc: false,
         build: {
-            rolldownOptions: { transform: { jsx: "preserve" } },
+            rolldownOptions: {
+                transform: { jsx: "preserve" },
+                // Shared chunks hold JSX too, so they're `.jsx` like the entries: an app's Solid
+                // plugin only reads JSX in files named so.
+                output: { chunkFileNames: "[name]-[hash].jsx" },
+            },
             // Renaming would turn a component (`<Tag>`) into a lowercase tag the Solid plugin
             // reads as an element.
             minify: false,

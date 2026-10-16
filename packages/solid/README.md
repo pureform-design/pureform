@@ -266,7 +266,8 @@ since they read props and context on purpose (otherwise Solid's development diag
 
 Through the omni MCP (or `omni run`):
 
-- `build`: Vite library build into `dist/`. JSX is left as written (`dist/index.jsx`), so the
+- `build`: Vite library build into `dist/`. JSX is left as written (`dist/index.jsx`, and shared
+  chunks are `.jsx` too, since an app's Solid plugin reads JSX only in files named so), so the
   app's Solid plugin compiles it for the DOM or the server; the `solid` export condition points
   there, as does `import`. Identifiers aren't minified, so components stay capitalized.
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`), with type
