@@ -8,6 +8,7 @@ dependencies:
   append:
     - "@pureform/panda-adapter"
     - "@pureform/preset"
+    - "@pureform/solid"
     - "@pureform/js-effects"
     - "@pureform/styling"
     - "@pureform/tsconfig"
