@@ -4,6 +4,41 @@
 
 **Deployment contract:** there is a server. `vite build` emits static client assets to `dist/client`, a request handler to `dist/server/server.js`, and — via `start: { node: true }` — a ready-to-run Node server at `dist/server/node.js` that `npm start` runs. SSR is the default posture — set `ssr: false` in `vite.config.ts` for a static shell + API server: pages render on the client while server functions, single-flight, sessions, and API routes keep working. Same template, one boolean.
 
+## pureform in this demo
+
+The demo is pureform's Panda target: `panda.pureform.ts` composes the pureform config and
+compiles it to a Panda preset, and `panda.config.ts` adds the preset, so Panda's `prepare`
+task (`panda codegen`) writes the recipes into `styled-system/`.
+
+`.pureform/` holds the style registry the components read (design doc §5.2 and §6). It is
+hand-written for now, in the shape `pureform generate` will write, and the generator replaces
+the whole folder (p4b-panda writes the modules, p4c moves the demo onto them):
+
+| File                               | What it is                                                                                                       |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `web/button.ts`, `web/checkbox.ts` | `ClassFactory` modules over Panda's slot recipes: `{ [slot]: { class, style? } }` per selection, cached, frozen. |
+| `index.ts`                         | `registry = createRegistry({ button, checkbox })`, `themes`, `Components`.                                       |
+| `registry.d.ts`                    | Augments `@pureform/styling`'s `ComponentRegistry` with each component's variants, slots, and instance tokens.   |
+| `panda.ts`                         | `staticCss` entries that keep every variant's classes; `panda.config.ts` spreads them in.                        |
+
+```ts
+import { registry } from "./.pureform";
+
+const entry = registry.entry("button");
+if (entry.kind === "static") {
+    const slots = entry.factory({
+        variant: "outlined",
+        tokens: { radius: "4px" },
+    });
+    slots.root.class; // "button__root button__root--color_primary … button__root--variant_outlined"
+    slots.root.style; // { "--pf-components-button-radius": "4px" }
+}
+```
+
+`tsconfig.json` includes `.pureform/` explicitly, since the base config includes only `src`.
+`tests/browser-e2e-tests` checks the factories against Panda's output
+(`panda-factories.e2e.test.ts`).
+
 ## Who owns what
 
 - **Solid + the plugin** own the RPC (`'use server'` functions compiled to typed fetches), the single-flight envelope, serialization, the turnkey entries, `src/Document.tsx`, sessions, and typed env.
