@@ -9,20 +9,14 @@ import {
     createControlTracker,
 } from "@pureform/binding-core";
 import type {
-    ChangeName,
     ChangeReason,
     Controllable,
-    DefaultName,
+    ControllableMachineProps,
 } from "@pureform/binding-core";
 import { isDev } from "@solidjs/web";
 import { type Accessor, createEffect, untrack } from "solid-js";
 
-/** The machine props for one controllable value: `{ checked, defaultChecked, onCheckedChange }`. */
-export type ControllableMachineProps<N extends string, T, D extends object> = {
-    [K in N]: T | undefined;
-} & { [K in DefaultName<N>]: T | undefined } & {
-    [K in ChangeName<N>]: (details: D) => void;
-};
+export type { ControllableMachineProps } from "@pureform/binding-core";
 
 /** One controllable value of a component. */
 export interface ControllableState<N extends string, T, D extends object> {
