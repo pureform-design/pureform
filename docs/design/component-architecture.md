@@ -270,7 +270,31 @@ for the root's `style` (registered with `@property` when they have a `valueType`
 transition). On native, they're merged into the styles and tweened. The component code
 doesn't know which.
 
-### 5.5 Themes
+### 5.5 Fewer compound variants: tokens a style sets
+
+Most compound variants pair two variant groups that each set half of a value, such as a
+color group and a fill. A style can instead set the component's own `dynamic` tokens, and
+other variants read them:
+
+```ts
+color: { error: { root: { tokens: { accent: sys("error"), onAccent: on("error") } } } },
+variant: { filled: { root: { backgroundColor: token("accent"), color: token("onAccent") } } },
+```
+
+- **Typed:** in a typed recipe, `tokens` takes the component's own token names, with
+  autocomplete, in base styles, variants, compounds, and states. The builder stores them
+  by path (`components.button.accent`) and only allows them on a root slot.
+- **Web:** each becomes its custom property in that rule, inherited by every slot.
+- **React Native:** selection takes them out, and the component is resolved again with
+  them, under the instance's own tokens (`withSetTokens`), cached per set of values.
+- **Precedence:** the theme's default, then variants and states, then the instance.
+- **Button, as built:** 7 color variants and 5 fills replace 35 compounds. Every
+  combination resolves identically on React Native (5,250 selections) and computes
+  identically in Chromium (21,000 slot styles), and the CSS is 35.7 KB smaller.
+- **Next:** the same for iconButton, fab, chip, the fields, and list items; then size ×
+  density through token arithmetic (`height: add(token("height"), token("densityOffset"))`).
+
+### 5.6 Themes
 
 - **Static:** each target scopes themes the way it natively does, and the factory exposes
   that as `themeAttributes(name)`, so components and providers never hard-code a selector:
@@ -478,7 +502,8 @@ Deferred until there's demand:
 2. **Panda's extractor** can't follow the registry; we rely on `staticCss`, which can
    bloat CSS without pruning. Is that acceptable in dev?
 3. **Solid 2 is RC.** API churn could break the Zag port; pin and track.
-4. **Variant explosion** for components with many variants (§5.3 fragments).
+4. **Variant explosion** for components with many variants: tokens a style sets (§5.5)
+   remove most compounds; fragments (§5.4) cover the rest.
 5. **SSR:** registry and provider must work during SSR and hydrate without style
    mismatch, including runtime themes (write vars inline on the server).
 6. **Where state lives on the web:** data attributes (proposed) vs. selection.
