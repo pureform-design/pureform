@@ -107,6 +107,11 @@ const progress = nativeFactory("linearProgress", styles, {
 progress({ tokens: { value: 40 } }).indicator.style; // resolved with the token, cached per value
 ```
 
+The hooks select through the same factories: `useComponentState` looks up
+`componentFactory(styles, name)` (one per provider styles and component) in the provider's
+environment, so every instance of a component shares one table, and a state change is a
+`Map.get`. Token tweening passes each frame's tokens as the selection's `tokens`.
+
 `pureform generate` with the `native` target (`@pureform/rn-adapter/codegen`) writes one module
 per allow-listed component, `.pureform/native/<name>.ts`, exporting a `NativeFactory<"name">`
 over that component's own precomputed templates and values (`splitPrecomputed`), parsed from a
