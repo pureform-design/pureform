@@ -44,6 +44,8 @@ export type {
 export { loadAdapter } from "./load-adapter";
 export { assertGlue, missingGlueMessage } from "./missing";
 export { VERSION } from "./package-version";
+export { CONFIG_FILES, createGlueRunner, findConfigFile } from "./runner";
+export type { GlueRunner } from "./runner";
 export { compareVersions, satisfies } from "./semver";
 export { componentShape } from "./shape";
 export {
@@ -53,4 +55,6 @@ export {
     findInstalled,
 } from "./train";
 export type { InstalledPackage, TrainCheck, TrainProblem } from "./train";
+export { watchGlue } from "./watch";
+export type { GlueWatcher, WatchGlueOptions } from "./watch";
 export type { FileResult, FileStatus } from "./write";

@@ -48,6 +48,8 @@ generate(options)
 | `missing.ts`      | `missingGlueMessage`, `assertGlue`                                            |
 | `errors.ts`       | `GenerateError` with a `code`, `isGenerateError`                              |
 | `load-adapter.ts` | `loadAdapter(target, root)`                                                   |
+| `runner.ts`       | `createGlueRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`           |
+| `watch.ts`        | `watchGlue(options, watching)`: generate on every change, without a bundler   |
 
 ## Public API
 
@@ -180,8 +182,44 @@ development when the running `@pureform/styling` differs (`trainVersionMismatch`
 `assertGlue(".pureform", { root, importer })` throws a `missing-glue` error naming both ways
 to generate the folder (`pureform generate`, or the bundler plugin) when the index is
 missing; `missingGlueMessage(outDir, importer)` gives the text. Nothing raises it on its own:
-the bundler plugin (p4c) raises it when an import resolves into a missing folder, and the CLI
+the bundler plugin raises it when an import resolves into a missing folder, and the CLI
 and test setups call `assertGlue`.
+
+### Generating again: the runner and the watcher
+
+What the bundler plugin, its Metro wrapper, and `pureform generate --watch` share:
+
+```ts
+import {
+    createGlueRunner,
+    findConfigFile,
+    watchGlue,
+} from "@pureform/generate";
+
+findConfigFile(root); // the first pureform.config.{ts,mts,cts,js,mjs,cjs}, else "pureform.config.ts"
+
+const runner = createGlueRunner({
+    root,
+    config: "pureform.config.ts",
+    target: "panda",
+});
+await runner.run(); // calls during a run share one more run after it
+runner.dependencies; // the config and its relative imports (the config alone until a run reads them)
+runner.affects(file); // whether a changed file is one of them
+
+const watcher = watchGlue(options, {
+    onResult,
+    onError,
+    delay: 50,
+    unref: false,
+});
+await watcher.ready; // the first run's result, or undefined when it failed (onError has the error)
+watcher.close();
+```
+
+`watchGlue` watches the folders of `runner.dependencies` with `fs.watch` (editors often save by
+replacing a file, which ends a watch on the file itself), runs again after a change to one of
+them, follows the dependencies each run finds, and keeps watching after a failed run.
 
 ## Build and test
 
@@ -193,8 +231,13 @@ and test setups call `assertGlue`.
 ## Surprises
 
 - **TypeScript skips dot folders.** An app's tsconfig must include `.pureform/**/*` or the
-  declarations are invisible; `generate` returns a hint when the root's `tsconfig.json`
-  doesn't mention the folder.
+  declarations are invisible; `generate` returns a hint when neither the root's
+  `tsconfig.json` nor a tsconfig it extends by a relative path mentions the folder.
+- **The hash depends on the JavaScript engine.** It covers the evaluated config, and the preset
+  computes some values (a shape morph's curves) differently under Bun than under Node, so the
+  same config hashes differently in each. Generate under one runtime (Node, as Vite runs the
+  bundler plugin). jiti transforms the config itself under both (`tryNative: false`), so at
+  least functions' source doesn't differ.
 - **Files without a header** (`header: false`, for JSON) can't be told from the app's, so
   they're never removed or reported as extra.
 - **`CORE_TRAIN_PACKAGES` is embedded**, since `cog.toml` isn't there in an app's install; a

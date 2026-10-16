@@ -200,8 +200,35 @@ const tsconfigHint = (root: string, outDir: string): string | undefined => {
     if (!existsSync(file)) return undefined;
     const folder = toPosix(relative(root, outDir));
     if (folder.startsWith("../")) return undefined;
-    if (readFileSync(file, "utf8").includes(folder)) return undefined;
+    if (tsconfigMentions(file, folder, new Set())) return undefined;
     return `Add "${folder}/**/*" to "include" in tsconfig.json: TypeScript skips folders whose names start with a dot, so it won't see the generated declarations otherwise.`;
+};
+
+// Whether a tsconfig, or one it extends by a relative path, names the folder.
+const tsconfigMentions = (
+    file: string,
+    folder: string,
+    seen: Set<string>,
+): boolean => {
+    if (seen.has(file) || !existsSync(file)) return false;
+    seen.add(file);
+    const text = readFileSync(file, "utf8");
+    if (text.includes(folder)) return true;
+    const extended = /"extends"\s*:\s*(\[[^\]]*\]|"[^"]*")/.exec(text)?.[1];
+    if (!extended) return false;
+    return [...extended.matchAll(/"([^"]+)"/g)]
+        .map((match) => match[1]!)
+        .filter((path) => path.startsWith("."))
+        .some((path) =>
+            tsconfigMentions(
+                resolve(
+                    dirname(file),
+                    path.endsWith(".json") ? path : `${path}.json`,
+                ),
+                folder,
+                seen,
+            ),
+        );
 };
 
 /** Generates `.pureform/` for a config and a target, or checks it (`check: true`). */
