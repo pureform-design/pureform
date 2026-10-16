@@ -9,8 +9,8 @@ Status: accepted. Supersedes layer 3 ("copy-paste delivery") of
    state-to-style mapping, and test ids live in framework-free packages. A Solid, React, or
    React Native binding is a thin layer of reactivity and JSX.
 2. **One config, everywhere.** `pureform.config.ts` is the single source. Build tools
-   (Panda, Tailwind, the CSS adapter, Metro) and runtime code import the same file, so they
-   can't drift.
+   (Panda, Tailwind, the CSS adapter, Metro) import it, and runtime code gets the glue
+   generated from it (§4, §6), so they can't drift.
 3. **Static and runtime theming.** Themes compile to static CSS where possible, and switch
    or override at runtime through `dynamic` tokens and providers, with no rebuild.
 4. **Pay for what you use.** Unused components ship neither JS nor CSS. Package layout does
@@ -31,14 +31,15 @@ Components get their styles by calling a factory from the registry with their se
 (§5). This only works if the call is a few property reads. The design keeps it so:
 
 - Variant and state selection is precomputed at build time into a flat table per
-  component, keyed by a small integer or short string (§5.3).
+  component, keyed by a small integer or short string (§5.4).
 - Lookups are memoized per instance by Solid's fine-grained reactivity: the style
   expression reruns only when a variant or state signal it read changes.
 - On the web, a lookup returns a class string (static) plus, when instance tokens exist, a
   style object of CSS variables. No style objects are built per render.
-- On React Native, the lookup returns a cached, frozen style object per selection; the
-  existing `useComponentState`/`useSelected` path in `rn-adapter` already does this and
-  is the proof of the bet.
+- On React Native, the lookup returns a cached, frozen style object per selection. Today
+  `rn-adapter`'s `useComponentState` memoizes per instance and selects again when a
+  variant or state changes, over resolved styles cached per theme; the factory moves that
+  cache to one shared table per component.
 
 A benchmark (§13) gates the decision: 10k lookups per frame under 1ms on a mid-range
 phone.
@@ -49,6 +50,9 @@ phone.
 @pureform/core              AST, config types, defineComponent (exists)
 @pureform/theme, material   contracts, providers (exist)
 @pureform/preset            Material components as AST (exists)
+@pureform/css-lowering,     shared CSS lowering, the framework-free ripple, and helpers
+  js-effects, utils,        (exist)
+  type-utils
 
 @pureform/styling           NEW. Types and a tiny registry: ClassFactory, StyleFactory,
                             Selection, instance tokens. Framework- and target-free.
@@ -59,7 +63,7 @@ phone.
                             controls). Framework-free.
 
 @pureform/*-adapter         Exist. Each gains a `/codegen` subpath (§5.2), run at build
-                            time by `@pureform/bundler`, that emits ClassFactory (web) or
+                            time by `@pureform/generate`, that emits ClassFactory (web) or
                             StyleFactory (native) modules into `.pureform/`.
 
 @pureform/solid             NEW. Solid 2 bindings: provider, useClasses, compound
@@ -103,10 +107,9 @@ options:
 ```ts
 // panda.config.ts
 import config from "./pureform.config";
-import { pureformPreset } from "@pureform/panda-adapter";
+import { compilePreset } from "@pureform/panda-adapter";
 export default defineConfig({
-    presets: [pureformPreset(config)],
-    prefix: "pf",
+    presets: [compilePreset(config, { prefix: "pf" })],
 });
 
 // vite.config.ts
@@ -130,9 +133,9 @@ export default defineConfig({
   bundle. It may only import pureform packages and pure data. No `fs`, no env reads at top
   level. A test in each adapter checks it.
 - **Loading.** Build tools load it with jiti (already used by Metro's `withPureform`).
-  `panda.config.ts` and Tailwind's entry become one-liners that import it:
-  `pureformPanda(config)`, `@import "pureform/tailwind"` with the plugin reading the
-  config.
+  `panda.config.ts` and the Vite config import it: `compilePreset(config)` today for
+  Panda, and the `pureformTailwind({ config, outFile })` Vite plugin for Tailwind, which
+  writes the stylesheet that `app.css` imports.
 - **Runtime.** Runtime code never imports the full config. It imports the generated
   registry module (§6), which carries only what runtime needs: selection tables, dynamic
   token names, theme names, defaults. The full AST stays at build time.
@@ -159,15 +162,17 @@ type StyleFactory<C> = (selection: Selection<C> & States<C>) => {
 };
 ```
 
-`Variants<C>`, `States<C>` (`hovered`, `pressed`, `focusVisible`, `disabled`,
-`selected`, …), `SlotOf<C>`, and `InstanceTokens<C>` are typed from the AST via
-`defineComponent`'s inference, reusing Material's names.
+`Variants<C>`, `States<C>` (`hover`, `pressed`, `focusVisible`, `disabled`, `selected`,
+…), `SlotOf<C>`, and `InstanceTokens<C>` are typed from the AST via `defineComponent`'s
+inference, reusing the AST's condition names.
 
 On the web, interaction states are not part of the selection. Machines set them as data
-attributes (`data-pressed`, as Zag already does), and the generated CSS matches them, so a
-press changes one attribute and calls nothing. Only a variant or token change calls the
-factory again. On React Native there are no selectors, so states are in the selection,
-and each change is one `Map.get` returning a cached, frozen object.
+attributes (`data-active` for a press, `data-hover`, `data-focus-visible`, as Zag does),
+and the generated CSS already matches them (`pressed` lowers to
+`:is(:active, [data-active])`), so a press changes one attribute and calls nothing. Only
+a variant or token change calls the factory again. On React Native there are no
+selectors, so states are in the selection, and each change is one `Map.get` returning a
+cached, frozen object.
 
 ### 5.2 Generated factories per target
 
@@ -182,14 +187,19 @@ export const button: ClassFactory<"button"> = (s) => recipe(s);
 ```
 
 **CSS and Tailwind:** plain lookup tables with no runtime dependency. Tailwind also gets
-`@source inline(...)` so it keeps the classes.
+`@source inline(...)` so it keeps the classes. This exists in part today: the CSS
+adapter's Vite plugin (which the Tailwind adapter's reuses) generates each component's
+class function from a manifest and serves it as `virtual:pureform/components`, typed from
+the config, over `componentClasses` in `@pureform/css-adapter/runtime`. It returns a class
+string per slot; the factory adds `style` for instance tokens and moves into `.pureform/`.
 
 ```ts
-// .pureform/web/button.ts (generated)
+// .pureform/web/button.ts (generated; class names as the CSS adapter writes them, here
+// with `classPrefix: "pf"`)
 const base = { root: "pf-button__root", label: "pf-button__label" };
 const variant = {
-    filled: { root: "pf-button--filled" },
-    outlined: { root: "pf-button--outlined" },
+    filled: { root: "pf-button__root--variant_filled" },
+    outlined: { root: "pf-button__root--variant_outlined" },
 };
 export const button: ClassFactory<"button"> = ({ variant: v = "filled" }) => ({
     root: { class: `${base.root} ${variant[v].root}` },
@@ -197,8 +207,10 @@ export const button: ClassFactory<"button"> = ({ variant: v = "filled" }) => ({
 });
 ```
 
-**Native:** a precomputed table, generated by Metro's `withPureform`, the same data
-`rn-adapter`'s `useSelected` reads today. Token tweening (`useMovingTokens`) wraps it.
+**Native:** a precomputed table. Metro's `withPureform` already precomputes each theme's
+resolved component styles, which `rn-adapter`'s `useSelected` selects from at runtime;
+the factory adds the per-selection table on top. Token tweening (`useMovingTokens`)
+wraps it.
 
 ```ts
 // .pureform/native/button.ts (generated)
@@ -354,7 +366,7 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   on Tailwind; React Native's precomputed styles are 12% smaller.
 - **What stays compound:** cases that need both conditions at once: the FAB's size with
   its shape and with `extended`, each text input's fill with a leading icon, primary tabs
-  with an icon, and card (3).
+  with an icon, and interactive cards per fill (3).
 
 ### 5.6 Themes
 
@@ -364,13 +376,17 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
       for themes loaded at runtime.
     - Tailwind v4: theme vars in `@theme`, scoped overrides under a `@custom-variant` on a
       data attribute, the convention Tailwind's docs use.
-    - CSS adapter: our own `[data-pf-theme]` scope, since there's no native one.
+    - CSS adapter: `[data-theme=<name>]`, the attribute set by its `themeAttribute`
+      option, since plain CSS has no native scope. The Tailwind adapter uses the same
+      option for its `@custom-variant`.
     - React Native: a context value; no selectors.
       Switching a theme is an attribute (or context) change.
 - **Runtime:** `<PureformProvider theme overrides>` sets theme scope and may override any
   `dynamic` token, writing CSS vars on web or a context value on native. Nested providers
-  scope. This is the existing `@pureform/theme` provider model surfaced through the
-  framework bindings.
+  scope. Both halves exist today: `rn-adapter`'s `PureformProvider` takes `overrides`, and
+  `css-lowering`'s `themeVars` turns a config's tokens into CSS vars. The bindings bring
+  them under one provider. (`@pureform/theme`'s "providers" are something else: the
+  token sources a config is composed from.)
 - **Runtime-only themes** (generated from a seed color at runtime): the provider calls
   `@pureform/material`'s generators in the browser and writes vars. Opt-in import, so
   apps that don't use it don't ship the color math.
@@ -430,7 +446,8 @@ class. No script runs before paint.
   on the provider's element, rendered on the server.
 - **Whole themes** (from a seed color, or loaded at runtime): the provider generates both
   schemes' vars, on the server too, and writes one `<style>` block under the same scheme
-  conditions the stylesheet uses, scoped to `[data-pf-theme="<hash>"]`. The hash is of
+  conditions the stylesheet uses, scoped to the target's theme attribute with the hash as
+  its name (`[data-theme="pf-<hash>"]`, or `data-panda-theme` on Panda). The hash is of
   the theme's input (the seed and options), so the server and client agree on it without
   generating anything, and two providers with the same theme share one block. The block
   goes into `<head>` through the framework's own API, keyed by the hash so it's
@@ -479,7 +496,8 @@ The design makes one setting, followed by everything that moves, on every target
       `[data-pf-motion="reduce"]` on an ancestor, the same pattern as `.light`/`.dark`
       (§5.7). The provider writes the attribute only when it isn't `"system"`.
     - React Native: `"system"` reads `AccessibilityInfo.isReduceMotionEnabled()` and
-      follows its `reduceMotionChanged` event; the existing prop maps to `"reduce"`/`"full"`.
+      follows its `reduceMotionChanged` event; the existing prop maps to `"reduce"` or
+      `"full"`.
 - **One hook for JS motion.** `useReducedMotion()` in each binding combines the provider's
   setting with the media query (web) or the OS (native). The ripple, Animated token tweens,
   and our own machines read it; nothing calls `matchMedia` on its own.
@@ -527,7 +545,10 @@ What's missing is one source of direction for JS, and a few styles that don't fl
       under `rtl`.
     - The linear progress's indeterminate keyframes run along `translateX`; an `rtl`
       set runs them the other way.
-    - Symmetric uses (`left: 0` with `right: 0`, or centering with `left: 50%`) stay.
+    - Symmetric uses stay: `left: 0` with `right: 0` or `width: 100%` (a control's
+      native input, an outline layer), and centering with `left: 50%` and
+      `translate(-50%)` (the touch target). The ripple is placed from pointer
+      coordinates, which are physical anyway.
 - **Icons that point.** The icon slot takes `mirror`, which sets `data-pf-mirror` and
   flips the icon with `scaleX(-1)` under `rtl`. Back arrows and chevrons set it; most icons
   don't. The icon slot contract decides the rest.
@@ -542,7 +563,8 @@ What's missing is one source of direction for JS, and a few styles that don't fl
 
 `pureform generate` (also run by the bundler plugin in dev and build) writes the factory
 modules of §5.2 to `.pureform/`, and an index, also served as the virtual module
-`virtual:pureform/registry`:
+`virtual:pureform/registry`. It succeeds today's `virtual:pureform/components` from the
+CSS and Tailwind adapters' Vite plugins:
 
 ```ts
 // generated: do not edit
@@ -565,9 +587,9 @@ config and the installed packages, so committing it only adds diffs to review. E
 
 - **Not committed (recommended):** add `.pureform/` to `.gitignore`. The bundler plugin
   writes it when dev or build starts; for steps without a bundler (`tsc`, lint, tests),
-  run `pureform generate` first, for example from the `prepare` script. `pureform
-generate` doesn't edit `.gitignore` itself; it prints the line to add when it finds the
-  folder unignored in a git repository.
+  run `pureform generate` first, for example from the `prepare` script.
+  `pureform generate` doesn't edit `.gitignore` itself; it prints the line to add when
+  it finds the folder unignored in a git repository.
 - **Committed:** `pureform generate --check` exits non-zero when the folder differs from
   what it would write, for CI.
 - **Staleness.** Every generated file starts with a header holding a hash of the config,
@@ -589,8 +611,8 @@ Three layers, cheapest first:
    (`@pureform/solid/button`, `.pureform/web/button`), `sideEffects: false`, no
    barrel re-exports in runtime entries. The root `@pureform/solid` re-exports for DX,
    and is fine under modern bundlers because nothing has side effects.
-2. **Allow-list.** The bundler plugin's `components` option limits what's generated: CSS, Panda
-   `staticCss`, Tailwind sources, and registry entries. Default: everything.
+2. **Allow-list.** The bundler plugin's `components` option limits what's generated:
+   CSS, Panda `staticCss`, Tailwind sources, and registry entries. Default: everything.
 3. **Usage-based pruning (bundler plugin).** In build mode, `@pureform/bundler`:
     - collects which components are imported from `@pureform/solid` (module graph, after
       tree shaking, via `moduleParsed`/`generateBundle`),
@@ -620,14 +642,14 @@ internal API so the swap is local.
 
 Mapping of preset components:
 
-| Component                                                                            | Behavior                                                                      |
-| ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| checkbox, switch, radio group, slider, tabs, menu, dialog, tooltip, select, combobox | Zag                                                                           |
-| button, icon button, FAB, chip (assist/filter/input/suggestion)                      | own (simple; press, focus, toggle)                                            |
-| linear and circular progress                                                         | own (no interaction; `role=progressbar` and value props)                      |
-| ripple, state layer                                                                  | own (`@pureform/machines/ripple`; ports `apps/solid-demo/src/lib/ripple.tsx`) |
-| navigation bar/rail, segmented button                                                | Zag `toggle-group`/`tabs` where it fits, else own                             |
-| text field                                                                           | Zag-free own machine: Material's floating label states don't map to Zag's     |
+| Component                                                                                                    | Behavior                                                                                                                              |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| checkbox, switch, radio group, slider, tabs, menu, dialog, tooltip, select, combobox (not in the preset yet) | Zag                                                                                                                                   |
+| button, icon button, FAB, chip (assist/filter/input/suggestion)                                              | own (simple; press, focus, toggle)                                                                                                    |
+| linear and circular progress                                                                                 | own (no interaction; `role=progressbar` and value props)                                                                              |
+| ripple, state layer                                                                                          | own: the ripple is already framework-free in `@pureform/js-effects`; `apps/solid-demo/src/lib/ripple.tsx` is the Solid wiring to port |
+| navigation bar/rail, segmented button (not in the preset yet)                                                | Zag `toggle-group`/`tabs` where it fits, else own                                                                                     |
+| text field                                                                                                   | Zag-free own machine: Material's floating label states don't map to Zag's                                                             |
 
 Our own machines use the same shape as Zag's (`machine`, `connect` returning part props),
 so bindings treat them uniformly.
@@ -668,8 +690,9 @@ so bindings treat them uniformly.
     string as a prefix for every part. Typed: the keys are the component's slot names from
     the AST.
 
-- Parts read a `ButtonContext` created by `Root`: machine API, selection, and the
-  resolved slot styles from one `select` call.
+- Parts read a `ButtonContext` created by `Root`: machine API, selection, and every
+  slot's classes from one `useClasses` call (on React Native, styles from one
+  `useStyles` call).
 
 ### 9.2 What every part does
 
@@ -680,7 +703,7 @@ so bindings treat them uniformly.
   part out of registry styles.
 - **Stable test ids:** `data-testid` defaults to `pf-<component>-<part>` (`pf-button-root`),
   overridable by `testId` on Root, which prefixes every part (`save-root`, `save-label`).
-  Also always present: `data-pf-part`, and state attributes (`data-pressed`,
+  Also always present: `data-pf-part`, and state attributes (`data-active`,
   `data-disabled`) usable as selectors. Exported `testIds.button.root` constants from
   `@pureform/anatomy` so tests don't hard-code strings.
 - **Per-instance styling hooks:** `tokens={{ value: 40 }}` sets instance tokens (§5.4).
@@ -704,15 +727,17 @@ component), Zag's shape, identical in Solid and React:
 <Checkbox.Root defaultChecked name="terms" />                                        // uncontrolled
 ```
 
-- **Names come from the AST's states**, so the prop, the data attribute, and the style
-  state match (`checked` → `data-checked` → `slot("root", "checked")`):
+- **Names come from the AST's states**, so the prop and the style state match, and the
+  CSS matches the attributes Zag sets (`checked` → Zag's `data-state="checked"` →
+  `slot("root", "checked")`, whose lowering also takes `:checked`, `data-checked`, and
+  `aria-checked`):
 
-    | Prop       | Components                                                                                          |
-    | ---------- | --------------------------------------------------------------------------------------------------- |
-    | `checked`  | checkbox (`boolean \| "indeterminate"`), switch                                                     |
-    | `selected` | chip, toggle icon button                                                                            |
-    | `value`    | text field, text area, select, slider, radio group, tabs, navigation bar and rail, segmented button |
-    | `open`     | menu, dialog, tooltip, select                                                                       |
+    | Prop       | Components                                                                                                                  |
+    | ---------- | --------------------------------------------------------------------------------------------------------------------------- |
+    | `checked`  | checkbox (`boolean \| "indeterminate"`), switch                                                                             |
+    | `selected` | chip, toggle icon button (needs a `selected` state in the preset)                                                           |
+    | `value`    | text field, text area, select, slider, radio group, tabs, navigation bar and rail, segmented button (not in the preset yet) |
+    | `open`     | menu, dialog, tooltip, select                                                                                               |
 
 - **Controlled means defined.** A prop that isn't `undefined` controls the state; the
   `default*` prop is read once, at creation. Switching between them warns in development.
@@ -739,22 +764,30 @@ validate, and disable with it, with no form library.
 - **Submitting.** A component with `name` submits under it:
     - Text field and text area: the `input` slot is the native `<input>` or `<textarea>`,
       so submitting, autofill, and the browser's validation work as is.
-    - Zag-backed controls (checkbox, switch, radio group, slider, select): Zag's hidden
-      native input, or for select its hidden `<select>`, so autofill fills it too. It
-      becomes an unstyled `HiddenInput` part in the anatomy, alongside the slots;
-      ready-made components render it themselves.
+    - Checkbox, switch, radio, and slider: the preset already gives each an `input` slot,
+      a native input stretched invisibly over the control that takes every interaction
+      (`controlInput`), so the CSS's `:checked` and `:disabled` work. Zag's hidden-input
+      props go on that slot, without Zag's visually-hidden inline style, which the slot's
+      style replaces. Whether Zag's machines accept interaction through that input rather
+      than their own control part is checked in the port (§13).
+    - Select: Zag's hidden `<select>`, so autofill fills it too, as an unstyled
+      `HiddenSelect` part outside the slots; ready-made components render it themselves.
     - Values: checkbox and switch submit `value` (default `"on"`) when checked, a slider
       its number, a multiple select one entry per value.
 - **Props:** `name`, `form` (a form's id, for a control outside it), `required`,
-  `disabled`, and `readOnly`, forwarded to the native element.
+  `disabled`, and `readOnly`, forwarded to the native element. Zag marks read-only with
+  `data-readonly`, while the `readOnly` lowering matches `data-read-only`; the lowering
+  takes both.
 - **Reset.** A form reset puts uncontrolled state back to its `default*` value. On
   controlled state it calls the change callback with `reason: "reset"`, and the owner
   decides. React 19 and Solid 2 form actions reset the form after submitting, so this
   path is common.
 - **Disabled fieldsets** disable every control in them. Zag tracks this with
   `trackFormControl`; our own machines use the same helper from `@zag-js/dom-query`.
-- **Validation.** Material's error look keys on the `invalid` state, which the CSS
-  already matches as `aria-invalid` or `data-invalid`. Three ways in:
+- **Validation.** Material's error look keys on the `invalid` state. On a text input's
+  slots the CSS matches `aria-invalid` or `data-invalid` on the slot or inside it, and not
+  `:invalid`, so an empty required field doesn't show an error before the user acts.
+  Three ways in:
     - `invalid` (boolean): the app decides; nothing else changes.
     - `error` (string): sets `invalid`, shows the text as supporting text, and calls
       `setCustomValidity`, so the browser blocks submitting and its validation APIs agree.
@@ -771,10 +804,12 @@ pureform ships no icon set. An icon is whatever the app renders: an SVG componen
 Material Symbols glyph, an image. The icon slot owns its size, color, and direction; the
 icon only has to follow them.
 
-- **Web contract: `1em` and `currentColor`.** The icon slot (`iconBox`) sets
-  `width`, `height`, and `font-size` to the icon size, and the slot's color. An SVG with
-  `width="1em" height="1em" fill="currentColor"` (what Material Symbols' SVGs, Iconify,
-  and `unplugin-icons` produce) or a font glyph then fits with no props. The AST has no
+- **Web contract: `1em` and `currentColor`.** The icon slot (`iconBox`) sets `width`,
+  `height`, and `font-size` to the icon size, and each component sets the slot's color.
+  An SVG with `width="1em" height="1em" fill="currentColor"` (what Iconify and
+  `unplugin-icons` produce) or a font glyph such as Material Symbols then fits with no
+  props. Raw Material Symbols SVG files carry only a `viewBox`, so they're imported
+  through such a tool or given those attributes. The AST has no
   child selectors, and none are added for this.
 - **React Native contract: a hook.** Nothing inherits there, so the icon part provides
   `useIconStyle()` → `{ size, color }`, and icon components take them as props
@@ -786,8 +821,9 @@ icon only has to follow them.
   read it, so `useIconStyle()` also returns `filled`, for apps that swap the SVG.
 - **Placement.** Compound parts (`Button.Icon`, `TextField.LeadingIcon`), or props on the
   ready-made component (`icon`, `leadingIcon`, `trailingIcon`) taking any element. A slot
-  renders only when given, and the root gets the data attribute that the icon-dependent
-  styles match (the fields' and tabs' remaining compounds, §5.5).
+  renders only when given, and the component sets the matching variant
+  (`leadingIcon: "true"` on the fields, `icon: "true"` on tabs), which the remaining
+  compounds read (§5.5).
 - **Direction:** `mirror` flips an icon that points under `rtl` (§5.9).
 - **Accessibility.** Icons in a slot are decorative: `aria-hidden="true"`. The standalone
   `Icon` takes `label`, which makes it `role="img"` with that name. Icon-only components
@@ -812,8 +848,9 @@ icon only has to follow them.
 
 `@pureform/cli` ships the `pureform` bin. It holds no generation logic of its own: it
 calls `@pureform/generate`, the same step the plugin runs, so the two can't produce
-different glue, and installing the CLI doesn't pull in the bundler plugin. A separate package keeps the command where users look for it and
-gives later commands a home without growing the plugin.
+different glue, and installing the CLI doesn't pull in the bundler plugin. A separate
+package keeps the command where users look for it and gives later commands a home
+without growing the plugin.
 
 - `pureform generate [--watch] [--check]`: writes the `.pureform/` glue and its type
   declarations without a bundler, for `tsc`, lint, and tests, or before a dev server
@@ -864,8 +901,9 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
 
 ## 12. Migration from what exists
 
-1. Extract `@pureform/styling` from `rn-adapter`'s `useSelected`/selection code and the
-   Panda/CSS adapters' runtime bits.
+1. Extract `@pureform/styling` from `rn-adapter`'s `useSelected`/selection code,
+   `@pureform/css-adapter/runtime`'s `componentClasses`, and `css-lowering`'s
+   `themeVars`.
 2. Add `@pureform/anatomy` generated from the preset; test against the AST.
 3. Port Zag's Solid adapter to Solid 2; build checkbox and button end to end on
    `solid-demo` with the Panda target.
@@ -876,7 +914,7 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
    (`pureform generate`) over it.
 5. Bring CSS and Tailwind targets to parity; switch `css-demo`/`tailwind-demo` to the
    components.
-6. Pruning (§7.3).
+6. Pruning (§7, item 3).
 7. Move RN components out of `rn-web-demo` into `@pureform/react-native` on the same
    anatomy.
 
@@ -890,6 +928,8 @@ Preset changes these designs need, independent of the steps above:
   the development warning in the bindings.
 - Icons (§9.6): the icon slots' `fill` token and `font-variation-settings`, set by the
   states Material draws filled.
+- State (§9.4): a `selected` state on the icon button, for toggle icon buttons.
+- Lowering (§9.5): `readOnly` also matches Zag's `data-readonly`.
 
 ## 13. Risks and open questions
 
@@ -897,6 +937,9 @@ Preset changes these designs need, independent of the steps above:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
+3. **Zag over the preset's native inputs** (§9.5): confirm that Zag's checkbox, switch,
+   radio group, and slider work with interaction arriving through the preset's
+   overlaid native `input` slot.
 
 Decided: factory generators live in each adapter's `/codegen` subpath; Panda's extractor
 can't follow the registry, so we rely on `staticCss` and accept its bloat until pruning;
