@@ -1,9 +1,9 @@
 # @pureform/solid
 
-pureform's bindings for Solid 2: the provider, the style registry's hooks, and the helpers
-components build their parts from, on top of a port of Zag.js's Solid adapter to Solid 2. The
-components themselves (button, checkbox, …) come next and are each "wire the anatomy to a
-machine to the registry".
+pureform's bindings for Solid 2: the provider, the style registry's hooks, the helpers
+components build their parts from, and the components themselves (button and checkbox so far),
+on top of a port of Zag.js's Solid adapter to Solid 2. Each component wires its anatomy to a
+machine to the registry, and comes ready-made and as compound parts.
 
 ## Where it sits
 
@@ -34,6 +34,9 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 | `form.ts`         | `useFormReset`, `useFieldsetDisabled`                                                     |
 | `motion.ts`       | `useReducedMotion`                                                                        |
 | `icon-style.ts`   | `useIconStyle`, and the context icon parts provide                                        |
+| `part-context.ts` | `createPartContext`: the context Root shares with its parts, and the error outside Root   |
+| `button/`         | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`     |
+| `checkbox/`       | `@pureform/solid/checkbox`: the same layout                                               |
 | `internal/zag/`   | The Zag port (below)                                                                      |
 
 ```
@@ -46,6 +49,64 @@ Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► use
 ```
 
 ## Public API
+
+### Components
+
+One subpath per component, so an app's bundle keeps only what it imports. Each export is the
+ready-made component, with its compound parts as properties.
+
+```tsx
+import { Button } from "@pureform/solid/button";
+import { Checkbox } from "@pureform/solid/checkbox";
+
+<Button label="Save" icon={<SaveIcon />} variant="tonal" type="submit" />
+<Button
+    label="Bold"
+    defaultSelected={false} // a toggle: aria-pressed, onSelectedChange({ selected })
+    class={{ root: ["wide", { busy: saving() }], label: "caps" }}
+    style={{ root: { "margin-top": "8px" } }}
+    testId="bold" // bold-root, bold-label, …
+    slotProps={{ icon: { title: "B" } }}
+    unstyled={{ label: true }}
+/>
+<Button.Root variant="text" onClick={save}>
+    <Button.TouchTarget />
+    <Button.Icon mirror><ArrowIcon /></Button.Icon>
+    <Button.Label>Next</Button.Label>
+</Button.Root>
+
+<Checkbox name="terms" aria-label="Accept the terms" defaultChecked />
+<Checkbox checked={agreed()} onCheckedChange={(d) => setAgreed(d.checked === true)} />
+<Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
+    <Checkbox.TouchTarget />
+    <Checkbox.Input />
+    <Checkbox.Box>
+        <Checkbox.CheckIcon />
+        <Checkbox.IndeterminateIcon />
+    </Checkbox.Box>
+</Checkbox.Root>
+```
+
+| Component  | Parts (element)                                                                                      | Machine                                |
+| ---------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `Button`   | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                           | `@pureform/machines/button`            |
+| `Checkbox` | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon` | Zag's checkbox, through `internal/zag` |
+
+- **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
+  `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
+  `selected` or `checked`), `id` and `ids` (the machine finds its elements by id, so set them
+  here rather than on a part), `testId`, `unstyled`, `as`, and the element's own props. The lists
+  live in `@pureform/binding-core` (`BUTTON_ROOT_PROPS`, `CHECKBOX_ROOT_PROPS`), shared with React.
+- **Parts** take the element's props and their own `unstyled`; `Button.Icon` takes `mirror`.
+  A part outside its Root throws, naming both.
+- **The ready-made** component takes Root's props, with `class`, `style`, and `slotProps` keyed by
+  part. `Button` takes `label`, `icon` (the icon part renders only when given), and `mirrorIcon`.
+  `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its input.
+- **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
+  target toggles it. Name it with `aria-label`, or point a `<label for>` at `ids.input`; don't
+  wrap it in another label. The input carries every native state the CSS reads (`:checked`,
+  `:indeterminate`, `:disabled`, `aria-invalid`), and the form reset and fieldset rule are the
+  binding's (below).
 
 ### Provider
 
@@ -207,7 +268,18 @@ Through the omni MCP (or `omni run`):
   app's Solid plugin compiles it for the DOM or the server; the `solid` export condition points
   there, as does `import`. Identifiers aren't minified, so components stay capitalized.
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`), with type
-  checks. The specs use a fake registry (`src/__fixtures__/registry.ts`) and the example button.
+  checks. The specs use a fake registry (`src/__fixtures__/registry.ts`, button and checkbox
+  classes that name the selection). Each component's spec covers rendering, keyboard, controlled
+  and uncontrolled state, test ids, `unstyled`, slot overrides, and forms; the core helpers'
+  specs use a smaller example button (`src/__fixtures__/button.tsx`).
+
+### Adding a component
+
+Copy `src/button/` or `src/checkbox/`: the contract (Root's own props, the selection, the machine
+props) goes in `@pureform/binding-core`'s `src/components/<name>.ts`; the component file creates
+its part context with `createPartContext`, makes one `useComponent` call in Root, and renders each
+part with `scope.render`. Add the entry to `vite.config.ts`'s `lib.entry` and the subpath to
+`package.json`'s `exports`.
 
 ## Worth knowing
 
@@ -217,5 +289,9 @@ Through the omni MCP (or `omni run`):
   whose entry kind differs isn't followed.
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
   transition.
+- The ready-made `Button` reads its `icon` prop once to decide whether to render the icon part,
+  which builds the icon's JSX an extra time; the part builds it again inside its own context.
+- A controlled checkbox's native input is put back after a click the owner ignores, in a
+  microtask once the machine and the owner have handled it (`syncCheckedInput`).
 - `solid-js` and `@solidjs/web` are peers at the exact release candidate the package is tested
   with (design doc §11).
