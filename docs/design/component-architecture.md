@@ -322,6 +322,64 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   `@pureform/material`'s generators in the browser and writes vars. Opt-in import, so
   apps that don't use it don't ship the color math.
 
+### 5.7 Server rendering
+
+Goal: the server's HTML has every class, attribute, and CSS var the client would render,
+so hydration changes nothing and the first paint is styled, in either color scheme.
+
+- **Factories are pure.** A factory reads only its selection: no DOM, no globals, no
+  state between calls. The server and the client get the same classes and vars from the
+  same input. A contract test calls each generated factory in Node and in the browser and
+  compares.
+- **The registry is synchronous.** Entries are static imports, so a component has its
+  factory on its first render on the server and while hydrating. A lazy entry would
+  render without classes and patch them in later. Code splitting comes from the component
+  modules (§7) and pruning, not from the registry.
+- **Nothing is module-level.** The registry, theme, and overrides come from
+  `PureformProvider`'s context, so concurrent requests can't leak into each other.
+- **Interaction states start off.** Machines render their initial state on the server
+  (`data-disabled`, `aria-checked` from props). Hover, press, and focus states are set
+  only by client events, so the server never guesses them.
+- **Ids match.** Zag ids and the `aria-*` links between parts come from the framework's
+  hydration-safe ids (Solid's `createUniqueId`, React's `useId`).
+- **Client-only effects stay in effects.** Ripples, `matchMedia`, and measuring run after
+  mount (`onSettled`, `useEffect`) and never change what was first rendered.
+
+**Color scheme.** The server doesn't know the system preference, so nothing styles by
+scheme in JS. The stylesheet already follows the system with
+`@media (prefers-color-scheme)` and lets `.light`/`.dark` on the root override it. An
+app that stores the user's choice reads it from a cookie on the server and renders the
+class. No script runs before paint.
+
+**Runtime themes and overrides** (§5.6) are written so either scheme works without JS:
+
+- **Small overrides** (a few tokens, scheme-independent): an inline `style` with CSS vars
+  on the provider's element, rendered on the server.
+- **Whole themes** (from a seed color, or loaded at runtime): the provider generates both
+  schemes' vars, on the server too, and writes one `<style>` block under the same scheme
+  conditions the stylesheet uses, scoped to `[data-pf-theme="<hash>"]`. The hash is of
+  the theme's content, so the server and client agree on it and two providers with the
+  same theme share one block. The block goes into `<head>` through the framework's own
+  API: React 19's `<style href precedence>`, which hoists and dedupes, and Solid's asset
+  API (to confirm on Solid 2). Panda's `injectTheme` touches the DOM, so the Panda
+  factory exposes the theme's CSS as a string and the provider renders it the same way.
+- **The generators run on both sides.** They're pure, so the client regenerates the same
+  vars instead of reading serialized ones. If that turns out to be slow, the server can
+  serialize them into the page instead.
+
+**Instance tokens** become inline CSS vars from the factory, so they render on the
+server. `@property` registrations are in the static stylesheet, so transitions work from
+the first paint.
+
+**React Native Web.** `StyleFactory` is pure as well, so RN-web's server-side style
+extraction works as it does today. Animated tweens start once mounted, from the rendered
+values.
+
+**Testing.** A browser-mode suite renders each component on the server, hydrates it, and
+fails on any hydration warning or on any class, `style`, `data-*`, or `aria-*` attribute
+that differs between the server's HTML and the hydrated DOM. It runs for each web target
+and in both color schemes, plus once with a runtime theme.
+
 ## 6. Generated glue
 
 `pureform generate` (also run by the bundler plugin in dev and build) writes the factory
@@ -331,9 +389,8 @@ modules of §5.2 to `.pureform/`, and an index, also served as the virtual modul
 ```ts
 // generated: do not edit
 import { createRegistry } from "@pureform/styling";
-export const registry = createRegistry({
-    button: () => import("./web/button").then((m) => m.button), // or a static import
-});
+import { button } from "./web/button";
+export const registry = createRegistry({ button }); // static, for server rendering (§5.7)
 export const themes = ["teal"] as const;
 export type Components = "button" | "checkbox"; // augments typing
 ```
@@ -510,8 +567,9 @@ Deferred until there's demand:
    static variant classes by the bundler plugin.
 2. **Solid 2 is RC.** API churn could break the Zag port; pin and track. Check whether
    `@zag-js/solid` supports Solid 2 before porting the adapter.
-3. **SSR:** registry and provider must work during SSR and hydrate without style
-   mismatch, including runtime themes (write vars inline on the server). Not designed yet.
+3. **Server rendering** (§5.7): confirm Solid 2's API for putting a `<style>` in
+   `<head>`, and measure whether regenerating seed themes on the client while hydrating is
+   cheap enough.
 4. **Not yet covered:** controlled and uncontrolled props (`checked`, `defaultChecked`,
    `onCheckedChange`) mapped onto Zag the same way in Solid and React; native form
    participation; `prefers-reduced-motion`, including token tweens on React Native;
