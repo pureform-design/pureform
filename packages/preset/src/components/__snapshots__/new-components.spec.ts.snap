@@ -421,10 +421,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineEnd": "var(--components-listItem-paddingInline, token(spacing.4))",
       "paddingInlineStart": "var(--components-listItem-paddingInline, token(spacing.4))",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "supportingText": {
       "color": {
@@ -649,10 +646,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineEnd": "var(--components-menu-itemPaddingInline, token(spacing.3))",
       "paddingInlineStart": "var(--components-menu-itemPaddingInline, token(spacing.3))",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "100%",
     },
     "itemLabel": {
@@ -955,7 +949,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transition": {
-        "_motionReduce": "none",
+        "_motionReduce": "opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
         "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
       },
     },
@@ -988,10 +982,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "height": "var(--components-navigationBar-indicatorHeight, 32px)",
       "justifyContent": "center",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "var(--components-navigationBar-indicatorWidth, 64px)",
     },
     "item": {
@@ -1024,10 +1015,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "paddingBlockEnd": "token(spacing.4)",
       "paddingBlockStart": "token(spacing.3)",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "label": {
       "maxWidth": "100%",
@@ -1197,7 +1185,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transition": {
-        "_motionReduce": "none",
+        "_motionReduce": "opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
         "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
       },
     },
@@ -1230,10 +1218,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "height": "var(--components-navigationRail-indicatorHeight, 32px)",
       "justifyContent": "center",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "var(--components-navigationRail-indicatorWidth, 56px)",
     },
     "item": {
@@ -1261,10 +1246,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlineWidth": "3px",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "100%",
     },
     "label": {
@@ -1464,10 +1446,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineStart": "var(--components-searchBar-paddingInline, token(spacing.4))",
       "position": "relative",
       "shadowElevation": "level3",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "trailing": {
       "alignItems": "center",
@@ -1503,10 +1482,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     "container": {
       "height": "calc(var(--components-select-height, 56px) + var(--components-select-densityOffset, token(sizes.densityOffset)))",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "input": {
       "&:is(:disabled, [aria-disabled=true])": {
@@ -1550,7 +1526,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "textStyle": "bodyLarge",
       "transition": {
-        "_motionReduce": "none",
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
         "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
       },
     },
@@ -1610,7 +1586,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
         "base": "translateY(-50%)",
       },
       "transition": {
-        "_motionReduce": "none",
+        "_motionReduce": "color token(durations.short3) token(easings.standard)",
         "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
       },
       "width": "var(--components-select-iconSize, token(sizes.iconMedium))",
@@ -1844,12 +1820,9 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "insetInlineStart": "0px",
       "position": "absolute",
       "transition": {
-        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
-          "_motionReduce": "none",
-          "base": "background-color token(durations.short3) token(easings.standard)",
-        },
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
-          "_motionReduce": "none",
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
           "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
         },
       },
@@ -1875,12 +1848,9 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
-          "_motionReduce": "none",
-          "base": "background-color token(durations.short3) token(easings.standard)",
-        },
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
-          "_motionReduce": "none",
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
           "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
         },
       },
@@ -1918,12 +1888,9 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "top": "50%",
       "transform": "translateY(-50%)",
       "transition": {
-        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
-          "_motionReduce": "none",
-          "base": "background-color token(durations.short3) token(easings.standard)",
-        },
+        ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
-          "_motionReduce": "none",
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
           "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
         },
       },
@@ -2137,10 +2104,7 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineStart": "token(spacing.3)",
       "position": "relative",
       "textStyle": "labelLarge",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "close": {
       "&:is(:disabled, [aria-disabled=true])": {
@@ -2172,10 +2136,7 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlineWidth": "3px",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "var(--components-snackbar-closeSize, 48px)",
     },
     "root": {
@@ -2294,10 +2255,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
       "paddingInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
   },
   "className": "tabs",

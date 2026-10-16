@@ -37,6 +37,25 @@ covers it pureform's own attributes: `data-pf-hover`, `data-pf-active` (a keyboa
 these; a behavior library's attributes, such as Zag's `data-state="checked"` or
 `data-selected`, don't style anything.
 
+## Reduced motion
+
+Under reduced motion, components stop moving but keep fading: a switch handle, a radio dot, a
+floating label, a navigation indicator, a shape morph, and a progress value change at once,
+while their colors, opacity, and elevation (`box-shadow`) still ease over the motion tokens.
+Indeterminate progress keeps spinning, since that motion is the only sign of work going on.
+The web follows the system's `prefers-reduced-motion`, which a `data-pf-motion="reduce"` or
+`"full"` attribute on an ancestor overrides (the bindings' provider writes it); React Native
+follows its provider's `reducedMotion`.
+
+Specs build their transitions with the helpers in `components/shared.ts`:
+
+- `STATE_TWEENS` and `stateTransition`: the state colors and elevation. They move nothing, so
+  they run under reduced motion too.
+- `tweens(...properties)`: those properties over `short3` on the standard curve.
+- `motionTransition(...parts)`: any parts; under reduced motion the ones that move drop out
+  (`transitionMoves` from `@pureform/core` decides), and none left is `none`. `tweens` and
+  shape morphs build on it.
+
 ## Density
 
 Density makes controls more compact (or roomier), a grid unit off a component's height per
@@ -163,7 +182,8 @@ components unless you show every shape.
 ### Morphing
 
 `morph(from, to)` makes a shape that changes into another while pressed, easing over `medium2`
-on the emphasized curve (instantly under reduced motion). It redraws both as the same number
+on the emphasized curve; under reduced motion the shape changes at once and the colors still
+fade. It redraws both as the same number
 of curves, running the same direction from the closest starting points, which is what lets
 the browser animate between them.
 

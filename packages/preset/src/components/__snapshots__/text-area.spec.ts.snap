@@ -6,10 +6,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     "container": {
       "display": "flex",
       "position": "relative",
-      "transition": {
-        "_motionReduce": "none",
-        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      },
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
     "input": {
       "&:is(:disabled, [aria-disabled=true])": {
@@ -52,7 +49,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "textStyle": "bodyLarge",
       "transition": {
-        "_motionReduce": "none",
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
         "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
       },
     },

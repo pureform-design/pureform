@@ -115,12 +115,20 @@ describe("morphing shapes", () => {
         expect(commands(pressed![1])).toEqual(commands(clip.base!));
     });
 
-    it("animate the clip, and not under reduced motion", () => {
-        expect(JSON.stringify(shape()?.container?.transition)).toContain(
+    it("animate the clip, and under reduced motion only the colors", () => {
+        const transition = shape()?.container?.transition as Record<
+            string,
+            string
+        >;
+        expect(transition.base).toContain(
             "clip-path token(durations.medium2) token(easings.emphasized)",
         );
-        expect(shape()?.container?.transition).toMatchObject({
-            _motionReduce: "none",
-        });
+        expect(transition._motionReduce).not.toContain("clip-path");
+        expect(transition._motionReduce).toContain(
+            "background-color token(durations.short3)",
+        );
+        expect(transition._motionReduce).toContain(
+            "box-shadow token(durations.medium1)",
+        );
     });
 });
