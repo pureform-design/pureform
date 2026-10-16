@@ -258,7 +258,9 @@ targets Solid 1, so this is a port of its version 1.46.0, with the same exports:
 It's internal: components use it, apps shouldn't. When `@zag-js/solid` supports Solid 2, the
 port is swapped out by changing imports. What changed from Zag's adapter, and why, is in the
 design doc's §8. Beyond Zag's adapter, `normalizeProps` writes ARIA booleans as `"true"` and
-`"false"` (Solid 2 writes `true` as an empty attribute).
+`"false"` (Solid 2 writes `true` as an empty attribute), and a machine's watches run untracked,
+since they read props and context on purpose (otherwise Solid's development diagnostics warn
+`STRICT_READ_UNTRACKED` on every watched change).
 
 ## Build and test
 
@@ -279,7 +281,8 @@ Copy `src/button/` or `src/checkbox/`: the contract (Root's own props, the selec
 props) goes in `@pureform/binding-core`'s `src/components/<name>.ts`; the component file creates
 its part context with `createPartContext`, makes one `useComponent` call in Root, and renders each
 part with `scope.render`. Add the entry to `vite.config.ts`'s `lib.entry` and the subpath to
-`package.json`'s `exports`.
+`package.json`'s `exports`. Then add it to the shared suites in `tests/component-suites`, which
+check the cross-cutting rules against Solid and React together (see that package's README).
 
 ## Worth knowing
 
