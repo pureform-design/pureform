@@ -2,7 +2,6 @@
 // tracks its interaction state, asks for its slots' styles, and lays the slots out as the web
 // markup does. The interactive ones animate their state changes and ripple when pressed.
 
-import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import {
     useComponentState,
     useComponentStyles,
@@ -10,18 +9,21 @@ import {
 } from "@pureform/rn-adapter/react";
 import { SvgDrawing } from "@pureform/rn-adapter/svg";
 import type { ReactNode } from "react";
-import { Animated, Image, Text, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import type { ImageStyle } from "react-native";
 
 import {
-    AnimatedPressable,
-    Glyph,
-    aview,
     atext,
+    aview,
+    Glyph,
+    MPressable,
+    MText,
+    MView,
     ownText,
     text,
     unselectable,
     useInk,
+    useMotionStyles,
     usePress,
     view,
     withInk,
@@ -48,7 +50,7 @@ export function Button(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ disabled: props.disabled ?? false });
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "button",
         { variant: props.variant, color: props.color },
         state,
@@ -60,7 +62,7 @@ export function Button(props: {
         { disabled: props.disabled ?? false },
     );
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="button"
             disabled={props.disabled}
@@ -68,12 +70,12 @@ export function Button(props: {
             style={aview({ ...s.root, ...unselectable })}
             testID={`button-${props.variant ?? "filled"}`}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.Text selectable={false} style={atext(s.label)}>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MText selectable={false} style={atext(s.label)}>
                 {props.label}
-            </Animated.Text>
+            </MText>
             {ink.layer}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -84,25 +86,21 @@ export function Chip(props: {
     onPress?: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected ?? false });
-    const s = useAnimatedComponentStyles(
-        "chip",
-        { variant: props.variant },
-        state,
-    );
+    const s = useMotionStyles("chip", { variant: props.variant }, state);
     const ink = useInk("chip", { variant: props.variant }, state);
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="button"
             onPress={props.onPress}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.Text selectable={false} style={atext(s.label)}>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MText selectable={false} style={atext(s.label)}>
                 {props.label}
-            </Animated.Text>
+            </MText>
             {ink.layer}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -112,9 +110,9 @@ export function Checkbox(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedComponentStyles("checkbox", {}, state);
+    const s = useMotionStyles("checkbox", {}, state);
     return (
-        <AnimatedPressable
+        <MPressable
             {...handlers}
             role="checkbox"
             aria-checked={props.checked}
@@ -122,12 +120,12 @@ export function Checkbox(props: {
             onPress={() => props.onChange(!props.checked)}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.View style={aview(s.box)}>
-                <Animated.View style={aview(s.checkIcon)} />
-                <Animated.View style={aview(s.indeterminateIcon)} />
-            </Animated.View>
-        </AnimatedPressable>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MView style={aview(s.box)}>
+                <MView style={aview(s.checkIcon)} />
+                <MView style={aview(s.indeterminateIcon)} />
+            </MView>
+        </MPressable>
     );
 }
 
@@ -137,9 +135,9 @@ export function Switch(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedComponentStyles("switchControl", {}, state);
+    const s = useMotionStyles("switchControl", {}, state);
     return (
-        <AnimatedPressable
+        <MPressable
             {...handlers}
             role="switch"
             aria-checked={props.checked}
@@ -147,16 +145,16 @@ export function Switch(props: {
             onPress={() => props.onChange(!props.checked)}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.View style={aview(s.track)}>
-                <Animated.View style={aview(s.stateLayer)} />
-                <Animated.View style={aview(s.handle)}>
-                    <Animated.Text selectable={false} style={atext(s.icon)}>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MView style={aview(s.track)}>
+                <MView style={aview(s.stateLayer)} />
+                <MView style={aview(s.handle)}>
+                    <MText selectable={false} style={atext(s.icon)}>
                         {props.checked ? "✓" : ""}
-                    </Animated.Text>
-                </Animated.View>
-            </Animated.View>
-        </AnimatedPressable>
+                    </MText>
+                </MView>
+            </MView>
+        </MPressable>
     );
 }
 
@@ -164,10 +162,8 @@ export function Card(props: {
     variant?: "elevated" | "filled" | "outlined";
     children: ReactNode;
 }) {
-    const s = useAnimatedComponentStyles("card", { variant: props.variant });
-    return (
-        <Animated.View style={aview(s.root)}>{props.children}</Animated.View>
-    );
+    const s = useMotionStyles("card", { variant: props.variant });
+    return <MView style={aview(s.root)}>{props.children}</MView>;
 }
 
 type TextStyleName =
@@ -249,7 +245,7 @@ export function IconButton(props: {
         size: props.size,
         shape: props.shape,
     };
-    const s = useAnimatedComponentStyles("iconButton", variants, state);
+    const s = useMotionStyles("iconButton", variants, state);
     const { drawings } = useComponentState("iconButton", variants, state);
     const ink = useInk("iconButton", variants, state, {
         slot: "container",
@@ -257,27 +253,27 @@ export function IconButton(props: {
         disabled: props.disabled ?? false,
     });
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="button"
             aria-label={props.label}
             disabled={props.disabled}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.View style={aview(s.container)}>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MView style={aview(s.container)}>
                 <SvgDrawing drawing={drawings.container} />
-                <Animated.View style={aview(s.icon)}>
+                <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
-                </Animated.View>
+                </MView>
                 {ink.layer}
-            </Animated.View>
+            </MView>
             {props.variant === "outlined" && (
-                <Animated.View pointerEvents="none" style={aview(s.outline)}>
+                <MView pointerEvents="none" style={aview(s.outline)}>
                     <SvgDrawing drawing={drawings.outline} />
-                </Animated.View>
+                </MView>
             )}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -295,30 +291,30 @@ export function Fab(props: {
         shape: props.shape,
         extended: props.label ? "true" : "false",
     };
-    const s = useAnimatedComponentStyles("fab", variants, state);
+    const s = useMotionStyles("fab", variants, state);
     const { drawings } = useComponentState("fab", variants, state);
     const ink = useInk("fab", variants, state, { slot: "container" });
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="button"
             aria-label={props.label ?? props.glyph}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.View style={aview(s.container)}>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MView style={aview(s.container)}>
                 <SvgDrawing drawing={drawings.container} />
-                <Animated.View style={aview(s.icon)}>
+                <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
-                </Animated.View>
+                </MView>
                 {props.label && (
-                    <Animated.Text selectable={false} style={atext(s.label)}>
+                    <MText selectable={false} style={atext(s.label)}>
                         {props.label}
-                    </Animated.Text>
+                    </MText>
                 )}
                 {ink.layer}
-            </Animated.View>
-        </AnimatedPressable>
+            </MView>
+        </MPressable>
     );
 }
 
@@ -328,9 +324,9 @@ export function Radio(props: {
     label: string;
 }) {
     const { state, handlers } = usePress({ checked: props.checked });
-    const s = useAnimatedComponentStyles("radio", {}, state);
+    const s = useMotionStyles("radio", {}, state);
     return (
-        <AnimatedPressable
+        <MPressable
             {...handlers}
             role="radio"
             aria-checked={props.checked}
@@ -338,11 +334,11 @@ export function Radio(props: {
             onPress={props.onChange}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.touchTarget)} />
-            <Animated.View style={aview(s.ring)}>
-                <Animated.View style={aview(s.dot)} />
-            </Animated.View>
-        </AnimatedPressable>
+            <MView pointerEvents="none" style={aview(s.touchTarget)} />
+            <MView style={aview(s.ring)}>
+                <MView style={aview(s.dot)} />
+            </MView>
+        </MPressable>
     );
 }
 
@@ -363,7 +359,7 @@ export function ListItem(props: {
             : props.overline || props.supportingText
               ? "two"
               : "one";
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "listItem",
         { lines, interactive: interactive ? "true" : "false" },
         interactive ? state : {},
@@ -376,30 +372,30 @@ export function ListItem(props: {
     );
     const line = (slot: string, value: string | undefined) =>
         value !== undefined && (
-            <Animated.Text selectable={false} style={atext(s[slot])}>
+            <MText selectable={false} style={atext(s[slot])}>
                 {value}
-            </Animated.Text>
+            </MText>
         );
     return (
-        <AnimatedPressable
+        <MPressable
             {...(interactive ? withInk(handlers, ink) : {})}
             role={interactive ? "button" : "listitem"}
             {...(interactive ? { onPress: props.onPress } : { disabled: true })}
             style={aview({ ...s.root, ...unselectable })}
         >
             {props.leading && (
-                <Animated.View style={aview(s.leading)}>
+                <MView style={aview(s.leading)}>
                     <Glyph style={s.leading} glyph={props.leading} />
-                </Animated.View>
+                </MView>
             )}
-            <Animated.View style={aview(s.content)}>
+            <MView style={aview(s.content)}>
                 {line("overline", props.overline)}
                 {line("headline", props.headline)}
                 {line("supportingText", props.supportingText)}
-            </Animated.View>
+            </MView>
             {line("trailingText", props.trailingText)}
             {ink.layer}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -413,7 +409,7 @@ export function LinearProgress(props: {
     value?: number | undefined;
     color?: Group;
 }) {
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "linearProgress",
         {
             color: props.color,
@@ -425,13 +421,13 @@ export function LinearProgress(props: {
         },
     );
     return (
-        <Animated.View
+        <MView
             role="progressbar"
             aria-valuenow={props.value}
             style={aview(s.root)}
         >
-            <Animated.View style={aview(s.indicator)} />
-        </Animated.View>
+            <MView style={aview(s.indicator)} />
+        </MView>
     );
 }
 
@@ -439,7 +435,7 @@ export function CircularProgress(props: {
     value?: number | undefined;
     color?: Group;
 }) {
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "circularProgress",
         {
             color: props.color,
@@ -451,18 +447,18 @@ export function CircularProgress(props: {
         },
     );
     return (
-        <Animated.View
+        <MView
             role="progressbar"
             aria-valuenow={props.value}
             style={aview(s.root)}
         >
-            <Animated.View style={aview(s.endHalf)}>
-                <Animated.View style={aview(s.endArc)} />
-            </Animated.View>
-            <Animated.View style={aview(s.startHalf)}>
-                <Animated.View style={aview(s.startArc)} />
-            </Animated.View>
-        </Animated.View>
+            <MView style={aview(s.endHalf)}>
+                <MView style={aview(s.endArc)} />
+            </MView>
+            <MView style={aview(s.startHalf)}>
+                <MView style={aview(s.startArc)} />
+            </MView>
+        </MView>
     );
 }
 

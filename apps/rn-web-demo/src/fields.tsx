@@ -2,31 +2,25 @@
 // focus and value, which the field's container and label read as the web's :focus-within and
 // a filled input.
 
-import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import { pressableState, useComponentStyles } from "@pureform/rn-adapter/react";
 import { useRef, useState } from "react";
 import type { Ref } from "react";
-import {
-    Animated,
-    Modal,
-    Pressable,
-    StyleSheet,
-    TextInput,
-    View,
-} from "react-native";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 import type { GestureResponderEvent } from "react-native";
 
 import { Menu } from "./navigation";
 import {
-    AnimatedPressable,
-    Glyph,
-    aview,
     atext,
+    aview,
+    Glyph,
+    MPressable,
+    MText,
+    MTextInput,
+    MView,
     unselectable,
+    useMotionStyles,
     usePress,
 } from "./parts";
-
-const AnimatedTextInput = Animated.createAnimatedComponent(TextInput);
 
 // A view, read for where it sits on screen.
 interface Measurable {
@@ -63,7 +57,7 @@ function Field(
 ) {
     const [ownFocus, setFocused] = useState(false);
     const focused = ownFocus || (props.expanded ?? false);
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         props.name,
         {
             variant: props.variant,
@@ -80,17 +74,14 @@ function Field(
         },
     );
     return (
-        <Animated.View style={aview(s.root)}>
-            <Animated.View
-                ref={props.container as never}
-                style={aview(s.container)}
-            >
+        <MView style={aview(s.root)}>
+            <MView ref={props.container as never} style={aview(s.container)}>
                 {props.leading && (
-                    <Animated.View style={aview(s.leadingIcon)}>
+                    <MView style={aview(s.leadingIcon)}>
                         <Glyph style={s.leadingIcon} glyph={props.leading} />
-                    </Animated.View>
+                    </MView>
                 )}
-                <AnimatedTextInput
+                <MTextInput
                     value={props.value}
                     onChangeText={props.onChange}
                     onFocus={() => setFocused(true)}
@@ -102,28 +93,25 @@ function Field(
                     numberOfLines={props.lines}
                     style={atext(s.input)}
                 />
-                <Animated.Text
+                <MText
                     selectable={false}
                     pointerEvents="none"
                     style={atext(s.label)}
                 >
                     {props.label}
-                </Animated.Text>
+                </MText>
                 {props.trailing && (
-                    <Animated.View
-                        pointerEvents="none"
-                        style={aview(s.trailingIcon)}
-                    >
+                    <MView pointerEvents="none" style={aview(s.trailingIcon)}>
                         <Glyph style={s.trailingIcon} glyph={props.trailing} />
-                    </Animated.View>
+                    </MView>
                 )}
-            </Animated.View>
+            </MView>
             {props.supportingText && (
-                <Animated.Text style={atext(s.supportingText)}>
+                <MText style={atext(s.supportingText)}>
                     {props.supportingText}
-                </Animated.Text>
+                </MText>
             )}
-        </Animated.View>
+        </MView>
     );
 }
 
@@ -213,21 +201,21 @@ export function SearchBar(props: {
         focusVisible: focused,
         filled: props.value !== "",
     };
-    const s = useAnimatedComponentStyles("searchBar", {}, searchState);
+    const s = useMotionStyles("searchBar", {}, searchState);
     // A placeholder's color is a prop, so it takes the plain value rather than an animated one.
     const placeholder = useComponentStyles("searchBar", {}, searchState).input
         ?.color;
     return (
-        <AnimatedPressable
+        <MPressable
             {...handlers}
             onFocus={undefined}
             onBlur={undefined}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View style={aview(s.leading)}>
+            <MView style={aview(s.leading)}>
                 <Glyph style={s.leading} glyph="⌕" />
-            </Animated.View>
-            <AnimatedTextInput
+            </MView>
+            <MTextInput
                 value={props.value}
                 onChangeText={props.onChange}
                 onFocus={() => setFocused(true)}
@@ -237,10 +225,10 @@ export function SearchBar(props: {
                 aria-label="Search"
                 style={atext(s.input)}
             />
-            <Animated.View style={aview(s.trailing)}>
+            <MView style={aview(s.trailing)}>
                 <Glyph style={s.trailing} glyph="🎤" />
-            </Animated.View>
-        </AnimatedPressable>
+            </MView>
+        </MPressable>
     );
 }
 
@@ -266,7 +254,7 @@ export function Slider(props: {
             ) => void,
         ) => void;
     }>(null);
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "slider",
         {},
         {
@@ -282,7 +270,7 @@ export function Slider(props: {
         props.onChange(Math.round(Math.min(Math.max(ratio, 0), 1) * 100));
     };
     return (
-        <Animated.View
+        <MView
             ref={root as never}
             role="slider"
             aria-label={props.label}
@@ -320,10 +308,10 @@ export function Slider(props: {
             }}
             style={aview({ ...s.root, ...unselectable })}
         >
-            <Animated.View pointerEvents="none" style={aview(s.track)} />
-            <Animated.View pointerEvents="none" style={aview(s.activeTrack)} />
-            <Animated.View pointerEvents="none" style={aview(s.stateLayer)} />
-            <Animated.View pointerEvents="none" style={aview(s.handle)} />
-        </Animated.View>
+            <MView pointerEvents="none" style={aview(s.track)} />
+            <MView pointerEvents="none" style={aview(s.activeTrack)} />
+            <MView pointerEvents="none" style={aview(s.stateLayer)} />
+            <MView pointerEvents="none" style={aview(s.handle)} />
+        </MView>
     );
 }

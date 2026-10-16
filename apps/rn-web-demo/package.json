@@ -12,8 +12,10 @@
         "@pureform/rn-adapter": "catalog:",
         "react": "catalog:",
         "react-dom": "catalog:",
+        "react-native-reanimated": "catalog:",
         "react-native-svg": "catalog:",
-        "react-native-web": "catalog:"
+        "react-native-web": "catalog:",
+        "react-native-worklets": "catalog:"
     },
     "devDependencies": {
         "@pureform/material": "catalog:",

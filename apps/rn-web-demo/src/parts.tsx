@@ -2,12 +2,15 @@
 // ripples, and glyphs standing in for icons.
 
 import type { State, Style } from "@pureform/rn-adapter";
+import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import { pressableState, useComponentState } from "@pureform/rn-adapter/react";
+import { useReanimatedComponentStyles } from "@pureform/rn-adapter/reanimated";
 import { useSvgRipple } from "@pureform/rn-adapter/svg";
-import { useState } from "react";
-import type { ComponentProps } from "react";
-import { Animated, Pressable } from "react-native";
+import { createContext, createElement, useContext, useState } from "react";
+import type { ComponentProps, ComponentType } from "react";
+import { Animated, Pressable, TextInput } from "react-native";
 import type { TextStyle, ViewStyle } from "react-native";
+import Reanimated from "react-native-reanimated";
 
 // The adapter's styles are checked against React Native's types when lowered.
 export const view = (style: Style | undefined) => style as ViewStyle;
@@ -20,16 +23,53 @@ export const aview = (style: Animatable) =>
 export const atext = (style: Animatable) =>
     style as Animated.WithAnimatedValue<TextStyle>;
 
-const AnimatedPressableBase = Animated.createAnimatedComponent(Pressable);
+/** The engine that runs the components' transitions and animations: React Native's
+ *  Animated, through useAnimatedComponentStyles, or Reanimated, through
+ *  useReanimatedComponentStyles. */
+export type Motion = "Animated" | "Reanimated";
+
+const MotionContext = createContext<Motion>("Animated");
+export const MotionProvider = MotionContext.Provider;
+
+/** A component's styles, from the engine the page picked. Both hooks run, so switching
+ *  engines keeps the hooks in order. */
+export const useMotionStyles = (
+    ...args: Parameters<typeof useAnimatedComponentStyles>
+): Record<string, Record<string, unknown>> => {
+    const animated = useAnimatedComponentStyles(...args);
+    const reanimated = useReanimatedComponentStyles(...args);
+    return useContext(MotionContext) === "Reanimated" ? reanimated : animated;
+};
+
+// One of the components' animated parts, from the engine the page picked.
+const either =
+    // oxlint-disable-next-line typescript/no-explicit-any
+    <C extends ComponentType<any>>(animated: C, reanimated: unknown) =>
+        (props: ComponentProps<C>) =>
+            createElement(
+                (useContext(MotionContext) === "Reanimated"
+                    ? reanimated
+                    : animated) as C,
+                props,
+            );
+
+export const MView = either(Animated.View, Reanimated.View);
+export const MText = either(Animated.Text, Reanimated.Text);
+export const MTextInput = either(
+    Animated.createAnimatedComponent(TextInput),
+    Reanimated.createAnimatedComponent(TextInput),
+);
+const PressableBase = either(
+    Animated.createAnimatedComponent(Pressable),
+    Reanimated.createAnimatedComponent(Pressable),
+);
 
 /** An animated Pressable that starts a press at once, as React Native does on a device.
  *  React Native Web holds a press's start for 50ms by default, which delays the pressed
  *  state and the ripple. */
-export const AnimatedPressable = (
-    props: ComponentProps<typeof AnimatedPressableBase>,
-) => (
+export const MPressable = (props: ComponentProps<typeof PressableBase>) => (
     // React Native's types call it unstable_pressDelay, and React Native Web reads delayPressIn.
-    <AnimatedPressableBase {...({ delayPressIn: 0 } as object)} {...props} />
+    <PressableBase {...({ delayPressIn: 0 } as object)} {...props} />
 );
 
 // Controls aren't text to select. Native text isn't selectable unless asked, but React Native

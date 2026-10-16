@@ -109,7 +109,11 @@ export default createConfig({
             },
         },
         build: { rolldownOptions: { shimMissingExports: true } },
-        // Parts of React Native Web's Animated refer to Node's `global`.
-        define: { global: "globalThis" },
+        // Parts of React Native Web's Animated refer to Node's `global`, and Reanimated to
+        // React Native's `__DEV__`.
+        define: {
+            global: "globalThis",
+            __DEV__: JSON.stringify(process.env.NODE_ENV !== "production"),
+        },
     },
 });

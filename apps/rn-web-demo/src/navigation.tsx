@@ -1,18 +1,19 @@
 // Navigation and surfaces: tabs, the navigation bar and rail, a menu, a dialog, a snackbar,
 // and tooltips. Each destination, tab, or item tracks its own interaction state.
 
-import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
 import type { ReactNode } from "react";
-import { Animated } from "react-native";
 
 import { Button } from "./components";
 import {
-    AnimatedPressable,
-    Glyph,
-    aview,
     atext,
+    aview,
+    Glyph,
+    MPressable,
+    MText,
+    MView,
     unselectable,
     useInk,
+    useMotionStyles,
     usePress,
     withInk,
 } from "./parts";
@@ -29,7 +30,7 @@ function Tab(props: {
     onPress: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected });
-    const s = useAnimatedComponentStyles(
+    const s = useMotionStyles(
         "tabs",
         { variant: props.variant, icon: "true" },
         state,
@@ -43,22 +44,22 @@ function Tab(props: {
         },
     );
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="tab"
             aria-selected={props.selected}
             onPress={props.onPress}
             style={aview({ ...s.tab, ...unselectable })}
         >
-            <Animated.View style={aview(s.icon)}>
+            <MView style={aview(s.icon)}>
                 <Glyph style={s.icon} glyph={props.item.glyph} />
-            </Animated.View>
-            <Animated.Text selectable={false} style={atext(s.label)}>
+            </MView>
+            <MText selectable={false} style={atext(s.label)}>
                 {props.item.label}
-            </Animated.Text>
-            <Animated.View pointerEvents="none" style={aview(s.indicator)} />
+            </MText>
+            <MView pointerEvents="none" style={aview(s.indicator)} />
             {ink.layer}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -69,9 +70,9 @@ export function Tabs(props: {
     onChange: (index: number) => void;
 }) {
     const variant = props.variant ?? "primary";
-    const s = useAnimatedComponentStyles("tabs", { variant, icon: "true" });
+    const s = useMotionStyles("tabs", { variant, icon: "true" });
     return (
-        <Animated.View role="tablist" style={aview(s.root)}>
+        <MView role="tablist" style={aview(s.root)}>
             {props.items.map((item, index) => (
                 <Tab
                     key={item.label}
@@ -81,7 +82,7 @@ export function Tabs(props: {
                     onPress={() => props.onChange(index)}
                 />
             ))}
-        </Animated.View>
+        </MView>
     );
 }
 
@@ -94,33 +95,30 @@ function NavigationItem(props: {
     onPress: () => void;
 }) {
     const { state, handlers } = usePress({ selected: props.selected });
-    const s = useAnimatedComponentStyles(props.name, {}, state);
+    const s = useMotionStyles(props.name, {}, state);
     const ink = useInk(props.name, {}, state, {
         slot: "indicator",
         centered: true,
     });
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="link"
             aria-current={props.selected ? "page" : undefined}
             onPress={props.onPress}
             style={aview({ ...s.item, ...unselectable })}
         >
-            <Animated.View style={aview(s.indicator)}>
-                <Animated.View
-                    pointerEvents="none"
-                    style={aview(s.activeIndicator)}
-                />
-                <Animated.View style={aview(s.icon)}>
+            <MView style={aview(s.indicator)}>
+                <MView pointerEvents="none" style={aview(s.activeIndicator)} />
+                <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.item.glyph} />
-                </Animated.View>
+                </MView>
                 {ink.layer}
-            </Animated.View>
-            <Animated.Text selectable={false} style={atext(s.label)}>
+            </MView>
+            <MText selectable={false} style={atext(s.label)}>
                 {props.item.label}
-            </Animated.Text>
-        </AnimatedPressable>
+            </MText>
+        </MPressable>
     );
 }
 
@@ -132,9 +130,9 @@ export function NavigationBar(props: {
     rail?: boolean;
 }) {
     const name: Navigation = props.rail ? "navigationRail" : "navigationBar";
-    const s = useAnimatedComponentStyles(name);
+    const s = useMotionStyles(name);
     return (
-        <Animated.View role="navigation" style={aview(s.root)}>
+        <MView role="navigation" style={aview(s.root)}>
             {props.items.map((item, index) => (
                 <NavigationItem
                     key={item.label}
@@ -144,7 +142,7 @@ export function NavigationBar(props: {
                     onPress={() => props.onChange(index)}
                 />
             ))}
-        </Animated.View>
+        </MView>
     );
 }
 
@@ -158,13 +156,13 @@ function MenuItem(props: {
         selected: props.selected,
         disabled: props.disabled ?? false,
     });
-    const s = useAnimatedComponentStyles("menu", {}, state);
+    const s = useMotionStyles("menu", {}, state);
     const ink = useInk("menu", {}, state, {
         slot: "item",
         ...(props.disabled ? { disabled: true } : {}),
     });
     return (
-        <AnimatedPressable
+        <MPressable
             {...withInk(handlers, ink)}
             role="menuitem"
             disabled={props.disabled}
@@ -172,23 +170,20 @@ function MenuItem(props: {
             style={aview({ ...s.item, ...unselectable })}
         >
             {props.item.glyph && (
-                <Animated.View style={aview(s.itemLeading)}>
+                <MView style={aview(s.itemLeading)}>
                     <Glyph style={s.itemLeading} glyph={props.item.glyph} />
-                </Animated.View>
+                </MView>
             )}
-            <Animated.Text selectable={false} style={atext(s.itemLabel)}>
+            <MText selectable={false} style={atext(s.itemLabel)}>
                 {props.item.label}
-            </Animated.Text>
+            </MText>
             {props.item.shortcut && (
-                <Animated.Text
-                    selectable={false}
-                    style={atext(s.itemTrailingText)}
-                >
+                <MText selectable={false} style={atext(s.itemTrailingText)}>
                     {props.item.shortcut}
-                </Animated.Text>
+                </MText>
             )}
             {ink.layer}
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
@@ -202,9 +197,9 @@ export function Menu(props: {
     value: number;
     onChange: (index: number) => void;
 }) {
-    const s = useAnimatedComponentStyles("menu");
+    const s = useMotionStyles("menu");
     return (
-        <Animated.View role="menu" style={aview(s.root)}>
+        <MView role="menu" style={aview(s.root)}>
             {props.items.map((item, index) => (
                 <MenuItem
                     key={item.label}
@@ -214,7 +209,7 @@ export function Menu(props: {
                     onPress={() => props.onChange(index)}
                 />
             ))}
-        </Animated.View>
+        </MView>
     );
 }
 
@@ -224,27 +219,19 @@ export function Dialog(props: {
     children: ReactNode;
     actions: { label: string; onPress?: () => void }[];
 }) {
-    const s = useAnimatedComponentStyles("dialog", {
+    const s = useMotionStyles("dialog", {
         icon: props.glyph ? "true" : "false",
     });
     return (
-        <Animated.View
-            role="dialog"
-            aria-label={props.headline}
-            style={aview(s.root)}
-        >
+        <MView role="dialog" aria-label={props.headline} style={aview(s.root)}>
             {props.glyph && (
-                <Animated.View style={aview(s.icon)}>
+                <MView style={aview(s.icon)}>
                     <Glyph style={s.icon} glyph={props.glyph} />
-                </Animated.View>
+                </MView>
             )}
-            <Animated.Text style={atext(s.headline)}>
-                {props.headline}
-            </Animated.Text>
-            <Animated.Text style={atext(s.body)}>
-                {props.children}
-            </Animated.Text>
-            <Animated.View style={aview(s.actions)}>
+            <MText style={atext(s.headline)}>{props.headline}</MText>
+            <MText style={atext(s.body)}>{props.children}</MText>
+            <MView style={aview(s.actions)}>
                 {props.actions.map((action) => (
                     <Button
                         key={action.label}
@@ -253,8 +240,8 @@ export function Dialog(props: {
                         {...(action.onPress ? { onPress: action.onPress } : {})}
                     />
                 ))}
-            </Animated.View>
-        </Animated.View>
+            </MView>
+        </MView>
     );
 }
 
@@ -264,26 +251,24 @@ function SnackbarButton(props: {
     text: string;
 }) {
     const { state, handlers } = usePress({});
-    const s = useAnimatedComponentStyles("snackbar", {}, state);
+    const s = useMotionStyles("snackbar", {}, state);
     return (
-        <AnimatedPressable
+        <MPressable
             {...handlers}
             role="button"
             aria-label={props.label}
             style={aview({ ...s[props.slot], ...unselectable })}
         >
             <Glyph style={s[props.slot]} glyph={props.text} />
-        </AnimatedPressable>
+        </MPressable>
     );
 }
 
 export function Snackbar(props: { message: string; action?: string }) {
-    const s = useAnimatedComponentStyles("snackbar");
+    const s = useMotionStyles("snackbar");
     return (
-        <Animated.View role="status" style={aview(s.root)}>
-            <Animated.Text style={atext(s.supportingText)}>
-                {props.message}
-            </Animated.Text>
+        <MView role="status" style={aview(s.root)}>
+            <MText style={atext(s.supportingText)}>{props.message}</MText>
             {props.action && (
                 <SnackbarButton
                     slot="action"
@@ -292,30 +277,26 @@ export function Snackbar(props: { message: string; action?: string }) {
                 />
             )}
             <SnackbarButton slot="close" label="Dismiss" text="×" />
-        </Animated.View>
+        </MView>
     );
 }
 
 export function Tooltip(props: { children: string; subhead?: string }) {
     const rich = props.subhead !== undefined;
-    const s = useAnimatedComponentStyles("tooltip", {
+    const s = useMotionStyles("tooltip", {
         variant: rich ? "rich" : "plain",
     });
     if (!rich) {
         return (
-            <Animated.View role="tooltip" style={aview(s.root)}>
+            <MView role="tooltip" style={aview(s.root)}>
                 <Glyph style={s.root} glyph={props.children} />
-            </Animated.View>
+            </MView>
         );
     }
     return (
-        <Animated.View role="tooltip" style={aview(s.root)}>
-            <Animated.Text style={atext(s.subhead)}>
-                {props.subhead}
-            </Animated.Text>
-            <Animated.Text style={atext(s.supportingText)}>
-                {props.children}
-            </Animated.Text>
-        </Animated.View>
+        <MView role="tooltip" style={aview(s.root)}>
+            <MText style={atext(s.subhead)}>{props.subhead}</MText>
+            <MText style={atext(s.supportingText)}>{props.children}</MText>
+        </MView>
     );
 }

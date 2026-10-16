@@ -44,6 +44,8 @@ import {
     Tabs,
     Tooltip,
 } from "./navigation";
+import { MotionProvider } from "./parts";
+import type { Motion } from "./parts";
 
 const DESTINATIONS = [
     { label: "Mail", glyph: "✉" },
@@ -433,6 +435,7 @@ export function App() {
     const [override, setOverride] = useState<keyof typeof OVERRIDES>("none");
     const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
     const [drawing, setDrawing] = useState<"svg" | "no svg">("svg");
+    const [engine, setEngine] = useState<Motion>("Animated");
     const { width } = useWindowDimensions();
     const controls = (
         <View style={styles.section}>
@@ -457,6 +460,11 @@ export function App() {
                 onChange={setMotion}
             />
             <Choices
+                value={engine}
+                options={["Animated", "Reanimated"] as const}
+                onChange={setEngine}
+            />
+            <Choices
                 value={drawing}
                 options={["svg", "no svg"] as const}
                 onChange={setDrawing}
@@ -478,7 +486,9 @@ export function App() {
             width={width}
             svg={drawing === "svg"}
         >
-            <Page controls={controls} />
+            <MotionProvider value={engine}>
+                <Page controls={controls} />
+            </MotionProvider>
         </PureformProvider>
     );
 }
