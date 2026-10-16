@@ -91,11 +91,35 @@
                 "development": "./src/metro-transformer.ts",
                 "default": "./dist/metro-transformer.mjs"
             }
+        },
+        "./factory": {
+            "types": "./dist/factory.d.ts",
+            "import": {
+                "development": "./src/factory.ts",
+                "default": "./dist/factory.mjs"
+            },
+            "require": {
+                "development": "./src/factory.ts",
+                "default": "./dist/factory.mjs"
+            }
+        },
+        "./codegen": {
+            "types": "./dist/codegen.d.ts",
+            "import": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            },
+            "require": {
+                "development": "./src/codegen.ts",
+                "default": "./dist/codegen.mjs"
+            }
         }
     },
     "dependencies": {
         "@pureform/core": "catalog:",
+        "@pureform/generate": "catalog:",
         "@pureform/js-effects": "catalog:",
+        "@pureform/styling": "catalog:",
         "chroma-js": "catalog:",
         "jiti": "catalog:"
     },

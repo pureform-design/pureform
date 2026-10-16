@@ -76,3 +76,38 @@ export const precompute = (
         dependents,
     };
 };
+
+/** Precomputed styles split by component, each as `precompute` gives it for that component
+ *  alone. The themes and formulas are shared. */
+export const splitPrecomputed = (
+    styles: PrecomputedStyles,
+): Record<string, PrecomputedStyles> => {
+    const out: Record<string, PrecomputedStyles> = {};
+    let offset = 0;
+    for (const [name, component] of Object.entries(styles.templates)) {
+        const templates = { [name]: component };
+        const found = themeTemplates(templates);
+        const dependents: Record<string, number[]> = {};
+        found.forEach((template, index) => {
+            for (const key of dependencies(template)) {
+                (dependents[key] ??= []).push(index);
+            }
+        });
+        const start = offset;
+        offset += found.length;
+        out[name] = {
+            mode: "precomputed",
+            templates,
+            themes: styles.themes,
+            ...(styles.formulas ? { formulas: styles.formulas } : {}),
+            values: Object.fromEntries(
+                Object.entries(styles.values).map(([key, values]) => [
+                    key,
+                    values.slice(start, offset),
+                ]),
+            ),
+            dependents,
+        };
+    }
+    return out;
+};

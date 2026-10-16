@@ -11,8 +11,10 @@ lower to CSS; this one lowers the same AST to style templates that React Native 
 @pureform/preset (tests and demos)
 ```
 
-It depends on `@pureform/core` only; `react`, `react-native`, `react-native-svg`, and
-`react-native-reanimated` are optional peers, each needed by one entry.
+It depends on `@pureform/core`, `@pureform/styling` (the `StyleFactory` types and the
+per-selection cache), and `@pureform/generate` (for the `/codegen` subpath); `react`,
+`react-native`, `react-native-svg`, and `react-native-reanimated` are optional peers, each
+needed by one entry.
 
 ## Architecture
 
@@ -22,7 +24,12 @@ config ──► lower.ts ──► templates ──► build.ts / resolve.ts �
 State + variants ──► select.ts (rules by specificity) ◄───────┘
                          │
                          ▼
+     factory.ts (one cached, frozen selection per key and environment)
+                         │
+                         ▼
      react.ts (provider, hooks) ──► animate/ (Animated) or reanimated.ts (CSS motion)
+
+config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over its precomputed styles)
 ```
 
 | Module                           | What it does                                                                                 |
@@ -32,6 +39,8 @@ State + variants ──► select.ts (rules by specificity) ◄─────�
 | `build.ts`, `resolve.ts`         | `precompute` and `runtimeStyles`: templates resolved per theme, and runtime overrides.       |
 | `theme.ts`                       | A theme's token values for one color scheme.                                                 |
 | `select.ts`                      | Picks a component's styles, transitions, and animations for its variants and state.          |
+| `factory.ts`                     | `nativeFactory`: a component's `StyleFactory`, selecting once per selection and environment. |
+| `codegen.ts`                     | The `native` target's codegen for `@pureform/generate`: a factory module per component.      |
 | `motion.ts`                      | Pure motion helpers: easing curves, interpolation, and which token tweens run.               |
 | `react.ts`                       | `PureformProvider`, `useComponentState`, `useComponentStyles`, `useReducedMotion`, …         |
 | `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, and press ripples.               |
@@ -49,6 +58,8 @@ State + variants ──► select.ts (rules by specificity) ◄─────�
 | `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles` and `cssMotion`, through Reanimated 4                                             |
 | `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                          |
 | `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                             |
+| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, and the `NativeFactory` types; no React, no lowering      |
+| `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`             |
 
 ```tsx
 import { precompute } from "@pureform/rn-adapter";
@@ -67,6 +78,41 @@ const slots = useAnimatedComponentStyles(
     { hover },
 );
 ```
+
+## Factories and codegen
+
+A component's `NativeFactory` (`@pureform/styling`'s `StyleFactory`, with more per slot) takes
+a selection of variants, states, and instance tokens, and returns its styles by slot. Each
+slot has its `style`, its SVG `drawing`, its `transitions` (a token's own under
+`$token:<key>`, which token tweening reads), its `animation`, and its `parent`; a component
+without slots has `root`. The first lookup of a key selects and freezes; later ones are a
+`Map.get` (`@pureform/styling`'s `selectionCache`). The key is each group's value and a bit per
+state the component's rules read (`selectionOrder`).
+
+The environment, what a provider holds, picks the table: `factory.for({ theme, scheme,
+overrides, svg, width, containers })`. Calling the factory itself is the base theme's light
+scheme. Widths only count through the component's width and container conditions, so every
+width meeting the same ones shares a table. `selected(selection)` gives the same lookup in the
+`Selected` shape the hooks read (`""` for a component without slots).
+
+```ts
+import { nativeFactory } from "@pureform/rn-adapter/factory";
+
+const button = nativeFactory("button", precompute(config));
+button.for({ scheme: "dark", svg: true })({ variant: "filled", pressed: true })
+    .root.style;
+const progress = nativeFactory("linearProgress", styles, {
+    value: "components.linearProgress.value",
+});
+progress({ tokens: { value: 40 } }).indicator.style; // resolved with the token, cached per value
+```
+
+`pureform generate` with the `native` target (`@pureform/rn-adapter/codegen`) writes one module
+per allow-listed component, `.pureform/native/<name>.ts`, exporting a `NativeFactory<"name">`
+over that component's own precomputed templates and values (`splitPrecomputed`), parsed from a
+JSON string, and `.pureform/native/theme-values.ts`, the themes' token values and formulas they
+share. Its options are `precompute`'s (`remBase`, `fontStack`, `themes`, `schemes`, `target`).
+Each module's declared `states` are the ones its key reads.
 
 ## Reduced motion
 
@@ -103,13 +149,22 @@ fill another way; `useIconStyle()` returning `filled` is planned for p8.
 Through the omni MCP (or `omni run`):
 
 - `build`: Vite library build into `dist/`, one bundle per entry.
-- `test:unit`: Vitest over `src/**/*.spec.ts`, with type checks.
+- `test:unit`: Vitest over `src/**/*.spec.ts`, with type checks. `factory.spec.ts` checks the
+  factory against selection for every preset component; `codegen.spec.ts` generates the preset's
+  glue into a temp app, compares every combination of every group's values, and type-checks it.
 - `test:integration`: the Metro transformer, under `test/`.
 
 `tests/browser-e2e-tests` renders it through React Native Web: `rn-parity` compares it with the
 CSS adapter, and `rn-motion` checks transitions and reduced motion.
 
 ## Worth knowing
+
+- A factory's selection merges variants and states, so a state named like one of the
+  component's groups (the progress indicators' `indeterminate`, the icon's `filled`) is left out
+  of its key; the group wins. A missing `rtl` is left to right: the key holds `rtl` as on or off.
+- The generated modules hold the component's styles for every theme and scheme, so they're
+  large (the preset's are 2.7 MB in all, the icon button alone 0.4 MB); an app should leave
+  `.pureform/` uncommitted. `generate` loads the codegen from `dist`, so build first.
 
 - React Native has no cascade: selection orders rules by layer, then specificity, then order,
   as selectors would, and passes inherited properties (`color`, fonts) down by hand.

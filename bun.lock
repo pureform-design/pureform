@@ -425,7 +425,9 @@
       "version": "0.0.0-semantically-released",
       "dependencies": {
         "@pureform/core": "catalog:",
+        "@pureform/generate": "catalog:",
         "@pureform/js-effects": "catalog:",
+        "@pureform/styling": "catalog:",
         "chroma-js": "catalog:",
         "jiti": "catalog:",
       },

@@ -96,11 +96,12 @@ const activeStates = (state: State): Set<string> => {
     return active;
 };
 
-const BOUND = /^(width|container(?:@(.+?))?)(>=|<=|<)(-?[\d.]+)$/;
+/** A condition on the window's width or a container's. */
+export const BOUND = /^(width|container(?:@(.+?))?)(>=|<=|<)(-?[\d.]+)$/;
 
-// Whether a state holds: one of the component's, or a bound on the window's width or a
-// container's.
-const holds = (name: string, active: Set<string>, state: State) => {
+/** Whether a condition holds: one of the component's states, or a bound on the window's
+ *  width or a container's (`width>=600`, `container@sidebar<400`). */
+export const holds = (name: string, active: Set<string>, state: State) => {
     const bound = BOUND.exec(name);
     if (!bound) return active.has(name);
     const width =
