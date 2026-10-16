@@ -436,6 +436,9 @@ export function App() {
     const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
     const [drawing, setDrawing] = useState<"svg" | "no svg">("svg");
     const [engine, setEngine] = useState<Motion>("Animated");
+    const [speed, setSpeed] = useState<"normal speed" | "slow motion">(
+        "normal speed",
+    );
     const { width } = useWindowDimensions();
     const controls = (
         <View style={styles.section}>
@@ -458,6 +461,11 @@ export function App() {
                 value={motion}
                 options={["motion", "reduced motion"] as const}
                 onChange={setMotion}
+            />
+            <Choices
+                value={speed}
+                options={["normal speed", "slow motion"] as const}
+                onChange={setSpeed}
             />
             <Choices
                 value={engine}
@@ -485,6 +493,7 @@ export function App() {
             reducedMotion={motion === "reduced motion"}
             width={width}
             svg={drawing === "svg"}
+            timeScale={speed === "slow motion" ? 10 : 1}
         >
             <MotionProvider value={engine}>
                 <Page controls={controls} />
