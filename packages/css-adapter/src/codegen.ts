@@ -68,6 +68,10 @@ export const codegen = defineCodegen<CssCodegenOptions>({
             },
         ],
         themeAttribute: themeAttributeOf(context.options),
+        vars: {
+            prefix: context.options.prefix,
+            tokenPrefix: context.options.tokenPrefix,
+        },
     }),
 });
 

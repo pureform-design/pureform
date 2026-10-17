@@ -7,6 +7,7 @@ export type {
     CodegenAdapter,
     CodegenContext,
     CodegenOutput,
+    CodegenVars,
     ComponentModule,
     ComponentShape,
     GeneratedFile,

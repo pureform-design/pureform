@@ -140,6 +140,11 @@ describe("the Panda codegen", () => {
         expect(output.themeAttribute).toBe("data-panda-theme");
     });
 
+    it("gives the registry the var prefixes", async () => {
+        const { output } = await run({ prefix: "pf", tokenPrefix: "x" });
+        expect(output.vars).toEqual({ prefix: "pf", tokenPrefix: "x" });
+    });
+
     it("writes the modules it's given, from Panda's outdir", async () => {
         const { files } = await run({ outdir: "src/panda" }, ["icon"]);
         expect(Object.keys(files)).toEqual(["web/icon.ts", "panda.ts"]);

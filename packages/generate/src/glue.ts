@@ -1,7 +1,7 @@
 // The files `generate` writes itself, around the adapter's modules: the registry index the app
 // hands to `PureformProvider`, and the declarations that type it.
 
-import type { ComponentShape } from "./adapter";
+import type { CodegenVars, ComponentShape } from "./adapter";
 
 /** The registry index's file, relative to `outDir`. */
 export const INDEX_FILE = "index.ts";
@@ -30,6 +30,23 @@ const key = (name: string): string =>
 export const moduleSpecifier = (path: string): string =>
     `./${path.replace(/\.(?:tsx?|m?js)$/, "")}`;
 
+// The registry's options: the version, then the theme attribute and the var prefixes when the
+// target has them.
+const registryOptions = (
+    themeAttribute: string | undefined,
+    vars: CodegenVars | undefined,
+): string => {
+    const options = ["version"];
+    if (themeAttribute !== undefined) {
+        options.push(`themeAttribute: ${JSON.stringify(themeAttribute)}`);
+    }
+    const named = Object.entries(vars ?? {})
+        .filter(([, value]) => value !== undefined)
+        .map(([key, value]) => `${key}: ${JSON.stringify(value)}`);
+    if (named.length > 0) options.push(`vars: { ${named.join(", ")} }`);
+    return `{ ${options.join(", ")} }`;
+};
+
 /** The registry index: every entry, static by default, the train's version and the target's
  *  theme attribute, the theme names, and the component names as a type. */
 export const registryIndex = (
@@ -37,6 +54,7 @@ export const registryIndex = (
     themes: readonly string[],
     version: string,
     themeAttribute?: string,
+    vars?: CodegenVars,
 ): string => {
     const imports = entries
         .filter((entry) => !entry.lazy)
@@ -63,9 +81,7 @@ export const registryIndex = (
         ...(registry.length > 0
             ? ["    {", ...registry, "    },"]
             : ["    {},"]),
-        themeAttribute === undefined
-            ? "    { version },"
-            : `    { version, themeAttribute: ${JSON.stringify(themeAttribute)} },`,
+        `    ${registryOptions(themeAttribute, vars)},`,
         ");",
         "",
         `export const themes = [${themes.map((theme) => JSON.stringify(theme)).join(", ")}] as const;`,

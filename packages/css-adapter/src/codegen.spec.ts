@@ -203,6 +203,15 @@ describe("the CSS codegen", () => {
         ]);
     });
 
+    it("gives the registry the var prefixes", async () => {
+        expect(
+            (await run({ prefix: "pf", tokenPrefix: "x" })).output.vars,
+        ).toEqual({
+            prefix: "pf",
+            tokenPrefix: "x",
+        });
+    });
+
     it("scopes named themes with the stylesheet's theme attribute", async () => {
         expect((await run()).output.themeAttribute).toBe("data-theme");
         const custom = await run({ themeAttribute: "data-pf-theme" });

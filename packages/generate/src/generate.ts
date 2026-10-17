@@ -402,6 +402,7 @@ export const generate = async <Options = Record<string, unknown>>(
             Object.keys(config.themes ?? {}),
             trainVersion,
             output.themeAttribute,
+            output.vars,
         ),
     );
     add(DECLARATIONS_FILE, registryDeclarations(entries));

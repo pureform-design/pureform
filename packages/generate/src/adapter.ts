@@ -100,6 +100,24 @@ export interface CodegenOutput {
      *  passes it to the registry, whose `themeAttributes(name)` providers write. Leave it out on
      *  targets without selectors. */
     readonly themeAttribute?: string;
+    /** How the target's stylesheet names its CSS vars. The index passes it to the registry, so
+     *  providers can write token overrides and runtime themes under the same names. Leave it
+     *  out on targets without CSS vars. */
+    readonly vars?: CodegenVars;
+}
+
+/** A target's var prefixes: the component var prefix (a string for every tier, or one per
+ *  tier) and the token var prefix. */
+export interface CodegenVars {
+    readonly prefix?:
+        | string
+        | {
+              readonly ui?: string;
+              readonly components?: string;
+              readonly global?: string;
+          }
+        | undefined;
+    readonly tokenPrefix?: string | undefined;
 }
 
 /** What an adapter's `/codegen` subpath exports as `codegen` (or as its default export). */
