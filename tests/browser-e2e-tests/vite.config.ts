@@ -11,6 +11,12 @@ import packageJson from "./package.json";
 
 const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
 
+// The React Native binding's built files: its sources are React's JSX, which Solid's plugin here
+// would compile as Solid's.
+const reactNative = fileURLToPath(
+    new URL("../../packages/react-native/dist/", import.meta.url),
+);
+
 export default createConfig({
     package: packageJson,
 
@@ -27,6 +33,14 @@ export default createConfig({
             alias: [
                 { find: /^\$(.*)$/, replacement: `${fixture}styled-system/$1` },
                 { find: /^#(.*)$/, replacement: `${fixture}src/$1` },
+                {
+                    find: /^@pureform\/react-native$/,
+                    replacement: `${reactNative}index.mjs`,
+                },
+                {
+                    find: /^@pureform\/react-native\/(.*)$/,
+                    replacement: `${reactNative}$1.mjs`,
+                },
                 // React Native components render through React Native Web.
                 { find: /^react-native$/, replacement: "react-native-web" },
             ],
