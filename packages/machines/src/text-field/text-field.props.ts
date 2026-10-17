@@ -7,6 +7,7 @@ export const props = createProps<TextFieldProps>()([
     "defaultValue",
     "dir",
     "disabled",
+    "error",
     "form",
     "getRootNode",
     "id",
@@ -14,8 +15,10 @@ export const props = createProps<TextFieldProps>()([
     "invalid",
     "name",
     "onValueChange",
+    "placeholder",
     "readOnly",
     "required",
+    "validate",
     "value",
 ]);
 

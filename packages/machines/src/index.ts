@@ -5,6 +5,7 @@ export * as button from "./button";
 export * as checkbox from "./checkbox";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";
+export * as select from "./select";
 export * as slider from "./slider";
 export * as switchControl from "./switch";
 export * as textField from "./text-field";

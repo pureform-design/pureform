@@ -1,4 +1,4 @@
-// Stub for p6b: the final shape, with only the value wired.
+// Material's text field and text area: pureform's own machine, in Zag's shape.
 export { anatomy } from "./text-field.anatomy";
 export { connect } from "./text-field.connect";
 export { machine } from "./text-field.machine";
@@ -10,5 +10,6 @@ export type {
     TextFieldProps as Props,
     TextFieldSchema as Schema,
     TextFieldService as Service,
+    ValidateMode,
     ValueChangeDetails,
 } from "./text-field.types";

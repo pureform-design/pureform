@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
 
 import * as radioGroup from "./radio-group";
+import * as select from "./select";
 import * as switchControl from "./switch";
 import { run, settle } from "./testing/vanilla";
 
@@ -96,6 +97,47 @@ describe("switchControl.machine", () => {
         document.querySelector("form")!.reset();
         await settle();
         expect(control.api().checked).toBe(true);
+        document.querySelector("fieldset")!.disabled = true;
+        await settle();
+        expect(control.service.computed("isDisabled")).toBe(true);
+        control.stop();
+    });
+});
+
+describe("select.machine", () => {
+    const mountSelect = (markup: string) => {
+        document.body.innerHTML = markup;
+        const hidden = document.querySelector<HTMLSelectElement>("select")!;
+        return run(
+            select.machine,
+            select.connect,
+            {
+                id: "size",
+                defaultValue: ["s"],
+                collection: select.collection({ items: ["s", "m"] }),
+            },
+            (api, spread) => spread(hidden, api.getHiddenSelectProps()),
+        );
+    };
+
+    it("stays enabled in the first legend of a disabled fieldset", async () => {
+        const control = mountSelect(
+            `<fieldset disabled><legend><select id="select:size:select"></select></legend></fieldset>`,
+        );
+        await settle();
+        expect(control.service.computed("isDisabled")).toBe(false);
+        control.stop();
+    });
+
+    it("is disabled inside a disabled fieldset, and leaves a form reset to the binding", async () => {
+        const control = mountSelect(
+            `<form><fieldset><select id="select:size:select"><option value="s">S</option><option value="m">M</option></select></fieldset></form>`,
+        );
+        control.api().setValue(["m"]);
+        await settle();
+        document.querySelector("form")!.reset();
+        await settle();
+        expect(control.api().value).toEqual(["m"]);
         document.querySelector("fieldset")!.disabled = true;
         await settle();
         expect(control.service.computed("isDisabled")).toBe(true);

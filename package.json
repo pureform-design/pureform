@@ -120,6 +120,8 @@
         "@zag-js/checkbox": "^1.46.0",
         "@zag-js/switch": "^1.46.0",
         "@zag-js/radio-group": "^1.46.0",
+        "@zag-js/select": "^1.46.0",
+        "@zag-js/collection": "^1.46.0",
         "@zag-js/react": "^1.46.0",
         "axe-core": "^4.14.0"
     }
