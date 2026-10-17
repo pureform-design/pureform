@@ -1,5 +1,7 @@
 // The search bar: a pressable root holding its leading icon, the input, and its trailing icon.
-// It tracks the input's focus and text, which it reads as focus and a filled input.
+// Its interaction source hears the root's hover and press and the input's focus, which always
+// shows, as a text field's does; it reads its text as a filled input. It has no ripple: the
+// field draws its own state.
 
 import { searchBarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -10,18 +12,12 @@ import type {
     SearchBarPart,
     SearchBarVariantProps,
 } from "@pureform/binding-core";
-import { useState } from "react";
 import type { ReactNode } from "react";
 import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useControllable,
-    usePress,
-    withEngine,
-} from "../parts";
+import { interactionStates, useInteraction } from "../interaction";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -42,7 +38,6 @@ export interface SearchBarProps
 
 function SearchBarImpl(props: SearchBarProps): ReactNode {
     const engine = useEngine();
-    const [focused, setFocused] = useState(false);
     const [value, setValue] = useControllable(
         "SearchBar",
         "value",
@@ -51,22 +46,25 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
         props.onValueChange,
         "",
     );
-    const { state, handlers } = usePress({
-        ...(props.disabled ? { disabled: true } : {}),
-        ...(props.mirrorLeading || props.mirrorTrailing
-            ? { mirrored: true }
-            : {}),
-    });
+    const { interaction, state } = useInteraction(undefined, props.disabled);
     const { styles: s, selected } = useComponentSlots(
         "searchBar",
         searchBarSelection(props),
         {
-            ...state,
-            focus: focused,
-            focusVisible: focused,
+            ...interactionStates(state, {
+                ...(props.disabled ? { disabled: true } : {}),
+                ...(props.mirrorLeading || props.mirrorTrailing
+                    ? { mirrored: true }
+                    : {}),
+            }),
             filled: value !== "",
         },
     );
+    const {
+        onFocus: _focus,
+        onBlur: _blur,
+        ...handlers
+    } = interaction.handlers;
     const placeholder = props.placeholder ?? "Search";
     const id = (part: SearchBarPart) =>
         testIdOf(searchBarAnatomy, part, props.testId);
@@ -81,8 +79,6 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
     return (
         <engine.Pressable
             {...handlers}
-            onFocus={undefined}
-            onBlur={undefined}
             disabled={props.disabled}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
@@ -92,8 +88,8 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
                 {...props.inputProps}
                 value={value}
                 onChangeText={setValue}
-                onFocus={() => setFocused(true)}
-                onBlur={() => setFocused(false)}
+                onFocus={() => interaction.emitter.focus(true)}
+                onBlur={() => interaction.emitter.blur()}
                 editable={!props.disabled}
                 placeholder={placeholder}
                 // A placeholder's color is a prop, so it takes the plain value.

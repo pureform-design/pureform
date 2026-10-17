@@ -17,6 +17,7 @@ import type {
     Direction,
     MotionSetting,
 } from "@pureform/binding-core";
+import type { Indication } from "@pureform/binding-core/indication";
 import { overridesFor } from "@pureform/rn-adapter/factory";
 import type {
     NativeFactory,
@@ -28,6 +29,7 @@ import type {
 import { StylesProvider } from "@pureform/rn-adapter/react";
 import type { StyleSource } from "@pureform/rn-adapter/react";
 import { isRuntimeTheme } from "@pureform/styling";
+import type { TokenValue } from "@pureform/styling";
 import {
     createContext,
     use,
@@ -47,6 +49,7 @@ import {
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { isDev } from "./env";
+import { providerIndicationValues } from "./indication-tokens";
 
 /** Overrides resolved for each scheme. */
 export interface SchemeOverrides {
@@ -66,6 +69,10 @@ export interface PureformState {
     readonly engine: MotionEngine;
     readonly width: number | undefined;
     readonly timeScale: number;
+    /** The nearest provider's `indication`; `undefined` for Material's, the default. */
+    readonly indication: Indication | undefined;
+    /** The focus indicator's color the nearest indication that sets one chooses. */
+    readonly focusIndicatorColor: TokenValue | undefined;
 }
 
 const NO_OVERRIDES: SchemeOverrides = Object.freeze({
@@ -105,6 +112,11 @@ export interface PureformProviderProps {
     readonly width?: number | undefined;
     /** How much longer every transition and animation runs, for watching motion slowly. */
     readonly timeScale?: number | undefined;
+    /** How interactive components show hover, focus, and press: `materialIndication()` (the
+     *  default), `noIndication`, or the app's own (`defineIndication`). A component's
+     *  `indication` prop overrides it. Its theme-level tokens join the overrides, under the
+     *  provider's own. Inherited. */
+    readonly indication?: Indication | undefined;
     readonly children?: ReactNode;
 }
 
@@ -217,12 +229,15 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
                 dir: base.dir,
                 motion: base.motion,
                 defaults: base.defaults,
+                indication: base.indication,
+                focusIndicatorColor: base.focusIndicatorColor,
             },
             {
                 registry: props.registry,
                 dir: props.dir,
                 motion: props.motion,
                 defaults: props.defaults,
+                indication: props.indication,
             },
         );
         return {
@@ -230,9 +245,18 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
             dir: resolved.dir,
             motion: resolved.motion,
             defaults: resolved.defaults,
+            indication: resolved.indication,
+            focusIndicatorColor: resolved.focusIndicatorColor,
             scheme: props.scheme ?? base.scheme,
             theme: props.theme ?? base.theme,
-            overrides: mergeOverrides(base.overrides, props.overrides),
+            // The indication's theme-level tokens, under the provider's own overrides.
+            overrides: mergeOverrides(
+                mergeOverrides(
+                    base.overrides,
+                    providerIndicationValues(props.indication),
+                ),
+                props.overrides,
+            ),
             engine: props.engine ?? base.engine,
             width: props.width ?? base.width,
             timeScale: props.timeScale ?? base.timeScale,
@@ -251,6 +275,7 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         props.engine,
         props.width,
         props.timeScale,
+        props.indication,
     ]);
     useEffect(() => {
         if (!isDev || !state.registry) return;

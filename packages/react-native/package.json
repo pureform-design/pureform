@@ -249,7 +249,8 @@
     },
     "dependencies": {
         "@pureform/anatomy": "catalog:",
-        "@pureform/binding-core": "catalog:"
+        "@pureform/binding-core": "catalog:",
+        "@pureform/machines": "catalog:"
     },
     "devDependencies": {
         "@pureform/preset": "catalog:",

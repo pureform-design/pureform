@@ -16,6 +16,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    IndicationProps,
     NavigationComponent,
     NavigationItem,
     NavigationVariantProps,
@@ -25,22 +26,18 @@ import type {
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "./icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useControllable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "./parts";
+import { useSurfaceIndication } from "./indication";
+import { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
 type NavigationPart = PartName<typeof navigationBarAnatomy>;
 
-export interface TabsProps extends Omit<TabsVariantProps, "icon"> {
+const [TAB_INDICATION] = tabsAnatomy.indication!;
+
+export interface TabsProps
+    extends Omit<TabsVariantProps, "icon">, IndicationProps {
     readonly items: readonly TabsItem<ReactNode>[];
     /** The selected tab's value. Controlled when defined. */
     readonly value?: string | undefined;
@@ -61,21 +58,24 @@ function TabImpl(props: {
 }): ReactNode {
     const { tabs, item } = props;
     const engine = useEngine();
-    const { state, handlers } = usePress({
-        selected: props.selected,
-        ...(item.disabled ? { disabled: true } : {}),
-        ...(item.mirrorIcon ? { mirrored: true } : {}),
+    const indication = useSurfaceIndication(TAB_INDICATION!, {
+        indication: tabs.indication,
+        interactionSource: item.interactionSource,
+        disabled: item.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "tabs",
-        tabsSelection({ ...tabs, icon: props.icon }),
-        state,
+        indication.select(tabsSelection({ ...tabs, icon: props.icon })),
+        indication.states({
+            selected: props.selected,
+            ...(item.disabled ? { disabled: true } : {}),
+            ...(item.mirrorIcon ? { mirrored: true } : {}),
+        }),
     );
-    const ink = useInk(selected, { slot: "tab" });
     const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, tabs.testId);
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="tab"
             aria-selected={props.selected}
             disabled={item.disabled}
@@ -102,7 +102,7 @@ function TabImpl(props: {
                 style={s.indicator}
                 testID={id("indicator")}
             />
-            {ink.layer}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }
@@ -153,9 +153,8 @@ function TabsImpl(props: TabsProps): ReactNode {
  *  Panels are the app's: render the one for the value. */
 export const Tabs = withEngine(TabsImpl, "Tabs");
 
-export interface NavigationProps<
-    C extends NavigationComponent,
-> extends NavigationVariantProps<C> {
+export interface NavigationProps<C extends NavigationComponent>
+    extends NavigationVariantProps<C>, IndicationProps {
     readonly items: readonly NavigationItem<ReactNode>[];
     /** The current destination's value. Controlled when defined. */
     readonly value?: string | undefined;
@@ -181,19 +180,24 @@ function DestinationImpl<C extends NavigationComponent>(props: {
 }): ReactNode {
     const { name, navigation, item } = props;
     const engine = useEngine();
-    const { state, handlers } = usePress({
-        selected: props.selected,
-        ...(item.disabled ? { disabled: true } : {}),
-        ...(item.mirrorIcon ? { mirrored: true } : {}),
+    const indication = useSurfaceIndication(ANATOMIES[name].indication![0]!, {
+        indication: navigation.indication,
+        interactionSource: item.interactionSource,
+        disabled: item.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         name,
-        navigationSelection(
-            navigation as unknown as NavigationProps<NavigationComponent>,
-        ) as Record<string, unknown>,
-        state,
+        indication.select(
+            navigationSelection(
+                navigation as unknown as NavigationProps<NavigationComponent>,
+            ) as Record<string, unknown>,
+        ),
+        indication.states({
+            selected: props.selected,
+            ...(item.disabled ? { disabled: true } : {}),
+            ...(item.mirrorIcon ? { mirrored: true } : {}),
+        }),
     );
-    const ink = useInk(selected, { slot: "indicator", centered: true });
     const id = (part: string) =>
         testIdOf(
             ANATOMIES[name] as typeof navigationBarAnatomy,
@@ -202,7 +206,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
         );
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="link"
             aria-current={props.selected ? "page" : undefined}
             disabled={item.disabled}
@@ -221,7 +225,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
                         {item.icon}
                     </IconSlot>
                 </engine.View>
-                {ink.layer}
+                {indication.layer(selected)}
             </engine.View>
             <engine.Text
                 selectable={false}

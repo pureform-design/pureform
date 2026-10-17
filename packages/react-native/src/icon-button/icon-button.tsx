@@ -10,24 +10,23 @@ import type {
     IconButtonContentProps,
     IconButtonPart,
     IconButtonVariantProps,
+    InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useControllable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
+const [INDICATION] = iconButtonAnatomy.indication!;
+
 export interface IconButtonProps
-    extends IconButtonVariantProps, IconButtonContentProps<ReactNode> {
+    extends
+        IconButtonVariantProps,
+        IconButtonContentProps<ReactNode>,
+        InteractiveProps {
     /** What the button does, for assistive technology: an icon alone says nothing. */
     readonly "aria-label": string;
     readonly disabled?: boolean | undefined;
@@ -53,23 +52,26 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
         props.onSelectedChange,
         false,
     );
-    const { state, handlers } = usePress({
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
         disabled,
-        ...(toggle ? { selected } : {}),
-        ...(props.mirrorIcon ? { mirrored: true } : {}),
     });
     const { styles: s, selected: slots } = useComponentSlots(
         "iconButton",
-        iconButtonSelection(props),
-        state,
+        indication.select(iconButtonSelection(props)),
+        indication.states({
+            disabled,
+            ...(toggle ? { selected } : {}),
+            ...(props.mirrorIcon ? { mirrored: true } : {}),
+        }),
     );
-    const ink = useInk(slots, { slot: "container", centered: true, disabled });
     const Drawing = engine.Drawing;
     const id = (part: IconButtonPart) =>
         testIdOf(iconButtonAnatomy, part, props.testId);
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="button"
             aria-label={props["aria-label"]}
             {...(toggle ? { "aria-checked": selected } : {})}
@@ -95,7 +97,7 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
                         {props.icon}
                     </IconSlot>
                 </engine.View>
-                {ink.layer}
+                {indication.layer(slots)}
             </engine.View>
             {props.variant === "outlined" ? (
                 <engine.View

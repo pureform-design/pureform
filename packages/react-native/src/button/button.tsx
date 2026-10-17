@@ -8,23 +8,23 @@ import type {
     ButtonContentProps,
     ButtonPart,
     ButtonVariantProps,
+    InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
+const [INDICATION] = buttonAnatomy.indication!;
+
 export interface ButtonProps
-    extends ButtonVariantProps, ButtonContentProps<ReactNode> {
+    extends
+        ButtonVariantProps,
+        ButtonContentProps<ReactNode>,
+        InteractiveProps {
     readonly disabled?: boolean | undefined;
     readonly onPress?: (() => void) | undefined;
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
@@ -34,21 +34,24 @@ export interface ButtonProps
 function ButtonImpl(props: ButtonProps): ReactNode {
     const engine = useEngine();
     const disabled = props.disabled ?? false;
-    const { state, handlers } = usePress({
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
         disabled,
-        ...(props.mirrorIcon ? { mirrored: true } : {}),
     });
     const { styles: s, selected } = useComponentSlots(
         "button",
-        buttonSelection(props),
-        state,
+        indication.select(buttonSelection(props)),
+        indication.states({
+            disabled,
+            ...(props.mirrorIcon ? { mirrored: true } : {}),
+        }),
     );
-    const ink = useInk(selected, { disabled });
     const id = (part: ButtonPart) =>
         testIdOf(buttonAnatomy, part, props.testId);
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
@@ -74,7 +77,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
             >
                 {props.label}
             </engine.Text>
-            {ink.layer}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }

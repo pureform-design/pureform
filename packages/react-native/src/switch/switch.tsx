@@ -1,27 +1,25 @@
 // The switch: a pressable root with its touch target and its track, which holds the state layer
-// and the handle; the handle shows a check while it's on.
+// (where it ripples) and the handle; the handle shows a check while it's on.
 
 import { switchControlAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { switchSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    InteractiveProps,
     SwitchPart,
     SwitchVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import {
-    testIdOf,
-    unselectable,
-    useControllable,
-    usePress,
-    withEngine,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface SwitchProps extends SwitchVariantProps {
+const [INDICATION] = switchControlAnatomy.indication!;
+
+export interface SwitchProps extends SwitchVariantProps, InteractiveProps {
     /** Whether it's on. Controlled when defined. */
     readonly checked?: boolean | undefined;
     readonly defaultChecked?: boolean | undefined;
@@ -48,22 +46,26 @@ function SwitchImpl(props: SwitchProps): ReactNode {
         props.onCheckedChange,
         false,
     );
-    const { state, handlers } = usePress({
-        checked,
-        ...(props.disabled ? { disabled: true } : {}),
-        ...(props.invalid ? { invalid: true } : {}),
-        ...(props.readOnly ? { readOnly: true } : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
     });
-    const { styles: s } = useComponentSlots(
+    const { styles: s, selected } = useComponentSlots(
         "switchControl",
-        switchSelection(props),
-        state,
+        indication.select(switchSelection(props)),
+        indication.states({
+            checked,
+            ...(props.disabled ? { disabled: true } : {}),
+            ...(props.invalid ? { invalid: true } : {}),
+            ...(props.readOnly ? { readOnly: true } : {}),
+        }),
     );
     const id = (part: SwitchPart) =>
         testIdOf(switchControlAnatomy, part, props.testId);
     return (
         <engine.Pressable
-            {...handlers}
+            {...indication.handlers}
             role="switch"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
@@ -82,7 +84,9 @@ function SwitchImpl(props: SwitchProps): ReactNode {
                 testID={id("touchTarget")}
             />
             <engine.View style={s.track} testID={id("track")}>
-                <engine.View style={s.stateLayer} testID={id("stateLayer")} />
+                <engine.View style={s.stateLayer} testID={id("stateLayer")}>
+                    {indication.layer(selected)}
+                </engine.View>
                 <engine.View style={s.handle} testID={id("handle")}>
                     <engine.Text
                         selectable={false}

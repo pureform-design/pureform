@@ -4,22 +4,22 @@
 import { chipAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { chipSelection } from "@pureform/binding-core";
-import type { ChipPart, ChipVariantProps } from "@pureform/binding-core";
+import type {
+    ChipPart,
+    ChipVariantProps,
+    InteractiveProps,
+} from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface ChipProps extends ChipVariantProps {
+const [INDICATION] = chipAnatomy.indication!;
+
+export interface ChipProps extends ChipVariantProps, InteractiveProps {
     readonly label?: ReactNode;
     /** An icon before the label. */
     readonly icon?: ReactNode;
@@ -34,21 +34,24 @@ export interface ChipProps extends ChipVariantProps {
 
 function ChipImpl(props: ChipProps): ReactNode {
     const engine = useEngine();
-    const { state, handlers } = usePress({
-        selected: props.selected ?? false,
-        ...(props.disabled ? { disabled: true } : {}),
-        ...(props.mirrorIcon ? { mirrored: true } : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "chip",
-        chipSelection(props),
-        state,
+        indication.select(chipSelection(props)),
+        indication.states({
+            selected: props.selected ?? false,
+            ...(props.disabled ? { disabled: true } : {}),
+            ...(props.mirrorIcon ? { mirrored: true } : {}),
+        }),
     );
-    const ink = useInk(selected, { disabled: props.disabled ?? false });
     const id = (part: ChipPart) => testIdOf(chipAnatomy, part, props.testId);
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
@@ -74,7 +77,7 @@ function ChipImpl(props: ChipProps): ReactNode {
             >
                 {props.label}
             </engine.Text>
-            {ink.layer}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }

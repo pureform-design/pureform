@@ -11,6 +11,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    IndicationProps,
     SelectItem,
     SelectPart,
     SelectVariantProps,
@@ -39,6 +40,7 @@ interface Measurable {
 export interface SelectProps
     extends
         Omit<SelectVariantProps, "leadingIcon">,
+        IndicationProps,
         Omit<
             FieldProps,
             "value" | "defaultValue" | "onValueChange" | "inputProps"
@@ -61,6 +63,7 @@ export function Select(props: SelectProps): ReactNode {
         defaultValue: _defaultValue,
         onValueChange,
         testId,
+        indication,
         ...field
     } = props;
     const [value, setValue] = useControllable<"value", string | null>(
@@ -126,6 +129,9 @@ export function Select(props: SelectProps): ReactNode {
                                 density: props.density,
                             })}
                             items={items}
+                            {...(indication === undefined
+                                ? {}
+                                : { indication })}
                             value={value}
                             onSelect={(details) => {
                                 if (details.value !== value)
