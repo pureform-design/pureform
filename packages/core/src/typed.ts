@@ -37,6 +37,7 @@ import {
 import { defineComponent, defineSlotComponent } from "./define";
 import type {
     ComponentSpec,
+    IndicationDeclaration,
     Metadata,
     SlottedComponentSpec,
     Token,
@@ -294,6 +295,8 @@ interface TypedComponentSpec<
 > {
     name: N;
     $meta?: Metadata;
+    /** Where it shows indication, its one slot being `root`. */
+    indication?: IndicationDeclaration<"root">[];
     tokens?: T;
     /** The variant groups and their values. Each value gets an entry, empty unless the
      *  recipe styles it. */
@@ -338,6 +341,8 @@ interface TypedSlotComponentSpec<
     slots: S[];
     /** How the slots nest; keys and children must be declared slots. */
     structure?: { [K in NoInfer<S>]?: NoInfer<S>[] };
+    /** Where it shows indication, one entry per interactive surface, naming declared slots. */
+    indication?: IndicationDeclaration<NoInfer<S>>[];
     tokens?: T;
     /** The variant groups and their values. Each value gets an entry, empty unless the
      *  recipe styles it. */
@@ -527,6 +532,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                 definedOnly({
                     name: spec.name,
                     $meta: spec.$meta,
+                    indication: spec.indication,
                     tokens: spec.tokens,
                     recipe: definedOnly({
                         base: own(recipe.base),
@@ -580,6 +586,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                 definedOnly({
                     name: spec.name,
                     $meta: spec.$meta,
+                    indication: spec.indication,
                     tokens: spec.tokens,
                     slots: spec.slots,
                     structure: spec.structure,

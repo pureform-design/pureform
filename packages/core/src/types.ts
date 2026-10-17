@@ -44,6 +44,22 @@ export type WithMeta<T> = { $value: T; $meta?: Metadata };
  *  `Token<T>` is backward-compatible since a bare `T` still satisfies it. */
 export type Token<T> = T | WithMeta<T>;
 
+/** Where a component shows indication (Material's state layer, ripple, and focus indicator):
+ *  which slot takes the interactions, which one the state layer tints, and which one draws the
+ *  focus indicator. A component declares one per interactive surface, beside its state layer;
+ *  the anatomy reads it, so bindings wire every component the same way. */
+export interface IndicationDeclaration<S extends string = string> {
+    /** The slot whose interactions (presses, hover, focus) feed the component's interaction
+     *  source. */
+    trigger: S;
+    /** The slot the state layer tints and a ripple fills and is clipped to. */
+    surface: S;
+    /** Whether a ripple starts at the surface's center rather than where it was pressed. */
+    centered: boolean;
+    /** The slot that draws the focus indicator. */
+    focus: S;
+}
+
 interface BaseComponentSpec {
     name: string;
     /** The component's token set, created here (not aliased from a central map). Entries are
@@ -60,6 +76,9 @@ interface BaseComponentSpec {
      *  Keeping these in `platformHints` keeps Panda and web jargon out of core's typed style
      *  map. */
     $meta?: Metadata;
+    /** Where it shows indication, one entry per interactive surface. Left out for a component
+     *  that isn't interactive. */
+    indication?: IndicationDeclaration[];
 }
 
 /** Styles applied only when several variant selections combine (lowering to Panda
