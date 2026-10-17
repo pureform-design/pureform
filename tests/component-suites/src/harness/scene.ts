@@ -9,13 +9,17 @@ export const COMPONENT_NAMES = [
     "Button",
     "Checkbox",
     "Chip",
+    "Dialog",
     "Fab",
     "IconButton",
+    "Menu",
     "RadioGroup",
     "Select",
+    "Snackbar",
     "Switch",
     "TextArea",
     "TextField",
+    "Tooltip",
 ] as const;
 
 export type ComponentName = (typeof COMPONENT_NAMES)[number];

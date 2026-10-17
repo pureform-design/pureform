@@ -6,13 +6,17 @@ import { PureformProvider } from "@pureform/react";
 import { Button } from "@pureform/react/button";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
+import { Dialog } from "@pureform/react/dialog";
 import { Fab } from "@pureform/react/fab";
 import { IconButton } from "@pureform/react/icon-button";
+import { Menu } from "@pureform/react/menu";
 import { RadioGroup } from "@pureform/react/radio-group";
 import { Select } from "@pureform/react/select";
+import { Snackbar } from "@pureform/react/snackbar";
 import { Switch } from "@pureform/react/switch";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
+import { Tooltip } from "@pureform/react/tooltip";
 import { createElement, type ComponentType, type ReactNode } from "react";
 
 import { registry } from "#registry";
@@ -25,13 +29,17 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Button,
     Checkbox,
     Chip,
+    Dialog,
     Fab,
     IconButton,
+    Menu,
     RadioGroup,
     Select,
+    Snackbar,
     Switch,
     TextArea,
     TextField,
+    Tooltip,
 };
 
 export function SceneView(props: {

@@ -89,6 +89,12 @@ export interface KeyboardCase {
      *  checked radio, which an arrow key moves. */
     focusable(host: HTMLElement): HTMLElement;
     readonly keys: readonly KeyCase[];
+    /** `false` for a component with no disabled state of its own (an overlay, whose trigger the
+     *  app disables): Tab isn't checked to skip it. */
+    readonly disables?: false | undefined;
+    /** The state focus moves it to on its own, which each key starts from: a tooltip opens when
+     *  Tab reaches its trigger. Left out: focus changes nothing. */
+    readonly focused?: unknown;
     /** Arrow keys by direction. Left out: arrows do nothing in either direction. */
     readonly arrows?:
         | {
@@ -110,6 +116,10 @@ export interface ComponentCase {
      *  mark: their physical borders, corners, and transform must match between `ltr` and `rtl`.
      *  The mirrored-box check can't see this, since their boxes are symmetric. */
     readonly unmirrored?: readonly string[] | undefined;
+    /** Renderings with an overlay open. Zag places a floating overlay, and hides the page around a
+     *  modal one, only in the browser, so the server rendering suite can't hydrate them unchanged:
+     *  the accessibility and direction suites run these in the browser alone. */
+    readonly opened?: Readonly<Record<string, SceneProps>> | undefined;
     readonly state?: StateCase | undefined;
     readonly form?: FormCase | undefined;
     readonly keyboard: KeyboardCase;

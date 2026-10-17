@@ -5,13 +5,17 @@ import { PureformProvider } from "@pureform/solid";
 import { Button } from "@pureform/solid/button";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
+import { Dialog } from "@pureform/solid/dialog";
 import { Fab } from "@pureform/solid/fab";
 import { IconButton } from "@pureform/solid/icon-button";
+import { Menu } from "@pureform/solid/menu";
 import { RadioGroup } from "@pureform/solid/radio-group";
 import { Select } from "@pureform/solid/select";
+import { Snackbar } from "@pureform/solid/snackbar";
 import { Switch } from "@pureform/solid/switch";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
+import { Tooltip } from "@pureform/solid/tooltip";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import type { Accessor } from "solid-js";
@@ -26,13 +30,17 @@ export const components: Record<ComponentName, ValidComponent> = {
     Button,
     Checkbox,
     Chip,
+    Dialog,
     Fab,
     IconButton,
+    Menu,
     RadioGroup,
     Select,
+    Snackbar,
     Switch,
     TextArea,
     TextField,
+    Tooltip,
 };
 
 export function SceneView(props: {

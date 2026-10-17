@@ -61,13 +61,20 @@ const pressAndCheck = async (
         dir,
     );
     expect(document.activeElement).toBe(component.keyboard.focusable(host));
+    // What focus did on its own (a tooltip opening) isn't the key's.
+    await harness.settle();
+    onChange.mockClear();
     await userEvent.keyboard(key);
     await harness.settle();
     if (does === "click") expect(onClick).toHaveBeenCalledTimes(1);
     if (does === "nothing") expect(onClick).not.toHaveBeenCalled();
     if (state) {
+        const start =
+            "focused" in component.keyboard
+                ? component.keyboard.focused
+                : state.from;
         expect(state.read(host)).toEqual(
-            does === "change" ? (to ?? state.to) : state.from,
+            does === "change" ? (to ?? state.to) : start,
         );
         expect(onChange).toHaveBeenCalledTimes(does === "change" ? 1 : 0);
     }
@@ -80,12 +87,17 @@ describe.each(COMPONENTS)("$component", (component) => {
         expect(document.activeElement).toBe(component.keyboard.focusable(host));
     });
 
-    it("Tab skips it when disabled", async () => {
-        const { host } = await focusWithTab(component, { disabled: true });
-        expect(document.activeElement).not.toBe(
-            component.keyboard.focusable(host),
-        );
-    });
+    it.skipIf(component.keyboard.disables === false)(
+        "Tab skips it when disabled",
+        async () => {
+            const { host } = await focusWithTab(component, {
+                disabled: true,
+            });
+            expect(document.activeElement).not.toBe(
+                component.keyboard.focusable(host),
+            );
+        },
+    );
 
     it.each(component.keyboard.keys)("$key: $does", async (key) => {
         await pressAndCheck(component, key);

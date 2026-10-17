@@ -1,11 +1,11 @@
-// Accessibility with axe over every example of every component, with the demo's real styles (so
-// color contrast counts), in both directions.
+// Accessibility with axe over every example of every component, and every opened overlay, with the
+// demo's real styles (so color contrast counts), in both directions.
 
 import axe from "axe-core";
 import { describe, expect, it } from "vitest";
 
 import { COMPONENTS } from "./components";
-import { mountCase } from "./harness/page";
+import { mountCase, renderings, settlePlaced } from "./harness/page";
 
 /** Each violation, one line per element: `rule: selector (summary)`. */
 const violations = async (element: Element): Promise<string[]> => {
@@ -20,12 +20,13 @@ const violations = async (element: Element): Promise<string[]> => {
 
 describe.each(COMPONENTS)("$component", (component) => {
     describe.each(["ltr", "rtl"] as const)("%s", (dir) => {
-        it.each(Object.entries(component.examples))(
+        it.each(renderings(component))(
             "%s has no axe violations",
             async (_, props) => {
                 const { host } = mountCase(component, props, {
                     provider: { dir },
                 });
+                await settlePlaced();
                 expect(await violations(host)).toEqual([]);
             },
         );

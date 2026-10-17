@@ -1,12 +1,10 @@
-// Direction (design doc §5.9), for every example of every component: the provider's `dir` reaches
-// every part the machine marks, and right to left mirrors left to right: each part's box in `rtl`
-// is its `ltr` box mirrored across the root (`x' = width - x - w`), while parts that don't point
-// (a check mark) draw the same both ways. Arrow keys in both directions
-// are in the keyboard suite.
+// Direction (design doc §5.9), for every example of every component and every opened overlay: the
+// provider's `dir` reaches every part the machine marks, and right to left mirrors left to right:
+// each part's box in `rtl` is its `ltr` box mirrored across the root (`x' = width - x - w`), while
+// parts that don't point (a check mark) draw the same both ways. Arrow keys in both directions are
+// in the keyboard suite.
 
 import { describe, expect, it } from "vitest";
-
-import { harness } from "#binding";
 
 import {
     boxesWithin,
@@ -14,7 +12,7 @@ import {
 } from "../../browser-e2e-tests/src/mirror";
 import { byTestId, COMPONENTS } from "./components";
 import type { ComponentCase } from "./components";
-import { mountCase } from "./harness/page";
+import { mountCase, renderings, settlePlaced } from "./harness/page";
 import type { SceneProps } from "./harness/scene";
 
 /** Physical styles that draw a part's shape. */
@@ -37,7 +35,7 @@ const measure = async (
     dir: "ltr" | "rtl",
 ) => {
     const scene = mountCase(component, props, { provider: { dir } });
-    await harness.settle();
+    await settlePlaced();
     const root = byTestId(scene.host, component.root);
     // A part the CSS hides (an icon button's outline unless outlined) has no box to mirror.
     const parts = Object.fromEntries(
@@ -68,7 +66,7 @@ const measure = async (
 };
 
 describe.each(COMPONENTS)("$component", (component) => {
-    it.each(Object.entries(component.examples))(
+    it.each(renderings(component))(
         "%s: rtl mirrors ltr, and every part takes the provider's dir",
         async (_, props) => {
             const ltr = await measure(component, props, "ltr");
