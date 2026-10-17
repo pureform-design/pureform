@@ -65,7 +65,7 @@ export interface ItemState {
 export interface NavigationApi<T extends PropTypes = PropTypes> {
     /** The current destination's value, or `null`. */
     value: string | null;
-    /** Make a destination current, as the app would: `onValueChange` isn't called. */
+    /** Make a destination current; `onValueChange` reports it, as Zag's `setValue` does. */
     setValue: (value: string | null) => void;
     getItemState: (props: ItemProps) => ItemState;
     getRootProps: () => T["element"];
