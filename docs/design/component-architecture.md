@@ -1761,6 +1761,18 @@ function defineIndication(indication: Indication): Indication;
 - **Output changes on purpose**: the default indication resolves to today's values, so the
   colors stay the same, but selectors read one more var, so it's checked against fixtures
   rather than the equivalence check.
+- **Built (p9b):** all seven names are component tokens (`stateHoverOpacity`,
+  `stateFocusOpacity`, `statePressedOpacity`, `stateDraggedOpacity`,
+  `focusIndicatorThickness`, `focusIndicatorOuterOffset`, `focusIndicatorColor`), so a
+  component's `indication` prop can set any of them on its root alone. The theme's thickness and
+  offset are the state contract's `focusIndicator` lengths, lowered beside the sizes
+  (`--sizes-focus-indicator-thickness`). The helpers take the component's token reader first
+  (`stateLayer(ref, { base, content })`, `focusRing(ref, focused?)`, `slotStateLayer(ref, …)`).
+  A state layer that follows another slot has no drag state, as before, so those components
+  declare `stateDraggedOpacity` without reading it. Since each root sets the tokens, a provider's
+  or a named theme's override of a component's indication token (`components.button.stateHoverOpacity`)
+  doesn't reach it, as with `densityOffset`; the theme-level tokens do. CSS grows about 3% raw
+  (under 1.1% gzipped) for the demo's config.
 
 #### Where indication draws: the anatomy
 
@@ -1805,6 +1817,15 @@ From today's preset:
   but it changes the markup (server HTML, child counts an app's CSS may match), so it's a
   separate decision: p9e measures mounting and style recalculation for 1,000 list items with
   and without it, and the numbers decide.
+- **Built (p9b):** a component spec's `indication` (core's `IndicationDeclaration`, typed by the
+  spec's slots) holds the declaration, and `ComponentAnatomy.indication` is a list of
+  `IndicationAnatomy`, one per interactive surface, since the snackbar has two (its action and
+  close). The card and list item declare theirs for when they're interactive. What differs from
+  the table: the navigation destination's surface is the pill (`indicator`), not the
+  `activeIndicator` inside it, which is drawn only on the current destination; both carry the
+  state layer. The search bar draws a state layer (with the tokens) but declares no indication.
+  The menu's entry covers the select's options, and the composites that draw the menu's or the
+  tabs' parts carry their entries.
 - **Pruning** (§7): the usage table counts the `ripple` entry as used by every component
   with an indication entry, unless the provider passes `noIndication` or a custom one with no
   layer and the scan can see it.
