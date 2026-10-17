@@ -24,6 +24,26 @@ export const mountCase = (
         options.host,
     );
 
+/** A component's renderings by name: its examples, then its opened overlays (`open: …`). */
+export const renderings = (
+    component: ComponentCase,
+): (readonly [string, SceneProps])[] => [
+    ...Object.entries(component.examples),
+    ...Object.entries(component.opened ?? {}).map(
+        ([name, props]) => [`open: ${name}`, props] as const,
+    ),
+];
+
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+/** Waits for a mounted scene to settle, and for an overlay in it to be placed: Zag places a
+ *  floating one a few frames after it opens, once the trigger has its layout. */
+export const settlePlaced = async (): Promise<void> => {
+    await harness.settle();
+    for (let i = 0; i < 4; i++) await frame();
+    await harness.settle();
+};
+
 const capitalize = (name: string) => name[0]!.toUpperCase() + name.slice(1);
 
 /** A state prop's three names: `checked`, `defaultChecked`, `onCheckedChange`. */

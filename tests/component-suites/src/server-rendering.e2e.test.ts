@@ -243,8 +243,12 @@ describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
         const { logged, changes } = await hydrate(
             scene({ seed: SEED, hydrate: "regenerate" }),
         );
-        // The generator loads after hydrating, the first time in this page.
-        await vi.waitFor(() => expect(generated.count).toBeGreaterThan(before));
+        // The generator loads after hydrating, the first time in this page: a cold import of the
+        // seed theme's generator, which can take longer than `waitFor`'s default second.
+        await vi.waitFor(
+            () => expect(generated.count).toBeGreaterThan(before),
+            { timeout: 10_000 },
+        );
         await harness.settle();
         expect(logged).toEqual([]);
         expect(changes).toEqual([]);
