@@ -1860,6 +1860,35 @@ component only passes its source. What differs from the sketch:
   indicated anatomy passed to `useComponent`, and drops it only when every provider and every
   component prop it sees passes a layerless indication.
 
+**Built (p9d), React Native:** `@pureform/react-native` has the same provider `indication`, component
+`indication` and `interactionSource` props, `useInteractionSource()`, `useInteractionState(source)`,
+and `useIndication(source, { centered })`. What differs from the web:
+
+- **No machine:** `Pressable`'s callbacks (and the slider's responder) emit through
+  `@pureform/machines/interaction`'s `InteractionEmitter`, wrapped as `NativeInteraction`. A press's
+  origin is its page point (`pageX`, `pageY`), which the native ripple measures its layer against,
+  or `"center"` for a key. Nested pressables need no claim: the responder system grants one.
+- **`materialIndication`** is binding-core's with a `native` half added (the same names, the same
+  object for the same options); binding-core's own Material objects, `DEFAULT_INDICATION` among them,
+  resolve to it. The native half is the engine's `useRipple`, driven by the source's presses, in the
+  surface's `color` (the theme's `onSurface` where the surface sets none) and corners, clipped to its
+  drawing. `"ink-sparkle"` draws the ink well.
+- **Tokens are native values** (lengths as numbers): the provider's go into its overrides by theme
+  path, under its own `overrides`; a prop's, and the providers' `focusIndicatorColor`, into the
+  component's instance tokens, under its `tokens`.
+- **`useIndication`** returns `{ surface, layer }`, the callbacks to spread on the app's `Pressable`
+  and the native half to render last inside it, and takes the surface's `style` (and `drawing`) for
+  the ripple's color and corners. Forwarded states need no attributes: a component that shares a
+  source selects with its state.
+- **`focusVisible`** holds unless a pointer press is in progress on any surface or ended under 500 ms
+  ago (`FOCUS_AFTER_PRESS_MS`), since a browser focuses a tapped element after the touch ends. React
+  Native has no global key events, so a programmatic focus more than 500 ms after a press shows the
+  indicator, where a browser would remember the pointer.
+- **A disabled component or item** selects as idle, even under a shared source, and ends what it
+  had in progress, a single tab, radio, or destination too.
+- **The search bar** has no indication entry, so no ripple: its source only carries the root's hover
+  and press and the input's focus.
+
 #### Behavior rules
 
 - **Reduced motion** (§5.8): the ripple stops; the state layer's fades and the focus
