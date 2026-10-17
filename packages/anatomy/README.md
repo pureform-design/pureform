@@ -45,6 +45,14 @@ interface ComponentAnatomy<
     readonly root: P; // the outermost part, "root" for every preset component
     readonly partNames: readonly P[]; // the AST's slots in order, then extra parts
     readonly parts: { readonly [K in P]: PartAnatomy<P> };
+    readonly indication?: readonly IndicationAnatomy<P>[]; // one per interactive surface
+}
+
+interface IndicationAnatomy<P extends string = string> {
+    readonly trigger: P; // the part whose interactions feed the interaction source
+    readonly surface: P; // the part the state layer tints and the ripple fills (and clips to)
+    readonly centered: boolean; // the ripple starts at the surface's center
+    readonly focus: P; // the part that draws the focus indicator
 }
 
 interface PartAnatomy<P extends string = string> {
@@ -68,6 +76,26 @@ interface PartAnatomy<P extends string = string> {
   hidden native `<select>`, §9.5) sits in `root`.
 - Names in attribute values and test ids are kebab case: `touchTarget` is
   `data-pf-part="touch-target"` and `pf-<scope>-touch-target`.
+- `indication` comes from the component spec's `indication`, which the preset declares beside
+  each component's state layer (design doc §9.8, "Where indication draws"). Only interactive
+  components have it; the card and the list item have it for when they're interactive (the
+  binding knows when), and the snackbar has two, its action and its close button. The select's
+  options are the menu's items, so `menuAnatomy`, `selectMenuAnatomy`, and `menuOverlayAnatomy`
+  carry the menu's entry; `tabsCompositeAnatomy` carries the tabs'.
+
+| Component                     | Trigger  | Surface      | Centered | Focus    |
+| ----------------------------- | -------- | ------------ | -------- | -------- |
+| button, chip, card, list item | `root`   | `root`       | no       | `root`   |
+| tabs                          | `tab`    | `tab`        | no       | `tab`    |
+| menu (items, select options)  | `item`   | `item`       | no       | `item`   |
+| snackbar                      | `action` | `action`     | no       | `action` |
+|                               | `close`  | `close`      | no       | `close`  |
+| icon button                   | `root`   | `container`  | yes      | `root`   |
+| FAB                           | `root`   | `container`  | no       | `root`   |
+| navigation bar and rail       | `item`   | `indicator`  | yes      | `item`   |
+| checkbox, radio               | `input`  | `root`       | yes      | `root`   |
+| switch                        | `input`  | `stateLayer` | yes      | `root`   |
+| slider                        | `input`  | `stateLayer` | yes      | `handle` |
 
 ## Public API
 
@@ -93,18 +121,18 @@ partTestId(buttonAnatomy, "label", "save"); // "save-label"
 partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 ```
 
-| Export                                                                     | What it is                                                       |
-| -------------------------------------------------------------------------- | ---------------------------------------------------------------- |
-| `<name>Anatomy` (`buttonAnatomy`, …)                                       | One component's anatomy. Import these in bindings to tree-shake. |
-| `anatomy`                                                                  | Every preset component's anatomy, by name.                       |
-| `testIds`                                                                  | Default test ids by component and part.                          |
-| `partTestId(component, part, testId?)`                                     | A part's test id under Root's `testId` (a `TestIdOverride`).     |
-| `partAttributes(component, part, testId?)`                                 | `data-scope`, `data-pf-part`, `data-testid` for a part.          |
-| `PART_ATTRIBUTE`, `SCOPE_ATTRIBUTE`, `TEST_ID_ATTRIBUTE`, `TEST_ID_PREFIX` | The attribute names, and `"pf"`.                                 |
-| `kebabCase(name)`                                                          | `touchTarget` → `touch-target`.                                  |
-| `partSlot(part)`                                                           | The registry slot a part is drawn by: its `slot`, else its name. |
-| `ComponentAnatomy`, `PartAnatomy`, `PartName<A>`, `ExtraPart`              | The shape.                                                       |
-| `Anatomies`, `AnatomyName`, `PartOf<N>`                                    | Types over the preset's components: `PartOf<"button">`.          |
+| Export                                                                             | What it is                                                       |
+| ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| `<name>Anatomy` (`buttonAnatomy`, …)                                               | One component's anatomy. Import these in bindings to tree-shake. |
+| `anatomy`                                                                          | Every preset component's anatomy, by name.                       |
+| `testIds`                                                                          | Default test ids by component and part.                          |
+| `partTestId(component, part, testId?)`                                             | A part's test id under Root's `testId` (a `TestIdOverride`).     |
+| `partAttributes(component, part, testId?)`                                         | `data-scope`, `data-pf-part`, `data-testid` for a part.          |
+| `PART_ATTRIBUTE`, `SCOPE_ATTRIBUTE`, `TEST_ID_ATTRIBUTE`, `TEST_ID_PREFIX`         | The attribute names, and `"pf"`.                                 |
+| `kebabCase(name)`                                                                  | `touchTarget` → `touch-target`.                                  |
+| `partSlot(part)`                                                                   | The registry slot a part is drawn by: its `slot`, else its name. |
+| `ComponentAnatomy`, `PartAnatomy`, `IndicationAnatomy`, `PartName<A>`, `ExtraPart` | The shape.                                                       |
+| `Anatomies`, `AnatomyName`, `PartOf<N>`                                            | Types over the preset's components: `PartOf<"button">`.          |
 
 React Native takes the test id as `testID`: use `partTestId` there, not `partAttributes`.
 
@@ -120,7 +148,8 @@ Build time only: the generator and `@pureform/generate` (for an app's own compon
 | `EXTRA_PARTS`                             | The extra parts, by component name.                                        |
 
 `deriveAnatomy` throws when `structure` puts a slot in two places or names a slot that doesn't
-exist, or an extra part's name is a slot or its parent isn't one.
+exist, an extra part's name is a slot or its parent isn't one, or the spec's `indication` names a
+part the component doesn't have.
 
 ## Refreshing after a preset change
 

@@ -10,15 +10,15 @@ any provider in its place.
 
 ## Contracts
 
-| Contract     | Requires                                                                                                                                              |
-| ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `color`      | The surface roles (`surface`, `onSurface`, the container steps, `outline`, `scrim`, …) and, per color group, `g`, `onG`, `gContainer`, `onGContainer` |
-| `typography` | `brand` and `plain` font roles and the 15 Material text styles. Add roles and styles freely                                                           |
-| `shape`      | Radii `none`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `full`                                                                          |
-| `layout`     | Spacing steps `0` through `16` and sizes `iconSmall` through `touchTarget`                                                                            |
-| `state`      | Opacities `stateHover`, `stateFocus`, `statePressed`, `stateDragged`, `disabledContainer`, `disabledContent`, `scrim`                                 |
-| `motion`     | Durations `short1` through `extraLong4` and easings `standard` through `linear`                                                                       |
-| `elevation`  | A `{ shadow, tint }` pair for each of `level0` through `level5`                                                                                       |
+| Contract     | Requires                                                                                                                                                                                                                                                                           |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `color`      | The surface roles (`surface`, `onSurface`, the container steps, `outline`, `scrim`, …) and, per color group, `g`, `onG`, `gContainer`, `onGContainer`                                                                                                                              |
+| `typography` | `brand` and `plain` font roles and the 15 Material text styles. Add roles and styles freely                                                                                                                                                                                        |
+| `shape`      | Radii `none`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `full`                                                                                                                                                                                                       |
+| `layout`     | Spacing steps `0` through `16` and sizes `iconSmall` through `touchTarget`                                                                                                                                                                                                         |
+| `state`      | Opacities `stateHover`, `stateFocus`, `statePressed`, `stateDragged`, `disabledContainer`, `disabledContent`, `scrim`; the focus indicator's `focusIndicatorThickness` and `focusIndicatorOuterOffset` (lengths, lowered beside the sizes and read through `focusIndicator(name)`) |
+| `motion`     | Durations `short1` through `extraLong4` and easings `standard` through `linear`                                                                                                                                                                                                    |
+| `elevation`  | A `{ shadow, tint }` pair for each of `level0` through `level5`                                                                                                                                                                                                                    |
 
 Each contract is a TypeScript type, so a missing name or a value of the wrong kind fails to
 compile. `resolveTheme()` checks both again at runtime and names the provider and the slot.
