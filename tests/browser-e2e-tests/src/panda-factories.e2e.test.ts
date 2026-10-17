@@ -1,7 +1,7 @@
-// The demo's Panda class factories (`apps/solid-demo/.pureform/`, written by the Panda adapter's
-// codegen): for every component and every selection, each returns per slot the classes Panda's
-// recipe function returns, and Panda's stylesheet, built with the `staticCss` entries from
-// `.pureform/`, has a rule for every class the recipe styles. Instance tokens become the
+// The Panda fixture's class factories (`tests/panda-fixture/.pureform/`, written by the Panda
+// adapter's codegen): for every component and every selection, each returns per slot the classes
+// Panda's recipe function returns, and Panda's stylesheet, built with the `staticCss` entries
+// from `.pureform/`, has a rule for every class the recipe styles. Instance tokens become the
 // component's own CSS vars on the root, and the styles read them.
 
 import * as pandaRecipes from "$recipes";
@@ -9,15 +9,15 @@ import { varName } from "@pureform/css-lowering";
 import type { ClassFactory, ComponentShape } from "@pureform/styling";
 import { describe, expect, it } from "vitest";
 
-import { registry } from "../../../apps/solid-demo/.pureform";
-import { staticCss } from "../../../apps/solid-demo/.pureform/panda";
+import { registry } from "../../panda-fixture/.pureform";
+import { staticCss } from "../../panda-fixture/.pureform/panda";
 import {
     PREFIX,
     pureformConfig,
     pureformPreset,
-} from "../../../apps/solid-demo/panda.pureform";
+} from "../../panda-fixture/panda.pureform";
 
-import pandaCss from "#/App.css?inline";
+import pandaCss from "#/styles.css?inline";
 
 type Recipe = ((selection: object) => string | Record<string, string>) & {
     variantMap: Record<string, string[]>;
@@ -156,7 +156,7 @@ const ownClass = (name: string, value: string): boolean => {
         : value === className || value.startsWith(`${className}--`);
 };
 
-describe("the demo's Panda registry", () => {
+describe("the fixture's Panda registry", () => {
     it("registers every component of the config as a static entry", () => {
         expect(registry.names).toEqual(NAMES);
         expect(NAMES.length).toBeGreaterThan(2);

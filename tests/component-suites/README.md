@@ -7,11 +7,12 @@ server rendering. They're the design doc's §5.6, §5.7, §5.9, §9.4, §9.5, an
 nothing depends on it.
 
 It depends on `@pureform/solid`, `@pureform/react`, and a style registry and stylesheet per
-target, all from the demo's config (`apps/solid-demo/pureform.config.ts`), so every component
-renders with its real classes and layout:
+target, all from the Panda fixture's config (`tests/panda-fixture/pureform.config.ts`), so every
+component renders with its real classes and layout:
 
-- **Panda:** the demo's own glue and Panda stylesheet (`apps/solid-demo/.pureform`,
-  `apps/solid-demo/src/App.css`), written by the demo's omni `generate` and `prepare` tasks.
+- **Panda:** the fixture's own glue and Panda stylesheet (`tests/panda-fixture/.pureform`,
+  `tests/panda-fixture/src/styles.css`), written by the fixture's omni `generate` and `prepare`
+  tasks.
 - **CSS and Tailwind:** `.pureform/css` and `.pureform/tailwind` in this folder (ignored by git),
   which `vitest.config.e2e.ts` writes with `@pureform/generate` before the projects start
   (`src/targets/glue.ts`), with every component of the config.
@@ -40,7 +41,8 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
   `react/panda`, `react/css`, `react/tailwind`. Solid's projects compile with Solid's plugin
   (hydratable output), React's with React's. Each aliases `#binding` to its binding's harness and
   `#registry` to its target's registry, loads its target's stylesheet as a setup file, and adds
-  the target's styling plugin (Panda's over the demo's config, Tailwind's, or none for plain CSS).
+  the target's styling plugin (Panda's over the fixture's config, Tailwind's, or none for plain
+  CSS).
   So every suite file runs six times.
 - **Targets** (`src/targets/`): `targets.ts` lists them; `glue.ts` writes the CSS and Tailwind
   glue (options `{ prefix: "pf", classPrefix: "pf" }`); each `<target>/registry.ts` re-exports a
@@ -77,7 +79,7 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
 | `accessibility.e2e.test.ts`    | axe over every example and every opened overlay, both directions, with the real styles (so contrast counts).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 | `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled (unless it has no disabled state); each key clicks it, changes its state, or does nothing, from the state focus left it in; arrow keys in `ltr` and `rtl`. A component with no `keyboard` case: Tab passes over it.                                                                                                                                                                                                                                                                                                                                         |
 | `direction.e2e.test.ts`        | §5.9: for every example and opened overlay, every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`); a component with no inner parts mirrors its root across its host, which takes the direction too. Animations are held at 300 ms while measuring.                                                                                                                                                                                                             |
-| `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand (both measured where the pointer can't hover), for each of the demo's themes; teal draws differently from the base theme (unless `themed: false`); a runtime theme from teal's seed draws teal's colors in both schemes.                                                                                                                                                                                             |
+| `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand (both measured where the pointer can't hover), for each of the config's themes; teal draws differently from the base theme (unless `themed: false`); a runtime theme from teal's seed draws teal's colors in both schemes.                                                                                                                                                                                           |
 | `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule; a named theme's attribute renders on the server; a runtime theme renders its scope and block on the server, hydrates in both schemes keeping the server's block and generating nothing (`"reuse"`), and regenerates the same block (`"regenerate"`); overrides render and hydrate unchanged. |
 
 ## Adding a component
@@ -112,16 +114,16 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
 Every target's registry must have the component: each is generated with every component of the
-demo's config (`apps/solid-demo/pureform.config.ts`), so a component the config has is already
-in all three, and every suite runs it on Panda, CSS, and Tailwind with no target-specific step.
-A part of the case left out skips the cases that need it.
+Panda fixture's config (`tests/panda-fixture/pureform.config.ts`), so a component the config has
+is already in all three, and every suite runs it on Panda, CSS, and Tailwind with no
+target-specific step. A part of the case left out skips the cases that need it.
 
 ## Running
 
-Through the omni MCP (or `omni run`): `test:e2e`, which first runs the demo's `prepare` (Panda
-codegen) and builds the adapters the CSS and Tailwind glue is generated with. `.env.local` at the
-repo root sets `CHROMIUM_PATH`. One file, one binding, one target (`--project` takes globs:
-`'solid/*'`, `'*/tailwind'`):
+Through the omni MCP (or `omni run`): `test:e2e`, which first runs the Panda fixture's `prepare`
+(`pureform generate`, then Panda's codegen) and builds the adapters the CSS and Tailwind glue is
+generated with. `.env.local` at the repo root sets `CHROMIUM_PATH`. One file, one binding, one
+target (`--project` takes globs: `'solid/*'`, `'*/tailwind'`):
 
 ```sh
 cd tests/component-suites

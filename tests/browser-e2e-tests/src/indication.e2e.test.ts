@@ -22,12 +22,12 @@ import { tokenVar } from "@pureform/styling/theme-vars";
 import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
-import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { pureformConfig } from "../../panda-fixture/panda.pureform";
 import type { Adapter } from "./commands";
 import { forcePseudoClasses } from "./force-pseudo";
 import { RN_COMPONENTS } from "./rn-components";
 
-import pandaCss from "#/App.css?inline";
+import pandaCss from "#/styles.css?inline";
 
 const OPTIONS = { prefix: "pf", themeAttribute: "data-panda-theme" };
 

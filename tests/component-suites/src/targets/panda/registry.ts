@@ -1,3 +1,3 @@
-// The Panda target: the demo's generated registry (`apps/solid-demo/.pureform`).
+// The Panda target: the Panda fixture's generated registry (`tests/panda-fixture/.pureform`).
 
-export { registry } from "../../../../../apps/solid-demo/.pureform";
+export { registry } from "../../../../panda-fixture/.pureform";

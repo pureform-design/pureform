@@ -1,14 +1,13 @@
-// Visual checks over the demo's page, rendered here with the demo's own styles: a screenshot
-// per section, plus measured layout rules that screenshots alone catch late (icons centered,
-// labels that float without jumping, the focus ring on keyboard focus).
+// Visual checks over the Panda fixture's page of every component, with the fixture's Panda
+// styles: a screenshot per section, plus measured layout rules that screenshots alone catch late
+// (icons centered, labels that float without jumping, the focus ring on keyboard focus).
 
-import "#/App.css";
+import "#/styles.css";
 import { render } from "@solidjs/web";
-import type { Component } from "solid-js";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
-import { Route } from "#/routes/index";
+import { Page } from "#/page";
 
 const SECTIONS = [
     "intro",
@@ -37,14 +36,12 @@ const SECTIONS = [
     "navigation",
 ];
 
-const IndexPage = Route.options.component as Component;
-
 let dispose: (() => void) | undefined;
 
 beforeEach(async () => {
     const root = document.createElement("div");
     document.body.append(root);
-    const unmount = render(() => <IndexPage />, root);
+    const unmount = render(() => <Page />, root);
     dispose = () => {
         unmount();
         root.remove();

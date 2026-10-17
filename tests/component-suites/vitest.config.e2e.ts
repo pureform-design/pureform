@@ -29,7 +29,7 @@ const executablePath = process.env.CHROMIUM_PATH;
 
 const bindings = fileURLToPath(new URL("./src/bindings/", import.meta.url));
 const targets = fileURLToPath(new URL("./src/targets/", import.meta.url));
-const demo = fileURLToPath(new URL("../../apps/solid-demo/", import.meta.url));
+const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
 
 // The CSS and Tailwind targets' registries and stylesheets, before any project imports them.
 await generateGlue();
@@ -37,11 +37,11 @@ await generateGlue();
 // Every project's Vite server, and each one's server-rendering server, listens for SIGTERM.
 process.setMaxListeners(32);
 
-// What styles each target's stylesheet: Panda's codegen over the demo's config, Tailwind's
-// compiler over the imported stylesheet, and nothing for plain CSS.
+// What styles each target's stylesheet: Panda's codegen over the Panda fixture's config,
+// Tailwind's compiler over the imported stylesheet, and nothing for plain CSS.
 const styling: Record<TargetName, () => PluginOption[]> = {
     panda: () => [
-        pandacss({ cwd: demo, configPath: `${demo}panda.config.ts` }),
+        pandacss({ cwd: fixture, configPath: `${fixture}panda.config.ts` }),
     ],
     css: () => [],
     tailwind: () => [tailwindcss()],

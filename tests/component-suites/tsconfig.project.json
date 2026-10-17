@@ -12,9 +12,5 @@
             "#registry": ["./src/targets/panda/registry.ts"]
         }
     },
-    "include": [
-        "src",
-        ".pureform/**/*.*",
-        "../../apps/solid-demo/.pureform/**/*.*"
-    ]
+    "include": ["src", ".pureform/**/*.*", "../panda-fixture/.pureform/**/*.*"]
 }

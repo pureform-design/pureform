@@ -8,9 +8,9 @@
         "types": ["vite/client", "node", "@vitest/browser-playwright"],
         "paths": {
             "@/*": ["./src/*"],
-            "$*": ["../../apps/solid-demo/styled-system/*"],
-            "#*": ["../../apps/solid-demo/src/*"]
+            "$*": ["../panda-fixture/styled-system/*"],
+            "#*": ["../panda-fixture/src/*"]
         }
     },
-    "include": ["src", "../../apps/solid-demo/src/router.tsx"]
+    "include": ["src", "../panda-fixture/.pureform/**/*.*"]
 }

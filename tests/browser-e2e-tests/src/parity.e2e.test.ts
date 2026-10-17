@@ -16,11 +16,11 @@ import type { ComponentManifest } from "@pureform/css-adapter";
 import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
-import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { pureformConfig } from "../../panda-fixture/panda.pureform";
 import type { Adapter } from "./commands";
 import { forcePseudoClasses } from "./force-pseudo";
 
-import pandaCss from "#/App.css?inline";
+import pandaCss from "#/styles.css?inline";
 
 const PREFIX = "pf";
 const THEME_ATTRIBUTE = "data-panda-theme";

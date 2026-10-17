@@ -51,7 +51,7 @@ export type SceneProps = Readonly<Record<string, unknown>>;
 export interface SceneProvider {
     readonly dir?: "ltr" | "rtl" | undefined;
     readonly motion?: "system" | "reduce" | "full" | undefined;
-    /** A named theme from the demo's config (`teal`, `sharp`, `dense`). */
+    /** A named theme from the suites' config (`teal`, `sharp`, `dense`). */
     readonly theme?: string | undefined;
     /** A runtime theme instead: Material's seed theme from this color (`harness/themes.ts`). */
     readonly seed?: `#${string}` | undefined;
