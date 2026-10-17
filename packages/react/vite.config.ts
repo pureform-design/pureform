@@ -20,6 +20,11 @@ export default createConfig({
                     index: "src/index.ts",
                     button: "src/button/index.ts",
                     checkbox: "src/checkbox/index.ts",
+                    chip: "src/chip/index.ts",
+                    fab: "src/fab/index.ts",
+                    "icon-button": "src/icon-button/index.ts",
+                    "radio-group": "src/radio-group/index.ts",
+                    switch: "src/switch/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

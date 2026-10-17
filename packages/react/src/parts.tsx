@@ -16,7 +16,12 @@ import type {
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";
-import type { ClassSlots, ComponentName, Selection } from "@pureform/styling";
+import type {
+    ClassSlots,
+    ComponentName,
+    Selection,
+    SlotClasses,
+} from "@pureform/styling";
 import {
     createElement,
     type CSSProperties,
@@ -72,17 +77,29 @@ export interface RenderOptions extends PartOptions {
     readonly ref?: Ref<HTMLElement> | undefined;
 }
 
-/** A component's classes and the means to build its parts. */
-export interface ComponentScope<A extends ComponentAnatomy> {
+/** The means to build a component's parts. */
+export interface PartScope<A extends ComponentAnatomy> {
     readonly anatomy: A;
-    /** Every slot's classes, from one `useClasses` call. */
-    readonly classes: ClassSlots<ComponentOf<A>>;
     /** A part's merged props, to spread: `<span {...scope.part("label", …)} />`. */
     part(part: PartName<A>, options?: PartOptions): PartProps;
     /** A part rendered: its element (or `as`), merged props, the user's `ref` and `children`. An
      *  icon part also provides its element to `useIconStyle()`. */
     render(part: PartName<A>, options: RenderOptions): ReactElement;
 }
+
+/** A component's classes and the means to build its parts. */
+export interface ComponentScope<
+    A extends ComponentAnatomy,
+> extends PartScope<A> {
+    /** Every slot's classes, from one `useClasses` call. */
+    readonly classes: ClassSlots<ComponentOf<A>>;
+}
+
+/** What `useUnstyledComponent` takes: `useComponent`'s options without a selection. */
+export type UnstyledComponentOptions<A extends ComponentAnatomy> = Omit<
+    ComponentOptions<A>,
+    "selection" | "unstyled"
+>;
 
 type RefCleanup = () => void;
 
@@ -146,20 +163,16 @@ function PartElement({
     return <IconPartContext value={element}>{node}</IconPartContext>;
 }
 
-/** Ties a component's anatomy to the registry, for Root to call once and share with its parts
- *  through context. */
-export function useComponent<A extends ComponentAnatomy>(
+const createPartScope = <A extends ComponentAnatomy>(
     anatomy: A,
-    options: ComponentOptions<A>,
-): ComponentScope<A> {
-    const state = usePureform();
-    const classes = useClasses(
-        anatomy.name as ComponentOf<A>,
-        options.selection,
-    );
-    const scope: ComponentScope<A> = {
+    options: UnstyledComponentOptions<A> & {
+        readonly unstyled?: ComponentOptions<A>["unstyled"];
+    },
+    classes: Readonly<Record<string, SlotClasses>> | undefined,
+    slotProps: object | undefined,
+): PartScope<A> => {
+    const scope: PartScope<A> = {
         anatomy,
-        classes,
         part(part, partOptions = {}) {
             return combinePartProps(
                 partSources({
@@ -171,7 +184,7 @@ export function useComponent<A extends ComponentAnatomy>(
                     unstyled: options.unstyled,
                     partUnstyled: partOptions.unstyled,
                     classes,
-                    slotProps: state.slotProps,
+                    slotProps,
                     props: partOptions.props,
                 }),
             ) as PartProps;
@@ -194,6 +207,33 @@ export function useComponent<A extends ComponentAnatomy>(
         },
     };
     return scope;
+};
+
+/** Ties a component's anatomy to the registry, for Root to call once and share with its parts
+ *  through context. */
+export function useComponent<A extends ComponentAnatomy>(
+    anatomy: A,
+    options: ComponentOptions<A>,
+): ComponentScope<A> {
+    const state = usePureform();
+    const classes = useClasses(
+        anatomy.name as ComponentOf<A>,
+        options.selection,
+    );
+    return {
+        ...createPartScope(anatomy, options, classes, state.slotProps),
+        classes,
+    };
+}
+
+/** Builds the parts of an anatomy the registry doesn't style, such as the radio group around its
+ *  radios: the same attributes, test ids, and merging as `useComponent`, with no classes. */
+export function useUnstyledComponent<A extends ComponentAnatomy>(
+    anatomy: A,
+    options: UnstyledComponentOptions<A> = {},
+): PartScope<A> {
+    const state = usePureform();
+    return createPartScope(anatomy, options, undefined, state.slotProps);
 }
 
 /** The props of a ready-made component that address each part by name:

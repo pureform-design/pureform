@@ -15,14 +15,21 @@ export { IconPartContext, useIconStyle } from "./icon-style";
 export { useReducedMotion } from "./motion";
 export { createPartContext } from "./part-context";
 export type { PartContext } from "./part-context";
-export { mergeRefs, slotPartProps, useComponent } from "./parts";
+export {
+    mergeRefs,
+    slotPartProps,
+    useComponent,
+    useUnstyledComponent,
+} from "./parts";
 export type {
     ComponentOf,
     ComponentOptions,
     ComponentScope,
     PartOptions,
+    PartScope,
     RenderOptions,
     SlotKeyedProps,
+    UnstyledComponentOptions,
 } from "./parts";
 export { combinePartProps, mergePartProps, mergeStyles } from "./props";
 export type { PartProps } from "./props";
