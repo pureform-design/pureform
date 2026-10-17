@@ -9,6 +9,7 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
+                    "runtime-theme": "src/runtime-theme/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
