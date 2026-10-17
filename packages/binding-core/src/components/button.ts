@@ -10,6 +10,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The button's parts: `"root" | "label" | "icon" | "touchTarget"`. */
@@ -50,7 +51,7 @@ export interface ButtonBehaviorProps extends Controllable<"selected", boolean> {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ButtonRootOwnProps
-    extends ButtonVariantProps, ButtonBehaviorProps {
+    extends ButtonVariantProps, ButtonBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
     readonly testId?: TestIdOverride<ButtonPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -77,6 +78,8 @@ export const BUTTON_ROOT_PROPS = [
     "onSelectedChange",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof ButtonRootOwnProps)[];
 
 /** The registry selection from Root's props. */

@@ -14,6 +14,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The navigation components: Material's bar and rail, which share their parts and behavior. */
@@ -53,7 +54,10 @@ export interface NavigationBehaviorProps extends Controllable<
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface NavigationRootOwnProps<C extends NavigationComponent>
-    extends NavigationVariantProps<C>, NavigationBehaviorProps {
+    extends
+        NavigationVariantProps<C>,
+        NavigationBehaviorProps,
+        IndicationProps {
     /** A prefix for every part's test id (`main` → `main-item`), or ids by part. */
     readonly testId?: TestIdOverride<NavigationPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -72,10 +76,11 @@ export const NAVIGATION_ROOT_PROPS = [
     "onValueChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof NavigationRootOwnProps<NavigationComponent>)[];
 
 /** What a destination takes for itself, besides its element's own props. */
-export interface NavigationItemOwnProps {
+export interface NavigationItemOwnProps extends InteractionSourceProps {
     /** The value the component takes when this destination is chosen. */
     readonly value: string;
     /** Where it leads: the destination renders as a link (`<a>`); without it, a button. */
@@ -88,6 +93,7 @@ export interface NavigationItemOwnProps {
 export const NAVIGATION_ITEM_PROPS = [
     "value",
     "disabled",
+    "interactionSource",
 ] as const satisfies readonly (keyof NavigationItemOwnProps)[];
 
 /** One destination of the ready-made components, as data; its label and icon in the framework's

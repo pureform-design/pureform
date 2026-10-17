@@ -12,6 +12,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import { isPresent } from "./content";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The list item's parts: `"root" | "leading" | "content" | "overline" | "headline" |
@@ -38,7 +39,7 @@ export interface ListItemStateProps {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ListItemRootOwnProps
-    extends ListItemVariantProps, ListItemStateProps {
+    extends ListItemVariantProps, ListItemStateProps, InteractiveProps {
     /** A prefix for every part's test id (`inbox` → `inbox-headline`), or ids by part. */
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -56,6 +57,8 @@ export const LIST_ITEM_ROOT_PROPS = [
     "disabled",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof ListItemRootOwnProps)[];
 
 /** What the ready-made list item renders inside Root, in the framework's node type. Each part

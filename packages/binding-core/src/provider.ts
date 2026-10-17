@@ -14,6 +14,7 @@ import type {
 } from "@pureform/styling";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 
+import type { Indication } from "./indication";
 import { withDefaults } from "./selection";
 
 /** Text direction, which the provider writes on its element and passes to every machine. */
@@ -76,6 +77,12 @@ export interface ProviderOptions<P = object> {
      *  server's block and generates nothing until the theme changes; `"regenerate"` runs the
      *  generator again while hydrating, for code that reads the theme's vars. */
     readonly hydrate?: ThemeHydration | undefined;
+    /** How interactive components under the provider show hover, focus, and press: Material's
+     *  (`materialIndication()`, the default), `noIndication`, or the app's own
+     *  (`defineIndication`). A component's own `indication` prop overrides it. Its tokens are
+     *  written as theme-level vars on the provider's element, so they reach every component under
+     *  it, on the server too. */
+    readonly indication?: Indication | undefined;
 }
 
 /** What a provider resolves to: its own options over its parent's. */
@@ -90,6 +97,11 @@ export interface ProviderState<P = object> {
     readonly theme: ProviderTheme | undefined;
     readonly overrides: ThemeOverrides;
     readonly hydrate: ThemeHydration;
+    /** The nearest provider's `indication`; `undefined` for the binding's default. */
+    readonly indication: Indication | undefined;
+    /** The focus indicator's color the nearest indication that sets one chooses. It has no
+     *  theme-level token, so each component writes it on its root. */
+    readonly focusIndicatorColor: TokenValue | undefined;
 }
 
 /** What components see with no provider above them. */
@@ -102,6 +114,8 @@ export const ROOT_PROVIDER: ProviderState<never> = Object.freeze({
     theme: undefined,
     overrides: Object.freeze({}),
     hydrate: "reuse",
+    indication: undefined,
+    focusIndicatorColor: undefined,
 });
 
 /** How the binding merges two props objects for one part, the inner one's taking precedence. */
@@ -183,6 +197,10 @@ export const resolveProvider = <P>(
             ? { ...base.overrides, ...own.overrides }
             : base.overrides,
         hydrate: own.hydrate ?? base.hydrate,
+        indication: own.indication ?? base.indication,
+        focusIndicatorColor:
+            own.indication?.tokens?.focusIndicatorColor ??
+            base.focusIndicatorColor,
     };
 };
 

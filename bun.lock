@@ -193,6 +193,7 @@
       "dependencies": {
         "@pureform/anatomy": "catalog:",
         "@pureform/core": "catalog:",
+        "@pureform/js-effects": "catalog:",
         "@pureform/styling": "catalog:",
       },
       "devDependencies": {

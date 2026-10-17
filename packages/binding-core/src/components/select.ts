@@ -14,6 +14,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { ChangeDetails, Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The select's parts: the field's, and `"hiddenSelect"`. */
@@ -48,7 +49,7 @@ export interface SelectElementIds {
 }
 
 /** One option, as data. */
-export interface SelectItem {
+export interface SelectItem extends InteractionSourceProps {
     readonly value: string;
     /** What the option and the field show, and typeahead matches. */
     readonly label: string;
@@ -109,7 +110,7 @@ export interface SelectBehaviorProps
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface SelectRootOwnProps
-    extends SelectVariantProps, SelectBehaviorProps {
+    extends SelectVariantProps, SelectBehaviorProps, IndicationProps {
     /** A prefix for every part's test id (`size` → `size-input`, `size-item`), or the field's ids
      *  by part. */
     readonly testId?: TestIdOverride<SelectPart> | undefined;
@@ -144,6 +145,7 @@ export const SELECT_ROOT_PROPS = [
     "onOpenChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof SelectRootOwnProps)[];
 
 /** The props of the ready-made select that name the combobox, so they go on it. */

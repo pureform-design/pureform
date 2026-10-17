@@ -14,6 +14,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import { isPresent } from "./content";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The tabs' parts: `"root" | "list"` (the tab list) `| "tab" | "icon" | "label" | "indicator" |
@@ -57,7 +58,8 @@ export interface TabsBehaviorProps extends Controllable<
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface TabsRootOwnProps extends TabsVariantProps, TabsBehaviorProps {
+export interface TabsRootOwnProps
+    extends TabsVariantProps, TabsBehaviorProps, IndicationProps {
     /** A prefix for every part's test id (`trips` → `trips-tab`), or ids by part. */
     readonly testId?: TestIdOverride<TabsPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -80,6 +82,7 @@ export const TABS_ROOT_PROPS = [
     "onValueChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof TabsRootOwnProps)[];
 
 /** The props of the ready-made tabs that name the tab list, so they go on it rather than on Root:
@@ -88,7 +91,7 @@ export const TABS_LIST_LABEL_PROPS = ["aria-label", "aria-labelledby"] as const;
 
 /** One tab of the ready-made tabs, as data; its label, icon, and panel in the framework's node
  *  type. */
-export interface TabsItem<Node = unknown> {
+export interface TabsItem<Node = unknown> extends InteractionSourceProps {
     readonly value: string;
     readonly label: Node;
     /** An icon with the label; any tab having one turns on the tabs' `icon` variant. */

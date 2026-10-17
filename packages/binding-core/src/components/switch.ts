@@ -11,6 +11,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The switch's parts: `"root" | "touchTarget" | "input" | "track" | "stateLayer" | "handle" |
@@ -51,7 +52,7 @@ export interface SwitchBehaviorProps extends Controllable<"checked", boolean> {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface SwitchRootOwnProps
-    extends SwitchVariantProps, SwitchBehaviorProps {
+    extends SwitchVariantProps, SwitchBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`wifi` → `wifi-input`), or ids by part. */
     readonly testId?: TestIdOverride<SwitchPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -76,6 +77,8 @@ export const SWITCH_ROOT_PROPS = [
     "onCheckedChange",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof SwitchRootOwnProps)[];
 
 /** The props of the ready-made switch that name the input, so they go on it rather than on Root:

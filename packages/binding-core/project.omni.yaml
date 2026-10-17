@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/core"
     - "@pureform/styling"
     - "@pureform/anatomy"
+    - "@pureform/js-effects"
 
 tasks:
   test:unit:

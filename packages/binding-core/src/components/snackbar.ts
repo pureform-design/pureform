@@ -12,6 +12,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { IndicationProps } from "./indication";
 
 /** The snackbar's parts: `"root" | "supportingText" | "action" | "close"`. */
 export type SnackbarPart = PartName<typeof snackbarAnatomy>;
@@ -62,7 +63,7 @@ export interface SnackbarBehaviorProps extends Controllable<
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface SnackbarRootOwnProps
-    extends SnackbarVariantProps, SnackbarBehaviorProps {
+    extends SnackbarVariantProps, SnackbarBehaviorProps, IndicationProps {
     /** A prefix for every part's test id (`saved` → `saved-action`), or ids by part. */
     readonly testId?: TestIdOverride<SnackbarPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -81,6 +82,7 @@ export const SNACKBAR_ROOT_PROPS = [
     "onOpenChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof SnackbarRootOwnProps)[];
 
 /** What the ready-made snackbar renders inside Root, in the framework's node type. */

@@ -154,6 +154,12 @@ export type {
     NavigationRootOwnProps,
     NavigationVariantProps,
 } from "./components/navigation";
+export { INTERACTIVE_PROPS } from "./components/indication";
+export type {
+    IndicationProps,
+    InteractionSourceProps,
+    InteractiveProps,
+} from "./components/indication";
 export { overlayPositionerProps } from "./components/overlay";
 export type {
     OverlayPlacement,

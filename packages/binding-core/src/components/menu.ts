@@ -13,6 +13,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { OverlayPositioning } from "./overlay";
 import type { VariantProp } from "./variants";
 
@@ -59,7 +60,8 @@ export interface MenuBehaviorProps extends Controllable<"open", boolean> {
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface MenuRootOwnProps extends MenuVariantProps, MenuBehaviorProps {
+export interface MenuRootOwnProps
+    extends MenuVariantProps, MenuBehaviorProps, IndicationProps {
     /** A prefix for every part's test id (`edit` → `edit-trigger`, `edit-item`), or ids by part. */
     readonly testId?: TestIdOverride<MenuPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -83,10 +85,11 @@ export const MENU_ROOT_PROPS = [
     "onOpenChange",
     "testId",
     "unstyled",
+    "indication",
 ] as const satisfies readonly (keyof MenuRootOwnProps)[];
 
 /** One item of the ready-made menu, as data; its label and icons in the framework's node type. */
-export interface MenuItem<Node = unknown> {
+export interface MenuItem<Node = unknown> extends InteractionSourceProps {
     readonly value: string;
     readonly label: Node;
     /** The text typeahead matches, when the label isn't plain text. */

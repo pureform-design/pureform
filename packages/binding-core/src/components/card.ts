@@ -7,6 +7,7 @@ import type { cardAnatomy, PartName, TestIdOverride } from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The card's parts: `"root" | "touchTarget"`. */
@@ -21,7 +22,7 @@ export interface CardVariantProps {
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface CardRootOwnProps extends CardVariantProps {
+export interface CardRootOwnProps extends CardVariantProps, InteractiveProps {
     /** Dims an interactive card; a button is disabled, anything else `aria-disabled`. */
     readonly disabled?: boolean | undefined;
     /** A prefix for every part's test id (`plan` → `plan-root`), or ids by part. */
@@ -38,6 +39,8 @@ export const CARD_ROOT_PROPS = [
     "disabled",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof CardRootOwnProps)[];
 
 /** The element Root renders: a link with an `href`, else `as`, else a `<div>`. */
