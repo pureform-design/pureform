@@ -13,4 +13,7 @@ export const glue = {
     options: { prefix: PREFIX },
     // The components the React binding has so far.
     components: ["button", "checkbox"],
+    // No pruning: the demo commits `.pureform/` (checked by `pureform generate --check`), which a
+    // pruned build would rewrite.
+    prune: false,
 } satisfies PureformPluginOptions<PandaCodegenOptions>;
