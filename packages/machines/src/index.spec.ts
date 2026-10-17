@@ -4,6 +4,7 @@ import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
 import * as zagSwitch from "@zag-js/switch";
+import * as zagTabs from "@zag-js/tabs";
 import * as zagTooltip from "@zag-js/tooltip";
 import { describe, expect, it } from "vitest";
 
@@ -16,6 +17,7 @@ describe("@pureform/machines", () => {
         expect(machines.menu.machine).toBe(zagMenu.machine);
         expect(machines.dialog.machine).toBe(zagDialog.machine);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
+        expect(machines.tabs.machine).toBe(zagTabs.machine);
         expect(machines.switchControl.connect).toBe(zagSwitch.connect);
         expect(machines.switchControl.machine.on).toBe(zagSwitch.machine.on);
         expect(machines.radioGroup.connect).toBe(zagRadioGroup.connect);
@@ -47,12 +49,14 @@ describe("@pureform/machines", () => {
             "checkbox",
             "dialog",
             "menu",
+            "navigation",
             "radioGroup",
             "ripple",
             "select",
             "slider",
             "snackbar",
             "switchControl",
+            "tabs",
             "textField",
             "tooltip",
         ] as const) {

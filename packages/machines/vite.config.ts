@@ -18,6 +18,8 @@ export default createConfig({
                     menu: "src/menu.ts",
                     dialog: "src/dialog.ts",
                     tooltip: "src/tooltip.ts",
+                    tabs: "src/tabs.ts",
+                    navigation: "src/navigation/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",

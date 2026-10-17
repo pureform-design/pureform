@@ -68,6 +68,20 @@
                 "default": "./dist/tooltip.mjs"
             }
         },
+        "./tabs": {
+            "types": "./dist/tabs.d.ts",
+            "import": {
+                "development": "./src/tabs.ts",
+                "default": "./dist/tabs.mjs"
+            }
+        },
+        "./navigation": {
+            "types": "./dist/navigation/index.d.ts",
+            "import": {
+                "development": "./src/navigation/index.ts",
+                "default": "./dist/navigation.mjs"
+            }
+        },
         "./snackbar": {
             "types": "./dist/snackbar/index.d.ts",
             "import": {
@@ -116,6 +130,7 @@
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/switch": "catalog:",
+        "@zag-js/tabs": "catalog:",
         "@zag-js/tooltip": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
