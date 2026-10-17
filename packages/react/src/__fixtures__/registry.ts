@@ -221,3 +221,52 @@ export const navigationRegistry = () =>
             "trailingText",
         ]),
     });
+
+/** A fake factory like `named`'s that also writes the `value` token to Root as `--value`. */
+const valued =
+    (
+        component: string,
+        slots: readonly string[],
+    ): ClassFactory<ComponentShape> =>
+    (s) =>
+        withTokenStyle(named(component, slots)(s) as never, s.tokens as never, {
+            value: "--value",
+        }) as never;
+
+/** The display components' fake factories, all static: the progress indicators and slider (with
+ *  their `value` token), card, search bar, ripple, and the single-part components. */
+export const displayRegistry = () =>
+    createRegistry({
+        linearProgress: valued("linear-progress", ["root", "indicator"]),
+        circularProgress: valued("circular-progress", [
+            "root",
+            "endHalf",
+            "endArc",
+            "startHalf",
+            "startArc",
+        ]),
+        slider: valued("slider", [
+            "root",
+            "track",
+            "activeTrack",
+            "stateLayer",
+            "handle",
+            "input",
+        ]),
+        card: named("card", ["root", "touchTarget"]),
+        searchBar: named("search-bar", [
+            "root",
+            "leading",
+            "input",
+            "trailing",
+        ]),
+        ripple: named("ripple", ["root", "ripple"]),
+        avatar: named("avatar", ["root"]),
+        media: named("media", ["root"]),
+        separator: named("separator", ["root"]),
+        scrim: named("scrim", ["root"]),
+        supportingText: named("supporting-text", ["root"]),
+        text: named("text", ["root"]),
+        icon: named("icon", ["root"]),
+        touchTarget: named("touch-target", ["root"]),
+    });

@@ -144,6 +144,104 @@
                 "development": "./src/text-field/index.ts",
                 "default": "./dist/text-field.mjs"
             }
+        },
+        "./avatar": {
+            "types": "./dist/avatar/index.d.ts",
+            "import": {
+                "development": "./src/avatar/index.ts",
+                "default": "./dist/avatar.mjs"
+            }
+        },
+        "./card": {
+            "types": "./dist/card/index.d.ts",
+            "import": {
+                "development": "./src/card/index.ts",
+                "default": "./dist/card.mjs"
+            }
+        },
+        "./circular-progress": {
+            "types": "./dist/circular-progress/index.d.ts",
+            "import": {
+                "development": "./src/circular-progress/index.ts",
+                "default": "./dist/circular-progress.mjs"
+            }
+        },
+        "./icon": {
+            "types": "./dist/icon/index.d.ts",
+            "import": {
+                "development": "./src/icon/index.ts",
+                "default": "./dist/icon.mjs"
+            }
+        },
+        "./linear-progress": {
+            "types": "./dist/linear-progress/index.d.ts",
+            "import": {
+                "development": "./src/linear-progress/index.ts",
+                "default": "./dist/linear-progress.mjs"
+            }
+        },
+        "./media": {
+            "types": "./dist/media/index.d.ts",
+            "import": {
+                "development": "./src/media/index.ts",
+                "default": "./dist/media.mjs"
+            }
+        },
+        "./ripple": {
+            "types": "./dist/ripple/index.d.ts",
+            "import": {
+                "development": "./src/ripple/index.ts",
+                "default": "./dist/ripple.mjs"
+            }
+        },
+        "./scrim": {
+            "types": "./dist/scrim/index.d.ts",
+            "import": {
+                "development": "./src/scrim/index.ts",
+                "default": "./dist/scrim.mjs"
+            }
+        },
+        "./search-bar": {
+            "types": "./dist/search-bar/index.d.ts",
+            "import": {
+                "development": "./src/search-bar/index.ts",
+                "default": "./dist/search-bar.mjs"
+            }
+        },
+        "./separator": {
+            "types": "./dist/separator/index.d.ts",
+            "import": {
+                "development": "./src/separator/index.ts",
+                "default": "./dist/separator.mjs"
+            }
+        },
+        "./slider": {
+            "types": "./dist/slider/index.d.ts",
+            "import": {
+                "development": "./src/slider/index.ts",
+                "default": "./dist/slider.mjs"
+            }
+        },
+        "./supporting-text": {
+            "types": "./dist/supporting-text/index.d.ts",
+            "import": {
+                "development": "./src/supporting-text/index.ts",
+                "default": "./dist/supporting-text.mjs"
+            }
+        },
+        "./text": {
+            "types": "./dist/text/index.d.ts",
+            "import": {
+                "development": "./src/text/index.ts",
+                "default": "./dist/text.mjs"
+            }
+        },
+        "./touch-target": {
+            "types": "./dist/touch-target/index.d.ts",
+            "import": {
+                "development": "./src/touch-target/index.ts",
+                "default": "./dist/touch-target.mjs"
+            }
         }
     },
     "publishConfig": {
