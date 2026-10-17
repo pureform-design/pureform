@@ -90,6 +90,8 @@ export {
     requireRegistry,
     resolveProvider,
     ROOT_PROVIDER,
+    themeAttributeOf,
+    themeAttributes,
 } from "./provider";
 export type {
     AnyRegistry,
@@ -100,6 +102,7 @@ export type {
     ProviderOptions,
     ProviderSlotProps,
     ProviderState,
+    ProviderTheme,
     ThemeHydration,
     ThemeName,
     ThemeOverrides,

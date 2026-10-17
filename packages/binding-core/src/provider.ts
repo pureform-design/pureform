@@ -5,12 +5,14 @@
 import type { MotionSetting } from "@pureform/core";
 import { MOTION_ATTRIBUTE } from "@pureform/core";
 import type {
+    AnyRuntimeTheme,
     ComponentName,
     Registry,
     Selection,
     SlotOf,
     TokenValue,
 } from "@pureform/styling";
+import { isRuntimeTheme, themeScope } from "@pureform/styling";
 
 import { withDefaults } from "./selection";
 
@@ -34,8 +36,14 @@ export type ProviderSlotProps<P> = {
 /** A static theme's name, as the config names it. */
 export type ThemeName = string;
 
-/** `dynamic` token values set for everything under the provider, by token path. */
-export type ThemeOverrides = Readonly<Record<string, TokenValue>>;
+/** What a provider's `theme` takes: a named theme from the config, or a runtime theme
+ *  (`seedTheme({ seed })` from `@pureform/material/runtime-theme`). */
+export type ProviderTheme = ThemeName | AnyRuntimeTheme;
+
+/** Token values set for everything under the provider, by token path, as React Native's
+ *  overrides take them: `{ "colors.primary": "#006a60", "components.button.container": "…" }`.
+ *  A key that's already a CSS var (`--brand`) is written as is. */
+export type ThemeOverrides = Readonly<Record<string, TokenValue | undefined>>;
 
 /** How the client gets a server-rendered runtime theme: keep the server's block, or generate it
  *  again while hydrating. */
@@ -54,14 +62,19 @@ export interface ProviderOptions<P = object> {
     readonly defaults?: ComponentDefaults | undefined;
     /** Props per component and slot. */
     readonly slotProps?: ProviderSlotProps<P> | undefined;
-    /** A named theme from the config, for everything under the provider. The provider writes
-     *  the registry's `themeAttributes(theme)` on its element, the target's own scope
-     *  (`data-theme`, `data-panda-theme`). Runtime themes land with the runtime themes phase
-     *  (p5b). */
-    readonly theme?: ThemeName | undefined;
-    /** Stub: token overrides, written as CSS vars by the runtime themes phase (p5b). */
+    /** The theme for everything under the provider: a named theme from the config, or a runtime
+     *  theme. The provider writes the target's theme attribute on its element (`data-theme`,
+     *  `data-panda-theme`): the name, or a runtime theme's scope (`pf-<hash>` of its input), whose
+     *  vars it writes in one `<style>` block in the document's head. */
+    readonly theme?: ProviderTheme | undefined;
+    /** Token values for everything under the provider, written as CSS vars in its element's
+     *  `style` (on the server too). Scheme-independent; for a scheme-aware palette use a runtime
+     *  theme. An override changes its own var only: tokens declared from it at the root keep
+     *  their value. */
     readonly overrides?: ThemeOverrides | undefined;
-    /** Stub: how a runtime theme hydrates (p5b). Default `"reuse"`. */
+    /** How the client gets a server-rendered runtime theme: `"reuse"` (the default) keeps the
+     *  server's block and generates nothing until the theme changes; `"regenerate"` runs the
+     *  generator again while hydrating, for code that reads the theme's vars. */
     readonly hydrate?: ThemeHydration | undefined;
 }
 
@@ -74,7 +87,7 @@ export interface ProviderState<P = object> {
     readonly motion: MotionSetting;
     readonly defaults: ComponentDefaults;
     readonly slotProps: ProviderSlotProps<P>;
-    readonly theme: ThemeName | undefined;
+    readonly theme: ProviderTheme | undefined;
     readonly overrides: ThemeOverrides;
     readonly hydrate: ThemeHydration;
 }
@@ -181,18 +194,34 @@ export interface ProviderAttributes {
     readonly [themeAttribute: string]: string | undefined;
 }
 
+/** The attribute a registry's target scopes themes with; `data-theme` when it has none, which
+ *  still scopes runtime themes, whose blocks the provider writes itself. */
+export const themeAttributeOf = (
+    registry: Pick<Registry, "themeAttribute"> | undefined,
+): string => registry?.themeAttribute ?? "data-theme";
+
+/** The attributes that scope a theme to an element: the registry's for a named theme, and the
+ *  theme attribute with the scope as its value for a runtime one. */
+export const themeAttributes = (
+    theme: ProviderTheme | undefined,
+    registry: AnyRegistry | undefined,
+): Readonly<Record<string, string>> | undefined => {
+    if (theme === undefined) return undefined;
+    if (isRuntimeTheme(theme)) {
+        return { [themeAttributeOf(registry)]: themeScope(theme) };
+    }
+    return registry?.themeAttributes(theme);
+};
+
 /** A provider's attributes: the direction in effect, its own motion setting unless it's
  *  `"system"` (the CSS reads `data-pf-motion` from the nearest ancestor that has it), and its
- *  own theme's attributes from the registry in effect (an inherited theme's are on an
- *  ancestor already). */
+ *  own theme's attributes (an inherited theme's are on an ancestor already). */
 export const providerAttributes = (
     own: Pick<ProviderOptions, "motion" | "theme">,
     state: Pick<ProviderState, "dir"> &
         Partial<Pick<ProviderState, "registry">>,
 ): ProviderAttributes => ({
-    ...(own.theme === undefined
-        ? undefined
-        : state.registry?.themeAttributes(own.theme)),
+    ...themeAttributes(own.theme, state.registry),
     dir: state.dir,
     [MOTION_ATTRIBUTE]:
         own.motion === "reduce" || own.motion === "full"
