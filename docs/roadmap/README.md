@@ -166,13 +166,13 @@ Builds design doc §9.8: the state layer, ripple, and focus indicator as one plu
 indication over an interaction source. p9a and p9b run in parallel; p9c and p9d build on
 p9a's interface commit in parallel; p9e follows them. p9b changes preset snapshots.
 
-|     | Subphase                                                                                 | Depends on   | Output context   |
-| --- | ---------------------------------------------------------------------------------------- | ------------ | ---------------- |
-| [ ] | [p9a: interaction source and the indication interface](phases/p9a-interaction-source.md) | p8           | `context/p9a.md` |
-| [ ] | [p9b: indication tokens and the anatomy entry](phases/p9b-indication-tokens.md)          | p8           | `context/p9b.md` |
-| [ ] | [p9c: indication on the web](phases/p9c-web-indication.md)                               | p9a, p9b, p7 | `context/p9c.md` |
-| [ ] | [p9d: indication on React Native](phases/p9d-native-indication.md)                       | p9a, p9b     | `context/p9d.md` |
-| [ ] | [p9e: indication suites and demos](phases/p9e-indication-suites.md)                      | p9c, p9d     | `context/p9e.md` |
+|     | Subphase                                                                                 | Depends on   | Output context                     |
+| --- | ---------------------------------------------------------------------------------------- | ------------ | ---------------------------------- |
+| [x] | [p9a: interaction source and the indication interface](phases/p9a-interaction-source.md) | p8           | [`context/p9a.md`](context/p9a.md) |
+| [ ] | [p9b: indication tokens and the anatomy entry](phases/p9b-indication-tokens.md)          | p8           | `context/p9b.md`                   |
+| [ ] | [p9c: indication on the web](phases/p9c-web-indication.md)                               | p9a, p9b, p7 | `context/p9c.md`                   |
+| [ ] | [p9d: indication on React Native](phases/p9d-native-indication.md)                       | p9a, p9b     | `context/p9d.md`                   |
+| [ ] | [p9e: indication suites and demos](phases/p9e-indication-suites.md)                      | p9c, p9d     | `context/p9e.md`                   |
 
 ## Waves
 
