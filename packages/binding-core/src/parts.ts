@@ -82,9 +82,14 @@ export const isIconPart = <A extends ComponentAnatomy>(
     (anatomy.parts as ComponentAnatomy["parts"])[part]?.mirror === true;
 
 /** The error for a compound part rendered outside its Root: `outsideRootMessage("Button",
- *  "Label")`. */
-export const outsideRootMessage = (component: string, part: string): string =>
-    `pureform: <${component}.${part}> must be inside <${component}.Root>, which shares the machine and classes with its parts.`;
+ *  "Label")`. `root` names the part that provides it, when that isn't Root (a radio group's
+ *  `Item`). */
+export const outsideRootMessage = (
+    component: string,
+    part: string,
+    root = "Root",
+): string =>
+    `pureform: <${component}.${part}> must be inside <${component}.${root}>, which shares the machine and classes with its parts.`;
 
 type Dict = Readonly<Record<string, unknown>>;
 

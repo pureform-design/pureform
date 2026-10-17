@@ -3,9 +3,12 @@ import { commands } from "vitest/browser";
 
 import {
     observeIconStyle,
+    radioInputs,
     readIconStyle,
+    setRadioDefaults,
     subscribeReducedMotion,
     syncCheckedInput,
+    syncRadioInputs,
     systemReducedMotion,
 } from "./dom";
 import type { IconStyle } from "./icon-style";
@@ -106,5 +109,43 @@ describe("syncCheckedInput", () => {
         expect([input.checked, input.indeterminate]).toEqual([false, true]);
         syncCheckedInput(input, true);
         expect([input.checked, input.indeterminate]).toEqual([true, false]);
+    });
+});
+
+describe("radio groups", () => {
+    const group = () => {
+        document.body.innerHTML = `<form><div data-group>
+            <input type="radio" name="size" value="s" checked>
+            <input type="radio" name="size" value="m">
+        </div></form>`;
+        return document.querySelector("[data-group]")!;
+    };
+
+    it("puts the radios back to the group's value", () => {
+        const element = group();
+        const [small, medium] = radioInputs(element);
+        medium!.checked = true;
+        syncRadioInputs(element, "s");
+        expect([small!.checked, medium!.checked]).toEqual([true, false]);
+        syncRadioInputs(element, null);
+        expect([small!.checked, medium!.checked]).toEqual([false, false]);
+    });
+
+    it("sets the defaults a form reset shows, leaving the user's radio checked", () => {
+        const element = group();
+        const [small, medium] = radioInputs(element);
+        medium!.click();
+        setRadioDefaults(element, "s");
+        expect([small!.defaultChecked, medium!.defaultChecked]).toEqual([
+            true,
+            false,
+        ]);
+        expect(medium!.checked).toBe(true);
+        element.closest("form")!.reset();
+        expect([small!.checked, medium!.checked]).toEqual([true, false]);
+        setRadioDefaults(element, null);
+        expect(
+            radioInputs(element).map((input) => input.defaultChecked),
+        ).toEqual([false, false]);
     });
 });
