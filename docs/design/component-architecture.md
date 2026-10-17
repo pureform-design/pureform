@@ -692,6 +692,18 @@ compile hydratable (`solid({ ssr: true })`, and in Vitest `solid: { hydratable: 
 the plugin compiles tests non-hydratable). An app that server-renders `@pureform/solid` keeps it
 in the server bundle (`ssr.noExternal`), since the package ships JSX.
 
+**Built (p6c), overlays:** the menu, tooltip, and dialog render in place, inside an unstyled Root
+element, not in a portal. A portal at the end of the body would leave the provider's element, and
+with it the theme's scope attribute, `dir`, and the runtime theme's block selector, and server
+rendering would have to place it elsewhere than the tree it hydrates. Closed overlays render on the
+server and hydrate unchanged (their positioners `hidden`); an open floating overlay can't, since
+Zag places it in the browser by writing its inline style, so the suites render open overlays in the
+browser only. The cost: an ancestor that clips or stacks can cut a menu or tooltip off
+(`positioning.strategy: "fixed"` escapes clipping, not a transformed ancestor), and the dialog's
+fixed layer sits in its ancestors' stacking context. The native top layer (`<dialog>`,
+`popover`) would escape both without a portal; it's left for later, since Zag's dialog and menu
+manage focus, dismissal, and hiding the page themselves.
+
 ### 5.8 Reduced motion
 
 Today the web follows `prefers-reduced-motion` in CSS, and the ripple checks it in JS;
@@ -960,6 +972,13 @@ that changed from outside. The select is Zag's, re-exported with `withFieldsetRu
 native select. In the Solid port, a machine's context and refs are set up untracked, since Zag's
 select reads its props there.
 
+**Built (p6c):** the menu, dialog, and tooltip are Zag's, re-exported unchanged (no form rules to
+swap). The snackbar has its own machine (`@pureform/machines/snackbar`): `open` with Zag's
+controllable semantics and a `reason` in its details (`timeout`, `action`, `close`, `escape`), a
+`duration` (5 s by default, `null` to stay) whose countdown holds while the pointer or focus is in
+it and starts again once both leave, and `onAction`. Zag's toast was passed over: it's a toaster
+store with a queue and placement, where the preset's snackbar is one element an app places.
+
 **Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
 (`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
 Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
@@ -1037,6 +1056,16 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   a composite, `selectMenuAnatomy` (`name: "menu"`, the select's scope and test ids), with Zag's
   positioner unstyled. Its `Input` is the preset's read-only combobox `<input>`, and its
   `HiddenSelect` renders an option per item.
+- **Built (p6c):** `menu`, `tooltip`, `dialog`, and `snackbar` subpaths in both bindings. The
+  preset's menu, tooltip, and dialog are only their surfaces, so the bindings render them through
+  composite anatomies (`menuOverlayAnatomy`, …): an unstyled `Root` element around a `Trigger`
+  and Zag's `Positioner`, then the surface as `Content` (`data-pf-part="content"`) and the
+  preset's other slots. A part may name the slot that draws it (`slot: "root"` on `content`), so
+  one `useComponent` call styles the whole overlay and the provider's `slotProps.menu.root` reaches
+  the surface. The dialog's backdrop is drawn by the scrim's entry (a second scope, as the select's
+  list is the menu's). `Trigger` and the dialog's `CloseTrigger` are `<button>`s that take `as`
+  (`as={Button}`), and the ready-mades draw their trigger as the pureform `Button` labeled with
+  `trigger`. The snackbar is its generated anatomy, Root being the surface.
 
 ### 9.2 What every part does
 
@@ -1141,6 +1170,10 @@ component), Zag's shape, identical in Solid and React:
   an equal value, and the caret, alone. The select's value is one string or `null` (Zag's list
   mapped by `selectValueProps`); a controlled select's choice the owner ignores moves nothing,
   since the field shows the machine's value.
+- **Built (p6c), overlays:** `open`, `defaultOpen`, and `onOpenChange` on the menu, tooltip,
+  dialog, and snackbar, as Zag's (the details are `{ open }`; the snackbar's add a `reason`). A
+  controlled overlay asks and moves only with the prop: a click on the trigger, a key, or the
+  snackbar's close button each ask once.
 
 ### 9.5 Forms
 
@@ -1327,6 +1360,9 @@ icon only has to follow them.
   loads that target's stylesheet; the CSS and Tailwind glue is generated from the demo's config
   before the run. A themes suite checks `themeAttributes` and that a provider's theme draws as
   the attribute set by hand does, and server rendering hydrates a themed provider.
+- **Built (p6c):** a case's `opened` renderings (overlays open) run in the axe and direction
+  suites in the browser alone; `keyboard.disables: false` marks a component with no disabled state
+  of its own, and `keyboard.focused` the state focus moves it to (a tooltip opens on Tab).
 
 ## 10. CLI
 
