@@ -8,8 +8,8 @@ can't write different glue, and installing the command doesn't pull in the plugi
 
 - **Depends on:** `@pureform/generate` (generation, config discovery, the watcher), `jiti`
   (loading the glue file).
-- **Depended on by:** apps' scripts (`apps/solid-demo`, `apps/react-demo`: their omni
-  `generate` tasks).
+- **Depended on by:** apps' and fixtures' scripts (`apps/solid-demo`, `apps/react-demo`,
+  `tests/panda-fixture`: their omni `generate` tasks).
 - Part of the core train: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§10 CLI](../../docs/design/component-architecture.md#10-cli),

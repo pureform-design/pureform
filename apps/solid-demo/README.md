@@ -19,9 +19,9 @@ and again in dev when `pureform.config.ts` or a file it imports changes. Its opt
 `pureform.glue.ts`. Don't edit the folder; change the config.
 
 Steps without Vite need the folder too: Panda's codegen (`panda.config.ts` imports
-`.pureform/panda`), `tsc`, and the browser tests. Through omni, `prepare` runs the `generate`
-task (`bun x pureform generate`, from `@pureform/cli`, after building the packages it loads)
-and then `panda codegen`; by hand, `bun x pureform generate` (`--watch` to keep it current,
+`.pureform/panda`) and `tsc`. Through omni, `prepare` runs the `generate` task
+(`bun x pureform generate`, from `@pureform/cli`, after building the packages it loads) and then
+`panda codegen`; by hand, `bun x pureform generate` (`--watch` to keep it current,
 `--check` to compare without writing). The command reads the same options from
 `pureform.glue.ts`. It runs under Node, as Vite does (`bun x` follows the bin's shebang): the
 preset computes a shape morph differently under Bun, which changes the glue's hash.
@@ -48,8 +48,13 @@ if (entry.kind === "static") {
 ```
 
 `tsconfig.json` includes `.pureform/` explicitly, since the base config includes only `src`.
-`tests/browser-e2e-tests` checks every factory against Panda's output for every variant
-combination (`panda-factories.e2e.test.ts`).
+
+`pureform.glue.ts` sets `prune: false`: most pages call Panda's recipes (`$recipes`) with
+variants picked at run time, which the bundler plugin's usage scan doesn't read, so a pruned
+build would keep only the button, checkbox, and ripple, and drop the rest from `staticCss`.
+
+The browser suites don't read this demo: they test their own copy of the Panda setup
+(`tests/panda-fixture`), so the demo can change freely.
 
 ### The components page
 
@@ -66,7 +71,7 @@ resolve to TypeScript sources Node can't load. An app using `@pureform/solid` wi
 rendering needs the same for `@pureform/solid`.
 
 The cross-cutting rules (state, forms, accessibility, keyboard, direction, server rendering) are
-checked against Solid and React by `tests/component-suites`.
+checked against Solid and React by `tests/component-suites`, over the Panda fixture's registry.
 
 ## Who owns what
 

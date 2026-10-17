@@ -11,7 +11,8 @@ export const PREFIX = "pf";
 export const glue = {
     target: "panda",
     options: { prefix: PREFIX },
-    // No pruning: the browser suites read this folder's registry (every component) and Panda's
-    // stylesheet built from it, and a build would rewrite it with only what the page draws.
+    // No pruning: most of the pages call Panda's recipes (`$recipes`) with variants picked at run
+    // time, which the plugin's scan doesn't read, so a pruned build would keep only the button,
+    // checkbox, and ripple, and `staticCss` would lose the rest.
     prune: false,
 } satisfies PureformPluginOptions<PandaCodegenOptions>;
