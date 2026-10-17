@@ -60,10 +60,11 @@ export const createInteractionSource = (): MutableInteractionSource =>
 export function useInteractionState(
     source: InteractionSource,
 ): Accessor<InteractionState> {
-    if (isServer) return () => IDLE_INTERACTION_STATE;
-    const [state, setState] = createSignal(source.state, {
-        ownedWrite: true,
-    });
+    // The same nodes on the server, where nothing emits, so hydration finds them.
+    const [state, setState] = createSignal(
+        isServer ? IDLE_INTERACTION_STATE : source.state,
+        { ownedWrite: true },
+    );
     createEffect(
         () => source,
         (current) => {
@@ -172,44 +173,43 @@ export function usePartIndication(
         NOT_FORWARDED,
         { ownedWrite: true },
     );
-    if (!isServer) {
-        createEffect(
-            () =>
-                [
-                    scope.interactive() ? source() : undefined,
-                    element() as HTMLElement | undefined,
-                    layer(),
-                ] as const,
-            ([current, el, layerEl]) => {
-                if (!current || !el) return;
-                const cleanups = roles.map(({ entry, role }) =>
-                    scope.host.instance(entry, current).attach(role, el),
-                );
-                if (surface && layerEl) {
-                    for (const { entry, role } of roles) {
-                        if (role !== "surface") continue;
-                        cleanups.push(
-                            scope.host
-                                .instance(entry, current)
-                                .attach("layer", layerEl),
-                        );
-                    }
-                }
-                if (shows) {
-                    const entry = roles.find(({ role }) => role === "state")!;
+    // Created on the server too, where it doesn't run, so hydration finds the same nodes.
+    createEffect(
+        () =>
+            [
+                scope.interactive() ? source() : undefined,
+                element() as HTMLElement | undefined,
+                layer(),
+            ] as const,
+        ([current, el, layerEl]) => {
+            if (!current || !el) return;
+            const cleanups = roles.map(({ entry, role }) =>
+                scope.host.instance(entry, current).attach(role, el),
+            );
+            if (surface && layerEl) {
+                for (const { entry, role } of roles) {
+                    if (role !== "surface") continue;
                     cleanups.push(
                         scope.host
-                            .instance(entry.entry, current)
-                            .subscribeForwarded(setForwarded),
+                            .instance(entry, current)
+                            .attach("layer", layerEl),
                     );
                 }
-                return () => {
-                    for (const cleanup of cleanups) cleanup();
-                    setForwarded(NOT_FORWARDED);
-                };
-            },
-        );
-    }
+            }
+            if (shows) {
+                const entry = roles.find(({ role }) => role === "state")!;
+                cleanups.push(
+                    scope.host
+                        .instance(entry.entry, current)
+                        .subscribeForwarded(setForwarded),
+                );
+            }
+            return () => {
+                for (const cleanup of cleanups) cleanup();
+                setForwarded(NOT_FORWARDED);
+            };
+        },
+    );
     const layerClass = () =>
         unstyled() ? undefined : rippleClasses(state().registry)?.root?.class;
     return {
