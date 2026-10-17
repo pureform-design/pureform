@@ -187,4 +187,14 @@ describe("createRegistry", () => {
             expect(registry.themeAttributes("teal")).toEqual({});
         });
     });
+
+    it("records how the target names its vars", () => {
+        expect(createRegistry({ chip }).vars).toEqual({});
+        const registry = createRegistry(
+            { chip },
+            { vars: { prefix: "pf", tokenPrefix: "x" } },
+        );
+        expect(registry.vars).toEqual({ prefix: "pf", tokenPrefix: "x" });
+        expect(Object.isFrozen(registry.vars)).toBe(true);
+    });
 });
