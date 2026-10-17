@@ -24,6 +24,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/react",
             "@zag-js/checkbox",
             "@pureform/machines > @zag-js/radio-group",
+            "@pureform/machines > @zag-js/select",
             "@pureform/machines > @zag-js/switch",
         ],
     },
