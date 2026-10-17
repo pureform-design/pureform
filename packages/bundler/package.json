@@ -76,9 +76,12 @@
         }
     },
     "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:",
         "@pureform/core": "catalog:",
         "@pureform/generate": "catalog:",
         "@pureform/styling": "catalog:",
+        "oxc-parser": "catalog:",
         "unplugin": "catalog:"
     },
     "devDependencies": {

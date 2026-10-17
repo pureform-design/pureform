@@ -5,7 +5,7 @@ import { isGenerateError } from "@pureform/generate";
 import { rolldown } from "rolldown";
 import { build, createServer } from "vite";
 import type { Plugin } from "vite";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     configSource,
@@ -283,5 +283,97 @@ describe("the plugin's hooks", () => {
         plugin.watchChange(join(root, "pureform.config.ts"));
         await plugin.buildStart();
         expect(adapter.calls).toHaveLength(1);
+    });
+});
+
+describe("pruning", () => {
+    // An app whose bundle reads only the registry's names, and whose other source draws a chip.
+    const prunable = (...names: string[]) => {
+        const root = tempApp(...names);
+        writeTree(root, {
+            "main.ts": `import { registry } from "virtual:pureform/registry";\nexport const names = registry.names;\nexport const classes = [];\nexport const themes = [];\n`,
+            "src/ui.tsx": `import { Chip } from "@pureform/solid/chip";\nexport const ui = <Chip variant="assist" />;\n`,
+        });
+        return root;
+    };
+
+    it("builds with only the components the app draws", async () => {
+        const root = prunable("chip", "divider", "badge");
+        const adapter = fakeAdapter();
+        const info = vi.spyOn(console, "log").mockImplementation(() => {});
+        try {
+            const app = await viteBuild(root, [
+                pureform.vite({ target: adapter }),
+            ]);
+            expect(app.names).toEqual(["chip"]);
+        } finally {
+            info.mockRestore();
+        }
+        expect(adapter.calls).toHaveLength(1);
+        expect(adapter.calls[0]!.components).toEqual(["chip"]);
+        expect(existsSync(join(root, ".pureform/web/divider.ts"))).toBe(false);
+    });
+
+    it("keeps the components prune.keep names, and everything with prune: false", async () => {
+        const kept = await viteBuild(prunable("chip", "divider", "badge"), [
+            pureform.vite({
+                target: fakeAdapter(),
+                prune: { keep: ["badge"] },
+            }),
+        ]);
+        expect(kept.names).toEqual(["chip", "badge"]);
+        const all = await viteBuild(prunable("chip", "divider", "badge"), [
+            pureform.vite({ target: fakeAdapter(), prune: false }),
+        ]);
+        expect(all.names).toEqual(["chip", "divider", "badge"]);
+    });
+
+    it("keeps everything and warns when the scan can't read a name", async () => {
+        const root = prunable("chip", "divider");
+        writeTree(root, {
+            "src/dynamic.ts": `import { useClassFactory } from "@pureform/solid";\nexport const factory = useClassFactory(name);\n`,
+        });
+        const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+        try {
+            const app = await viteBuild(root, [
+                pureform.vite({ target: fakeAdapter() }),
+            ]);
+            expect(app.names).toEqual(["chip", "divider"]);
+            expect(warn.mock.calls.flat().join("\n")).toContain(
+                "pureform: pruning kept every component and variant, since src/dynamic.ts calls useClassFactory with a component name the scan can't read",
+            );
+        } finally {
+            warn.mockRestore();
+        }
+    });
+
+    it("doesn't prune a dev server", async () => {
+        const root = prunable("chip", "divider");
+        const server = await createServer({
+            root,
+            configFile: false,
+            logLevel: "silent",
+            plugins: [pureform.vite({ target: fakeAdapter() })],
+            server: { middlewareMode: true, ws: false },
+        });
+        try {
+            expect(glue(root, "index.ts")).toContain('"divider"');
+        } finally {
+            await server.close();
+        }
+    });
+
+    it("prunes a Rolldown build", async () => {
+        const root = prunable("chip", "divider");
+        const bundle = await rolldown({
+            cwd: root,
+            input: join(root, "main.ts"),
+            plugins: [pureform.rolldown({ root, target: fakeAdapter() })],
+            logLevel: "silent",
+        });
+        await bundle.generate({ format: "es" });
+        await bundle.close();
+        expect(glue(root, "index.ts")).not.toContain('"divider"');
+        expect(glue(root, "index.ts")).toContain('"chip"');
     });
 });

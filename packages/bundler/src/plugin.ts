@@ -21,10 +21,13 @@ import type { ViteDevServer } from "vite";
 import {
     describeResult,
     generateOptions,
+    pruneOptions,
     REGISTRY_ID,
     toPosix,
 } from "./options";
 import type { PureformPluginOptions } from "./options";
+import { describePruning, findUsage } from "./prune";
+import type { Pruning } from "./prune";
 
 const message = (error: unknown) =>
     error instanceof Error ? error.message : String(error);
@@ -41,25 +44,43 @@ export const unpluginFactory: UnpluginFactory<
     let server: ViteDevServer | undefined;
     let hinted = false;
     let warn = (text: string) => console.warn(text);
+    let info = (text: string) => console.log(text);
     let error = (text: string) => console.error(text);
     const watching = options.watch !== false;
+    let pruning: Pruning | undefined;
+    let reported = false;
 
-    const setRoot = (value: string) => {
+    // Creates the runner once, scanning the app first when this build prunes.
+    const setRoot = (value: string, prune: boolean) => {
         if (runner) return;
         root = resolve(options.root ?? value);
-        runner = createGlueRunner(generateOptions(options, root));
+        const pruneWith = prune ? pruneOptions(options.prune, true) : undefined;
+        if (pruneWith) {
+            pruning = findUsage(root, outDir(), {
+                ...pruneWith,
+                exclude: [...(pruneWith.exclude ?? []), ...excluded],
+            });
+            for (const line of pruning.warnings) warn(line);
+        }
+        runner = createGlueRunner(
+            generateOptions(options, root, pruning?.usage),
+        );
     };
+    // The bundler's own output folder, which the scan skips.
+    let excluded: string[] = [];
     const outDir = () => resolve(root!, options.outDir ?? DEFAULT_OUT_DIR);
     const shown = (path: string) => toPosix(relative(root!, path)) || ".";
 
     const hints = (result: GenerateResult) => {
+        if (!reported && pruning?.usage) info(describePruning(result));
+        reported = true;
         if (hinted) return;
         hinted = true;
         for (const hint of result.hints) warn(`pureform: ${hint}`);
     };
 
-    const start = () => {
-        setRoot(process.cwd());
+    const start = (prune = false) => {
+        setRoot(process.cwd(), prune);
         pending ??= runner!.run();
         return pending;
     };
@@ -106,8 +127,10 @@ export const unpluginFactory: UnpluginFactory<
         enforce: "pre",
 
         async buildStart() {
+            // Bundlers other than Vite start here: they prune unless watching.
+            const meta = (this as { meta?: { watchMode?: boolean } }).meta;
             try {
-                hints(await start());
+                hints(await start(!serving && meta?.watchMode !== true));
             } catch (failure) {
                 // A dev server keeps running on the glue there is; the error shows on import.
                 if (!serving) throw failure;
@@ -151,7 +174,11 @@ export const unpluginFactory: UnpluginFactory<
             // Before any plugin's `configResolved`: Panda's reads `.pureform/panda.ts` there.
             async config(config, env) {
                 serving = env.command === "serve";
-                setRoot(config.root ?? process.cwd());
+                if (config.build?.outDir) excluded = [config.build.outDir];
+                setRoot(
+                    config.root ?? process.cwd(),
+                    !serving && !config.build?.watch,
+                );
                 try {
                     await start();
                 } catch (failure) {
@@ -160,6 +187,7 @@ export const unpluginFactory: UnpluginFactory<
             },
             configResolved(config) {
                 warn = (text) => config.logger.warn(text);
+                info = (text) => config.logger.info(text);
                 error = (text) => config.logger.error(text);
             },
             configureServer(value) {

@@ -23,10 +23,12 @@ import type { CodegenAdapter, Target } from "@pureform/generate";
 import {
     describeResult,
     generateOptions,
+    pruneOptions,
     REGISTRY_ID,
     toPosix,
 } from "./options";
 import type { PureformPluginOptions } from "./options";
+import { findUsage } from "./prune";
 
 export interface PureformMetroOptions<
     Options = Record<string, unknown>,
@@ -78,9 +80,21 @@ export const withPureformGlue = async <C extends MetroConfig>(
     options: PureformMetroOptions = {},
 ): Promise<MetroConfigWithGlue<C>> => {
     const root = resolve(options.root ?? config.projectRoot ?? process.cwd());
+    // Metro serves and bundles from one config, so pruning is the app's call: `prune: true` in a
+    // config for release bundles.
+    const prune = pruneOptions(options.prune, false);
+    const pruning = prune
+        ? findUsage(
+              root,
+              resolve(root, options.outDir ?? DEFAULT_OUT_DIR),
+              prune,
+          )
+        : undefined;
+    for (const line of pruning?.warnings ?? []) console.warn(line);
     const settings = generateOptions(
         { ...options, target: options.target ?? "native" },
         root,
+        pruning?.usage,
     );
     if (options.watch === false) {
         await generate(settings);

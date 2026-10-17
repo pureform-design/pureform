@@ -202,9 +202,12 @@
       "name": "@pureform/bundler",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:",
         "@pureform/core": "catalog:",
         "@pureform/generate": "catalog:",
         "@pureform/styling": "catalog:",
+        "oxc-parser": "catalog:",
         "unplugin": "catalog:",
       },
       "devDependencies": {
