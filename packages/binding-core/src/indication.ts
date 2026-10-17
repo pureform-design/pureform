@@ -15,7 +15,9 @@ import type { AnyRegistry, Direction } from "./provider";
  * indicator's thickness and outer offset, and `secondary`) and set back to the theme's on the
  * component's root. They're static, so the server renders them: on the web as CSS vars
  * (theme-level from the provider, on the component's root from its `indication` prop), on React
- * Native in the selection's overrides. Each left out keeps the theme's value.
+ * Native in the selection's overrides. Each left out keeps the theme's value. Numbers are React
+ * Native's units: an opacity is a fraction (`0.08`, which the web writes as `8%`), and a length
+ * is in pixels.
  */
 export interface IndicationTokens {
     /** The state layer's opacity while hovered. */

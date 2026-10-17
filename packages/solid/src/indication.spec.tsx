@@ -108,10 +108,10 @@ describe("indication", () => {
         await settle();
         const provider = host.firstElementChild as HTMLElement;
         expect(provider.style.getPropertyValue("--opacity-state-hover")).toBe(
-            "0",
+            "0%",
         );
         expect(provider.style.getPropertyValue("--opacity-state-pressed")).toBe(
-            "0",
+            "0%",
         );
         const root = byTestId(ids.root);
         expect(layerOf(root)).toBe(null);
@@ -156,7 +156,7 @@ describe("indication", () => {
             own.style.getPropertyValue(
                 "--pf-components-button-stateHoverOpacity",
             ),
-        ).toBe("0.2");
+        ).toBe("20%");
         expect(nested.getAttribute("style")).toBe(null);
     });
 
