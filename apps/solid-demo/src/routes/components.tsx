@@ -1,8 +1,16 @@
-import type { Direction } from "@pureform/solid";
-import { PureformProvider } from "@pureform/solid";
+import type { Direction, Indication } from "@pureform/solid";
+import {
+    createInteractionSource,
+    materialIndication,
+    noIndication,
+    PureformProvider,
+    useInteractionState,
+} from "@pureform/solid";
 import { Button } from "@pureform/solid/button";
 import { Checkbox } from "@pureform/solid/checkbox";
 import type { CheckedState } from "@pureform/solid/checkbox";
+import { Chip } from "@pureform/solid/chip";
+import { IconButton } from "@pureform/solid/icon-button";
 import type { JSX } from "@solidjs/web";
 import { createFileRoute } from "@tanstack/solid-router";
 import { For, createMemo, createSignal } from "solid-js";
@@ -15,8 +23,9 @@ export const Route = createFileRoute("/components")({
 });
 
 // The button and checkbox from `@pureform/solid` in their variants and states, styled by the
-// Panda target through the registry generated in `.pureform/`. React's demo
-// (`apps/react-demo`) renders the same page.
+// Panda target through the registry generated in `.pureform/`, with a switch for the provider's
+// indication and components sharing one interaction source. React's demo (`apps/react-demo`)
+// renders the same buttons and checkboxes.
 
 const VARIANTS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
 const SIZES = ["small", "medium", "large"] as const;
@@ -37,6 +46,41 @@ function Section(props: { title: string; children: JSX.Element }): JSX.Element {
             </h2>
             {props.children}
         </section>
+    );
+}
+
+// The indications the page can switch to: Material's, Material's without the ripple, and none
+// (no state layer or ripple; the focus indicator stays).
+const INDICATIONS: Record<string, Indication> = {
+    Material: materialIndication(),
+    "No ripple": materialIndication({ ripple: false }),
+    None: noIndication,
+};
+
+/** Three components on one interaction source: pressing or hovering any shows on all three, and
+ *  `useInteractionState` reports it. Focus stays with the one that has it. */
+function SharedSource(): JSX.Element {
+    const source = createInteractionSource();
+    const state = useInteractionState(source);
+    const said = () => {
+        const now = state();
+        if (now.pressed) return "Pressed";
+        if (now.hovered) return "Hovered";
+        if (now.focusVisible) return "Focused";
+        return "At rest";
+    };
+    return (
+        <div style={row}>
+            <Button label="Press me" interactionSource={source} />
+            <Chip label="Or me" interactionSource={source} />
+            <IconButton
+                aria-label="Or me too"
+                icon="★"
+                variant="tonal"
+                interactionSource={source}
+            />
+            <span aria-live="polite">{said()}</span>
+        </div>
     );
 }
 
@@ -135,8 +179,13 @@ function Form(): JSX.Element {
 
 function ComponentsRoute(): JSX.Element {
     const [dir, setDir] = createSignal<Direction>("ltr");
+    const [indication, setIndication] = createSignal("Material");
     return (
-        <PureformProvider registry={registry} dir={dir()}>
+        <PureformProvider
+            registry={registry}
+            dir={dir()}
+            indication={INDICATIONS[indication()]}
+        >
             <main
                 style={{
                     display: "grid",
@@ -157,6 +206,26 @@ function ComponentsRoute(): JSX.Element {
                         onClick={() => setDir(dir() === "ltr" ? "rtl" : "ltr")}
                     />
                 </header>
+
+                <Section title="Indication">
+                    <div style={row} role="group" aria-label="Indication">
+                        <For each={Object.keys(INDICATIONS)}>
+                            {(name) => (
+                                <Button
+                                    label={name}
+                                    variant={
+                                        indication() === name
+                                            ? "tonal"
+                                            : "outlined"
+                                    }
+                                    aria-pressed={indication() === name}
+                                    onClick={() => setIndication(name)}
+                                />
+                            )}
+                        </For>
+                    </div>
+                    <SharedSource />
+                </Section>
 
                 <Section title="Button variants">
                     <div style={row}>

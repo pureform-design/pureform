@@ -1,16 +1,20 @@
 // The demo page: @pureform/react-native's components in light and dark, the base and teal themes,
 // the generated registry's precomputed styles or styles resolved at runtime, each motion engine,
-// and a brand color overriding the primary family per scheme, which recomputes the state layers
-// mixed over it in either mode.
+// a brand color overriding the primary family per scheme, which recomputes the state layers
+// mixed over it in either mode, the provider's indication, and components sharing one source.
 
 import {
     Glyph,
     PureformContainer,
     PureformProvider,
     animated,
+    materialIndication,
+    noIndication,
+    useInteractionSource,
+    useInteractionState,
     useTokens,
 } from "@pureform/react-native";
-import type { MotionEngine } from "@pureform/react-native";
+import type { Indication, MotionEngine } from "@pureform/react-native";
 import { Avatar } from "@pureform/react-native/avatar";
 import { Button } from "@pureform/react-native/button";
 import { Card } from "@pureform/react-native/card";
@@ -105,6 +109,41 @@ const SIZES = ["Small", "Medium", "Large"].map((size) => ({
     label: size,
 }));
 
+// The indications the page can switch to: Material's, Material's without the ripple, and none
+// (no state layer or ripple; the focus indicator stays).
+const INDICATIONS: Record<string, Indication> = {
+    "material indication": materialIndication(),
+    "no ripple": materialIndication({ ripple: false }),
+    "no indication": noIndication,
+};
+
+/** Three components on one interaction source: pressing or hovering any shows on all three, and
+ *  `useInteractionState` reports it. Focus stays with the one that has it. */
+function SharedSource() {
+    const source = useInteractionSource();
+    const state = useInteractionState(source);
+    const said = state.pressed
+        ? "Pressed"
+        : state.hovered
+          ? "Hovered"
+          : state.focusVisible
+            ? "Focused"
+            : "At rest";
+    return (
+        <View style={styles.row}>
+            <Button label="Press me" interactionSource={source} />
+            <Chip label="Or me" interactionSource={source} />
+            <IconButton
+                aria-label="Or me too"
+                icon={<Glyph glyph="★" />}
+                variant="tonal"
+                interactionSource={source}
+            />
+            <Text textStyle="bodyLarge">{said}</Text>
+        </View>
+    );
+}
+
 // No override, or a brand's whole primary family for each scheme.
 const OVERRIDES: Record<string, Overrides> = { none: {}, ...brands };
 
@@ -166,6 +205,9 @@ function Page(props: { controls: ReactNode }) {
         >
             <Text textStyle="headlineMedium">pureform, React Native Web</Text>
             {props.controls}
+            <Section title="Shared interaction source">
+                <SharedSource />
+            </Section>
             <Section title="Buttons">
                 <View style={styles.row}>
                     {(
@@ -567,6 +609,7 @@ export function App() {
     const [speed, setSpeed] = useState<"normal speed" | "slow motion">(
         "normal speed",
     );
+    const [indication, setIndication] = useState("material indication");
     const controls = (
         <View style={styles.section}>
             <Choices
@@ -609,6 +652,11 @@ export function App() {
                 options={Object.keys(OVERRIDES)}
                 onChange={setOverride}
             />
+            <Choices
+                value={indication}
+                options={Object.keys(INDICATIONS)}
+                onChange={setIndication}
+            />
         </View>
     );
     return (
@@ -620,6 +668,7 @@ export function App() {
             motion={motion === "reduced motion" ? "reduce" : "full"}
             engine={ENGINES[engine]![drawing]!}
             timeScale={speed === "slow motion" ? 10 : 1}
+            indication={INDICATIONS[indication]!}
         >
             <Page controls={controls} />
         </PureformProvider>

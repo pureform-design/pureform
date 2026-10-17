@@ -220,6 +220,40 @@ describe("rn-web-demo", () => {
         await wait(1000);
     });
 
+    it("shows a press on every component sharing a source, and switches the indication", async () => {
+        const button = all("pf-button-root").find(
+            (element) => element.textContent === "Press me",
+        )!;
+        const other = chip("Or me");
+        const rest = getComputedStyle(other).backgroundColor;
+        const box = button.getBoundingClientRect();
+        const at = {
+            bubbles: true,
+            button: 0,
+            clientX: box.left + 4,
+            clientY: box.top + 4,
+        };
+        button.dispatchEvent(new MouseEvent("mousedown", at));
+        await wait(400);
+        expect(document.body.textContent).toContain("Pressed");
+        expect(getComputedStyle(other).backgroundColor).not.toBe(rest);
+        document.dispatchEvent(new MouseEvent("mouseup", at));
+        await wait(400);
+        expect(document.body.textContent).toContain("At rest");
+
+        // A layer in each surface while the indication draws a ripple, none without one.
+        const layered = () =>
+            all("pf-button-root").filter((element) => {
+                const last = element.lastElementChild;
+                return last !== null && !last.hasAttribute("data-testid");
+            }).length;
+        expect(layered()).toBeGreaterThan(0);
+        await press(chip("no indication"));
+        expect(layered()).toBe(0);
+        await press(chip("material indication"));
+        expect(layered()).toBeGreaterThan(0);
+    });
+
     it("fills the current destination's icon", () => {
         const factory = registry.entry("navigationBar").factory;
         expect(factory({ selected: true }).icon.iconFill).toBe(1);
