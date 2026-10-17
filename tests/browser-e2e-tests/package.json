@@ -6,10 +6,12 @@
     "type": "module",
     "devDependencies": {
         "@pandacss/vite": "catalog:",
+        "@pureform/anatomy": "catalog:",
         "@pureform/core": "catalog:",
         "@pureform/css-adapter": "catalog:",
         "@pureform/css-lowering": "catalog:",
         "@pureform/panda-adapter": "catalog:",
+        "@pureform/react-native": "catalog:",
         "@pureform/rn-adapter": "catalog:",
         "@pureform/styling": "catalog:",
         "@pureform/tailwind-adapter": "catalog:",

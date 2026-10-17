@@ -16,6 +16,8 @@ dependencies:
     - "@pureform/tailwind-adapter"
     - "@pureform/rn-adapter"
     - "@pureform/styling"
+    - "@pureform/anatomy"
+    - "@pureform/react-native"
     - "@pureform/panda-fixture"
 
 cache:
