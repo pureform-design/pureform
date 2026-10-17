@@ -30,7 +30,7 @@ afterEach(() => {
 });
 
 describe("indication tokens", () => {
-    it("lowers lengths given as numbers to pixels", () => {
+    it("lowers lengths given as numbers to pixels, and opacities to percentages", () => {
         expect(
             indicationTokenValues({
                 stateHoverOpacity: 0.12,
@@ -39,7 +39,7 @@ describe("indication tokens", () => {
                 focusIndicatorColor: "red",
             }),
         ).toEqual({
-            stateHoverOpacity: "0.12",
+            stateHoverOpacity: "12%",
             focusIndicatorThickness: "4px",
             focusIndicatorOuterOffset: "0.5rem",
             focusIndicatorColor: "red",
@@ -49,10 +49,10 @@ describe("indication tokens", () => {
 
     it("gives a provider the theme-level tokens, but not the color", () => {
         expect(providerIndicationOverrides(noIndication)).toEqual({
-            "opacity.stateHover": "0",
-            "opacity.stateFocus": "0",
-            "opacity.statePressed": "0",
-            "opacity.stateDragged": "0",
+            "opacity.stateHover": "0%",
+            "opacity.stateFocus": "0%",
+            "opacity.statePressed": "0%",
+            "opacity.stateDragged": "0%",
         });
         expect(
             providerIndicationOverrides(
@@ -71,10 +71,10 @@ describe("indication tokens", () => {
     it("gives a component its prop's tokens over the providers' color", () => {
         expect(componentIndicationTokens(noIndication, "red")).toEqual({
             focusIndicatorColor: "red",
-            stateHoverOpacity: "0",
-            stateFocusOpacity: "0",
-            statePressedOpacity: "0",
-            stateDraggedOpacity: "0",
+            stateHoverOpacity: "0%",
+            stateFocusOpacity: "0%",
+            statePressedOpacity: "0%",
+            stateDraggedOpacity: "0%",
         });
         expect(
             componentIndicationTokens(

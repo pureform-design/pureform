@@ -39,14 +39,25 @@ const LENGTHS: ReadonlySet<string> = new Set([
     "focusIndicatorOuterOffset",
 ]);
 
-/** An indication token's value as CSS: a length given as a number is in pixels. */
+// Opacities given as numbers are fractions, as React Native takes them; the web's theme holds
+// them as percentages, which `color-mix()` reads (a bare number there drops the declaration).
+const OPACITIES: ReadonlySet<string> = new Set([
+    "stateHoverOpacity",
+    "stateFocusOpacity",
+    "statePressedOpacity",
+    "stateDraggedOpacity",
+]);
+
+/** An indication token's value as CSS: a length given as a number is in pixels, and an opacity
+ *  given as a number a percentage. */
 export const indicationTokenValue = (
     name: IndicationTokenName,
     value: TokenValue,
-): string =>
-    typeof value === "number" && LENGTHS.has(name) && value !== 0
-        ? `${value}px`
-        : String(value);
+): string => {
+    if (typeof value !== "number") return String(value);
+    if (OPACITIES.has(name)) return `${Math.round(value * 10_000) / 100}%`;
+    return LENGTHS.has(name) && value !== 0 ? `${value}px` : String(value);
+};
 
 /** An indication's tokens as CSS values, by name; `undefined` when it sets none. */
 export const indicationTokenValues = (
