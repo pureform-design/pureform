@@ -40,6 +40,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { useItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -119,8 +120,10 @@ function Root(props: SelectRootProps): ReactNode {
             }),
         [items],
     );
+    const interaction = useItemInteractionSources();
     const service = useMachine(select.machine, {
         id,
+        ...interaction,
         dir,
         collection,
         ...selectMachineProps(props, fieldsetDisabled),

@@ -6,6 +6,7 @@ import * as button from "@pureform/machines/button";
 import { type Accessor, createMemo, createUniqueId } from "solid-js";
 
 import { useControllable } from "./controllable";
+import { ownInteractionSource } from "./interaction";
 import { normalizeProps, useMachine } from "./internal/zag";
 import type { MachineProps, PropTypes } from "./internal/zag";
 import { useDirection } from "./provider";
@@ -28,8 +29,10 @@ export function usePressable(
         "selected",
         props,
     );
+    const interaction = ownInteractionSource();
     const service = useMachine(button.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         ...machineProps(),
         ...selected.machineProps(),

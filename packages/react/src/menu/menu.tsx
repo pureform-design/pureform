@@ -23,6 +23,7 @@ import { type ElementType, type ReactNode, useId } from "react";
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
+import { useItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -86,8 +87,10 @@ function Root(props: MenuRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const open = useControllable<"open", boolean>("Menu", "open", props);
+    const interaction = useItemInteractionSources();
     const service = useMachine(menu.machine, {
         id,
+        ...interaction,
         dir,
         ...menuMachineProps(props),
         ...open.machineProps,

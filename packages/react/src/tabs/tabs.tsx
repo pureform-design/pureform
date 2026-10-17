@@ -24,6 +24,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { useItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -90,8 +91,10 @@ function Root(props: TabsRootProps): ReactNode {
         "value",
         props,
     );
+    const interaction = useItemInteractionSources();
     const service = useMachine(tabs.machine, {
         id,
+        ...interaction,
         dir,
         ...tabsMachineProps(props),
         ...value.machineProps,

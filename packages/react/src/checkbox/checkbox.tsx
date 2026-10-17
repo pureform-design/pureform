@@ -33,6 +33,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -75,8 +76,10 @@ function Root(props: CheckboxRootProps): ReactNode {
     const checked = useControllable("Checkbox", "checked", props);
     const [input, setInput] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(input);
+    const interaction = useOwnInteractionSource();
     const service = useMachine(checkbox.machine, {
         id,
+        ...interaction,
         dir,
         ...checkboxMachineProps(props, fieldsetDisabled),
         ...checked.machineProps,

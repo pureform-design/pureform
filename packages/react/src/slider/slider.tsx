@@ -29,6 +29,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFormReset } from "../form";
+import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -69,8 +70,10 @@ function Root(props: SliderRootProps): ReactNode {
     const dir = useDirection();
     const value = useControllable<"value", number>("Slider", "value", props);
     const [input, setInput] = useState<HTMLInputElement | null>(null);
+    const interaction = useOwnInteractionSource();
     const service = useMachine(slider.machine, {
         id,
+        ...interaction,
         dir,
         ...sliderMachineProps(props),
         ...value.machineProps,
