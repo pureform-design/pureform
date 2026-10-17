@@ -1,6 +1,8 @@
 // The registry: each component's factory by name, static or loaded on demand. An entry's kind is
 // fixed when the registry is created, so the server and the client take the same path.
 
+import type { VarPrefix } from "@pureform/css-lowering";
+
 /** Any factory: a function of a selection. */
 export type AnyFactory = (selection: never) => unknown;
 
@@ -75,6 +77,14 @@ export type LazyEntryName<E extends RegistryInput> = Exclude<
  *  "data-theme": "teal" }`. Empty for the base theme, and on targets without selectors. */
 export type ThemeAttributes = Readonly<Record<string, string>>;
 
+/** How the target names its CSS vars, as its stylesheet was compiled: the component var prefix
+ *  (`"pf"` gives `--pf-components-button-container`) and the token var prefix (`"pf"` gives
+ *  `--pf-colors-primary`). Both default to none. */
+export interface VarOptions {
+    readonly prefix?: VarPrefix;
+    readonly tokenPrefix?: string;
+}
+
 /** What `createRegistry` takes besides the entries. */
 export interface RegistryOptions {
     /** The core train's version the generated glue was made with. Bindings compare it with the
@@ -84,6 +94,9 @@ export interface RegistryOptions {
      *  `data-panda-theme` for Panda, the `themeAttribute` option (default `data-theme`) for the
      *  CSS and Tailwind targets. Left out on targets without selectors (React Native). */
     themeAttribute?: string;
+    /** How the target names its CSS vars, for providers that write token overrides and runtime
+     *  themes. Left out on targets without CSS vars (React Native). */
+    vars?: VarOptions;
 }
 
 export interface Registry<E extends RegistryInput = RegistryInput> {
@@ -96,6 +109,8 @@ export interface Registry<E extends RegistryInput = RegistryInput> {
      *  no name (the base theme) and on targets without one. Providers write them on their
      *  element; an app can spread them on any element. */
     themeAttributes(name: string | undefined): ThemeAttributes;
+    /** How the target names its CSS vars. Empty when the glue recorded none. */
+    readonly vars: VarOptions;
     /** Every entry's name, in the order given. */
     readonly names: readonly (keyof E & string)[];
     /** Whether the registry has an entry by this name. */
@@ -109,6 +124,7 @@ export interface Registry<E extends RegistryInput = RegistryInput> {
 }
 
 const NO_ATTRIBUTES: ThemeAttributes = Object.freeze({});
+const NO_VARS: VarOptions = Object.freeze({});
 
 const isLazy = (input: AnyFactory | LazyInput): input is LazyInput =>
     typeof input === "object" && input !== null && "lazy" in input;
@@ -148,8 +164,8 @@ const lazyEntry = (name: string, input: LazyInput): LazyEntry => {
 /** A registry of factories by name: `createRegistry({ button, card: { lazy: () =>
  *  import("./web/card") } })`. A lazy loader's module gives its factory as the module itself,
  *  its default export, or its export named after the entry. Generated glue also passes the
- *  train's version and the target's theme attribute: `createRegistry({ button }, { version,
- *  themeAttribute: "data-theme" })`. */
+ *  train's version, the target's theme attribute, and its var prefixes: `createRegistry({ button },
+ *  { version, themeAttribute: "data-theme", vars: { prefix: "pf" } })`. */
 export const createRegistry = <const E extends RegistryInput>(
     input: E,
     options: RegistryOptions = {},
@@ -184,6 +200,7 @@ export const createRegistry = <const E extends RegistryInput>(
         version: options.version,
         themeAttribute,
         themeAttributes,
+        vars: options.vars ? Object.freeze({ ...options.vars }) : NO_VARS,
         names,
         has: (name: string): name is keyof E & string => entries.has(name),
         entry: (name: string) => get(name),
