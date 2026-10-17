@@ -1,4 +1,9 @@
-import { createRegistry } from "@pureform/styling";
+import {
+    createRegistry,
+    defineRuntimeTheme,
+    themeScope,
+} from "@pureform/styling";
+import type { ThemeGenerator } from "@pureform/styling";
 import { screen } from "@testing-library/react";
 import { Suspense, useState } from "react";
 import { describe, expect, it } from "vitest";
@@ -11,6 +16,7 @@ import {
     useLazyClassFactory,
     useMotion,
     usePureform,
+    useThemeVars,
 } from ".";
 import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
 import {
@@ -18,7 +24,9 @@ import {
     interact,
     mount,
     mountAsync,
+    outside,
     quietly,
+    settle,
 } from "./testing/render";
 
 const neverLoads = () => new Promise<never>(() => {});
@@ -138,7 +146,134 @@ describe("PureformProvider", () => {
         expect(element.style.color).toBe("red");
     });
 
-    it.todo("writes a runtime theme and token overrides (p5b)");
+    it("writes its own token overrides as vars in its style", () => {
+        const registry = createRegistry({ button }, { vars: { prefix: "pf" } });
+        mount(
+            <PureformProvider
+                data-testid="p"
+                registry={registry}
+                overrides={{
+                    "colors.primary": "rgb(0, 106, 96)",
+                    "components.button.container": "red",
+                }}
+                style={{ color: "blue" }}
+            >
+                <PureformProvider data-testid="inner" />
+            </PureformProvider>,
+        );
+        const element = screen.getByTestId("p");
+        expect(element.style.getPropertyValue("--colors-primary")).toBe(
+            "rgb(0, 106, 96)",
+        );
+        expect(
+            element.style.getPropertyValue("--pf-components-button-container"),
+        ).toBe("red");
+        expect(element.style.color).toBe("blue");
+        // Inherited overrides reach the inner provider through the cascade.
+        const inner = screen.getByTestId("inner");
+        expect(inner.getAttribute("style")).toBe("display: contents;");
+        expect(
+            getComputedStyle(inner).getPropertyValue("--colors-primary"),
+        ).toBe("rgb(0, 106, 96)");
+    });
+
+    describe("with a runtime theme", () => {
+        type Seed = { seed: string };
+        const generate: ThemeGenerator<Seed> = (input) => ({
+            light: { "--colors-primary": input.seed },
+            dark: { "--colors-primary": "black" },
+        });
+        const registry = createRegistry(
+            { button },
+            { themeAttribute: "data-theme" },
+        );
+        const blocks = (scope: string) =>
+            document.head.querySelectorAll(`style[data-href="${scope}"]`);
+
+        it("scopes it by its hash and writes its block once the generator loads", async () => {
+            let release!: () => void;
+            const loading = new Promise<void>((resolve) => (release = resolve));
+            const seedTheme = defineRuntimeTheme<Seed>("seed-a", async () => {
+                await loading;
+                return generate;
+            });
+            const theme = seedTheme({ seed: "rgb(0, 106, 96)" });
+            const scope = themeScope(theme);
+            mount(
+                <PureformProvider
+                    data-testid="p"
+                    registry={registry}
+                    theme={theme}
+                >
+                    <span data-testid="child" />
+                </PureformProvider>,
+            );
+            expect(screen.getByTestId("p").getAttribute("data-theme")).toBe(
+                scope,
+            );
+            await settle();
+            expect(blocks(scope)).toHaveLength(0);
+            release();
+            await settle();
+            await settle();
+            expect(blocks(scope)).toHaveLength(1);
+            expect(blocks(scope)[0]!.textContent).toContain(
+                `[data-theme="${scope}"]`,
+            );
+            expect(
+                getComputedStyle(screen.getByTestId("child")).getPropertyValue(
+                    "--colors-primary",
+                ),
+            ).toBe("rgb(0, 106, 96)");
+        });
+
+        it("shares one block between providers, follows a changed theme, and gives its vars", async () => {
+            const seedTheme = defineRuntimeTheme<Seed>(
+                "seed-b",
+                () => generate,
+            );
+            const seed = outside("rgb(1, 2, 3)");
+            function Probe() {
+                return (
+                    <span data-testid="probe">
+                        {useThemeVars()?.light["--colors-primary"]}
+                    </span>
+                );
+            }
+            mount(
+                <seed.Holder>
+                    {(value) => (
+                        <PureformProvider
+                            registry={registry}
+                            theme={seedTheme({ seed: value })}
+                        >
+                            <PureformProvider
+                                theme={seedTheme({ seed: value })}
+                            >
+                                <Probe />
+                            </PureformProvider>
+                        </PureformProvider>
+                    )}
+                </seed.Holder>,
+            );
+            await settle();
+            await settle();
+            const first = themeScope(seedTheme({ seed: "rgb(1, 2, 3)" }));
+            expect(blocks(first)).toHaveLength(1);
+            expect(screen.getByTestId("probe").textContent).toBe(
+                "rgb(1, 2, 3)",
+            );
+            await seed.set("rgb(4, 5, 6)");
+            await settle();
+            await settle();
+            const second = themeScope(seedTheme({ seed: "rgb(4, 5, 6)" }));
+            expect(blocks(second)).toHaveLength(1);
+            expect(blocks(second)[0]!.textContent).toContain("rgb(4, 5, 6)");
+            expect(screen.getByTestId("probe").textContent).toBe(
+                "rgb(4, 5, 6)",
+            );
+        });
+    });
 });
 
 function ButtonClasses(props: {
