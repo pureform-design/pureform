@@ -13,15 +13,19 @@ export interface PartContext<T> {
 }
 
 /** Creates the context a compound component's Root shares with its parts. `component` names it
- *  in the error a part outside Root throws: `createPartContext<…>("Button")`. */
-export function createPartContext<T>(component: string): PartContext<T> {
+ *  in the error a part outside Root throws: `createPartContext<…>("Button")`. `root` names the
+ *  part that provides it, when that isn't Root. */
+export function createPartContext<T>(
+    component: string,
+    root?: string,
+): PartContext<T> {
     const Provider = createContext<T | null>(null);
     return {
         Provider,
         use(part) {
             const value = useContext(Provider);
             if (value === null)
-                throw new Error(outsideRootMessage(component, part));
+                throw new Error(outsideRootMessage(component, part, root));
             return value;
         },
     };
