@@ -1,21 +1,16 @@
-import { pureformTailwind } from "@pureform/tailwind-adapter/vite";
+import pureform from "@pureform/bundler/vite";
 import { createConfig } from "@pureform/vite-config/app";
+import solid from "@solidjs/vite-plugin";
 import tailwindcss from "@tailwindcss/vite";
 
 import packageJson from "./package.json";
-import { config } from "./src/config";
+import { glue } from "./pureform.glue";
 
 export default createConfig({
     package: packageJson,
     overrides: {
-        // pureform's plugin writes the stylesheet before Tailwind's reads it.
-        plugins: [
-            pureformTailwind({
-                config,
-                outFile: "src/pureform.gen.css",
-                dts: "src/pureform.d.ts",
-            }),
-            tailwindcss(),
-        ],
+        // pureform writes `.pureform/styles.css` when dev or build starts, before Tailwind's
+        // plugin reads `src/app.css`, which imports it.
+        plugins: [pureform(glue), tailwindcss(), solid()],
     },
 });

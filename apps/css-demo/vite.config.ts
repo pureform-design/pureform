@@ -1,12 +1,14 @@
-import { pureformCss } from "@pureform/css-adapter/vite";
+import pureform from "@pureform/bundler/vite";
 import { createConfig } from "@pureform/vite-config/app";
+import solid from "@solidjs/vite-plugin";
 
 import packageJson from "./package.json";
-import { config } from "./src/config";
+import { glue } from "./pureform.glue";
 
 export default createConfig({
     package: packageJson,
     overrides: {
-        plugins: [pureformCss({ config, dts: "src/pureform.d.ts" })],
+        // pureform writes `.pureform/` (the registry and `styles.css`) when dev or build starts.
+        plugins: [pureform(glue), solid()],
     },
 });

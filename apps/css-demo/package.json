@@ -1,7 +1,7 @@
 {
     "name": "@pureform/css-demo",
     "version": "0.0.0-semantically-released",
-    "description": "pureform styled by the plain CSS adapter",
+    "description": "pureform's Solid binding on the plain CSS target",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -9,13 +9,20 @@
         "preview": "vite preview"
     },
     "dependencies": {
-        "@pureform/css-adapter": "catalog:",
-        "@pureform/material": "catalog:",
-        "@pureform/preset": "catalog:"
+        "@pureform/solid": "catalog:",
+        "@pureform/styling": "catalog:",
+        "@solidjs/web": "catalog:",
+        "solid-js": "catalog:"
     },
     "devDependencies": {
+        "@pureform/bundler": "catalog:",
+        "@pureform/cli": "catalog:",
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/material": "catalog:",
+        "@pureform/preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
+        "@solidjs/vite-plugin": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:"
     }
