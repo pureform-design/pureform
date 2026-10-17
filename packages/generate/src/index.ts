@@ -35,7 +35,11 @@ export {
     isGenerated,
     stableStringify,
 } from "./hash";
-export { formatImportViolations, scanConfigImports } from "./imports";
+export {
+    formatImportViolations,
+    resolveRelative,
+    scanConfigImports,
+} from "./imports";
 export type {
     ConfigImports,
     ImportRule,

@@ -55,9 +55,10 @@ const BUILTINS = new Set(builtinModules);
 const isFile = (path: string): boolean =>
     existsSync(path) && statSync(path).isFile();
 
-// A relative import as TypeScript and bundlers resolve it: the path, the path with an
-// extension, a `.js` written for a `.ts` file, or a folder's index.
-const resolveRelative = (
+/** A relative import as TypeScript and bundlers resolve it: the path, the path with an
+ *  extension, a `.js` written for a `.ts` file, or a folder's index. `undefined` when no file
+ *  matches. */
+export const resolveRelative = (
     from: string,
     specifier: string,
 ): string | undefined => {
