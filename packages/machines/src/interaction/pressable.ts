@@ -18,6 +18,8 @@ export function pressableItemProps<P, T extends PropTypes>(
     disabled: boolean,
     normalize: NormalizeProps<T>,
 ): P {
+    // A disabled item takes no new interaction, and ends what it had.
+    if (disabled) emitter.disabled();
     return chainProps(
         props,
         normalize.element({

@@ -46,6 +46,7 @@ export function itemPressProps<P, T extends PropTypes>(
     normalize: NormalizeProps<T>,
 ): P {
     const emitter = emitters.item(value);
+    if (disabled) emitter.disabled();
     return chainProps(
         props,
         normalize.element({

@@ -16,6 +16,7 @@ import * as slider from "../slider";
 import * as switchControl from "../switch";
 import * as tabs from "../tabs";
 import { run, settle } from "../testing/vanilla";
+import { InteractionEmitter } from "./emitter";
 
 const stops: (() => void)[] = [];
 afterEach(() => {
@@ -368,7 +369,12 @@ describe("radio group", () => {
         );
         stops.push(running.stop);
         radios[1]!.item.dispatchEvent(pointer("pointerdown"));
+        await settle();
+        expect(running.api().getItemState({ value: "b" }).active).toBe(true);
+        // Let go away from the radio: it isn't pressed any more.
         window.dispatchEvent(pointer("pointerup"));
+        await settle();
+        expect(running.api().getItemState({ value: "b" }).active).toBe(false);
         await userEvent.tab();
         expect(document.activeElement).toBe(radios[0]!.input);
         radios[0]!.input.dispatchEvent(key("keydown", " "));
@@ -450,6 +456,25 @@ describe("slider", () => {
 });
 
 describe("tabs", () => {
+    it("ends a press once its surface is disabled, after the work that disabled it", async () => {
+        const { source, types } = recorded();
+        const emitter = new InteractionEmitter(() => source);
+        emitter.disabled();
+        emitter.hoverEnter();
+        emitter.press("center", "keyboard");
+        emitter.disabled();
+        emitter.disabled();
+        expect(types()).toEqual(["hoverEnter", "press:keyboard"]);
+        await Promise.resolve();
+        expect(types()).toEqual([
+            "hoverEnter",
+            "press:keyboard",
+            "cancel",
+            "hoverExit",
+        ]);
+        expect(source.state.pressed).toBe(false);
+    });
+
     it("emits each tab's interactions to its own source", async () => {
         const items = recordedItems();
         const root = document.createElement("div");
