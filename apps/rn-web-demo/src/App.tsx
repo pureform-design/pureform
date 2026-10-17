@@ -1,64 +1,109 @@
-// The demo page: the components the adapter covers in light and dark, the base and teal themes, precomputed or
-// runtime styles, and a brand color overriding the primary family per scheme, which
-// recomputes the state layers mixed over it in either mode.
+// The demo page: @pureform/react-native's components in light and dark, the base and teal themes,
+// the generated registry's precomputed styles or styles resolved at runtime, each motion engine,
+// and a brand color overriding the primary family per scheme, which recomputes the state layers
+// mixed over it in either mode.
 
-import type { Overrides } from "@pureform/rn-adapter";
 import {
+    Glyph,
     PureformContainer,
     PureformProvider,
+    animated,
     useTokens,
-} from "@pureform/rn-adapter/react";
+} from "@pureform/react-native";
+import type { MotionEngine } from "@pureform/react-native";
+import { Avatar } from "@pureform/react-native/avatar";
+import { Button } from "@pureform/react-native/button";
+import { Card } from "@pureform/react-native/card";
+import { Checkbox } from "@pureform/react-native/checkbox";
+import { Chip } from "@pureform/react-native/chip";
+import { CircularProgress } from "@pureform/react-native/circular-progress";
+import { Dialog } from "@pureform/react-native/dialog";
+import { Fab } from "@pureform/react-native/fab";
+import { Icon } from "@pureform/react-native/icon";
+import { IconButton } from "@pureform/react-native/icon-button";
+import { LinearProgress } from "@pureform/react-native/linear-progress";
+import { ListItem } from "@pureform/react-native/list-item";
+import { Media } from "@pureform/react-native/media";
+import { Menu } from "@pureform/react-native/menu";
+import { NavigationBar } from "@pureform/react-native/navigation-bar";
+import { NavigationRail } from "@pureform/react-native/navigation-rail";
+import { Radio } from "@pureform/react-native/radio-group";
+import { reanimated } from "@pureform/react-native/reanimated";
+import { reanimatedSvg } from "@pureform/react-native/reanimated-svg";
+import { Scrim } from "@pureform/react-native/scrim";
+import { SearchBar } from "@pureform/react-native/search-bar";
+import { Select } from "@pureform/react-native/select";
+import { Separator } from "@pureform/react-native/separator";
+import { Slider } from "@pureform/react-native/slider";
+import { Snackbar } from "@pureform/react-native/snackbar";
+import { SupportingText } from "@pureform/react-native/supporting-text";
+import { animatedSvg } from "@pureform/react-native/svg";
+import { Switch } from "@pureform/react-native/switch";
+import { Tabs } from "@pureform/react-native/tabs";
+import { Text } from "@pureform/react-native/text";
+import { TextArea } from "@pureform/react-native/text-area";
+import { TextField } from "@pureform/react-native/text-field";
+import { Tooltip } from "@pureform/react-native/tooltip";
+import type { Overrides } from "@pureform/rn-adapter/factory";
+import { nativeFactory } from "@pureform/rn-adapter/factory";
+import { createRegistry } from "@pureform/styling";
 import { Fragment, useState } from "react";
 import type { ReactNode } from "react";
-import {
-    ScrollView,
-    StyleSheet,
-    View,
-    useWindowDimensions,
-} from "react-native";
-import { brands, precomputed, runtime } from "virtual:pureform-rn";
+import { ScrollView, StyleSheet, View } from "react-native";
+import { brands, runtime, runtimeTokens } from "virtual:pureform-rn";
 
-import {
-    Avatar,
-    Button,
-    Card,
-    Checkbox,
-    Chip,
-    CircularProgress,
-    Fab,
-    Icon,
-    IconButton,
-    LinearProgress,
-    ListItem,
-    Media,
-    Panel,
-    Radio,
-    SHAPES,
-    Scrim,
-    Separator,
-    Swatch,
-    Tweens,
-    SupportingText,
-    Switch,
-    Type,
-} from "./components";
-import { SearchBar, Select, Slider, TextArea, TextField } from "./fields";
-import {
-    Dialog,
-    Menu,
-    NavigationBar,
-    Snackbar,
-    Tabs,
-    Tooltip,
-} from "./navigation";
-import { MotionProvider } from "./parts";
-import type { Motion } from "./parts";
+import { registry } from "../.pureform";
+import { PICTURE, Panel, SHAPES, Swatch, Tweens } from "./custom";
+
+// The same components over styles resolved at runtime, each a factory as the generated glue's
+// are.
+const runtimeRegistry = createRegistry(
+    Object.fromEntries(
+        Object.entries(runtimeTokens).map(([name, tokens]) => [
+            name,
+            nativeFactory(name, runtime, tokens),
+        ]),
+    ),
+);
+
+/** The engines, by whether they draw with SVG and what runs their motion. */
+const ENGINES: Record<string, Record<string, MotionEngine>> = {
+    Animated: { "no svg": animated, svg: animatedSvg },
+    Reanimated: { "no svg": reanimated, svg: reanimatedSvg },
+};
 
 const DESTINATIONS = [
-    { label: "Mail", glyph: "✉" },
-    { label: "Chat", glyph: "☏" },
-    { label: "Rooms", glyph: "⌂" },
+    { value: "mail", label: "Mail", icon: <Glyph glyph="✉" /> },
+    { value: "chat", label: "Chat", icon: <Glyph glyph="☏" /> },
+    { value: "rooms", label: "Rooms", icon: <Glyph glyph="⌂" /> },
 ];
+
+const MENU = [
+    {
+        value: "cut",
+        label: "Cut",
+        leadingIcon: <Glyph glyph="✂" />,
+        trailingText: "⌘X",
+    },
+    {
+        value: "copy",
+        label: "Copy",
+        leadingIcon: <Glyph glyph="⧉" />,
+        trailingText: "⌘C",
+    },
+    {
+        value: "paste",
+        label: "Paste",
+        leadingIcon: <Glyph glyph="⎘" />,
+        trailingText: "⌘V",
+        disabled: true,
+    },
+];
+
+const SIZES = ["Small", "Medium", "Large"].map((size) => ({
+    value: size,
+    label: size,
+}));
 
 // No override, or a brand's whole primary family for each scheme.
 const OVERRIDES: Record<string, Overrides> = { none: {}, ...brands };
@@ -87,7 +132,7 @@ function Choices<T extends string>({ value, options, onChange }: Choice<T>) {
 function Section(props: { title: string; children: ReactNode }) {
     return (
         <View style={styles.section}>
-            <Type style="titleLarge">{props.title}</Type>
+            <Text textStyle="titleLarge">{props.title}</Text>
             {props.children}
         </View>
     );
@@ -108,9 +153,9 @@ function Page(props: { controls: ReactNode }) {
     const [bio, setBio] = useState("");
     const [query, setQuery] = useState("");
     const [volume, setVolume] = useState(30);
-    const [tab, setTab] = useState(0);
-    const [destination, setDestination] = useState(0);
-    const [choice, setChoice] = useState(1);
+    const [tab, setTab] = useState("mail");
+    const [destination, setDestination] = useState("mail");
+    const [choice, setChoice] = useState("copy");
     return (
         <ScrollView
             style={{
@@ -119,7 +164,7 @@ function Page(props: { controls: ReactNode }) {
             }}
             contentContainerStyle={styles.page}
         >
-            <Type style="headlineMedium">pureform, React Native Web</Type>
+            <Text textStyle="headlineMedium">pureform, React Native Web</Text>
             {props.controls}
             <Section title="Buttons">
                 <View style={styles.row}>
@@ -151,17 +196,23 @@ function Page(props: { controls: ReactNode }) {
             <Section title="Controls">
                 <View style={styles.row}>
                     <Checkbox
-                        label="checkbox"
+                        aria-label="checkbox"
                         checked={checked}
-                        onChange={setChecked}
+                        onCheckedChange={(details) =>
+                            setChecked(details.checked === true)
+                        }
                     />
-                    <Switch label="switch" checked={on} onChange={setOn} />
+                    <Switch
+                        aria-label="switch"
+                        checked={on}
+                        onCheckedChange={(details) => setOn(details.checked)}
+                    />
                     {["small", "medium", "large"].map((option) => (
                         <Radio
                             key={option}
-                            label={option}
+                            aria-label={option}
                             checked={size === option}
-                            onChange={() => setSize(option)}
+                            onPress={() => setSize(option)}
                         />
                     ))}
                 </View>
@@ -173,9 +224,13 @@ function Page(props: { controls: ReactNode }) {
             <Section title="Icons and icon buttons">
                 <View style={styles.row}>
                     {(["small", "medium", "large"] as const).map((size) => (
-                        <Icon key={size} size={size} glyph="★" />
+                        <Icon key={size} size={size}>
+                            <Glyph glyph="★" />
+                        </Icon>
                     ))}
-                    <Icon glyph="♥" color="error" />
+                    <Icon color="error">
+                        <Glyph glyph="♥" />
+                    </Icon>
                     {(
                         [
                             "standard",
@@ -188,13 +243,13 @@ function Page(props: { controls: ReactNode }) {
                         <IconButton
                             key={variant}
                             variant={variant}
-                            label={variant}
-                            glyph="✎"
+                            aria-label={variant}
+                            icon={<Glyph glyph="✎" />}
                         />
                     ))}
                     <IconButton
-                        label="disabled"
-                        glyph="✎"
+                        aria-label="disabled"
+                        icon={<Glyph glyph="✎" />}
                         variant="filled"
                         disabled
                     />
@@ -210,15 +265,22 @@ function Page(props: { controls: ReactNode }) {
                                 variant={variant}
                                 shape={shape}
                                 size="large"
-                                label={`${variant} ${shape}`}
-                                glyph="✎"
+                                aria-label={`${variant} ${shape}`}
+                                icon={<Glyph glyph="✎" />}
                             />
                         ),
                     )}
-                    <Fab glyph="+" size="large" shape={shape} />
-                    <Avatar initials="AL" size="large" shape={shape} />
+                    <Fab
+                        icon={<Glyph glyph="+" />}
+                        aria-label="+"
+                        size="large"
+                        shape={shape}
+                    />
+                    <Avatar label="AL" size="large" shape={shape}>
+                        AL
+                    </Avatar>
                     <View style={styles.picture}>
-                        <Media aspect="square" shape={shape} />
+                        <Media source={PICTURE} aspect="square" shape={shape} />
                     </View>
                 </View>
             </Section>
@@ -253,11 +315,24 @@ function Page(props: { controls: ReactNode }) {
             <Section title="Floating action buttons">
                 <View style={styles.row}>
                     {(["small", "medium", "large"] as const).map((size) => (
-                        <Fab key={size} size={size} glyph="+" />
+                        <Fab
+                            key={size}
+                            size={size}
+                            icon={<Glyph glyph="+" />}
+                            aria-label="+"
+                        />
                     ))}
-                    <Fab glyph="+" variant="filled" />
-                    <Fab glyph="+" variant="surface" />
-                    <Fab glyph="✎" label="Compose" />
+                    <Fab
+                        icon={<Glyph glyph="+" />}
+                        aria-label="+"
+                        variant="filled"
+                    />
+                    <Fab
+                        icon={<Glyph glyph="+" />}
+                        aria-label="+"
+                        variant="surface"
+                    />
+                    <Fab icon={<Glyph glyph="✎" />} label="Compose" />
                 </View>
             </Section>
             <Section title="Lists">
@@ -265,19 +340,19 @@ function Page(props: { controls: ReactNode }) {
                     {[
                         {
                             headline: "One line",
-                            leading: "★",
+                            leading: <Glyph glyph="★" />,
                             trailingText: "100+",
                         },
                         {
                             headline: "Two lines",
                             supportingText: "Supporting text",
-                            leading: "♥",
+                            leading: <Glyph glyph="♥" />,
                         },
                         {
                             headline: "Three lines",
                             overline: "Overline",
                             supportingText: "Supporting text that runs on",
-                            leading: "✉",
+                            leading: <Glyph glyph="✉" />,
                         },
                     ].map((props, index) => (
                         <Fragment key={props.headline}>
@@ -318,12 +393,12 @@ function Page(props: { controls: ReactNode }) {
                     {(["landscape", "square", "portrait"] as const).map(
                         (aspect) => (
                             <View key={aspect} style={styles.media}>
-                                <Media aspect={aspect} />
+                                <Media source={PICTURE} aspect={aspect} />
                             </View>
                         ),
                     )}
                     <View style={[styles.media, styles.clip]}>
-                        <Media aspect="landscape" />
+                        <Media source={PICTURE} aspect="landscape" />
                         <Scrim />
                     </View>
                 </View>
@@ -334,7 +409,7 @@ function Page(props: { controls: ReactNode }) {
                         <TextField
                             label="Name"
                             value={name}
-                            onChange={setName}
+                            onValueChange={(details) => setName(details.value)}
                         />
                     </View>
                     <View style={styles.field}>
@@ -342,22 +417,24 @@ function Page(props: { controls: ReactNode }) {
                             label="Email"
                             variant="outlined"
                             value={email}
-                            onChange={setEmail}
+                            onValueChange={(details) => setEmail(details.value)}
                             invalid={!email.includes(".")}
                             supportingText={
                                 email.includes(".")
                                     ? "Looks right"
                                     : "Add a domain"
                             }
-                            leading="✉"
+                            leadingIcon={<Glyph glyph="✉" />}
                         />
                     </View>
                     <View style={styles.field}>
                         <Select
                             label="Size"
                             value={fit}
-                            options={["Small", "Medium", "Large"]}
-                            onChange={setFit}
+                            items={SIZES}
+                            onValueChange={(details) =>
+                                setFit(details.value ?? "")
+                            }
                             supportingText="Pick a size"
                         />
                     </View>
@@ -366,29 +443,38 @@ function Page(props: { controls: ReactNode }) {
                             label="Bio"
                             variant="outlined"
                             value={bio}
-                            onChange={setBio}
+                            onValueChange={(details) => setBio(details.value)}
                         />
                     </View>
                 </View>
                 <View style={styles.field}>
-                    <SearchBar value={query} onChange={setQuery} />
+                    <SearchBar
+                        value={query}
+                        onValueChange={(details) => setQuery(details.value)}
+                        leading={<Glyph glyph="⌕" />}
+                        trailing={<Glyph glyph="🎤" />}
+                    />
                 </View>
                 <View style={styles.bar}>
                     <Slider
-                        label="Volume"
+                        aria-label="Volume"
                         value={volume}
-                        onChange={setVolume}
+                        onValueChange={(details) => setVolume(details.value)}
                     />
                 </View>
             </Section>
             <Section title="Tabs and navigation">
                 <View style={styles.list}>
-                    <Tabs items={DESTINATIONS} value={tab} onChange={setTab} />
+                    <Tabs
+                        items={DESTINATIONS}
+                        value={tab}
+                        onValueChange={(details) => setTab(details.value)}
+                    />
                     <Tabs
                         items={DESTINATIONS}
                         variant="secondary"
                         value={tab}
-                        onChange={setTab}
+                        onValueChange={(details) => setTab(details.value)}
                     />
                 </View>
                 <View style={styles.row}>
@@ -396,46 +482,50 @@ function Page(props: { controls: ReactNode }) {
                         <NavigationBar
                             items={DESTINATIONS}
                             value={destination}
-                            onChange={setDestination}
+                            onValueChange={(details) =>
+                                setDestination(details.value)
+                            }
                         />
                     </View>
-                    <NavigationBar
-                        rail
+                    <NavigationRail
                         items={DESTINATIONS}
                         value={destination}
-                        onChange={setDestination}
+                        onValueChange={(details) =>
+                            setDestination(details.value)
+                        }
                     />
                 </View>
             </Section>
             <Section title="Menus, dialogs, and messages">
                 <View style={[styles.row, styles.top]}>
                     <Menu
-                        items={[
-                            { label: "Cut", glyph: "✂", shortcut: "⌘X" },
-                            { label: "Copy", glyph: "⧉", shortcut: "⌘C" },
-                            {
-                                label: "Paste",
-                                glyph: "⎘",
-                                shortcut: "⌘V",
-                                disabled: true,
-                            },
-                        ]}
+                        items={MENU}
                         value={choice}
-                        onChange={setChoice}
+                        onSelect={(details) => setChoice(details.value)}
                     />
                     <Dialog
-                        glyph="⚠"
+                        icon={<Glyph glyph="⚠" />}
                         headline="Discard draft?"
-                        actions={[{ label: "Cancel" }, { label: "Discard" }]}
+                        actions={
+                            <>
+                                <Button variant="text" label="Cancel" />
+                                <Button variant="text" label="Discard" />
+                            </>
+                        }
                     >
                         Your changes won't be saved.
                     </Dialog>
                     <View style={[styles.section, styles.start]}>
-                        <Snackbar message="Message archived" action="Undo" />
-                        <Tooltip>Save to drafts</Tooltip>
-                        <Tooltip subhead="Drafts">
-                            Drafts stay on this device.
-                        </Tooltip>
+                        <Snackbar
+                            supportingText="Message archived"
+                            action="Undo"
+                        />
+                        <Tooltip supportingText="Save to drafts" />
+                        <Tooltip
+                            variant="rich"
+                            subhead="Drafts"
+                            supportingText="Drafts stay on this device."
+                        />
                     </View>
                 </View>
             </Section>
@@ -445,18 +535,20 @@ function Page(props: { controls: ReactNode }) {
                         (variant) => (
                             <Card key={variant} variant={variant}>
                                 <View style={styles.card}>
-                                    <Type style="titleMedium">
+                                    <Text textStyle="titleMedium">
                                         {variant} card
-                                    </Type>
-                                    <Type style="bodyMedium">
-                                        Styled by the React Native adapter.
-                                    </Type>
+                                    </Text>
+                                    <Text textStyle="bodyMedium">
+                                        Styled by @pureform/react-native.
+                                    </Text>
                                 </View>
                             </Card>
                         ),
                     )}
                     {(["small", "medium", "large"] as const).map((size) => (
-                        <Avatar key={size} size={size} initials="AL" />
+                        <Avatar key={size} size={size} label="AL">
+                            AL
+                        </Avatar>
                     ))}
                 </View>
             </Section>
@@ -471,11 +563,10 @@ export function App() {
     const [override, setOverride] = useState<keyof typeof OVERRIDES>("none");
     const [motion, setMotion] = useState<"motion" | "reduced motion">("motion");
     const [drawing, setDrawing] = useState<"svg" | "no svg">("svg");
-    const [engine, setEngine] = useState<Motion>("Animated");
+    const [engine, setEngine] = useState<"Animated" | "Reanimated">("Animated");
     const [speed, setSpeed] = useState<"normal speed" | "slow motion">(
         "normal speed",
     );
-    const { width } = useWindowDimensions();
     const controls = (
         <View style={styles.section}>
             <Choices
@@ -522,18 +613,15 @@ export function App() {
     );
     return (
         <PureformProvider
-            styles={mode === "precomputed" ? precomputed : runtime}
+            registry={mode === "precomputed" ? registry : runtimeRegistry}
             scheme={scheme}
             {...(theme === "teal" ? { theme } : {})}
             overrides={OVERRIDES[override]!}
-            reducedMotion={motion === "reduced motion"}
-            width={width}
-            svg={drawing === "svg"}
+            motion={motion === "reduced motion" ? "reduce" : "full"}
+            engine={ENGINES[engine]![drawing]!}
             timeScale={speed === "slow motion" ? 10 : 1}
         >
-            <MotionProvider value={engine}>
-                <Page controls={controls} />
-            </MotionProvider>
+            <Page controls={controls} />
         </PureformProvider>
     );
 }

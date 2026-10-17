@@ -8,9 +8,24 @@ dependencies:
   append:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
+    - "@pureform/vitest-config"
+    - "@pureform/react-native"
+    - "@pureform/styling"
     - "@pureform/rn-adapter"
     - "@pureform/material"
     - "@pureform/preset"
+    - "@pureform/generate"
+    - "@pureform/bundler"
+    - "@pureform/cli"
+
+cache:
+  key:
+    files:
+      append:
+        - pureform.config.ts
+        - pureform.glue.ts
+        - vite.config.ts
+        - index.html
 
 tasks:
   test:unit:
@@ -19,14 +34,32 @@ tasks:
   test:integration:
     enabled: false
 
+  # The page in Chromium, from the package over the generated registry.
   test:e2e:
-    enabled: false
+    enabled: true
 
   test:
     enabled: true
 
+  # Writes `.pureform/` (ignored by git) from `pureform.config.ts` with the built React Native
+  # adapter's codegen, for `tsc` without a dev server; `vite dev` and `vite build` write it
+  # themselves.
+  generate:
+    # `bun x` runs the bin under Node (its shebang), as Vite runs the plugin: the preset computes
+    # some values (shape morphs) differently under Bun, which changes the glue's hash.
+    exec: bun x pureform generate
+    dependencies:
+      - ^build
+    cache:
+      output:
+        files:
+          - ".pureform/**/*"
+
   build:
     enabled: true
+    dependencies:
+      append:
+        - generate
 
   publish:
     enabled: false
