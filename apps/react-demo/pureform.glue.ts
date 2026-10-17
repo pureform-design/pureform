@@ -11,8 +11,8 @@ export const PREFIX = "pf";
 export const glue = {
     target: "panda",
     options: { prefix: PREFIX },
-    // The components the React binding has so far.
-    components: ["button", "checkbox"],
+    // The components the demo draws, and the ripple their indication draws with.
+    components: ["button", "checkbox", "ripple"],
     // No pruning: the demo commits `.pureform/` (checked by `pureform generate --check`), which a
     // pruned build would rewrite.
     prune: false,
