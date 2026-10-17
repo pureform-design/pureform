@@ -10,7 +10,7 @@ how they map onto the selection and the machine.
 ## Where it sits
 
 ```
-@pureform/core, styling, anatomy        (framework-free; types, registry, part names)
+@pureform/core, styling, anatomy, js-effects   (framework-free; types, registry, part names, the ripple)
                  │
 @pureform/binding-core   (this package; no framework)
                  │
@@ -23,25 +23,28 @@ to prune builds.
 
 ## Architecture
 
-| Module            | What it holds                                                                                                                                                                                                                          |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider.ts`     | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                            |
-| `selection.ts`    | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                       |
-| `entries.ts`      | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                           |
-| `parts.ts`        | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`                                                                                                                |
-| `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                 |
-| `class-names.ts`  | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                              |
-| `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                              |
-| `components/`     | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`) |
-| `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                                                                                                                                         |
-| `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                      |
-| `version.ts`      | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                                          |
-| `warn.ts`         | `warnOnce`                                                                                                                                                                                                                             |
-| `web-theme.ts`    | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
-| `usage.ts`        | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                       |
-| `interaction.ts`  | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                    |
-| `indication.ts`   | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`                                                                                                                                   |
-| `dom.ts`          | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
+| Module                   | What it holds                                                                                                                                                                                                                          |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.ts`            | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                            |
+| `selection.ts`           | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                       |
+| `entries.ts`             | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                           |
+| `parts.ts`               | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`                                                                                                                |
+| `props.ts`               | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                 |
+| `class-names.ts`         | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                              |
+| `controllable.ts`        | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                              |
+| `components/`            | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`) |
+| `motion.ts`              | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                                                                                                                                         |
+| `icon-style.ts`          | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                      |
+| `version.ts`             | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                                          |
+| `warn.ts`                | `warnOnce`                                                                                                                                                                                                                             |
+| `web-theme.ts`           | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
+| `usage.ts`               | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                       |
+| `interaction.ts`         | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                    |
+| `indication.ts`          | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`; re-exports the three modules below                                                                                               |
+| `indication-material.ts` | The web halves of `materialIndication({ ripple })` (the ripple from the source's presses, over `createRipple` from `@pureform/js-effects`) and `noIndication`; `rippleClasses(registry)`                                               |
+| `indication-tokens.ts`   | An indication's tokens as CSS: theme-level overrides for a provider, instance tokens for a component, the focus indicator check                                                                                                        |
+| `indication-host.ts`     | `IndicationHost`: what the web bindings share to tie an anatomy's indication entries to a component's elements, run the effect after mount, and track hover and press forwarded from another origin                                    |
+| `dom.ts`                 | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
 
 The root entry uses no DOM API and no CSS lowering, so React Native can import it.
 
@@ -406,7 +409,9 @@ isn't promised (today: at mount on the client, none on the server).
 
 ### `@pureform/binding-core/indication`
 
-The interface the bindings' indications implement (types only, and `defineIndication`):
+The interface every indication implements, the web halves of the built-ins, and what the web
+bindings share to wire them (design doc §9.8). Apps import the built-ins from their binding
+(`@pureform/solid`, `@pureform/react`), which re-exports them.
 
 ```ts
 interface Indication {
@@ -423,7 +428,46 @@ interface IndicationTarget { trigger: HTMLElement; surface: HTMLElement; layer?:
 interface IndicationContext { centered; reducedMotion(); dir(); registry }
 interface NativeIndicationProps { source; surface: { style; drawing? }; centered; reducedMotion; dir; registry }
 defineIndication(indication): Indication;
+
+// The built-ins' web halves
+materialIndication(options?: { ripple?: "ink-well" | "ink-sparkle" | false }): Indication;
+//   "material", layer: true, web: draws Material's ripple in the layer from the source's presses
+//   (its controller made on the first press; touch waits out the scroll delay; none under reduced
+//   motion). The same object for the same options. { ripple: false } has no layer and no web.
+noIndication: Indication;      // "none": the four state-layer opacities at 0; keeps the focus indicator
+DEFAULT_INDICATION;            // materialIndication()
+rippleClasses(registry): { root?, ripple? } | undefined; // the registry's static `ripple` entry
+
+// Tokens as the web writes them
+providerIndicationOverrides(indication): ThemeOverrides | undefined;
+//   theme-level paths: opacity.stateHover, …, sizes.focusIndicatorThickness, sizes.focusIndicatorOuterOffset
+componentIndicationTokens(indication, providerColor): Record<string, string> | undefined;
+//   the component's instance tokens: the providers' focusIndicatorColor, then the prop's tokens
+indicationTokenValues(tokens); // lengths given as numbers become px
+dropsFocusIndicator(indication); droppedFocusIndicatorMessage(indication);
+
+// What the web bindings share
+indicationRoles(entries, part); // [{ entry, role: "trigger" | "surface" | "state" }], cached
+class IndicationHost {          // one per component
+    configure(indication, registry): void;
+    instance(entry, source): IndicationInstance; // one per surface and source
+}
+class IndicationInstance {
+    attach(role: "trigger" | "surface" | "layer" | "state", element): () => void;
+    subscribeForwarded(listener: (states: { hover; pressed }) => void): () => void;
+}
 ```
+
+The provider's `indication` (on `ProviderOptions`) resolves through nesting like `motion`:
+`ProviderState.indication` is the nearest one, and `ProviderState.focusIndicatorColor` the
+nearest indication's color, since the focus indicator's color has no theme-level token. Each
+interactive component's contract takes `indication` and `interactionSource`
+(`components/indication.ts`: `IndicationProps`, `InteractionSourceProps`, `InteractiveProps`,
+`INTERACTIVE_PROPS`); a composite takes `indication` on Root and `interactionSource` per item.
+
+A forwarded hover or press is one whose emit's origin isn't one of the surface's own elements
+(its trigger, surface, layer, or the element it marks states on): another component sharing the
+source, or the app emitting with no element. Focus is never forwarded.
 
 ### `@pureform/binding-core/usage`
 
@@ -443,7 +487,10 @@ icons, a card's `interactive`) and keeps every value. Also: `BINDING_PACKAGES`,
 `REGISTRY_HOOKS` (`useClasses`, `useStyles`, and React Native's `useComponentSlots` and
 `useSelectedStyles` select; `useClassFactory`, `useLazyClassFactory`,
 `useStyleFactory` hand out a factory), `ANATOMY_HOOK` (`useComponent`), and `PROVIDER`
-(`PureformProvider` and its `defaults` prop).
+(`PureformProvider` and its `defaults` prop). Every component with an indication entry also
+draws `ripple`, the entry its surfaces' layer is styled with; `INDICATION` names the prop, the
+hook (`useIndication`), and the built-ins, so the scan can drop the ripple when every indication
+it sees has no layer.
 
 **Keep it current:** a new component needs an entry, and a new group a component computes must
 stay off its list. `usage.spec.ts` checks the subpaths against both bindings' exports, the listed

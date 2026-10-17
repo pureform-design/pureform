@@ -25,31 +25,32 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 
 ## Architecture
 
-| Module                                                                                             | What it holds                                                                                                                                                                            |
-| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider.tsx`                                                                                     | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                                                            |
-| `classes.ts`                                                                                       | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                                                                   |
-| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components)                                     |
-| `props.ts`                                                                                         | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                                                                 |
-| `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                                                           |
-| `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                                                    |
-| `motion.ts`                                                                                        | `useReducedMotion`                                                                                                                                                                       |
-| `icon-style.ts`                                                                                    | `useIconStyle`, and the context icon parts provide                                                                                                                                       |
-| `part-context.ts`                                                                                  | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                                                                  |
-| `button/`                                                                                          | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                                                    |
-| `checkbox/`                                                                                        | `@pureform/solid/checkbox`: the same layout                                                                                                                                              |
-| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/`                                         | The other components, in the same layout                                                                                                                                                 |
-| `text-field/`, `text-area/`, `select/`                                                             | The text inputs, in the same layout                                                                                                                                                      |
-| `tabs/`, `navigation-bar/`, `navigation-rail/`                                                     | Navigation, in the same layout                                                                                                                                                           |
-| `list/`, `list-item/`                                                                              | The list and list item, in the same layout                                                                                                                                               |
-| `linear-progress/`, `circular-progress/`, `slider/`, `card/`, `search-bar/`, `ripple/`             | Display components, in the same layout                                                                                                                                                   |
-| `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/` | Single-part components: the export is Root itself                                                                                                                                        |
-| `single-part.tsx`                                                                                  | `createSinglePart` (internal): a single-part component's Root                                                                                                                            |
-| `navigation.tsx`                                                                                   | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                            |
-| `text-input.tsx`                                                                                   | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                                                            |
-| `interaction.ts`                                                                                   | `ownInteractionSource`, `itemInteractionSources` (internal): each interactive component's interaction source (one per item for composites), made on the client and passed to its machine |
-| `pressable.ts`                                                                                     | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                                                         |
-| `internal/zag/`                                                                                    | The Zag port (below)                                                                                                                                                                     |
+| Module                                                                                             | What it holds                                                                                                                                                                                                                 |
+| -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                                                                     | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                                                                                                 |
+| `classes.ts`                                                                                       | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                                                                                                        |
+| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components)                                                                          |
+| `props.ts`                                                                                         | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                                                                                                      |
+| `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                                                                                                |
+| `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                                                                                         |
+| `motion.ts`                                                                                        | `useReducedMotion`                                                                                                                                                                                                            |
+| `icon-style.ts`                                                                                    | `useIconStyle`, and the context icon parts provide                                                                                                                                                                            |
+| `part-context.ts`                                                                                  | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                                                                                                       |
+| `button/`                                                                                          | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                                                                                         |
+| `checkbox/`                                                                                        | `@pureform/solid/checkbox`: the same layout                                                                                                                                                                                   |
+| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/`                                         | The other components, in the same layout                                                                                                                                                                                      |
+| `text-field/`, `text-area/`, `select/`                                                             | The text inputs, in the same layout                                                                                                                                                                                           |
+| `tabs/`, `navigation-bar/`, `navigation-rail/`                                                     | Navigation, in the same layout                                                                                                                                                                                                |
+| `list/`, `list-item/`                                                                              | The list and list item, in the same layout                                                                                                                                                                                    |
+| `linear-progress/`, `circular-progress/`, `slider/`, `card/`, `search-bar/`, `ripple/`             | Display components, in the same layout                                                                                                                                                                                        |
+| `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/` | Single-part components: the export is Root itself                                                                                                                                                                             |
+| `single-part.tsx`                                                                                  | `createSinglePart` (internal): a single-part component's Root                                                                                                                                                                 |
+| `navigation.tsx`                                                                                   | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                                                                 |
+| `text-input.tsx`                                                                                   | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                                                                                                 |
+| `interaction.ts`                                                                                   | `useOwnInteractionSource`, `itemInteractionSources`, `useInteractionHandlers` (internal): each component's source (the app's, or its own; one per item for composites), and the handlers a surface with no machine emits with |
+| `indication.tsx`                                                                                   | `createInteractionSource`, `useInteractionState`, `useIndication`; and (internal) how `useComponent` resolves the indication and wires each part the anatomy's indication entry names                                         |
+| `pressable.ts`                                                                                     | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                                                                                              |
+| `internal/zag/`                                                                                    | The Zag port (below)                                                                                                                                                                                                          |
 
 ```
 Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► useClasses ──► registry entry
@@ -371,6 +372,81 @@ and no `</head>` hands the head tags to its `onHead` option.
 | `useDirection()` | `Accessor<"ltr" \| "rtl">`: pass it to every machine as `dir`                      |
 | `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
 | `useMotion()`    | `Accessor<MotionSetting>`: the nearest `"reduce"` or `"full"`, else `"system"`     |
+
+### Indication
+
+How interactive components show hover, focus, and press (design doc §9.8): the state layer and
+the focus indicator are the preset's CSS, and the indication picks their tokens; the ripple
+draws in a layer element inside each surface.
+
+```tsx
+import {
+    defineIndication,
+    materialIndication,
+    noIndication,
+} from "@pureform/solid";
+
+<PureformProvider registry={registry} indication={noIndication}>
+    {" "}
+    {/* every component under it */}
+    <Button
+        label="Save"
+        indication={materialIndication({ ripple: "ink-sparkle" })}
+    />
+</PureformProvider>;
+
+// An app's own: a softer hover, a thicker focus ring, and a press that scales the surface.
+const soft = defineIndication({
+    name: "app:soft",
+    tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
+    web(target, source) {
+        return source.subscribe((_, state) => {
+            target.surface.style.scale = state.pressed ? "0.98" : "";
+        });
+    },
+});
+```
+
+- **The default** is `materialIndication()` (the ink-well ripple). The provider's `indication`
+  is inherited and overridable by a nested provider; a component's `indication` prop overrides
+  it for that component. The provider writes its indication's tokens as theme-level vars on its
+  element (`--opacity-state-hover`, `--sizes-focus-indicator-thickness`); a component's prop
+  writes them as instance tokens on its root, so they don't reach a nested component. A
+  provider's `focusIndicatorColor` has no theme-level token, so it reaches each component's
+  root as an instance token. An indication that sets `focusIndicatorThickness` to 0 warns once
+  in development.
+- **The layer** is an empty `<span aria-hidden="true" data-ripple-layer>` with the ripple's
+  `root` class, rendered first inside the anatomy's surface while the indication has
+  `layer: true`, on the server too. The card and the list item show indication only while
+  interactive (a link, a button, or `interactive`).
+- **The effect** (`web`) runs after mount with the trigger, the surface, the layer, the source,
+  and `{ centered, reducedMotion(), dir(), registry }`.
+- **Sources.** Every interactive component takes `interactionSource` (on Root and the
+  ready-made component; a composite's items take one each: `Tabs.Tab`, `Menu.Item`,
+  `RadioGroup.Item`, a navigation `Item`, or `interactionSource` in an item's data; the
+  snackbar's `Action` and `Close`). Components sharing a source show each other's hover and
+  press: the binding marks a hover or press from another origin with `data-pf-hover` or
+  `data-pf-active` on the element the preset matches it on (the trigger, or the root around a
+  native input), after mount only. Focus is never forwarded.
+
+| Hook                                  | Returns                                                                                                                                                  |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `createInteractionSource()`           | a stable `MutableInteractionSource`                                                                                                                      |
+| `useInteractionState(source)`         | `Accessor<InteractionState>`: hovered, focused, focusVisible, pressed, dragged; idle on the server                                                       |
+| `useIndication(source, { centered })` | `{ surface, layer }`: props for an app's own surface (ref, handlers that emit to `source`, forwarded attributes) and the layer to render first inside it |
+
+```tsx
+function Tile() {
+    const source = createInteractionSource();
+    const indication = useIndication(source, { centered: false });
+    return (
+        <div class="tile" {...indication.surface}>
+            {indication.layer}
+            Open
+        </div>
+    );
+}
+```
 
 ### Registry hooks
 

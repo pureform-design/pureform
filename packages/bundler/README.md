@@ -196,6 +196,14 @@ the bundler's `outDir`, and test and story files are skipped):
 Groups a component sets itself (a FAB's `extended`, a text field's icons, a card's
 `interactive`) keep every value. Defaults are always kept.
 
+**The ripple.** Every component that shows indication (a button, a checkbox, a tab, …), an
+anatomy with an indication entry passed to `useComponent`, and `useIndication` draw the `ripple`
+entry: the layer inside each surface is styled with it. The scan drops it only when every
+`<PureformProvider>` it sees passes an indication it can tell has no layer, and so does every
+component's `indication` prop: `noIndication`, `materialIndication({ ripple: false })`, or
+`defineIndication({ … })` (or an object) without `layer: true`. With no provider in the scanned
+files, the ripple stays.
+
 **When it keeps everything** and warns (`pureform: pruning kept every component and variant,
 since …`): a file that doesn't parse, a registry hook or `registry.entry` with a name it can't
 read, `useComponent` with an anatomy it can't name, an unknown component subpath, re-exported or

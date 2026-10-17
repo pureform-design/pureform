@@ -129,6 +129,12 @@ its own, since its API reads one).
 - **Origins**: a press's `origin` is the pointer's `clientX`/`clientY`, or `"center"`; the
   emit's own origin argument is the element the handler ran on (`undefined` for a highlight or a
   key on a list item, which the item itself didn't receive).
+- **A new source**: the button reads its state from the source it emits to, and follows a new
+  `interactionSource` when the prop changes. Zag hands props out as copies of plain objects, so
+  the machine tracks a source by its `subscribe` function, which every copy shares.
+- **Surfaces with no machine** (a card, a list item, the snackbar's buttons) emit through
+  `pressableItemProps(props, emitter, disabled, normalize)` from `@pureform/machines/interaction`,
+  with an `InteractionEmitter` the binding makes.
 - **Zag's machines** are wrapped, not changed: `withInteraction(machine, watch)` adds the
   emitters to its refs, an effect that ends them on stop, and a `watch`; `connect` chains
   the emitting handlers after Zag's on the normalized part props (`chainProps`).
