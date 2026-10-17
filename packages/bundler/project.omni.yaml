@@ -12,7 +12,9 @@ dependencies:
     - "@pureform/anatomy"
     - "@pureform/binding-core"
     - "@pureform/core"
+    - "@pureform/css-adapter"
     - "@pureform/generate"
+    - "@pureform/preset"
     - "@pureform/styling"
 
 cache:
