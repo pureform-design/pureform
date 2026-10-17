@@ -1,0 +1,1770 @@
+button.root: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(118, 98, 173, 1)
+    dragged: bg rgba(127, 108, 179, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=secondary].root: bg rgba(98, 91, 112, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(111, 104, 123, 1)
+    focused: bg rgba(114, 107, 126, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(114, 107, 126, 1)
+    dragged: bg rgba(123, 117, 135, 1)
+    hovered-selected: bg rgba(111, 104, 123, 1)
+    pressed-checked: bg rgba(114, 107, 126, 1)
+    focused-checked: bg rgba(114, 107, 126, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=tertiary].root: bg rgba(125, 82, 96, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(135, 96, 109, 1)
+    focused: bg rgba(138, 99, 112, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(138, 99, 112, 1)
+    dragged: bg rgba(146, 110, 121, 1)
+    hovered-selected: bg rgba(135, 96, 109, 1)
+    pressed-checked: bg rgba(138, 99, 112, 1)
+    focused-checked: bg rgba(138, 99, 112, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=success].root: bg rgba(0, 110, 33, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(20, 122, 51, 1)
+    focused: bg rgba(26, 125, 55, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(26, 125, 55, 1)
+    dragged: bg rgba(41, 133, 69, 1)
+    hovered-selected: bg rgba(20, 122, 51, 1)
+    pressed-checked: bg rgba(26, 125, 55, 1)
+    focused-checked: bg rgba(26, 125, 55, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=warning].root: bg rgba(116, 91, 0, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(127, 104, 20, 1)
+    focused: bg rgba(130, 107, 26, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(130, 107, 26, 1)
+    dragged: bg rgba(138, 117, 41, 1)
+    hovered-selected: bg rgba(127, 104, 20, 1)
+    pressed-checked: bg rgba(130, 107, 26, 1)
+    focused-checked: bg rgba(130, 107, 26, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=error].root: bg rgba(186, 26, 26, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(192, 44, 44, 1)
+    focused: bg rgba(193, 49, 49, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(193, 49, 49, 1)
+    dragged: bg rgba(197, 63, 63, 1)
+    hovered-selected: bg rgba(192, 44, 44, 1)
+    pressed-checked: bg rgba(193, 49, 49, 1)
+    focused-checked: bg rgba(193, 49, 49, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[color=info].root: bg rgba(0, 104, 124, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(20, 116, 134, 1)
+    focused: bg rgba(26, 119, 137, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(26, 119, 137, 1)
+    dragged: bg rgba(41, 128, 145, 1)
+    hovered-selected: bg rgba(20, 116, 134, 1)
+    pressed-checked: bg rgba(26, 119, 137, 1)
+    focused-checked: bg rgba(26, 119, 137, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[variant=tonal].root: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1) | outline none
+    hovered: bg rgba(221, 208, 246, 1)
+    focused: bg rgba(218, 204, 243, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(218, 204, 243, 1)
+    dragged: bg rgba(208, 194, 236, 1)
+    hovered-selected: bg rgba(221, 208, 246, 1)
+    pressed-checked: bg rgba(218, 204, 243, 1)
+    focused-checked: bg rgba(218, 204, 243, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[variant=outlined].root: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[variant=text].root: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+button[variant=elevated].root: bg rgba(247, 242, 247, 1) | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(235, 229, 240, 1)
+    focused: bg rgba(233, 226, 239, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(233, 226, 239, 1)
+    dragged: bg rgba(224, 216, 234, 1)
+    hovered-selected: bg rgba(235, 229, 240, 1)
+    pressed-checked: bg rgba(233, 226, 239, 1)
+    focused-checked: bg rgba(233, 226, 239, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+card.root: bg rgba(247, 242, 247, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+card[variant=filled].root: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+card[variant=outlined].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+card[interactive=true].root: bg rgba(247, 242, 247, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(229, 225, 230, 1)
+    focused: bg rgba(225, 221, 225, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(225, 221, 225, 1)
+    dragged: bg rgba(212, 208, 212, 1)
+    hovered-selected: bg rgba(229, 225, 230, 1)
+    pressed-checked: bg rgba(225, 221, 225, 1)
+    focused-checked: bg rgba(225, 221, 225, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip.root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip.icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip.touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip[variant=elevated].root: bg rgba(247, 242, 247, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(233, 228, 233, 1)
+    focused: bg rgba(230, 225, 230, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(230, 225, 230, 1)
+    dragged: bg rgba(219, 214, 220, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(230, 225, 230, 1)
+    focused-checked: bg rgba(230, 225, 230, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[variant=elevated].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip[variant=elevated].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip[variant=elevated].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip[color=tertiary].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[color=tertiary].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+chip[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+chip[color=tertiary].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+chip[color=success].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(107, 240, 120, 1) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[color=success].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+chip[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+chip[color=success].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+chip[color=warning].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(242, 212, 127, 1) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[color=warning].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+chip[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+chip[color=warning].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+chip[color=error].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(246, 201, 198, 1) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[color=error].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+chip[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+chip[color=error].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+chip[color=info].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(162, 223, 242, 1) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+chip[color=info].icon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+chip[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+chip[color=info].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+checkbox.root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox.box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(103, 80, 164, 1)
+checkbox[color=secondary].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(98, 91, 112, 0.1)
+    focused-checked: bg rgba(98, 91, 112, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=secondary].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(98, 91, 112, 1)
+    focused-checked: bg rgba(98, 91, 112, 1)
+checkbox[color=tertiary].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(125, 82, 96, 0.1)
+    focused-checked: bg rgba(125, 82, 96, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=tertiary].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(125, 82, 96, 1)
+    focused-checked: bg rgba(125, 82, 96, 1)
+checkbox[color=success].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 110, 33, 0.1)
+    focused-checked: bg rgba(0, 110, 33, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=success].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(0, 110, 33, 1)
+    focused-checked: bg rgba(0, 110, 33, 1)
+checkbox[color=warning].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(116, 91, 0, 0.1)
+    focused-checked: bg rgba(116, 91, 0, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=warning].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(116, 91, 0, 1)
+    focused-checked: bg rgba(116, 91, 0, 1)
+checkbox[color=error].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(186, 26, 26, 0.1)
+    focused-checked: bg rgba(186, 26, 26, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=error].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(186, 26, 26, 1)
+    focused-checked: bg rgba(186, 26, 26, 1)
+checkbox[color=info].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 104, 124, 0.1)
+    focused-checked: bg rgba(0, 104, 124, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+checkbox[color=info].box: bg transparent | color none | outline none
+    pressed-checked: bg rgba(0, 104, 124, 1)
+    focused-checked: bg rgba(0, 104, 124, 1)
+switchControl.root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl.track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(103, 80, 164, 1) | outline solid 2 rgba(103, 80, 164, 1) offset 0
+    focused-checked: bg rgba(103, 80, 164, 1) | outline solid 2 rgba(103, 80, 164, 1) offset 0
+switchControl.stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+switchControl.handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=secondary].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=secondary].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(98, 91, 112, 1) | outline solid 2 rgba(98, 91, 112, 1) offset 0
+    focused-checked: bg rgba(98, 91, 112, 1) | outline solid 2 rgba(98, 91, 112, 1) offset 0
+switchControl[color=secondary].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(98, 91, 112, 0.1)
+    focused-checked: bg rgba(98, 91, 112, 0.1)
+switchControl[color=secondary].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=tertiary].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=tertiary].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(125, 82, 96, 1) | outline solid 2 rgba(125, 82, 96, 1) offset 0
+    focused-checked: bg rgba(125, 82, 96, 1) | outline solid 2 rgba(125, 82, 96, 1) offset 0
+switchControl[color=tertiary].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(125, 82, 96, 0.1)
+    focused-checked: bg rgba(125, 82, 96, 0.1)
+switchControl[color=tertiary].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=success].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=success].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(0, 110, 33, 1) | outline solid 2 rgba(0, 110, 33, 1) offset 0
+    focused-checked: bg rgba(0, 110, 33, 1) | outline solid 2 rgba(0, 110, 33, 1) offset 0
+switchControl[color=success].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 110, 33, 0.1)
+    focused-checked: bg rgba(0, 110, 33, 0.1)
+switchControl[color=success].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=warning].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=warning].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(116, 91, 0, 1) | outline solid 2 rgba(116, 91, 0, 1) offset 0
+    focused-checked: bg rgba(116, 91, 0, 1) | outline solid 2 rgba(116, 91, 0, 1) offset 0
+switchControl[color=warning].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(116, 91, 0, 0.1)
+    focused-checked: bg rgba(116, 91, 0, 0.1)
+switchControl[color=warning].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=error].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=error].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(186, 26, 26, 1) | outline solid 2 rgba(186, 26, 26, 1) offset 0
+    focused-checked: bg rgba(186, 26, 26, 1) | outline solid 2 rgba(186, 26, 26, 1) offset 0
+switchControl[color=error].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(186, 26, 26, 0.1)
+    focused-checked: bg rgba(186, 26, 26, 0.1)
+switchControl[color=error].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+switchControl[color=info].root: bg none | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+switchControl[color=info].track: bg rgba(230, 225, 230, 1) | color none | outline solid 2 rgba(122, 117, 127, 1) offset 0
+    pressed-checked: bg rgba(0, 104, 124, 1) | outline solid 2 rgba(0, 104, 124, 1) offset 0
+    focused-checked: bg rgba(0, 104, 124, 1) | outline solid 2 rgba(0, 104, 124, 1) offset 0
+switchControl[color=info].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 104, 124, 0.1)
+    focused-checked: bg rgba(0, 104, 124, 0.1)
+switchControl[color=info].handle: bg rgba(122, 117, 127, 1) | color none | outline none
+    hovered: bg rgba(73, 69, 78, 1)
+    hovered-selected: bg rgba(73, 69, 78, 1)
+    pressed-checked: bg rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(255, 255, 255, 1)
+iconButton.root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton.container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[color=secondary].root: bg none | color rgba(98, 91, 112, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=secondary].container: bg transparent | color rgba(98, 91, 112, 1) | outline none
+    hovered: bg rgba(98, 91, 112, 0.08)
+    focused: bg rgba(98, 91, 112, 0.1)
+    pressed: bg rgba(98, 91, 112, 0.1)
+    hovered-selected: bg rgba(98, 91, 112, 0.08)
+    pressed-checked: bg rgba(98, 91, 112, 0.1)
+    focused-checked: bg rgba(98, 91, 112, 0.1)
+iconButton[color=tertiary].root: bg none | color rgba(125, 82, 96, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=tertiary].container: bg transparent | color rgba(125, 82, 96, 1) | outline none
+    hovered: bg rgba(125, 82, 96, 0.08)
+    focused: bg rgba(125, 82, 96, 0.1)
+    pressed: bg rgba(125, 82, 96, 0.1)
+    hovered-selected: bg rgba(125, 82, 96, 0.08)
+    pressed-checked: bg rgba(125, 82, 96, 0.1)
+    focused-checked: bg rgba(125, 82, 96, 0.1)
+iconButton[color=success].root: bg none | color rgba(0, 110, 33, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=success].container: bg transparent | color rgba(0, 110, 33, 1) | outline none
+    hovered: bg rgba(0, 110, 33, 0.08)
+    focused: bg rgba(0, 110, 33, 0.1)
+    pressed: bg rgba(0, 110, 33, 0.1)
+    hovered-selected: bg rgba(0, 110, 33, 0.08)
+    pressed-checked: bg rgba(0, 110, 33, 0.1)
+    focused-checked: bg rgba(0, 110, 33, 0.1)
+iconButton[color=warning].root: bg none | color rgba(116, 91, 0, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=warning].container: bg transparent | color rgba(116, 91, 0, 1) | outline none
+    hovered: bg rgba(116, 91, 0, 0.08)
+    focused: bg rgba(116, 91, 0, 0.1)
+    pressed: bg rgba(116, 91, 0, 0.1)
+    hovered-selected: bg rgba(116, 91, 0, 0.08)
+    pressed-checked: bg rgba(116, 91, 0, 0.1)
+    focused-checked: bg rgba(116, 91, 0, 0.1)
+iconButton[color=error].root: bg none | color rgba(186, 26, 26, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=error].container: bg transparent | color rgba(186, 26, 26, 1) | outline none
+    hovered: bg rgba(186, 26, 26, 0.08)
+    focused: bg rgba(186, 26, 26, 0.1)
+    pressed: bg rgba(186, 26, 26, 0.1)
+    hovered-selected: bg rgba(186, 26, 26, 0.08)
+    pressed-checked: bg rgba(186, 26, 26, 0.1)
+    focused-checked: bg rgba(186, 26, 26, 0.1)
+iconButton[color=info].root: bg none | color rgba(0, 104, 124, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[color=info].container: bg transparent | color rgba(0, 104, 124, 1) | outline none
+    hovered: bg rgba(0, 104, 124, 0.08)
+    focused: bg rgba(0, 104, 124, 0.1)
+    pressed: bg rgba(0, 104, 124, 0.1)
+    hovered-selected: bg rgba(0, 104, 124, 0.08)
+    pressed-checked: bg rgba(0, 104, 124, 0.1)
+    focused-checked: bg rgba(0, 104, 124, 0.1)
+iconButton[variant=filled].root: bg none | color rgba(255, 255, 255, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[variant=filled].container: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1)
+    pressed: bg rgba(118, 98, 173, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1)
+iconButton[variant=tonal].root: bg none | color rgba(79, 55, 138, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[variant=tonal].container: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1) | outline none
+    hovered: bg rgba(221, 208, 246, 1)
+    focused: bg rgba(218, 204, 243, 1)
+    pressed: bg rgba(218, 204, 243, 1)
+    hovered-selected: bg rgba(221, 208, 246, 1)
+    pressed-checked: bg rgba(218, 204, 243, 1)
+    focused-checked: bg rgba(218, 204, 243, 1)
+iconButton[variant=elevated].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[variant=elevated].container: bg rgba(247, 242, 247, 1) | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(235, 229, 240, 1)
+    focused: bg rgba(233, 226, 239, 1)
+    pressed: bg rgba(233, 226, 239, 1)
+    hovered-selected: bg rgba(235, 229, 240, 1)
+    pressed-checked: bg rgba(233, 226, 239, 1)
+    focused-checked: bg rgba(233, 226, 239, 1)
+iconButton[shape=circle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=circle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=square].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=square].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=slanted].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=slanted].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=arch].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=arch].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=fan].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=fan].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=arrow].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=arrow].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=semiCircle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=semiCircle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=oval].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=oval].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=pill].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=pill].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=triangle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=triangle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=diamond].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=diamond].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=clamShell].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=clamShell].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=pentagon].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=pentagon].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=gem].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=gem].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=sunny].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=sunny].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=verySunny].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=verySunny].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookie4Sided].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookie4Sided].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookie6Sided].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookie6Sided].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookie7Sided].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookie7Sided].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookie9Sided].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookie9Sided].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookie12Sided].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookie12Sided].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=ghostish].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=ghostish].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=clover4Leaf].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=clover4Leaf].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=clover8Leaf].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=clover8Leaf].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=burst].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=burst].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=softBurst].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=softBurst].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=boom].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=boom].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=softBoom].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=softBoom].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=flower].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=flower].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=puffy].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=puffy].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=puffyDiamond].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=puffyDiamond].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=pixelCircle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=pixelCircle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=pixelTriangle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=pixelTriangle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=bun].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=bun].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=heart].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=heart].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=cookieToCircle].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=cookieToCircle].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[shape=squareToSunny].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[shape=squareToSunny].container: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+iconButton[toggle=true].root: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(103, 80, 164, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+iconButton[toggle=true].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+iconButton[toggle=true].container: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1)
+    pressed: bg rgba(73, 69, 78, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08) | color rgba(103, 80, 164, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1)
+iconButton[toggle=true].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+iconButton[toggle=true].outline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+fab.root: bg none | color rgba(79, 55, 138, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab.container: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1) | outline none
+    hovered: bg rgba(221, 208, 246, 1)
+    focused: bg rgba(218, 204, 243, 1)
+    pressed: bg rgba(218, 204, 243, 1)
+    hovered-selected: bg rgba(221, 208, 246, 1)
+    pressed-checked: bg rgba(218, 204, 243, 1)
+    focused-checked: bg rgba(218, 204, 243, 1)
+fab[color=secondary].root: bg none | color rgba(74, 68, 88, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=secondary].container: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1) | outline none
+    hovered: bg rgba(219, 210, 235, 1)
+    focused: bg rgba(216, 207, 232, 1)
+    pressed: bg rgba(216, 207, 232, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1)
+    pressed-checked: bg rgba(216, 207, 232, 1)
+    focused-checked: bg rgba(216, 207, 232, 1)
+fab[color=tertiary].root: bg none | color rgba(99, 59, 72, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=tertiary].container: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1) | outline none
+    hovered: bg rgba(243, 204, 215, 1)
+    focused: bg rgba(239, 201, 212, 1)
+    pressed: bg rgba(239, 201, 212, 1)
+    hovered-selected: bg rgba(243, 204, 215, 1)
+    pressed-checked: bg rgba(239, 201, 212, 1)
+    focused-checked: bg rgba(239, 201, 212, 1)
+fab[color=success].root: bg none | color rgba(0, 83, 23, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=success].container: bg rgba(116, 254, 128, 1) | color rgba(0, 83, 23, 1) | outline none
+    hovered: bg rgba(107, 240, 120, 1)
+    focused: bg rgba(104, 237, 118, 1)
+    pressed: bg rgba(104, 237, 118, 1)
+    hovered-selected: bg rgba(107, 240, 120, 1)
+    pressed-checked: bg rgba(104, 237, 118, 1)
+    focused-checked: bg rgba(104, 237, 118, 1)
+fab[color=warning].root: bg none | color rgba(87, 68, 0, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=warning].container: bg rgba(255, 224, 138, 1) | color rgba(87, 68, 0, 1) | outline none
+    hovered: bg rgba(242, 212, 127, 1)
+    focused: bg rgba(238, 208, 124, 1)
+    pressed: bg rgba(238, 208, 124, 1)
+    hovered-selected: bg rgba(242, 212, 127, 1)
+    pressed-checked: bg rgba(238, 208, 124, 1)
+    focused-checked: bg rgba(238, 208, 124, 1)
+fab[color=error].root: bg none | color rgba(147, 0, 10, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=error].container: bg rgba(255, 218, 214, 1) | color rgba(147, 0, 10, 1) | outline none
+    hovered: bg rgba(246, 201, 198, 1)
+    focused: bg rgba(244, 196, 194, 1)
+    pressed: bg rgba(244, 196, 194, 1)
+    hovered-selected: bg rgba(246, 201, 198, 1)
+    pressed-checked: bg rgba(244, 196, 194, 1)
+    focused-checked: bg rgba(244, 196, 194, 1)
+fab[color=info].root: bg none | color rgba(0, 78, 94, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[color=info].container: bg rgba(176, 236, 255, 1) | color rgba(0, 78, 94, 1) | outline none
+    hovered: bg rgba(162, 223, 242, 1)
+    focused: bg rgba(158, 220, 239, 1)
+    pressed: bg rgba(158, 220, 239, 1)
+    hovered-selected: bg rgba(162, 223, 242, 1)
+    pressed-checked: bg rgba(158, 220, 239, 1)
+    focused-checked: bg rgba(158, 220, 239, 1)
+fab[variant=filled].root: bg none | color rgba(255, 255, 255, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[variant=filled].container: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1)
+    pressed: bg rgba(118, 98, 173, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1)
+fab[variant=surface].root: bg none | color rgba(103, 80, 164, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+fab[variant=surface].container: bg rgba(236, 231, 235, 1) | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(225, 219, 229, 1)
+    focused: bg rgba(223, 216, 228, 1)
+    pressed: bg rgba(223, 216, 228, 1)
+    hovered-selected: bg rgba(225, 219, 229, 1)
+    pressed-checked: bg rgba(223, 216, 228, 1)
+    focused-checked: bg rgba(223, 216, 228, 1)
+listItem.root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem.leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem.content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem.overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem.headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem.supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem.trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+listItem[interactive=true].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[interactive=true].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[color=tertiary].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1)
+listItem[color=tertiary].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=tertiary].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+listItem[color=success].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(116, 254, 128, 1) | color rgba(0, 83, 23, 1)
+listItem[color=success].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=success].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+listItem[color=warning].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(255, 224, 138, 1) | color rgba(87, 68, 0, 1)
+listItem[color=warning].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=warning].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+listItem[color=error].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(255, 218, 214, 1) | color rgba(147, 0, 10, 1)
+listItem[color=error].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=error].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+listItem[color=info].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(176, 236, 255, 1) | color rgba(0, 78, 94, 1)
+listItem[color=info].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+listItem[color=info].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+radio.root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=secondary].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(98, 91, 112, 0.1)
+    focused-checked: bg rgba(98, 91, 112, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=tertiary].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(125, 82, 96, 0.1)
+    focused-checked: bg rgba(125, 82, 96, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=success].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 110, 33, 0.1)
+    focused-checked: bg rgba(0, 110, 33, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=warning].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(116, 91, 0, 0.1)
+    focused-checked: bg rgba(116, 91, 0, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=error].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(186, 26, 26, 0.1)
+    focused-checked: bg rgba(186, 26, 26, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+radio[color=info].root: bg transparent | color none | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(0, 104, 124, 0.1)
+    focused-checked: bg rgba(0, 104, 124, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+textField.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+textField[variant=outlined].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+textField[variant=outlined].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+textField[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(98, 91, 112, 1)
+    focused-checked: color rgba(98, 91, 112, 1)
+textField[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(125, 82, 96, 1)
+    focused-checked: color rgba(125, 82, 96, 1)
+textField[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 110, 33, 1)
+    focused-checked: color rgba(0, 110, 33, 1)
+textField[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(116, 91, 0, 1)
+    focused-checked: color rgba(116, 91, 0, 1)
+textField[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(186, 26, 26, 1)
+    focused-checked: color rgba(186, 26, 26, 1)
+textField[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 104, 124, 1)
+    focused-checked: color rgba(0, 104, 124, 1)
+textArea.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+textArea[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(98, 91, 112, 1)
+    focused-checked: color rgba(98, 91, 112, 1)
+textArea[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(125, 82, 96, 1)
+    focused-checked: color rgba(125, 82, 96, 1)
+textArea[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 110, 33, 1)
+    focused-checked: color rgba(0, 110, 33, 1)
+textArea[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(116, 91, 0, 1)
+    focused-checked: color rgba(116, 91, 0, 1)
+textArea[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(186, 26, 26, 1)
+    focused-checked: color rgba(186, 26, 26, 1)
+textArea[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 104, 124, 1)
+    focused-checked: color rgba(0, 104, 124, 1)
+textArea[variant=outlined].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+textArea[variant=outlined].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+searchBar.root: bg rgba(236, 231, 235, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(219, 215, 219, 1)
+    focused: bg rgba(215, 211, 215, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(215, 211, 215, 1)
+    dragged: bg rgba(203, 198, 202, 1)
+    hovered-selected: bg rgba(219, 215, 219, 1)
+    pressed-checked: bg rgba(215, 211, 215, 1)
+    focused-checked: bg rgba(215, 211, 215, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+select.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+select[variant=outlined].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+select[variant=outlined].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+select[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(98, 91, 112, 1)
+    focused-checked: color rgba(98, 91, 112, 1)
+select[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(125, 82, 96, 1)
+    focused-checked: color rgba(125, 82, 96, 1)
+select[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 110, 33, 1)
+    focused-checked: color rgba(0, 110, 33, 1)
+select[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(116, 91, 0, 1)
+    focused-checked: color rgba(116, 91, 0, 1)
+select[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(186, 26, 26, 1)
+    focused-checked: color rgba(186, 26, 26, 1)
+select[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(0, 104, 124, 1)
+    focused-checked: color rgba(0, 104, 124, 1)
+slider.stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1)
+    pressed: bg rgba(103, 80, 164, 0.1)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1)
+slider.handle: bg rgba(103, 80, 164, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=secondary].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(98, 91, 112, 0.08)
+    focused: bg rgba(98, 91, 112, 0.1)
+    pressed: bg rgba(98, 91, 112, 0.1)
+    hovered-selected: bg rgba(98, 91, 112, 0.08)
+    pressed-checked: bg rgba(98, 91, 112, 0.1)
+    focused-checked: bg rgba(98, 91, 112, 0.1)
+slider[color=secondary].handle: bg rgba(98, 91, 112, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=tertiary].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(125, 82, 96, 0.08)
+    focused: bg rgba(125, 82, 96, 0.1)
+    pressed: bg rgba(125, 82, 96, 0.1)
+    hovered-selected: bg rgba(125, 82, 96, 0.08)
+    pressed-checked: bg rgba(125, 82, 96, 0.1)
+    focused-checked: bg rgba(125, 82, 96, 0.1)
+slider[color=tertiary].handle: bg rgba(125, 82, 96, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=success].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(0, 110, 33, 0.08)
+    focused: bg rgba(0, 110, 33, 0.1)
+    pressed: bg rgba(0, 110, 33, 0.1)
+    hovered-selected: bg rgba(0, 110, 33, 0.08)
+    pressed-checked: bg rgba(0, 110, 33, 0.1)
+    focused-checked: bg rgba(0, 110, 33, 0.1)
+slider[color=success].handle: bg rgba(0, 110, 33, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=warning].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(116, 91, 0, 0.08)
+    focused: bg rgba(116, 91, 0, 0.1)
+    pressed: bg rgba(116, 91, 0, 0.1)
+    hovered-selected: bg rgba(116, 91, 0, 0.08)
+    pressed-checked: bg rgba(116, 91, 0, 0.1)
+    focused-checked: bg rgba(116, 91, 0, 0.1)
+slider[color=warning].handle: bg rgba(116, 91, 0, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=error].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(186, 26, 26, 0.08)
+    focused: bg rgba(186, 26, 26, 0.1)
+    pressed: bg rgba(186, 26, 26, 0.1)
+    hovered-selected: bg rgba(186, 26, 26, 0.08)
+    pressed-checked: bg rgba(186, 26, 26, 0.1)
+    focused-checked: bg rgba(186, 26, 26, 0.1)
+slider[color=error].handle: bg rgba(186, 26, 26, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+slider[color=info].stateLayer: bg transparent | color none | outline none
+    hovered: bg rgba(0, 104, 124, 0.08)
+    focused: bg rgba(0, 104, 124, 0.1)
+    pressed: bg rgba(0, 104, 124, 0.1)
+    hovered-selected: bg rgba(0, 104, 124, 0.08)
+    pressed-checked: bg rgba(0, 104, 124, 0.1)
+    focused-checked: bg rgba(0, 104, 124, 0.1)
+slider[color=info].handle: bg rgba(0, 104, 124, 1) | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu.item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu.itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+menu.itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+menu.itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+menu[color=tertiary].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[color=tertiary].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+menu[color=tertiary].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+menu[color=tertiary].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+menu[color=success].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(107, 240, 120, 1) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[color=success].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+menu[color=success].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+menu[color=success].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+menu[color=warning].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(242, 212, 127, 1) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[color=warning].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+menu[color=warning].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+menu[color=warning].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+menu[color=error].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(246, 201, 198, 1) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[color=error].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+menu[color=error].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+menu[color=error].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+menu[color=info].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(162, 223, 242, 1) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[color=info].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+menu[color=info].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+menu[color=info].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+tabs.tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(241, 235, 246, 1) | color rgba(103, 80, 164, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs.icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+tabs.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+tabs.indicator: bg rgba(103, 80, 164, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
+tabs[variant=secondary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(235, 230, 235, 1) | color rgba(28, 27, 30, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[variant=secondary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+tabs[variant=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+tabs[variant=secondary].indicator: bg rgba(103, 80, 164, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+tabs[color=secondary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(241, 235, 242, 1) | color rgba(98, 91, 112, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=secondary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(98, 91, 112, 1)
+tabs[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(98, 91, 112, 1)
+tabs[color=secondary].indicator: bg rgba(98, 91, 112, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(98, 91, 112, 1)
+tabs[color=tertiary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(243, 235, 240, 1) | color rgba(125, 82, 96, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=tertiary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(125, 82, 96, 1)
+tabs[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(125, 82, 96, 1)
+tabs[color=tertiary].indicator: bg rgba(125, 82, 96, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(125, 82, 96, 1)
+tabs[color=success].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(233, 237, 235, 1) | color rgba(0, 110, 33, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=success].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 110, 33, 1)
+tabs[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 110, 33, 1)
+tabs[color=success].indicator: bg rgba(0, 110, 33, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 110, 33, 1)
+tabs[color=warning].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(242, 235, 233, 1) | color rgba(116, 91, 0, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=warning].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(116, 91, 0, 1)
+tabs[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(116, 91, 0, 1)
+tabs[color=warning].indicator: bg rgba(116, 91, 0, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(116, 91, 0, 1)
+tabs[color=error].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(248, 230, 235, 1) | color rgba(186, 26, 26, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=error].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(186, 26, 26, 1)
+tabs[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(186, 26, 26, 1)
+tabs[color=error].indicator: bg rgba(186, 26, 26, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(186, 26, 26, 1)
+tabs[color=info].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(239, 234, 239, 1)
+    focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(235, 230, 236, 1)
+    dragged: bg rgba(224, 219, 225, 1)
+    hovered-selected: bg rgba(233, 236, 243, 1) | color rgba(0, 104, 124, 1)
+    pressed-checked: bg rgba(235, 230, 236, 1)
+    focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 104, 124, 1)
+tabs[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 104, 124, 1)
+tabs[color=info].indicator: bg rgba(0, 104, 124, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 104, 124, 1)
+navigationBar.item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar.indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar.activeIndicator: bg rgba(232, 222, 248, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(216, 206, 231, 1)
+    focused: bg rgba(212, 203, 226, 1)
+    pressed: bg rgba(212, 203, 226, 1)
+    hovered-selected: bg rgba(216, 206, 231, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(212, 203, 226, 1)
+    focused-checked: bg rgba(212, 203, 226, 1)
+navigationBar.icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationBar.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationBar[color=tertiary].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[color=tertiary].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[color=tertiary].activeIndicator: bg rgba(255, 217, 227, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 202, 211, 1)
+    focused: bg rgba(232, 198, 207, 1)
+    pressed: bg rgba(232, 198, 207, 1)
+    hovered-selected: bg rgba(237, 202, 211, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(232, 198, 207, 1)
+    focused-checked: bg rgba(232, 198, 207, 1)
+navigationBar[color=tertiary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+navigationBar[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationBar[color=success].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[color=success].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[color=success].activeIndicator: bg rgba(116, 254, 128, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(109, 236, 120, 1)
+    focused: bg rgba(107, 231, 118, 1)
+    pressed: bg rgba(107, 231, 118, 1)
+    hovered-selected: bg rgba(109, 236, 120, 1) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(107, 231, 118, 1)
+    focused-checked: bg rgba(107, 231, 118, 1)
+navigationBar[color=success].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+navigationBar[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationBar[color=warning].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[color=warning].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[color=warning].activeIndicator: bg rgba(255, 224, 138, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 208, 129, 1)
+    focused: bg rgba(232, 204, 127, 1)
+    pressed: bg rgba(232, 204, 127, 1)
+    hovered-selected: bg rgba(237, 208, 129, 1) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(232, 204, 127, 1)
+    focused-checked: bg rgba(232, 204, 127, 1)
+navigationBar[color=warning].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+navigationBar[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationBar[color=error].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[color=error].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[color=error].activeIndicator: bg rgba(255, 218, 214, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 203, 199, 1)
+    focused: bg rgba(232, 199, 196, 1)
+    pressed: bg rgba(232, 199, 196, 1)
+    hovered-selected: bg rgba(237, 203, 199, 1) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(232, 199, 196, 1)
+    focused-checked: bg rgba(232, 199, 196, 1)
+navigationBar[color=error].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+navigationBar[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationBar[color=info].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[color=info].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[color=info].activeIndicator: bg rgba(176, 236, 255, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(164, 219, 237, 1)
+    focused: bg rgba(161, 215, 233, 1)
+    pressed: bg rgba(161, 215, 233, 1)
+    hovered-selected: bg rgba(164, 219, 237, 1) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(161, 215, 233, 1)
+    focused-checked: bg rgba(161, 215, 233, 1)
+navigationBar[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+navigationBar[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail.item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail.indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail.activeIndicator: bg rgba(232, 222, 248, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(216, 206, 231, 1)
+    focused: bg rgba(212, 203, 226, 1)
+    pressed: bg rgba(212, 203, 226, 1)
+    hovered-selected: bg rgba(216, 206, 231, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(212, 203, 226, 1)
+    focused-checked: bg rgba(212, 203, 226, 1)
+navigationRail.icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationRail.label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail[color=tertiary].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[color=tertiary].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[color=tertiary].activeIndicator: bg rgba(255, 217, 227, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 202, 211, 1)
+    focused: bg rgba(232, 198, 207, 1)
+    pressed: bg rgba(232, 198, 207, 1)
+    hovered-selected: bg rgba(237, 202, 211, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(232, 198, 207, 1)
+    focused-checked: bg rgba(232, 198, 207, 1)
+navigationRail[color=tertiary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+navigationRail[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail[color=success].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[color=success].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[color=success].activeIndicator: bg rgba(116, 254, 128, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(109, 236, 120, 1)
+    focused: bg rgba(107, 231, 118, 1)
+    pressed: bg rgba(107, 231, 118, 1)
+    hovered-selected: bg rgba(109, 236, 120, 1) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(107, 231, 118, 1)
+    focused-checked: bg rgba(107, 231, 118, 1)
+navigationRail[color=success].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+navigationRail[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail[color=warning].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[color=warning].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[color=warning].activeIndicator: bg rgba(255, 224, 138, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 208, 129, 1)
+    focused: bg rgba(232, 204, 127, 1)
+    pressed: bg rgba(232, 204, 127, 1)
+    hovered-selected: bg rgba(237, 208, 129, 1) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(232, 204, 127, 1)
+    focused-checked: bg rgba(232, 204, 127, 1)
+navigationRail[color=warning].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+navigationRail[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail[color=error].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[color=error].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[color=error].activeIndicator: bg rgba(255, 218, 214, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(237, 203, 199, 1)
+    focused: bg rgba(232, 199, 196, 1)
+    pressed: bg rgba(232, 199, 196, 1)
+    hovered-selected: bg rgba(237, 203, 199, 1) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(232, 199, 196, 1)
+    focused-checked: bg rgba(232, 199, 196, 1)
+navigationRail[color=error].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+navigationRail[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+navigationRail[color=info].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(28, 27, 30, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[color=info].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[color=info].activeIndicator: bg rgba(176, 236, 255, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(164, 219, 237, 1)
+    focused: bg rgba(161, 215, 233, 1)
+    pressed: bg rgba(161, 215, 233, 1)
+    hovered-selected: bg rgba(164, 219, 237, 1) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(161, 215, 233, 1)
+    focused-checked: bg rgba(161, 215, 233, 1)
+navigationRail[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+navigationRail[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
+snackbar.action: bg transparent | color rgba(207, 188, 255, 1) | outline none
+    hovered: bg rgba(207, 188, 255, 0.08)
+    focused: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(207, 188, 255, 0.1)
+    dragged: bg rgba(207, 188, 255, 0.16)
+    hovered-selected: bg rgba(207, 188, 255, 0.08)
+    pressed-checked: bg rgba(207, 188, 255, 0.1)
+    focused-checked: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+snackbar.close: bg transparent | color rgba(244, 239, 244, 1) | outline none
+    hovered: bg rgba(244, 239, 244, 0.08)
+    focused: bg rgba(244, 239, 244, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(244, 239, 244, 0.1)
+    dragged: bg rgba(244, 239, 244, 0.16)
+    hovered-selected: bg rgba(244, 239, 244, 0.08)
+    pressed-checked: bg rgba(244, 239, 244, 0.1)
+    focused-checked: bg rgba(244, 239, 244, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
