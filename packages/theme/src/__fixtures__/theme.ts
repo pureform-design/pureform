@@ -24,6 +24,7 @@ import {
     SIZE_ROLES,
     SPACING_STEPS,
     STATE_ROLES,
+    FOCUS_INDICATOR_ROLES,
 } from "../contracts/foundations";
 import { BASE_TEXT_STYLES } from "../contracts/typography";
 import type { TextStyleNode } from "../contracts/typography";
@@ -75,7 +76,10 @@ export const providers = () => ({
         spacing: fill(SPACING_STEPS, (step) => px(Number(step) * 4)),
         sizes: fill(SIZE_ROLES, () => px(40)),
     }),
-    state: stateFromTokens({ opacities: fill(STATE_ROLES, () => pct(10)) }),
+    state: stateFromTokens({
+        opacities: fill(STATE_ROLES, () => pct(10)),
+        focusIndicator: fill(FOCUS_INDICATOR_ROLES, () => px(3)),
+    }),
     motion: motionFromTokens({
         durations: fill(DURATION_ROLES, () => numeric(200, "ms")),
         easings: fill(EASING_ROLES, () => cubicBezier([0.2, 0, 0, 1])),

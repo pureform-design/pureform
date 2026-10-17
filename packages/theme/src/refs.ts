@@ -9,6 +9,7 @@ import type { BaseColorGroup, ColorRole } from "./contracts/color";
 import type {
     DurationRole,
     EasingRole,
+    FocusIndicatorRole,
     ShapeRole,
     SizeRole,
     SpacingStep,
@@ -65,5 +66,8 @@ export const radius = ref<ShapeRole | (string & {})>(PATHS.radius);
 export const spacing = ref<SpacingStep | (string & {})>(PATHS.spacing);
 export const size = ref<SizeRole | (string & {})>(PATHS.size);
 export const opacity = ref<StateRole | (string & {})>(PATHS.opacity);
+/** One of the focus indicator's lengths: `focusIndicator("focusIndicatorThickness")`. The state
+ *  contract declares them, and they lower beside the sizes. */
+export const focusIndicator = ref<FocusIndicatorRole>(PATHS.size);
 export const duration = ref<DurationRole | (string & {})>(PATHS.duration);
 export const easing = ref<EasingRole | (string & {})>(PATHS.easing);

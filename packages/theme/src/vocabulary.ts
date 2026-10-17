@@ -17,6 +17,7 @@ import type {
     DurationRole,
     EasingRole,
     ElevationLevel,
+    FocusIndicatorRole,
     ShapeRole,
     SizeRole,
     SpacingStep,
@@ -45,7 +46,7 @@ export interface ThemeVocabulary<
     tokens: Tiers<{
         radii: Tokens<ShapeRole, ScalarNode>;
         spacing: Tokens<SpacingStep, ScalarNode>;
-        sizes: Tokens<SizeRole, ScalarNode>;
+        sizes: Tokens<SizeRole | FocusIndicatorRole, ScalarNode>;
         opacity: Tokens<StateRole, ScalarNode>;
         fontSize: Tokens<BaseTextStyle | TStyle, ScalarNode>;
         lineHeight: Tokens<BaseTextStyle | TStyle, ScalarNode>;

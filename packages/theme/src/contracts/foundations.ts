@@ -140,10 +140,22 @@ export const STATE_ROLES = [
 
 export type StateRole = (typeof STATE_ROLES)[number];
 
+/** The focus indicator's lengths, in Material's names: how thick it's drawn, and how far
+ *  outside the focused element. */
+export const FOCUS_INDICATOR_ROLES = [
+    "focusIndicatorThickness",
+    "focusIndicatorOuterOffset",
+] as const;
+
+export type FocusIndicatorRole = (typeof FOCUS_INDICATOR_ROLES)[number];
+
 export interface StateContract {
     /** Opacities, as percentages: the state layer tints, the disabled strengths, and the
      *  scrim. */
     opacities: Record<StateRole, NumericScalarNode> &
+        Record<string, NumericScalarNode>;
+    /** The focus indicator's thickness and outer offset, as lengths. */
+    focusIndicator: Record<FocusIndicatorRole, NumericScalarNode> &
         Record<string, NumericScalarNode>;
 }
 
