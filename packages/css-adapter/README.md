@@ -270,10 +270,10 @@ own attributes (`data-state`, `data-hover`, …) aren't matched. The full table 
 
 ## Parity with the Panda adapter
 
-Both adapters lower through `@pureform/css-lowering`, and the demo's end-to-end suite renders
-every component at each variant value with each adapter and requires the same computed styles.
-States are compared the same way, set through their ARIA or `data-pf-*` attributes, with focus
-forced through DevTools.
+Both adapters lower through `@pureform/css-lowering`, and the browser suite
+(`tests/browser-e2e-tests`) renders every component at each variant value with each adapter and
+requires the same computed styles. States are compared the same way, set through their ARIA or
+`data-pf-*` attributes, with focus forced through DevTools.
 
 ## Build and test
 
@@ -287,5 +287,5 @@ equals `compileCss`, that it reads every instance token's var, and that the glue
 with TypeScript's `tsc`.
 
 `tests/component-suites` runs the bindings' shared suites (state, forms, accessibility, keyboard,
-direction, named themes, server rendering) on this target too, over glue generated from the demo's
-config.
+direction, named themes, server rendering) on this target too, over glue generated from the
+Panda fixture's config (`tests/panda-fixture`).
