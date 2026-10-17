@@ -61,6 +61,22 @@ describe("normalizeVariants", () => {
         });
     });
 
+    it('takes a "*" group for the groups not listed', () => {
+        expect(
+            normalizeVariants(
+                { button: { "*": [], variant: ["text"] } },
+                ["button"],
+                shape,
+            ),
+        ).toEqual({
+            button: {
+                variant: ["filled", "text"],
+                size: [],
+                toggle: ["false"],
+            },
+        });
+    });
+
     it("leaves out components outside the list, and is empty without usage", () => {
         expect(
             normalizeVariants({ button: { size: ["small"] } }, ["chip"], shape),
