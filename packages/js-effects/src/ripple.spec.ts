@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { readRippleTiming, ripple } from "./ripple";
+import { createRipple, readRippleTiming, ripple } from "./ripple";
 
 const transitionStyle = (
     transitionProperty: string,
@@ -234,5 +234,54 @@ describe("ripple", () => {
         detach();
         container.dispatchEvent(pointer("pointerdown"));
         expect(animations).toHaveLength(0);
+    });
+});
+
+describe("createRipple", () => {
+    it("ripples from the presses it's told of", () => {
+        const { layer } = surface();
+        const controller = createRipple(() => layer);
+        controller.press({ x: 130, y: 60 });
+        expect(animations[0]?.keyframes[0]?.transform).toBe(
+            "translate(10px, -10px) scale(1)",
+        );
+        controller.release();
+        expect(animations.map((a) => a.options.duration)).toEqual([450, 375]);
+    });
+
+    it("ripples a key's press from the center", () => {
+        const { layer } = surface();
+        createRipple(() => layer).press("center");
+        expect(animations[0]?.keyframes[0]?.transform).toBe(
+            "translate(80px, 0px) scale(1)",
+        );
+    });
+
+    it("waits out a touch, and never ripples a cancelled one", () => {
+        const { layer } = surface();
+        const controller = createRipple(() => layer);
+        controller.press({ x: 0, y: 0 }, true);
+        controller.cancel();
+        vi.advanceTimersByTime(200);
+        expect(animations).toHaveLength(0);
+
+        controller.press({ x: 0, y: 0 }, true);
+        controller.release();
+        expect(animations.map((a) => a.options.duration)).toEqual([450, 375]);
+    });
+
+    it("reads its options at each press", () => {
+        const { layer } = surface();
+        let centered = false;
+        const controller = createRipple(() => layer, {
+            get centerOrigin() {
+                return centered;
+            },
+        });
+        centered = true;
+        controller.press({ x: 130, y: 60 });
+        expect(animations[0]?.keyframes[0]?.transform).toBe(
+            "translate(80px, 0px) scale(1)",
+        );
     });
 });

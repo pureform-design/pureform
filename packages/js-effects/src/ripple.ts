@@ -343,14 +343,30 @@ const RENDERERS: Record<RippleVariant, Renderer> = {
     "ink-sparkle": inkSparkle,
 };
 
-/** Attach Material press ripples to `container`. Returns a function that detaches them. */
-export function ripple(container: HTMLElement, options: RippleOptions = {}) {
+/** One surface's ripples, driven by its presses rather than by events: what `ripple()` runs
+ *  over a surface's pointer events, and what an indication runs over an interaction source. */
+export interface RippleController {
+    /** A press at `origin`, in viewport coordinates, or from the center (a key). A touch press
+     *  waits briefly, so a scroll that starts there cancels it first. A new press releases the
+     *  ripple before it. */
+    press(origin: Point | "center", touch?: boolean): void;
+    /** The press ended: the ripple fades once it has shown long enough. A touch released inside
+     *  the delay still gets its full ripple, from `origin` when given. */
+    release(origin?: Point): void;
+    /** The press was cancelled, such as by a scroll: a waiting touch never ripples, and a drawn
+     *  ripple fades. */
+    cancel(): void;
+}
+
+/** Draws Material press ripples in the layer `layerOf()` returns, from presses its caller
+ *  reports. It reads `options` at each press, so getters on it can change between presses. */
+export function createRipple(
+    layerOf: () => HTMLElement | null | undefined,
+    options: RippleOptions = {},
+): RippleController {
     const press = ripplePress(() => performance.now());
     let touchTimer: ReturnType<typeof setTimeout> | undefined;
-
-    const layerOf = () =>
-        options.getRippleLayer?.(container) ??
-        container.querySelector<HTMLElement>("[data-ripple-layer]");
+    let waiting: Point | "center" | undefined;
 
     function begin(origin: Point | "center") {
         const layer = layerOf();
@@ -378,47 +394,72 @@ export function ripple(container: HTMLElement, options: RippleOptions = {}) {
         press.begin(render(layer, geometry, timing, options), timing);
     }
 
-    function end() {
+    function stopWaiting() {
         clearTimeout(touchTimer);
         touchTimer = undefined;
+        waiting = undefined;
+    }
+
+    function end() {
+        stopWaiting();
         press.end();
     }
+
+    return {
+        press(origin, touch = false) {
+            if (!touch) {
+                begin(origin);
+                return;
+            }
+            // Wait so a scroll that starts here cancels the press first.
+            stopWaiting();
+            waiting = origin;
+            touchTimer = setTimeout(() => begin(origin), TOUCH_DELAY_MS);
+        },
+        release(origin) {
+            if (waiting !== undefined) {
+                const from = origin ?? waiting;
+                stopWaiting();
+                begin(from);
+            }
+            end();
+        },
+        cancel: end,
+    };
+}
+
+/** Attach Material press ripples to `container`. Returns a function that detaches them. */
+export function ripple(container: HTMLElement, options: RippleOptions = {}) {
+    const controller = createRipple(
+        () =>
+            options.getRippleLayer?.(container) ??
+            container.querySelector<HTMLElement>("[data-ripple-layer]"),
+        options,
+    );
 
     function onPointerDown(e: PointerEvent) {
         if (e.button !== 0 || isDisabled(container, options)) return;
         if (!claim(e, options.allowPropagation ?? false)) return;
-        const origin = { x: e.clientX, y: e.clientY };
-        if (e.pointerType === "touch") {
-            // Wait so a scroll that starts here cancels the press (as `pointercancel`) first.
-            clearTimeout(touchTimer);
-            touchTimer = setTimeout(() => begin(origin), TOUCH_DELAY_MS);
-        } else {
-            begin(origin);
-        }
+        controller.press(
+            { x: e.clientX, y: e.clientY },
+            e.pointerType === "touch",
+        );
     }
 
     function onPointerUp(e: PointerEvent) {
-        // A tap released inside the touch delay still gets its full ripple.
-        if (touchTimer !== undefined) {
-            clearTimeout(touchTimer);
-            touchTimer = undefined;
-            begin({ x: e.clientX, y: e.clientY });
-        }
-        end();
+        controller.release({ x: e.clientX, y: e.clientY });
     }
 
     function onCancel() {
-        clearTimeout(touchTimer);
-        touchTimer = undefined;
-        end();
+        controller.cancel();
     }
 
     // A click with no pointer behind it (Enter or Space) ripples from the center.
     function onClick(e: MouseEvent) {
         if (e.detail !== 0 || isDisabled(container, options)) return;
         if (!claim(e, options.allowPropagation ?? false)) return;
-        begin("center");
-        end();
+        controller.press("center");
+        controller.release();
     }
 
     const listeners: [string, EventListener][] = [
