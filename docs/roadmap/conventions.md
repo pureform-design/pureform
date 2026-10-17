@@ -47,6 +47,11 @@ for what they can't do (git, formatting, linting, ad-hoc scripts).
   the results for the projects you changed.
 - **Browser tests** use Vitest browser mode (Chromium). `.env.local` sets
   `CHROMIUM_PATH`; outside omni, load it with `set -a; source .env.local; set +a`.
+- **The suites' Panda setup is `tests/panda-fixture`,** not `apps/solid-demo`: the config every
+  target is generated from, the Panda registry and stylesheet, and the visual suite's page. Output
+  contexts written before it (p3c to p9c) say the suites read the demo; read them as the
+  fixture. Change the fixture to change what the suites test, and a demo for the demo; each web
+  demo has its own smoke test (`test:e2e`).
 - **New packages** are scaffolded with the omni `ts-package` generator (see above).
   Dependencies go through the root `package.json` catalog. Test projects live under `tests/`.
 - **Package READMEs:** every package a phase creates gets a `README.md`, and every
