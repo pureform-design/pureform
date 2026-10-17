@@ -1,6 +1,7 @@
 // What a suite asks a binding to render, without naming a framework: one ready-made component
-// with its props, inside a `PureformProvider` holding the demo's registry. Each binding has a
-// view of it (`src/bindings/<binding>/scene.tsx`) that renders it in the browser and on the server.
+// with its props, inside a `PureformProvider` holding the target's registry (`#registry`). Each
+// binding has a view of it (`src/bindings/<binding>/scene.tsx`) that renders it in the browser and
+// on the server.
 
 /** The ready-made components every binding renders. Add a component's name here and to each
  *  binding's `components` map in `src/bindings/<binding>/scene.tsx`. */
@@ -16,6 +17,8 @@ export type SceneProps = Readonly<Record<string, unknown>>;
 export interface SceneProvider {
     readonly dir?: "ltr" | "rtl" | undefined;
     readonly motion?: "system" | "reduce" | "full" | undefined;
+    /** A named theme from the demo's config (`teal`, `sharp`, `dense`). */
+    readonly theme?: string | undefined;
 }
 
 export interface Scene {

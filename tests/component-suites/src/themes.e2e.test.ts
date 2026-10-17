@@ -1,0 +1,110 @@
+// Named themes (design doc §5.6), for every component on every target: a provider's `theme`
+// writes the registry's `themeAttributes(theme)`, the target's own scope, on its element, and the
+// component under it draws exactly as under that attribute set by hand, which is how an app
+// without a provider applies a theme. The teal theme recolors, so it must change what's drawn.
+
+import { describe, expect, it } from "vitest";
+
+import { harness } from "#binding";
+import { registry } from "#registry";
+
+import { byTestId, COMPONENTS } from "./components";
+import type { ComponentCase } from "./components";
+import type { Mounted } from "./harness/harness";
+import { hostIn, mountCase } from "./harness/page";
+
+/** The demo's named themes. */
+const THEMES = ["teal", "sharp", "dense"] as const;
+
+/** What a theme can change in a part: colors, shape, and size. */
+const DRAWN = [
+    "color",
+    "backgroundColor",
+    "borderTopColor",
+    "borderTopWidth",
+    "borderTopLeftRadius",
+    "outlineColor",
+    "width",
+    "height",
+] as const;
+
+/** Every part's drawn styles, by part name, for a mounted scene, which then leaves the page. Scenes
+ *  are measured one at a time in the same place, so the pointer (which may rest on it) is over
+ *  each alike. */
+const drawn = async (component: ComponentCase, scene: Mounted) => {
+    await harness.settle();
+    const root = byTestId(scene.host, component.root);
+    const styles = Object.fromEntries(
+        [root, ...root.querySelectorAll<HTMLElement>("[data-pf-part]")].map(
+            (part) => {
+                const style = getComputedStyle(part);
+                return [
+                    part.dataset.pfPart ?? "root",
+                    Object.fromEntries(DRAWN.map((key) => [key, style[key]])),
+                ];
+            },
+        ),
+    );
+    // Off the page; the scene itself unmounts after the test.
+    document.body.innerHTML = "";
+    return styles;
+};
+
+/** The attributes as markup: `data-theme="teal"`. */
+const markup = (attributes: Readonly<Record<string, string>>) =>
+    Object.entries(attributes)
+        .map(([name, value]) => `${name}="${value}"`)
+        .join(" ");
+
+describe("themeAttributes", () => {
+    it.each(THEMES)("scopes %s by the target's attribute", (theme) => {
+        const attributes = registry.themeAttributes(theme);
+        expect(registry.themeAttribute).toBeTypeOf("string");
+        expect(attributes).toEqual({ [registry.themeAttribute!]: theme });
+        expect(registry.themeAttributes(undefined)).toEqual({});
+    });
+});
+
+describe.each(COMPONENTS)("$component", (component) => {
+    describe.each(THEMES)("%s", (theme) => {
+        it("is written on the provider's element", async () => {
+            const { host } = mountCase(component, {}, { provider: { theme } });
+            await harness.settle();
+            const provider = host.firstElementChild!;
+            for (const [name, value] of Object.entries(
+                registry.themeAttributes(theme),
+            )) {
+                expect(provider.getAttribute(name)).toBe(value);
+            }
+        });
+
+        it("draws as under the attribute set by hand", async () => {
+            const provided = await drawn(
+                component,
+                mountCase(component, {}, { provider: { theme } }),
+            );
+            const byHand = await drawn(
+                component,
+                mountCase(
+                    component,
+                    {},
+                    {
+                        host: hostIn(
+                            `<div ${markup(registry.themeAttributes(theme))}><div data-host></div></div>`,
+                        ),
+                    },
+                ),
+            );
+            expect(provided).toEqual(byHand);
+        });
+    });
+
+    it("draws differently in teal than in the base theme", async () => {
+        const base = await drawn(component, mountCase(component));
+        const teal = await drawn(
+            component,
+            mountCase(component, {}, { provider: { theme: "teal" } }),
+        );
+        expect(teal).not.toEqual(base);
+    });
+});

@@ -13,6 +13,9 @@ dependencies:
     - "@pureform/styling"
     - "@pureform/solid"
     - "@pureform/react"
+    - "@pureform/generate"
+    - "@pureform/css-adapter"
+    - "@pureform/tailwind-adapter"
     - "@pureform/site"
 
 cache:

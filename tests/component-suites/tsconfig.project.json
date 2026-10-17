@@ -8,8 +8,13 @@
         "types": ["vite/client", "node", "@vitest/browser-playwright"],
         "paths": {
             "@/*": ["./src/*"],
-            "#binding": ["./src/bindings/solid/harness.tsx"]
+            "#binding": ["./src/bindings/solid/harness.tsx"],
+            "#registry": ["./src/targets/panda/registry.ts"]
         }
     },
-    "include": ["src", "../../apps/solid-demo/.pureform/**/*.*"]
+    "include": [
+        "src",
+        ".pureform/**/*.*",
+        "../../apps/solid-demo/.pureform/**/*.*"
+    ]
 }

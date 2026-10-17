@@ -8,6 +8,7 @@ import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
+import { registry } from "#registry";
 
 import { COMPONENTS } from "./components";
 import type { ComponentCase } from "./components";
@@ -155,7 +156,27 @@ describe.each(controls)("$component, fieldsets", (component) => {
     });
 });
 
-// The design runs this suite for each web target and once with a runtime theme. Only the Panda
-// target has a registry the bindings render yet.
-it.todo("hydrates on the CSS and Tailwind targets (p5a)");
+describe.each(COMPONENTS)("$component, a named theme", (component) => {
+    it("renders the theme's attributes on the server and hydrates without a change", async () => {
+        const scene: Scene = {
+            ...sceneOf(component, {}),
+            provider: { theme: "teal" },
+        };
+        const attributes = registry.themeAttributes("teal");
+        const rendered = await serverRendered(scene);
+        for (const [name, value] of Object.entries(attributes)) {
+            expect(rendered.firstElementChild!.getAttribute(name)).toBe(value);
+        }
+        rendered.remove();
+        const { host, logged, changes } = await hydrate(scene);
+        expect(logged).toEqual([]);
+        expect(changes).toEqual([]);
+        for (const [name, value] of Object.entries(attributes)) {
+            expect(host.firstElementChild!.getAttribute(name)).toBe(value);
+        }
+    });
+});
+
+// Every target runs this suite (one Vitest project per binding and target); a runtime theme is
+// the runtime themes phase's.
 it.todo("hydrates with a runtime theme from the provider (p5b)");
