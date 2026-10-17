@@ -54,6 +54,34 @@
                 "default": "./dist/radio-group.mjs"
             }
         },
+        "./menu": {
+            "types": "./dist/menu/index.d.ts",
+            "import": {
+                "development": "./src/menu/index.ts",
+                "default": "./dist/menu.mjs"
+            }
+        },
+        "./dialog": {
+            "types": "./dist/dialog/index.d.ts",
+            "import": {
+                "development": "./src/dialog/index.ts",
+                "default": "./dist/dialog.mjs"
+            }
+        },
+        "./tooltip": {
+            "types": "./dist/tooltip/index.d.ts",
+            "import": {
+                "development": "./src/tooltip/index.ts",
+                "default": "./dist/tooltip.mjs"
+            }
+        },
+        "./snackbar": {
+            "types": "./dist/snackbar/index.d.ts",
+            "import": {
+                "development": "./src/snackbar/index.ts",
+                "default": "./dist/snackbar.mjs"
+            }
+        },
         "./select": {
             "types": "./dist/select/index.d.ts",
             "import": {
