@@ -5,15 +5,18 @@ import {
     compositeTestIds,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
+    listAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
+    tabsCompositeAnatomy,
     tooltipOverlayAnatomy,
 } from "./composites";
 import {
     anatomy,
     dialogAnatomy,
     menuAnatomy,
+    tabsAnatomy,
     tooltipAnatomy,
 } from "./generated";
 import type { ComponentAnatomy } from "./types";
@@ -102,5 +105,38 @@ describe("composites", () => {
             "data-pf-part": "backdrop",
             "data-testid": compositeTestIds.dialogBackdrop.root,
         });
+    });
+
+    it("the tabs draw every slot of the preset's, the tab list as list, between unstyled Root and panels", () => {
+        const parts = tabsCompositeAnatomy.parts as ComponentAnatomy["parts"];
+        const slots = Object.values(parts)
+            .filter((part) => part.styled)
+            .map(partSlot);
+        expect(slots.sort()).toEqual([...tabsAnatomy.partNames].sort());
+        expect(partSlot(parts.list!)).toBe("root");
+        expect(partSlot(parts.root!)).toBeNull();
+        expect(parts.content!.styled).toBe(false);
+        for (const name of tabsCompositeAnatomy.partNames) {
+            expect(parts[name]!.testId).toBe(compositeTestIds.tabs[name]);
+            const preset = (tabsAnatomy.parts as ComponentAnatomy["parts"])[
+                name
+            ];
+            if (preset && name !== "root") {
+                expect(parts[name]!.mirror).toBe(preset.mirror);
+            }
+        }
+        expect(
+            partAttributes(tabsCompositeAnatomy, "root")["data-testid"],
+        ).toBe(tabsAnatomy.parts.root.testId);
+    });
+
+    it("the list is unstyled, around its items", () => {
+        expect(Object.keys(anatomy)).not.toContain(listAnatomy.name);
+        for (const name of listAnatomy.partNames) {
+            expect(listAnatomy.parts[name].styled).toBe(false);
+            expect(listAnatomy.parts[name].testId).toBe(
+                compositeTestIds.list[name],
+            );
+        }
     });
 });
