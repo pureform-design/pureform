@@ -32,18 +32,15 @@ export const LIST_ROOT_PROPS = [
     "testId",
 ] as const satisfies readonly (keyof ListRootOwnProps)[];
 
-/** One item of the ready-made list, as data: a list item's content and props. */
-export interface ListItemData<
-    Node = unknown,
-> extends ListItemContentProps<Node> {
+/** One item of the ready-made list, as data: a list item's content, variants, and props. */
+export interface ListItemData<Node = unknown>
+    extends ListItemContentProps<Node>, ListItemVariantProps {
     /** Its key among the items. @default its index */
     readonly value?: string | undefined;
     /** Where it leads: the item renders as a link. */
     readonly href?: string | undefined;
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
-    readonly lines?: ListItemVariantProps["lines"];
-    readonly interactive?: boolean | undefined;
     /** The item's test ids: a prefix or ids by part. */
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
 }
