@@ -98,6 +98,33 @@ export type {
     RadioVariantProps,
 } from "./components/radio-group";
 export {
+    fromZagValue,
+    SELECT_COLLECTION,
+    SELECT_CONTENT_PROPS,
+    SELECT_INPUT_LABEL_PROPS,
+    SELECT_ROOT_PROPS,
+    selectHiddenSelectProps,
+    selectInputProps,
+    selectMachineProps,
+    selectMenuSelection,
+    selectPositionerProps,
+    selectSelection,
+    selectSupportingTextId,
+    selectValueProps,
+    toZagValue,
+} from "./components/select";
+export type {
+    SelectBehaviorProps,
+    SelectContentProps,
+    SelectElementIds,
+    SelectItem,
+    SelectMenuPart,
+    SelectPart,
+    SelectPositioning,
+    SelectRootOwnProps,
+    SelectVariantProps,
+} from "./components/select";
+export {
     SWITCH_CONTENT_PROPS,
     SWITCH_INPUT_LABEL_PROPS,
     SWITCH_ROOT_PROPS,
@@ -114,6 +141,28 @@ export type {
     SwitchRootOwnProps,
     SwitchVariantProps,
 } from "./components/switch";
+export {
+    TEXT_AREA_INPUT_PROPS,
+    TEXT_AREA_ROOT_PROPS,
+    TEXT_FIELD_CONTENT_PROPS,
+    TEXT_FIELD_INPUT_PROPS,
+    TEXT_FIELD_ROOT_PROPS,
+    textAreaSelection,
+    textFieldMachineProps,
+    textFieldNativeDefault,
+    textFieldSelection,
+} from "./components/text-field";
+export type {
+    TextAreaPart,
+    TextAreaRootOwnProps,
+    TextAreaVariantProps,
+    TextFieldBehaviorProps,
+    TextFieldContentProps,
+    TextFieldElementIds,
+    TextFieldPart,
+    TextFieldRootOwnProps,
+    TextFieldVariantProps,
+} from "./components/text-field";
 export type { VariantProp } from "./components/variants";
 export {
     controllableNames,

@@ -132,6 +132,16 @@ export const setRadioDefaults = (
     }
 };
 
+/** Puts a text input or text area back in step with its machine's value: after typing into a
+ *  controlled field whose owner didn't take the change, the browser shows the typed text anyway.
+ *  An equal value is left alone, so the caret stays where it is. */
+export const syncTextInput = (
+    input: HTMLInputElement | HTMLTextAreaElement,
+    value: string,
+): void => {
+    if (input.value !== value) input.value = value;
+};
+
 export {
     THEME_BLOCK_ATTRIBUTE,
     THEME_PRECEDENCE,
