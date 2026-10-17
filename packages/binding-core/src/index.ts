@@ -375,3 +375,133 @@ export type {
 export { selectionSignature, withDefaults } from "./selection";
 export { trainVersionMismatch } from "./version";
 export { warnOnce } from "./warn";
+export {
+    AVATAR_ROOT_PROPS,
+    avatarElement,
+    avatarRootProps,
+    avatarSelection,
+} from "./components/avatar";
+export type {
+    AvatarPart,
+    AvatarRootOwnProps,
+    AvatarVariantProps,
+} from "./components/avatar";
+export {
+    CARD_ROOT_PROPS,
+    cardElement,
+    cardRootProps,
+    cardSelection,
+    isInteractiveCard,
+} from "./components/card";
+export type {
+    CardPart,
+    CardRootOwnProps,
+    CardVariantProps,
+} from "./components/card";
+export {
+    ICON_ROOT_PROPS,
+    iconRootProps,
+    iconSelection,
+} from "./components/icon";
+export type {
+    IconPart,
+    IconRootOwnProps,
+    IconVariantProps,
+} from "./components/icon";
+export { MEDIA_ROOT_PROPS, mediaSelection } from "./components/media";
+export type {
+    MediaPart,
+    MediaRootOwnProps,
+    MediaVariantProps,
+} from "./components/media";
+export {
+    isIndeterminate,
+    PROGRESS_ROOT_PROPS,
+    progressPercent,
+    progressRootProps,
+    progressSelection,
+} from "./components/progress";
+export type {
+    CircularProgressPart,
+    LinearProgressPart,
+    ProgressComponent,
+    ProgressRootOwnProps,
+    ProgressValueProps,
+    ProgressVariantProps,
+} from "./components/progress";
+export {
+    RIPPLE_ROOT_PROPS,
+    rippleMachineProps,
+    rippleSelection,
+} from "./components/ripple";
+export type {
+    RippleBehaviorProps,
+    RipplePart,
+    RippleRootOwnProps,
+    RippleVariantProps,
+} from "./components/ripple";
+export { SCRIM_ROOT_PROPS, scrimSelection } from "./components/scrim";
+export type {
+    ScrimPart,
+    ScrimRootOwnProps,
+    ScrimVariantProps,
+} from "./components/scrim";
+export {
+    SEARCH_BAR_CONTENT_PROPS,
+    SEARCH_BAR_INPUT_PROPS,
+    SEARCH_BAR_ROOT_PROPS,
+    searchBarMachineProps,
+    searchBarSelection,
+} from "./components/search-bar";
+export type {
+    SearchBarBehaviorProps,
+    SearchBarContentProps,
+    SearchBarElementIds,
+    SearchBarPart,
+    SearchBarRootOwnProps,
+    SearchBarVariantProps,
+} from "./components/search-bar";
+export {
+    SEPARATOR_ROOT_PROPS,
+    separatorRootProps,
+    separatorSelection,
+} from "./components/separator";
+export type {
+    SeparatorPart,
+    SeparatorRootOwnProps,
+    SeparatorVariantProps,
+} from "./components/separator";
+export {
+    SLIDER_INPUT_LABEL_PROPS,
+    SLIDER_ROOT_PROPS,
+    sliderMachineProps,
+    sliderNativeDefault,
+    sliderSelection,
+} from "./components/slider";
+export type {
+    SliderBehaviorProps,
+    SliderElementIds,
+    SliderPart,
+    SliderRootOwnProps,
+    SliderVariantProps,
+} from "./components/slider";
+export {
+    SUPPORTING_TEXT_ROOT_PROPS,
+    supportingTextSelection,
+} from "./components/supporting-text";
+export type {
+    SupportingTextPart,
+    SupportingTextRootOwnProps,
+    SupportingTextVariantProps,
+} from "./components/supporting-text";
+export { TEXT_ROOT_PROPS, textSelection } from "./components/text";
+export type {
+    TextPart,
+    TextRootOwnProps,
+    TextVariantProps,
+} from "./components/text";
+export { TOUCH_TARGET_ROOT_PROPS } from "./components/touch-target";
+export type {
+    TouchTargetPart,
+    TouchTargetRootOwnProps,
+} from "./components/touch-target";
