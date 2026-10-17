@@ -1,4 +1,8 @@
-import { createRegistry } from "@pureform/styling";
+import {
+    createRegistry,
+    defineRuntimeTheme,
+    themeScope,
+} from "@pureform/styling";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
@@ -170,6 +174,32 @@ describe("providerAttributes", () => {
             dir: "ltr",
             "data-pf-motion": undefined,
         });
+    });
+
+    it("scopes a runtime theme by its hash under the target's attribute", () => {
+        const themed = createRegistry(
+            { button: () => ({ root: { class: "button" } }) },
+            { themeAttribute: "data-panda-theme" },
+        );
+        const seedTheme = defineRuntimeTheme<{ seed: string }>("seed", () => ({
+            default: () => ({ light: {} }),
+        }));
+        const theme = seedTheme({ seed: "#006a60" });
+        expect(
+            providerAttributes({ theme }, { dir: "ltr", registry: themed }),
+        ).toEqual({
+            "data-panda-theme": themeScope(theme),
+            dir: "ltr",
+            "data-pf-motion": undefined,
+        });
+        // Without an attribute of its own, the target still scopes it under data-theme.
+        expect(providerAttributes({ theme }, { dir: "ltr", registry })).toEqual(
+            {
+                "data-theme": themeScope(theme),
+                dir: "ltr",
+                "data-pf-motion": undefined,
+            },
+        );
     });
 });
 

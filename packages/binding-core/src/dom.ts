@@ -1,6 +1,7 @@
-// The DOM half: the system's reduced-motion preference, an icon slot's measured style, and a
-// native checkbox kept in step with its machine. Only call these in the browser, after mount; the
-// root entry stays free of DOM use for React Native.
+// The web half: the system's reduced-motion preference, an icon slot's measured style, a native
+// checkbox kept in step with its machine, and runtime themes and overrides as CSS. Only call the
+// DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
+// lowering for React Native.
 
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 import type { IconStyle } from "./icon-style";
@@ -97,3 +98,19 @@ export const syncCheckedInput = (
     if (input.checked !== on) input.checked = on;
     if (input.indeterminate !== mixed) input.indeterminate = mixed;
 };
+
+export {
+    THEME_BLOCK_ATTRIBUTE,
+    THEME_PRECEDENCE,
+    generateThemeVars,
+    generatedBlock,
+    initialThemeBlock,
+    loadThemeVars,
+    needsThemeLoad,
+    overrideVars,
+    serverThemeCss,
+    themeCss,
+    themeSelector,
+    unloadedThemeMessage,
+} from "./web-theme";
+export type { InitialBlockOptions, ThemeBlock } from "./web-theme";
