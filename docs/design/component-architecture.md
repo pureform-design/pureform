@@ -552,6 +552,20 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   `@pureform/material`'s generators in the browser and writes vars. Opt-in import, so
   apps that don't use it don't ship the color math.
 
+    Built (p5b): a provider's `theme` takes a name or a `RuntimeTheme`, `{ source, input }`, made
+    by a function `defineRuntimeTheme(name, load)` returns (`@pureform/styling`). The source loads
+    its generator on demand and shares it across inputs; the generator turns the input into CSS
+    vars per scheme, `{ light, dark }`, named by the registry's new `vars` (`{ prefix, tokenPrefix
+  }`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
+    `seedTheme({ seed, customSeeds?, overrides? })` is a few lines; its generator (the palette,
+    `resolveTheme`, `themeVars`) is a separate chunk. It writes every color token and role, so a
+    seed draws as a named theme with the same `materialColor` does (the suites check it against
+    teal), and nothing else. `overrides` take React Native's keys (`"colors.primary"`,
+    `"components.button.container"`, or a `--var`), named by `tokenVar` from
+    `@pureform/styling/theme-vars`; only the provider's own are written, and a token declared from
+    an overridden one at the root keeps its value. `useThemeVars()` in each binding gives the
+    nearest runtime theme's generated vars.
+
 ### 5.7 Server rendering
 
 Goal: the server's HTML has every class, attribute, and CSS var the client would render,
@@ -629,6 +643,31 @@ class. No script runs before paint.
       so the vars match. Use it when code reads the theme's values in JS, or when the
       server doesn't render the block (client-only routes).
 
+**Built (p5b):** the scope is `pf-<hash>`, a 53-bit hash (base 36) of the source's name and the
+input serialized with sorted keys, written under the registry's theme attribute (`data-theme` when
+it has none). The block is `[attr="pf-<hash>"]` with the light vars, then the dark ones under
+`.dark [attr=…]` and `@media (prefers-color-scheme: dark) { :root:not(.light) [attr=…] }`, as the
+stylesheet's element rules; it's unlayered. Solid writes it with `useHead({ tag: "style", key:
+"pureform-theme:<scope>", props: { "data-pf-theme": scope, children: css } })`; React renders
+`<style href={scope} precedence="pureform">`. Panda's `getTheme`/`injectTheme` aren't used: every
+target takes the same path, since the vars are named the same. What differs from the plan:
+
+- **The server needs the generator loaded first** (`await preloadTheme(theme)` in the request
+  handler): rendering is synchronous, and the generator loads lazily. Without it the server
+  renders the attribute and no block, and warns once in development; the client then generates.
+- **Reuse reads the server's block.** Solid's `useHead` adopts an existing head tag only when its
+  text matches, and React adopts by `href` but can't change a hoisted style later, so with
+  `"reuse"` the client takes the block's text from the page (`serverThemeCss`) as its own and
+  generates nothing. Without a server block it generates, loading the generator after mount.
+- **"Pure" isn't bitwise across engines:** Node and Chromium gave different last digits for the
+  same palette, so `seedTheme` rounds its numbers to 10 significant digits. If two engines still
+  disagree, Solid replaces the block with the client's (it looks the same) and React keeps the
+  server's.
+- **React never removes a hoisted style**, so a runtime theme the app switches away from stays in
+  the head, unused. Solid removes it when no provider uses it.
+- Overrides are inline vars on the provider's element, rendered on the server; scheme-independent
+  only (per-scheme values need a runtime theme).
+
 **Instance tokens** become inline CSS vars from the factory, so they render on the
 server. `@property` registrations are in the static stylesheet, so transitions work from
 the first paint.
@@ -647,7 +686,8 @@ and in both color schemes, plus once with a runtime theme.
 with the binding's plugin (`tests/component-suites`); the test puts the HTML in the page,
 hydrates it, and fails on any console warning or error, any element replaced, or any attribute
 changed (all of them, not only the four kinds). It runs in both color schemes on the Panda
-target; the other targets (p5a) and a runtime theme (p5b) are `todo`. Solid's client code must
+target; the other targets (p5a) and a runtime theme (p5b) were `todo` then, and run now on every
+target. Solid's client code must
 compile hydratable (`solid({ ssr: true })`, and in Vitest `solid: { hydratable: true }`, since
 the plugin compiles tests non-hydratable). An app that server-renders `@pureform/solid` keeps it
 in the server bundle (`ssr.noExternal`), since the package ships JSX.
