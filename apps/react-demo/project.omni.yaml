@@ -8,6 +8,7 @@ dependencies:
   append:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
+    - "@pureform/vitest-config"
     - "@pureform/react"
     - "@pureform/styling"
     - "@pureform/panda-adapter"
@@ -38,8 +39,13 @@ tasks:
   test:integration:
     enabled: false
 
+  # A smoke test: the page in Chromium, from the committed glue and Panda's stylesheet.
   test:e2e:
-    enabled: false
+    enabled: true
+    # Panda's codegen, which the page's stylesheet and the config read, after the glue.
+    dependencies:
+      append:
+        - prepare
 
   test:
     enabled: true

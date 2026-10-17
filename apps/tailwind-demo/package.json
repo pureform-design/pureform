@@ -22,10 +22,14 @@
         "@pureform/tailwind-adapter": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
         "@solidjs/vite-plugin": "catalog:",
         "@tailwindcss/vite": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
         "tailwindcss": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:"
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

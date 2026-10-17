@@ -27,10 +27,14 @@
         "@pureform/theme": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:"
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

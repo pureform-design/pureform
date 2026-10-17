@@ -49,7 +49,9 @@ codegen`.
 ## Worth knowing
 
 - Theme switching and runtime overrides wait for p5b; the provider's `theme` prop does nothing yet.
-- No tests of its own: the components are tested in `@pureform/react`, and the shared browser
-  suites in `tests/component-suites` cover the cross-cutting rules for React and Solid together
-  (they render with the Panda fixture's registry, `tests/panda-fixture`, whose button and
-  checkbox match this one's).
+- Its only test is a smoke test: `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite
+  config, after `prepare`) renders the page in Chromium, its buttons styled by Panda's
+  stylesheet, without an error. The components are tested in `@pureform/react`, and the shared
+  browser suites in `tests/component-suites` cover the cross-cutting rules for React and Solid
+  together (with the Panda fixture's registry, `tests/panda-fixture`, whose button and checkbox
+  match this one's).
