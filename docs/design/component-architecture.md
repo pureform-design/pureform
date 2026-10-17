@@ -257,6 +257,9 @@ slot-state table the preset mostly uses):
   state, marked each allowed way, plus Zag's attributes alone, which must not match)
   rather than the before-and-after equivalence check. Shorter selectors also shrink the
   CSS.
+- **Interaction states come from an interaction source** (§9.8). A state from the element
+  itself matches its pseudo-class; the bindings write `data-pf-*` only for a state forwarded
+  from somewhere else, such as another component sharing the source.
 
 ### 5.2 Generated factories per target
 
@@ -1486,6 +1489,299 @@ icon only has to follow them.
   indeterminate progress animates under reduced motion; the themes suite measures both renderings
   where the pointer can't hover them.
 
+### 9.8 Indication
+
+Indication is how an interactive surface answers the user: the **state layer** (hover, focus,
+press, drag), the **ripple**, and the **focus indicator**, in Material's names. Compose models
+the same thing as an `Indication` that draws from an `InteractionSource`, with a default from
+the composition (`LocalIndication`); pureform takes that shape, so it's one concept apps can
+swap, not three styling details spread over the preset.
+
+**Why: what exists today.**
+
+- The state layer is styling only. Most components mix it into the background of the root
+  (button, chip, card, list item, tab) or another slot (the icon button's and FAB's
+  `container`, the navigation item's `activeIndicator`, a control's root circle); only the
+  switch and the slider have a `stateLayer` slot.
+- The ripple is wired on React Native (`useInk` in button, chip, FAB, icon button, list item,
+  menu item, and navigation destinations) but on no web component: apps place `<Ripple />`
+  themselves.
+- The focus indicator is the preset's `focusRing()` helper, with its width, offset, and color
+  written as literals.
+- Each machine tracks interactions its own way. The web button machine writes Zag-style
+  `data-hover`, `data-active`, and `data-focus-visible`, which no CSS matches; `data-pf-hover`
+  is set only on highlighted menu and select items.
+- Nothing lets an app turn any of it off or replace it, at the provider or per component.
+  Removing the `ripple` component at build time is the only switch.
+
+**The model.**
+
+```mermaid
+flowchart LR
+    events[DOM events / Pressable] --> machine[component machine]
+    machine -->|emit| source[InteractionSource]
+    app[app code] -.->|share, observe, emit| source
+    source --> state[states: CSS or selection]
+    source --> indication[Indication]
+    provider[provider indication] --> indication
+    prop[component indication prop] --> indication
+    indication --> tokens[state-layer and focus-indicator tokens]
+    indication --> effect[ripple layer and effect]
+```
+
+1. **An `InteractionSource`** carries what happened to a component, in Compose's terms: a
+   press (with its origin point, or the center for a keyboard press, and the pointer kind),
+   its release or cancel, hover enter and exit, focus (with whether it's visible) and blur,
+   drag start and stop. It holds the resulting state and notifies subscribers. It's
+   framework-free.
+2. **An `Indication`** turns a source into feedback on a surface. It has a static half, the
+   tokens it sets, and a live half, an effect that runs after mount. The static half keeps
+   §5.1: on the web, the state layer and the focus indicator stay CSS, matched by
+   pseudo-classes, and the indication only picks their token values. The live half draws
+   the ripple.
+3. **The provider holds the default**, inherited and overridable by a nested provider like
+   `motion` and `dir`; **each interactive component takes an `indication` prop** that
+   overrides it for that component.
+4. **The anatomy names where indication draws**, so the bindings wire it the same way for
+   every component and an app's custom indication doesn't need to know the preset's slots.
+
+#### Interaction source
+
+```ts
+type PointerKind = "mouse" | "touch" | "pen" | "keyboard" | "virtual";
+
+type Interaction =
+    | {
+          type: "press";
+          id: number;
+          origin: { x: number; y: number } | "center";
+          pointer: PointerKind;
+      }
+    | { type: "release" | "cancel"; id: number }
+    | { type: "hoverEnter" | "hoverExit" }
+    | { type: "focus"; visible: boolean }
+    | { type: "blur" }
+    | { type: "dragStart" | "dragStop" };
+
+interface InteractionState {
+    hovered: boolean;
+    focused: boolean;
+    focusVisible: boolean;
+    pressed: boolean;
+    dragged: boolean;
+}
+
+interface InteractionSource {
+    readonly state: InteractionState;
+    subscribe(
+        listener: (interaction: Interaction, state: InteractionState) => void,
+    ): () => void;
+}
+
+interface MutableInteractionSource extends InteractionSource {
+    /** `origin` is the element (or native view) the interaction happened on. */
+    emit(interaction: Interaction, origin?: unknown): void;
+}
+
+function createInteractionSource(): MutableInteractionSource;
+```
+
+- **Who emits.** A component's machine, which already tracks presses, hover, and focus
+  visibility, emits to the component's source; the bindings don't listen for events a second
+  time. Touch never emits hover. A component that becomes disabled ends what's in progress
+  (a cancel, a hover exit, a blur), as Compose does, so nothing stays pressed.
+- **Hoisting.** Every interactive component takes `interactionSource`. Without one, it
+  creates its own. With one, it uses the app's, which lets an app observe a component (show
+  something while a button is pressed) or share one source between components, so pressing a
+  list row also shows the press on a surface inside it.
+- **Shared sources on the web.** A state that came from the element itself is matched by its
+  pseudo-class, as today, and costs no JS. A hover or press that came from somewhere else
+  (another element sharing the source, or the app emitting) can't match a pseudo-class, so
+  the binding writes `data-pf-hover` or `data-pf-active` (§5.1) on the receiving component's
+  trigger, the case those attributes exist for. Focus is never forwarded: it stays with the
+  element that has it, so a page never shows two focus indicators, and no new attribute is
+  needed. The attributes are written after mount only, never in hydrated markup (§5.7).
+- **React Native.** `Pressable`'s callbacks feed the machine, which emits; the source's state
+  goes into the selection, replacing `usePress`'s own tracking.
+- **The machines' unmatched attributes go.** The button machine's `data-hover`,
+  `data-active`, and `data-focus-visible` are dropped; the button API's `pressed`, `hovered`,
+  and `focusVisible` stay, read from the source.
+- **Hooks**, the same names in every binding, returning each framework's usual shape:
+    - `createInteractionSource()` (Solid) and `useInteractionSource()` (React, React
+      Native) make a stable source.
+    - `useInteractionState(source)` returns the state, as an accessor in Solid and a value in
+      React (through `useSyncExternalStore`).
+
+#### Indication
+
+```ts
+interface Indication {
+    /** Identifies the indication, for development messages and equality. */
+    readonly name: string;
+    /** Token values it sets: the state layer's opacities and the focus indicator's thickness,
+     *  offset, and color. Static, so the server renders them. */
+    readonly tokens?: IndicationTokens;
+    /** Whether the surface holds a layer element for the effect to draw in. */
+    readonly layer?: boolean;
+    /** Web: runs after mount; returns its cleanup. */
+    readonly web?: (
+        target: IndicationTarget,
+        source: InteractionSource,
+        context: IndicationContext,
+    ) => () => void;
+    /** React Native: rendered inside the surface. */
+    readonly native?: ComponentType<NativeIndicationProps>;
+}
+
+interface IndicationTarget {
+    trigger: HTMLElement;
+    surface: HTMLElement;
+    layer?: HTMLElement;
+}
+
+interface IndicationContext {
+    /** Ripple from the surface's center rather than the press origin. */
+    centered: boolean;
+    reducedMotion(): boolean;
+    dir(): "ltr" | "rtl";
+    /** The ripple component's registry entry, for an indication that draws Material's ripple. */
+    registry: Registry;
+}
+
+function defineIndication(indication: Indication): Indication;
+```
+
+- **Built-ins**, from each binding package (each fills in its platform's half):
+    - `materialIndication({ ripple?: "ink-well" | "ink-sparkle" | false })`, the default:
+      Material's state layer, the ripple through the ripple machine (web) or the motion
+      engine's `useRipple` (React Native), and the focus indicator.
+    - `noIndication`: state-layer opacities of 0 and no ripple. It keeps the focus indicator.
+- **The focus indicator is never dropped by a built-in.** A custom indication can set its
+  thickness to 0, and pureform warns once in development, since keyboard users need a
+  visible focus (WCAG 2.4.7).
+- **Writing one.** A custom indication sets tokens, draws in the layer, or both. An app's
+  own design can tint with its own opacities, scale the surface on press from `web`, or
+  render a `native` component that animates with Reanimated. It gets the source, so it
+  draws from interactions rather than from guessed events.
+- **App surfaces.** For a clickable element of the app's own, `useIndication(source,
+{ centered })` returns the props for the surface and the layer element to render, so the
+  app gets the provider's indication without a pureform component.
+
+#### Tokens: how the static half works without JS
+
+- **State-layer opacities become component tokens.** Each interactive component gets
+  `stateHoverOpacity`, `stateFocusOpacity`, `statePressedOpacity`, and `stateDraggedOpacity`,
+  defaulting to the theme's `stateHover`, `stateFocus`, `statePressed`, and `stateDragged`.
+  `stateLayer()` and `slotStateLayer()` read the component's tokens instead of the theme's.
+- **The focus indicator gets tokens**, in Material's names: the theme's
+  `focusIndicatorThickness` (3) and `focusIndicatorOuterOffset` (2), and a component token
+  `focusIndicatorColor` (`secondary`). `focusRing()` reads them instead of its literals.
+- **The provider's indication writes theme-level tokens** on the provider's element as CSS
+  vars, the same way runtime overrides do (§5.6), so the change reaches every component
+  below it. On React Native they join the selection's overrides.
+- **A component's `indication` prop writes component tokens** on that component's root, as
+  instance tokens do (§5.4). They reach only that component: each component's base style
+  sets its indication tokens back to the theme's on its own root
+  (`--…-stateHoverOpacity: var(<theme's stateHover>)`), so a nested component of the same
+  kind starts from the provider's values again, while the prop's inline vars win on the root
+  that has them. It's plain CSS, so it holds before hydration, for a few declarations per
+  component.
+- **Output changes on purpose**: the default indication resolves to today's values, so the
+  colors stay the same, but selectors read one more var, so it's checked against fixtures
+  rather than the equivalence check.
+
+#### Where indication draws: the anatomy
+
+Each interactive component's anatomy gains an `indication` entry, derived from the preset:
+
+```ts
+interface IndicationAnatomy<P extends string> {
+    /** The part whose interactions feed the source. */
+    trigger: P;
+    /** The part the state layer tints and the ripple fills; it clips the ripple. */
+    surface: P;
+    /** Ripple from the surface's center. */
+    centered: boolean;
+    /** The part that draws the focus indicator. */
+    focus: P;
+}
+```
+
+The preset declares it once per component with the state layer, so the two can't disagree.
+From today's preset:
+
+| Components                                               | Trigger         | Surface                               | Centered |
+| -------------------------------------------------------- | --------------- | ------------------------------------- | -------- |
+| button, chip, card and list item (when interactive), tab | root (or `tab`) | the same                              | no       |
+| menu item, select option                                 | item            | item (highlight forwards as hover)    | no       |
+| snackbar action and close                                | the button      | the same                              | no       |
+| icon button                                              | root            | `container`                           | yes      |
+| FAB                                                      | root            | `container`                           | no       |
+| navigation bar and rail destination                      | item            | `activeIndicator`                     | yes      |
+| checkbox, radio                                          | native input    | root circle                           | yes      |
+| switch                                                   | native input    | `stateLayer`                          | yes      |
+| slider                                                   | native input    | the handle's state layer (drag emits) | yes      |
+
+- **No indication:** text fields and the search bar's field draw their own active indicator;
+  dialogs, menus, tooltips, progress, and static components aren't interactive.
+- **The layer** is the ripple component's `root` slot, rendered as an unstyled, `aria-hidden`
+  part inside the surface when the indication has `layer: true`. The provider's indication is
+  known on the server and the client, so hydration matches. The standalone `Ripple`
+  component stays, for app surfaces.
+- **Pruning** (§7): the usage table counts the `ripple` entry as used by every component
+  with an indication entry, unless the provider passes `noIndication` or a custom one with no
+  layer and the scan can see it.
+
+#### Behavior rules
+
+- **Reduced motion** (§5.8): the ripple stops; the state layer's fades and the focus
+  indicator stay. The context's `reducedMotion()` is the binding's `useReducedMotion()`.
+- **Keyboard presses** ripple from the center and show the pressed state layer through
+  `data-pf-active`, as today.
+- **Nested surfaces** (a button inside an interactive card) ripple once, on the innermost
+  surface, as the js-effects ripple already claims the event.
+- **Server rendering**: tokens and the layer render on the server; effects and forwarded
+  attributes start after mount.
+- **Direction**: the ripple is placed from pointer coordinates, already an allowed exception
+  (§5.9).
+- **The focus indicator on React Native** is the same `focusRing()` style, lowered to React
+  Native's `outline*` props, which `rn-adapter` already passes through, on the anatomy's focus
+  part under `focusVisible`. `focusVisible` holds only for focus that doesn't follow a press
+  (a hardware keyboard, a TV remote), the heuristic browsers use, instead of for every focus
+  as it does now.
+- **Not indication:** press-driven elevation and Material 3 Expressive's press shape morphs
+  stay as the preset's state styles. The interface leaves room (tokens and an effect) for a
+  later indication to take them over when the expressive components land.
+
+#### Testing
+
+A shared `indication` suite in `tests/component-suites`, reading each case's anatomy entry:
+
+- hovering, pressing, and keyboard focus change the surface's computed color, and drag does on
+  the slider;
+- a press adds a ripple to the layer, from the center when `centered`, and none under
+  reduced motion;
+- `noIndication` on the provider leaves the color unchanged but keeps the focus indicator;
+- a component's `indication` prop doesn't reach a nested component of another kind;
+- a shared source shows a press on a second component through `data-pf-active`, and
+  `useInteractionState` reports it;
+- disabling a pressed component ends the press;
+- server rendering with a custom indication hydrates without warnings.
+
+React Native runs the same rules through the selection, and RN-web in
+`tests/browser-e2e-tests`.
+
+#### Where it lives
+
+- `@pureform/binding-core/interaction`: the source and its state, framework-free.
+- `@pureform/binding-core/indication`: `Indication`, `defineIndication`, the tokens, and the
+  web halves of the built-ins (over the `ripple` machine). React Native's halves live in
+  `@pureform/react-native`, over the motion engines.
+- `@pureform/machines`: the button, checkbox, switch, radio, slider, menu, and navigation
+  machines emit to a source.
+- `@pureform/preset` and `@pureform/material`: the tokens, `stateLayer()`, `focusRing()`,
+  and each component's indication declaration; `@pureform/anatomy` derives the entry.
+
 ## 10. CLI
 
 `@pureform/cli` ships the `pureform` bin. It holds no generation logic of its own: it
@@ -1621,3 +1917,10 @@ Decided:
   `data-pf-*` attributes (§5.1).
 - Too many variant combinations is solved by tokens a style sets (§5.5), with fragments
   (§5.4) for the rest.
+- Indication (§9.8) owns the state layer, the ripple, and the focus indicator. It's a
+  pluggable runtime API, defaulted by the provider and overridden per component, over a
+  public, hoistable interaction source; on the web the state layer and focus indicator stay
+  CSS, and an indication sets their tokens. A shared source forwards hover and press, never
+  focus; each root resets its indication tokens, so a prop reaches only its component; React
+  Native draws the focus indicator with `outline*` props for keyboard focus only; press
+  elevation and shape stay in the preset.
