@@ -1,8 +1,9 @@
 // Direction (design doc §5.9), for every example of every component and every opened overlay: the
 // provider's `dir` reaches every part the machine marks, and right to left mirrors left to right:
-// each part's box in `rtl` is its `ltr` box mirrored across the root (`x' = width - x - w`), while
-// parts that don't point (a check mark) draw the same both ways. Arrow keys in both directions are
-// in the keyboard suite.
+// each part's box in `rtl` is its `ltr` box mirrored across the root (`x' = width - x - w`), or a
+// component with no inner parts mirrored across its host, while parts that don't
+// point (a check mark) draw the same both ways. Arrow keys in both directions are in the keyboard
+// suite.
 
 import { describe, expect, it } from "vitest";
 
@@ -37,12 +38,27 @@ const measure = async (
     const scene = mountCase(component, props, { provider: { dir } });
     await settlePlaced();
     const root = byTestId(scene.host, component.root);
+    // An indeterminate progress indicator moves on its own, reduced motion or not: every animation
+    // is held at one time, the same in both directions.
+    for (const animation of root.getAnimations({ subtree: true })) {
+        animation.pause();
+        animation.currentTime = 300;
+    }
     // A part the CSS hides (an icon button's outline unless outlined) has no box to mirror.
     const parts = Object.fromEntries(
         [...root.querySelectorAll<HTMLElement>("[data-pf-part]")]
             .filter((part) => part.getClientRects().length > 0)
             .map((part) => [part.dataset.pfPart!, part]),
     );
+    // A component with no parts inside its root (an avatar, a separator) is measured in its host
+    // instead: its own box mirrors there. The host takes the direction too, as an app's page
+    // would: an inline component sits where its block's direction puts it.
+    const alone = Object.keys(parts).length === 0;
+    const frame = alone ? scene.host : root;
+    if (alone) {
+        scene.host.dir = dir;
+        await settlePlaced();
+    }
     const drawn = Object.fromEntries(
         (component.unmirrored ?? []).map((name) => {
             const style = getComputedStyle(parts[name]!);
@@ -54,8 +70,8 @@ const measure = async (
     );
     const measured = {
         drawn,
-        width: root.getBoundingClientRect().width,
-        boxes: boxesWithin(root, parts),
+        width: frame.getBoundingClientRect().width,
+        boxes: boxesWithin(frame, alone ? { root } : parts),
         dirs: [...scene.host.querySelectorAll("[dir]")].map((element) =>
             element.getAttribute("dir"),
         ),

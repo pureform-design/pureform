@@ -122,7 +122,12 @@ export interface ComponentCase {
     readonly opened?: Readonly<Record<string, SceneProps>> | undefined;
     readonly state?: StateCase | undefined;
     readonly form?: FormCase | undefined;
-    readonly keyboard: KeyboardCase;
+    /** Left out for a component focus never reaches (a progress indicator, an avatar): Tab passes
+     *  over it. */
+    readonly keyboard?: KeyboardCase | undefined;
+    /** `false` for a component that draws no color from the scheme (text, a touch target), which
+     *  a theme that only recolors can't change: the themes suite skips "draws differently". */
+    readonly themed?: false | undefined;
 }
 
 /** The element with a test id inside `host`. */

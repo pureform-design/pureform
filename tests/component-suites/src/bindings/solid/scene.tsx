@@ -2,25 +2,39 @@
 // The browser (`harness.tsx`) and the server (`server.tsx`) render the same view.
 
 import { PureformProvider } from "@pureform/solid";
+import { Avatar } from "@pureform/solid/avatar";
 import { Button } from "@pureform/solid/button";
+import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
+import { CircularProgress } from "@pureform/solid/circular-progress";
 import { Dialog } from "@pureform/solid/dialog";
 import { Fab } from "@pureform/solid/fab";
+import { Icon } from "@pureform/solid/icon";
 import { IconButton } from "@pureform/solid/icon-button";
+import { LinearProgress } from "@pureform/solid/linear-progress";
 import { List } from "@pureform/solid/list";
 import { ListItem } from "@pureform/solid/list-item";
+import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
 import { RadioGroup } from "@pureform/solid/radio-group";
+import { Ripple } from "@pureform/solid/ripple";
+import { Scrim } from "@pureform/solid/scrim";
+import { SearchBar } from "@pureform/solid/search-bar";
 import { Select } from "@pureform/solid/select";
+import { Separator } from "@pureform/solid/separator";
+import { Slider } from "@pureform/solid/slider";
 import { Snackbar } from "@pureform/solid/snackbar";
+import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
 import { Tabs } from "@pureform/solid/tabs";
+import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
 import { Tooltip } from "@pureform/solid/tooltip";
+import { TouchTarget } from "@pureform/solid/touch-target";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import type { Accessor } from "solid-js";
@@ -32,25 +46,39 @@ import { sceneTheme } from "../../harness/themes";
 
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ValidComponent> = {
+    Avatar,
     Button,
+    Card,
     Checkbox,
     Chip,
+    CircularProgress,
     Dialog,
     Fab,
+    Icon,
     IconButton,
+    LinearProgress,
     List,
     ListItem,
+    Media,
     Menu,
     NavigationBar,
     NavigationRail,
     RadioGroup,
+    Ripple,
+    Scrim,
+    SearchBar,
     Select,
+    Separator,
+    Slider,
     Snackbar,
+    SupportingText,
     Switch,
     Tabs,
+    Text,
     TextArea,
     TextField,
     Tooltip,
+    TouchTarget,
 };
 
 export function SceneView(props: {
