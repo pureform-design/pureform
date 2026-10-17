@@ -5,12 +5,14 @@ export * as button from "./button";
 export * as checkbox from "./checkbox";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
+export * as navigation from "./navigation";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";
 export * as select from "./select";
 export * as slider from "./slider";
 export * as snackbar from "./snackbar";
 export * as switchControl from "./switch";
+export * as tabs from "./tabs";
 export * as textField from "./text-field";
 export * as tooltip from "./tooltip";
 
