@@ -1,5 +1,5 @@
 import type { Service } from "@zag-js/core";
-import { contains, dataAttr } from "@zag-js/dom-query";
+import { contains } from "@zag-js/dom-query";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
 
 import { parts } from "./snackbar.anatomy";
@@ -33,7 +33,6 @@ export function connect<T extends PropTypes>(
                 role: "status",
                 hidden: !open,
                 "data-state": dataState,
-                "data-paused": dataAttr(paused),
                 onPointerEnter(event: { pointerType: string }) {
                     if (event.pointerType === "touch") return;
                     send({ type: "PAUSE", source: "pointer" });
