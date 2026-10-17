@@ -29,6 +29,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@pureform/machines > @zag-js/dialog",
             "@pureform/machines > @zag-js/tooltip",
             "@pureform/machines > @zag-js/switch",
+            "@pureform/machines > @zag-js/tabs",
         ],
     },
     test: {

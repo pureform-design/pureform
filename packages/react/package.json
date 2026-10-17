@@ -75,6 +75,41 @@
                 "default": "./dist/tooltip.mjs"
             }
         },
+        "./tabs": {
+            "types": "./dist/tabs/index.d.ts",
+            "import": {
+                "development": "./src/tabs/index.ts",
+                "default": "./dist/tabs.mjs"
+            }
+        },
+        "./navigation-bar": {
+            "types": "./dist/navigation-bar/index.d.ts",
+            "import": {
+                "development": "./src/navigation-bar/index.ts",
+                "default": "./dist/navigation-bar.mjs"
+            }
+        },
+        "./navigation-rail": {
+            "types": "./dist/navigation-rail/index.d.ts",
+            "import": {
+                "development": "./src/navigation-rail/index.ts",
+                "default": "./dist/navigation-rail.mjs"
+            }
+        },
+        "./list": {
+            "types": "./dist/list/index.d.ts",
+            "import": {
+                "development": "./src/list/index.ts",
+                "default": "./dist/list.mjs"
+            }
+        },
+        "./list-item": {
+            "types": "./dist/list-item/index.d.ts",
+            "import": {
+                "development": "./src/list-item/index.ts",
+                "default": "./dist/list-item.mjs"
+            }
+        },
         "./snackbar": {
             "types": "./dist/snackbar/index.d.ts",
             "import": {

@@ -193,3 +193,31 @@ export const overlaysRegistry = () =>
         ]),
         button: named("button", ["root", "touchTarget", "icon", "label"]),
     });
+
+const NAV_SLOTS = [
+    "root",
+    "item",
+    "indicator",
+    "activeIndicator",
+    "icon",
+    "label",
+] as const;
+
+/** Navigation and lists' fake factories, all static: the tabs, navigation bar and rail, and list
+ *  item. */
+export const navigationRegistry = () =>
+    createRegistry({
+        tabs: named("tabs", ["root", "tab", "icon", "label", "indicator"]),
+        navigationBar: named("navigation-bar", NAV_SLOTS),
+        navigationRail: named("navigation-rail", NAV_SLOTS),
+        listItem: named("list-item", [
+            "root",
+            "leading",
+            "content",
+            "overline",
+            "headline",
+            "supportingText",
+            "trailing",
+            "trailingText",
+        ]),
+    });
