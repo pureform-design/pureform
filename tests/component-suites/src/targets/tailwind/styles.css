@@ -1,0 +1,3 @@
+/* As an app imports it: Tailwind first, then pureform's stylesheet for Tailwind. */
+@import "tailwindcss";
+@import "../../../.pureform/tailwind/styles.css";

@@ -1,6 +1,7 @@
 // Commands the suites run in Node. `renderOnServer` renders a scene with the running binding's
 // server build: a Vite server in SSR mode loads `src/bindings/<binding>/server.tsx` with the same
-// plugins as the browser project, so the component code is the same and only the build differs.
+// plugins and the same target's registry as the browser project, so the component code is the
+// same and only the build differs.
 
 import { fileURLToPath } from "node:url";
 
@@ -11,21 +12,30 @@ import type { BrowserCommand } from "vitest/node";
 
 import type { Scene } from "./harness/scene";
 import type { ServerRender } from "./harness/server";
+import { TARGETS } from "./targets/targets";
+import type { TargetName } from "./targets/targets";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
 type Binding = "solid" | "react";
 
-const servers = new Map<Binding, Promise<ViteDevServer>>();
+const servers = new Map<string, Promise<ViteDevServer>>();
 
-const serverFor = (binding: Binding): Promise<ViteDevServer> => {
-    let server = servers.get(binding);
+const serverFor = (
+    binding: Binding,
+    target: TargetName,
+): Promise<ViteDevServer> => {
+    const key = `${binding}/${target}`;
+    let server = servers.get(key);
     if (!server) {
         server = createServer({
             configFile: false,
             root,
             logLevel: "error",
             appType: "custom",
+            // One dependency cache per server: they start at once, and would otherwise clear
+            // each other's.
+            cacheDir: `node_modules/.vite/ssr-${binding}-${target}`,
             server: { middlewareMode: true, hmr: false, ws: false },
             plugins: binding === "solid" ? [solid({ ssr: true })] : [react()],
             ssr: {
@@ -34,26 +44,39 @@ const serverFor = (binding: Binding): Promise<ViteDevServer> => {
             },
             resolve: {
                 dedupe: ["solid-js", "@solidjs/web", "react", "react-dom"],
+                alias: [
+                    {
+                        find: /^#registry$/,
+                        replacement: `${root}src/targets/${target}/registry.ts`,
+                    },
+                ],
             },
         });
-        servers.set(binding, server);
+        servers.set(key, server);
     }
     return server;
 };
 
-// Project names carry the browser: "solid (chromium)".
-const bindingOf = (project: string): Binding => {
-    const name = project.split(" ")[0];
-    if (name === "solid" || name === "react") return name;
-    throw new Error(`no binding for the Vitest project "${project}"`);
+// Project names are the binding and the target, and carry the browser: "solid/css (chromium)".
+const projectOf = (project: string): [Binding, TargetName] => {
+    const [binding, target] = project.split(" ")[0]!.split("/");
+    if (
+        (binding === "solid" || binding === "react") &&
+        TARGETS.includes(target as TargetName)
+    ) {
+        return [binding, target as TargetName];
+    }
+    throw new Error(
+        `no binding and target for the Vitest project "${project}"`,
+    );
 };
 
 const renderOnServer: BrowserCommand<[scene: Scene]> = async (
     context,
     scene,
 ) => {
-    const binding = bindingOf(context.project.name);
-    const server = await serverFor(binding);
+    const [binding, target] = projectOf(context.project.name);
+    const server = await serverFor(binding, target);
     const module = (await server.ssrLoadModule(
         `/src/bindings/${binding}/server.tsx`,
     )) as { render(scene: Scene): ServerRender | Promise<ServerRender> };

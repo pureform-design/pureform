@@ -1,14 +1,23 @@
 # @pureform/component-suites
 
 Shared browser suites that check the rules every component follows, against the Solid and React
-bindings at once: controlled and uncontrolled state, native forms, accessibility and the
-keyboard, direction, and server rendering. They're the design doc's §5.7, §5.9, §9.4, §9.5, and
-§9.7 as tests. Private; nothing depends on it.
+bindings at once, on each web target (Panda, plain CSS, Tailwind): controlled and uncontrolled
+state, native forms, accessibility and the keyboard, direction, named themes, and server
+rendering. They're the design doc's §5.6, §5.7, §5.9, §9.4, §9.5, and §9.7 as tests. Private;
+nothing depends on it.
 
-It depends on `@pureform/solid`, `@pureform/react`, and the demo's style registry and Panda
-stylesheet (`apps/solid-demo/.pureform`, `apps/solid-demo/src/App.css`), so every component
-renders with its real classes and layout. Each binding's own specs (`packages/<binding>/src`)
-test the binding's details; these suites test what both must agree on.
+It depends on `@pureform/solid`, `@pureform/react`, and a style registry and stylesheet per
+target, all from the demo's config (`apps/solid-demo/pureform.config.ts`), so every component
+renders with its real classes and layout:
+
+- **Panda:** the demo's own glue and Panda stylesheet (`apps/solid-demo/.pureform`,
+  `apps/solid-demo/src/App.css`), written by the demo's omni `generate` and `prepare` tasks.
+- **CSS and Tailwind:** `.pureform/css` and `.pureform/tailwind` in this folder (ignored by git),
+  which `vitest.config.e2e.ts` writes with `@pureform/generate` before the projects start
+  (`src/targets/glue.ts`), with every component of the config.
+
+Each binding's own specs (`packages/<binding>/src`) test the binding's details; these suites test
+what both must agree on, on every target.
 
 ## How it fits together
 
@@ -17,18 +26,30 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
       │  imports
       ├── src/components/    one case per component: props, examples, state, form, keyboard
       ├── src/harness/       Scene, Harness, page helpers, the server-render client
-      └── #binding ────────► src/bindings/solid/harness.tsx   (Vitest project "solid")
-                             src/bindings/react/harness.tsx   (Vitest project "react")
+      └── #binding ────────► src/bindings/solid/harness.tsx   (projects "solid/<target>")
+                             src/bindings/react/harness.tsx   (projects "react/<target>")
                                      │ both render
                              src/bindings/<binding>/scene.tsx  ◄── server.tsx (in Node)
+                                     │ PureformProvider registry={…}
+                             #registry ──► src/targets/<target>/registry.ts
+                             setup     ──► src/targets/<target>/setup.ts (the stylesheet)
 ```
 
-- **Two Vitest projects, one set of files.** `vitest.config.e2e.ts` defines a `solid` project
-  (Solid's plugin, hydratable output) and a `react` project (React's plugin). Each aliases
-  `#binding` to its own harness, so every suite file runs twice, once per binding.
+- **Six Vitest projects, one set of files.** `vitest.config.e2e.ts` defines a project per binding
+  and target, named `<binding>/<target>`: `solid/panda`, `solid/css`, `solid/tailwind`,
+  `react/panda`, `react/css`, `react/tailwind`. Solid's projects compile with Solid's plugin
+  (hydratable output), React's with React's. Each aliases `#binding` to its binding's harness and
+  `#registry` to its target's registry, loads its target's stylesheet as a setup file, and adds
+  the target's styling plugin (Panda's over the demo's config, Tailwind's, or none for plain CSS).
+  So every suite file runs six times.
+- **Targets** (`src/targets/`): `targets.ts` lists them; `glue.ts` writes the CSS and Tailwind
+  glue (options `{ prefix: "pf", classPrefix: "pf" }`); each `<target>/registry.ts` re-exports a
+  registry and each `<target>/setup.ts` imports the stylesheet as an app would (the CSS adapter's
+  reset and `styles.css`; Tailwind's `styles.css`, which imports `tailwindcss` and then the
+  generated stylesheet).
 - **A scene** (`src/harness/scene.ts`) is what a suite asks for: a component's name, its props,
-  and the provider's `dir`/`motion`. Each binding's `scene.tsx` renders it inside
-  `PureformProvider` with the demo's registry.
+  and the provider's `dir`, `motion`, and `theme`. Each binding's `scene.tsx` renders it inside
+  `PureformProvider` with the target's registry (`#registry`).
 - **The harness** (`src/harness/harness.ts`) mounts a scene into a host (anywhere in the page:
   inside a form, a fieldset, a legend), sets props from outside as an owner would
   (`update`), hydrates server HTML, and `settle`s (waits for the machines and the framework).
@@ -36,7 +57,9 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
 - **Server rendering** goes through a browser command, `renderOnServer` (`src/commands.ts`): Node
   starts a Vite server in SSR mode with the binding's plugin, loads
   `src/bindings/<binding>/server.tsx`, and returns the HTML (and Solid's hydration bootstrap).
-  The test puts it in the page and hydrates it.
+  The test puts it in the page and hydrates it. There's one server per binding and target (the
+  project's name says which), aliasing `#registry` as the project does, each with its own
+  dependency cache.
 
 ## Suites
 
@@ -47,6 +70,7 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
 | `accessibility.e2e.test.ts`    | axe over every example, both directions, with the real styles (so contrast counts).                                                                                                                                                                                                                            |
 | `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled; each key clicks it, changes its state, or does nothing; arrow keys in `ltr` and `rtl`.                                                                                                                                                                        |
 | `direction.e2e.test.ts`        | §5.9: every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`).                                                                                                      |
+| `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand, for each of the demo's themes; teal draws differently from the base theme.                                             |
 | `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule. |
 
 ## Adding a component
@@ -67,19 +91,22 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
     - `unmirrored`: parts that don't point (a check mark), which must draw the same both ways.
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
-The registry must have the component: `apps/solid-demo/.pureform` is generated with every
-component of the demo's config, so a component the config has is already there. A part of the
-case left out skips the cases that need it.
+Every target's registry must have the component: each is generated with every component of the
+demo's config (`apps/solid-demo/pureform.config.ts`), so a component the config has is already
+in all three, and every suite runs it on Panda, CSS, and Tailwind with no target-specific step.
+A part of the case left out skips the cases that need it.
 
 ## Running
 
 Through the omni MCP (or `omni run`): `test:e2e`, which first runs the demo's `prepare` (Panda
-codegen). `.env.local` at the repo root sets `CHROMIUM_PATH`. One file, one binding:
+codegen) and builds the adapters the CSS and Tailwind glue is generated with. `.env.local` at the
+repo root sets `CHROMIUM_PATH`. One file, one binding, one target (`--project` takes globs:
+`'solid/*'`, `'*/tailwind'`):
 
 ```sh
 cd tests/component-suites
 set -a; source ../../.env.local; set +a
-bun x vitest --config vitest.config.e2e.ts run src/forms --project react
+bun x vitest --config vitest.config.e2e.ts run src/forms --project react/css
 ```
 
 Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
@@ -87,9 +114,14 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 
 ## Worth knowing
 
-- **Stubs:** `error` has no component yet (the text inputs bring it in p6b), and server
-  rendering runs on the Panda target only, without a runtime theme (p5a, p5b); each is an
-  `it.todo`.
+- **Stubs:** `error` has no component yet (the text inputs bring it in p6b), and server rendering
+  runs without a runtime theme (p5b); each is an `it.todo`.
+- **Targets differ only in their stylesheet and registry.** No suite branches on the target; a
+  case that needs to know reads the registry (`#registry`), as the themes suite reads
+  `registry.themeAttributes`.
+- Elements are measured one at a time in the same place when two renders are compared (the
+  themes suite): the pointer may rest on the first element on the page, whose hover state layer
+  then changes its background.
 - Solid's plugin compiles tests non-hydratable; the `solid` project asks for hydratable output
   (`solid: { hydratable: true }`), as an app's client build is.
 - Solid's server render returns a bootstrap that clears the previous render's `_$HY`, since every
