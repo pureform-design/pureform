@@ -73,6 +73,10 @@ match `@pureform/solid`'s; one shared browser suite runs against both.
 ```tsx
 import { Button } from "@pureform/react/button";
 import { Checkbox } from "@pureform/react/checkbox";
+import { Dialog } from "@pureform/react/dialog";
+import { Menu } from "@pureform/react/menu";
+import { Snackbar } from "@pureform/react/snackbar";
+import { Tooltip } from "@pureform/react/tooltip";
 
 <Button label="Save" icon={<SaveIcon />} variant="tonal" type="submit" />
 <Button
@@ -111,6 +115,27 @@ import { Checkbox } from "@pureform/react/checkbox";
     defaultValue="m"
     items={[{ value: "s", label: "Small" }, { value: "m", label: "Medium" }]}
 />
+<Menu
+    trigger="Edit" // drawn as a Button
+    items={[{ value: "cut", label: "Cut", leadingIcon: <CutIcon />, trailingText: "⌘X" }]}
+    onSelect={(d) => run(d.value)}
+/>
+<Tooltip trigger="Save" supportingText="Save to drafts" />
+<Dialog
+    trigger="Discard"
+    headline="Discard draft?"
+    body="Your changes won't be saved."
+    actions={<Button label="Cancel" variant="text" />}
+/>
+<Snackbar open={saved} onOpenChange={(d) => setSaved(d.open)} supportingText="Saved" action="Undo" closeLabel="Dismiss" />
+<Menu.Root onSelect={(d) => run(d.value)}>
+    <Menu.Trigger as={IconButton} icon={<MoreIcon />} aria-label="More" />
+    <Menu.Positioner>
+        <Menu.Content>
+            <Menu.Item value="share"><Menu.ItemLabel>Share</Menu.ItemLabel></Menu.Item>
+        </Menu.Content>
+    </Menu.Positioner>
+</Menu.Root>
 
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />
@@ -122,17 +147,21 @@ import { Checkbox } from "@pureform/react/checkbox";
 </Checkbox.Root>
 ```
 
-| Component               | Parts (element)                                                                                                                                                                           | Machine                                              |
-| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `Button`                | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                | `@pureform/machines/button`                          |
-| `Checkbox`              | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                                                                                      | Zag's checkbox                                       |
-| `Switch`                | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`                                                                              | Zag's switch (`@pureform/machines/switch`)           |
-| `RadioGroup`            | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot`                                                                 | Zag's radio group (`@pureform/machines/radio-group`) |
-| `Chip`                  | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                | `@pureform/machines/button`                          |
-| `IconButton`            | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                                                                                 | `@pureform/machines/button`                          |
-| `Fab`                   | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                                                                                   | `@pureform/machines/button` (never a toggle)         |
-| `TextField`, `TextArea` | `Root` (`div`), `Container` (`div`), `LeadingIcon`, `Input` (`input` or `textarea`), `Label` (`label`), `TrailingIcon`, `SupportingText` (`span`)                                         | `@pureform/machines/text-field`                      |
-| `Select`                | the field's (`Input` is a read-only `input`), `HiddenSelect` (`select`, unstyled), `Positioner` (`div`, unstyled), `Content` (`div`), and per option `Item` (`div`), `ItemLabel` (`span`) | Zag's select (`@pureform/machines/select`)           |
+| Component               | Parts (element)                                                                                                                                                                                                                                                                  | Machine                                              |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Button`                | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
+| `Checkbox`              | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                                                                                                                                                                             | Zag's checkbox                                       |
+| `Switch`                | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`                                                                                                                                                                     | Zag's switch (`@pureform/machines/switch`)           |
+| `RadioGroup`            | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot`                                                                                                                                                        | Zag's radio group (`@pureform/machines/radio-group`) |
+| `Chip`                  | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
+| `IconButton`            | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                                                                                                                                                                        | `@pureform/machines/button`                          |
+| `Fab`                   | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                                                                                                                                                                          | `@pureform/machines/button` (never a toggle)         |
+| `TextField`, `TextArea` | `Root` (`div`), `Container` (`div`), `LeadingIcon`, `Input` (`input` or `textarea`), `Label` (`label`), `TrailingIcon`, `SupportingText` (`span`)                                                                                                                                | `@pureform/machines/text-field`                      |
+| `Select`                | the field's (`Input` is a read-only `input`), `HiddenSelect` (`select`, unstyled), `Positioner` (`div`, unstyled), `Content` (`div`), and per option `Item` (`div`), `ItemLabel` (`span`)                                                                                        | Zag's select (`@pureform/machines/select`)           |
+| `Menu`                  | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the menu's `root` slot), per item `Item` (`div`), `ItemLeading`, `ItemLabel`, `ItemTrailing`, `ItemTrailingText` (`span`)                                             | Zag's menu (`@pureform/machines/menu`)               |
+| `Tooltip`               | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the tooltip's `root` slot), `Subhead`, `SupportingText` (`span`), `Actions` (`div`)                                                                                   | Zag's tooltip (`@pureform/machines/tooltip`)         |
+| `Dialog`                | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`) | Zag's dialog (`@pureform/machines/dialog`)           |
+| `Snackbar`              | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Action`, `Close` (`button`)                                                                                                                                                                                         | `@pureform/machines/snackbar`                        |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -173,6 +202,40 @@ import { Checkbox } from "@pureform/react/checkbox";
   arrow keys up and down open the list; the sideways arrow keys choose the option before or after,
   by direction. Root takes `items` (`{ value, label, disabled? }`); the ready-made renders every
   part. One value only: no `multiple` yet.
+- **Overlays render in place.** The menu, tooltip, and dialog have an unstyled `Root` element
+  (test id `pf-<name>-root`) around their trigger and a `Positioner`, and draw the preset's surface
+  as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles
+  it). Nothing is portaled: the provider's theme, `dir`, and registry reach the overlay as any part,
+  and server rendering and hydration see one tree. A clipping or stacking ancestor can cut a menu or
+  tooltip off; `positioning={{ strategy: "fixed" }}` escapes most. The positioner is `hidden` while
+  closed. `Trigger` is a `<button>`, or any component with `as` (`as={Button}`,
+  `as={IconButton}`), which takes the rest of its props; the ready-mades draw it as a `Button`
+  labeled with `trigger`, and render none without it (open them with `open`). `open`,
+  `defaultOpen`, and `onOpenChange` are controllable on all three.
+- **The menu**'s ready-made takes `items` as data: `value`, `label`, and optionally `valueText`,
+  `disabled`, `closeOnSelect`, `leadingIcon`, `trailingIcon`, `trailingText`, and the icons'
+  `mirror*` flags. Root takes `onSelect({ value })`, `closeOnSelect`, `loopFocus`, `typeahead`,
+  and `positioning` (`bottom-start` by default). Open, the surface holds focus and the highlighted
+  item shows the hover state (`data-pf-hover`).
+- **The tooltip** opens on hover after `openDelay` (400 ms) and on keyboard focus, and points the
+  trigger's `aria-describedby` at itself. The ready-made renders a plain tooltip's
+  `supportingText` straight in the surface, and a rich one's (`variant="rich"`) `subhead`,
+  `supportingText`, and `actions` in their parts; a rich tooltip is `interactive`. `disabled`
+  stops the tooltip, not the trigger.
+- **The dialog** is fixed over the viewport and centered (inline layout styles on the
+  positioner), with the scrim's registry entry drawing the `Backdrop` (`pf-dialog-backdrop`; Root's
+  `testId` and `unstyled` take a `backdrop` key). While a modal dialog is open, Zag keeps focus in
+  it, hides the rest of the page from assistive technology, and stops the page scrolling. The
+  `Headline` (an `<h2>`) names it and the `Body` describes it. The ready-made takes `icon` (turning
+  on the `icon` variant), `mirrorIcon`, `headline`, `body`, and `actions`; `Dialog.CloseTrigger`
+  closes it (`as={Button}`).
+- **The snackbar** is its `Root`: a `role="status"` region, hidden while closed, that closes itself
+  after `duration` (5000 ms; `null` to stay) unless the pointer or focus is in it. `onOpenChange`
+  gets `{ open, reason }` (`timeout`, `action`, `close`, `escape`, `open`); `onAction` runs before
+  the action asks to close. The ready-made takes `supportingText`, `action` (the button renders
+  only when given), `closeLabel` (the close button's name; it renders only when given), and
+  `closeIcon` (a cross unless given). Placing it is the app's. `className`, `style`, and `slotProps` are
+  keyed by part on every ready-made.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label htmlFor>` at `ids.input`;
   don't wrap it in another label. The input carries every native state the CSS reads
@@ -364,6 +427,10 @@ Through the omni MCP (or `omni run`):
 
 ## Worth knowing
 
+- The overlays' ready-made triggers import the `Button` (`../button`), so a menu, tooltip, or
+  dialog subpath brings the button's part code with it.
+- A dialog with no focusable element inside takes focus on its surface (`tabindex="-1"`); after
+  the snackbar's action closes it, focus goes back to the page.
 - The development warning for a stale glue version calls `trainVersionMismatch`, which finds
   nothing until p4a records it.
 - Server rendering isn't exercised by these tests (p3c's hydration suite).
