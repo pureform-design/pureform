@@ -162,9 +162,9 @@ export default defineConfig({
   package outside `@pureform/*` (unless the build allows it), or an environment read at top
   level. Each adapter's tests can call the same check.
 - **Loading.** Build tools load it with jiti (already used by Metro's `withPureform`).
-  `panda.config.ts` and the Vite config import it: `compilePreset(config)` today for
-  Panda, and the `pureformTailwind({ config, outFile })` Vite plugin for Tailwind, which
-  writes the stylesheet that `app.css` imports.
+  `panda.config.ts` imports it for `compilePreset(config)`; on the CSS and Tailwind targets
+  the bundler plugin (or `pureform generate`) loads it and writes `.pureform/styles.css`,
+  which the app's CSS imports (since p5a, which retired the adapters' own Vite plugins).
 - **Runtime.** Runtime code never imports the full config. It imports the generated
   registry module (§6), which carries only what runtime needs: selection tables, dynamic
   token names, theme names, defaults. The full AST stays at build time.
@@ -323,6 +323,11 @@ v4 keeps every rule outside its utilities as written and makes utilities only fr
 scans, so the factories' classes survive without being listed (checked through Tailwind's
 compiler with no candidates), and listing them would only make utilities of a class that
 shares a utility's name.
+
+Built (p5a): both demos, `css-demo` and `tailwind-demo`, render `@pureform/solid`'s components
+over these registries through the bundler plugin, and the adapters' own Vite plugins
+(`pureformCss`, `pureformTailwind`, `virtual:pureform/components`, `buildCss`) are gone. The
+shared suites (§9.7) run every component on Panda, CSS, and Tailwind.
 
 **Native:** a precomputed table. Metro's `withPureform` already precomputes each theme's
 resolved component styles, which `rn-adapter`'s `useSelected` selects from at runtime;
@@ -529,6 +534,14 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
       option for its `@custom-variant`.
     - React Native: a context value; no selectors.
       Switching a theme is an attribute (or context) change.
+
+    Built (p5a): `themeAttributes(name)` is on the registry, `registry.themeAttributes("teal")`,
+    rather than on each factory: the attribute is the target's, not a component's. Each
+    adapter's codegen returns its `themeAttribute` (`data-panda-theme`, or the CSS and Tailwind
+    `themeAttribute` option, default `data-theme`; none on React Native), the generated index
+    passes it to `createRegistry`, and `PureformProvider`'s `theme` writes the attributes on its
+    element (an inherited theme writes nothing, its ancestor's attribute already scopes it).
+
 - **Runtime:** `<PureformProvider theme overrides>` sets theme scope and may override any
   `dynamic` token, writing CSS vars on web or a context value on native. Nested providers
   scope. Both halves exist today: `rn-adapter`'s `PureformProvider` takes `overrides`, and
@@ -1204,6 +1217,11 @@ icon only has to follow them.
   suite reads: controlled and uncontrolled state, forms, axe in both directions, the keyboard
   (arrow keys in both directions), mirrored boxes and `dir` on every part, and server rendering.
   The selection-by-test-id contract suite against RN-web stays in `tests/browser-e2e-tests`.
+- **Built (p5a):** six projects, one per binding and web target (`solid/panda`, `solid/css`,
+  `solid/tailwind`, and React's three). Each aliases `#registry` to its target's registry and
+  loads that target's stylesheet; the CSS and Tailwind glue is generated from the demo's config
+  before the run. A themes suite checks `themeAttributes` and that a provider's theme draws as
+  the attribute set by hand does, and server rendering hydrates a themed provider.
 
 ## 10. CLI
 
@@ -1296,7 +1314,7 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
 4. Add `@pureform/generate` (config loading, codegen, staleness), then
    `@pureform/bundler` (virtual registry, no pruning) and `@pureform/cli`
    (`pureform generate`) over it.
-5. Bring CSS and Tailwind targets to parity; switch `css-demo`/`tailwind-demo` to the
+5. Bring CSS and Tailwind targets to parity (done, p5a); switch `css-demo`/`tailwind-demo` to the
    components.
 6. Pruning (§7, item 3).
 7. Move RN components out of `rn-web-demo` into `@pureform/react-native` on the same
