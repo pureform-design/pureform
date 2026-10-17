@@ -6,22 +6,48 @@ import { parts } from "./text-field.anatomy";
 import * as dom from "./text-field.dom";
 import type { TextFieldApi, TextFieldSchema } from "./text-field.types";
 
-// Stub: the parts' basic wiring only; p6b fills in the rest.
 export function connect<T extends PropTypes>(
     service: Service<TextFieldSchema>,
     normalize: NormalizeProps<T>,
 ): TextFieldApi<T> {
-    const { send, context, prop, computed, scope } = service;
+    const { state, send, context, prop, computed, scope } = service;
     const value = context.get("value");
     const disabled = computed("disabled");
-    const invalid = !!prop("invalid");
-    const focused = !disabled && context.get("focused");
+    const invalid = computed("invalid");
+    const focused = !disabled && state.matches("focused");
     const filled = computed("filled");
+    const readOnly = !!prop("readOnly");
 
     const dataAttrs = {
         "data-disabled": dataAttr(disabled),
         "data-focus": dataAttr(focused),
         "data-invalid": dataAttr(invalid),
+        "data-readonly": dataAttr(readOnly),
+    };
+
+    // What the input and the text area share. `defaultValue` carries the current value, as Zag's
+    // hidden inputs do: the server renders it, and React leaves the input to the user.
+    const control = {
+        ...dataAttrs,
+        id: dom.getInputId(scope),
+        dir: prop("dir"),
+        name: prop("name"),
+        form: prop("form"),
+        defaultValue: value,
+        placeholder: prop("placeholder"),
+        disabled,
+        readOnly,
+        required: prop("required"),
+        "aria-invalid": invalid ? true : undefined,
+        onFocus() {
+            send({ type: "FOCUS" });
+        },
+        onBlur() {
+            send({ type: "BLUR" });
+        },
+        onChange(event: { currentTarget: { value: string } }) {
+            send({ type: "VALUE.SET", value: event.currentTarget.value });
+        },
     };
 
     return {
@@ -30,8 +56,15 @@ export function connect<T extends PropTypes>(
         filled,
         disabled,
         invalid,
+        errorText: computed("errorText"),
         setValue(next) {
             send({ type: "VALUE.SET", value: next });
+        },
+        reset(next) {
+            send({ type: "RESET", value: next });
+        },
+        focus() {
+            dom.getInputEl(scope)?.focus();
         },
         getRootProps() {
             return normalize.element({
@@ -51,32 +84,10 @@ export function connect<T extends PropTypes>(
             });
         },
         getInputProps() {
-            return normalize.input({
-                ...parts.input.attrs,
-                ...dataAttrs,
-                id: dom.getInputId(scope),
-                dir: prop("dir"),
-                name: prop("name"),
-                form: prop("form"),
-                value,
-                disabled,
-                readOnly: prop("readOnly"),
-                required: prop("required"),
-                "aria-invalid": invalid,
-                "aria-describedby": dom.getSupportingTextId(scope),
-                onFocus() {
-                    send({ type: "CONTEXT.SET", context: { focused: true } });
-                },
-                onBlur() {
-                    send({ type: "CONTEXT.SET", context: { focused: false } });
-                },
-                onChange(event) {
-                    send({
-                        type: "VALUE.SET",
-                        value: event.currentTarget.value,
-                    });
-                },
-            });
+            return normalize.input({ ...parts.input.attrs, ...control });
+        },
+        getTextAreaProps() {
+            return normalize.textarea({ ...parts.input.attrs, ...control });
         },
         getSupportingTextProps() {
             return normalize.element({

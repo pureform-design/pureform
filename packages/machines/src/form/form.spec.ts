@@ -72,6 +72,26 @@ describe("setNativeDefault", () => {
         setNativeDefault(null, "x");
         expect($("#div").outerHTML).toBe('<div id="div"></div>');
     });
+
+    it("keeps what an unedited text control or select shows", () => {
+        html(`
+            <input id="text" value="current">
+            <textarea id="area">current</textarea>
+            <select id="select"><option value="a">A</option><option value="b">B</option></select>
+            <select id="empty"><option value="a">A</option><option value="b">B</option></select>
+        `);
+        $<HTMLSelectElement>("#empty").selectedIndex = -1;
+        setNativeDefault($("#text"), "default");
+        setNativeDefault($("#area"), "default");
+        setNativeDefault($("#select"), "b");
+        setNativeDefault($("#empty"), "b");
+        expect($("#text").value).toBe("current");
+        expect($<HTMLTextAreaElement>("#area").value).toBe("current");
+        expect($<HTMLSelectElement>("#select").value).toBe("a");
+        expect($<HTMLSelectElement>("#empty").selectedIndex).toBe(-1);
+        expect($("#text").defaultValue).toBe("default");
+        expect($<HTMLTextAreaElement>("#area").defaultValue).toBe("default");
+    });
 });
 
 describe("getFormOf", () => {

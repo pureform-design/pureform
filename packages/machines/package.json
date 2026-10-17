@@ -40,6 +40,13 @@
                 "default": "./dist/radio-group.mjs"
             }
         },
+        "./select": {
+            "types": "./dist/select.d.ts",
+            "import": {
+                "development": "./src/select.ts",
+                "default": "./dist/select.mjs"
+            }
+        },
         "./ripple": {
             "types": "./dist/ripple/index.d.ts",
             "import": {
@@ -73,9 +80,11 @@
         "@pureform/js-effects": "catalog:",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/checkbox": "catalog:",
+        "@zag-js/collection": "catalog:",
         "@zag-js/core": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/radio-group": "catalog:",
+        "@zag-js/select": "catalog:",
         "@zag-js/switch": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"

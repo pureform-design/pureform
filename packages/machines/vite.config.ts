@@ -14,6 +14,7 @@ export default createConfig({
                     checkbox: "src/checkbox.ts",
                     switch: "src/switch.ts",
                     "radio-group": "src/radio-group.ts",
+                    select: "src/select.ts",
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",
                     slider: "src/slider/index.ts",

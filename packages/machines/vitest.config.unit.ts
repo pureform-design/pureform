@@ -16,6 +16,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
         include: [
             "@zag-js/checkbox",
             "@zag-js/radio-group",
+            "@zag-js/select",
             "@zag-js/switch",
             "@zag-js/vanilla",
         ],
