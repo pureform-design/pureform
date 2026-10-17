@@ -8,17 +8,19 @@ import type { ComponentSubpath } from "./usage";
 // The bindings' component sources, by path from this folder.
 const SOURCES = import.meta.glob<string>(
     [
-        "../../{solid,react}/src/*/*.{ts,tsx}",
-        "../../{solid,react}/src/{navigation,text-input,single-part}.tsx",
-        "!../../{solid,react}/src/*/*.spec.*",
+        "../../{solid,react,react-native}/src/*/*.{ts,tsx}",
+        "../../{solid,react,react-native}/src/{navigation,text-input,single-part,progress}.tsx",
+        "!../../{solid,react,react-native}/src/*/*.spec.*",
     ],
     { query: "?raw", import: "default", eager: true },
 );
 
 const PACKAGES = import.meta.glob<{ exports: Record<string, unknown> }>(
-    "../../{solid,react}/package.json",
+    "../../{solid,react,react-native}/package.json",
     { import: "default", eager: true },
 );
+
+type Binding = "solid" | "react" | "react-native";
 
 // The registry selection each entry of each component gets from its props.
 const select = (
@@ -55,7 +57,7 @@ const select = (
     }
 };
 
-const sources = (binding: "solid" | "react", subpath: string): string[] =>
+const sources = (binding: Binding, subpath: string): string[] =>
     Object.entries(SOURCES)
         .filter(([path]) => path.startsWith(`../../${binding}/src/${subpath}/`))
         .map(([, text]) => text);
@@ -76,10 +78,42 @@ const SHARED: Readonly<Record<string, readonly string[]>> = {
     ],
 };
 
-const sharedSources = (binding: "solid" | "react", subpath: string) =>
-    Object.entries(SHARED)
+// React Native's shared files: its tabs share the navigation's, its progress indicators share one,
+// and the select is a text input there.
+const NATIVE_SHARED: Readonly<Record<string, readonly string[]>> = {
+    ...SHARED,
+    "navigation.tsx": ["tabs", "navigation-bar", "navigation-rail"],
+    "text-input.tsx": ["text-field", "text-area", "select"],
+    "progress.tsx": ["linear-progress", "circular-progress"],
+    "single-part.tsx": [
+        "avatar",
+        "icon",
+        "media",
+        "scrim",
+        "separator",
+        "supporting-text",
+        "text",
+    ],
+};
+
+const sharedFiles = (binding: Binding) =>
+    binding === "react-native" ? NATIVE_SHARED : SHARED;
+
+const sharedSources = (binding: Binding, subpath: string) =>
+    Object.entries(sharedFiles(binding))
         .filter(([, users]) => users.includes(subpath))
         .map(([file]) => SOURCES[`../../${binding}/src/${file}`]!);
+
+// The entries a component's sources draw, by the anatomies they name.
+const drawnBy = (text: string): Set<string> => {
+    const drawn = new Set<string>();
+    for (const [, key] of text.matchAll(/\b(\w+Anatomy)\b/g)) {
+        const found = anatomyNames.get(key!);
+        if (found?.styled) drawn.add(found.name);
+    }
+    if (/\bas=\{Button\}/.test(text)) drawn.add("button");
+    return drawn;
+};
 
 const anatomyNames = new Map(
     Object.entries(anatomy).flatMap(([key, value]) =>
@@ -141,22 +175,64 @@ describe("COMPONENT_USAGE", () => {
         }
     });
 
-    for (const binding of ["solid", "react"] as const) {
-        it(`lists every entry the ${binding} components draw`, () => {
-            for (const [subpath, { entries }] of Object.entries(
-                COMPONENT_USAGE,
-            )) {
-                const text = sources(binding, subpath).join("\n");
-                const drawn = new Set<string>();
-                for (const [, key] of text.matchAll(/\b(\w+Anatomy)\b/g)) {
-                    const found = anatomyNames.get(key!);
-                    if (found?.styled) drawn.add(found.name);
+    it("names only component subpaths for react-native, besides its engines", () => {
+        const exports = Object.keys(
+            PACKAGES["../../react-native/package.json"]!.exports,
+        )
+            .map((key) => key.replace(/^\.\/?/, ""))
+            .filter(
+                (key) =>
+                    key &&
+                    !["svg", "reanimated", "reanimated-svg"].includes(key),
+            );
+        expect(exports.length).toBeGreaterThan(0);
+        for (const subpath of exports) {
+            expect(Object.keys(COMPONENT_USAGE), subpath).toContain(subpath);
+        }
+    });
+
+    it("lists every entry the react-native components draw", () => {
+        const exports = Object.keys(
+            PACKAGES["../../react-native/package.json"]!.exports,
+        ).map((key) => key.replace(/^\.\/?/, ""));
+        for (const [subpath, { entries }] of Object.entries(COMPONENT_USAGE)) {
+            if (!exports.includes(subpath)) continue;
+            // A file several components share draws each of theirs.
+            const users = new Set([
+                subpath,
+                ...Object.values(NATIVE_SHARED)
+                    .filter((list) => list.includes(subpath))
+                    .flat(),
+            ]);
+            const listed = new Set(
+                [...users].flatMap((user) =>
+                    Object.keys(
+                        COMPONENT_USAGE[user as ComponentSubpath].entries,
+                    ),
+                ),
+            );
+            const drawn = drawnBy(
+                [
+                    ...sources("react-native", subpath),
+                    ...sharedSources("react-native", subpath),
+                ].join("\n"),
+            );
+            expect(Object.keys(entries).length + drawn.size).toBeGreaterThan(0);
+            for (const entry of drawn) expect(listed, subpath).toContain(entry);
+        }
+    });
+
+    for (const binding of ["solid", "react", "react-native"] as const) {
+        if (binding !== "react-native")
+            it(`lists every entry the ${binding} components draw`, () => {
+                for (const [subpath, { entries }] of Object.entries(
+                    COMPONENT_USAGE,
+                )) {
+                    const drawn = drawnBy(sources(binding, subpath).join("\n"));
+                    const own = Object.keys(entries);
+                    expect(own.sort(), subpath).toEqual([...drawn].sort());
                 }
-                if (/\bas=\{Button\}/.test(text)) drawn.add("button");
-                const own = Object.keys(entries);
-                expect(own.sort(), subpath).toEqual([...drawn].sort());
-            }
-        });
+            });
 
         it(`sets no listed group from anything but its own prop in the ${binding} components`, () => {
             for (const [subpath, { entries }] of Object.entries(
