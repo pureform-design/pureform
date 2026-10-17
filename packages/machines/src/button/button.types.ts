@@ -80,6 +80,8 @@ export interface ButtonSchema {
         pressSource: PressSource | null;
         /** Emits to `interactionSource`, or to a source of the machine's own without one. */
         interaction: InteractionEmitter;
+        /** Stops following the source the state was last read from. */
+        unfollowSource: (() => void) | null;
     };
     computed: {
         disabled: boolean;

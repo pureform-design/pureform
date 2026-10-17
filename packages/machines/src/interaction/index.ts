@@ -5,6 +5,7 @@ export {
     isFocusVisible,
     pointerKind,
 } from "./emitter";
+export { pressableItemProps } from "./pressable";
 export {
     chainProps,
     emittersOf,

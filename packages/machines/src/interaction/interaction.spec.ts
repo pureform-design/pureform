@@ -230,6 +230,24 @@ describe("button", () => {
         expect(api().pressed).toBe(false);
     });
 
+    it("follows a new source once it's given one", async () => {
+        const first = createInteractionSource();
+        const second = createInteractionSource();
+        const { api, setProps } = mountButton({
+            id: "a",
+            interactionSource: first,
+        });
+        await settle();
+        setProps({ id: "a", interactionSource: second });
+        await settle();
+        first.emit({ type: "hoverEnter" });
+        await settle();
+        expect(api().hovered).toBe(false);
+        second.emit({ type: "hoverEnter" });
+        await settle();
+        expect(api().hovered).toBe(true);
+    });
+
     it("keeps a source of its own without one", async () => {
         const { root, api } = mountButton({ id: "a" });
         root.dispatchEvent(pointer("pointerdown"));
