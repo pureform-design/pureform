@@ -141,7 +141,7 @@ components to the shared suites. Non-Panda targets need p5a.
 |     | Subphase                                                                                                     | Depends on | Output context                     |
 | --- | ------------------------------------------------------------------------------------------------------------ | ---------- | ---------------------------------- |
 | [x] | [p6a: toggles](phases/p6-component-rollout.md) (switch, radio group, chip, icon button, FAB)                 | p3c        | [`context/p6a.md`](context/p6a.md) |
-| [ ] | [p6b: text inputs](phases/p6-component-rollout.md) (text field, text area, select)                           | p3c        | `context/p6b.md`                   |
+| [x] | [p6b: text inputs](phases/p6-component-rollout.md) (text field, text area, select)                           | p3c        | [`context/p6b.md`](context/p6b.md) |
 | [ ] | [p6c: overlays](phases/p6-component-rollout.md) (menu, dialog, tooltip, snackbar)                            | p3c        | `context/p6c.md`                   |
 | [ ] | [p6d: navigation and lists](phases/p6-component-rollout.md) (tabs, navigation bar and rail, list, list item) | p3c        | `context/p6d.md`                   |
 | [ ] | [p6e: display](phases/p6-component-rollout.md) (progress, slider, card, the rest)                            | p3c        | `context/p6e.md`                   |
