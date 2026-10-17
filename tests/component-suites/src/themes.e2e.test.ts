@@ -64,6 +64,10 @@ const markup = (attributes: Readonly<Record<string, string>>) =>
         .map(([name, value]) => `${name}="${value}"`)
         .join(" ");
 
+/** A host the pointer can't hover, so a state layer can't tint one scene and not another. */
+const unhovered = () =>
+    hostIn(`<div style="pointer-events: none"><div data-host></div></div>`);
+
 describe("themeAttributes", () => {
     it.each(THEMES)("scopes %s by the target's attribute", (theme) => {
         const attributes = registry.themeAttributes(theme);
@@ -86,10 +90,16 @@ describe.each(COMPONENTS)("$component", (component) => {
             }
         });
 
+        // Neither scene can be hovered: a wide component (a slider) lies under wherever the
+        // pointer rests, and its state layer's color would be measured mid-transition.
         it("draws as under the attribute set by hand", async () => {
             const provided = await drawn(
                 component,
-                mountCase(component, {}, { provider: { theme } }),
+                mountCase(
+                    component,
+                    {},
+                    { host: unhovered(), provider: { theme } },
+                ),
             );
             const byHand = await drawn(
                 component,
@@ -98,7 +108,7 @@ describe.each(COMPONENTS)("$component", (component) => {
                     {},
                     {
                         host: hostIn(
-                            `<div ${markup(registry.themeAttributes(theme))}><div data-host></div></div>`,
+                            `<div style="pointer-events: none" ${markup(registry.themeAttributes(theme))}><div data-host></div></div>`,
                         ),
                     },
                 ),
@@ -107,14 +117,17 @@ describe.each(COMPONENTS)("$component", (component) => {
         });
     });
 
-    it("draws differently in teal than in the base theme", async () => {
-        const base = await drawn(component, mountCase(component));
-        const teal = await drawn(
-            component,
-            mountCase(component, {}, { provider: { theme: "teal" } }),
-        );
-        expect(teal).not.toEqual(base);
-    });
+    it.skipIf(component.themed === false)(
+        "draws differently in teal than in the base theme",
+        async () => {
+            const base = await drawn(component, mountCase(component));
+            const teal = await drawn(
+                component,
+                mountCase(component, {}, { provider: { theme: "teal" } }),
+            );
+            expect(teal).not.toEqual(base);
+        },
+    );
 });
 
 /** The colors a part draws, of what `drawn` measures. */
@@ -128,55 +141,58 @@ const colorsOf = (styles: Record<string, Record<string, string>>) =>
         ]),
     );
 
-/** A host the pointer can't hover, so a state layer can't tint one scene and not another. */
-const unhovered = () =>
-    hostIn(`<div style="pointer-events: none"><div data-host></div></div>`);
-
-describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
-    it.each(["light", "dark"] as const)(
-        "from teal's seed draws teal's colors in the %s scheme",
-        async (scheme) => {
-            await commands.emulateColorScheme(scheme);
-            await preloadTheme(countedSeedTheme({ seed: "#006A60" }));
-            try {
-                const scene = mountCase(
-                    component,
-                    {},
-                    { host: unhovered(), provider: { seed: "#006A60" } },
-                );
-                const scope = scene.host.firstElementChild!.getAttribute(
-                    registry.themeAttribute ?? "data-theme",
-                );
-                await vi.waitFor(() =>
-                    expect(
-                        [...document.head.querySelectorAll("style")].some(
-                            (style) =>
-                                style.textContent?.includes(`"${scope}"]`),
-                        ),
-                    ).toBe(true),
-                );
-                const runtime = colorsOf(await drawn(component, scene));
-                const teal = colorsOf(
-                    await drawn(
+// A component the scheme doesn't color draws the same under any theme.
+describe.each(COMPONENTS.filter((component) => component.themed !== false))(
+    "$component, a runtime theme",
+    (component) => {
+        it.each(["light", "dark"] as const)(
+            "from teal's seed draws teal's colors in the %s scheme",
+            async (scheme) => {
+                await commands.emulateColorScheme(scheme);
+                await preloadTheme(countedSeedTheme({ seed: "#006A60" }));
+                try {
+                    const scene = mountCase(
                         component,
-                        mountCase(
+                        {},
+                        { host: unhovered(), provider: { seed: "#006A60" } },
+                    );
+                    const scope = scene.host.firstElementChild!.getAttribute(
+                        registry.themeAttribute ?? "data-theme",
+                    );
+                    await vi.waitFor(() =>
+                        expect(
+                            [...document.head.querySelectorAll("style")].some(
+                                (style) =>
+                                    style.textContent?.includes(`"${scope}"]`),
+                            ),
+                        ).toBe(true),
+                    );
+                    const runtime = colorsOf(await drawn(component, scene));
+                    const teal = colorsOf(
+                        await drawn(
                             component,
-                            {},
-                            { host: unhovered(), provider: { theme: "teal" } },
+                            mountCase(
+                                component,
+                                {},
+                                {
+                                    host: unhovered(),
+                                    provider: { theme: "teal" },
+                                },
+                            ),
                         ),
-                    ),
-                );
-                const base = colorsOf(
-                    await drawn(
-                        component,
-                        mountCase(component, {}, { host: unhovered() }),
-                    ),
-                );
-                expect(runtime).toEqual(teal);
-                expect(runtime).not.toEqual(base);
-            } finally {
-                await commands.emulateColorScheme("light");
-            }
-        },
-    );
-});
+                    );
+                    const base = colorsOf(
+                        await drawn(
+                            component,
+                            mountCase(component, {}, { host: unhovered() }),
+                        ),
+                    );
+                    expect(runtime).toEqual(teal);
+                    expect(runtime).not.toEqual(base);
+                } finally {
+                    await commands.emulateColorScheme("light");
+                }
+            },
+        );
+    },
+);

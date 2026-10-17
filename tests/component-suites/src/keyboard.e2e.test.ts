@@ -1,6 +1,6 @@
 // The keyboard, for every component: Tab reaches it and skips it when disabled, each key does what
 // the component's case says (clicks it, changes its state, or nothing), and arrow keys do what
-// they should in both directions.
+// they should in both directions. Tab passes over a component with no keyboard case.
 
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -8,7 +8,7 @@ import { userEvent } from "vitest/browser";
 import { harness } from "#binding";
 
 import { COMPONENTS } from "./components";
-import type { ComponentCase, KeyCase } from "./components";
+import type { ComponentCase, KeyboardCase, KeyCase } from "./components";
 import { hostIn, mountCase, stateNames } from "./harness/page";
 
 /** Mounts the component after a plain button, and tabs from it onto the component. */
@@ -32,7 +32,7 @@ const focusWithTab = async (
 /** Presses `key` on the focused component and checks what it did. A click is checked on the
  *  component without its state (a plain button); a change or nothing, with its state. */
 const pressAndCheck = async (
-    component: ComponentCase,
+    component: Keyed,
     { key, does, to, props = {} }: KeyCase,
     dir: "ltr" | "rtl" = "ltr",
 ) => {
@@ -81,7 +81,27 @@ const pressAndCheck = async (
     expect(document.activeElement).toBe(component.keyboard.focusable(host));
 };
 
-describe.each(COMPONENTS)("$component", (component) => {
+/** A component with a keyboard case. */
+type Keyed = ComponentCase & { readonly keyboard: KeyboardCase };
+
+const KEYED = COMPONENTS.filter((component): component is Keyed =>
+    Boolean(component.keyboard),
+);
+
+describe.each(COMPONENTS.filter((component) => !component.keyboard))(
+    "$component",
+    (component) => {
+        it("Tab passes over it", async () => {
+            const { host } = await focusWithTab(component, {});
+            expect(
+                host.contains(document.activeElement) &&
+                    document.activeElement !== host,
+            ).toBe(false);
+        });
+    },
+);
+
+describe.each(KEYED)("$component", (component) => {
     it("Tab moves focus to it", async () => {
         const { host } = await focusWithTab(component, {});
         expect(document.activeElement).toBe(component.keyboard.focusable(host));
@@ -106,7 +126,7 @@ describe.each(COMPONENTS)("$component", (component) => {
 
 // Arrow keys follow the provider's direction (design doc §5.9): the same physical key moves the
 // other way in `rtl`. A component without `keyboard.arrows` ignores them in both directions.
-describe.each(COMPONENTS)("$component, arrow keys", (component) => {
+describe.each(KEYED)("$component, arrow keys", (component) => {
     describe.each(["ltr", "rtl"] as const)("%s", (dir) => {
         const arrows = component.keyboard.arrows?.[dir] ?? [
             { key: "{ArrowLeft}", does: "nothing" },
