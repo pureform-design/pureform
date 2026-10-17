@@ -25,27 +25,30 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 
 ## Architecture
 
-| Module                                                     | What it holds                                                                                                                                        |
-| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `provider.tsx`                                             | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                        |
-| `classes.ts`                                               | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                               |
-| `parts.tsx`                                                | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components) |
-| `props.ts`                                                 | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                             |
-| `controllable.ts`                                          | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                       |
-| `form.ts`                                                  | `useFormReset`, `useFieldsetDisabled`                                                                                                                |
-| `motion.ts`                                                | `useReducedMotion`                                                                                                                                   |
-| `icon-style.ts`                                            | `useIconStyle`, and the context icon parts provide                                                                                                   |
-| `part-context.ts`                                          | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                              |
-| `button/`                                                  | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                |
-| `checkbox/`                                                | `@pureform/solid/checkbox`: the same layout                                                                                                          |
-| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/` | The other components, in the same layout                                                                                                             |
-| `text-field/`, `text-area/`, `select/`                     | The text inputs, in the same layout                                                                                                                  |
-| `tabs/`, `navigation-bar/`, `navigation-rail/`             | Navigation, in the same layout                                                                                                                       |
-| `list/`, `list-item/`                                      | The list and list item, in the same layout                                                                                                           |
-| `navigation.tsx`                                           | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                        |
-| `text-input.tsx`                                           | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                        |
-| `pressable.ts`                                             | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                     |
-| `internal/zag/`                                            | The Zag port (below)                                                                                                                                 |
+| Module                                                                                             | What it holds                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                                                                     | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                        |
+| `classes.ts`                                                                                       | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                               |
+| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components) |
+| `props.ts`                                                                                         | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                             |
+| `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                       |
+| `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                |
+| `motion.ts`                                                                                        | `useReducedMotion`                                                                                                                                   |
+| `icon-style.ts`                                                                                    | `useIconStyle`, and the context icon parts provide                                                                                                   |
+| `part-context.ts`                                                                                  | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                              |
+| `button/`                                                                                          | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                |
+| `checkbox/`                                                                                        | `@pureform/solid/checkbox`: the same layout                                                                                                          |
+| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/`                                         | The other components, in the same layout                                                                                                             |
+| `text-field/`, `text-area/`, `select/`                                                             | The text inputs, in the same layout                                                                                                                  |
+| `tabs/`, `navigation-bar/`, `navigation-rail/`                                                     | Navigation, in the same layout                                                                                                                       |
+| `list/`, `list-item/`                                                                              | The list and list item, in the same layout                                                                                                           |
+| `linear-progress/`, `circular-progress/`, `slider/`, `card/`, `search-bar/`, `ripple/`             | Display components, in the same layout                                                                                                               |
+| `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/` | Single-part components: the export is Root itself                                                                                                    |
+| `single-part.tsx`                                                                                  | `createSinglePart` (internal): a single-part component's Root                                                                                        |
+| `navigation.tsx`                                                                                   | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                        |
+| `text-input.tsx`                                                                                   | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                        |
+| `pressable.ts`                                                                                     | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                     |
+| `internal/zag/`                                                                                    | The Zag port (below)                                                                                                                                 |
 
 ```
 Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► useClasses ──► registry entry
@@ -286,6 +289,40 @@ content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on 
   `value` as its key), and `slotProps` and `unstyled` keyed by the list item's parts, applied to
   every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
   your own `<ul>`.
+- **Progress indicators** (`LinearProgress`, `CircularProgress`) have no machine: Root is a
+  `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`, and `value`
+  (from `min` to `max`, 0 to 100 by default) sets the preset's `value` token as a percentage.
+  Without a value (or with `indeterminate`) it's indeterminate: no `aria-valuenow`, and the preset
+  animates it. Name it with `aria-label`. `<LinearProgress value={40} aria-label="Uploading" />`.
+- **The slider** runs pureform's slider machine over a native `<input type="range">` laid over the
+  track: the browser handles dragging, the keyboard (its arrow keys follow `dir`), forms, and
+  screen readers. `value` is controllable (`number`); `min`, `max`, `step`, `name`, `form`,
+  `disabled`, `readOnly`, `invalid` go to the machine and the input; the value sets the root's
+  `value` token. The ready-made puts `aria-label`, `aria-labelledby`, `aria-describedby`, and
+  `aria-valuetext` on the input. A controlled or read-only slider's input is put back after a
+  change it didn't take.
+- **The card** has no machine. Root is a `<div>` surface, a link with `href`, or any element with
+  `as`; a link or a button is `interactive` (state layer, hover lift, touch target) unless told
+  otherwise, and `disabled` disables a button or sets `aria-disabled`. The ready-made takes its
+  content as children and renders `TouchTarget` first while interactive.
+- **The search bar** runs the text field machine: Root is a `<label>` around `Leading`
+  (`aria-hidden`), the `<input type="search">`, and `Trailing` (not hidden: it can hold actions).
+  `value` is controllable; `placeholder`, `name`, `form`, `required`, `disabled`, `readOnly` go to
+  the input, and so do the ready-made's `aria-label`, `aria-labelledby`, `aria-describedby`,
+  `list`, and autocomplete ARIA. Content: `leading`, `trailing`, `mirrorLeading`, `mirrorTrailing`.
+- **The ripple** is the layer a press ripple draws in: put `<Ripple />` inside a positioned
+  surface. It runs pureform's ripple machine with `useReducedMotion()` (no ripples while motion is
+  reduced) and the `ripple` slot's class for each ripple. Props: `disabled`, `effect`
+  (`"ink-well"` or `"ink-sparkle"`), `centered`, `allowPropagation`, `getSurfaceEl`.
+- **Single-part components** (`Avatar`, `Media`, `Separator`, `Scrim`, `SupportingText`, `Text`,
+  `Icon`, `TouchTarget`) are Root alone (`Avatar.Root` is the same component): their variants,
+  `tokens`, `testId`, `unstyled`, `as`, and the element's own props, `class` and `style` included.
+  The avatar is an `<img>` with `src` (its `label` the `alt`), else a `<span>` of its children,
+  `role="img"` named by `label`, or hidden without one. Media is an `<img>` (`as="video"` for a
+  video). The separator is an `<hr>` (another element gets `role="separator"`). The scrim and touch
+  target are `aria-hidden`. Text takes the preset's `style` group as `textStyle`, since `style` is
+  the element's. The icon is hidden unless given a `label` (then `role="img"`), flips under `rtl`
+  with `mirror`, and provides `useIconStyle()` to what it holds.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label for>` at `ids.input`; don't
   wrap it in another label. The input carries every native state the CSS reads (`:checked`,
