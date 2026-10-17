@@ -18,15 +18,15 @@ generator and the drift test read it, and nothing at runtime does.
                     src/anatomy.spec.ts ◄─────────┘ compares them ──────────────┘
 ```
 
-| Module          | What it does                                                                               |
-| --------------- | ------------------------------------------------------------------------------------------ |
-| `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                |
-| `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`. |
-| `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                    |
-| `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                          |
-| `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.          |
-| `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                  |
-| `composites.ts` | Written by hand: anatomies that group preset components, unstyled (`radioGroupAnatomy`).   |
+| Module          | What it does                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------- |
+| `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                       |
+| `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`.        |
+| `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                           |
+| `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                                 |
+| `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.                 |
+| `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                         |
+| `composites.ts` | Written by hand: anatomies outside the preset's slots (`radioGroupAnatomy`, `selectMenuAnatomy`). |
 
 **Generated, not derived at import.** Deriving at import would pull the whole preset (every
 recipe, the theme) into every app bundle just to learn part names. The generated module is plain
@@ -134,6 +134,13 @@ the registry doesn't style them: `radioGroupAnatomy` is the element around a gro
 (`data-scope="radio-group"`, `data-pf-part="root"`, test id `pf-radio-group-root`, also in
 `compositeTestIds.radioGroup.root`). Bindings render them with the same attributes and test id
 rules as any part (`useUnstyledComponent`), and they stay out of `anatomy` and `testIds`.
+
+`selectMenuAnatomy` is the select's list of options, drawn by another component's slots: its
+`name` is `"menu"`, so a binding's `useComponent` styles its parts with the menu's registry entry,
+and its part names are the menu's slots (`root`, `item`, `itemLabel`) plus an unstyled
+`positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
+`data-pf-part="content"` and `pf-select-content`, then `pf-select-item`, `pf-select-item-label`,
+`pf-select-positioner` (`compositeTestIds.selectMenu`).
 
 ## Building and testing
 

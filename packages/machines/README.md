@@ -7,16 +7,16 @@ framework's Zag adapter, and spreads the part props `connect` returns on its ele
 here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
-`utils`, and the `checkbox`, `switch`, and `radio-group` machines) and on
+`utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, and `select` machines) and on
 `@pureform/js-effects` for the ripple. The bindings depend on it.
 
 ## Architecture
 
 ```
-@zag-js/checkbox, switch, radio-group ──re-exported──┐
-                                                     │
-own machines (button, ripple,                        ├──► @pureform/machines ──► bindings:
-  text field and slider stubs) ── Zag's shape ───────┤                         useMachine(machine, props)
+@zag-js/checkbox, switch, radio-group, ──re-exported─┐
+  select                                             │
+own machines (button, ripple, text field,            ├──► @pureform/machines ──► bindings:
+  slider stub) ── Zag's shape ───────────────────────┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
 form helpers (native defaults, reset, fieldsets) ────┘                         spread part props
 ```
@@ -35,16 +35,16 @@ Our own machines keep controllable state the way Zag does (its `bindable`): a pr
 `undefined` controls the state, its `default*` prop is read at the start, and the change
 callback reports user actions only, with a details object.
 
-| Module                                       | What it does                                                                                         |
-| -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `button/`                                    | Press, focus, hover, and an optional toggle (`selected`).                                            |
-| `ripple/`                                    | The ripple of `@pureform/js-effects`, run as a machine.                                              |
-| `text-field/`                                | Stub for p6b: the value only.                                                                        |
-| `slider/`                                    | Stub for p6e: the value only.                                                                        |
-| `checkbox.ts`, `switch.ts`, `radio-group.ts` | Zag's machines, re-exported; the switch's and radio group's with pureform's form rules.              |
-| `zag-form.ts`                                | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
-| `form/`                                      | Native defaults, form reset, and disabled fieldsets.                                                 |
-| `testing/`                                   | The test harness: runs a machine with Zag's vanilla adapter. Not exported.                           |
+| Module                                                    | What it does                                                                                         |
+| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `button/`                                                 | Press, focus, hover, and an optional toggle (`selected`).                                            |
+| `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                              |
+| `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).         |
+| `slider/`                                                 | Stub for p6e: the value only.                                                                        |
+| `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported; all but the checkbox's with pureform's form rules.                      |
+| `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
+| `form/`                                                   | Native defaults, form reset, and disabled fieldsets.                                                 |
+| `testing/`                                                | The test harness: runs a machine with Zag's vanilla adapter. Not exported.                           |
 
 ## Public API
 
@@ -55,8 +55,9 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                          |
 | `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules      |
 | `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                  |
+| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules    |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
-| `@pureform/machines/text-field`  | `textField`'s members (stub)                                                                                |
+| `@pureform/machines/text-field`  | `textField`'s members                                                                                       |
 | `@pureform/machines/slider`      | `slider`'s members (stub)                                                                                   |
 | `@pureform/machines/form`        | the form helpers                                                                                            |
 
@@ -76,9 +77,10 @@ const api = button.connect(service, normalizeProps);
 The switch's namespace is `switchControl`, since `switch` can't be an import name; it matches
 the preset's component name.
 
-**The switch's and radio group's machines** are Zag's with one effect replaced
+**The switch's, radio group's, and select's machines** are Zag's with one effect replaced
 (`withFieldsetRule`): `trackFormControlState` follows the fieldsets around the native input (the
-switch) or the group element (the radio group) by the browser's rule, with pureform's
+switch), the group element (the radio group), or the hidden native select (the select) by the
+browser's rule, with pureform's
 `trackFieldsetDisabled`, and no longer resets during the form's `reset` event. Zag reads only the
 closest fieldset, so a group in the first legend of a disabled fieldset came out disabled; and the
 switch's own reset sent an untrusted change that React reported twice. The bindings own the reset
@@ -108,6 +110,32 @@ toggle), `label`, and `icon` (`aria-hidden`). The parts carry Zag-style `data-ac
 `data-focus`, `data-focus-visible`, `data-hover`, `data-disabled`, and `data-state` (`on` or
 `off` on a toggle); they style nothing, since pureform's CSS reads native and ARIA states
 and `data-pf-*` (bindings set `data-pf-active` from `pressed`).
+
+### Text field
+
+The text field and the text area share it: the input part is an `<input>` (`getInputProps()`) or a
+`<textarea>` (`getTextAreaProps()`).
+
+| Prop                                     | Type                                                   | Notes                                                                                   |
+| ---------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------- |
+| `id`, `ids`                              | `string`, `{ root?, input?, label?, supportingText? }` | element ids: `text-field:<id>`, `…:input`, `…:label`, `…:supporting-text`               |
+| `value`, `defaultValue`, `onValueChange` | `string`, `string`, `({ value }) => void`              | controllable, Zag's semantics; the default is `""`                                      |
+| `disabled`, `readOnly`, `required`       | `boolean`                                              | a disabled fieldset around the input disables it too                                    |
+| `invalid`                                | `boolean`                                              | marks the input `aria-invalid`; nothing else                                            |
+| `error`                                  | `string`                                               | invalid, the error text, and the input's custom validity                                |
+| `validate`                               | `"native"`                                             | the input's own constraints decide once the user commits a change or the form checks it |
+| `placeholder`                            | `string`                                               | default `" "`: the label floats while no placeholder shows                              |
+| `name`, `form`, `dir`, `getRootNode`     |                                                        | forwarded or as in Zag                                                                  |
+
+States: `idle` and `focused`. The input keeps its own text: `connect` gives it the value as
+`defaultValue` (the server renders it, and React leaves the input to the user), and the machine
+writes a value that changed from outside back to the input, leaving an equal one (and the caret)
+alone. The value's bindable is `sync`, so under React the owner's update renders before the input
+event's microtask ends. A form reset is the binding's: it calls `reset(value)` (event `RESET`) once
+the browser has reset the input, which also forgets the user's interaction. `connect` returns
+`value`, `focused`, `filled`, `disabled`, `invalid`, `errorText` (the `error`, or the browser's
+`validationMessage` under `validate="native"` once the user has interacted), `supportingTextId`,
+`setValue`, `reset`, `focus`, and the parts' props.
 
 ### Ripple
 
@@ -165,10 +193,12 @@ trackFormReset(input, {
 
 ## Good to know
 
-- Only the checkbox, switch, and radio group are re-exported so far; p6 adds Zag's tabs, menu,
-  dialog, tooltip, and select as their components land. The checkbox's machine is still Zag's
+- The checkbox, switch, radio group, and select are re-exported so far; p6 adds Zag's tabs,
+  menu, dialog, and tooltip as their components land. The checkbox's machine is still Zag's
   own (its reset and closest-fieldset tracking don't show through the bindings; see the shared
   suites); give it `withFieldsetRule` if that changes.
-- The text field and slider are stubs with their final shape; p6b and p6e fill them in, and
-  their `todo` tests list what's missing.
+- The slider is a stub with its final shape; p6e fills it in, and its `todo` tests list what's
+  missing.
+- `setNativeDefault` keeps what an unedited text control or select shows: writing a default
+  alone would change it.
 - Design doc: §8 (behavior), §9.4 (controlled state), §9.5 (forms).
