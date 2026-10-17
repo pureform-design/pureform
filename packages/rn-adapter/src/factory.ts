@@ -30,6 +30,7 @@ import type { Drawing, Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
 import type { Animation, ThemeValues, Transition, Value } from "./values";
 
+export { overridesFor } from "./resolve";
 export type {
     Overrides,
     PrecomputedStyles,
