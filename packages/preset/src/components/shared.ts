@@ -53,7 +53,12 @@ import {
     textStyle,
 } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import {
+    INDICATION_TOKENS,
+    STATE_LAYER_OPACITY,
+    stateLayer,
+} from "../state-layer";
+import type { IndicationRef, IndicationToken } from "../state-layer";
 
 /** The corners of a shape Material draws as a circle, such as a radio's dot or a handle: a
  *  circle whatever the theme's corners, which a full radius follows. */
@@ -122,13 +127,19 @@ export const disabledColor = (
     level: "disabledContainer" | "disabledContent",
 ): ColorValue => colorMix(transparent, sys("onSurface"), opacity(level));
 
+/** The indication tokens' root style: every interactive component's base sets them back to the
+ *  theme's on its root, so a component's own tokens reach its slots but not a nested component
+ *  of the same kind, which starts from the theme's again. */
+export const INDICATION_ROOT: StyleMap = { tokens: INDICATION_TOKENS };
+
 /** Container and content colors for an interactive surface: the container takes a state layer
- *  of the content color, and the content stays as given. */
+ *  of the content color, at the opacities `token` reads, and the content stays as given. */
 export const interactiveColors = (
+    token: IndicationRef,
     container: ColorValue,
     content: ColorValue,
 ): StyleMap => ({
-    backgroundColor: stateLayer({ base: container, content }),
+    backgroundColor: stateLayer(token, { base: container, content }),
     color: content,
 });
 
@@ -207,11 +218,11 @@ export const tokenFillColors = (
  *  content color, and its disabled colors. */
 export const fillTokenColors = (
     fill: Fill,
-    token: (name: GroupToken) => AliasNode,
+    token: (name: GroupToken | IndicationToken) => AliasNode,
 ): StyleMap => {
     const { container, content } = tokenFillColors(fill, token);
     return {
-        ...interactiveColors(container, content),
+        ...interactiveColors(token, container, content),
         states: { disabled: disabledColors(fill) },
     };
 };
@@ -324,16 +335,19 @@ export const tweens = (...properties: TransitionPart["property"][]) =>
         ),
     );
 
-/** Material's focus indicator: a 3px ring in the secondary color, 2px outside the element,
- *  shown while `focused` holds (keyboard focus by default). It replaces the browser's own
- *  outline, and is drawn with `outline`, so it never moves anything. */
+/** Material's focus indicator: a ring of the focus indicator's thickness and color, its outer
+ *  offset outside the element (by default the theme's 3px, secondary, and 2px), shown while
+ *  `focused` holds (keyboard focus by default). `token` reads the component's indication
+ *  tokens. It replaces the browser's own outline, and is drawn with `outline`, so it never
+ *  moves anything. */
 export const focusRing = (
+    token: IndicationRef,
     focused: Condition | Condition[] = "focusVisible",
 ): StyleMap => ({
     outlineStyle: when(focused, solid, none),
-    outlineWidth: px(3),
-    outlineColor: sys("secondary"),
-    outlineOffset: px(2),
+    outlineWidth: token("focusIndicatorThickness"),
+    outlineColor: token("focusIndicatorColor"),
+    outlineOffset: token("focusIndicatorOuterOffset"),
 });
 
 /** A color group's four roles, for example `primary`, `onPrimary`, `primaryContainer`, and
@@ -455,21 +469,23 @@ export const iconBox = (
     },
 });
 
-/** The root every pressable component shares: the focus ring and state transition, a
- *  positioned inline row that centers its content (the touch target sits over it), no border,
- *  a pointer, and no clicks while disabled. */
-export const pressableRoot: StyleMap = {
-    ...focusRing(),
-    transition: stateTransition,
-    position: relative,
-    display: inlineFlex,
-    flexDirection: row,
-    alignItems: center,
-    justifyContent: center,
-    borderWidth: px(0),
-    cursor: pointer,
-    states: { disabled: { pointerEvents: none } },
-};
+/** The root every pressable component shares: the focus ring (reading `token`, the
+ *  component's indication tokens) and state transition, a positioned inline row that centers
+ *  its content (the touch target sits over it), no border, a pointer, and no clicks while
+ *  disabled. */
+export const pressableRoot = (token: IndicationRef) =>
+    ({
+        ...focusRing(token),
+        transition: stateTransition,
+        position: relative,
+        display: inlineFlex,
+        flexDirection: row,
+        alignItems: center,
+        justifyContent: center,
+        borderWidth: px(0),
+        cursor: pointer,
+        states: { disabled: { pointerEvents: none } },
+    }) satisfies StyleMap;
 
 /** A Material surface: a container color, the content color drawn on it, and an elevation
  *  level. Card, menu, and dialog are surfaces. */
@@ -497,10 +513,12 @@ export const inputText = (color: ColorValue): StyleMap => ({
 });
 
 /** A state layer that follows another slot: `base` tinted with `content` while `slotName` is
- *  hovered, focused, or pressed. `selected` gives the colors once a state such as `checked` or
- *  `selected` holds: its tint color, its container if it fills, and its container while
- *  disabled if that differs. A disabled slot shows no tint. */
+ *  hovered, focused, or pressed, at the opacities `token` reads (the component's indication
+ *  tokens). `selected` gives the colors once a state such as `checked` or `selected` holds: its
+ *  tint color, its container if it fills, and its container while disabled if that differs. A
+ *  disabled slot shows no tint. */
 export const slotStateLayer = (
+    token: IndicationRef,
     slotName: string,
     rest: { base: ColorValue; content: ColorValue; disabled?: ColorValue },
     selected?: {
@@ -512,19 +530,19 @@ export const slotStateLayer = (
 ) => {
     const layer = when();
     for (const [state, level] of [
-        ["hover", "stateHover"],
-        ["focusVisibleWithin", "stateFocus"],
-        ["pressed", "statePressed"],
+        ["hover", STATE_LAYER_OPACITY.hover],
+        ["focusVisibleWithin", STATE_LAYER_OPACITY.focus],
+        ["pressed", STATE_LAYER_OPACITY.pressed],
     ] as const) {
         const condition = slot(slotName, state);
-        layer.on(condition, colorMix(rest.base, rest.content, opacity(level)));
+        layer.on(condition, colorMix(rest.base, rest.content, token(level)));
         if (selected) {
             layer.on(
                 [selected.state, condition],
                 colorMix(
                     selected.base ?? rest.base,
                     selected.content,
-                    opacity(level),
+                    token(level),
                 ),
             );
         }

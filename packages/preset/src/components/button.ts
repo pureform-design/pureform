@@ -12,6 +12,7 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -26,6 +27,7 @@ import {
     groupTokens,
     iconBox,
     iconFill,
+    INDICATION_ROOT,
     keysOf,
     pressableRoot,
     sys,
@@ -57,6 +59,7 @@ const { tokens } = componentTokens("button", {
     paddingLarge: spacing("8"),
     ...groupTokens(DEFAULT_GROUP),
     ...DENSITY_TOKEN,
+    ...INDICATION_TOKENS,
 });
 
 type Size = "Small" | "Medium" | "Large";
@@ -81,6 +84,14 @@ export const createButton = <
             tokens,
             slots: ["root", "label", "icon", "touchTarget"],
             structure: { root: ["touchTarget", "icon", "label"] },
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "root",
+                    centered: false,
+                    focus: "root",
+                },
+            ],
             variants: {
                 color: groups as ColorGroups,
                 variant: keysOf(FILLS),
@@ -101,7 +112,8 @@ export const createButton = <
                 return {
                     base: {
                         root: {
-                            ...pressableRoot,
+                            ...INDICATION_ROOT,
+                            ...pressableRoot(token),
                             gap: token("gap"),
                             borderRadius: token("radius"),
                         },

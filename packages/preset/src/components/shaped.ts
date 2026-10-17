@@ -44,6 +44,7 @@ import type {
 import { duration, easing, elevationTint } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
+import type { IndicationRef } from "../state-layer";
 import {
     STATE_TWEENS,
     disabledColor,
@@ -119,10 +120,11 @@ export interface ShapedFill {
 }
 
 /** A fill's colors, split between the root (the content color the icon and label inherit)
- *  and the container (the fill, with its state layer, and the disabled fill). `selected` gives
- *  the colors once the root is selected (a toggle that's on); a selected container keeps a
- *  faint fill when disabled. */
+ *  and the container (the fill, with its state layer at the opacities `token` reads, and the
+ *  disabled fill). `selected` gives the colors once the root is selected (a toggle that's on); a
+ *  selected container keeps a faint fill when disabled. */
 export const shapedColors = (
+    token: IndicationRef,
     fill: Fill,
     { container, content }: ShapedFill,
     selected?: ShapedFill,
@@ -141,6 +143,7 @@ export const shapedColors = (
         },
         container: {
             backgroundColor: slotStateLayer(
+                token,
                 "root",
                 { base: container, content, disabled },
                 selected && {

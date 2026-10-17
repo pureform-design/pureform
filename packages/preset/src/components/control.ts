@@ -20,6 +20,7 @@ import {
 } from "@pureform/core/ast";
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 
+import type { IndicationRef } from "../state-layer";
 import { disabledColor, slotStateLayer, touchTarget } from "./shared";
 
 /** The selection control slots every control has, in markup order. */
@@ -33,13 +34,15 @@ export const CONTROL_INVALID = slot("root", "invalid");
 export const CONTROL_DISABLED = slot("root", "disabled");
 
 /** A state layer over a transparent surface: the content color at the hover, focus, or
- *  pressed opacity, read from the control's root. Material tints it with the unselected
- *  content color, or the selected one once the control is checked. */
+ *  pressed opacity `token` reads, following the control's root. Material tints it with the
+ *  unselected content color, or the selected one once the control is checked. */
 export const controlStateLayer = (
+    token: IndicationRef,
     content: ColorValue,
     checkedContent: ColorValue,
 ) =>
     slotStateLayer(
+        token,
         "root",
         { base: transparent, content },
         { state: CONTROL_CHECKED, content: checkedContent },

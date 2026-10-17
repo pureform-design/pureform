@@ -16,7 +16,7 @@ import {
 import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { opacity, radius, spacing } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     componentTokens,
     disabledColor,
@@ -25,6 +25,7 @@ import {
     touchTarget,
     stateTransition,
     focusRing,
+    INDICATION_ROOT,
 } from "./shared";
 
 type CardFill = "elevated" | "filled" | "outlined";
@@ -38,6 +39,7 @@ const { tokens, ref } = componentTokens("card", {
     elevatedContainer: sys("surfaceContainerLow"),
     filledContainer: sys("surfaceContainerHighest"),
     outlinedContainer: sys("surface"),
+    ...INDICATION_TOKENS,
 });
 
 const CONTAINER: Record<CardFill, ColorValue> = {
@@ -78,7 +80,10 @@ const interactive = (fill: CardFill) => ({
     match: { interactive: "true" as const, variant: fill },
     style: {
         root: {
-            backgroundColor: stateLayer({ base: CONTAINER[fill], content }),
+            backgroundColor: stateLayer(ref, {
+                base: CONTAINER[fill],
+                content,
+            }),
             states: {
                 hover: { apply: { shadowElevation: HOVERED[fill] } },
                 disabled: {
@@ -109,6 +114,10 @@ export const card = pf.slotComponent({
     tokens,
     slots: ["root", "touchTarget"],
     structure: { root: ["touchTarget"] },
+    // When interactive: a link or a button.
+    indication: [
+        { trigger: "root", surface: "root", centered: false, focus: "root" },
+    ],
     variants: {
         variant: ["elevated", "filled", "outlined"],
         interactive: ["true", "false"],
@@ -116,7 +125,8 @@ export const card = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
-                ...focusRing(),
+                ...INDICATION_ROOT,
+                ...focusRing(ref),
                 transition: stateTransition,
                 position: relative,
                 color: content,

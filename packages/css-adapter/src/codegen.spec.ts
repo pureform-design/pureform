@@ -520,6 +520,19 @@ describe("generate with the CSS target", () => {
                 const unread = new Set([
                     "--pf-components-slider-stateLayerColor",
                     "--pf-components-menu-supportingColor",
+                    // A state layer that follows another slot has no drag state.
+                    ...[
+                        "iconButton",
+                        "fab",
+                        "checkbox",
+                        "radio",
+                        "switchControl",
+                        "slider",
+                        "navigationBar",
+                        "navigationRail",
+                    ].map(
+                        (name) => `--pf-components-${name}-stateDraggedOpacity`,
+                    ),
                 ]);
                 for (const [name, spec] of Object.entries(preset.components)) {
                     const factory = factoryOf(glue, name);

@@ -21,8 +21,10 @@ import {
 } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     componentTokens,
+    INDICATION_ROOT,
     interactiveColors,
     pressableRoot,
     surface,
@@ -42,6 +44,7 @@ const { tokens, ref } = componentTokens("snackbar", {
     // The close button is its own touch target.
     closeSize: px(48),
     iconSize: sizeToken("iconMedium"),
+    ...INDICATION_TOKENS,
 });
 
 const pf = typed();
@@ -55,9 +58,19 @@ export const snackbar = pf.slotComponent({
     tokens,
     slots: ["root", "supportingText", "action", "close"],
     structure: { root: ["supportingText", "action", "close"] },
+    indication: [
+        {
+            trigger: "action",
+            surface: "action",
+            centered: false,
+            focus: "action",
+        },
+        { trigger: "close", surface: "close", centered: false, focus: "close" },
+    ],
     recipe: () => ({
         base: {
             root: {
+                ...INDICATION_ROOT,
                 ...surface(ref("container"), ref("content"), "level3"),
                 display: flex,
                 flexDirection: row,
@@ -77,8 +90,8 @@ export const snackbar = pf.slotComponent({
             },
             // A text button in the inverse primary color.
             action: {
-                ...pressableRoot,
-                ...interactiveColors(transparent, ref("actionColor")),
+                ...pressableRoot(ref),
+                ...interactiveColors(ref, transparent, ref("actionColor")),
                 textStyle: textStyle("labelLarge"),
                 height: ref("actionHeight"),
                 paddingInlineStart: spacing("3"),
@@ -87,8 +100,8 @@ export const snackbar = pf.slotComponent({
             },
             // An icon button in the content color.
             close: {
-                ...pressableRoot,
-                ...interactiveColors(transparent, ref("content")),
+                ...pressableRoot(ref),
+                ...interactiveColors(ref, transparent, ref("content")),
                 width: ref("closeSize"),
                 height: ref("closeSize"),
                 fontSize: ref("iconSize"),
