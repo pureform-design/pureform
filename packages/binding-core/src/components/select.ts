@@ -218,6 +218,12 @@ export const selectValueProps = (controllable: {
         controllable.onValueChange({ value: fromZagValue(details.value) }),
 });
 
+// Zag's item ids take numbers too; the select's values are strings.
+const itemId = (
+    id: ((value: string) => string) | undefined,
+): ((value: string | number) => string) | undefined =>
+    id === undefined ? undefined : (value) => id(String(value));
+
 /** Zag's select props from Root's, besides `id`, `dir`, the collection, and the controllable
  *  `value` and `open`. `fieldsetDisabled` is the binding's `useFieldsetDisabled`. */
 export const selectMachineProps = (
@@ -243,7 +249,7 @@ export const selectMachineProps = (
         hiddenSelect: props.ids?.hiddenSelect,
         content: props.ids?.content,
         positioner: props.ids?.positioner,
-        item: props.ids?.item,
+        item: itemId(props.ids?.item),
     },
 });
 
@@ -260,21 +266,52 @@ export const selectSupportingTextId = (
     id: string,
 ): string => props.ids?.supportingText ?? `select:${id}:supporting-text`;
 
+const SIDEWAYS: Readonly<Record<string, string>> = {
+    ArrowLeft: "ArrowRight",
+    ArrowRight: "ArrowLeft",
+};
+
+// The event with its sideways arrow key swapped, for a handler that reads `key`.
+const swapSideways = <E extends object>(event: E): E =>
+    new Proxy(event, {
+        get(target, property) {
+            if (property === "key") {
+                const key = (target as { key?: string }).key ?? "";
+                return SIDEWAYS[key] ?? key;
+            }
+            const value = Reflect.get(target, property, target) as unknown;
+            return typeof value === "function" ? value.bind(target) : value;
+        },
+    });
+
 /** Zag's trigger props for the `input` part, a read-only `<input>` the preset draws as the field:
  *  no `type="button"`, the value's label as its value, and a placeholder of one space so the
- *  label floats once there's a value. */
+ *  label floats once there's a value. Under `rtl` the sideways arrow keys swap, so the one
+ *  pointing back chooses the option before, as in any other direction-aware control (Zag's
+ *  select reads them by the list's vertical orientation, which doesn't flip). */
 export const selectInputProps = <P extends object>(
     props: P,
     valueText: string,
+    dir: "ltr" | "rtl" | undefined,
 ): Omit<P, "type"> & {
     readonly readOnly: true;
     readonly value: string;
     readonly placeholder: " ";
     readonly autoComplete: "off";
 } => {
-    const { type: _type, ...rest } = props as P & { type?: unknown };
+    const { type: _type, ...rest } = props as P & {
+        type?: unknown;
+        onKeyDown?: (event: object) => void;
+    };
+    const onKeyDown = (rest as { onKeyDown?: (event: object) => void })
+        .onKeyDown;
     return {
         ...rest,
+        ...(dir === "rtl" && onKeyDown
+            ? {
+                  onKeyDown: (event: object) => onKeyDown(swapSideways(event)),
+              }
+            : {}),
         readOnly: true,
         value: valueText,
         placeholder: " ",
