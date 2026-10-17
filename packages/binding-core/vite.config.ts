@@ -11,6 +11,7 @@ export default createConfig({
                 entry: {
                     index: "src/index.ts",
                     dom: "src/dom.ts",
+                    usage: "src/usage.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
