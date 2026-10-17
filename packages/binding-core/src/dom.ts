@@ -99,6 +99,39 @@ export const syncCheckedInput = (
     if (input.indeterminate !== mixed) input.indeterminate = mixed;
 };
 
+/** The native radios of a radio group, in order: every `input[type=radio]` inside its element. */
+export const radioInputs = (
+    group: Element | null | undefined,
+): HTMLInputElement[] =>
+    group
+        ? [...group.querySelectorAll<HTMLInputElement>('input[type="radio"]')]
+        : [];
+
+/** Puts a radio group's native radios back in step with its value: after a click on a radio of a
+ *  controlled group whose owner didn't take the change, the browser has checked it anyway. */
+export const syncRadioInputs = (
+    group: Element | null | undefined,
+    value: string | null,
+): void => {
+    for (const input of radioInputs(group)) {
+        const on = input.value === value;
+        if (input.checked !== on) input.checked = on;
+    }
+};
+
+/** Sets each native radio's default (what a form reset shows) to whether its value is `value`.
+ *  Only a default that differs is written: writing one can check a radio the user hasn't
+ *  touched. */
+export const setRadioDefaults = (
+    group: Element | null | undefined,
+    value: string | null | undefined,
+): void => {
+    for (const input of radioInputs(group)) {
+        const on = value != null && input.value === value;
+        if (input.defaultChecked !== on) input.defaultChecked = on;
+    }
+};
+
 export {
     THEME_BLOCK_ATTRIBUTE,
     THEME_PRECEDENCE,

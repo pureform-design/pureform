@@ -36,6 +36,84 @@ export type {
     CheckboxVariantProps,
     CheckedState,
 } from "./components/checkbox";
+export { CHIP_ROOT_PROPS, chipSelection } from "./components/chip";
+export type {
+    ChipPart,
+    ChipRootOwnProps,
+    ChipVariantProps,
+} from "./components/chip";
+export {
+    hasAccessibleName,
+    isPresent,
+    missingNameMessage,
+} from "./components/content";
+export type { IconOnlyName } from "./components/content";
+export {
+    FAB_CONTENT_PROPS,
+    FAB_ROOT_PROPS,
+    fabMachineProps,
+    fabSelection,
+} from "./components/fab";
+export type {
+    FabBehaviorProps,
+    FabContentProps,
+    FabPart,
+    FabRootOwnProps,
+    FabVariantProps,
+} from "./components/fab";
+export {
+    ICON_BUTTON_CONTENT_PROPS,
+    ICON_BUTTON_ROOT_PROPS,
+    iconButtonSelection,
+    isToggle,
+} from "./components/icon-button";
+export type {
+    IconButtonContentProps,
+    IconButtonPart,
+    IconButtonRootOwnProps,
+    IconButtonVariantProps,
+} from "./components/icon-button";
+export {
+    RADIO_GROUP_CONTENT_PROPS,
+    RADIO_GROUP_ROOT_PROPS,
+    RADIO_INPUT_LABEL_PROPS,
+    RADIO_PROPS,
+    radioGroupMachineProps,
+    radioGroupResetValue,
+    radioGroupRootProps,
+    radioInputProps,
+    radioItemProps,
+    radioRingProps,
+    radioSelection,
+} from "./components/radio-group";
+export type {
+    RadioGroupBehaviorProps,
+    RadioGroupContentProps,
+    RadioGroupElementIds,
+    RadioGroupItem,
+    RadioGroupPart,
+    RadioGroupRootOwnProps,
+    RadioOwnProps,
+    RadioPart,
+    RadioVariantProps,
+} from "./components/radio-group";
+export {
+    SWITCH_CONTENT_PROPS,
+    SWITCH_INPUT_LABEL_PROPS,
+    SWITCH_ROOT_PROPS,
+    switchInputProps,
+    switchMachineProps,
+    switchNativeDefault,
+    switchSelection,
+} from "./components/switch";
+export type {
+    SwitchBehaviorProps,
+    SwitchContentProps,
+    SwitchElementIds,
+    SwitchPart,
+    SwitchRootOwnProps,
+    SwitchVariantProps,
+} from "./components/switch";
 export type { VariantProp } from "./components/variants";
 export {
     controllableNames,
