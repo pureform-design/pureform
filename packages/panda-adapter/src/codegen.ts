@@ -4,14 +4,17 @@
 
 import type { VarPrefix } from "@pureform/css-lowering";
 import { defineCodegen } from "@pureform/generate";
+import type { CodegenContext } from "@pureform/generate";
 
 import { factoryModule, recipeFile, tokenVars } from "./codegen/factory";
 import { staticCssModule } from "./codegen/static-css";
+import type { StaticCssRule } from "./codegen/static-css";
 import { THEME_ATTRIBUTE } from "./options";
 
 export { factoryModule, recipeFile, tokenVars } from "./codegen/factory";
 export type { FactoryModuleInput } from "./codegen/factory";
 export { staticCssModule } from "./codegen/static-css";
+export type { StaticCssRule } from "./codegen/static-css";
 
 /** The Panda target's build options. */
 export interface PandaCodegenOptions {
@@ -27,6 +30,22 @@ export interface PandaCodegenOptions {
 
 /** The file `panda.config.ts` imports `staticCss` from, relative to `.pureform/`. */
 export const STATIC_CSS_FILE = "panda.ts";
+
+// A pruned build's narrowed components: each group's values in use, or all of them.
+const staticCssRules = (
+    context: CodegenContext<PandaCodegenOptions>,
+): Record<string, StaticCssRule> =>
+    Object.fromEntries(
+        Object.entries(context.variants ?? {}).map(([name, used]) => [
+            name,
+            Object.fromEntries(
+                Object.keys(context.shape(name).variants).map((group) => [
+                    group,
+                    used[group] ?? ["*"],
+                ]),
+            ),
+        ]),
+    );
 
 /** The Panda adapter's codegen: `web/<name>.ts` per component, and `panda.ts`. The registry
  *  scopes named themes with Panda's own `data-panda-theme`, and names vars with `prefix`. */
@@ -61,6 +80,7 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
                     contents: staticCssModule(
                         context.components,
                         Object.keys(context.config.themes ?? {}),
+                        staticCssRules(context),
                     ),
                 },
             ],

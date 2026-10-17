@@ -16,7 +16,7 @@ import { px } from "@pureform/core/ast";
 import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import { generate } from "@pureform/generate";
 import type { CodegenContext, ComponentShape } from "@pureform/generate";
-import { componentShape } from "@pureform/generate";
+import { componentShape, normalizeVariants } from "@pureform/generate";
 import { pureform } from "@pureform/preset";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -25,6 +25,41 @@ import { STYLESHEET_FILE, codegen, subsetConfig, tokenVars } from "./codegen";
 import type { CssCodegenOptions } from "./codegen";
 import { componentClasses } from "./runtime";
 import { compileCss } from "./stylesheet";
+
+const escapeRegExp = (text: string) =>
+    text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+// A stylesheet as one line per rule: its at-rules, selector, and declarations, so two
+// stylesheets compare rule by rule whatever their order.
+const flattenCss = (css: string): string[] => {
+    const rules: string[] = [];
+    const stack: { header: string; body: string }[] = [];
+    let text = "";
+    for (const char of css.replace(/\/\*[\s\S]*?\*\//g, "")) {
+        if (char === "{") {
+            const end = text.lastIndexOf(";") + 1;
+            if (stack.length > 0) stack.at(-1)!.body += text.slice(0, end);
+            stack.push({ header: text.slice(end).trim(), body: "" });
+            text = "";
+        } else if (char === "}") {
+            const frame = stack.pop()!;
+            const body = (frame.body + text).trim();
+            if (body) {
+                const path = [
+                    ...stack.map((parent) => parent.header),
+                    frame.header,
+                ];
+                rules.push(`${path.join(" / ")} { ${body} }`);
+            }
+            text = "";
+        } else if (char === ";" && stack.length === 0) {
+            text = "";
+        } else {
+            text += char;
+        }
+    }
+    return rules.map((rule) => rule.replace(/\s+/g, " "));
+};
 
 // A slotted button with a boolean group, a group with no default, a group whose name isn't an
 // identifier, and tokens (one with a theme var only); a single-slot icon with a value that
@@ -410,6 +445,69 @@ describe("generate with the CSS target", () => {
                 expect(stylesheet().split("\n\n").slice(1).join("\n\n")).toBe(
                     compileCss(preset, options),
                 );
+            },
+        );
+
+        it(
+            "drops only the rules of variant values a pruned build leaves out",
+            { timeout: 60_000 },
+            async () => {
+                // Every component keeps the first value of each group, and its default.
+                const names = Object.keys(preset.components);
+                const variants = normalizeVariants(
+                    Object.fromEntries(
+                        names.map((name) => [
+                            name,
+                            Object.fromEntries(
+                                Object.entries(
+                                    componentShape(preset.components[name]!)
+                                        .variants,
+                                ).map(([group, values]) => [
+                                    group,
+                                    values.slice(0, 1),
+                                ]),
+                            ),
+                        ]),
+                    ),
+                    names,
+                    (name) => componentShape(preset.components[name]!),
+                );
+                const full = flattenCss(compileCss(preset, options));
+                const pruned = flattenCss(
+                    compileCss(subsetConfig(preset, names, variants), options),
+                );
+                // The classes of the values left out: `<base>(__<slot>)?--<group>_<value>`.
+                const removed = Object.entries(variants).flatMap(
+                    ([name, groups]) => {
+                        const base = manifestOf(
+                            preset.components[name]!,
+                            options,
+                        ).className;
+                        const shape = componentShape(preset.components[name]!);
+                        return Object.entries(groups).flatMap(([group, kept]) =>
+                            shape.variants[group]!.filter(
+                                (value) => !kept.includes(value),
+                            ).map(
+                                (value) =>
+                                    new RegExp(
+                                        `\\.${escapeRegExp(base)}(?:__[\\w-]+)?--${escapeRegExp(group)}_${escapeRegExp(value)}(?![\\w-])`,
+                                    ),
+                            ),
+                        );
+                    },
+                );
+                expect(removed.length).toBeGreaterThan(100);
+                const fullSet = new Set(full);
+                const extra = pruned.filter((rule) => !fullSet.has(rule));
+                expect(extra).toEqual([]);
+                const prunedSet = new Set(pruned);
+                const lost = full.filter(
+                    (rule) =>
+                        !prunedSet.has(rule) &&
+                        !removed.some((pattern) => pattern.test(rule)),
+                );
+                expect(lost).toEqual([]);
+                expect(pruned.length).toBeLessThan(full.length);
             },
         );
 
