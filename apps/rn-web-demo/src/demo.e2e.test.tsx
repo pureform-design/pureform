@@ -196,6 +196,30 @@ describe("rn-web-demo", () => {
         await press(chip("Animated"));
     });
 
+    it("ripples in each surface the anatomy names, the controls' and the snackbar's too", async () => {
+        // The ripple layer: the surface's last element, which has no test id.
+        const ripples = (surface: HTMLElement) => {
+            const layer = surface.lastElementChild;
+            return layer && !layer.hasAttribute("data-testid")
+                ? layer.childElementCount
+                : 0;
+        };
+        for (const [pressed, surface] of [
+            ["pf-button-root", "pf-button-root"],
+            ["pf-icon-button-root", "pf-icon-button-container"],
+            ["pf-checkbox-root", "pf-checkbox-root"],
+            ["pf-switch-control-root", "pf-switch-control-state-layer"],
+            ["pf-radio-root", "pf-radio-root"],
+            ["pf-snackbar-action", "pf-snackbar-action"],
+            ["pf-snackbar-close", "pf-snackbar-close"],
+        ]) {
+            await userEvent.click(first(pressed!));
+            expect(ripples(first(surface!)), surface).toBeGreaterThan(0);
+            await userEvent.unhover(first(pressed!));
+        }
+        await wait(1000);
+    });
+
     it("fills the current destination's icon", () => {
         const factory = registry.entry("navigationBar").factory;
         expect(factory({ selected: true }).icon.iconFill).toBe(1);
