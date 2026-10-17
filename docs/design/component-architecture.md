@@ -556,7 +556,7 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
     by a function `defineRuntimeTheme(name, load)` returns (`@pureform/styling`). The source loads
     its generator on demand and shares it across inputs; the generator turns the input into CSS
     vars per scheme, `{ light, dark }`, named by the registry's new `vars` (`{ prefix, tokenPrefix
-  }`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
+}`, which each codegen returns as `CodegenOutput.vars`). `@pureform/material/runtime-theme`'s
     `seedTheme({ seed, customSeeds?, overrides? })` is a few lines; its generator (the palette,
     `resolveTheme`, `themeVars`) is a separate chunk. It writes every color token and role, so a
     seed draws as a named theme with the same `materialColor` does (the suites check it against
@@ -943,6 +943,13 @@ Mapping of preset components:
 Our own machines use the same shape as Zag's (`machine`, `connect` returning part props),
 so bindings treat them uniformly.
 
+**Built (p6a):** the switch and radio group from `@pureform/machines` are Zag's with one effect
+swapped (`withFieldsetRule`): their fieldset tracking follows the browser's rule
+(`trackFieldsetDisabled`), and they no longer reset during the form's `reset` event. Zag's radio
+group read only the closest fieldset, so hydrated in the first legend of a disabled fieldset it
+came out disabled; Zag's switch reset by sending an untrusted change, which React reported twice.
+The chip, icon button, and FAB run the button machine (the FAB with `toggle: false`).
+
 **Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
 (`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
 Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
@@ -1004,6 +1011,13 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   export shape, parts, elements, and DOM order, on the same binding-core lists. Slot-keyed
   classes are `className`, content props take `ReactNode`, and parts take a `ref`. Components
   call a `useMachine` wrapper that lets each machine prop be `undefined`, as Solid's port does.
+- **Built (p6a):** `switch`, `radio-group`, `chip`, `icon-button`, and `fab` subpaths in both
+  bindings, the same way. The preset's `radio` is one radio, so the radio group's element is a
+  composite the generator doesn't write: `radioGroupAnatomy` in `@pureform/anatomy`, unstyled,
+  rendered with `useUnstyledComponent` (the same attributes and test id rules, no registry entry).
+  Its radios are `RadioGroup.Item` with `ItemTouchTarget`, `ItemInput`, `ItemRing`, `ItemDot`;
+  the ready-made `RadioGroup` takes `items` as data, and `slotProps`/`unstyled` keyed by the
+  radio's parts. The group's `color`, `density`, and `tokens` are every radio's defaults.
 
 ### 9.2 What every part does
 
@@ -1185,6 +1199,14 @@ validate, and disable with it, with no form library.
   named with `aria-label`, which the ready-made checkbox forwards to it, or by a `<label for>`
   pointing at Root's `ids.input`. `readOnly` also sets `aria-readonly`. The marks drop Zag's
   `hidden`, since the CSS shows each in its state with a transition.
+- **Built (p6a), switch and radio group:** the switch is the checkbox's shape, with `role="switch"`
+  on the input (Zag's hidden input has none). The radio group's native defaults are every radio's
+  (`setRadioDefaults`, written only where they differ, since writing one can check a radio the
+  user hasn't touched); the form reset follows the first radio, so `form="id"` works; a controlled
+  group puts its radios back after a click the owner ignores (`syncRadioInputs`). Zag's root
+  props lose `aria-labelledby` (no label part) and its indicator's inline style; its `data-ssr`
+  marks are dropped, since they change after hydrating. Arrow keys are the browser's own on the
+  native radios, and follow `dir`.
 
 ### 9.6 Icons
 
@@ -1235,6 +1257,11 @@ icon only has to follow them.
   `Icon` takes `label`, which makes it `role="img"` with that name. Icon-only components
   (icon button, FAB without text) require `aria-label` or `aria-labelledby` in their
   types, and in development they warn if both are missing at runtime.
+- **Built (p6a):** the icon button's binding selects `toggle: true` from `isToggle(props)` (`toggle`,
+  else `selected` or `defaultSelected` given), and the machine sets `aria-pressed`. `IconOnlyName`
+  types the ready-made icon button and an unlabeled FAB; the warning (`missingNameMessage`) fires
+  from the icon button's Root and from the ready-made FAB when it has no `label`. The ready-made
+  FAB sets `extended` from its `label` unless given.
 
 ### 9.7 Testing
 
