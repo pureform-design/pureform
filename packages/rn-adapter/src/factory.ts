@@ -47,13 +47,16 @@ export type {
 } from "./values";
 
 /** One slot's styles: its style, what it draws with SVG, its transitions (a token's own
- *  among them, under `$token:<key>`), its keyframe animation, and its parent slot. */
+ *  among them, under `$token:<key>`), its keyframe animation, its parent slot, and an icon
+ *  slot's fill. */
 export interface NativeSlot extends SlotStyle<Style, Drawing> {
     readonly style: Style;
     readonly drawing?: Drawing;
     readonly transitions: readonly Transition[];
     readonly animation?: Animation;
     readonly parent?: string;
+    /** Material Symbols' `FILL` axis for an icon slot that sets it: 1 draws the icon filled. */
+    readonly iconFill?: number;
 }
 
 /** A component's styles per slot. A component without slots has `root`. */
@@ -194,12 +197,14 @@ const slotsOf = (selected: Selected): Record<string, NativeSlot> => {
         const drawing = selected.drawings[slot];
         const animation = selected.animations[slot];
         const parent = selected.parents[slot];
+        const iconFill = selected.iconFills[slot];
         slots[slot === "" ? "root" : slot] = {
             style,
             ...(drawing ? { drawing } : {}),
             transitions: selected.transitions[slot] ?? [],
             ...(animation ? { animation } : {}),
             ...(parent === undefined ? {} : { parent }),
+            ...(iconFill === undefined ? {} : { iconFill }),
         };
     }
     return slots;

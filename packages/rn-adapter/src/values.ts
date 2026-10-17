@@ -59,6 +59,10 @@ export interface Animation {
  *  the shapes, and a box shadow elsewhere. */
 export const DROP_SHADOW = "dropShadow";
 
+/** Material Symbols' fill axis (0 or 1) on an icon slot, from `fontVariationSettings`, which
+ *  React Native has no style for: selection returns it beside the style, for the icon. */
+export const ICON_FILL = "iconFill";
+
 /** A slot's clip shape, which selection returns beside its style for an SVG to draw. */
 export const SHAPE = "clipPath";
 

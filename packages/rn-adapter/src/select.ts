@@ -11,6 +11,7 @@ import { compositeOver, formatColor, parseColor } from "./rgba";
 import {
     ANIMATION,
     DROP_SHADOW,
+    ICON_FILL,
     SHAPE,
     TINT,
     TOKEN,
@@ -219,6 +220,9 @@ export interface Selected {
     /** The tokens the selected styles set, by key. Styles reading them follow only once the
      *  component is resolved again with them, as `useComponentState` does. */
     tokens: ThemeValues;
+    /** Each icon slot's fill, Material Symbols' `FILL` axis (1 draws the icon filled), where it
+     *  sets one. */
+    iconFills: Record<string, number>;
 }
 
 /** A component's style per slot (or its one style under `""`, without slots) for variants and
@@ -299,7 +303,11 @@ export const selectWithTransitions = (
     const animations: Record<string, Animation> = {};
     const drawings: Record<string, Drawing> = {};
     const tokens: ThemeValues = {};
+    const iconFills: Record<string, number> = {};
     for (const [slot, style] of Object.entries(styles)) {
+        const fill = style[ICON_FILL];
+        delete style[ICON_FILL];
+        if (typeof fill === "number") iconFills[slot] = fill;
         for (const property of Object.keys(style)) {
             if (!property.startsWith(TOKEN)) continue;
             tokens[property.slice(TOKEN.length)] = style[property] as Concrete;
@@ -360,5 +368,13 @@ export const selectWithTransitions = (
     )) {
         for (const child of children) parents[child] = parent;
     }
-    return { styles, transitions, animations, parents, drawings, tokens };
+    return {
+        styles,
+        transitions,
+        animations,
+        parents,
+        drawings,
+        tokens,
+        iconFills,
+    };
 };

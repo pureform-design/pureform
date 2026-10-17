@@ -25,6 +25,7 @@ import type { MixSpace } from "./spaces";
 import {
     ANIMATION,
     DROP_SHADOW,
+    ICON_FILL,
     SHAPE,
     TINT,
     TOKEN,
@@ -351,8 +352,13 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 throw new Unsupported(`no React Native "${node.value}"`);
             return plain(value);
         }
-        case "fontVariation":
-            throw new Unsupported("variable font axes");
+        case "fontVariation": {
+            // An icon's fill is the one axis read, beside the style; the others have no use.
+            const fill = node.axes.FILL;
+            if (ctx.property !== "fontVariationSettings" || !fill)
+                throw new Unsupported("variable font axes");
+            return lowerNode(fill as ValueNode, ctx);
+        }
         case "fontFamily":
             return plain(
                 ctx.fontStack === "all"
@@ -714,7 +720,9 @@ const lowerStyle = (
                       ? DROP_SHADOW
                       : property === "clipPath"
                         ? SHAPE
-                        : rnProperty(property);
+                        : property === "fontVariationSettings"
+                          ? ICON_FILL
+                          : rnProperty(property);
         if (rn === null) continue;
         if (rn === undefined) {
             diagnostics.add(
