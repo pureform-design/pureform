@@ -11,6 +11,7 @@ export const props = createProps<SliderProps>()([
     "getRootNode",
     "id",
     "ids",
+    "interactionSource",
     "invalid",
     "max",
     "min",

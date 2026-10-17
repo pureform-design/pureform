@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/js-effects"
+    - "@pureform/binding-core"
 
 tasks:
   test:unit:

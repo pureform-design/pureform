@@ -5,6 +5,8 @@ import type {
     PropTypes,
 } from "@zag-js/types";
 
+import type { ItemInteractionProps } from "../interaction";
+
 export interface ValueChangeDetails {
     value: string | null;
 }
@@ -14,7 +16,8 @@ export interface ElementIds {
     item?: ((value: string) => string) | undefined;
 }
 
-export interface NavigationProps extends DirectionProperty, CommonProperties {
+export interface NavigationProps
+    extends DirectionProperty, CommonProperties, ItemInteractionProps {
     /** The ids of the elements in the navigation. Useful for composition. */
     ids?: ElementIds | undefined;
     /** The controlled value: the current destination's. */

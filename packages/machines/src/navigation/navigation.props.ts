@@ -10,6 +10,7 @@ export const props = createProps<NavigationProps>()([
     "getRootNode",
     "id",
     "ids",
+    "itemInteractionSource",
     "onValueChange",
     "value",
 ]);

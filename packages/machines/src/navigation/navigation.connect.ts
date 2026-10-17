@@ -2,6 +2,8 @@ import type { Service } from "@zag-js/core";
 import { dataAttr } from "@zag-js/dom-query";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
 
+import { emittersOf } from "../interaction";
+import { pressableItemProps } from "../interaction/pressable";
 import { parts } from "./navigation.anatomy";
 import * as dom from "./navigation.dom";
 import type {
@@ -37,9 +39,10 @@ export function connect<T extends PropTypes>(
                 "data-disabled": dataAttr(prop("disabled")),
             });
         },
+        // Each destination emits to its own interaction source.
         getItemProps(item) {
             const state = getItemState(item);
-            return normalize.element({
+            const props = normalize.element({
                 ...parts.item.attrs,
                 id: dom.getItemId(scope, item.value),
                 dir: prop("dir"),
@@ -62,6 +65,12 @@ export function connect<T extends PropTypes>(
                     send({ type: "ITEM.CLICK", value: item.value });
                 },
             });
+            return pressableItemProps(
+                props,
+                emittersOf(service).item(item.value),
+                state.disabled,
+                normalize,
+            );
         },
         getIconProps() {
             return normalize.element({

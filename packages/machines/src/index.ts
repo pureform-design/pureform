@@ -18,5 +18,7 @@ export * as tooltip from "./tooltip";
 
 export * from "./form";
 
+export type { InteractionProps, ItemInteractionProps } from "./interaction";
+
 export type { Machine, MachineSchema, Service } from "@zag-js/core";
 export type { NormalizeProps, PropTypes } from "@zag-js/types";

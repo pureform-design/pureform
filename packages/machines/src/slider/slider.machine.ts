@@ -1,7 +1,12 @@
-import { createMachine } from "@zag-js/core";
+import type {
+    PointerKind,
+    PressOrigin,
+} from "@pureform/binding-core/interaction";
+import { createMachine, type Machine } from "@zag-js/core";
 import { addDomEvent } from "@zag-js/dom-query";
 
 import { trackFormControl } from "../form/control";
+import { emittersOf, withInteraction } from "../interaction";
 import * as dom from "./slider.dom";
 import type { SliderSchema } from "./slider.types";
 
@@ -31,8 +36,9 @@ export const snapValue = (
 // forms, and direction. The input keeps its own value; the machine holds it with Zag's
 // controllable-state semantics, writes it back to the input when it changes from outside, follows
 // the fieldsets around it by the browser's rule, and marks a drag while the pointer is down. A form
-// reset is the binding's: it calls `reset` once the browser has reset the input.
-export const machine = createMachine<SliderSchema>({
+// reset is the binding's: it calls `reset` once the browser has reset the input. A drag emits a
+// press and a drag to the interaction source, from where the pointer went down.
+const slider = createMachine<SliderSchema>({
     props({ props }) {
         const min = props.min ?? 0;
         return {
@@ -93,13 +99,17 @@ export const machine = createMachine<SliderSchema>({
     states: {
         idle: {
             on: {
-                "POINTER.DOWN": { guard: "canDrag", target: "dragging" },
+                "POINTER.DOWN": {
+                    guard: "canDrag",
+                    target: "dragging",
+                    actions: ["emitDragStart"],
+                },
             },
         },
         dragging: {
             effects: ["trackPointerUp"],
             on: {
-                "POINTER.UP": { target: "idle" },
+                "POINTER.UP": { target: "idle", actions: ["emitDragStop"] },
             },
         },
     },
@@ -121,16 +131,38 @@ export const machine = createMachine<SliderSchema>({
             // A drag ends wherever the pointer is let go, as `:active` does.
             trackPointerUp({ scope, send }) {
                 const win = scope.getWin();
-                const end = () => send({ type: "POINTER.UP" });
                 const cleanups = [
-                    addDomEvent(win, "pointerup", end),
-                    addDomEvent(win, "pointercancel", end),
+                    addDomEvent(win, "pointerup", () =>
+                        send({ type: "POINTER.UP" }),
+                    ),
+                    addDomEvent(win, "pointercancel", () =>
+                        send({ type: "POINTER.UP", cancelled: true }),
+                    ),
                 ];
                 return () => cleanups.forEach((cleanup) => cleanup());
             },
         },
 
         actions: {
+            emitDragStart(params) {
+                const { event, scope } = params;
+                const emitter = emittersOf(params).own;
+                const input = dom.getInputEl(scope);
+                emitter.press(
+                    event["origin"] as PressOrigin,
+                    event["pointer"] as PointerKind,
+                    input,
+                );
+                emitter.dragStart(input);
+            },
+            emitDragStop(params) {
+                const { event, scope } = params;
+                const emitter = emittersOf(params).own;
+                const input = dom.getInputEl(scope);
+                emitter.dragStop(input);
+                if (event["cancelled"]) emitter.cancel(input);
+                else emitter.release(input);
+            },
             setValue({ context, event, prop }) {
                 const value = Number(event["value"]);
                 if (Number.isNaN(value)) return;
@@ -152,4 +184,14 @@ export const machine = createMachine<SliderSchema>({
             },
         },
     },
+});
+
+/** The slider machine, ending what's in progress when it becomes disabled. */
+export const machine: Machine<SliderSchema> = withInteraction<
+    SliderSchema,
+    object
+>(slider, ({ track, computed }, emitters) => {
+    track([() => computed("disabled")], () => {
+        if (computed("disabled")) emitters.end();
+    });
 });

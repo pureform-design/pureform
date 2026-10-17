@@ -336,6 +336,7 @@
       "name": "@pureform/machines",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/binding-core": "catalog:",
         "@pureform/js-effects": "catalog:",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/checkbox": "catalog:",
