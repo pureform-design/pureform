@@ -32,5 +32,6 @@ bun run dev
 `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) renders the page in
 Chromium: every component's parts by test id, each drawing its generated factory's styles, the
 runtime registry drawing the same, the scheme switch, the controls, the select's menu, tabs and
-navigation, and shapes drawn with SVG under each engine without losing the page's state. Set
+navigation, shapes drawn with SVG under each engine without losing the page's state, and a ripple
+in each surface the anatomy names (the controls' and the snackbar's buttons too). Set
 `CHROMIUM_PATH` (`.env.local`) to use a system Chromium.

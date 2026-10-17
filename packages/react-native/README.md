@@ -19,33 +19,39 @@ where React Native allows.
       react 19, react-native; react-native-svg, react-native-reanimated (optional peers)
 ```
 
-- **Depends on:** `@pureform/anatomy` (part names and test ids), `@pureform/binding-core`
-  (provider nesting, selections from props, controllable state, icon style types), and, as
+- **Depends on:** `@pureform/anatomy` (part names, test ids, and where each component shows
+  indication), `@pureform/binding-core` (provider nesting, selections from props, controllable
+  state, icon style types, the interaction source and the `Indication` interface),
+  `@pureform/machines` (only its `/interaction` subpath's `InteractionEmitter`, which has no Zag
+  or DOM code), and, as
   peers, `@pureform/styling` (the registry) and `@pureform/rn-adapter` (the factories' runtime,
   the hooks that select and animate, and the engines' drawing). Both peers are core-train
   packages the app's generated glue imports too, so the app and the binding share one copy.
 - **Depended on by:** `apps/rn-web-demo`.
-- No Zag: React Native has no DOM for its machines. Components track their own press, hover,
-  and focus through `Pressable`, and controlled state through `useControllable`.
+- No Zag: React Native has no DOM for its machines. `Pressable`'s callbacks emit each
+  component's press, hover, and focus to its interaction source, as a machine does on the web,
+  and controlled state goes through `useControllable`.
 
 See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3, §5.8, §5.9,
-and §9.6.
+§9.6, and §9.8.
 
 ## Architecture
 
-| Module                                                                  | What it holds                                                                                                         |
-| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| `provider.tsx`                                                          | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`, `useEngine`                            |
-| `styles.ts`                                                             | `useStyles`, `useStyleFactory` (the registry's hooks), `useComponentSlots`, `useSelectedStyles` (what components use) |
-| `engine.ts`, `engines/`                                                 | `MotionEngine` and the engines: `animated` here, `animatedSvg`, `reanimated`, `reanimatedSvg` at their subpaths       |
-| `icon-style.tsx`                                                        | `useIconStyle`, `IconSlot` (what an icon part provides), `Glyph` (a text glyph as an icon)                            |
-| `parts.tsx`                                                             | `usePress`, `useInk` and `withInk` (ripples), `useControllable`, `withEngine`, `testIdOf`                             |
-| `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                             |
-| `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                              |
-| `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                 |
-| `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                 |
-| `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`               | Lists and surfaces                                                                                                    |
-| `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                     |
+| Module                                                                  | What it holds                                                                                                             |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                                          | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`, `useEngine`                                |
+| `styles.ts`                                                             | `useStyles`, `useStyleFactory` (the registry's hooks), `useComponentSlots`, `useSelectedStyles` (what components use)     |
+| `engine.ts`, `engines/`                                                 | `MotionEngine` and the engines: `animated` here, `animatedSvg`, `reanimated`, `reanimatedSvg` at their subpaths           |
+| `icon-style.tsx`                                                        | `useIconStyle`, `IconSlot` (what an icon part provides), `Glyph` (a text glyph as an icon)                                |
+| `interaction.ts`                                                        | `useInteractionSource`, `useInteractionState`; `NativeInteraction` (Pressable's callbacks → the source), focus visibility |
+| `indication.tsx`, `indication-tokens.ts`                                | `materialIndication` (with its native ripple), `useIndication`; each component's `useSurfaceIndication` (internal)        |
+| `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
+| `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
+| `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
+| `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                     |
+| `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                     |
+| `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`               | Lists and surfaces                                                                                                        |
+| `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                         |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory
@@ -54,6 +60,12 @@ PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entr
        └── component ── useComponentSlots(name, selection, state)
                           ├─ engine.useStyles  → animated styles per slot (transitions run)
                           └─ useComponentState → plain selection (drawings, icon fills)
+
+Pressable callbacks ── NativeInteraction ──emit──► InteractionSource ──► state → selection
+                                                         │
+                         indication (prop ?? provider ?? Material's)
+                           ├─ tokens  → provider overrides / instance tokens
+                           └─ native  → rendered last inside the anatomy's surface (the ripple)
 ```
 
 ## Public API
@@ -98,6 +110,24 @@ import { registry } from "./.pureform";
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in
   the slot's type and color, moving with it; a string given as an icon is drawn as one.
+- **Indication:** the provider's `indication` (inherited) and each interactive component's
+  `indication` prop pick how it shows hover, focus, and press: `materialIndication({ ripple })`
+  (the default), `noIndication` (state layer opacities 0, no ripple, focus indicator kept), or the
+  app's own (`defineIndication({ name, tokens, native })`). The provider's tokens join its
+  overrides by theme path (`opacity.stateHover`, `sizes.focusIndicatorThickness`), under its own
+  `overrides`; a prop's tokens, and the providers' `focusIndicatorColor`, join the component's
+  instance tokens, under its `tokens`. Values are native: lengths are numbers. A `native` half is
+  rendered last inside the anatomy's surface with `NativeIndicationProps` (the source, the
+  surface's style and drawing, `centered`, `reducedMotion`, `dir`, the registry). Composites (tabs,
+  navigation, menu, select, snackbar, radio group) take `indication` on the component and
+  `interactionSource` per item.
+- **Interaction sources:** each interactive component takes `interactionSource` (an item's goes in
+  its item data); `useInteractionSource()` makes a stable one to share or observe, and
+  `useInteractionState(source)` follows it. `useIndication(source, { centered, style, drawing })`
+  gives an app's own `Pressable` the provider's indication: `{ surface, layer }`, the callbacks to
+  spread and the layer to render last inside it. Focus is visible only when it doesn't follow a
+  pointer press (one in progress, or one that ended under `FOCUS_AFTER_PRESS_MS`, 500 ms, ago),
+  so a keyboard or TV remote shows the focus indicator and a touch doesn't.
 - **Components:** variant props are `@pureform/binding-core`'s (`variant`, `color`, `size`, …),
   content props too where it has them (`label`, `icon`, `mirrorIcon`, `leadingIcon`, …).
   Controlled state follows Zag's shape: `checked` / `defaultChecked` / `onCheckedChange({ checked })`.
@@ -110,8 +140,10 @@ import { registry } from "./.pureform";
 - `test:unit`: Vitest in Chromium through React Native Web (`vitest.config.unit.ts`), with React
   Testing Library and type checks: the provider (direction, reduced motion from the system,
   overrides per scheme, inheritance), the hooks (the factory's result, one frozen object,
-  suspending on a lazy entry, instance tokens by name), and the components (test ids,
-  controlled and uncontrolled state, the select's menu, icon fills, engines). Node-side
+  suspending on a lazy entry, instance tokens by name), the components (test ids,
+  controlled and uncontrolled state, the select's menu, icon fills, engines), and indication
+  (`indication.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
+  prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface). Node-side
   commands (`src/testing/commands.ts`) precompute the preset's styles for a test registry.
 - `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package.
 
@@ -122,6 +154,13 @@ import { registry } from "./.pureform";
 - **Overlays are surfaces:** the menu, dialog, snackbar, and tooltip render their surface; when
   and where they show (a `Modal`, a timer) is the app's. The select is the exception: it opens
   its menu in a `Modal` under the field.
+- **The ripple's color** is the surface's `color`, or the theme's `onSurface` for a surface that
+  sets none (the controls' state layers), where the web's is `currentColor`. `"ink-sparkle"`
+  draws the ink well: React Native has no sparkle.
+- **Disabled shows no interaction:** a disabled component (or item) selects as idle even when a
+  shared source is pressed, and ends what it had in progress.
+- **The search bar** hears its root's hover and press and its input's focus (always visible, as a
+  text field's), but has no indication entry, so no ripple.
 - **A component's states are one set:** a component with two icons mirrors both when either is
   marked, and every slot sees the component's press and hover.
 - **Direction on a device is global:** React Native lays out the whole app by
