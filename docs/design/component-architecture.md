@@ -901,6 +901,28 @@ Three layers, cheapest first:
 Pruning is a safety-off switch: if the scan fails or sees `useClassFactory(dynamicName)`, it
 keeps everything and warns.
 
+Built (p7): `@pureform/bundler`'s `prune` option, on by default in bundler builds (never in dev
+servers or watch builds; Metro only with `prune: true`). The usage is read **before** the build,
+not from the module graph after it: Panda reads `staticCss` in `configResolved` and Tailwind
+reads the stylesheet while transforming, both before any module graph exists. The scan
+(`scanUsage`, with `oxc-parser`) reads every script under the root (or `prune.include`) and
+what they import by relative path, skipping `node_modules`, dot folders, output folders, the
+glue, and tests; unused files under the root count as used. It reads component subpath imports
+(each draws the registry entries `@pureform/binding-core/usage`'s `COMPONENT_USAGE` lists), their
+JSX's written-out variant props, `useClasses`/`useStyles` selections, the factory hooks,
+`useComponent` with an anatomy, `registry.entry("…")` on the glue's registry, and the
+provider's `defaults`. A value it can't read keeps that group's values; a component used other
+than as a JSX tag keeps all of its own; a name it can't read stops pruning with a warning. Groups
+a component computes itself (a FAB's `extended`) keep every value, and defaults always stay.
+`generate` takes the result as `usage` (`{ components, variants }`), narrows the components,
+and hands adapters `context.variants`: Panda narrows `staticCss` rules, the CSS and Tailwind
+targets compile the stylesheet from `narrowConfig` (values and their compound variants dropped),
+and the native target precomputes from it. Factory modules and declarations don't change. A
+pruned build writes the pruned glue to `.pureform/` in place, as Panda writes `styled-system/`;
+the next dev server or `pureform generate` writes the full glue back (the hash covers what
+pruning narrowed), so an app that commits the folder sets `prune: false`. Escape hatches:
+`prune.keep` (whole components), `prune.variants: false`, `prune: false`, and the allow-list.
+
 ## 8. Behavior: Zag.js and Solid 2
 
 Checked October 2026: `solid-js@next` is `2.0.0-rc.15`; `@zag-js/solid` `latest`
