@@ -101,6 +101,13 @@ export const listItemElement = <E>(props: {
 const isInteractiveElement = (element: unknown) =>
     element === "a" || element === "button";
 
+/** Whether the list item is interactive: `interactive`, else whether Root renders a link or a
+ *  button. Only then does it show indication. */
+export const isInteractiveListItem = (
+    props: Pick<ListItemVariantProps, "interactive">,
+    element: unknown,
+): boolean => props.interactive ?? isInteractiveElement(element);
+
 /** The registry selection from Root's props: `interactive` defaults to whether Root renders a
  *  link or a button. */
 export const listItemSelection = (
@@ -108,7 +115,7 @@ export const listItemSelection = (
     element: unknown,
 ): Selection<"listItem"> => ({
     lines: props.lines,
-    interactive: props.interactive ?? isInteractiveElement(element),
+    interactive: isInteractiveListItem(props, element),
     density: props.density,
     color: props.color,
     tokens: props.tokens,

@@ -43,6 +43,7 @@ import {
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { itemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -67,6 +68,7 @@ interface SelectContextValue {
     /** What a form reset shows, for the hidden select's options. */
     readonly resetsTo: Accessor<string | null>;
     readonly setHiddenSelect: (element: HTMLSelectElement) => void;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What an option shares with its parts. */
@@ -123,10 +125,10 @@ function Root(props: SelectRootProps): JSX.Element {
             ...SELECT_COLLECTION,
         }),
     );
-    const interaction = itemInteractionSources();
+    const sources = itemInteractionSources();
     const service = useMachine(select.machine, () => ({
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir: dir(),
         collection: collection(),
         ...selectMachineProps(props, fieldsetDisabled()),
@@ -160,6 +162,7 @@ function Root(props: SelectRootProps): JSX.Element {
         selection: () => selectMenuSelection(props),
         testId: () =>
             typeof props.testId === "string" ? props.testId : undefined,
+        indication: () => props.indication,
     });
     return (
         <context.Provider
@@ -173,6 +176,7 @@ function Root(props: SelectRootProps): JSX.Element {
                 errorText: () => props.error || undefined,
                 resetsTo,
                 setHiddenSelect: setHidden,
+                sources,
             }}
         >
             {scope.render("root", {
@@ -323,12 +327,17 @@ function Content(props: SelectPartProps): JSX.Element {
 
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 function Item(props: SelectItemProps): JSX.Element {
-    const { menu, api } = context.use("Item");
+    const { menu, api, sources } = context.use("Item");
     const item = () => props.item;
+    const source = sources.item(
+        () => props.item.value,
+        () => props.item.interactionSource,
+    );
     return (
         <itemContext.Provider value={{ item }}>
             {menu.render("item", {
                 element: "div",
+                interactionSource: source,
                 machine: () => api().getItemProps({ item: item() }),
                 states: () => ({
                     hover: api().getItemState({ item: item() }).highlighted,

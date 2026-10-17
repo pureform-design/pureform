@@ -23,7 +23,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
-import { ownInteractionSource } from "../interaction";
+import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -65,10 +65,10 @@ function Root(props: ButtonRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
     const selected = useControllable("Button", "selected", props);
-    const interaction = ownInteractionSource();
+    const source = useOwnInteractionSource(() => props.interactionSource);
     const service = useMachine(button.machine, () => ({
         id,
-        ...interaction,
+        interactionSource: source(),
         dir: dir(),
         ...buttonMachineProps(props),
         ...selected.machineProps(),
@@ -78,6 +78,8 @@ function Root(props: ButtonRootProps): JSX.Element {
         selection: () => buttonSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
     });
     return (
         <context.Provider value={{ scope, api }}>

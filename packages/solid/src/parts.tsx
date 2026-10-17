@@ -9,8 +9,19 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
-import { forSlot, isIconPart, partSources } from "@pureform/binding-core";
+import {
+    forSlot,
+    isIconPart,
+    isUnstyled,
+    partSources,
+} from "@pureform/binding-core";
 import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
+import {
+    componentIndicationTokens,
+    indicationRoles,
+} from "@pureform/binding-core/indication";
+import type { Indication } from "@pureform/binding-core/indication";
+import type { InteractionSource } from "@pureform/binding-core/interaction";
 import type {
     ClassSlots,
     ComponentName,
@@ -29,6 +40,8 @@ import {
 
 import { useClasses } from "./classes";
 import { IconPartContext } from "./icon-style";
+import { createIndicationScope, usePartIndication } from "./indication";
+import type { IndicationScope } from "./indication";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 import { usePureform } from "./provider";
@@ -46,6 +59,15 @@ export interface ComponentOptions<A extends ComponentAnatomy> {
     readonly testId?: Accessor<TestIdOverride<PartName<A>> | undefined>;
     /** Root's `unstyled`: every part, or some, without the registry's styles. */
     readonly unstyled?: Accessor<Unstyled<PartName<A>> | undefined>;
+    /** Root's `indication` prop, over the provider's. Its tokens go on Root, as instance tokens
+     *  do, for a component whose anatomy has an indication entry. */
+    readonly indication?: Accessor<Indication | undefined>;
+    /** The source the component's machine emits to, which the parts its anatomy's indication
+     *  entry names draw from. A composite's item parts pass their own to `render`. */
+    readonly interactionSource?: Accessor<InteractionSource | undefined>;
+    /** Whether the component shows indication now: a card or a list item only with an action.
+     *  Always, by default. */
+    readonly interactive?: Accessor<boolean>;
 }
 
 /** What a part merges besides its anatomy's attributes and the registry's classes. */
@@ -69,6 +91,9 @@ export interface RenderOptions extends PartOptions {
     readonly as?: Accessor<ValidComponent | undefined>;
     /** A ref of the component's own, alongside the user's. */
     readonly ref?: (element: HTMLElement) => void;
+    /** The source of the item this part belongs to, for a composite's parts that show an item's
+     *  indication; others draw from the component's. */
+    readonly interactionSource?: Accessor<InteractionSource | undefined>;
 }
 
 /** The means to build a component's parts. */
@@ -101,6 +126,7 @@ const createPartScope = <A extends ComponentAnatomy>(
         readonly unstyled?: ComponentOptions<A>["unstyled"];
     },
     classes: Accessor<Readonly<Record<string, SlotClasses>> | undefined>,
+    indication?: IndicationScope,
 ): PartScope<A> => {
     const state = usePureform();
     const scope: PartScope<A> = {
@@ -125,7 +151,6 @@ const createPartScope = <A extends ComponentAnatomy>(
             return merge(merged) as PartProps;
         },
         render(part, renderOptions) {
-            const props = scope.part(part, renderOptions);
             const user = renderOptions.props as
                 | { children?: JSX.Element; ref?: unknown }
                 | undefined;
@@ -136,6 +161,30 @@ const createPartScope = <A extends ComponentAnatomy>(
                 undefined,
                 { ownedWrite: true },
             );
+            const roles = indication
+                ? indicationRoles(indication.entries, part)
+                : [];
+            const shown =
+                indication && roles.length > 0
+                    ? usePartIndication(
+                          indication,
+                          roles,
+                          renderOptions.interactionSource ?? indication.source,
+                          element,
+                          () =>
+                              isUnstyled(options.unstyled?.(), part) ||
+                              !!renderOptions.unstyled?.(),
+                      )
+                    : undefined;
+            const props = scope.part(
+                part,
+                shown
+                    ? {
+                          ...renderOptions,
+                          states: () => shown.states(renderOptions.states?.()),
+                      }
+                    : renderOptions,
+            );
             const refs = [
                 (el: Element) => setElement(el),
                 renderOptions.ref,
@@ -144,6 +193,7 @@ const createPartScope = <A extends ComponentAnatomy>(
             // A function, so an icon part's children render inside its context.
             const node = () => (
                 <Tag {...props} ref={refs}>
+                    {shown?.layer}
                     {user?.children}
                 </Tag>
             );
@@ -161,9 +211,34 @@ export function useComponent<A extends ComponentAnatomy>(
     options: ComponentOptions<A>,
 ): ComponentScope<A> {
     const name = anatomy.name as ComponentOf<A>;
-    const classes = useClasses(name, options.selection);
+    const entries = anatomy.indication;
+    if (!entries?.length) {
+        const classes = useClasses(name, options.selection);
+        return { ...createPartScope(anatomy, options, classes), classes };
+    }
+    const state = usePureform();
+    const indication = createIndicationScope(entries, {
+        indication: options.indication,
+        interactive: options.interactive,
+        source: options.interactionSource,
+    });
+    // The indication prop's tokens, and the providers' focus indicator color, go on Root under
+    // the component's own tokens.
+    const classes = useClasses(name, () => {
+        const selection = options.selection();
+        if (!indication.interactive()) return selection;
+        const tokens = componentIndicationTokens(
+            options.indication?.(),
+            state().focusIndicatorColor,
+        );
+        if (!tokens) return selection;
+        return {
+            ...selection,
+            tokens: { ...tokens, ...selection.tokens },
+        } as Selection<ComponentOf<A>>;
+    });
     return {
-        ...createPartScope(anatomy, options, classes),
+        ...createPartScope(anatomy, options, classes, indication),
         classes,
     };
 }

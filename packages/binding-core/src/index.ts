@@ -103,6 +103,7 @@ export type {
 } from "./components/list";
 export {
     LIST_ITEM_CONTENT_PROPS,
+    isInteractiveListItem,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
     listItemLines,

@@ -56,11 +56,15 @@ export interface ChipIconProps extends ChipPartProps {
  *  filter chip, given `selected` or `defaultSelected`, toggles and reports it with
  *  `aria-pressed`. */
 function Root(props: ChipRootProps): JSX.Element {
-    const api = usePressable("Chip", props, () => buttonMachineProps(props));
+    const { api, source } = usePressable("Chip", props, () =>
+        buttonMachineProps(props),
+    );
     const scope = useComponent(chipAnatomy, {
         selection: () => chipSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
     });
     return (
         <context.Provider value={{ scope, api }}>

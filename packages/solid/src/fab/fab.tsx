@@ -60,11 +60,15 @@ export interface FabIconProps extends FabPartProps {
 
 /** The FAB's root: a native `<button>` that runs the machine and shares it with its parts. */
 function Root(props: FabRootProps): JSX.Element {
-    const api = usePressable("Fab", {}, () => fabMachineProps(props));
+    const { api, source } = usePressable("Fab", props, () =>
+        fabMachineProps(props),
+    );
     const scope = useComponent(fabAnatomy, {
         selection: () => fabSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
     });
     return (
         <context.Provider value={{ scope, api }}>

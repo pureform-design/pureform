@@ -150,4 +150,5 @@ export const menuItemProps = (item: MenuItem) => ({
     valueText: item.valueText,
     disabled: item.disabled,
     closeOnSelect: item.closeOnSelect,
+    interactionSource: item.interactionSource,
 });

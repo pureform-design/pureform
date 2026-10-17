@@ -68,13 +68,15 @@ function Root(props: IconButtonRootProps): JSX.Element {
     if (isDev && !untrack(() => hasAccessibleName(props))) {
         warnOnce(missingNameMessage("IconButton"));
     }
-    const api = usePressable("IconButton", props, () =>
+    const { api, source } = usePressable("IconButton", props, () =>
         buttonMachineProps(props),
     );
     const scope = useComponent(iconButtonAnatomy, {
         selection: () => iconButtonSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
     });
     return (
         <context.Provider value={{ scope, api }}>
