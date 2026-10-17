@@ -23,6 +23,7 @@ cache:
     files:
       append:
         - "src/__screenshots__/**/*"
+        - "src/__fixtures__/**/*"
         - "../panda-fixture/src/**/*"
         - "../panda-fixture/.pureform/**/*"
         - "../panda-fixture/panda.config.ts"
