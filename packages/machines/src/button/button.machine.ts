@@ -5,6 +5,7 @@ import {
     type MutableInteractionSource,
 } from "@pureform/binding-core/interaction";
 import { createGuards, createMachine } from "@zag-js/core";
+import type { Params } from "@zag-js/core";
 import { addDomEvent } from "@zag-js/dom-query";
 
 import { trackFormControl } from "../form/control";
@@ -13,6 +14,39 @@ import * as dom from "./button.dom";
 import type { ButtonSchema } from "./button.types";
 
 const { and, not } = createGuards<ButtonSchema>();
+
+// Zag compares what a watch tracks by value, and hands props out as copies of plain objects, so a
+// source is tracked by a number given to its `subscribe`, which every copy shares.
+const sourceKeys = new WeakMap<object, number>();
+let lastSourceKey = 0;
+const sourceKey = (source: object | undefined): number => {
+    if (!source) return 0;
+    let key = sourceKeys.get(source);
+    if (key === undefined) {
+        key = ++lastSourceKey;
+        sourceKeys.set(source, key);
+    }
+    return key;
+};
+
+// Reads the state from the source the button emits to, and follows its changes, dropping the
+// source it followed before.
+const followSource = (
+    refs: Params<ButtonSchema>["refs"],
+    context: Params<ButtonSchema>["context"],
+) => {
+    refs.get("unfollowSource")?.();
+    const source = refs.get("interaction").source();
+    if (!source) {
+        refs.set("unfollowSource", null);
+        return;
+    }
+    context.set("interaction", source.state);
+    refs.set(
+        "unfollowSource",
+        source.subscribe((_, state) => context.set("interaction", state)),
+    );
+};
 
 export const machine = createMachine<ButtonSchema>({
     props({ props }) {
@@ -55,6 +89,7 @@ export const machine = createMachine<ButtonSchema>({
         let own: MutableInteractionSource | undefined;
         return {
             pressSource: null,
+            unfollowSource: null,
             interaction: new InteractionEmitter(
                 () =>
                     prop("interactionSource") ??
@@ -77,6 +112,10 @@ export const machine = createMachine<ButtonSchema>({
                 action(["clearInteraction"]);
             },
         );
+        // A new source: the state follows it from now on.
+        track([() => sourceKey(prop("interactionSource")?.subscribe)], () => {
+            action(["followSource"]);
+        });
     },
 
     effects: ["trackFormControl", "trackInteractionSource"],
@@ -141,16 +180,11 @@ export const machine = createMachine<ButtonSchema>({
             // it. Stopping ends what the button has in progress, so a shared source doesn't stay
             // pressed.
             trackInteractionSource({ refs, context, scope }) {
-                const emitter = refs.get("interaction");
-                const source = emitter.source();
-                if (!source) return;
-                context.set("interaction", source.state);
-                const unsubscribe = source.subscribe((_, state) =>
-                    context.set("interaction", state),
-                );
+                followSource(refs, context);
                 return () => {
-                    emitter.end(dom.getRootEl(scope));
-                    unsubscribe();
+                    refs.get("interaction").end(dom.getRootEl(scope));
+                    refs.get("unfollowSource")?.();
+                    refs.set("unfollowSource", null);
                 };
             },
 
@@ -197,6 +231,9 @@ export const machine = createMachine<ButtonSchema>({
             clearInteraction({ context, refs, scope }) {
                 context.set("focused", false);
                 refs.get("interaction").end(dom.getRootEl(scope));
+            },
+            followSource({ refs, context }) {
+                followSource(refs, context);
             },
             setContext({ context, event }) {
                 if (event.type !== "CONTEXT.SET") return;
