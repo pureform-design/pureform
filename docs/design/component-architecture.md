@@ -986,6 +986,18 @@ buttons that Tab reaches in turn, with the current one marked `aria-current`, wh
 machine models. It holds only the controllable `value` and stops a click on a disabled
 destination. The list and list item have no machine.
 
+**Built (p6e):** the slider's machine is pureform's own (`@pureform/machines/slider`), as planned:
+the native range input takes the pointer, the keyboard, and the form, and the machine holds the
+controllable `value`, snaps a value to the step from `min`, writes a value from outside back to the
+input, follows the fieldsets by the browser's rule, and marks a drag while the pointer is down
+(`dragging`, which the binding shows as the root's pressed state). `readOnly` takes no change, and
+the binding puts the input back, since a range input has no `readonly`. The linear and circular
+progress indicators have no machine: their contract gives `role="progressbar"` and the value
+attributes, and the value's percentage is the preset's `value` token. The search bar runs the text
+field machine. The ripple component runs the ripple machine with the binding's
+`useReducedMotion()` and the `ripple` slot's class. The card and the single-part components have
+no machine.
+
 **Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
 (`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
 Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
@@ -1083,6 +1095,20 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   list is a composite (`listAnatomy`): an unstyled `<ul>` with an unstyled `<li>` (`List.Item`)
   around each list item, whose Root is a `<div>`, an `<a>` with an `href`, or any element with
   `as`. The list's `density`, `color`, and `tokens` are its items' defaults.
+- **Built (p6e):** `linear-progress`, `circular-progress`, `slider`, `card`, `search-bar`, `ripple`,
+  and the single-part `avatar`, `media`, `separator`, `scrim`, `supporting-text`, `text`, `icon`,
+  and `touch-target` subpaths in both bindings, which completes the preset's components. A
+  single-part component's export is its Root (`Avatar.Root` is the same component), built by one
+  internal factory per binding (`createSinglePart`): its variants, `tokens`, `testId`,
+  `unstyled`, `as`, and the element's own props, `class` (React's `className`) and `style` plain
+  rather than keyed by slot. The text's `style` variant group is the prop `textStyle`, since
+  `style` is the element's.
+  The avatar is an `<img>` with `src` and a `<span>` otherwise; the standalone icon is
+  `aria-hidden` unless given `label`. The card follows the list item: a `<div>`, a link with
+  `href`, or any element with `as`, interactive (with its touch target) when it's a link or a
+  button. The search bar's Root is the preset's `<label>`; its `Trailing` part isn't hidden, since
+  it can hold actions. The ripple's `ripple` part isn't rendered by the binding: it's the class each
+  ripple element takes.
 
 ### 9.2 What every part does
 
@@ -1195,6 +1221,9 @@ component), Zag's shape, identical in Solid and React:
   tab unless given one, since only the selected tab takes focus from Tab) and on the navigation bar
   and rail (the current destination). A list item's `selected` isn't controllable state: the app
   marks the current item, as it would a link to the current page.
+- **Built (p6e):** `value` on the slider (`number`) and the search bar (`string`). A controlled or
+  read-only slider's native input is put back after a change it didn't take, as the text inputs'
+  are. A progress indicator's `value` is a plain prop: the app sets it, and no user changes it.
 
 ### 9.5 Forms
 
@@ -1296,6 +1325,11 @@ validate, and disable with it, with no form library.
   carries `error` as its custom validity; with no value nothing is selected, so `required`
   blocks submitting. Its sideways arrow keys follow `dir` (Zag reads them by the list's vertical
   orientation, which doesn't flip), so the binding swaps them under `rtl`.
+- **Built (p6e), slider and search bar:** the slider's range input takes `name`, `form`, and
+  `disabled`, submits its number, and resets the same way; its native default is the `default*`
+  value, else `min` (a range input with no default resets to the middle). It has no `required`
+  (a range input always has a value). The search bar is a text input in all of this: `name`,
+  `form`, `required`, and the reset, with no `error` or supporting text.
 
 ### 9.6 Icons
 
@@ -1354,6 +1388,9 @@ icon only has to follow them.
 - **Built (p6b):** the ready-made select draws Material's drop-down arrow as a small inline SVG
   (`1em`, `currentColor`) unless given a `trailingIcon`: the arrow is part of the component, not
   an icon set.
+- **Built (p6e):** the standalone `Icon` takes `label` (then `role="img"` with that name, else
+  `aria-hidden`), `mirror`, and the preset's `size`, `color`, and `filled`; as an icon part, it
+  provides `useIconStyle()` to what it holds.
 
 ### 9.7 Testing
 
@@ -1388,6 +1425,13 @@ icon only has to follow them.
   the list item (rendered `as: "button"`, so it has focus and a disabled state). Contract helpers
   read named props only: spreading a Solid props object reads its `children` and renders them
   outside their Root, which the server rendering suite caught.
+- **Built (p6e):** a case may leave `keyboard` out, for a component focus never reaches: the
+  keyboard suite checks that Tab passes over it. `themed: false` marks a component the scheme
+  doesn't color (text, the touch target, the scrim, the ripple), which skips "draws differently in
+  teal" and the runtime theme. The direction suite measures a component with no inner parts by its
+  root's box in its host (which takes the direction too), and holds animations at one time, since
+  indeterminate progress animates under reduced motion; the themes suite measures both renderings
+  where the pointer can't hover them.
 
 ## 10. CLI
 
