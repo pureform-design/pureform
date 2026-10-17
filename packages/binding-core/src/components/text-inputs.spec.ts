@@ -149,7 +149,11 @@ describe("select", () => {
 
     it("adjusts Zag's part props to the preset's markup", () => {
         expect(
-            selectInputProps({ type: "button", role: "combobox" }, "Medium"),
+            selectInputProps(
+                { type: "button", role: "combobox" },
+                "Medium",
+                "ltr",
+            ),
         ).toEqual({
             role: "combobox",
             readOnly: true,
@@ -157,6 +161,15 @@ describe("select", () => {
             placeholder: " ",
             autoComplete: "off",
         });
+        const keys: string[] = [];
+        const rtl = selectInputProps(
+            { onKeyDown: (event: { key: string }) => keys.push(event.key) },
+            "",
+            "rtl",
+        );
+        for (const key of ["ArrowLeft", "ArrowRight", "ArrowDown"])
+            rtl.onKeyDown({ key });
+        expect(keys).toEqual(["ArrowRight", "ArrowLeft", "ArrowDown"]);
         expect(selectPositionerProps({ id: "p" }, false)).toEqual({
             id: "p",
             hidden: true,
