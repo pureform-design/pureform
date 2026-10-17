@@ -61,8 +61,13 @@ flowchart LR
     p5a[p5a CSS, Tailwind] --> p7
     p5b[p5b runtime themes]
     p6[p6 component rollout]
-    p7[p7 pruning]
-    p8[p8 React Native]
+    p7[p7 pruning] --> p9c
+    p8[p8 React Native] --> p9a & p9b
+    p9a[p9a interaction source] --> p9c & p9d
+    p9b[p9b indication tokens] --> p9c & p9d
+    p9c[p9c web indication] --> p9e
+    p9d[p9d native indication] --> p9e
+    p9e[p9e indication suites]
 ```
 
 Dotted lines are soft dependencies: the later phase can start, and picks the earlier
@@ -155,6 +160,20 @@ Independent of each other.
 | [x] | [p7: usage-based pruning](phases/p7-pruning.md)           | p4c, p5a    | [`context/p7.md`](context/p7.md) |
 | [x] | [p8: `@pureform/react-native`](phases/p8-react-native.md) | p2b, p4b-rn | [`context/p8.md`](context/p8.md) |
 
+### Phase 9: indication
+
+Builds design doc §9.8: the state layer, ripple, and focus indicator as one pluggable
+indication over an interaction source. p9a and p9b run in parallel; p9c and p9d build on
+p9a's interface commit in parallel; p9e follows them. p9b changes preset snapshots.
+
+|     | Subphase                                                                                 | Depends on   | Output context   |
+| --- | ---------------------------------------------------------------------------------------- | ------------ | ---------------- |
+| [ ] | [p9a: interaction source and the indication interface](phases/p9a-interaction-source.md) | p8           | `context/p9a.md` |
+| [ ] | [p9b: indication tokens and the anatomy entry](phases/p9b-indication-tokens.md)          | p8           | `context/p9b.md` |
+| [ ] | [p9c: indication on the web](phases/p9c-web-indication.md)                               | p9a, p9b, p7 | `context/p9c.md` |
+| [ ] | [p9d: indication on React Native](phases/p9d-native-indication.md)                       | p9a, p9b     | `context/p9d.md` |
+| [ ] | [p9e: indication suites and demos](phases/p9e-indication-suites.md)                      | p9c, p9d     | `context/p9e.md` |
+
 ## Waves
 
 The most that can run at once, assuming each wave's phases finish before the next:
@@ -165,3 +184,6 @@ The most that can run at once, assuming each wave's phases finish before the nex
 4. **Wave 4:** p3c, p4b-panda, p4b-css, p4b-tailwind, p4b-rn.
 5. **Wave 5:** p4c-bundler, p4c-cli, p5b, p6a to p6e, p8.
 6. **Wave 6:** p5a, then p7.
+7. **Wave 7:** p9a, p9b.
+8. **Wave 8:** p9c, p9d.
+9. **Wave 9:** p9e.
