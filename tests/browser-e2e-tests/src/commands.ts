@@ -9,7 +9,7 @@ import { compileTailwind } from "@pureform/tailwind-adapter";
 import { compile } from "@tailwindcss/node";
 import type { BrowserCommand } from "vitest/node";
 
-import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { pureformConfig } from "../../panda-fixture/panda.pureform";
 import { RN_COMPONENTS } from "./rn-components";
 
 /** The options both adapters take here. */
@@ -51,12 +51,12 @@ export const commands = { adapterCss, rnStyles, emulateReducedMotion };
 
 declare module "vitest/browser" {
     interface BrowserCommands {
-        /** An adapter's stylesheet for the demo's config. */
+        /** An adapter's stylesheet for the Panda fixture's config. */
         adapterCss: (
             adapter: Adapter,
             options: AdapterOptions,
         ) => Promise<string>;
-        /** The React Native adapter's precomputed styles for the demo's config. */
+        /** The React Native adapter's precomputed styles for the Panda fixture's config. */
         rnStyles: () => Promise<PrecomputedStyles>;
         /** Emulate `prefers-reduced-motion` on the page. */
         emulateReducedMotion: (

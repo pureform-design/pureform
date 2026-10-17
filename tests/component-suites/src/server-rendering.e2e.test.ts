@@ -183,7 +183,7 @@ describe.each(COMPONENTS)("$component, a named theme", (component) => {
     });
 });
 
-/** The seed the runtime theme cases generate from: the demo's teal theme's. */
+/** The seed the runtime theme cases generate from: the config's teal theme's. */
 const SEED = "#006A60";
 
 describe.each(COMPONENTS)("$component, a runtime theme", (component) => {

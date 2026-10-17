@@ -1,4 +1,4 @@
-// The Panda target's stylesheet: the demo's Panda CSS, with every registered variant
+// The Panda target's stylesheet: the Panda fixture's Panda CSS, with every registered variant
 // (`staticCss`).
 
-import "../../../../../apps/solid-demo/src/App.css";
+import "../../../../panda-fixture/src/styles.css";

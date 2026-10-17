@@ -21,7 +21,7 @@ import { countedSeedTheme } from "./harness/themes";
 // that reads the page's colors (axe's contrast) runs in the dark scheme.
 afterAll(() => commands.emulateColorScheme("light"));
 
-/** The demo's named themes. */
+/** The config's named themes. */
 const THEMES = ["teal", "sharp", "dense"] as const;
 
 /** What a theme can change in a part: colors, shape, and size. */

@@ -16,24 +16,24 @@ dependencies:
     - "@pureform/tailwind-adapter"
     - "@pureform/rn-adapter"
     - "@pureform/styling"
-    - "@pureform/site"
+    - "@pureform/panda-fixture"
 
 cache:
   key:
     files:
       append:
         - "src/__screenshots__/**/*"
-        - "../../apps/solid-demo/src/**/*"
-        - "../../apps/solid-demo/.pureform/**/*"
-        - "../../apps/solid-demo/panda.config.ts"
-        - "../../apps/solid-demo/panda.pureform.ts"
-        - "../../apps/solid-demo/pureform.config.ts"
-        - "../../apps/solid-demo/pureform.glue.ts"
+        - "../panda-fixture/src/**/*"
+        - "../panda-fixture/.pureform/**/*"
+        - "../panda-fixture/panda.config.ts"
+        - "../panda-fixture/panda.pureform.ts"
+        - "../panda-fixture/pureform.config.ts"
+        - "../panda-fixture/pureform.glue.ts"
 
 tasks:
   test:e2e:
     enabled: true
-    # The demo's Panda codegen writes the styled-system the tests import.
+    # The Panda fixture's codegen writes the styled-system the tests import.
     dependencies:
       append:
         - ^prepare

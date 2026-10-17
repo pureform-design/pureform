@@ -29,7 +29,7 @@ import { View } from "react-native";
 import { beforeAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
-import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { pureformConfig } from "../../panda-fixture/panda.pureform";
 import { forcePseudoClasses } from "./force-pseudo";
 import { RN_COMPONENTS } from "./rn-components";
 

@@ -9,10 +9,10 @@ import { classesFor } from "@pureform/css-adapter";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
-import { pureformConfig } from "../../../apps/solid-demo/panda.pureform";
+import { pureformConfig } from "../../panda-fixture/panda.pureform";
 import type { Adapter } from "./commands";
 
-import pandaCss from "#/App.css?inline";
+import pandaCss from "#/styles.css?inline";
 
 const OPTIONS = { prefix: "pf", themeAttribute: "data-panda-theme" };
 const MIRROR = STATE_ATTRIBUTES.mirrored;

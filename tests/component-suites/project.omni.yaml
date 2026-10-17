@@ -17,24 +17,24 @@ dependencies:
     - "@pureform/generate"
     - "@pureform/css-adapter"
     - "@pureform/tailwind-adapter"
-    - "@pureform/site"
+    - "@pureform/panda-fixture"
 
 cache:
   key:
     files:
       append:
-        - "../../apps/solid-demo/.pureform/**/*"
-        - "../../apps/solid-demo/panda.config.ts"
-        - "../../apps/solid-demo/panda.pureform.ts"
-        - "../../apps/solid-demo/pureform.config.ts"
-        - "../../apps/solid-demo/pureform.glue.ts"
-        - "../../apps/solid-demo/src/App.css"
+        - "../panda-fixture/.pureform/**/*"
+        - "../panda-fixture/panda.config.ts"
+        - "../panda-fixture/panda.pureform.ts"
+        - "../panda-fixture/pureform.config.ts"
+        - "../panda-fixture/pureform.glue.ts"
+        - "../panda-fixture/src/styles.css"
         - "../../tests/browser-e2e-tests/src/mirror.ts"
 
 tasks:
   test:e2e:
     enabled: true
-    # The demo's Panda codegen writes the styled-system the registry and stylesheet import.
+    # The Panda fixture's codegen writes the styled-system the registry and stylesheet import.
     dependencies:
       append:
         - ^prepare

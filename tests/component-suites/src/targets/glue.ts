@@ -1,7 +1,7 @@
-// Writes the CSS and Tailwind targets' glue from the demo's config, once per run, before the
-// projects start (`vitest.config.e2e.ts` awaits it): `.pureform/css` and `.pureform/tailwind`,
+// Writes the CSS and Tailwind targets' glue from the Panda fixture's config, once per run, before
+// the projects start (`vitest.config.e2e.ts` awaits it): `.pureform/css` and `.pureform/tailwind`,
 // with every component, so a component the config has is in every registry. The Panda target's
-// glue is the demo's own (`apps/solid-demo/.pureform`, the omni `generate` task).
+// glue is the fixture's own (`tests/panda-fixture/.pureform`, its omni `generate` task).
 
 import { fileURLToPath } from "node:url";
 
@@ -12,12 +12,12 @@ import type { TailwindCodegenOptions } from "@pureform/tailwind-adapter/codegen"
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 
-/** The config every target is generated from: the demo's. */
+/** The config every target is generated from: the Panda fixture's. */
 export const CONFIG = fileURLToPath(
-    new URL("../../../../apps/solid-demo/pureform.config.ts", import.meta.url),
+    new URL("../../../panda-fixture/pureform.config.ts", import.meta.url),
 );
 
-/** Each generated target's options: classes and component vars prefixed as the Panda demo's. */
+/** Each generated target's options: classes and component vars prefixed as the Panda fixture's. */
 export const GLUE = {
     css: {
         target: "css",

@@ -1,5 +1,5 @@
 // Accessibility with axe over every example of every component, and every opened overlay, with the
-// demo's real styles (so color contrast counts), in both directions.
+// target's real styles (so color contrast counts), in both directions.
 
 import axe from "axe-core";
 import { describe, expect, it } from "vitest";

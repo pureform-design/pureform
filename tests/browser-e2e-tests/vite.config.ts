@@ -1,5 +1,5 @@
-// Renders the demo's page inside the tests with the demo's own Panda config and recipes, so no
-// dev server is needed.
+// Renders the Panda fixture's page and recipes (`tests/panda-fixture`) inside the tests with the
+// fixture's own Panda config, so no dev server is needed.
 
 import { fileURLToPath } from "node:url";
 
@@ -9,7 +9,7 @@ import solid from "@solidjs/vite-plugin";
 
 import packageJson from "./package.json";
 
-const demo = fileURLToPath(new URL("../../apps/solid-demo/", import.meta.url));
+const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
 
 export default createConfig({
     package: packageJson,
@@ -17,16 +17,16 @@ export default createConfig({
     overrides: {
         plugins: [
             pandacss({
-                cwd: demo,
-                configPath: `${demo}panda.config.ts`,
+                cwd: fixture,
+                configPath: `${fixture}panda.config.ts`,
                 transform: true,
             }),
             solid(),
         ],
         resolve: {
             alias: [
-                { find: /^\$(.*)$/, replacement: `${demo}styled-system/$1` },
-                { find: /^#(.*)$/, replacement: `${demo}src/$1` },
+                { find: /^\$(.*)$/, replacement: `${fixture}styled-system/$1` },
+                { find: /^#(.*)$/, replacement: `${fixture}src/$1` },
                 // React Native components render through React Native Web.
                 { find: /^react-native$/, replacement: "react-native-web" },
             ],
