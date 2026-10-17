@@ -172,7 +172,7 @@ p9a's interface commit in parallel; p9e follows them. p9b changes preset snapsho
 | [x] | [p9b: indication tokens and the anatomy entry](phases/p9b-indication-tokens.md)          | p8           | [`context/p9b.md`](context/p9b.md) |
 | [x] | [p9c: indication on the web](phases/p9c-web-indication.md)                               | p9a, p9b, p7 | [`context/p9c.md`](context/p9c.md) |
 | [x] | [p9d: indication on React Native](phases/p9d-native-indication.md)                       | p9a, p9b     | [`context/p9d.md`](context/p9d.md) |
-| [ ] | [p9e: indication suites and demos](phases/p9e-indication-suites.md)                      | p9c, p9d     | `context/p9e.md`                   |
+| [x] | [p9e: indication suites and demos](phases/p9e-indication-suites.md)                      | p9c, p9d     | [`context/p9e.md`](context/p9e.md) |
 
 ## Waves
 
