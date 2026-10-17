@@ -1,0 +1,4 @@
+# pureform's glue, written by the omni `generate` task
+.pureform
+# Written by `panda codegen` (the omni `prepare` task) and by the suites' Panda plugin
+styled-system
