@@ -110,7 +110,7 @@ export const registry = createRegistry(
         button,
         checkbox: { lazy: () => import("./web/checkbox") },
     },
-    { version, themeAttribute: "data-panda-theme" },
+    { version, themeAttribute: "data-panda-theme", vars: { prefix: "pf" } },
 );
 
 export const themes = ["teal", "sharp", "dense"] as const;
@@ -150,13 +150,17 @@ export const codegen = defineCodegen<{ prefix?: string }>({
             { path: "panda.ts", contents: "export const staticCss = …;\n" },
         ],
         themeAttribute: "data-panda-theme", // how the stylesheet scopes named themes
+        vars: { prefix: "pf" }, // how the stylesheet names its CSS vars
     }),
 });
 ```
 
 `themeAttribute` is the attribute the target's stylesheet matches named themes with; the index
 passes it to `createRegistry`, whose `themeAttributes(name)` providers write on their element.
-Leave it out on targets without selectors (React Native).
+Leave it out on targets without selectors (React Native). `vars` (`CodegenVars`: the component
+var `prefix` and the `tokenPrefix`) is how the stylesheet names its CSS vars; the index passes the
+defined ones to `createRegistry` as `vars`, which providers name token overrides and runtime
+theme vars with. Leave it out on targets without CSS vars.
 
 The context gives the config, the components to generate, the adapter's options, the root
 and output folder, `shape(name)` (groups, defaults, slots, tokens from the config), and

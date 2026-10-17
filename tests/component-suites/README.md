@@ -2,8 +2,8 @@
 
 Shared browser suites that check the rules every component follows, against the Solid and React
 bindings at once, on each web target (Panda, plain CSS, Tailwind): controlled and uncontrolled
-state, native forms, accessibility and the keyboard, direction, named themes, and server
-rendering. They're the design doc's §5.6, §5.7, §5.9, §9.4, §9.5, and §9.7 as tests. Private;
+state, native forms, accessibility and the keyboard, direction, named and runtime themes, and
+server rendering. They're the design doc's §5.6, §5.7, §5.9, §9.4, §9.5, and §9.7 as tests. Private;
 nothing depends on it.
 
 It depends on `@pureform/solid`, `@pureform/react`, and a style registry and stylesheet per
@@ -48,30 +48,37 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
   reset and `styles.css`; Tailwind's `styles.css`, which imports `tailwindcss` and then the
   generated stylesheet).
 - **A scene** (`src/harness/scene.ts`) is what a suite asks for: a component's name, its props,
-  and the provider's `dir`, `motion`, and `theme`. Each binding's `scene.tsx` renders it inside
-  `PureformProvider` with the target's registry (`#registry`).
+  and the provider's `dir`, `motion`, `theme`, `seed` (a runtime theme), `hydrate`, and
+  `overrides`. Each binding's `scene.tsx` renders it inside `PureformProvider` with the target's
+  registry (`#registry`). `src/harness/themes.ts` turns a `seed` into Material's `seedTheme`
+  through a source that counts its generations (`generated.count`), the same scope as
+  `seedTheme`'s, so a suite can tell that hydrating generated nothing.
 - **The harness** (`src/harness/harness.ts`) mounts a scene into a host (anywhere in the page:
   inside a form, a fieldset, a legend), sets props from outside as an owner would
   (`update`), hydrates server HTML, and `settle`s (waits for the machines and the framework).
   React runs unwrapped by `act`, scheduling as in an app.
 - **Server rendering** goes through a browser command, `renderOnServer` (`src/commands.ts`): Node
   starts a Vite server in SSR mode with the binding's plugin, loads
-  `src/bindings/<binding>/server.tsx`, and returns the HTML (and Solid's hydration bootstrap).
-  The test puts it in the page and hydrates it. There's one server per binding and target (the
+  `src/bindings/<binding>/server.tsx`, and returns the HTML and the head: Solid's `useHead` tags
+  (from `renderToString`'s `onHead`) and hydration bootstrap, or React's hoisted `<style
+precedence>` blocks (split off the front of its markup). Each awaits `preloadTheme` for a
+  runtime theme first, as an app's request handler would. The test puts the head in the page
+  (`applyHead`: scripts run, a theme block replaces an earlier one for the same scope) and the
+  HTML in a host, then hydrates it. There's one server per binding and target (the
   project's name says which), aliasing `#registry` as the project does, each with its own
   dependency cache.
 
 ## Suites
 
-| File                           | What it checks                                                                                                                                                                                                                                                                                                 |
-| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `controllable.e2e.test.ts`     | §9.4: uncontrolled state changes on its own; controlled state asks and moves only with the prop (or when the owner takes the change); one callback per user action, none for a prop change; the default is read once; switching warns once.                                                                    |
-| `forms.e2e.test.ts`            | §9.5: `FormData` entries (also through `form="id"` from outside the form); reset to the default, controlled and uncontrolled, with `reason: "reset"`; disabled fieldsets (nested, the first legend's exemption, toggled); `required`, `invalid`, `error`.                                                      |
-| `accessibility.e2e.test.ts`    | axe over every example, both directions, with the real styles (so contrast counts).                                                                                                                                                                                                                            |
-| `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled; each key clicks it, changes its state, or does nothing; arrow keys in `ltr` and `rtl`.                                                                                                                                                                        |
-| `direction.e2e.test.ts`        | §5.9: every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`).                                                                                                      |
-| `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand, for each of the demo's themes; teal draws differently from the base theme.                                             |
-| `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule. |
+| File                           | What it checks                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| ------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `controllable.e2e.test.ts`     | §9.4: uncontrolled state changes on its own; controlled state asks and moves only with the prop (or when the owner takes the change); one callback per user action, none for a prop change; the default is read once; switching warns once.                                                                                                                                                                                                                                                                                                                                                                 |
+| `forms.e2e.test.ts`            | §9.5: `FormData` entries (also through `form="id"` from outside the form); reset to the default, controlled and uncontrolled, with `reason: "reset"`; disabled fieldsets (nested, the first legend's exemption, toggled); `required`, `invalid`, `error`.                                                                                                                                                                                                                                                                                                                                                   |
+| `accessibility.e2e.test.ts`    | axe over every example, both directions, with the real styles (so contrast counts).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `keyboard.e2e.test.ts`         | Tab reaches the component and skips it disabled; each key clicks it, changes its state, or does nothing; arrow keys in `ltr` and `rtl`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `direction.e2e.test.ts`        | §5.9: every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`).                                                                                                                                                                                                                                                                                                                                                                                                   |
+| `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand, for each of the demo's themes; teal draws differently from the base theme; a runtime theme from teal's seed draws teal's colors in both schemes.                                                                                                                                                                                                                                                                    |
+| `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule; a named theme's attribute renders on the server; a runtime theme renders its scope and block on the server, hydrates in both schemes keeping the server's block and generating nothing (`"reuse"`), and regenerates the same block (`"regenerate"`); overrides render and hydrate unchanged. |
 
 ## Adding a component
 
@@ -114,14 +121,14 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 
 ## Worth knowing
 
-- **Stubs:** `error` has no component yet (the text inputs bring it in p6b), and server rendering
-  runs without a runtime theme (p5b); each is an `it.todo`.
+- **Stubs:** `error` has no component yet (the text inputs bring it in p6b); an `it.todo`.
 - **Targets differ only in their stylesheet and registry.** No suite branches on the target; a
   case that needs to know reads the registry (`#registry`), as the themes suite reads
   `registry.themeAttributes`.
 - Elements are measured one at a time in the same place when two renders are compared (the
   themes suite): the pointer may rest on the first element on the page, whose hover state layer
-  then changes its background.
+  then changes its background. The runtime theme case mounts its scenes in a host with
+  `pointer-events: none`, since its scenes stay on the page longer (the generator loads).
 - Solid's plugin compiles tests non-hydratable; the `solid` project asks for hydratable output
   (`solid: { hydratable: true }`), as an app's client build is.
 - Solid's server render returns a bootstrap that clears the previous render's `_$HY`, since every
