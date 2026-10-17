@@ -10,7 +10,6 @@ export default createConfig({
             lib: {
                 entry: {
                     index: "src/index.ts",
-                    vite: "src/vite.ts",
                     codegen: "src/codegen.ts",
                 },
                 formats: ["es"],

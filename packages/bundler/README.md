@@ -149,9 +149,10 @@ bundle still exits), and resolves `virtual:pureform/registry` before the config'
 
 - **Rollup and esbuild aren't installed here**, so their subpaths (thin unplugin outputs) are
   untested; Vite and Rolldown are.
-- **The CSS and Tailwind adapters' own Vite plugins stay** (`pureformCss`, `pureformTailwind`,
-  serving `virtual:pureform/components`): `css-demo` and `tailwind-demo` still read class
-  strings from them, and moving those demos onto the registry is p5a's.
+- **It replaced the CSS and Tailwind adapters' own Vite plugins** (`pureformCss`,
+  `pureformTailwind`, `virtual:pureform/components`), which are gone: with `target: "css"` or
+  `"tailwind"` it writes `.pureform/styles.css` too, which the app imports (Tailwind: after
+  `tailwindcss`, and with this plugin before Tailwind's).
 - **Generate under one runtime.** The glue's hash covers the evaluated config, which the preset
   computes slightly differently under Bun than under Node; Vite runs the plugin under Node, and
   so does `pureform generate` (its bin's shebang, which `bun x` follows).

@@ -15,17 +15,6 @@
                 "default": "./dist/index.mjs"
             }
         },
-        "./vite": {
-            "types": "./dist/vite.d.ts",
-            "import": {
-                "development": "./src/vite.ts",
-                "default": "./dist/vite.mjs"
-            },
-            "require": {
-                "development": "./src/vite.ts",
-                "default": "./dist/vite.mjs"
-            }
-        },
         "./codegen": {
             "types": "./dist/codegen.d.ts",
             "import": {
@@ -51,18 +40,13 @@
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
         "@tailwindcss/node": "catalog:",
+        "@types/node": "catalog:",
         "tailwindcss": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"
     },
     "peerDependencies": {
-        "tailwindcss": "catalog:",
-        "vite": "catalog:"
-    },
-    "peerDependenciesMeta": {
-        "vite": {
-            "optional": true
-        }
+        "tailwindcss": "catalog:"
     }
 }

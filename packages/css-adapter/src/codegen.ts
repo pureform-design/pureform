@@ -1,6 +1,6 @@
 // The CSS adapter's codegen, which `@pureform/generate` loads for the `css` target: a
 // `ClassFactory` module per component with its classes written out, and the stylesheet for
-// those components. It succeeds the Vite plugin's `virtual:pureform/components`.
+// those components. The bundler plugin (`@pureform/bundler`) and `pureform generate` run it.
 
 import type { CoreConfig } from "@pureform/core/types";
 import { defineCodegen } from "@pureform/generate";

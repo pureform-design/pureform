@@ -266,16 +266,11 @@
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
+        "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
       },
-      "peerDependencies": {
-        "vite": "catalog:",
-      },
-      "optionalPeers": [
-        "vite",
-      ],
     },
     "packages/css-lowering": {
       "name": "@pureform/css-lowering",
@@ -592,6 +587,7 @@
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
         "@tailwindcss/node": "catalog:",
+        "@types/node": "catalog:",
         "tailwindcss": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
@@ -599,11 +595,7 @@
       },
       "peerDependencies": {
         "tailwindcss": "catalog:",
-        "vite": "catalog:",
       },
-      "optionalPeers": [
-        "vite",
-      ],
     },
     "packages/theme": {
       "name": "@pureform/theme",

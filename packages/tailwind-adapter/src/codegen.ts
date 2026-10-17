@@ -1,7 +1,7 @@
 // The Tailwind adapter's codegen, which `@pureform/generate` loads for the `tailwind` target:
 // the CSS adapter's `ClassFactory` modules, since the Tailwind stylesheet keeps its class
-// names, and that stylesheet for those components. It succeeds the Vite plugin's
-// `virtual:pureform/components`.
+// names, and that stylesheet for those components. The bundler plugin (`@pureform/bundler`) and
+// `pureform generate` run it.
 //
 // Tailwind keeps every rule of the components layer whether or not its scanner sees the
 // classes (only utilities are generated from what it sees), so the factories' classes need no
