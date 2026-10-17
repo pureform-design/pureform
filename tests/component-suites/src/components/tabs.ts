@@ -2,10 +2,11 @@
 // Space click it, and the arrow keys left and right select the tab before or after, by direction.
 // Each tab shows its panel. They aren't a form control.
 
-import { compositeTestIds } from "@pureform/anatomy";
+import { compositeTestIds, tabsAnatomy } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
+import { itemSources } from "./types";
 
 const ids = compositeTestIds.tabs;
 
@@ -123,4 +124,6 @@ export const tabsCase: ComponentCase = {
             ],
         },
     },
+    // The tabs have no disabled state of their own; a tab has.
+    indication: itemSources(tabsAnatomy, ITEMS, { disabled: undefined }),
 };

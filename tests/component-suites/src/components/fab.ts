@@ -1,10 +1,10 @@
 // The FAB: a native `<button>` that submits as the form's submitter, and Enter and Space to click.
 // It doesn't toggle.
 
-import { testIds } from "@pureform/anatomy";
+import { fabAnatomy, testIds } from "@pureform/anatomy";
 
 import type { ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.fab;
 
@@ -40,4 +40,5 @@ export const fab: ComponentCase = {
             { key: " ", does: "click" },
         ],
     },
+    indication: ownSource(fabAnatomy),
 };

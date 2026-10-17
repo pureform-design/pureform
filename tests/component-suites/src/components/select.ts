@@ -2,11 +2,15 @@
 // that submits, resets, and validates; Enter, Space, and the arrow keys up and down open the list,
 // and the arrow keys sideways choose the option before or after, by direction.
 
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import {
+    compositeTestIds,
+    selectMenuAnatomy,
+    testIds,
+} from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, itemSources } from "./types";
 
 const ids = testIds.select;
 const menu = compositeTestIds.selectMenu;
@@ -133,4 +137,15 @@ export const select: ComponentCase = {
             ],
         },
     },
+    // Open, by a click on the field; the keyboard highlights an option, which shows as hovered.
+    indication: itemSources(selectMenuAnatomy, ITEMS, {
+        open: async (host) => {
+            await userEvent.click(input(host));
+            await opened(host);
+        },
+        focus: async (host) => {
+            content(host).focus();
+            await userEvent.keyboard("{ArrowDown}");
+        },
+    }),
 };

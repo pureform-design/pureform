@@ -3,11 +3,13 @@
 // state, as an owner would. React schedules its work as it would in an app (not in `act`), and
 // `settle` waits for it.
 
+import { useInteractionSource, useInteractionState } from "@pureform/react";
+import type { MutableInteractionSource } from "@pureform/react";
 import { type ReactNode, useState } from "react";
 import { flushSync } from "react-dom";
 import { createRoot, hydrateRoot, type Root } from "react-dom/client";
 
-import type { Harness, Mounted } from "../../harness/harness";
+import type { Harness, Mounted, ObservedSource } from "../../harness/harness";
 import { track } from "../../harness/mounts";
 import type { Scene, SceneProps } from "../../harness/scene";
 import { SceneView } from "./scene";
@@ -45,6 +47,25 @@ const start = (
     });
 };
 
+const STATE = "data-interaction-state";
+
+const observe = (): ObservedSource => {
+    const host = document.body.appendChild(document.createElement("div"));
+    let source!: MutableInteractionSource;
+    function Observer(): ReactNode {
+        source = useInteractionSource();
+        const state = useInteractionState(source);
+        return <output {...{ [STATE]: JSON.stringify(state) }} />;
+    }
+    const root = createRoot(host);
+    flushSync(() => root.render(<Observer />));
+    track({ host, update: settle, unmount: () => root.unmount() });
+    return {
+        source,
+        state: () => JSON.parse(host.firstElementChild!.getAttribute(STATE)!),
+    };
+};
+
 export const harness: Harness = {
     name: "react",
     mount: (
@@ -66,5 +87,6 @@ export const harness: Harness = {
         await settle();
         return mounted;
     },
+    observe,
     settle,
 };

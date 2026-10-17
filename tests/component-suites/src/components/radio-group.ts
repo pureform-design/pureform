@@ -1,11 +1,11 @@
 // The radio group: `value`, a native radio per item that submits, resets, and validates, Space to
 // check the focused radio, and arrow keys that move to the radio before or after, by direction.
 
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { compositeTestIds, radioAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, itemSources } from "./types";
 
 const ids = testIds.radio;
 
@@ -111,4 +111,5 @@ export const radioGroup: ComponentCase = {
             ],
         },
     },
+    indication: itemSources(radioAnatomy, ITEMS),
 };

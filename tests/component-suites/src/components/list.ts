@@ -1,10 +1,10 @@
 // The list item and the list: no state of their own. A list item is a row, a link (`href`), or a
 // button (`as="button"`), which Enter clicks; the list is a `<ul>` of them, each in an `<li>`.
 
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { compositeTestIds, listItemAnatomy, testIds } from "@pureform/anatomy";
 
 import type { ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.listItem;
 
@@ -41,6 +41,7 @@ export const listItem: ComponentCase = {
             { key: " ", does: "click" },
         ],
     },
+    indication: ownSource(listItemAnatomy),
 };
 
 const ITEMS = [

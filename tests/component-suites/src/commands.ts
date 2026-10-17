@@ -89,7 +89,25 @@ const emulateColorScheme: BrowserCommand<[scheme: "light" | "dark"]> = (
     scheme,
 ) => context.page.emulateMedia({ colorScheme: scheme });
 
-export const commands = { renderOnServer, emulateColorScheme };
+/** What the mouse does: moves to a point, goes down there, or comes up there. */
+export type MouseAction = "move" | "down" | "up";
+
+// The test's frame may sit anywhere in the page, and be scaled: a point in its viewport is
+// placed in the page's.
+const mouse: BrowserCommand<
+    [action: MouseAction, x: number, y: number]
+> = async (context, action, x, y) => {
+    const box = await context.iframe.owner().boundingBox();
+    const frame = await context.frame();
+    const width = await frame.evaluate(() => window.innerWidth);
+    if (!box) throw new Error("the test's frame has no box");
+    const scale = box.width / width;
+    await context.page.mouse.move(box.x + x * scale, box.y + y * scale);
+    if (action === "down") await context.page.mouse.down();
+    if (action === "up") await context.page.mouse.up();
+};
+
+export const commands = { renderOnServer, emulateColorScheme, mouse };
 
 /** Closes the server-rendering Vite servers with the test server, so the run can exit. */
 export const closeServers: Plugin = {
@@ -107,5 +125,8 @@ declare module "vitest/browser" {
         renderOnServer: (scene: Scene) => Promise<ServerRender>;
         /** Emulate `prefers-color-scheme` on the page. */
         emulateColorScheme: (scheme: "light" | "dark") => Promise<void>;
+        /** The real mouse at a point in the test's viewport: it moves there, then goes down or
+         *  up, so `:hover` and `:active` match as they would for a user. */
+        mouse: (action: MouseAction, x: number, y: number) => Promise<void>;
     }
 }

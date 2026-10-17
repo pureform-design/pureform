@@ -1,7 +1,12 @@
 // A scene in Solid: the ready-made component inside `PureformProvider` with the target's registry.
 // The browser (`harness.tsx`) and the server (`server.tsx`) render the same view.
 
-import { PureformProvider } from "@pureform/solid";
+import {
+    materialIndication,
+    noIndication,
+    PureformProvider,
+} from "@pureform/solid";
+import type { Indication } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
 import { Button } from "@pureform/solid/button";
 import { Card } from "@pureform/solid/card";
@@ -41,7 +46,13 @@ import type { Accessor } from "solid-js";
 
 import { registry } from "#registry";
 
-import type { ComponentName, Scene, SceneProps } from "../../harness/scene";
+import { customIndication } from "../../harness/indications";
+import type {
+    ComponentName,
+    Scene,
+    SceneIndication,
+    SceneProps,
+} from "../../harness/scene";
 import { sceneTheme } from "../../harness/themes";
 
 /** Every component the suites render, by name. */
@@ -81,23 +92,54 @@ export const components: Record<ComponentName, ValidComponent> = {
     TouchTarget,
 };
 
+/** The indications a scene names. */
+const indications: Record<SceneIndication, Indication> = {
+    material: materialIndication(),
+    "ink-sparkle": materialIndication({ ripple: "ink-sparkle" }),
+    "no-ripple": materialIndication({ ripple: false }),
+    none: noIndication,
+    custom: customIndication(materialIndication()),
+};
+
+const indicationOf = (name: SceneIndication | undefined) =>
+    name === undefined ? {} : { indication: indications[name] };
+
 export function SceneView(props: {
     scene: Scene;
     props: Accessor<SceneProps>;
 }): JSX.Element {
+    const view = () => (
+        <Dynamic
+            component={components[props.scene.component]}
+            {...indicationOf(props.scene.indication)}
+            {...(props.props() as object)}
+        />
+    );
+    const wrapper = props.scene.wrapper;
     return (
         <PureformProvider
             registry={registry}
+            indication={
+                props.scene.provider?.indication &&
+                indications[props.scene.provider.indication]
+            }
             dir={props.scene.provider?.dir}
             motion={props.scene.provider?.motion}
             theme={sceneTheme(props.scene.provider)}
             hydrate={props.scene.provider?.hydrate}
             overrides={props.scene.provider?.overrides}
         >
-            <Dynamic
-                component={components[props.scene.component]}
-                {...(props.props() as object)}
-            />
+            {wrapper ? (
+                <Dynamic
+                    component={components[wrapper.component]}
+                    {...indicationOf(wrapper.indication)}
+                    {...(wrapper.props as object)}
+                >
+                    {view()}
+                </Dynamic>
+            ) : (
+                view()
+            )}
         </PureformProvider>
     );
 }

@@ -2,7 +2,7 @@
 // its action; Enter and Space choose it, which closes the snackbar and leaves focus on the page.
 // It has no form and no disabled state.
 
-import { testIds } from "@pureform/anatomy";
+import { snackbarAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
@@ -66,4 +66,7 @@ export const snackbar: ComponentCase = {
             { key: "{Escape}", does: "change" },
         ],
     },
+    // Its action and its close button; the ready-made snackbar takes no source for either, and
+    // has no disabled state.
+    indication: { anatomy: snackbarAnatomy },
 };
