@@ -38,6 +38,61 @@
                 "default": "./dist/checkbox.jsx"
             }
         },
+        "./chip": {
+            "types": "./dist/chip/index.d.ts",
+            "solid": {
+                "development": "./src/chip/index.ts",
+                "default": "./dist/chip.jsx"
+            },
+            "import": {
+                "development": "./src/chip/index.ts",
+                "default": "./dist/chip.jsx"
+            }
+        },
+        "./fab": {
+            "types": "./dist/fab/index.d.ts",
+            "solid": {
+                "development": "./src/fab/index.ts",
+                "default": "./dist/fab.jsx"
+            },
+            "import": {
+                "development": "./src/fab/index.ts",
+                "default": "./dist/fab.jsx"
+            }
+        },
+        "./icon-button": {
+            "types": "./dist/icon-button/index.d.ts",
+            "solid": {
+                "development": "./src/icon-button/index.ts",
+                "default": "./dist/icon-button.jsx"
+            },
+            "import": {
+                "development": "./src/icon-button/index.ts",
+                "default": "./dist/icon-button.jsx"
+            }
+        },
+        "./radio-group": {
+            "types": "./dist/radio-group/index.d.ts",
+            "solid": {
+                "development": "./src/radio-group/index.ts",
+                "default": "./dist/radio-group.jsx"
+            },
+            "import": {
+                "development": "./src/radio-group/index.ts",
+                "default": "./dist/radio-group.jsx"
+            }
+        },
+        "./switch": {
+            "types": "./dist/switch/index.d.ts",
+            "solid": {
+                "development": "./src/switch/index.ts",
+                "default": "./dist/switch.jsx"
+            },
+            "import": {
+                "development": "./src/switch/index.ts",
+                "default": "./dist/switch.jsx"
+            }
+        },
         "./internal/zag": {
             "types": "./dist/internal/zag/index.d.ts",
             "solid": {

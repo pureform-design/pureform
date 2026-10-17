@@ -83,3 +83,58 @@ export const deferredLoader = () => {
 
 export const fakeRegistry = (lazy: () => Promise<unknown>) =>
     createRegistry({ button, checkbox, chip: { lazy } });
+
+/** A static factory whose root class names the component and its selection
+ *  (`icon-button icon-button--variant-filled icon-button--toggle-true`), and each other slot
+ *  `<component>__<slot>`. */
+const named =
+    (
+        component: string,
+        slots: readonly string[],
+    ): ClassFactory<ComponentShape> =>
+    (s) => {
+        const selected = Object.entries(s)
+            .filter(([key, value]) => key !== "tokens" && value !== undefined)
+            .map(([key, value]) => `${component}--${key}-${String(value)}`);
+        return Object.fromEntries(
+            slots.map((slot) => [
+                slot,
+                {
+                    class:
+                        slot === "root"
+                            ? [component, ...selected].join(" ")
+                            : `${component}__${slot}`,
+                },
+            ]),
+        ) as never;
+    };
+
+/** The toggles' fake factories, all static: the switch, radio, chip, icon button, and FAB. */
+export const togglesRegistry = () =>
+    createRegistry({
+        switchControl: named("switch", [
+            "root",
+            "touchTarget",
+            "input",
+            "track",
+            "stateLayer",
+            "handle",
+            "icon",
+        ]),
+        radio: named("radio", ["root", "touchTarget", "input", "ring", "dot"]),
+        chip: named("chip", ["root", "icon", "label", "touchTarget"]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        fab: named("fab", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "label",
+        ]),
+    });
