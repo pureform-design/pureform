@@ -98,11 +98,15 @@ export const BINDING_PACKAGES = [
     "@pureform/react-native",
 ] as const;
 
-/** The hooks the bindings export that read the registry by name: `useClasses(name, selection)`
- *  and `useStyles(name, selection)` select, the others hand out a whole factory. */
+/** The hooks the bindings export that read the registry by name: `useClasses(name, selection)`,
+ *  `useStyles(name, selection)`, and React Native's `useComponentSlots` and `useSelectedStyles`
+ *  select, the others hand out a whole factory. */
 export const REGISTRY_HOOKS = {
     useClasses: "selection",
     useStyles: "selection",
+    // React Native's: a component's styles through the provider's engine, or its plain selection.
+    useComponentSlots: "selection",
+    useSelectedStyles: "selection",
     useClassFactory: "factory",
     useLazyClassFactory: "factory",
     useStyleFactory: "factory",
