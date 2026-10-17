@@ -72,6 +72,9 @@ export const selectMenuAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "item", surface: "item", centered: false, focus: "item" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 /** The menu as the bindings render it: Root, an unstyled element around the trigger and the menu, the trigger, and Zag's positioner, also unstyled, around the menu's surface (`content`, the preset's `root` slot) and its items, which the menu's registry entry styles. */
@@ -180,6 +183,9 @@ export const menuOverlayAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "item", surface: "item", centered: false, focus: "item" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 /** The tooltip as the bindings render it: Root around the trigger and Zag's positioner, all three unstyled, and the tooltip's surface (`content`, the preset's `root` slot) with its subhead, supporting text, and actions. */
@@ -462,6 +468,9 @@ export const tabsCompositeAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "tab", surface: "tab", centered: false, focus: "tab" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 /** The list: a `<ul>` around list items, each in an `<li>` (`item`), so a list item can be a link

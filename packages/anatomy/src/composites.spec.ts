@@ -22,6 +22,17 @@ import {
 import type { ComponentAnatomy } from "./types";
 
 describe("composites", () => {
+    it.each([
+        ["the select's menu", selectMenuAnatomy, menuAnatomy],
+        ["the menu's overlay", menuOverlayAnatomy, menuAnatomy],
+        ["the tabs", tabsCompositeAnatomy, tabsAnatomy],
+    ] as const)(
+        "%s shows indication where the preset's component does",
+        (_, composite, preset) => {
+            expect(composite.indication).toEqual(preset.indication);
+        },
+    );
+
     it("aren't preset components, and the registry doesn't style them", () => {
         expect(Object.keys(anatomy)).not.toContain(radioGroupAnatomy.name);
         expect(radioGroupAnatomy.parts.root.styled).toBe(false);

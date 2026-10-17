@@ -73,6 +73,45 @@ describe("deriveAnatomy", () => {
         expect(deriveAnatomy(compound).parts.icon!.mirror).toBe(true);
     });
 
+    it("says where it shows indication, as the spec declares it", () => {
+        expect(deriveAnatomy(card).indication).toBeUndefined();
+        const pressable = defineSlotComponent({
+            name: "pressable",
+            slots: ["root", "surface"],
+            structure: { root: ["surface"] },
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "surface",
+                    centered: true,
+                    focus: "root",
+                },
+            ],
+            recipe: { base: {} },
+        });
+        expect(deriveAnatomy(pressable).indication).toEqual([
+            {
+                trigger: "root",
+                surface: "surface",
+                centered: true,
+                focus: "root",
+            },
+        ]);
+        expect(() =>
+            deriveAnatomy({
+                ...pressable,
+                indication: [
+                    {
+                        trigger: "root",
+                        surface: "layer",
+                        centered: false,
+                        focus: "root",
+                    },
+                ],
+            }),
+        ).toThrow('pressable: indication names "layer", which is not a part');
+    });
+
     it("gives a single-slot component a root part", () => {
         const icon = defineComponent({
             name: "glyph",
