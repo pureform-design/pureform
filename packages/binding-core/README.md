@@ -39,6 +39,8 @@ to prune builds.
 | `warn.ts`         | `warnOnce`                                                                                                                                                                                                                             |
 | `web-theme.ts`    | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
 | `usage.ts`        | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                       |
+| `interaction.ts`  | The interaction source (on `/interaction`): `InteractionKinds`, `Interaction`, `InteractionState`, `createInteractionSource` and the state it keeps                                                                                    |
+| `indication.ts`   | The `Indication` interface (on `/indication`): what an indication sets and draws, `defineIndication`                                                                                                                                   |
 | `dom.ts`          | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
 
 The root entry uses no DOM API and no CSS lowering, so React Native can import it.
@@ -358,6 +360,70 @@ of it, so a controlled checkbox whose owner ignores the change would otherwise s
 `observeIconStyle` re-reads after an attribute changes anywhere in the icon's component (its
 `data-scope` root), after a transition there ends, and when the slot resizes.
 
+### `@pureform/binding-core/interaction`
+
+What happened to an interactive component, in Compose's terms (design doc §9.8). A component's
+machine (`@pureform/machines`) emits interactions to the component's source; anything that draws
+from them subscribes.
+
+```ts
+type PointerKind = "mouse" | "touch" | "pen" | "keyboard" | "virtual";
+interface InteractionKinds {                   // open: apps augment it with prefixed kinds
+    press: { id: number; origin: { x: number; y: number } | "center"; pointer: PointerKind };
+    release: { id: number }; cancel: { id: number };
+    hoverEnter: {}; hoverExit: {}; focus: { visible: boolean }; blur: {};
+    dragStart: {}; dragStop: {};
+}
+type Interaction;                              // { type: K } & InteractionKinds[K], for every K
+interface InteractionState { hovered; focused; focusVisible; pressed; dragged }
+interface InteractionSource {
+    readonly state: InteractionState;          // a new frozen object only when it changes
+    subscribe((interaction, state, origin) => void): () => void;
+}
+interface MutableInteractionSource extends InteractionSource {
+    emit(interaction, origin?): void;          // origin: the element or native view it happened on
+}
+createInteractionSource(): MutableInteractionSource;
+IDLE_INTERACTION_STATE;
+```
+
+The state: a press holds until a `release` or `cancel` with its id; hover holds while more
+enters than exits have come, and never during a touch press; focus from `focus` to `blur`; a drag
+while more starts than stops have come. A kind it doesn't know (an app's) reaches subscribers and
+changes nothing. An app adds a kind by augmenting the interface:
+
+```ts
+declare module "@pureform/binding-core/interaction" {
+    interface InteractionKinds {
+        "app:longPress": { id: number; duration: number };
+    }
+}
+```
+
+A source is always a value in every type; whether a component makes its own at mount or later
+isn't promised (today: at mount on the client, none on the server).
+
+### `@pureform/binding-core/indication`
+
+The interface the bindings' indications implement (types only, and `defineIndication`):
+
+```ts
+interface Indication {
+    readonly name: string;
+    readonly tokens?: IndicationTokens;        // stateHoverOpacity, stateFocusOpacity, statePressedOpacity,
+                                               // stateDraggedOpacity, focusIndicatorThickness,
+                                               // focusIndicatorOuterOffset, focusIndicatorColor
+    readonly layer?: boolean;                  // the surface holds a layer element
+    readonly web?: (target: IndicationTarget, source: InteractionSource,
+                    context: IndicationContext) => () => void; // after mount, before the first interaction
+    readonly native?: NativeIndicationComponent; // (props: NativeIndicationProps) => …, React-free
+}
+interface IndicationTarget { trigger: HTMLElement; surface: HTMLElement; layer?: HTMLElement }
+interface IndicationContext { centered; reducedMotion(); dir(); registry }
+interface NativeIndicationProps { source; surface: { style; drawing? }; centered; reducedMotion; dir; registry }
+defineIndication(indication): Indication;
+```
+
 ### `@pureform/binding-core/usage`
 
 Data for usage-based pruning (design doc §7), keyed by component subpath, the same in every
@@ -386,8 +452,8 @@ but its own prop.
 
 ## Building and testing
 
-- `task_run` `build` on `@pureform/binding-core`: Vite library build, three entries (`index`,
-  `dom`, `usage`), with declarations.
+- `task_run` `build` on `@pureform/binding-core`: Vite library build, five entries (`index`,
+  `dom`, `interaction`, `indication`, `usage`), with declarations.
 - `task_run` `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`),
   with type checks. A browser command, `emulateReducedMotion`, flips the media query
   (`src/testing/commands.ts`).

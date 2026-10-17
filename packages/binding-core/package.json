@@ -27,6 +27,28 @@
                 "default": "./dist/dom.mjs"
             }
         },
+        "./interaction": {
+            "types": "./dist/interaction.d.ts",
+            "import": {
+                "development": "./src/interaction.ts",
+                "default": "./dist/interaction.mjs"
+            },
+            "require": {
+                "development": "./src/interaction.ts",
+                "default": "./dist/interaction.mjs"
+            }
+        },
+        "./indication": {
+            "types": "./dist/indication.d.ts",
+            "import": {
+                "development": "./src/indication.ts",
+                "default": "./dist/indication.mjs"
+            },
+            "require": {
+                "development": "./src/indication.ts",
+                "default": "./dist/indication.mjs"
+            }
+        },
         "./usage": {
             "types": "./dist/usage.d.ts",
             "import": {
