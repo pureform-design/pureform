@@ -42,6 +42,10 @@ export const codegen = defineCodegen<TailwindCodegenOptions>({
             },
         ],
         themeAttribute: themeAttributeOf(context.options),
+        vars: {
+            prefix: context.options.prefix,
+            tokenPrefix: context.options.tokenPrefix,
+        },
     }),
 });
 

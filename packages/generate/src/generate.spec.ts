@@ -137,6 +137,26 @@ describe("generate", () => {
         );
     });
 
+    it("passes the target's var prefixes to the registry", async () => {
+        const root = tempRoot();
+        const adapter = fakeAdapter();
+        await generate({
+            root,
+            config: fixtureConfig(),
+            target: defineCodegen({
+                ...adapter,
+                codegen: async (context) => ({
+                    ...(await adapter.codegen(context)),
+                    themeAttribute: "data-theme",
+                    vars: { prefix: "pf", tokenPrefix: undefined },
+                }),
+            }),
+        });
+        expect(body(read(root, "index.ts"))).toContain(
+            '    { version, themeAttribute: "data-theme", vars: { prefix: "pf" } },\n);',
+        );
+    });
+
     it("rejects a theme attribute that isn't an attribute name", async () => {
         const adapter = fakeAdapter();
         const error = await rejection(

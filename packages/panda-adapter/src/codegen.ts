@@ -20,13 +20,16 @@ export interface PandaCodegenOptions {
     /** The var prefix the preset was compiled with (`compilePreset`'s `prefix`), which names
      *  the instance tokens' CSS vars. Default none. */
     prefix?: VarPrefix;
+    /** Panda's own `prefix`, when the app's Panda config sets one: it names the token vars,
+     *  which providers write for token overrides and runtime themes. Default none. */
+    tokenPrefix?: string;
 }
 
 /** The file `panda.config.ts` imports `staticCss` from, relative to `.pureform/`. */
 export const STATIC_CSS_FILE = "panda.ts";
 
 /** The Panda adapter's codegen: `web/<name>.ts` per component, and `panda.ts`. The registry
- *  scopes named themes with Panda's own `data-panda-theme`. */
+ *  scopes named themes with Panda's own `data-panda-theme`, and names vars with `prefix`. */
 export const codegen = defineCodegen<PandaCodegenOptions>({
     name: "panda",
     platform: "web",
@@ -62,6 +65,10 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
                 },
             ],
             themeAttribute: THEME_ATTRIBUTE,
+            vars: {
+                prefix: context.options.prefix,
+                tokenPrefix: context.options.tokenPrefix,
+            },
         };
     },
 });

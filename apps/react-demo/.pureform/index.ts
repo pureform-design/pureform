@@ -14,7 +14,7 @@ export const registry = createRegistry(
         button,
         checkbox,
     },
-    { version, themeAttribute: "data-panda-theme" },
+    { version, themeAttribute: "data-panda-theme", vars: { prefix: "pf" } },
 );
 
 export const themes = ["teal", "sharp", "dense"] as const;

@@ -203,6 +203,16 @@ describe("the Tailwind codegen", () => {
         }
     });
 
+    it("gives the registry the var prefixes", async () => {
+        const output = await codegen.codegen(
+            context({ prefix: "pf", tokenPrefix: "x" }),
+        );
+        expect(output.vars).toEqual({
+            prefix: "pf",
+            tokenPrefix: "x",
+        });
+    });
+
     it("scopes named themes with the attribute its theme variants match", async () => {
         const base = await codegen.codegen(context({}));
         expect(base.themeAttribute).toBe("data-theme");
