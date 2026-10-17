@@ -8,6 +8,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { ButtonElementIds } from "./button";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The FAB's parts: `"root" | "touchTarget" | "container" | "icon" | "label"`. */
@@ -40,7 +41,8 @@ export interface FabBehaviorProps {
 }
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface FabRootOwnProps extends FabVariantProps, FabBehaviorProps {
+export interface FabRootOwnProps
+    extends FabVariantProps, FabBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`compose` → `compose-icon`), or ids by part. */
     readonly testId?: TestIdOverride<FabPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -64,6 +66,8 @@ export const FAB_ROOT_PROPS = [
     "ids",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof FabRootOwnProps)[];
 
 /** The registry selection from Root's props. */

@@ -12,6 +12,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { ButtonBehaviorProps } from "./button";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The icon button's parts: `"root" | "touchTarget" | "container" | "icon" | "outline"`. */
@@ -30,7 +31,7 @@ export interface IconButtonVariantProps {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface IconButtonRootOwnProps
-    extends IconButtonVariantProps, ButtonBehaviorProps {
+    extends IconButtonVariantProps, ButtonBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`like` → `like-icon`), or ids by part. */
     readonly testId?: TestIdOverride<IconButtonPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -58,6 +59,8 @@ export const ICON_BUTTON_ROOT_PROPS = [
     "onSelectedChange",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof IconButtonRootOwnProps)[];
 
 /** Whether a press toggles `selected`: `toggle` when given, else whether `selected` or

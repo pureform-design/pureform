@@ -11,6 +11,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The checkbox's parts: `"root" | "touchTarget" | "input" | "box" | "checkIcon" |
@@ -58,7 +59,7 @@ export interface CheckboxBehaviorProps extends Controllable<
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface CheckboxRootOwnProps
-    extends CheckboxVariantProps, CheckboxBehaviorProps {
+    extends CheckboxVariantProps, CheckboxBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`terms` → `terms-input`), or ids by part. */
     readonly testId?: TestIdOverride<CheckboxPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -84,6 +85,8 @@ export const CHECKBOX_ROOT_PROPS = [
     "onCheckedChange",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof CheckboxRootOwnProps)[];
 
 /** The props of the ready-made checkbox that name the input, so they go on it rather than on

@@ -14,6 +14,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** A radio's parts: `"root" | "touchTarget" | "input" | "ring" | "dot"`. */
@@ -65,7 +66,7 @@ export interface RadioGroupBehaviorProps extends Controllable<
 
 /** Everything the group's Root takes for itself, besides the element's own props and `as`. */
 export interface RadioGroupRootOwnProps
-    extends RadioVariantProps, RadioGroupBehaviorProps {
+    extends RadioVariantProps, RadioGroupBehaviorProps, IndicationProps {
     /** The group element's test id: a prefix (`size` → `size-root`), or by part. */
     readonly testId?: TestIdOverride<RadioGroupPart> | undefined;
 }
@@ -88,11 +89,13 @@ export const RADIO_GROUP_ROOT_PROPS = [
     "defaultValue",
     "onValueChange",
     "testId",
+    "indication",
 ] as const satisfies readonly (keyof RadioGroupRootOwnProps)[];
 
 /** What one radio takes for itself, besides the element's own props and `as`. Its variants
  *  default to the group's. */
-export interface RadioOwnProps extends RadioVariantProps {
+export interface RadioOwnProps
+    extends RadioVariantProps, InteractionSourceProps {
     /** The value the group takes when this radio is checked, and its input submits. */
     readonly value: string;
     /** Disables this radio only. */
@@ -115,6 +118,7 @@ export const RADIO_PROPS = [
     "invalid",
     "testId",
     "unstyled",
+    "interactionSource",
 ] as const satisfies readonly (keyof RadioOwnProps)[];
 
 /** The props of a ready-made radio that name its input, so they go on it rather than on the
@@ -126,7 +130,7 @@ export const RADIO_INPUT_LABEL_PROPS = [
 ] as const;
 
 /** One radio of the ready-made radio group, as data. */
-export interface RadioGroupItem {
+export interface RadioGroupItem extends InteractionSourceProps {
     readonly value: string;
     /** The radio's accessible name, on its input. */
     readonly label: string;

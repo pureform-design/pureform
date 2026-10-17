@@ -1,7 +1,8 @@
 // How an interactive surface answers the user: the state layer, the ripple, and the focus
 // indicator, in Material's names, as one pluggable `Indication` that draws from the component's
-// interaction source. This module is the interface; the built-ins and the wiring live in each
-// binding.
+// interaction source. This module is the interface, the web halves of the built-ins (Material's
+// and none), how the web writes an indication's tokens, and the wiring the web bindings share.
+// React Native fills in the built-ins' native halves.
 
 import type { TokenValue } from "@pureform/styling";
 
@@ -97,8 +98,8 @@ export interface Indication {
     readonly layer?: boolean | undefined;
     /**
      * Web: the live half. It runs after mount, at the latest before the first interaction
-     * reaches it; it's not promised to run at mount, nor on the first interaction. Returns its
-     * cleanup.
+     * reaches it; it's not promised to run at mount, nor on the first interaction, so it may
+     * move later. It runs again when the indication or its elements change. Returns its cleanup.
      */
     readonly web?:
         | ((
@@ -115,3 +116,38 @@ export interface Indication {
 export function defineIndication(indication: Indication): Indication {
     return indication;
 }
+
+export {
+    componentIndicationTokens,
+    droppedFocusIndicatorMessage,
+    dropsFocusIndicator,
+    INDICATION_TOKEN_NAMES,
+    indicationTokenValue,
+    indicationTokenValues,
+    providerIndicationOverrides,
+    THEME_INDICATION_TOKENS,
+} from "./indication-tokens";
+export type { IndicationTokenName } from "./indication-tokens";
+export {
+    DEFAULT_INDICATION,
+    materialIndication,
+    noIndication,
+    rippleClasses,
+} from "./indication-material";
+export type {
+    MaterialIndicationOptions,
+    MaterialRipple,
+    RippleClasses,
+} from "./indication-material";
+export {
+    IndicationHost,
+    IndicationInstance,
+    indicationRoles,
+    NOT_FORWARDED,
+    stateIndicationPart,
+} from "./indication-host";
+export type {
+    ForwardedStates,
+    IndicationEnvironment,
+    IndicationRole,
+} from "./indication-host";

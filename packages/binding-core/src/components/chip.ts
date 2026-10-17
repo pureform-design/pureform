@@ -7,6 +7,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { ButtonBehaviorProps } from "./button";
+import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The chip's parts: `"root" | "icon" | "label" | "touchTarget"`. */
@@ -23,7 +24,7 @@ export interface ChipVariantProps {
 /** Everything Root takes for itself, besides the element's own props and `as`: the button
  *  machine's props (`selected` makes it a filter chip), the variants, `testId`, and `unstyled`. */
 export interface ChipRootOwnProps
-    extends ChipVariantProps, ButtonBehaviorProps {
+    extends ChipVariantProps, ButtonBehaviorProps, InteractiveProps {
     /** A prefix for every part's test id (`wifi` → `wifi-label`), or ids by part. */
     readonly testId?: TestIdOverride<ChipPart> | undefined;
     /** Every part, or some, without the registry's styles. */
@@ -49,6 +50,8 @@ export const CHIP_ROOT_PROPS = [
     "onSelectedChange",
     "testId",
     "unstyled",
+    "indication",
+    "interactionSource",
 ] as const satisfies readonly (keyof ChipRootOwnProps)[];
 
 /** The registry selection from Root's props. */
