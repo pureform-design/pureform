@@ -11,6 +11,7 @@ import type {
     GenerateResult,
     ImportRuleOptions,
     Target,
+    Usage,
 } from "@pureform/generate";
 
 /** The id the generated index is served as. */
@@ -39,21 +40,52 @@ export interface PureformPluginOptions<Options = Record<string, unknown>> {
     /** Generate again when the config or a file it imports changes, in dev and watch builds.
      *  Default `true`. */
     readonly watch?: boolean;
+    /** Usage-based pruning: builds keep only the components the app draws and the variant
+     *  values it selects, found by scanning its source. `true` (default in bundler builds,
+     *  `false` in Metro), `false`, or options. Dev servers and watch builds never prune. */
+    readonly prune?: boolean | PruneOptions;
 }
 
-/** The options `generate` gets from the plugin's, for a root. */
+/** How pruning scans the app, and what it keeps whatever it finds. */
+export interface PruneOptions {
+    /** Files and folders to scan, relative to the root, and what they import by relative
+     *  path. Default: every script under the root. */
+    readonly include?: readonly string[];
+    /** Folders and files to skip, relative to the root, besides `node_modules`, dot folders,
+     *  `dist`, `build`, `coverage`, `styled-system`, the glue, and test files. */
+    readonly exclude?: readonly string[];
+    /** Components to keep with every variant, whatever the scan finds: ones the app reaches in
+     *  ways it can't see, such as through a package that renders them. */
+    readonly keep?: readonly string[];
+    /** Narrow each component's variant values too, not only the components. Default `true`. */
+    readonly variants?: boolean;
+}
+
+/** The options `generate` gets from the plugin's, for a root, and what pruning found. */
 export const generateOptions = <Options>(
     options: PureformPluginOptions<Options>,
     root: string,
+    usage?: Usage,
 ): GenerateOptions<Options> => {
-    const { watch: _, config, ...rest } = options;
+    const { watch: _, prune: __, config, ...rest } = options;
     return Object.fromEntries(
         Object.entries({
             ...rest,
             config: config ?? findConfigFile(root),
             root,
+            usage,
         }).filter(([, value]) => value !== undefined),
     ) as unknown as GenerateOptions<Options>;
+};
+
+/** The pruning options, or `undefined` when pruning is off. */
+export const pruneOptions = (
+    option: boolean | PruneOptions | undefined,
+    fallback: boolean,
+): PruneOptions | undefined => {
+    const value = option ?? fallback;
+    if (value === false) return undefined;
+    return value === true ? {} : value;
 };
 
 export const toPosix = (path: string) => path.split(sep).join("/");

@@ -9,6 +9,8 @@ dependencies:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
+    - "@pureform/anatomy"
+    - "@pureform/binding-core"
     - "@pureform/core"
     - "@pureform/generate"
     - "@pureform/styling"
