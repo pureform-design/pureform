@@ -61,12 +61,37 @@ export function connect<T extends PropTypes>(
         getItemProps: (props) => {
             const emitter = emitters.item(props.value);
             const { disabled } = api.getItemState(props);
+            if (disabled) emitter.disabled();
             return chainProps(
                 api.getItemProps(props),
                 normalize.element({
                     onPointerDown(event) {
                         if (disabled) return;
                         emitter.pointerDown(event, event.currentTarget);
+                        // Zag lets go of the pressed radio only when the pointer comes up on it:
+                        // let go wherever it comes up, as `:active` does.
+                        const win = (event.currentTarget as Element | null)
+                            ?.ownerDocument.defaultView;
+                        if (!win) return;
+                        const letGo = () => {
+                            win.removeEventListener("pointerup", letGo, true);
+                            win.removeEventListener(
+                                "pointercancel",
+                                letGo,
+                                true,
+                            );
+                            if (
+                                service.context.get("activeValue") ===
+                                props.value
+                            ) {
+                                service.send({
+                                    type: "SET_ACTIVE",
+                                    value: null,
+                                });
+                            }
+                        };
+                        win.addEventListener("pointerup", letGo, true);
+                        win.addEventListener("pointercancel", letGo, true);
                     },
                     onPointerMove(event) {
                         if (disabled) return;
@@ -81,6 +106,7 @@ export function connect<T extends PropTypes>(
         getItemHiddenInputProps: (props) => {
             const emitter = emitters.item(props.value);
             const { disabled } = api.getItemState(props);
+            if (disabled) emitter.disabled();
             return chainProps(
                 api.getItemHiddenInputProps(props),
                 normalize.element({

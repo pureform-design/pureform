@@ -209,6 +209,26 @@ export class InteractionEmitter {
         this.hoverExit(element);
         this.blur(element);
     }
+
+    #ending = false;
+
+    /** The surface is disabled now, as its props say while they're computed: ends what it has in
+     *  progress once the current work is done, since a render mustn't notify the source's
+     *  subscribers (other components) while it runs. Nothing happens when nothing is in
+     *  progress. */
+    disabled(element?: unknown): void {
+        const busy =
+            this.#press !== undefined ||
+            this.#hovered ||
+            this.#focused !== undefined ||
+            this.#dragging;
+        if (!busy || this.#ending) return;
+        this.#ending = true;
+        queueMicrotask(() => {
+            this.#ending = false;
+            this.end(element);
+        });
+    }
 }
 
 /** A machine's emitters, one per surface: its own (`""`) and one per item of a composite (by
