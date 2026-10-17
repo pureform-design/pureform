@@ -384,6 +384,7 @@ interface MutableInteractionSource extends InteractionSource {
     emit(interaction, origin?): void;          // origin: the element or native view it happened on
 }
 createInteractionSource(): MutableInteractionSource;
+createInteractionSources(): (key: string) => MutableInteractionSource; // one per key, made when first asked
 IDLE_INTERACTION_STATE;
 ```
 

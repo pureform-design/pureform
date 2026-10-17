@@ -179,6 +179,22 @@ function derive(ledger: Ledger, previous: InteractionState): InteractionState {
     return same ? previous : Object.freeze(next);
 }
 
+/** One source per key, made the first time a key is asked for: a composite's sources by item
+ *  value, which its machine takes as `itemInteractionSource`. */
+export function createInteractionSources(): (
+    key: string,
+) => MutableInteractionSource {
+    const sources = new Map<string, MutableInteractionSource>();
+    return (key) => {
+        let source = sources.get(key);
+        if (!source) {
+            source = createInteractionSource();
+            sources.set(key, source);
+        }
+        return source;
+    };
+}
+
 /**
  * A new source, idle. Its state follows pureform's kinds:
  *
