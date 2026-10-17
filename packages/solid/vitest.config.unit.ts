@@ -17,7 +17,12 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     oxc: {},
     // Optimized up front, so Vite doesn't reload a test when it finds them.
     optimizeDeps: {
-        include: ["@zag-js/checkbox", "@zag-js/radio-group", "@zag-js/switch"],
+        include: [
+            "@zag-js/checkbox",
+            "@zag-js/radio-group",
+            "@zag-js/select",
+            "@zag-js/switch",
+        ],
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },
     test: {

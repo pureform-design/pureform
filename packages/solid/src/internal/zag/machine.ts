@@ -74,26 +74,30 @@ export function useMachine<T extends MachineSchema>(
     );
     const prop: any = createProp(props);
 
-    const context: any = machine.context?.({
-        prop,
-        bindable: createBindable as any,
-        get scope() {
-            return scope();
-        },
-        flush,
-        getContext() {
-            return ctx as any;
-        },
-        getComputed() {
-            return computed as any;
-        },
-        getRefs() {
-            return refs as any;
-        },
-        getEvent() {
-            return getEvent();
-        },
-    });
+    // A machine reads its props once while it sets up its context (Zag's select finds the items
+    // of its initial value), which isn't a dependency.
+    const context: any = untrack(() =>
+        machine.context?.({
+            prop,
+            bindable: createBindable as any,
+            get scope() {
+                return scope();
+            },
+            flush,
+            getContext() {
+                return ctx as any;
+            },
+            getComputed() {
+                return computed as any;
+            },
+            getRefs() {
+                return refs as any;
+            },
+            getEvent() {
+                return getEvent();
+            },
+        }),
+    );
 
     const ctx: BindableContext<T> = {
         get(key) {
@@ -139,7 +143,9 @@ export function useMachine<T extends MachineSchema>(
             Object.getOwnPropertyDescriptors(state),
         ) as Params<T>["state"];
 
-    const refs = createRefs(machine.refs?.({ prop, context: ctx }) ?? {});
+    const refs = createRefs(
+        untrack(() => machine.refs?.({ prop, context: ctx })) ?? {},
+    );
 
     const getParams = (): Params<T> => ({
         state: getState(),

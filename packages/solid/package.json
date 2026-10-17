@@ -82,6 +82,17 @@
                 "default": "./dist/radio-group.jsx"
             }
         },
+        "./select": {
+            "types": "./dist/select/index.d.ts",
+            "solid": {
+                "development": "./src/select/index.ts",
+                "default": "./dist/select.jsx"
+            },
+            "import": {
+                "development": "./src/select/index.ts",
+                "default": "./dist/select.jsx"
+            }
+        },
         "./switch": {
             "types": "./dist/switch/index.d.ts",
             "solid": {
@@ -91,6 +102,28 @@
             "import": {
                 "development": "./src/switch/index.ts",
                 "default": "./dist/switch.jsx"
+            }
+        },
+        "./text-area": {
+            "types": "./dist/text-area/index.d.ts",
+            "solid": {
+                "development": "./src/text-area/index.ts",
+                "default": "./dist/text-area.jsx"
+            },
+            "import": {
+                "development": "./src/text-area/index.ts",
+                "default": "./dist/text-area.jsx"
+            }
+        },
+        "./text-field": {
+            "types": "./dist/text-field/index.d.ts",
+            "solid": {
+                "development": "./src/text-field/index.ts",
+                "default": "./dist/text-field.jsx"
+            },
+            "import": {
+                "development": "./src/text-field/index.ts",
+                "default": "./dist/text-field.jsx"
             }
         },
         "./internal/zag": {
