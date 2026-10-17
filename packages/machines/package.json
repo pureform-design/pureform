@@ -47,6 +47,34 @@
                 "default": "./dist/select.mjs"
             }
         },
+        "./menu": {
+            "types": "./dist/menu.d.ts",
+            "import": {
+                "development": "./src/menu.ts",
+                "default": "./dist/menu.mjs"
+            }
+        },
+        "./dialog": {
+            "types": "./dist/dialog.d.ts",
+            "import": {
+                "development": "./src/dialog.ts",
+                "default": "./dist/dialog.mjs"
+            }
+        },
+        "./tooltip": {
+            "types": "./dist/tooltip.d.ts",
+            "import": {
+                "development": "./src/tooltip.ts",
+                "default": "./dist/tooltip.mjs"
+            }
+        },
+        "./snackbar": {
+            "types": "./dist/snackbar/index.d.ts",
+            "import": {
+                "development": "./src/snackbar/index.ts",
+                "default": "./dist/snackbar.mjs"
+            }
+        },
         "./ripple": {
             "types": "./dist/ripple/index.d.ts",
             "import": {
@@ -82,10 +110,13 @@
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",
         "@zag-js/core": "catalog:",
+        "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
+        "@zag-js/menu": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/switch": "catalog:",
+        "@zag-js/tooltip": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
     },
