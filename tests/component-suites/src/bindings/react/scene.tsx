@@ -9,11 +9,16 @@ import { Chip } from "@pureform/react/chip";
 import { Dialog } from "@pureform/react/dialog";
 import { Fab } from "@pureform/react/fab";
 import { IconButton } from "@pureform/react/icon-button";
+import { List } from "@pureform/react/list";
+import { ListItem } from "@pureform/react/list-item";
 import { Menu } from "@pureform/react/menu";
+import { NavigationBar } from "@pureform/react/navigation-bar";
+import { NavigationRail } from "@pureform/react/navigation-rail";
 import { RadioGroup } from "@pureform/react/radio-group";
 import { Select } from "@pureform/react/select";
 import { Snackbar } from "@pureform/react/snackbar";
 import { Switch } from "@pureform/react/switch";
+import { Tabs } from "@pureform/react/tabs";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
 import { Tooltip } from "@pureform/react/tooltip";
@@ -32,11 +37,16 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Dialog,
     Fab,
     IconButton,
+    List,
+    ListItem,
     Menu,
+    NavigationBar,
+    NavigationRail,
     RadioGroup,
     Select,
     Snackbar,
     Switch,
+    Tabs,
     TextArea,
     TextField,
     Tooltip,
