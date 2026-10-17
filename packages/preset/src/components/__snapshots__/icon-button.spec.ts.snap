@@ -47,6 +47,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "&:is(:disabled, [aria-disabled=true])": {
           "pointerEvents": "none",
         },
+        "--components-iconButton-focusIndicatorColor": "token(colors.secondary)",
+        "--components-iconButton-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+        "--components-iconButton-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+        "--components-iconButton-stateDraggedOpacity": "token(opacity.stateDragged)",
+        "--components-iconButton-stateFocusOpacity": "token(opacity.stateFocus)",
+        "--components-iconButton-stateHoverOpacity": "token(opacity.stateHover)",
+        "--components-iconButton-statePressedOpacity": "token(opacity.statePressed)",
         "alignItems": "center",
         "borderRadius": "var(--components-iconButton-radius, token(radii.full))",
         "borderWidth": "0px",
@@ -54,13 +61,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "display": "inline-flex",
         "flexDirection": "row",
         "justifyContent": "center",
-        "outlineColor": "token(colors.secondary)",
-        "outlineOffset": "2px",
+        "outlineColor": "var(--components-iconButton-focusIndicatorColor, token(colors.secondary))",
+        "outlineOffset": "var(--components-iconButton-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
         "outlineStyle": {
           "&:focus-visible": "solid",
           "base": "none",
         },
-        "outlineWidth": "3px",
+        "outlineWidth": "var(--components-iconButton-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
         "position": "relative",
         "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       },
@@ -81,15 +88,15 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "css": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accent, token(colors.primary))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "token(colors.surfaceContainerHighest)",
             },
           },
@@ -110,15 +117,15 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "css": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHighest), token(colors.onSurfaceVariant) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accentContainer, token(colors.primaryContainer))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "token(colors.surfaceContainerHighest)",
             },
           },
@@ -139,15 +146,15 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "css": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.inverseSurface)",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.stateFocus))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "transparent",
             },
           },
@@ -174,15 +181,15 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "css": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "transparent",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "transparent",
             },
           },
@@ -203,15 +210,15 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "css": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-iconButton-accent, token(colors.primary))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
-              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "token(colors.surfaceContainerLow)",
             },
           },
@@ -382,10 +389,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "elevated": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "token(colors.surfaceContainerLow)",
             },
             "backgroundImage": {
@@ -409,10 +416,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "filled": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accent, token(colors.primary)), var(--components-iconButton-onAccent, token(colors.onPrimary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "var(--components-iconButton-accent, token(colors.primary))",
             },
             "backgroundImage": {
@@ -436,10 +443,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "outlined": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "transparent",
             },
           },
@@ -462,10 +469,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "standard": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "transparent",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, transparent, var(--components-iconButton-accent, token(colors.primary)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "transparent",
             },
           },
@@ -479,10 +486,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "tonal": {
           "container": {
             "backgroundColor": {
-              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-statePressedOpacity, token(opacity.statePressed)))",
               ".iconButton__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
-              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+              ".iconButton__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-stateFocusOpacity, token(opacity.stateFocus)))",
+              ".iconButton__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-iconButton-accentContainer, token(colors.primaryContainer)), var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-iconButton-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "var(--components-iconButton-accentContainer, token(colors.primaryContainer))",
             },
             "backgroundImage": {

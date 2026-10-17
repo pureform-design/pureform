@@ -29,6 +29,7 @@ import {
     dense,
     densitySteps,
     densityVariant,
+    INDICATION_ROOT,
     surface,
     sys,
     variantsOf,
@@ -84,6 +85,16 @@ export const createMenu = <
                     "itemTrailingText",
                 ],
             },
+            // Each item, and each of a select's options, which the menu draws. A highlighted
+            // item shows as hovered.
+            indication: [
+                {
+                    trigger: "item",
+                    surface: "item",
+                    centered: false,
+                    focus: "item",
+                },
+            ],
             variants: {
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
@@ -91,6 +102,7 @@ export const createMenu = <
             recipe: () => ({
                 base: {
                     root: {
+                        ...INDICATION_ROOT,
                         ...surface(ref("container"), ref("content"), "level2"),
                         display: flex,
                         flexDirection: column,

@@ -28,6 +28,7 @@ import type { ColorValue } from "@pureform/core/ast";
 import { size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     CONTROL_CHECKED,
     CONTROL_DISABLED,
@@ -50,6 +51,7 @@ import {
     densityVariant,
     disabledColor,
     focusRing,
+    INDICATION_ROOT,
     mergeSlots,
     stateTransition,
     sys,
@@ -68,6 +70,7 @@ const { tokens, ref } = componentTokens("radio", {
     borderColor: sys("onSurfaceVariant"),
     checkedColor: sys("primary"),
     errorColor: sys("error"),
+    ...INDICATION_TOKENS,
 });
 
 // The ring and the dot share one color: the group's once checked.
@@ -80,7 +83,9 @@ const markColor = (checked: ColorValue, rest: ColorValue) =>
 
 // Every property that depends on the color group, each with its full set of states.
 const colored = (checked: ColorValue) => ({
-    root: { backgroundColor: controlStateLayer(sys("onSurface"), checked) },
+    root: {
+        backgroundColor: controlStateLayer(ref, sys("onSurface"), checked),
+    },
     ring: { borderColor: markColor(checked, ref("borderColor")) },
     dot: { backgroundColor: markColor(checked, checked) },
 });
@@ -106,6 +111,14 @@ export const createRadio = <
                 root: ["touchTarget", "input", "ring"],
                 ring: ["dot"],
             },
+            indication: [
+                {
+                    trigger: "input",
+                    surface: "root",
+                    centered: true,
+                    focus: "root",
+                },
+            ],
             variants: {
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
@@ -114,7 +127,8 @@ export const createRadio = <
                 base: mergeSlots(
                     {
                         root: {
-                            ...focusRing(CONTROL_FOCUS),
+                            ...INDICATION_ROOT,
+                            ...focusRing(ref, CONTROL_FOCUS),
                             ...controlRoot(dense(ref("size"))),
                             transition: stateTransition,
                             borderRadius: circle,

@@ -29,6 +29,7 @@ import {
     DENSITY_TOKEN,
     densityTokenVariant,
     densitySteps,
+    INDICATION_ROOT,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
@@ -83,6 +84,15 @@ export const createListItem = <
                 root: ["leading", "content", "trailing", "trailingText"],
                 content: ["overline", "headline", "supportingText"],
             },
+            // When interactive: a link or a button.
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "root",
+                    centered: false,
+                    focus: "root",
+                },
+            ],
             variants: {
                 lines: ["one", "two", "three"],
                 interactive: ["true", "false"],
@@ -92,6 +102,7 @@ export const createListItem = <
             recipe: () => ({
                 base: {
                     root: {
+                        ...INDICATION_ROOT,
                         ...parts.row,
                         gap: ref("gap"),
                         paddingInlineStart: ref("paddingInline"),

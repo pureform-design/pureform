@@ -23,11 +23,12 @@ import {
 } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     componentTokens,
     focusRing,
     iconBox,
+    INDICATION_ROOT,
     iconFill,
     inputText,
     stateTransition,
@@ -47,6 +48,7 @@ const { tokens, ref } = componentTokens("searchBar", {
     gap: spacing("4"),
     iconSize: sizeToken("iconMedium"),
     iconFill: unitless(0),
+    ...INDICATION_TOKENS,
 });
 
 const pf = typed();
@@ -63,8 +65,9 @@ export const searchBar = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
+                ...INDICATION_ROOT,
                 ...surface(ref("container"), ref("inputColor"), "level3"),
-                ...focusRing(slot("root", "focusVisibleWithin")),
+                ...focusRing(ref, slot("root", "focusVisibleWithin")),
                 transition: stateTransition,
                 position: relative,
                 display: flex,
@@ -75,7 +78,7 @@ export const searchBar = pf.slotComponent({
                 paddingInlineStart: ref("paddingInline"),
                 paddingInlineEnd: ref("paddingInline"),
                 borderRadius: ref("radius"),
-                backgroundColor: stateLayer({
+                backgroundColor: stateLayer(ref, {
                     base: ref("container"),
                     content: ref("inputColor"),
                 }),

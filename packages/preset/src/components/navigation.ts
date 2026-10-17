@@ -6,6 +6,7 @@
 // indicator grows from the center to fill it once the destination is current, and an icon font
 // draws the icon filled.
 
+import type { IndicationDeclaration } from "@pureform/core";
 import {
     absolute,
     center,
@@ -36,6 +37,7 @@ import {
     textStyle,
 } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     componentTokens,
     iconBox,
@@ -61,6 +63,7 @@ export const NAV_TOKENS = {
     activeIconFill: unitless(1),
     indicatorHeight: px(32),
     gap: spacing("1"),
+    ...INDICATION_TOKENS,
 } satisfies Record<string, ValueNode>;
 
 export type NavToken = keyof typeof NAV_TOKENS;
@@ -86,6 +89,20 @@ export const NAV_STRUCTURE = {
     indicator: ["activeIndicator", "icon"],
 } as { [K in "root" | "item" | "indicator"]: (typeof NAV_SLOTS)[number][] };
 
+/** Where a destination shows indication: the pill takes its state layer and ripples from its
+ *  center. The pill, not the active indicator inside it, is the surface: the active indicator
+ *  is drawn only on the current destination. */
+export const NAV_INDICATION: IndicationDeclaration<
+    (typeof NAV_SLOTS)[number]
+>[] = [
+    {
+        trigger: "item",
+        surface: "indicator",
+        centered: true,
+        focus: "item",
+    },
+];
+
 const CURRENT = slot("item", "selected");
 
 /** The colors a current destination takes. */
@@ -104,7 +121,7 @@ export const navColors = (
     },
     // The fill carries the state layer once current, over the pill's own.
     activeIndicator: {
-        backgroundColor: slotStateLayer("item", {
+        backgroundColor: slotStateLayer(ref, "item", {
             base: active.indicator,
             content: ref("stateLayerColor"),
         }),
@@ -132,15 +149,16 @@ export const navParts = (
         indicator: ref("indicatorColor"),
         icon: ref("activeIconColor"),
     });
+    const pressable = pressableRoot(ref);
     return {
         item: {
-            ...pressableRoot,
+            ...pressable,
             flexDirection: column,
             gap: ref("gap"),
             backgroundColor: transparent,
             color: ref("labelColor"),
             states: {
-                ...pressableRoot.states,
+                ...pressable.states,
                 selected: { color: ref("activeLabelColor") },
             },
         } satisfies StyleMap,
@@ -153,7 +171,7 @@ export const navParts = (
             width: indicatorWidth,
             height: ref("indicatorHeight"),
             borderRadius: radius("full"),
-            backgroundColor: slotStateLayer("item", {
+            backgroundColor: slotStateLayer(ref, "item", {
                 base: transparent,
                 content: ref("stateLayerColor"),
             }),

@@ -17,6 +17,7 @@ import { spacing } from "@pureform/theme";
 
 import {
     NAV_SLOTS,
+    NAV_INDICATION,
     NAV_STRUCTURE,
     navColors,
     navParts,
@@ -26,6 +27,7 @@ import {
     DEFAULT_GROUP,
     colorVariant,
     defaultGroups,
+    INDICATION_ROOT,
     surface,
     sys,
     variantsOf,
@@ -57,12 +59,14 @@ export const createNavigationBar = <const G extends string = ColorGroup>(
             tokens,
             slots: [...NAV_SLOTS],
             structure: NAV_STRUCTURE,
+            indication: NAV_INDICATION,
             variants: {
                 color: groups as ColorGroups,
             },
             recipe: () => ({
                 base: {
                     root: {
+                        ...INDICATION_ROOT,
                         ...surface(
                             ref("container"),
                             ref("labelColor"),

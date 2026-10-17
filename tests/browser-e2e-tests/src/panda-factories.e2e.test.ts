@@ -243,6 +243,17 @@ describe.each(NAMES)("the %s factory", (name) => {
 const UNREAD = [
     "--pf-components-slider-stateLayerColor",
     "--pf-components-menu-supportingColor",
+    // A state layer that follows another slot has no drag state.
+    ...[
+        "iconButton",
+        "fab",
+        "checkbox",
+        "radio",
+        "switchControl",
+        "slider",
+        "navigationBar",
+        "navigationRail",
+    ].map((name) => `--pf-components-${name}-stateDraggedOpacity`),
 ];
 
 describe("instance tokens", () => {
@@ -257,7 +268,7 @@ describe("instance tokens", () => {
                 .map((node) => varName(node.path, PREFIX))
                 .filter((variable) => !pandaCss.includes(`var(${variable}`)),
         );
-        expect(unread).toEqual(UNREAD);
+        expect(unread.sort()).toEqual([...UNREAD].sort());
     });
 
     it("change a checkbox's box size through its root", () => {

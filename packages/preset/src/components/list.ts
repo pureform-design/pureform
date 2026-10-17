@@ -25,7 +25,7 @@ import type {
 } from "@pureform/core/ast";
 import { size as sizeToken, textStyle } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     componentTokens,
     disabledColor,
@@ -47,6 +47,7 @@ export const ROW_TOKENS = {
     selectedContent: sys("onSecondaryContainer"),
     iconSize: sizeToken("iconMedium"),
     iconFill: unitless(0),
+    ...INDICATION_TOKENS,
 } satisfies Record<string, ValueNode>;
 
 export type RowToken = keyof typeof ROW_TOKENS;
@@ -102,15 +103,15 @@ export const rowParts = (
 
     // An interactive row takes the state layer, the focus ring, and the pointer.
     const interactive: StyleMap = {
-        ...focusRing(),
+        ...focusRing(ref),
         cursor: pointer,
-        backgroundColor: stateLayer({
+        backgroundColor: stateLayer(ref, {
             base: ref("container"),
             content: ref("content"),
         }),
         states: {
             selected: {
-                backgroundColor: stateLayer({
+                backgroundColor: stateLayer(ref, {
                     base: selectedColors.container,
                     content: selectedColors.content,
                 }),

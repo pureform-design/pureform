@@ -6,6 +6,7 @@
 // - Touch targets: every interactive component reaches the theme's touch target.
 // - Focus: every interactive component shows the focus ring.
 
+import { alias, px } from "@pureform/core/ast";
 import type { SlottedComponentSpec } from "@pureform/core/types";
 import { resolveColor } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
@@ -104,7 +105,25 @@ describe("touch targets", () => {
     });
 });
 
+// The focus ring is the component's focus indicator thickness, which defaults to the theme's:
+// 3px in Material's.
+const showsFocusRing = (name: string, style: Record<string, unknown>) => {
+    expect(style.outlineWidth).toEqual(
+        alias("components", name, "focusIndicatorThickness"),
+    );
+    expect(slotted(name).tokens?.focusIndicatorThickness).toMatchObject({
+        default: alias("tokens", "sizes", "focusIndicatorThickness"),
+    });
+};
+
 describe("focus", () => {
+    it("draws the theme's focus indicator 3px thick, 2px outside", () => {
+        expect(config.tokens.sizes).toMatchObject({
+            focusIndicatorThickness: px(3),
+            focusIndicatorOuterOffset: px(2),
+        });
+    });
+
     it.each(INTERACTIVE)("%s shows the focus ring", (name) => {
         const root = slotted(name).recipe.base.root as Record<string, unknown>;
         expect(root.outlineStyle).toMatchObject({
@@ -112,11 +131,7 @@ describe("focus", () => {
             base: { type: "keyword", value: "none" },
             cases: [{ value: { type: "keyword", value: "solid" } }],
         });
-        expect(root.outlineWidth).toEqual({
-            type: "numeric",
-            value: 3,
-            unit: "px",
-        });
+        showsFocusRing(name, root);
     });
 });
 
@@ -140,12 +155,7 @@ const ITEMS: [string, (spec: SlottedComponentSpec) => unknown, string][] = [
 
 describe("items", () => {
     it.each(ITEMS)("%s's item shows the focus ring", (name, item) => {
-        const style = item(slotted(name)) as Record<string, unknown>;
-        expect(style.outlineWidth).toEqual({
-            type: "numeric",
-            value: 3,
-            unit: "px",
-        });
+        showsFocusRing(name, item(slotted(name)) as Record<string, unknown>);
     });
 
     it.each(ITEMS)(

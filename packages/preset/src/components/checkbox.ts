@@ -38,6 +38,7 @@ import type { ColorValue } from "@pureform/core/ast";
 import { size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     CONTROL_CHECKED,
     CONTROL_DISABLED,
@@ -60,6 +61,7 @@ import {
     densityVariant,
     disabledColor,
     focusRing,
+    INDICATION_ROOT,
     mergeSlots,
     stateTransition,
     sys,
@@ -83,6 +85,7 @@ const { tokens, ref } = componentTokens("checkbox", {
     errorColor: sys("error"),
     errorIconColor: sys("onError"),
     disabledIconColor: sys("surface"),
+    ...INDICATION_TOKENS,
 });
 
 const INDETERMINATE = slot("root", "indeterminate");
@@ -99,7 +102,7 @@ interface CheckboxColors {
 // color variant replaces it whole and error and disabled still win.
 const colored = ({ checked, onChecked }: CheckboxColors) => ({
     root: {
-        backgroundColor: controlStateLayer(sys("onSurface"), checked),
+        backgroundColor: controlStateLayer(ref, sys("onSurface"), checked),
     },
     box: {
         backgroundColor: when()
@@ -156,6 +159,14 @@ export const createCheckbox = <
                 root: ["touchTarget", "input", "box"],
                 box: ["checkIcon", "indeterminateIcon"],
             },
+            indication: [
+                {
+                    trigger: "input",
+                    surface: "root",
+                    centered: true,
+                    focus: "root",
+                },
+            ],
             variants: {
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
@@ -164,7 +175,8 @@ export const createCheckbox = <
                 base: mergeSlots(
                     {
                         root: {
-                            ...focusRing(CONTROL_FOCUS),
+                            ...INDICATION_ROOT,
+                            ...focusRing(ref, CONTROL_FOCUS),
                             ...controlRoot(dense(ref("size"))),
                             transition: stateTransition,
                             borderRadius: circle,

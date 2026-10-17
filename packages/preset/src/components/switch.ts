@@ -32,6 +32,7 @@ import {
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     CONTROL_CHECKED,
     CONTROL_DISABLED,
@@ -49,6 +50,7 @@ import {
     defaultGroups,
     disabledColor,
     focusRing,
+    INDICATION_ROOT,
     mergeSlots,
     stateTransition,
     sys,
@@ -81,6 +83,7 @@ const { tokens, ref } = componentTokens("switchControl", {
     checkedHandleColor: sys("onPrimary"),
     checkedHandleHoverColor: sys("primaryContainer"),
     iconColor: sys("onPrimaryContainer"),
+    ...INDICATION_TOKENS,
 });
 
 // Where the handle and its state layer sit along the track.
@@ -117,7 +120,7 @@ const colored = (c: SwitchColors) => ({
             .else(ref("trackColor")),
     },
     stateLayer: {
-        backgroundColor: controlStateLayer(sys("onSurface"), c.track),
+        backgroundColor: controlStateLayer(ref, sys("onSurface"), c.track),
     },
     handle: {
         backgroundColor: when()
@@ -157,12 +160,21 @@ export const createSwitch = <const G extends string = ColorGroup>(
                 track: ["stateLayer", "handle"],
                 handle: ["icon"],
             },
+            indication: [
+                {
+                    trigger: "input",
+                    surface: "stateLayer",
+                    centered: true,
+                    focus: "root",
+                },
+            ],
             variants: { color: groups as ColorGroups },
             recipe: () => ({
                 base: mergeSlots(
                     {
                         root: {
-                            ...focusRing(CONTROL_FOCUS),
+                            ...INDICATION_ROOT,
+                            ...focusRing(ref, CONTROL_FOCUS),
                             borderRadius: radius("full"),
                             position: relative,
                             display: inlineFlex,

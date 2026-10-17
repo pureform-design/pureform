@@ -16,6 +16,7 @@ import { none, px, unitless } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     DEFAULT_SHAPES,
     shapedColors,
@@ -33,6 +34,7 @@ import {
     groupTokens,
     iconBox,
     iconFill,
+    INDICATION_ROOT,
     keysOf,
     lower,
     pressableRoot,
@@ -62,6 +64,7 @@ const { tokens, ref } = componentTokens("fab", {
     gap: spacing("3"),
     padding: spacing("4"),
     ...groupTokens(DEFAULT_GROUP),
+    ...INDICATION_TOKENS,
 });
 
 type Size = "Small" | "Medium" | "Large";
@@ -104,6 +107,14 @@ export const createFab = <const G extends string = ColorGroup>(
                 root: ["touchTarget", "container"],
                 container: ["icon", "label"],
             },
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "container",
+                    centered: false,
+                    focus: "root",
+                },
+            ],
             variants: {
                 color: groups as ColorGroups,
                 variant: keysOf(FILLS),
@@ -114,7 +125,8 @@ export const createFab = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
-                        ...pressableRoot,
+                        ...INDICATION_ROOT,
+                        ...pressableRoot(ref),
                         ...elevation.root,
                         states: {
                             ...elevation.root.states,
@@ -147,7 +159,10 @@ export const createFab = <const G extends string = ColorGroup>(
                                     : colors.container;
                             return [
                                 name,
-                                shapedColors(fill, { ...colors, container }),
+                                shapedColors(ref, fill, {
+                                    ...colors,
+                                    container,
+                                }),
                             ];
                         }),
                     ),

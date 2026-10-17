@@ -34,6 +34,7 @@ import {
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import { controlInput } from "./control";
 import {
     DEFAULT_GROUP,
@@ -42,6 +43,7 @@ import {
     defaultGroups,
     disabledColor,
     focusRing,
+    INDICATION_ROOT,
     mergeSlots,
     slotStateLayer,
     sys,
@@ -59,6 +61,7 @@ const { tokens, ref } = componentTokens("slider", {
     handleSize: px(20),
     stateLayerSize: px(40),
     value: unitless(0),
+    ...INDICATION_TOKENS,
 });
 
 const DISABLED = slot("root", "disabled");
@@ -96,7 +99,7 @@ const colored = (active: ColorValue) => ({
     activeTrack: unlessDisabled(active, "disabledContent"),
     handle: unlessDisabled(active, "disabledContent"),
     stateLayer: {
-        backgroundColor: slotStateLayer("root", {
+        backgroundColor: slotStateLayer(ref, "root", {
             base: transparent,
             content: active,
         }),
@@ -128,11 +131,21 @@ export const createSlider = <const G extends string = ColorGroup>(
             structure: {
                 root: ["track", "activeTrack", "stateLayer", "handle", "input"],
             },
+            // A drag holds the press: the state layer shows it pressed.
+            indication: [
+                {
+                    trigger: "input",
+                    surface: "stateLayer",
+                    centered: true,
+                    focus: "handle",
+                },
+            ],
             variants: { color: groups as ColorGroups },
             recipe: () => ({
                 base: mergeSlots(
                     {
                         root: {
+                            ...INDICATION_ROOT,
                             position: relative,
                             display: flex,
                             alignItems: center,
@@ -161,7 +174,10 @@ export const createSlider = <const G extends string = ColorGroup>(
                         stateLayer: atValue(ref("stateLayerSize")),
                         handle: {
                             ...atValue(ref("handleSize")),
-                            ...focusRing(slot("root", "focusVisibleWithin")),
+                            ...focusRing(
+                                ref,
+                                slot("root", "focusVisibleWithin"),
+                            ),
                         },
                         input: controlInput,
                     },

@@ -27,7 +27,7 @@ import {
 import type { ColorValue } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -35,6 +35,7 @@ import {
     defaultGroups,
     iconBox,
     iconFill,
+    INDICATION_ROOT,
     pressableRoot,
     sys,
     variantsOf,
@@ -57,20 +58,23 @@ const { tokens, ref } = componentTokens("tabs", {
     iconFill: unitless(0),
     indicatorHeight: px(3),
     secondaryIndicatorHeight: px(2),
+    ...INDICATION_TOKENS,
 });
+
+const pressable = pressableRoot(ref);
 
 const SELECTED = slot("tab", "selected");
 
 // The tab's colors, with the active content color given: it tints the state layer too.
 const tabColors = (active: ColorValue) => ({
-    backgroundColor: stateLayer({
+    backgroundColor: stateLayer(ref, {
         base: ref("container"),
         content: ref("content"),
     }),
     color: ref("content"),
     states: {
         selected: {
-            backgroundColor: stateLayer({
+            backgroundColor: stateLayer(ref, {
                 base: ref("container"),
                 content: active,
             }),
@@ -97,6 +101,14 @@ export const createTabs = <const G extends string = ColorGroup>(
                 root: ["tab"],
                 tab: ["icon", "label", "indicator"],
             },
+            indication: [
+                {
+                    trigger: "tab",
+                    surface: "tab",
+                    centered: false,
+                    focus: "tab",
+                },
+            ],
             variants: {
                 variant: ["primary", "secondary"],
                 icon: ["true", "false"],
@@ -105,16 +117,17 @@ export const createTabs = <const G extends string = ColorGroup>(
             recipe: () => ({
                 base: {
                     root: {
+                        ...INDICATION_ROOT,
                         display: flex,
                         flexDirection: row,
                         backgroundColor: ref("container"),
                     },
                     // Tabs share the list's width equally.
                     tab: {
-                        ...pressableRoot,
+                        ...pressable,
                         ...tabColors(ref("activeColor")),
                         states: {
-                            ...pressableRoot.states,
+                            ...pressable.states,
                             ...tabColors(ref("activeColor")).states,
                         },
                         flexBasis: px(0),

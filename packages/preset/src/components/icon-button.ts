@@ -27,6 +27,7 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { INDICATION_TOKENS } from "../state-layer";
 import {
     DEFAULT_SHAPES,
     shapedColors,
@@ -50,6 +51,7 @@ import {
     groupTokens,
     iconBox,
     iconFill,
+    INDICATION_ROOT,
     keysOf,
     mergeSlotStyles,
     pressableRoot,
@@ -81,6 +83,7 @@ const { tokens, ref } = componentTokens("iconButton", {
     sizeLarge: sizeToken("controlLarge"),
     ...groupTokens(DEFAULT_GROUP),
     ...DENSITY_TOKEN,
+    ...INDICATION_TOKENS,
 });
 
 const size = (
@@ -178,6 +181,14 @@ export const createIconButton = <
                 root: ["touchTarget", "container", "outline"],
                 container: ["icon"],
             },
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "container",
+                    centered: true,
+                    focus: "root",
+                },
+            ],
             variants: {
                 color: groups as ColorGroups,
                 variant: keysOf(FILLS),
@@ -189,7 +200,8 @@ export const createIconButton = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...pressableRoot,
+                        ...INDICATION_ROOT,
+                        ...pressableRoot(ref),
                         borderRadius: ref("radius"),
                     },
                     container: shapedContainer(ref("radius")),
@@ -212,7 +224,11 @@ export const createIconButton = <
                                 fill === "outlined"
                                     ? { outline: shapedOutlineStroke(ref) }
                                     : {},
-                                shapedColors(fill, tokenFillColors(fill, ref)),
+                                shapedColors(
+                                    ref,
+                                    fill,
+                                    tokenFillColors(fill, ref),
+                                ),
                             ),
                         ]),
                     ),
@@ -235,7 +251,7 @@ export const createIconButton = <
                     return {
                         match: { variant: name, toggle: "true" as const },
                         style: mergeSlotStyles(
-                            shapedColors(fill, unselected, selected),
+                            shapedColors(ref, fill, unselected, selected),
                             fill === "outlined"
                                 ? {
                                       outline: {

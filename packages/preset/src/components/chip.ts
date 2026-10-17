@@ -18,7 +18,7 @@ import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { stateLayer } from "../state-layer";
+import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -31,6 +31,7 @@ import {
     disabledColor,
     iconBox,
     iconFill,
+    INDICATION_ROOT,
     pressableRoot,
     sys,
     touchTarget,
@@ -53,6 +54,7 @@ const { tokens, ref } = componentTokens("chip", {
     content: sys("onSurfaceVariant"),
     selectedContainer: sys("secondaryContainer"),
     selectedContent: sys("onSecondaryContainer"),
+    ...INDICATION_TOKENS,
 });
 
 /** The colors a selected chip takes from its color group. */
@@ -69,11 +71,14 @@ const TOKEN_SELECTED: Selected = {
 // The resting, selected, and disabled colors over a given container. Each variant sets them
 // all, since a variant's color would otherwise override a selected color set in the base.
 const colors = (container: ColorValue, selected: Selected): StyleMap => ({
-    backgroundColor: stateLayer({ base: container, content: ref("content") }),
+    backgroundColor: stateLayer(ref, {
+        base: container,
+        content: ref("content"),
+    }),
     color: ref("content"),
     states: {
         selected: {
-            backgroundColor: stateLayer({
+            backgroundColor: stateLayer(ref, {
                 base: selected.container,
                 content: selected.content,
             }),
@@ -145,6 +150,14 @@ export const createChip = <
             tokens,
             slots: ["root", "icon", "label", "touchTarget"],
             structure: { root: ["touchTarget", "icon", "label"] },
+            indication: [
+                {
+                    trigger: "root",
+                    surface: "root",
+                    centered: false,
+                    focus: "root",
+                },
+            ],
             variants: {
                 variant: ["outlined", "elevated"],
                 color: groups as ColorGroups,
@@ -153,7 +166,8 @@ export const createChip = <
             recipe: () => ({
                 base: {
                     root: {
-                        ...pressableRoot,
+                        ...INDICATION_ROOT,
+                        ...pressableRoot(ref),
                         gap: ref("gap"),
                         height: dense(ref("height")),
                         paddingInlineStart: ref("padding"),

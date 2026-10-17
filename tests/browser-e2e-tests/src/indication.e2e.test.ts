@@ -6,6 +6,9 @@
 //
 // Each fixture lists, per element, its resting values and the states that change them. An
 // element no state changes is left out.
+//
+// A component's own indication tokens, set on its root, change it and not a component of the
+// same kind nested inside it, which starts from the theme's again.
 
 import * as pandaRecipes from "$recipes";
 import { classesFor, manifestOf } from "@pureform/css-adapter";
@@ -15,6 +18,7 @@ import type {
     AnyComponent,
     NativeSelection,
 } from "@pureform/rn-adapter/factory";
+import { tokenVar } from "@pureform/styling/theme-vars";
 import { describe, expect, it } from "vitest";
 import { commands } from "vitest/browser";
 
@@ -356,5 +360,186 @@ describe("the state layer and the focus indicator compute as the fixtures record
         await expect(fixture(byScenario)).toMatchFileSnapshot(
             "./__fixtures__/indication/native.txt",
         );
+    });
+});
+
+// A component's tree of slots as markup, with `inside` placed in the slot `into`.
+const nestedMarkup = (
+    name: string,
+    classes: Classes,
+    id: string,
+    rootStyle = "",
+    inside?: { into: string; html: string },
+): string => {
+    const spec = pureformConfig.components[
+        name as keyof typeof pureformConfig.components
+    ] as { slots: string[]; structure?: Record<string, string[]> };
+    const element = (slot: string): string => {
+        const own = typeof classes === "string" ? classes : classes[slot];
+        const style =
+            slot === "root" && rootStyle ? ` style="${rootStyle}"` : "";
+        const inner =
+            (spec.structure?.[slot] ?? []).map(element).join("") +
+            (inside?.into === slot ? inside.html : "");
+        return `<div data-id="${id}.${slot}" data-pf-hover class="${own}"${style}>${inner}</div>`;
+    };
+    return outermost(spec.slots, spec.structure ?? {})
+        .map(element)
+        .join("");
+};
+
+// Components whose surface is their root, another slot, and a slot following the root.
+const NESTED: [name: string, surface: string][] = [
+    ["button", "root"],
+    ["iconButton", "container"],
+    ["checkbox", "root"],
+];
+
+const OWN_TOKENS = {
+    stateHoverOpacity: "50%",
+    focusIndicatorThickness: "7px",
+    focusIndicatorColor: "rgb(255, 0, 0)",
+};
+
+// The same in React Native's values: lengths in points.
+const NATIVE_OWN_TOKENS = {
+    stateHoverOpacity: "50%",
+    focusIndicatorThickness: 7,
+    focusIndicatorColor: "rgba(255, 0, 0, 1)",
+};
+
+describe("a component's own indication tokens", () => {
+    it.each(ADAPTERS)(
+        "change it and not a nested one of the same kind, on %s",
+        async (_target, adapter) => {
+            const css = adapter
+                ? [await commands.adapterCss(adapter, OPTIONS)]
+                : [];
+            const frame = document.createElement("iframe");
+            frame.id = "indication-nested";
+            frame.style.cssText = "width: 1280px; height: 900px; border: 0";
+            document.body.append(frame);
+            try {
+                const html = NESTED.map(([name, surface]) => {
+                    const classes = (adapter ? CLASSES.plain : CLASSES.panda)({
+                        id: name,
+                        name,
+                        selection: {},
+                    });
+                    const own = Object.entries(OWN_TOKENS)
+                        .map(
+                            ([token, value]) =>
+                                `${tokenVar(`components.${name}.${token}`, OPTIONS)}: ${value}`,
+                        )
+                        .join("; ");
+                    return `<div>${nestedMarkup(
+                        name,
+                        classes,
+                        `${name}-outer`,
+                        own,
+                        {
+                            into: surface,
+                            html: nestedMarkup(name, classes, `${name}-inner`),
+                        },
+                    )}${nestedMarkup(name, classes, `${name}-plain`)}</div>`;
+                }).join("");
+                const doc = frame.contentDocument!;
+                doc.open();
+                doc.write(
+                    `<!doctype html><html><head><style>${pandaCss}</style>${css
+                        .map((sheet) => `<style>${sheet}</style>`)
+                        .join("")}</head><body>${html}</body></html>`,
+                );
+                doc.close();
+                if (adapter) {
+                    const sheet = doc.styleSheets[0]!;
+                    const win =
+                        frame.contentWindow as unknown as typeof globalThis;
+                    for (let i = sheet.cssRules.length - 1; i >= 0; i--) {
+                        const rule = sheet.cssRules[i];
+                        const keep =
+                            rule instanceof win.CSSLayerStatementRule ||
+                            (rule instanceof win.CSSLayerBlockRule &&
+                                ["reset", "base"].includes(rule.name));
+                        if (!keep) sheet.deleteRule(i);
+                    }
+                }
+                const read = (id: string, property: string) =>
+                    frame
+                        .contentWindow!.getComputedStyle(
+                            doc.querySelector(`[data-id="${id}"]`)!,
+                        )
+                        .getPropertyValue(property);
+                const hovered = Object.fromEntries(
+                    NESTED.map(([name, surface]) => [
+                        name,
+                        ["outer", "inner", "plain"].map((which) =>
+                            read(
+                                `${name}-${which}.${surface}`,
+                                "background-color",
+                            ),
+                        ),
+                    ]),
+                );
+                await forcePseudoClasses(frame, "[data-id]", [
+                    "focus",
+                    "focus-visible",
+                    "focus-within",
+                ]);
+                const ring = (id: string) =>
+                    ["outline-width", "outline-color"]
+                        .map((property) => read(id, property))
+                        .join(" ");
+                for (const [name] of NESTED) {
+                    const [outer, inner, plain] = hovered[name]!;
+                    expect(outer, name).not.toBe(plain);
+                    expect(inner, name).toBe(plain);
+                    expect(ring(`${name}-outer.root`), name).toBe(
+                        "7px rgb(255, 0, 0)",
+                    );
+                    expect(ring(`${name}-inner.root`), name).toBe(
+                        ring(`${name}-plain.root`),
+                    );
+                    expect(ring(`${name}-plain.root`), name).toMatch(/^3px /);
+                }
+            } finally {
+                frame.remove();
+            }
+        },
+    );
+
+    it("change it on React Native", async () => {
+        const styles = await commands.rnStyles();
+        for (const [name, surface] of NESTED) {
+            const factory = componentFactory(styles, name).for({
+                scheme: "light",
+            });
+            // The factory here has no generated glue to name the tokens, so they go by path.
+            const own = Object.fromEntries(
+                Object.entries(NATIVE_OWN_TOKENS).map(([token, value]) => [
+                    `components.${name}.${token}`,
+                    value,
+                ]),
+            );
+            const select = (state: State, tokens?: object) =>
+                factory.selected({
+                    ...state,
+                    ...(tokens ? { tokens } : {}),
+                } as NativeSelection<AnyComponent>).styles as Record<
+                    string,
+                    Record<string, unknown> | undefined
+                >;
+            const hovered = { hover: true };
+            expect(
+                select(hovered, own)[surface]?.backgroundColor,
+                name,
+            ).not.toEqual(select(hovered)[surface]?.backgroundColor);
+            const focused = { focus: true, focusVisible: true };
+            expect(select(focused, own).root, name).toMatchObject({
+                outlineWidth: 7,
+                outlineColor: "rgba(255, 0, 0, 1)",
+            });
+            expect(select(focused).root?.outlineWidth, name).toBe(3);
+        }
     });
 });

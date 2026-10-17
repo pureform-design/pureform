@@ -46,6 +46,13 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "&:is(:hover, [data-pf-hover])": {
         "filterElevation": "level4",
       },
+      "--components-fab-focusIndicatorColor": "token(colors.secondary)",
+      "--components-fab-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-fab-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-fab-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-fab-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-fab-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-fab-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
       "borderWidth": "0px",
       "cursor": "pointer",
@@ -53,13 +60,13 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "filterElevation": "level3",
       "flexDirection": "row",
       "justifyContent": "center",
-      "outlineColor": "token(colors.secondary)",
-      "outlineOffset": "2px",
+      "outlineColor": "var(--components-fab-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-fab-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {
         "&:focus-visible": "solid",
         "base": "none",
       },
-      "outlineWidth": "3px",
+      "outlineWidth": "var(--components-fab-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
@@ -250,10 +257,10 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "filled": {
         "container": {
           "backgroundColor": {
-            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.statePressed))",
+            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) var(--components-fab-statePressedOpacity, token(opacity.statePressed)))",
             ".fab__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) token(opacity.stateHover))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) var(--components-fab-stateFocusOpacity, token(opacity.stateFocus)))",
+            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-fab-accent, token(colors.primary)), var(--components-fab-onAccent, token(colors.onPrimary)) var(--components-fab-stateHoverOpacity, token(opacity.stateHover)))",
             "base": "var(--components-fab-accent, token(colors.primary))",
           },
         },
@@ -267,10 +274,10 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "surface": {
         "container": {
           "backgroundColor": {
-            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.statePressed))",
+            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) var(--components-fab-statePressedOpacity, token(opacity.statePressed)))",
             ".fab__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) token(opacity.stateHover))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) var(--components-fab-stateFocusOpacity, token(opacity.stateFocus)))",
+            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, token(colors.surfaceContainerHigh), var(--components-fab-accent, token(colors.primary)) var(--components-fab-stateHoverOpacity, token(opacity.stateHover)))",
             "base": "token(colors.surfaceContainerHigh)",
           },
         },
@@ -284,10 +291,10 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "tonal": {
         "container": {
           "backgroundColor": {
-            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.statePressed))",
+            ".fab__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fab-statePressedOpacity, token(opacity.statePressed)))",
             ".fab__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateFocus))",
-            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) token(opacity.stateHover))",
+            ".fab__root:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible)) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fab-stateFocusOpacity, token(opacity.stateFocus)))",
+            ".fab__root:is(:hover, [data-pf-hover]) &": "color-mix(in srgb, var(--components-fab-accentContainer, token(colors.primaryContainer)), var(--components-fab-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fab-stateHoverOpacity, token(opacity.stateHover)))",
             "base": "var(--components-fab-accentContainer, token(colors.primaryContainer))",
           },
         },
