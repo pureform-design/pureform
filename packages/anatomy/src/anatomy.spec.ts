@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { deriveAnatomy } from "./derive";
 import { anatomy, testIds } from "./generated";
-import type { ComponentAnatomy } from "./types";
+import type { ComponentAnatomy, IndicationAnatomy } from "./types";
 
 const components = pureform().components as Record<string, AnyComponentSpec>;
 const written = anatomy as Record<string, ComponentAnatomy>;
@@ -28,6 +28,36 @@ const ICON_PARTS: Record<string, string[]> = {
     tabs: ["icon"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
+};
+
+// Where each interactive component shows indication, as the design's table has it: the
+// trigger, the surface, whether the ripple is centered, and the focus part.
+const at = (
+    trigger: string,
+    surface: string,
+    centered: boolean,
+    focus = trigger,
+): IndicationAnatomy => ({ trigger, surface, centered, focus });
+
+const INDICATION: Record<string, IndicationAnatomy[]> = {
+    button: [at("root", "root", false)],
+    chip: [at("root", "root", false)],
+    // When interactive, as a link or a button.
+    card: [at("root", "root", false)],
+    listItem: [at("root", "root", false)],
+    tabs: [at("tab", "tab", false)],
+    // Its items, and the select's options, which the menu draws.
+    menu: [at("item", "item", false)],
+    snackbar: [at("action", "action", false), at("close", "close", false)],
+    iconButton: [at("root", "container", true)],
+    fab: [at("root", "container", false)],
+    // The pill: the active indicator inside it draws only on the current destination.
+    navigationBar: [at("item", "indicator", true)],
+    navigationRail: [at("item", "indicator", true)],
+    checkbox: [at("input", "root", true, "root")],
+    radio: [at("input", "root", true, "root")],
+    switchControl: [at("input", "stateLayer", true, "root")],
+    slider: [at("input", "stateLayer", true, "handle")],
 };
 
 describe("the written anatomy", () => {
@@ -79,6 +109,16 @@ describe("the written anatomy", () => {
                 .filter(([, parts]) => parts!.length > 0),
         );
         expect(mirrored).toEqual(ICON_PARTS);
+    });
+
+    it("says where every interactive component shows indication, and no other", () => {
+        expect(
+            Object.fromEntries(
+                Object.values(written)
+                    .filter((component) => component.indication)
+                    .map(({ name, indication }) => [name, indication]),
+            ),
+        ).toEqual(INDICATION);
     });
 
     it("adds the select's hidden native select as an unstyled part", () => {

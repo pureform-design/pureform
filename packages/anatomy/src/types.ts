@@ -23,6 +23,20 @@ export interface PartAnatomy<P extends string = string> {
     readonly slot?: string | null;
 }
 
+/** Where a component shows indication (the state layer, the ripple, and the focus indicator),
+ *  from the preset's declaration beside its state layer. A component has one per interactive
+ *  surface. */
+export interface IndicationAnatomy<P extends string = string> {
+    /** The part whose interactions feed the component's interaction source. */
+    readonly trigger: P;
+    /** The part the state layer tints and the ripple fills; it clips the ripple. */
+    readonly surface: P;
+    /** Whether the ripple starts at the surface's center rather than where it was pressed. */
+    readonly centered: boolean;
+    /** The part that draws the focus indicator. */
+    readonly focus: P;
+}
+
 /** A component's anatomy: its parts, by name, and where they sit. */
 export interface ComponentAnatomy<
     N extends string = string,
@@ -38,6 +52,9 @@ export interface ComponentAnatomy<
     readonly partNames: readonly P[];
     /** Every part, by name. */
     readonly parts: { readonly [K in P]: PartAnatomy<P> };
+    /** Where it shows indication, one entry per interactive surface; left out when it isn't
+     *  interactive. */
+    readonly indication?: readonly IndicationAnatomy<P>[];
 }
 
 /** A component anatomy's part names. */

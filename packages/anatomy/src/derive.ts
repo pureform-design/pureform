@@ -7,7 +7,12 @@ import type { StyleMap } from "@pureform/core/ast";
 
 import { kebabCase, TEST_ID_PREFIX } from "./attributes";
 import { EXTRA_PARTS } from "./extras";
-import type { ComponentAnatomy, ExtraPart, PartAnatomy } from "./types";
+import type {
+    ComponentAnatomy,
+    ExtraPart,
+    IndicationAnatomy,
+    PartAnatomy,
+} from "./types";
 
 // Whether a style reads the `mirrored` state anywhere in its states.
 const readsMirrored = (style: StyleMap | undefined): boolean =>
@@ -39,8 +44,9 @@ const slotStyles = (spec: AnyComponentSpec, slot: string): StyleMap[] => {
 };
 
 /** A component's anatomy, from its spec and its extra parts (by default, the ones
- *  `EXTRA_PARTS` names for it). Throws when `structure` nests a slot twice or names an unknown
- *  one, or an extra part's name or parent doesn't fit. */
+ *  `EXTRA_PARTS` names for it), with where it shows indication as the spec declares it. Throws
+ *  when `structure` nests a slot twice or names an unknown one, an extra part's name or parent
+ *  doesn't fit, or the indication names a part it doesn't have. */
 export const deriveAnatomy = (
     spec: AnyComponentSpec,
     extras: readonly ExtraPart[] = EXTRA_PARTS[spec.name] ?? [],
@@ -105,6 +111,18 @@ export const deriveAnatomy = (
         };
     };
     const partNames = [...slots, ...extras.map((extra) => extra.name)];
+    const indication = spec.indication?.map(
+        ({ trigger, surface, centered, focus }): IndicationAnatomy => {
+            for (const named of [trigger, surface, focus]) {
+                if (!known.has(named)) {
+                    throw new Error(
+                        `${name}: indication names "${named}", which is not a part`,
+                    );
+                }
+            }
+            return { trigger, surface, centered, focus };
+        },
+    );
     return {
         name,
         scope,
@@ -120,6 +138,7 @@ export const deriveAnatomy = (
                 part(extra.name, false, false),
             ]),
         ]),
+        ...(indication ? { indication } : {}),
     };
 };
 

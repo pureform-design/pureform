@@ -46,6 +46,9 @@ export const buttonAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "root", surface: "root", centered: false, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const iconButtonAnatomy = {
@@ -100,6 +103,14 @@ export const iconButtonAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "root",
+            surface: "container",
+            centered: true,
+            focus: "root",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const fabAnatomy = {
@@ -154,6 +165,14 @@ export const fabAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "root",
+            surface: "container",
+            centered: false,
+            focus: "root",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const avatarAnatomy = {
@@ -235,6 +254,9 @@ export const chipAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "root", surface: "root", centered: false, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const textFieldAnatomy = {
@@ -618,6 +640,9 @@ export const checkboxAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "input", surface: "root", centered: true, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const radioAnatomy = {
@@ -672,6 +697,9 @@ export const radioAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "input", surface: "root", centered: true, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const switchControlAnatomy = {
@@ -752,6 +780,14 @@ export const switchControlAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "input",
+            surface: "stateLayer",
+            centered: true,
+            focus: "root",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const sliderAnatomy = {
@@ -822,6 +858,14 @@ export const sliderAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "input",
+            surface: "stateLayer",
+            centered: true,
+            focus: "handle",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const linearProgressAnatomy = {
@@ -1011,6 +1055,9 @@ export const listItemAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "root", surface: "root", centered: false, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const menuAnatomy = {
@@ -1086,6 +1133,9 @@ export const menuAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "item", surface: "item", centered: false, focus: "item" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const tabsAnatomy = {
@@ -1140,6 +1190,9 @@ export const tabsAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "tab", surface: "tab", centered: false, focus: "tab" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const navigationBarAnatomy = {
@@ -1210,6 +1263,14 @@ export const navigationBarAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "item",
+            surface: "indicator",
+            centered: true,
+            focus: "item",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const navigationRailAnatomy = {
@@ -1280,6 +1341,14 @@ export const navigationRailAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "item",
+            surface: "indicator",
+            centered: true,
+            focus: "item",
+        },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const dialogAnatomy = {
@@ -1379,6 +1448,15 @@ export const snackbarAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        {
+            trigger: "action",
+            surface: "action",
+            centered: false,
+            focus: "action",
+        },
+        { trigger: "close", surface: "close", centered: false, focus: "close" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const tooltipAnatomy = {
@@ -1451,6 +1529,9 @@ export const cardAnatomy = {
             mirror: false,
         },
     },
+    indication: [
+        { trigger: "root", surface: "root", centered: false, focus: "root" },
+    ],
 } as const satisfies ComponentAnatomy;
 
 export const scrimAnatomy = {
