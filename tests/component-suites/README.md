@@ -93,8 +93,9 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
       read the state from the page;
     - `form` (if it's a form control): the native control, how the machine shows disabled, what it
       submits, and whether it resets, takes `required`, `invalid`, `error`;
-    - `keyboard`: the focusable element, what each key does, and `arrows` by direction if arrow
-      keys do anything;
+    - `keyboard`: the focusable element (read again after each key, so it can follow focus: a
+      radio group's checked radio), what each key does (a `change` can name the state it moves
+      to with `to`), and `arrows` by direction if arrow keys do anything;
     - `unmirrored`: parts that don't point (a check mark), which must draw the same both ways.
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
@@ -136,3 +137,8 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 - React's `settle` waits a frame and two tasks: React syncs the native input in a passive effect,
   which can land after a single timeout.
 - The browser context emulates reduced motion, so boxes are measured at rest.
+- The direction suite skips parts with no box (`display: none`): an icon button's outline unless
+  it's outlined.
+- **Components so far:** button, checkbox, chip, FAB, icon button, radio group (its `root` is the
+  unstyled group element, `compositeTestIds.radioGroup.root`; its radios repeat the radio's test
+  ids, so cases find them by value), and switch.

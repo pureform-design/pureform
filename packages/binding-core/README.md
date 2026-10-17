@@ -22,22 +22,22 @@ framework: context, memos, effects, and rendering.
 
 ## Architecture
 
-| Module            | What it holds                                                                                                               |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `provider.ts`     | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry` |
-| `selection.ts`    | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                            |
-| `entries.ts`      | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                |
-| `parts.ts`        | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`     |
-| `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                      |
-| `class-names.ts`  | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                   |
-| `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                   |
-| `components/`     | One file per component's contract (`button.ts`, `checkbox.ts`), and `VariantProp` (`variants.ts`)                           |
-| `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                              |
-| `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                           |
-| `version.ts`      | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`               |
-| `warn.ts`         | `warnOnce`                                                                                                                  |
-| `web-theme.ts`    | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)            |
-| `dom.ts`          | The web half, on its own subpath: reduced motion, measuring an icon slot, a checkbox input kept in step, `web-theme.ts`     |
+| Module            | What it holds                                                                                                                                                                                                                          |
+| ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.ts`     | `ProviderOptions`, `ProviderState`, `resolveProvider` (nesting), `providerAttributes`, `themeAttributes`, `requireRegistry`                                                                                                            |
+| `selection.ts`    | `withDefaults`: a selection over the provider's defaults; `selectionSignature` to memoize on one                                                                                                                                       |
+| `entries.ts`      | `classEntry` (the provider registry's entry), and the class hooks' errors about lazy entries                                                                                                                                           |
+| `parts.ts`        | `partSources` (a part's props, in merge order), `stateAttributes`, `partClasses`, `forSlot`, `isUnstyled`, `isIconPart`                                                                                                                |
+| `props.ts`        | `combineProps`: one part's props from several sources, with the binding's rules for classes and styles                                                                                                                                 |
+| `class-names.ts`  | `cx`: a `clsx`-compatible class joiner, for bindings whose class prop is a string (React)                                                                                                                                              |
+| `controllable.ts` | `Controllable<N, T>`, the controlled/uncontrolled warning, and `reason: "reset"` tracking                                                                                                                                              |
+| `components/`     | One file per component's contract (`button.ts`, `checkbox.ts`, `switch.ts`, `radio-group.ts`, `chip.ts`, `icon-button.ts`, `fab.ts`), what ready-made components share about content (`content.ts`), and `VariantProp` (`variants.ts`) |
+| `motion.ts`       | `resolveReducedMotion`, `REDUCED_MOTION_QUERY`                                                                                                                                                                                         |
+| `icon-style.ts`   | `IconStyle`, `DEFAULT_ICON_STYLE`                                                                                                                                                                                                      |
+| `version.ts`      | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                                          |
+| `warn.ts`         | `warnOnce`                                                                                                                                                                                                                             |
+| `web-theme.ts`    | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
+| `dom.ts`          | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
 
 The root entry uses no DOM API and no CSS lowering, so React Native can import it.
 
@@ -130,6 +130,35 @@ checkboxNativeDefault(resetsTo): boolean;          // what a form reset shows na
 checkboxResetState(defaultChecked): CheckedState;  // what the binding sends after a reset
 checkboxInputProps(zagHiddenInputProps, readOnly); // without Zag's style and aria-labelledby
 checkboxMarkProps(zagIndicatorProps);              // without `hidden`: the CSS shows each mark
+
+// Switch: the checkbox's shape on Zag's switch, without indeterminate
+SWITCH_ROOT_PROPS; SWITCH_INPUT_LABEL_PROPS; SWITCH_CONTENT_PROPS; // icon
+switchSelection(props); switchMachineProps(props, fieldsetDisabled); switchNativeDefault(resetsTo);
+switchInputProps(zagHiddenInputProps, readOnly);   // role="switch", without style, aria-labelledby
+
+// Radio group: the group (unstyled, radioGroupAnatomy) and each radio (the preset's radio)
+interface RadioGroupRootOwnProps         // color, density, tokens (every radio's defaults), disabled,
+                                         // invalid, required, readOnly, name, form, orientation,
+                                         // id, ids, value, defaultValue, onValueChange, testId
+interface RadioOwnProps                  // value, disabled, invalid, color, density, tokens,
+                                         // testId, unstyled
+RADIO_GROUP_ROOT_PROPS; RADIO_PROPS; RADIO_INPUT_LABEL_PROPS; RADIO_GROUP_CONTENT_PROPS; // items
+interface RadioGroupItem { value; label; disabled?; invalid?; testId? }
+radioSelection(groupVariants, radioVariants);       // the radio's own win
+radioGroupMachineProps(props, fieldsetDisabled); radioGroupResetValue(defaultValue);
+radioGroupRootProps(p); radioItemProps(p); radioInputProps(p); radioRingProps(p);
+                                         // without aria-labelledby, Zag's inline style, data-ssr
+
+// Chip, icon button, FAB: on the button machine (buttonMachineProps, or fabMachineProps)
+CHIP_ROOT_PROPS; chipSelection(props);
+ICON_BUTTON_ROOT_PROPS; ICON_BUTTON_CONTENT_PROPS; iconButtonSelection(props); // sets `toggle`
+isToggle(props);                         // toggle ?? (selected or defaultSelected given)
+FAB_ROOT_PROPS; FAB_CONTENT_PROPS; fabSelection(props); fabMachineProps(props); // never a toggle
+
+// Content
+isPresent(node);                         // not undefined, null, or false
+type IconOnlyName;                       // aria-label or aria-labelledby, required
+hasAccessibleName(props); missingNameMessage(component);
 ```
 
 A component's props are typed with these, so an app whose generated declarations register the
@@ -143,6 +172,9 @@ subscribeReducedMotion(onChange): () => void;  // calls at once, then on each ch
 readIconStyle(element): IconStyle;             // font-size, color, the FILL axis
 observeIconStyle(element, onChange): () => void;
 syncCheckedInput(input, checked);              // a native checkbox back to the machine's state
+radioInputs(group): HTMLInputElement[];        // a radio group's native radios
+syncRadioInputs(group, value);                 // the radios back to the group's value
+setRadioDefaults(group, value);                // each radio's default, written only when it differs
 
 // Runtime themes and overrides
 themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions
@@ -200,8 +232,8 @@ of it, so a controlled checkbox whose owner ignores the change would otherwise s
   `createRegistry`, and the providers call `trainVersionMismatch(registry)` in development; it
   returns a warning when `registry.version` differs from `@pureform/styling`'s `VERSION`. A
   registry made by hand, with no version, passes.
-- **Reset reasons with Zag.** Zag's checkbox, switch, and radio group put their state back to
-  its value at creation during the form's `reset` event. `untilNextTask({ drop })` covers that
+- **Reset reasons with Zag.** Zag's checkbox puts its state back to its value at creation during
+  the form's `reset` event (the switch and radio group from `@pureform/machines` no longer do). `untilNextTask({ drop })` covers that
   moment: callbacks are marked `reason: "reset"` when uncontrolled (the value at creation is the
   default) and dropped when controlled (the binding reports the real default afterwards, through
   `during`).
