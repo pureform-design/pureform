@@ -25,6 +25,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/dialog",
             "@zag-js/tooltip",
             "@zag-js/switch",
+            "@zag-js/tabs",
         ],
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },

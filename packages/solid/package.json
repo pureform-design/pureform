@@ -115,6 +115,61 @@
                 "default": "./dist/tooltip.jsx"
             }
         },
+        "./tabs": {
+            "types": "./dist/tabs/index.d.ts",
+            "solid": {
+                "development": "./src/tabs/index.ts",
+                "default": "./dist/tabs.jsx"
+            },
+            "import": {
+                "development": "./src/tabs/index.ts",
+                "default": "./dist/tabs.jsx"
+            }
+        },
+        "./navigation-bar": {
+            "types": "./dist/navigation-bar/index.d.ts",
+            "solid": {
+                "development": "./src/navigation-bar/index.ts",
+                "default": "./dist/navigation-bar.jsx"
+            },
+            "import": {
+                "development": "./src/navigation-bar/index.ts",
+                "default": "./dist/navigation-bar.jsx"
+            }
+        },
+        "./navigation-rail": {
+            "types": "./dist/navigation-rail/index.d.ts",
+            "solid": {
+                "development": "./src/navigation-rail/index.ts",
+                "default": "./dist/navigation-rail.jsx"
+            },
+            "import": {
+                "development": "./src/navigation-rail/index.ts",
+                "default": "./dist/navigation-rail.jsx"
+            }
+        },
+        "./list": {
+            "types": "./dist/list/index.d.ts",
+            "solid": {
+                "development": "./src/list/index.ts",
+                "default": "./dist/list.jsx"
+            },
+            "import": {
+                "development": "./src/list/index.ts",
+                "default": "./dist/list.jsx"
+            }
+        },
+        "./list-item": {
+            "types": "./dist/list-item/index.d.ts",
+            "solid": {
+                "development": "./src/list-item/index.ts",
+                "default": "./dist/list-item.jsx"
+            },
+            "import": {
+                "development": "./src/list-item/index.ts",
+                "default": "./dist/list-item.jsx"
+            }
+        },
         "./snackbar": {
             "types": "./dist/snackbar/index.d.ts",
             "solid": {
