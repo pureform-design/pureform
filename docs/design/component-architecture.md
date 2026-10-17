@@ -950,6 +950,16 @@ group read only the closest fieldset, so hydrated in the first legend of a disab
 came out disabled; Zag's switch reset by sending an untrusted change, which React reported twice.
 The chip, icon button, and FAB run the button machine (the FAB with `toggle: false`).
 
+**Built (p6b):** the text field machine is pureform's own (`@pureform/machines/text-field`),
+shared by the text field and the text area: the value with Zag's controllable semantics (its
+bindable is `sync`, so React renders the owner's update before the input event's microtask
+ends), `idle` and `focused` states, the browser's fieldset rule, and validation (`invalid`,
+`error` as the input's custom validity, `validate: "native"` once the user commits a change or
+the form checks its controls). The input keeps its own text; the machine writes back only a value
+that changed from outside. The select is Zag's, re-exported with `withFieldsetRule` on its hidden
+native select. In the Solid port, a machine's context and refs are set up untracked, since Zag's
+select reads its props there.
+
 **Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
 (`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
 Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
@@ -1018,6 +1028,15 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   Its radios are `RadioGroup.Item` with `ItemTouchTarget`, `ItemInput`, `ItemRing`, `ItemDot`;
   the ready-made `RadioGroup` takes `items` as data, and `slotProps`/`unstyled` keyed by the
   radio's parts. The group's `color`, `density`, and `tokens` are every radio's defaults.
+- **Built (p6b):** `text-field`, `text-area`, and `select` subpaths in both bindings. The text field
+  and text area share one factory per binding (`createTextInput`) over the same parts (`Root`,
+  `Container`, `LeadingIcon`, `Input`, `Label`, `TrailingIcon`, `SupportingText`); their ready-made
+  components take `label`, `supportingText`, and the icons as content (an icon turns on the
+  preset's `leadingIcon`/`trailingIcon` variant), and the input's own attributes, which go on the
+  input. The select's list isn't one of its slots: it's drawn by the menu's registry entry through
+  a composite, `selectMenuAnatomy` (`name: "menu"`, the select's scope and test ids), with Zag's
+  positioner unstyled. Its `Input` is the preset's read-only combobox `<input>`, and its
+  `HiddenSelect` renders an option per item.
 
 ### 9.2 What every part does
 
@@ -1116,6 +1135,12 @@ component), Zag's shape, identical in Solid and React:
   uncontrolled value only updates on render); when controlled, it puts the input back to the
   value last committed (read through a ref), and the owner's update, if any, moves it with the
   machine's own sync. Uncontrolled, the browser's toggle already is the new state.
+- **Built (p6b), text inputs:** the same rule for typed text. The input keeps its own text (the
+  machine passes the value as `defaultValue`, so React doesn't control it), and after each input
+  event the binding puts back the value last committed when controlled (`syncTextInput`), leaving
+  an equal value, and the caret, alone. The select's value is one string or `null` (Zag's list
+  mapped by `selectValueProps`); a controlled select's choice the owner ignores moves nothing,
+  since the field shows the machine's value.
 
 ### 9.5 Forms
 
@@ -1207,6 +1232,16 @@ validate, and disable with it, with no form library.
   props lose `aria-labelledby` (no label part) and its indicator's inline style; its `data-ssr`
   marks are dropped, since they change after hydrating. Arrow keys are the browser's own on the
   native radios, and follow `dir`.
+- **Built (p6b), text inputs and select:** the text field and text area reset their input the same
+  way (the native default is what a reset shows; the binding sends the machine `RESET` after the
+  browser's reset, which also forgets the user's interaction). `setNativeDefault` now keeps what an
+  unedited text control or select shows, since writing the default alone moves it. The three ways
+  into validation are built as written above; `error` also replaces the supporting text, and the
+  ready-made field points `aria-describedby` at the supporting text while it shows. The select's
+  hidden `<select>` takes `name`, `form`, `required`, and `autocomplete`, resets the same way, and
+  carries `error` as its custom validity; with no value nothing is selected, so `required`
+  blocks submitting. Its sideways arrow keys follow `dir` (Zag reads them by the list's vertical
+  orientation, which doesn't flip), so the binding swaps them under `rtl`.
 
 ### 9.6 Icons
 
@@ -1262,6 +1297,9 @@ icon only has to follow them.
   types the ready-made icon button and an unlabeled FAB; the warning (`missingNameMessage`) fires
   from the icon button's Root and from the ready-made FAB when it has no `label`. The ready-made
   FAB sets `extended` from its `label` unless given.
+- **Built (p6b):** the ready-made select draws Material's drop-down arrow as a small inline SVG
+  (`1em`, `currentColor`) unless given a `trailingIcon`: the arrow is part of the component, not
+  an icon set.
 
 ### 9.7 Testing
 
