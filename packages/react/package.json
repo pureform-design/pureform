@@ -54,11 +54,32 @@
                 "default": "./dist/radio-group.mjs"
             }
         },
+        "./select": {
+            "types": "./dist/select/index.d.ts",
+            "import": {
+                "development": "./src/select/index.ts",
+                "default": "./dist/select.mjs"
+            }
+        },
         "./switch": {
             "types": "./dist/switch/index.d.ts",
             "import": {
                 "development": "./src/switch/index.ts",
                 "default": "./dist/switch.mjs"
+            }
+        },
+        "./text-area": {
+            "types": "./dist/text-area/index.d.ts",
+            "import": {
+                "development": "./src/text-area/index.ts",
+                "default": "./dist/text-area.mjs"
+            }
+        },
+        "./text-field": {
+            "types": "./dist/text-field/index.d.ts",
+            "import": {
+                "development": "./src/text-field/index.ts",
+                "default": "./dist/text-field.mjs"
             }
         }
     },

@@ -24,7 +24,10 @@ export default createConfig({
                     fab: "src/fab/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "radio-group": "src/radio-group/index.ts",
+                    select: "src/select/index.ts",
                     switch: "src/switch/index.ts",
+                    "text-area": "src/text-area/index.ts",
+                    "text-field": "src/text-field/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
