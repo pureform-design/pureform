@@ -12,6 +12,7 @@ import * as anatomies from "@pureform/anatomy";
 import {
     BINDING_PACKAGES,
     COMPONENT_USAGE,
+    INDICATION,
     PROVIDER,
     REGISTRY_HOOKS,
     ANATOMY_HOOK,
@@ -79,6 +80,13 @@ class Collector {
     readonly defaults: [entry: string, group: string, values: Values][] = [];
     allVariants = false;
     readonly bails: string[] = [];
+    /** Whether a component that shows indication, or `useIndication`, is used: they draw the
+     *  ripple's layer unless every indication has none. */
+    indicated = false;
+    /** How many providers the scan saw, and whether each, and every component's `indication`
+     *  prop, passes an indication it can tell has no layer. */
+    providers = 0;
+    layerless = true;
 
     /** A use of an entry: values for some groups, and for the rest. */
     use(entry: string, listed: Map<string, Values>, rest: Values): void {
@@ -113,6 +121,10 @@ class Collector {
     }
 
     usage(): Usage {
+        // The ripple's layer goes unless every provider passes an indication with no layer.
+        if (this.indicated && !(this.providers > 0 && this.layerless)) {
+            this.use(INDICATION.entry, new Map(), ALL);
+        }
         for (const [entry, group, values] of this.defaults) {
             this.add(entry, group, values);
         }
@@ -255,6 +267,14 @@ const anatomyName = (exported: string): string | undefined => {
         : undefined;
 };
 
+// Whether an anatomy has an indication entry, so its surfaces hold the ripple's layer.
+const anatomyShowsIndication = (exported: string): boolean =>
+    ((
+        (anatomies as Record<string, unknown>)[exported] as
+            | { indication?: readonly unknown[] }
+            | undefined
+    )?.indication?.length ?? 0) > 0;
+
 // A file's bindings: what each local name imported from the bindings, the anatomy, or the glue is.
 interface Bindings {
     readonly components: Map<string, string>; // local → subpath (named import)
@@ -292,12 +312,23 @@ const scanFile = (
         registries: new Set(),
     };
 
+    // The ripple a component draws for its indication's layer, which the usage adds at the end
+    // unless every indication has no layer; the ripple component's own subpath draws it always.
+    const indicationEntry = (subpath: string, entry: string): boolean => {
+        if (entry !== INDICATION.entry || subpath === INDICATION.entry) {
+            return false;
+        }
+        collector.indicated = true;
+        return true;
+    };
+
     const usedModule = (subpath: string) => {
         const usage = COMPONENT_USAGE[
             subpath as keyof typeof COMPONENT_USAGE
         ] as ComponentUsage | undefined;
         if (!usage) return;
         for (const [entry, groups] of Object.entries(usage.entries)) {
+            if (indicationEntry(subpath, entry)) continue;
             collector.use(
                 entry,
                 new Map(Object.keys(groups).map((group) => [group, new Set()])),
@@ -311,6 +342,7 @@ const scanFile = (
             subpath
         ];
         for (const entry of Object.keys(usage?.entries ?? {})) {
+            if (indicationEntry(subpath, entry)) continue;
             collector.use(entry, new Map(), ALL);
         }
     };
@@ -508,6 +540,40 @@ const scanFile = (
         );
     };
 
+    // Whether an indication, as written, has no layer: `noIndication`, `materialIndication({
+    // ripple: false })`, or `defineIndication({ … })` (or an object) without `layer: true`.
+    const isLayerless = (value: Node | null): boolean => {
+        if (value?.type !== "JSXExpressionContainer") return false;
+        const node = unwrap(value.expression as Node);
+        if (node.type === "Identifier") {
+            return bindings.hooks.get(node.name as string) === INDICATION.none;
+        }
+        const objectLayerless = (object: Node | undefined) => {
+            if (object?.type !== "ObjectExpression") return false;
+            for (const property of object.properties as Node[]) {
+                if (property.type !== "Property") return false;
+                if (propertyName(property) !== "layer") continue;
+                const layer = unwrap(property.value as Node);
+                return layer.type === "Literal" && layer.value === false;
+            }
+            return true;
+        };
+        if (node.type === "ObjectExpression") return objectLayerless(node);
+        if (node.type !== "CallExpression") return false;
+        const hook = hookOf(node.callee as Node);
+        const arg = (node.arguments as Node[])[0];
+        const options = arg ? unwrap(arg) : undefined;
+        if (hook === INDICATION.define) return objectLayerless(options);
+        if (hook !== INDICATION.material) return false;
+        if (options?.type !== "ObjectExpression") return false;
+        return (options.properties as Node[]).some((property) => {
+            if (property.type !== "Property") return false;
+            if (propertyName(property) !== "ripple") return false;
+            const ripple = unwrap(property.value as Node);
+            return ripple.type === "Literal" && ripple.value === false;
+        });
+    };
+
     const providerDefaults = (attribute: Node) => {
         if (attribute.type !== "JSXAttribute") {
             collector.allVariants = true;
@@ -546,9 +612,18 @@ const scanFile = (
     const element = (opening: Node) => {
         const name = opening.name as Node;
         if (isProvider(name)) {
+            collector.providers++;
+            let layerless = false;
             for (const attribute of opening.attributes as Node[]) {
                 providerDefaults(attribute);
+                if (
+                    attribute.type === "JSXAttribute" &&
+                    (attribute.name as Node).name === INDICATION.prop
+                ) {
+                    layerless = isLayerless(attribute.value as Node | null);
+                }
             }
+            if (!layerless) collector.layerless = false;
             return;
         }
         const subpath = componentOfTag(name);
@@ -562,6 +637,12 @@ const scanFile = (
                 continue;
             }
             const prop = (attribute.name as Node).name as string;
+            if (
+                prop === INDICATION.prop &&
+                !isLayerless(attribute.value as Node | null)
+            ) {
+                collector.layerless = false;
+            }
             const values =
                 attribute.value === null
                     ? new Set(["true"])
@@ -577,6 +658,7 @@ const scanFile = (
     const call = (node: Node) => {
         const args = node.arguments as Node[];
         const hook = hookOf(node.callee as Node);
+        if (hook === INDICATION.hook) collector.indicated = true;
         if (hook && hook in REGISTRY_HOOKS) {
             const name = args[0] ? unwrap(args[0]) : undefined;
             if (name?.type !== "Literal" || typeof name.value !== "string") {
@@ -612,6 +694,10 @@ const scanFile = (
                 exported = (target.property as Node).name as string;
             }
             const entry = exported ? anatomyName(exported) : undefined;
+            // Its surfaces hold the ripple's layer.
+            if (exported && anatomyShowsIndication(exported)) {
+                collector.indicated = true;
+            }
             if (!entry) {
                 collector.bails.push(
                     `${shown} calls ${hook} with an anatomy the scan can't name`,

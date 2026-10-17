@@ -44,7 +44,7 @@ describe("scanUsage", () => {
         });
         expect(result.warnings).toEqual([]);
         expect(result.usage).toEqual({
-            components: ["button", "checkbox", "chip"],
+            components: ["button", "checkbox", "chip", "ripple"],
             variants: {
                 button: {
                     variant: ["filled", "text"],
@@ -75,7 +75,14 @@ describe("scanUsage", () => {
             `,
         });
         expect(result.usage).toEqual({
-            components: ["button", "dialog", "fab", "iconButton", "scrim"],
+            components: [
+                "button",
+                "dialog",
+                "fab",
+                "iconButton",
+                "ripple",
+                "scrim",
+            ],
             variants: {},
         });
     });
@@ -94,7 +101,7 @@ describe("scanUsage", () => {
             `,
         });
         expect(result.usage).toEqual({
-            components: ["menu", "select", "text"],
+            components: ["menu", "ripple", "select", "text"],
             variants: {
                 menu: { color: ["secondary"], density: [] },
                 select: {
@@ -161,7 +168,7 @@ describe("scanUsage", () => {
                 ),
             ).usage,
         ).toEqual({
-            components: ["button"],
+            components: ["button", "ripple"],
             variants: {
                 button: {
                     variant: ["tonal"],
@@ -172,9 +179,83 @@ describe("scanUsage", () => {
             },
         });
         expect(scan(files("defaults")).usage).toEqual({
-            components: ["button"],
+            components: ["button", "ripple"],
             variants: {},
         });
+    });
+
+    it("drops the ripple only when every provider and component passes an indication with no layer", () => {
+        const files = (provider: string, button = "") => ({
+            "src/app.tsx": `
+                import { PureformProvider, noIndication, materialIndication, defineIndication, useIndication } from "@pureform/solid";
+                import { Button } from "@pureform/solid/button";
+                export const App = () => (
+                    <PureformProvider registry={registry} ${provider}>
+                        <Button ${button} />
+                    </PureformProvider>
+                );
+            `,
+        });
+        const components = (provider: string, button?: string) =>
+            scan(files(provider, button)).usage?.components;
+        expect(components("indication={noIndication}")).toEqual(["button"]);
+        expect(
+            components("indication={materialIndication({ ripple: false })}"),
+        ).toEqual(["button"]);
+        expect(
+            components(
+                'indication={defineIndication({ name: "flat", tokens: {} })}',
+            ),
+        ).toEqual(["button"]);
+        expect(
+            components('indication={{ name: "flat", layer: false }}'),
+        ).toEqual(["button"]);
+        expect(components("")).toEqual(["button", "ripple"]);
+        expect(components("indication={materialIndication()}")).toEqual([
+            "button",
+            "ripple",
+        ]);
+        expect(
+            components(
+                'indication={defineIndication({ name: "ink", layer: true })}',
+            ),
+        ).toEqual(["button", "ripple"]);
+        expect(components("indication={props.indication}")).toEqual([
+            "button",
+            "ripple",
+        ]);
+        expect(
+            components(
+                "indication={noIndication}",
+                "indication={materialIndication()}",
+            ),
+        ).toEqual(["button", "ripple"]);
+        expect(
+            components(
+                "indication={noIndication}",
+                "indication={noIndication}",
+            ),
+        ).toEqual(["button"]);
+    });
+
+    it("keeps the ripple for an app's own surface or anatomy that shows indication", () => {
+        expect(
+            scan({
+                "src/app.tsx": `
+                    import { useIndication } from "@pureform/react";
+                    const surface = useIndication(source);
+                `,
+            }).usage?.components,
+        ).toEqual(["ripple"]);
+        expect(
+            scan({
+                "src/app.tsx": `
+                    import { useComponent } from "@pureform/solid";
+                    import { chipAnatomy } from "@pureform/anatomy";
+                    const scope = useComponent(chipAnatomy, { selection: () => ({}) });
+                `,
+            }).usage?.components,
+        ).toEqual(["chip", "ripple"]);
     });
 
     it("reads the registry imported from the glue", () => {
@@ -206,7 +287,7 @@ describe("scanUsage", () => {
             },
             ["src"],
         );
-        expect(result.usage?.components).toEqual(["chip"]);
+        expect(result.usage?.components).toEqual(["chip", "ripple"]);
         expect(
             result.files
                 .map((file) => file.split("/").slice(-2).join("/"))
