@@ -1583,7 +1583,11 @@ interface InteractionState {
 interface InteractionSource {
     readonly state: InteractionState;
     subscribe(
-        listener: (interaction: Interaction, state: InteractionState) => void,
+        listener: (
+            interaction: Interaction,
+            state: InteractionState,
+            origin: unknown,
+        ) => void,
     ): () => void;
 }
 
@@ -1647,6 +1651,33 @@ function createInteractionSource(): MutableInteractionSource;
       Native) make a stable source.
     - `useInteractionState(source)` returns the state, as an accessor in Solid and a value in
       React (through `useSyncExternalStore`).
+
+**Built (p9a):** `@pureform/binding-core/interaction` and `/indication` hold the types above, and
+`createInteractionSource`, `createInteractionSources` (one source per key, for a composite's
+items), and `defineIndication`. What differs from the sketch:
+
+- **Listeners get the emit's origin** as a third argument (the element or native view), so a
+  binding can tell a state from its own element (matched by a pseudo-class) from a forwarded one.
+- **The state counts**: a press holds until its id's release or cancel, hover while more enters
+  than exits have come (a shared source hears several), and a drag likewise. "Touch never hovers"
+  is kept twice: machines emit no hover for a touch pointer, and the state isn't hovered while a
+  touch press is in progress.
+- **A press's origin** is in viewport coordinates (`clientX`, `clientY` on the web).
+- **`IndicationTokens`** are the component tokens' names (`stateHoverOpacity`, …,
+  `focusIndicatorThickness`, `focusIndicatorOuterOffset`, `focusIndicatorColor`).
+  **`NativeIndicationProps`** are the source, the surface's resolved style and drawing, `centered`,
+  `reducedMotion`, `dir`, and the registry. `native` is typed structurally (a function or class
+  component taking those props), so binding-core doesn't depend on React.
+- **Composites take a source per item**: the radio group, tabs, menu, select, and navigation
+  machines take `itemInteractionSource(value)`; the button, checkbox, switch, and slider take
+  `interactionSource`. A highlight's hover has no origin element. Enter or Space on a menu's or
+  select's highlighted item presses and releases it at once, since the key chooses it as it goes
+  down.
+- **Only the machine's own `disabled`** ends what's in progress; a disabled item (a tab, a radio)
+  takes no new interaction. A menu or select ends everything when it closes, and every machine
+  when it stops.
+- **Not emitting yet**: the card and list item have no machine, and the snackbar's action and
+  close buttons aren't on the button machine, so nothing emits for them until p9c wires them.
 
 #### Indication
 
