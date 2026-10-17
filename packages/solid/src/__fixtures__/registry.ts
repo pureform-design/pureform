@@ -138,3 +138,23 @@ export const togglesRegistry = () =>
             "label",
         ]),
     });
+
+const FIELD_SLOTS = [
+    "root",
+    "container",
+    "leadingIcon",
+    "input",
+    "label",
+    "trailingIcon",
+    "supportingText",
+] as const;
+
+/** The text inputs' fake factories, all static: the text field, text area, select, and the menu
+ *  the select draws its list with. */
+export const textInputsRegistry = () =>
+    createRegistry({
+        textField: named("text-field", FIELD_SLOTS),
+        textArea: named("text-area", FIELD_SLOTS),
+        select: named("select", FIELD_SLOTS),
+        menu: named("menu", ["root", "item", "itemLabel"]),
+    });
