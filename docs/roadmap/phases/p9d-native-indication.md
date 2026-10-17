@@ -20,8 +20,9 @@ Move `@pureform/react-native` from `usePress` and `useInk` onto the interaction 
 - `Pressable`'s callbacks feed the component's machine, which emits to its source; the
   source's state goes into the selection, replacing `usePress`'s tracking.
 - `materialIndication({ ripple })` and `noIndication` for React Native: the `native` half
-  renders in the anatomy's surface over the motion engine's `useRipple`; the tokens join the
-  selection's overrides (theme-level from the provider, instance tokens from a prop).
+  renders in the anatomy's surface over the motion engine's `useRipple`, driven by the source's
+  presses rather than its own press handlers; the tokens join the selection's overrides
+  (theme-level from the provider, instance tokens from a prop).
 - `focusVisible` holds only for focus that doesn't follow a press, so the focus indicator
   (`focusRing()` lowered to `outline*`) shows for a hardware keyboard or TV remote and not for
   touch.

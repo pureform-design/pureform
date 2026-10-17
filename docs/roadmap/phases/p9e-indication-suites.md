@@ -27,8 +27,13 @@ show it in the demos.
     - a shared source shows a press on a second component through `data-pf-active`, never
       forwards focus, and `useInteractionState` reports it;
     - disabling a pressed component ends the press;
+    - an app's own interaction kind reaches subscribers and leaves the built-in state alone;
     - server rendering with a custom indication hydrates without warnings.
 - The same rules on RN-web in `tests/browser-e2e-tests`.
+- A benchmark: mount 1,000 list items with and without the layer element, recording mount time
+  and style recalculation in Chromium, and the same with eager and lazily created sources. The
+  output context records the numbers and recommends whether the layer or the sources should
+  become lazy.
 - `solid-demo`'s `/components` page and `rn-web-demo` gain an indication switch (Material,
   no ripple, none) and a shared-source example.
 

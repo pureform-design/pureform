@@ -21,6 +21,11 @@ the component prop, hoistable sources, and the ripple on by default.
   (over the `ripple` machine) and `noIndication`; turning an indication's tokens into CSS vars
   (theme-level for the provider, component-level for a prop); the development warning when a
   custom indication drops the focus indicator.
+- The ripple draws from the source's presses instead of its own pointer listeners on the
+  surface, and builds its controller on the first press. The layer element stays eager (p9e
+  measures it).
+- The `web` effect runs after mount; its doc comment promises only "at the latest before the
+  first interaction reaches it", so it can move later without breaking custom indications.
 - Both bindings:
     - the provider's `indication`, inherited and overridable;
     - every interactive component's `indication` and `interactionSource` props, on Root and

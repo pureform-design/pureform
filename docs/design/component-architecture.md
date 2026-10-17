@@ -1550,18 +1550,27 @@ flowchart LR
 ```ts
 type PointerKind = "mouse" | "touch" | "pen" | "keyboard" | "virtual";
 
-type Interaction =
-    | {
-          type: "press";
-          id: number;
-          origin: { x: number; y: number } | "center";
-          pointer: PointerKind;
-      }
-    | { type: "release" | "cancel"; id: number }
-    | { type: "hoverEnter" | "hoverExit" }
-    | { type: "focus"; visible: boolean }
-    | { type: "blur" }
-    | { type: "dragStart" | "dragStop" };
+/** Every kind of interaction, by `type`. pureform's are typed here; apps add their own by
+ *  augmenting the interface, as the registry's types are augmented (§5.1). */
+interface InteractionKinds {
+    press: {
+        id: number;
+        origin: { x: number; y: number } | "center";
+        pointer: PointerKind;
+    };
+    release: { id: number };
+    cancel: { id: number };
+    hoverEnter: {};
+    hoverExit: {};
+    focus: { visible: boolean };
+    blur: {};
+    dragStart: {};
+    dragStop: {};
+}
+
+type Interaction = {
+    [K in keyof InteractionKinds]: { type: K } & InteractionKinds[K];
+}[keyof InteractionKinds];
 
 interface InteractionState {
     hovered: boolean;
@@ -1586,6 +1595,24 @@ interface MutableInteractionSource extends InteractionSource {
 function createInteractionSource(): MutableInteractionSource;
 ```
 
+- **Open kinds, typed defaults.** pureform's kinds are a typed, discriminated union, so a
+  `switch` on `type` narrows and autocompletes. An app adds a kind by augmenting
+  `InteractionKinds`:
+
+    ```ts
+    declare module "@pureform/binding-core/interaction" {
+        interface InteractionKinds {
+            "app:longPress": { id: number; duration: number };
+        }
+    }
+    source.emit({ type: "app:longPress", id: 1, duration: 600 });
+    ```
+
+    Its kinds reach every subscriber with the same typing. The built-in state ignores kinds it
+    doesn't know, so an app derives its own state from its kinds, as Compose's consumers do.
+    App kinds take a prefix (`app:` or the library's name), so they can't collide with a kind
+    pureform adds later.
+
 - **Who emits.** A component's machine, which already tracks presses, hover, and focus
   visibility, emits to the component's source; the bindings don't listen for events a second
   time. Touch never emits hover. A component that becomes disabled ends what's in progress
@@ -1594,6 +1621,15 @@ function createInteractionSource(): MutableInteractionSource;
   creates its own. With one, it uses the app's, which lets an app observe a component (show
   something while a button is pressed) or share one source between components, so pressing a
   list row also shows the press on a surface inside it.
+- **Created eagerly, promised neutrally.** A component creates its own source when it mounts
+  on the client, and none on the server, where nothing emits. A source is a small plain
+  object (its state and a listener list), well under 1% of mounting a component beside its
+  Zag machine, so creating it on the first interaction, as Compose 1.7 does, isn't worth the
+  "not created yet" paths it needs in every binding. The contract doesn't promise either way:
+  a source is always a value (never `null` in a type), a subscriber that attaches late sees
+  ordinary events (any replay is invisible), and an indication's `web` runs after mount, at
+  the latest before the first interaction reaches it. Going lazy later, if p9e's measurement
+  asks for it, is then an internal change.
 - **Shared sources on the web.** A state that came from the element itself is matched by its
   pseudo-class, as today, and costs no JS. A hover or press that came from somewhere else
   (another element sharing the source, or the app emitting) can't match a pseudo-class, so
@@ -1623,7 +1659,8 @@ interface Indication {
     readonly tokens?: IndicationTokens;
     /** Whether the surface holds a layer element for the effect to draw in. */
     readonly layer?: boolean;
-    /** Web: runs after mount; returns its cleanup. */
+    /** Web: runs after mount, at the latest before the first interaction reaches it (never
+     *  promised to run at mount, nor on the first interaction); returns its cleanup. */
     readonly web?: (
         target: IndicationTarget,
         source: InteractionSource,
@@ -1656,6 +1693,10 @@ function defineIndication(indication: Indication): Indication;
       Material's state layer, the ripple through the ripple machine (web) or the motion
       engine's `useRipple` (React Native), and the focus indicator.
     - `noIndication`: state-layer opacities of 0 and no ripple. It keeps the focus indicator.
+- **The ripple reads the source.** Material's ripple draws from the source's presses rather
+  than adding its own pointer listeners to the surface, as the js-effects ripple does today,
+  so a surface has one set of listeners, the machine's. Its controller and drawing state are
+  created on the first press.
 - **The focus indicator is never dropped by a built-in.** A custom indication can set its
   thickness to 0, and pureform warns once in development, since keyboard users need a
   visible focus (WCAG 2.4.7).
@@ -1728,6 +1769,11 @@ From today's preset:
   part inside the surface when the indication has `layer: true`. The provider's indication is
   known on the server and the client, so hydration matches. The standalone `Ripple`
   component stays, for app surfaces.
+- **The layer stays eager for now.** It costs one empty, absolutely placed node per surface,
+  the one cost that grows with long lists. Inserting it on the first press would save that,
+  but it changes the markup (server HTML, child counts an app's CSS may match), so it's a
+  separate decision: p9e measures mounting and style recalculation for 1,000 list items with
+  and without it, and the numbers decide.
 - **Pruning** (§7): the usage table counts the `ripple` entry as used by every component
   with an indication entry, unless the provider passes `noIndication` or a custom one with no
   layer and the scan can see it.
@@ -1739,7 +1785,8 @@ From today's preset:
 - **Keyboard presses** ripple from the center and show the pressed state layer through
   `data-pf-active`, as today.
 - **Nested surfaces** (a button inside an interactive card) ripple once, on the innermost
-  surface, as the js-effects ripple already claims the event.
+  surface: the innermost machine claims the press, as the js-effects ripple claims the event
+  today, so the outer one doesn't emit it.
 - **Server rendering**: tokens and the layer render on the server; effects and forwarded
   attributes start after mount.
 - **Direction**: the ripple is placed from pointer coordinates, already an allowed exception
@@ -1766,10 +1813,12 @@ A shared `indication` suite in `tests/component-suites`, reading each case's ana
 - a shared source shows a press on a second component through `data-pf-active`, and
   `useInteractionState` reports it;
 - disabling a pressed component ends the press;
+- an app's own interaction kind reaches subscribers and leaves the built-in state alone;
 - server rendering with a custom indication hydrates without warnings.
 
 React Native runs the same rules through the selection, and RN-web in
-`tests/browser-e2e-tests`.
+`tests/browser-e2e-tests`. A benchmark mounts 1,000 list items, with and without the layer
+element, and records mount time and style recalculation, for the layer decision above.
 
 #### Where it lives
 
@@ -1923,4 +1972,7 @@ Decided:
   CSS, and an indication sets their tokens. A shared source forwards hover and press, never
   focus; each root resets its indication tokens, so a prop reaches only its component; React
   Native draws the focus indicator with `outline*` props for keyboard focus only; press
-  elevation and shape stay in the preset.
+  elevation and shape stay in the preset. Interaction kinds are open, with pureform's typed
+  and apps' added by augmentation. Sources are created eagerly behind a contract that
+  promises neither eager nor lazy; the ripple reads the source and builds its controller on
+  the first press; the layer element stays eager until measured.
