@@ -1,7 +1,8 @@
 # @pureform/solid
 
 pureform's bindings for Solid 2: the provider, the style registry's hooks, the helpers
-components build their parts from, and the components themselves (button and checkbox so far),
+components build their parts from, and the components themselves (button, checkbox, switch, radio
+group, chip, icon button, and FAB so far),
 on top of a port of Zag.js's Solid adapter to Solid 2. Each component wires its anatomy to a
 machine to the registry, and comes ready-made and as compound parts.
 
@@ -24,20 +25,22 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 
 ## Architecture
 
-| Module            | What it holds                                                                             |
-| ----------------- | ----------------------------------------------------------------------------------------- |
-| `provider.tsx`    | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`             |
-| `classes.ts`      | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                    |
-| `parts.tsx`       | `useComponent` (a component's classes and parts), `slotPartProps` (ready-made components) |
-| `props.ts`        | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`  |
-| `controllable.ts` | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine            |
-| `form.ts`         | `useFormReset`, `useFieldsetDisabled`                                                     |
-| `motion.ts`       | `useReducedMotion`                                                                        |
-| `icon-style.ts`   | `useIconStyle`, and the context icon parts provide                                        |
-| `part-context.ts` | `createPartContext`: the context Root shares with its parts, and the error outside Root   |
-| `button/`         | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`     |
-| `checkbox/`       | `@pureform/solid/checkbox`: the same layout                                               |
-| `internal/zag/`   | The Zag port (below)                                                                      |
+| Module                                                     | What it holds                                                                                                                                        |
+| ---------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                             | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                        |
+| `classes.ts`                                               | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                               |
+| `parts.tsx`                                                | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components) |
+| `props.ts`                                                 | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                             |
+| `controllable.ts`                                          | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                       |
+| `form.ts`                                                  | `useFormReset`, `useFieldsetDisabled`                                                                                                                |
+| `motion.ts`                                                | `useReducedMotion`                                                                                                                                   |
+| `icon-style.ts`                                            | `useIconStyle`, and the context icon parts provide                                                                                                   |
+| `part-context.ts`                                          | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                              |
+| `button/`                                                  | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                |
+| `checkbox/`                                                | `@pureform/solid/checkbox`: the same layout                                                                                                          |
+| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/` | The other components, in the same layout                                                                                                             |
+| `pressable.ts`                                             | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                     |
+| `internal/zag/`                                            | The Zag port (below)                                                                                                                                 |
 
 ```
 Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► useClasses ──► registry entry
@@ -77,6 +80,17 @@ import { Checkbox } from "@pureform/solid/checkbox";
 
 <Checkbox name="terms" aria-label="Accept the terms" defaultChecked />
 <Checkbox checked={agreed()} onCheckedChange={(d) => setAgreed(d.checked === true)} />
+<Switch name="wifi" aria-label="Wi-Fi" icon={<CheckIcon />} />
+<RadioGroup
+    name="size"
+    aria-label="Size"
+    defaultValue="m"
+    items={[{ value: "s", label: "Small" }, { value: "m", label: "Medium" }]}
+/>
+<Chip label="Vegan" defaultSelected={false} /> // a filter chip
+<IconButton icon={<StarIcon />} aria-label="Favorite" defaultSelected={false} variant="filled" />
+<Fab icon={<EditIcon />} label="Compose" /> // extended, since it has a label
+
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />
     <Checkbox.Input />
@@ -87,10 +101,15 @@ import { Checkbox } from "@pureform/solid/checkbox";
 </Checkbox.Root>
 ```
 
-| Component  | Parts (element)                                                                                      | Machine                                |
-| ---------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `Button`   | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                           | `@pureform/machines/button`            |
-| `Checkbox` | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon` | Zag's checkbox, through `internal/zag` |
+| Component    | Parts (element)                                                                                                           | Machine                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Button`     | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
+| `Checkbox`   | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                      | Zag's checkbox, through `internal/zag`               |
+| `Switch`     | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`              | Zag's switch (`@pureform/machines/switch`)           |
+| `RadioGroup` | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot` | Zag's radio group (`@pureform/machines/radio-group`) |
+| `Chip`       | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
+| `IconButton` | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                 | `@pureform/machines/button`                          |
+| `Fab`        | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                   | `@pureform/machines/button` (never a toggle)         |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -102,6 +121,20 @@ import { Checkbox } from "@pureform/solid/checkbox";
 - **The ready-made** component takes Root's props, with `class`, `style`, and `slotProps` keyed by
   part. `Button` takes `label`, `icon` (the icon part renders only when given), and `mirrorIcon`.
   `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its input.
+- **The switch is a `<label>` too**, around a native checkbox with `role="switch"`; its ready-made
+  takes `icon` (shown in the handle while on) and puts the ARIA naming props on the input.
+- **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
+  id `pf-radio-group-root`) holding a preset `radio` per item. Name the group with `aria-label` or
+  `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).
+  Variants on the group (`color`, `density`, `tokens`) are every radio's defaults; an `Item`'s own
+  win. The ready-made takes `items` (`{ value, label, disabled?, invalid?, testId? }`), and
+  `slotProps` and `unstyled` keyed by the radio's parts, applied to every radio; `class` and
+  `style` are the group element's. Arrow keys move and check, by direction, natively.
+- **The chip and icon button toggle** when given `selected` or `defaultSelected` (`aria-pressed`);
+  a toggle icon button also selects the preset's `toggle` variant. **The FAB** never toggles; its
+  ready-made is extended (`extended` variant) when it has a `label`. Icon-only components (icon
+  button, FAB without a label) need `aria-label` or `aria-labelledby` in their types, and warn in
+  development without one.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label for>` at `ids.input`; don't
   wrap it in another label. The input carries every native state the CSS reads (`:checked`,
@@ -286,7 +319,7 @@ Through the omni MCP (or `omni run`):
   there, as does `import`. Identifiers aren't minified, so components stay capitalized.
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`), with type
   checks. The specs use a fake registry (`src/__fixtures__/registry.ts`, button and checkbox
-  classes that name the selection). Each component's spec covers rendering, keyboard, controlled
+  classes that name the selection, and `togglesRegistry()` for the other components). Each component's spec covers rendering, keyboard, controlled
   and uncontrolled state, test ids, `unstyled`, slot overrides, and forms; the core helpers'
   specs use a smaller example button (`src/__fixtures__/button.tsx`).
 
@@ -309,7 +342,11 @@ check the cross-cutting rules against Solid and React together (see that package
   transition.
 - The ready-made `Button` reads its `icon` prop once to decide whether to render the icon part,
   which builds the icon's JSX an extra time; the part builds it again inside its own context.
-- A controlled checkbox's native input is put back after a click the owner ignores, in a
-  microtask once the machine and the owner have handled it (`syncCheckedInput`).
+- A controlled checkbox's or switch's native input is put back after a click the owner ignores,
+  in a microtask once the machine and the owner have handled it (`syncCheckedInput`); a radio
+  group's radios likewise (`syncRadioInputs`).
+- `useFormReset` takes `writeDefault` for a control whose native default isn't one input's: the
+  radio group writes every radio's (`setRadioDefaults`), tracking the form through its first
+  radio.
 - `solid-js` and `@solidjs/web` are peers at the exact release candidate the package is tested
   with (design doc §11).

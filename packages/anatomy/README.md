@@ -26,6 +26,7 @@ generator and the drift test read it, and nothing at runtime does.
 | `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                          |
 | `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.          |
 | `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                  |
+| `composites.ts` | Written by hand: anatomies that group preset components, unstyled (`radioGroupAnatomy`).   |
 
 **Generated, not derived at import.** Deriving at import would pull the whole preset (every
 recipe, the theme) into every app bundle just to learn part names. The generated module is plain
@@ -127,6 +128,12 @@ it with oxfmt. Until then, `src/anatomy.spec.ts` fails with "the preset changed:
 @pureform/anatomy's generate task".
 
 To add an extra part, list it in `src/extras.ts` and regenerate.
+
+**Composites** group preset components without being one, so the generator doesn't write them and
+the registry doesn't style them: `radioGroupAnatomy` is the element around a group's radios
+(`data-scope="radio-group"`, `data-pf-part="root"`, test id `pf-radio-group-root`, also in
+`compositeTestIds.radioGroup.root`). Bindings render them with the same attributes and test id
+rules as any part (`useUnstyledComponent`), and they stay out of `anatomy` and `testIds`.
 
 ## Building and testing
 

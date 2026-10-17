@@ -1,7 +1,8 @@
 # @pureform/react
 
 pureform's bindings for React 19: the provider, the style registry's hooks, the helpers
-components build their parts from, and the components themselves (button and checkbox so far).
+components build their parts from, and the components themselves (button, checkbox, switch, radio
+group, chip, icon button, and FAB so far).
 It mirrors `@pureform/solid`'s API with React's idioms (values instead of accessors, `className`
 instead of `class`, `useMemo`, `use()` for lazy entries, `useId`). Each component wires its
 anatomy to a machine to the registry, and comes ready-made and as compound parts. Machines run
@@ -27,21 +28,23 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 
 ## Architecture
 
-| Module            | What it holds                                                                           |
-| ----------------- | --------------------------------------------------------------------------------------- |
-| `provider.tsx`    | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`           |
-| `classes.ts`      | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                  |
-| `parts.tsx`       | `useComponent` (a component's classes and parts), `slotPartProps`, `mergeRefs`          |
-| `props.ts`        | React's rules for merging a part's props: one `className` string (`cx`), style objects  |
-| `controllable.ts` | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine          |
-| `form.ts`         | `useFormReset`, `useFieldsetDisabled`                                                   |
-| `motion.ts`       | `useReducedMotion`                                                                      |
-| `icon-style.ts`   | `useIconStyle`, and the context icon parts provide                                      |
-| `part-context.ts` | `createPartContext`: the context Root shares with its parts, and the error outside Root |
-| `machine.ts`      | `useMachine`: Zag's, typed so a component can pass its optional props through           |
-| `button/`         | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`   |
-| `checkbox/`       | `@pureform/react/checkbox`: the same layout                                             |
-| `env.ts`          | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`             |
+| Module                                                     | What it holds                                                                                                                             |
+| ---------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                             | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                             |
+| `classes.ts`                                               | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                    |
+| `parts.tsx`                                                | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps`, `mergeRefs` |
+| `props.ts`                                                 | React's rules for merging a part's props: one `className` string (`cx`), style objects                                                    |
+| `controllable.ts`                                          | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                            |
+| `form.ts`                                                  | `useFormReset`, `useFieldsetDisabled`                                                                                                     |
+| `motion.ts`                                                | `useReducedMotion`                                                                                                                        |
+| `icon-style.ts`                                            | `useIconStyle`, and the context icon parts provide                                                                                        |
+| `part-context.ts`                                          | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                   |
+| `machine.ts`                                               | `useMachine`: Zag's, typed so a component can pass its optional props through                                                             |
+| `button/`                                                  | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                     |
+| `checkbox/`                                                | `@pureform/react/checkbox`: the same layout                                                                                               |
+| `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/` | The other components, in the same layout                                                                                                  |
+| `pressable.ts`                                             | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                          |
+| `env.ts`                                                   | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`                                                               |
 
 ```
 Root ── useComponent(anatomy, { selection, testId, unstyled }) ──► useClasses ──► registry entry
@@ -87,6 +90,17 @@ import { Checkbox } from "@pureform/react/checkbox";
 
 <Checkbox name="terms" aria-label="Accept the terms" defaultChecked />
 <Checkbox checked={agreed} onCheckedChange={(d) => setAgreed(d.checked === true)} />
+<Switch name="wifi" aria-label="Wi-Fi" icon={<CheckIcon />} />
+<RadioGroup
+    name="size"
+    aria-label="Size"
+    defaultValue="m"
+    items={[{ value: "s", label: "Small" }, { value: "m", label: "Medium" }]}
+/>
+<Chip label="Vegan" defaultSelected={false} /> // a filter chip
+<IconButton icon={<StarIcon />} aria-label="Favorite" defaultSelected={false} variant="filled" />
+<Fab icon={<EditIcon />} label="Compose" /> // extended, since it has a label
+
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />
     <Checkbox.Input />
@@ -97,10 +111,15 @@ import { Checkbox } from "@pureform/react/checkbox";
 </Checkbox.Root>
 ```
 
-| Component  | Parts (element)                                                                                      | Machine                     |
-| ---------- | ---------------------------------------------------------------------------------------------------- | --------------------------- |
-| `Button`   | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                           | `@pureform/machines/button` |
-| `Checkbox` | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon` | Zag's checkbox              |
+| Component    | Parts (element)                                                                                                           | Machine                                              |
+| ------------ | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Button`     | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
+| `Checkbox`   | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                      | Zag's checkbox                                       |
+| `Switch`     | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`              | Zag's switch (`@pureform/machines/switch`)           |
+| `RadioGroup` | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot` | Zag's radio group (`@pureform/machines/radio-group`) |
+| `Chip`       | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
+| `IconButton` | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                 | `@pureform/machines/button`                          |
+| `Fab`        | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                   | `@pureform/machines/button` (never a toggle)         |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -114,6 +133,13 @@ import { Checkbox } from "@pureform/react/checkbox";
   keyed by part. `Button` takes `label`, `icon` (the icon part renders only when given), and
   `mirrorIcon`. `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its
   input.
+- **The switch, radio group, chip, icon button, and FAB** behave as `@pureform/solid`'s do (see
+  its README): the switch is a `<label>` around a checkbox with `role="switch"`; the radio group
+  is an unstyled `div` (`radioGroupAnatomy`) around a preset `radio` per `Item`, its ready-made
+  taking `items`, and `slotProps`/`unstyled` keyed by the radio's parts; the chip and icon button
+  toggle when given `selected` or `defaultSelected` (a toggle icon button also selects the
+  `toggle` variant); the FAB is extended when its ready-made has a `label`. Icon-only components
+  need `aria-label` or `aria-labelledby`, and warn in development without one.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label htmlFor>` at `ids.input`;
   don't wrap it in another label. The input carries every native state the CSS reads
@@ -291,12 +317,13 @@ filled: false }`.
 
 Through the omni MCP (or `omni run`):
 
-- `build`: Vite library build into `dist/index.mjs`, `dist/button.mjs`, and `dist/checkbox.mjs`
+- `build`: Vite library build into `dist/index.mjs` and one `dist/<component>.mjs` per subpath
   (shared chunks beside them) with declarations; React, Zag, and the
   pureform packages stay external, and `process.env.NODE_ENV` is left for the app's bundler.
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`) with React
   Testing Library, and type checks. The specs use a fake registry
-  (`src/__fixtures__/registry.ts`, with button and checkbox factories that name the selection)
+  (`src/__fixtures__/registry.ts`, with button and checkbox factories that name the selection,
+  and `togglesRegistry()` for the other components)
   and the example button. The component specs mirror `@pureform/solid`'s case by case;
   `src/testing/render.tsx` has `outside` (a value set from the test, as a Solid signal) and an
   error boundary. Interactions go through

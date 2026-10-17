@@ -35,15 +35,16 @@ Our own machines keep controllable state the way Zag does (its `bindable`): a pr
 `undefined` controls the state, its `default*` prop is read at the start, and the change
 callback reports user actions only, with a details object.
 
-| Module                                       | What it does                                                               |
-| -------------------------------------------- | -------------------------------------------------------------------------- |
-| `button/`                                    | Press, focus, hover, and an optional toggle (`selected`).                  |
-| `ripple/`                                    | The ripple of `@pureform/js-effects`, run as a machine.                    |
-| `text-field/`                                | Stub for p6b: the value only.                                              |
-| `slider/`                                    | Stub for p6e: the value only.                                              |
-| `checkbox.ts`, `switch.ts`, `radio-group.ts` | Zag's machines, re-exported.                                               |
-| `form/`                                      | Native defaults, form reset, and disabled fieldsets.                       |
-| `testing/`                                   | The test harness: runs a machine with Zag's vanilla adapter. Not exported. |
+| Module                                       | What it does                                                                                         |
+| -------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `button/`                                    | Press, focus, hover, and an optional toggle (`selected`).                                            |
+| `ripple/`                                    | The ripple of `@pureform/js-effects`, run as a machine.                                              |
+| `text-field/`                                | Stub for p6b: the value only.                                                                        |
+| `slider/`                                    | Stub for p6e: the value only.                                                                        |
+| `checkbox.ts`, `switch.ts`, `radio-group.ts` | Zag's machines, re-exported; the switch's and radio group's with pureform's form rules.              |
+| `zag-form.ts`                                | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
+| `form/`                                      | Native defaults, form reset, and disabled fieldsets.                                                 |
+| `testing/`                                   | The test harness: runs a machine with Zag's vanilla adapter. Not exported.                           |
 
 ## Public API
 
@@ -52,8 +53,8 @@ callback reports user actions only, with a details object.
 | `@pureform/machines`             | the namespaces below, the form helpers, and Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types |
 | `@pureform/machines/button`      | `button`'s members                                                                                          |
 | `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                          |
-| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root)                                                |
-| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root)                                                            |
+| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules      |
+| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                  |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
 | `@pureform/machines/text-field`  | `textField`'s members (stub)                                                                                |
 | `@pureform/machines/slider`      | `slider`'s members (stub)                                                                                   |
@@ -74,6 +75,14 @@ const api = button.connect(service, normalizeProps);
 
 The switch's namespace is `switchControl`, since `switch` can't be an import name; it matches
 the preset's component name.
+
+**The switch's and radio group's machines** are Zag's with one effect replaced
+(`withFieldsetRule`): `trackFormControlState` follows the fieldsets around the native input (the
+switch) or the group element (the radio group) by the browser's rule, with pureform's
+`trackFieldsetDisabled`, and no longer resets during the form's `reset` event. Zag reads only the
+closest fieldset, so a group in the first legend of a disabled fieldset came out disabled; and the
+switch's own reset sent an untrusted change that React reported twice. The bindings own the reset
+(design doc §9.5). Everything else, `connect` included, is Zag's.
 
 ### Button
 
@@ -157,7 +166,9 @@ trackFormReset(input, {
 ## Good to know
 
 - Only the checkbox, switch, and radio group are re-exported so far; p6 adds Zag's tabs, menu,
-  dialog, tooltip, and select as their components land.
+  dialog, tooltip, and select as their components land. The checkbox's machine is still Zag's
+  own (its reset and closest-fieldset tracking don't show through the bindings; see the shared
+  suites); give it `withFieldsetRule` if that changes.
 - The text field and slider are stubs with their final shape; p6b and p6e fill them in, and
   their `todo` tests list what's missing.
 - Design doc: §8 (behavior), §9.4 (controlled state), §9.5 (forms).
