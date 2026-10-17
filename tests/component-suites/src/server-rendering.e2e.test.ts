@@ -4,7 +4,8 @@
 // and change no attribute (classes, `style`, `data-*`, `aria-*`, and the rest); then the
 // component must respond. Controlled and default state render on the server.
 
-import { describe, expect, it } from "vitest";
+import { themeScope } from "@pureform/styling";
+import { describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -14,7 +15,8 @@ import { COMPONENTS } from "./components";
 import type { ComponentCase } from "./components";
 import { hostIn, stateNames, watchConsole } from "./harness/page";
 import type { Scene, SceneProps } from "./harness/scene";
-import { renderOnServer, runScripts } from "./harness/server";
+import { applyHead, renderOnServer } from "./harness/server";
+import { countedSeedTheme, generated } from "./harness/themes";
 
 /** Every element under `host` with its attributes, in document order. */
 const snapshot = (host: HTMLElement) =>
@@ -33,7 +35,7 @@ const serverRendered = async (
     around = `<div data-host></div>`,
 ) => {
     const { html, head } = await renderOnServer(scene);
-    runScripts(head);
+    applyHead(head);
     const host = hostIn(around);
     host.innerHTML = html;
     return host;
@@ -177,6 +179,87 @@ describe.each(COMPONENTS)("$component, a named theme", (component) => {
     });
 });
 
-// Every target runs this suite (one Vitest project per binding and target); a runtime theme is
-// the runtime themes phase's.
-it.todo("hydrates with a runtime theme from the provider (p5b)");
+/** The seed the runtime theme cases generate from: the demo's teal theme's. */
+const SEED = "#006A60";
+
+describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
+    const attribute = registry.themeAttribute ?? "data-theme";
+    const scope = themeScope(countedSeedTheme({ seed: SEED }));
+    const selector = `[${attribute}="${scope}"]`;
+    const scene = (provider: Scene["provider"]): Scene => ({
+        ...sceneOf(component, {}),
+        provider,
+    });
+    const blocks = () =>
+        [...document.head.querySelectorAll("style")].filter((style) =>
+            style.textContent?.startsWith(selector),
+        );
+
+    it("renders its scope and its block on the server", async () => {
+        const { html, head } = await renderOnServer(scene({ seed: SEED }));
+        expect(html).toContain(`${attribute}="${scope}"`);
+        expect(head).toContain(`${selector} {`);
+        expect(head).toContain("@media (prefers-color-scheme: dark)");
+    });
+
+    it.each(["light", "dark"] as const)(
+        "hydrates in the %s scheme keeping the server's block, and generates nothing",
+        async (scheme) => {
+            await commands.emulateColorScheme(scheme);
+            const before = generated.count;
+            const { host, logged, changes } = await hydrate(
+                scene({ seed: SEED }),
+            );
+            expect(logged).toEqual([]);
+            expect(changes).toEqual([]);
+            expect(host.firstElementChild!.getAttribute(attribute)).toBe(scope);
+            expect(blocks()).toHaveLength(1);
+            expect(generated.count).toBe(before);
+            // The block applies: the root reads the theme's colors.
+            const root = byTestIdIn(host, component.root);
+            expect(
+                getComputedStyle(root)
+                    .getPropertyValue("--colors-primary-light")
+                    .trim(),
+            ).toBe(
+                /--colors-primary-light: ([^;]+);/.exec(
+                    blocks()[0]!.textContent!,
+                )![1],
+            );
+        },
+    );
+
+    it("hydrates with regenerate, generating the same block", async () => {
+        const server = await serverRendered(
+            scene({ seed: SEED, hydrate: "regenerate" }),
+        );
+        const css = blocks()[0]!.textContent;
+        server.remove();
+        const before = generated.count;
+        const { logged, changes } = await hydrate(
+            scene({ seed: SEED, hydrate: "regenerate" }),
+        );
+        // The generator loads after hydrating, the first time in this page.
+        await vi.waitFor(() => expect(generated.count).toBeGreaterThan(before));
+        await harness.settle();
+        expect(logged).toEqual([]);
+        expect(changes).toEqual([]);
+        expect(blocks()).toHaveLength(1);
+        expect(blocks()[0]!.textContent).toBe(css);
+    });
+
+    it("renders overrides on the server and hydrates without a change", async () => {
+        const overrides = { "colors.primary": "rgb(255, 0, 0)" };
+        const { host, logged, changes } = await hydrate(scene({ overrides }));
+        expect(logged).toEqual([]);
+        expect(changes).toEqual([]);
+        const provider = host.firstElementChild as HTMLElement;
+        expect(provider.style.getPropertyValue("--colors-primary")).toBe(
+            "rgb(255, 0, 0)",
+        );
+    });
+});
+
+/** The element under `host` with this test id. */
+const byTestIdIn = (host: HTMLElement, id: string): HTMLElement =>
+    host.querySelector<HTMLElement>(`[data-testid="${id}"]`)!;

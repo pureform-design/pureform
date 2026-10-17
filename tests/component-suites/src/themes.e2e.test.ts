@@ -2,8 +2,11 @@
 // writes the registry's `themeAttributes(theme)`, the target's own scope, on its element, and the
 // component under it draws exactly as under that attribute set by hand, which is how an app
 // without a provider applies a theme. The teal theme recolors, so it must change what's drawn.
+// A runtime theme from teal's seed draws teal's colors, in both schemes.
 
-import { describe, expect, it } from "vitest";
+import { preloadTheme } from "@pureform/styling";
+import { describe, expect, it, vi } from "vitest";
+import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
 import { registry } from "#registry";
@@ -12,6 +15,7 @@ import { byTestId, COMPONENTS } from "./components";
 import type { ComponentCase } from "./components";
 import type { Mounted } from "./harness/harness";
 import { hostIn, mountCase } from "./harness/page";
+import { countedSeedTheme } from "./harness/themes";
 
 /** The demo's named themes. */
 const THEMES = ["teal", "sharp", "dense"] as const;
@@ -107,4 +111,68 @@ describe.each(COMPONENTS)("$component", (component) => {
         );
         expect(teal).not.toEqual(base);
     });
+});
+
+/** The colors a part draws, of what `drawn` measures. */
+const COLORS = ["color", "backgroundColor", "borderTopColor", "outlineColor"];
+
+const colorsOf = (styles: Record<string, Record<string, string>>) =>
+    Object.fromEntries(
+        Object.entries(styles).map(([part, style]) => [
+            part,
+            Object.fromEntries(COLORS.map((key) => [key, style[key]])),
+        ]),
+    );
+
+/** A host the pointer can't hover, so a state layer can't tint one scene and not another. */
+const unhovered = () =>
+    hostIn(`<div style="pointer-events: none"><div data-host></div></div>`);
+
+describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
+    it.each(["light", "dark"] as const)(
+        "from teal's seed draws teal's colors in the %s scheme",
+        async (scheme) => {
+            await commands.emulateColorScheme(scheme);
+            await preloadTheme(countedSeedTheme({ seed: "#006A60" }));
+            try {
+                const scene = mountCase(
+                    component,
+                    {},
+                    { host: unhovered(), provider: { seed: "#006A60" } },
+                );
+                const scope = scene.host.firstElementChild!.getAttribute(
+                    registry.themeAttribute ?? "data-theme",
+                );
+                await vi.waitFor(() =>
+                    expect(
+                        [...document.head.querySelectorAll("style")].some(
+                            (style) =>
+                                style.textContent?.includes(`"${scope}"]`),
+                        ),
+                    ).toBe(true),
+                );
+                const runtime = colorsOf(await drawn(component, scene));
+                const teal = colorsOf(
+                    await drawn(
+                        component,
+                        mountCase(
+                            component,
+                            {},
+                            { host: unhovered(), provider: { theme: "teal" } },
+                        ),
+                    ),
+                );
+                const base = colorsOf(
+                    await drawn(
+                        component,
+                        mountCase(component, {}, { host: unhovered() }),
+                    ),
+                );
+                expect(runtime).toEqual(teal);
+                expect(runtime).not.toEqual(base);
+            } finally {
+                await commands.emulateColorScheme("light");
+            }
+        },
+    );
 });

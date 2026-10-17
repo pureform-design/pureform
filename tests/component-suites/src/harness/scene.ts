@@ -19,6 +19,12 @@ export interface SceneProvider {
     readonly motion?: "system" | "reduce" | "full" | undefined;
     /** A named theme from the demo's config (`teal`, `sharp`, `dense`). */
     readonly theme?: string | undefined;
+    /** A runtime theme instead: Material's seed theme from this color (`harness/themes.ts`). */
+    readonly seed?: `#${string}` | undefined;
+    /** How the client gets a server-rendered runtime theme. */
+    readonly hydrate?: "reuse" | "regenerate" | undefined;
+    /** Token overrides, by token path. */
+    readonly overrides?: Readonly<Record<string, string>> | undefined;
 }
 
 export interface Scene {
