@@ -6,33 +6,54 @@ import { parts } from "./slider.anatomy";
 import * as dom from "./slider.dom";
 import type { SliderApi, SliderSchema } from "./slider.types";
 
-// Stub: the parts' basic wiring only; p6e fills in the rest.
 export function connect<T extends PropTypes>(
     service: Service<SliderSchema>,
     normalize: NormalizeProps<T>,
 ): SliderApi<T> {
-    const { send, context, prop, computed, scope } = service;
+    const { state, send, context, prop, computed, scope } = service;
     const value = context.get("value");
     const disabled = computed("disabled");
+    const fraction = computed("fraction");
+    const dragging = !disabled && state.matches("dragging");
+    const readOnly = !!prop("readOnly");
+    const invalid = !!prop("invalid");
+
+    const dataAttrs = {
+        "data-disabled": dataAttr(disabled),
+        "data-dragging": dataAttr(dragging),
+        "data-invalid": dataAttr(invalid),
+        "data-readonly": dataAttr(readOnly),
+    };
 
     return {
         value,
-        fraction: computed("fraction"),
+        fraction,
+        percent: fraction * 100,
+        dragging,
         disabled,
         setValue(next) {
             send({ type: "VALUE.SET", value: next });
         },
+        reset(next) {
+            send({ type: "RESET", value: next });
+        },
+        focus() {
+            dom.getInputEl(scope)?.focus();
+        },
         getRootProps() {
             return normalize.element({
                 ...parts.root.attrs,
-                "data-disabled": dataAttr(disabled),
+                ...dataAttrs,
                 id: dom.getRootId(scope),
                 dir: prop("dir"),
             });
         },
+        // `defaultValue` carries the current value, as Zag's hidden inputs do: the server renders
+        // it, and React leaves the input to the user.
         getInputProps() {
             return normalize.input({
                 ...parts.input.attrs,
+                ...dataAttrs,
                 id: dom.getInputId(scope),
                 type: "range",
                 dir: prop("dir"),
@@ -41,11 +62,16 @@ export function connect<T extends PropTypes>(
                 min: prop("min"),
                 max: prop("max"),
                 step: prop("step"),
-                value: String(value),
+                defaultValue: String(value),
                 disabled,
-                "aria-invalid": !!prop("invalid"),
+                "aria-invalid": invalid ? true : undefined,
+                "aria-readonly": readOnly ? true : undefined,
+                onPointerDown(event) {
+                    if (event.button !== 0) return;
+                    send({ type: "POINTER.DOWN" });
+                },
                 onChange(event) {
-                    if (prop("readOnly")) return;
+                    if (readOnly) return;
                     send({
                         type: "VALUE.SET",
                         value: event.currentTarget.valueAsNumber,
