@@ -150,10 +150,10 @@ components to the shared suites. Non-Panda targets need p5a.
 
 Independent of each other.
 
-|     | Phase                                                     | Depends on  | Output context  |
-| --- | --------------------------------------------------------- | ----------- | --------------- |
-| [ ] | [p7: usage-based pruning](phases/p7-pruning.md)           | p4c, p5a    | `context/p7.md` |
-| [ ] | [p8: `@pureform/react-native`](phases/p8-react-native.md) | p2b, p4b-rn | `context/p8.md` |
+|     | Phase                                                     | Depends on  | Output context                   |
+| --- | --------------------------------------------------------- | ----------- | -------------------------------- |
+| [x] | [p7: usage-based pruning](phases/p7-pruning.md)           | p4c, p5a    | [`context/p7.md`](context/p7.md) |
+| [ ] | [p8: `@pureform/react-native`](phases/p8-react-native.md) | p2b, p4b-rn | `context/p8.md`                  |
 
 ## Waves
 

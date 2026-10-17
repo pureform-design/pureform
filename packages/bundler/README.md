@@ -202,8 +202,9 @@ dynamically imported registry hooks, or the glue imported as a namespace or dyna
 
 **What it can't see** (use `keep`, or `prune: false`): components drawn from packages under
 `node_modules` (a design system that wraps pureform), names passed through `usePureform()`'s
-registry or a registry passed around under another name, and calls of the registry hooks through
-a wrapper the app writes. The scan isn't the bundler's module graph: unused files under the root
+registry or a registry passed around under another name, and a registry hook assigned to another
+name (`const use = useClasses`; a wrapper that calls it with a parameter keeps everything
+instead). The scan isn't the bundler's module graph: unused files under the root
 count as used.
 
 ## Build and test
