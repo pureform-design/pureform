@@ -17,6 +17,21 @@ import {
 } from "../providers";
 import type { SeedThemeInput } from "./index";
 
+// Numbers in a value, rounded to 10 significant digits. The color math gives slightly different
+// last digits in different engines (Node and Chromium), and the server's block and the client's
+// must match; 10 digits are still far finer than a color can show.
+const NUMBER = /-?\d*\.\d+(?:e[-+]?\d+)?/gi;
+
+const rounded = (vars: CssVars): CssVars =>
+    Object.fromEntries(
+        Object.entries(vars).map(([name, value]) => [
+            name,
+            value.replace(NUMBER, (n) =>
+                String(Number(Number(n).toPrecision(10))),
+            ),
+        ]),
+    );
+
 // The entries of `dark` whose value differs from `light`'s.
 const darkOnly = (light: CssVars, dark: CssVars): CssVars =>
     Object.fromEntries(
@@ -46,8 +61,12 @@ export const generateSeedTheme: ThemeGenerator<SeedThemeInput> = (
         semanticTokens: { colors: theme.config.semanticTokens?.colors ?? {} },
         components: {},
     } as CoreConfig;
-    const light = themeVars(config, { ...vars, scheme: "light" }) as CssVars;
-    const dark = themeVars(config, { ...vars, scheme: "dark" }) as CssVars;
+    const light = rounded(
+        themeVars(config, { ...vars, scheme: "light" }) as CssVars,
+    );
+    const dark = rounded(
+        themeVars(config, { ...vars, scheme: "dark" }) as CssVars,
+    );
     return { light, dark: darkOnly(light, dark) };
 };
 

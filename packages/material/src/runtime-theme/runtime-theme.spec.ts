@@ -59,6 +59,14 @@ describe("generateSeedTheme", () => {
         );
     });
 
+    it("rounds to 10 significant digits, so engines agree", () => {
+        const digits = Object.values(light)
+            .flatMap((value) => value.match(/\d*\.\d+/g) ?? [])
+            .map((n) => n.replace(".", "").replace(/^0+/, "").length);
+        expect(digits.length).toBeGreaterThan(0);
+        expect(Math.max(...digits)).toBeLessThanOrEqual(10);
+    });
+
     it("is pure", () => {
         expect(generateSeedTheme({ seed: "#006A60" }, {})).toEqual({
             light,
