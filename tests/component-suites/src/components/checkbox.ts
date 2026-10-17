@@ -1,11 +1,11 @@
 // The checkbox: `checked` (with "indeterminate"), a native input that submits, resets, and
 // validates, and Space to toggle.
 
-import { testIds } from "@pureform/anatomy";
+import { checkboxAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.checkbox;
 
@@ -74,4 +74,5 @@ export const checkbox: ComponentCase = {
             { key: "{Enter}", does: "nothing" },
         ],
     },
+    indication: ownSource(checkboxAnatomy),
 };

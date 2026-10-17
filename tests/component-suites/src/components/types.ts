@@ -3,6 +3,9 @@
 // the list and uses the parts a component declares. A part left out skips the suite's cases for
 // it (a component with no `state` has nothing controllable).
 
+import type { IndicationAnatomy } from "@pureform/anatomy";
+import type { MutableInteractionSource } from "@pureform/solid";
+
 import type { ComponentName, SceneProps } from "../harness/scene";
 
 /** The component's state a user changes, for the controllable rules (design doc §9.4). */
@@ -103,6 +106,39 @@ export interface KeyboardCase {
         | undefined;
 }
 
+/** An anatomy with its indication entries: its scope and parts find the elements each entry
+ *  names (`[data-scope][data-pf-part]`). */
+export interface IndicatedAnatomy {
+    readonly scope: string;
+    readonly parts: Readonly<Record<string, { readonly attribute: string }>>;
+    readonly indication?: readonly IndicationAnatomy[];
+}
+
+/** Where a component shows indication, for the indication suite (design doc §9.8). Each entry
+ *  of the anatomy's `indication` is checked on the first element its parts match: a composite's
+ *  first item. */
+export interface IndicationCase {
+    /** The anatomy the component's indication entries come from. */
+    readonly anatomy: IndicatedAnatomy;
+    /** Props that show every surface (an open menu), over the component's. */
+    readonly props?: SceneProps | undefined;
+    /** What shows the surfaces once mounted, when props alone can't (a select's list). */
+    open?(host: HTMLElement): Promise<void>;
+    /** Props that give the checked surface `source`: the root's `interactionSource`, or the
+     *  first item's. Left out where the ready-made component takes no source (the snackbar). */
+    source?(source: MutableInteractionSource): SceneProps;
+    /** Props that disable the checked surface while it's mounted: the component, or the
+     *  composite. Left out for a component with no disabled state (the snackbar). */
+    readonly disabled?: SceneProps | undefined;
+    /** For a composite: props that give the first item `source` and disable it alone. */
+    itemDisabled?(source: MutableInteractionSource): SceneProps;
+    /** Keyboard focus reaching the checked surface's trigger, when Tab alone doesn't: a menu's
+     *  item, which a highlight shows as hovered. */
+    focus?(host: HTMLElement): Promise<void>;
+    /** Whether a drag tints the surface (the slider). */
+    readonly drags?: boolean | undefined;
+}
+
 export interface ComponentCase {
     readonly component: ComponentName;
     /** Props every scene of the component gets: an accessible name. */
@@ -128,6 +164,9 @@ export interface ComponentCase {
     /** `false` for a component that draws no color from the scheme (text, a touch target), which
      *  a theme that only recolors can't change: the themes suite skips "draws differently". */
     readonly themed?: false | undefined;
+    /** Where it shows indication, for an interactive component (an anatomy with `indication`
+     *  entries). */
+    readonly indication?: IndicationCase | undefined;
 }
 
 /** The element with a test id inside `host`. */
@@ -138,4 +177,37 @@ export const byTestId = <E extends HTMLElement = HTMLElement>(
     const element = host.querySelector<E>(`[data-testid="${id}"]`);
     if (!element) throw new Error(`no element with data-testid="${id}"`);
     return element;
+};
+
+/** A component with one surface: the root takes the source, and `disabled` disables it. */
+export const ownSource = (
+    anatomy: IndicatedAnatomy,
+    extra: Partial<IndicationCase> = {},
+): IndicationCase => ({
+    anatomy,
+    source: (interactionSource) => ({ interactionSource }),
+    disabled: { disabled: true },
+    ...extra,
+});
+
+/** A composite whose items (`items`) each take a source: the first item gets it, and is the
+ *  one disabled alone; `disabled` disables the composite. */
+export const itemSources = (
+    anatomy: IndicatedAnatomy,
+    items: readonly Readonly<Record<string, unknown>>[],
+    extra: Partial<IndicationCase> = {},
+): IndicationCase => {
+    const first = (props: Readonly<Record<string, unknown>>) => ({
+        items: items.map((item, index) =>
+            index === 0 ? { ...item, ...props } : item,
+        ),
+    });
+    return {
+        anatomy,
+        source: (interactionSource) => first({ interactionSource }),
+        disabled: { disabled: true },
+        itemDisabled: (interactionSource) =>
+            first({ interactionSource, disabled: true }),
+        ...extra,
+    };
 };

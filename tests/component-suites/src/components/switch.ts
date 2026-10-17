@@ -1,11 +1,11 @@
 // The switch: `checked`, a native checkbox with `role="switch"` that submits, resets, and
 // validates, and Space to toggle.
 
-import { testIds } from "@pureform/anatomy";
+import { switchControlAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.switchControl;
 
@@ -63,4 +63,5 @@ export const switchControl: ComponentCase = {
             { key: "{Enter}", does: "nothing" },
         ],
     },
+    indication: ownSource(switchControlAnatomy),
 };

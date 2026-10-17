@@ -2,7 +2,12 @@
 // A scene in React: the ready-made component inside `PureformProvider` with the target's registry.
 // The browser (`harness.tsx`) and the server (`server.tsx`) render the same view.
 
-import { PureformProvider } from "@pureform/react";
+import {
+    materialIndication,
+    noIndication,
+    PureformProvider,
+} from "@pureform/react";
+import type { Indication } from "@pureform/react";
 import { Avatar } from "@pureform/react/avatar";
 import { Button } from "@pureform/react/button";
 import { Card } from "@pureform/react/card";
@@ -40,7 +45,13 @@ import { createElement, type ComponentType, type ReactNode } from "react";
 
 import { registry } from "#registry";
 
-import type { ComponentName, Scene, SceneProps } from "../../harness/scene";
+import { customIndication } from "../../harness/indications";
+import type {
+    ComponentName,
+    Scene,
+    SceneIndication,
+    SceneProps,
+} from "../../harness/scene";
 import { sceneTheme } from "../../harness/themes";
 
 /** Every component the suites render, by name. */
@@ -80,23 +91,52 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     TouchTarget,
 };
 
+/** The indications a scene names. */
+const indications: Record<SceneIndication, Indication> = {
+    material: materialIndication(),
+    "ink-sparkle": materialIndication({ ripple: "ink-sparkle" }),
+    "no-ripple": materialIndication({ ripple: false }),
+    none: noIndication,
+    custom: customIndication(materialIndication()),
+};
+
+const indicationOf = (name: SceneIndication | undefined) =>
+    name === undefined ? {} : { indication: indications[name] };
+
 export function SceneView(props: {
     scene: Scene;
     props: SceneProps;
 }): ReactNode {
+    const { scene } = props;
+    const view = createElement(
+        components[scene.component] as ComponentType<object>,
+        { ...indicationOf(scene.indication), ...props.props },
+    );
     return (
         <PureformProvider
             registry={registry}
+            indication={
+                scene.provider?.indication &&
+                indications[scene.provider.indication]
+            }
             dir={props.scene.provider?.dir}
             motion={props.scene.provider?.motion}
             theme={sceneTheme(props.scene.provider)}
             hydrate={props.scene.provider?.hydrate}
             overrides={props.scene.provider?.overrides}
         >
-            {createElement(
-                components[props.scene.component] as ComponentType<object>,
-                props.props,
-            )}
+            {scene.wrapper
+                ? createElement(
+                      components[
+                          scene.wrapper.component
+                      ] as ComponentType<object>,
+                      {
+                          ...indicationOf(scene.wrapper.indication),
+                          ...scene.wrapper.props,
+                      },
+                      view,
+                  )
+                : view}
         </PureformProvider>
     );
 }

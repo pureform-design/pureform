@@ -2,11 +2,11 @@
 // submits, resets, and takes the arrow keys by direction (the browser's own). The root's value
 // token follows the value.
 
-import { testIds } from "@pureform/anatomy";
+import { sliderAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.slider;
 
@@ -81,4 +81,8 @@ export const slider: ComponentCase = {
             ],
         },
     },
+    indication: ownSource(sliderAnatomy, {
+        props: { defaultValue: 40 },
+        drags: true,
+    }),
 };

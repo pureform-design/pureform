@@ -3,10 +3,12 @@
 // has no disabled state of its own. Open, it's placed against the trigger in the browser, so its
 // open renderings are client-only.
 
-import { compositeTestIds } from "@pureform/anatomy";
+import { compositeTestIds, menuOverlayAnatomy } from "@pureform/anatomy";
+import { userEvent } from "vitest/browser";
 
 import { overlayParts } from "./overlay";
 import type { ComponentCase, KeyCase } from "./types";
+import { itemSources } from "./types";
 
 const ids = compositeTestIds.menu;
 const { content, trigger, read, click, shown } = overlayParts(ids);
@@ -78,4 +80,14 @@ export const menu: ComponentCase = {
             ],
         },
     },
+    // Open; the menu has no disabled state of its own, and the keyboard highlights an item, which
+    // shows as hovered.
+    indication: itemSources(menuOverlayAnatomy, ITEMS, {
+        props: { defaultOpen: true },
+        disabled: undefined,
+        focus: async (host) => {
+            content(host).focus();
+            await userEvent.keyboard("{ArrowDown}");
+        },
+    }),
 };

@@ -2,12 +2,16 @@
 // destination is a button (or a link) that Tab reaches in turn, and Enter and Space choose it.
 // Arrow keys do nothing. They aren't a form control.
 
-import { testIds } from "@pureform/anatomy";
+import {
+    navigationBarAnatomy,
+    navigationRailAnatomy,
+    testIds,
+} from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ComponentName } from "../harness/scene";
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, itemSources } from "./types";
 
 const ITEMS = [
     { value: "home", label: "Home", icon: "⌂" },
@@ -19,6 +23,7 @@ const ITEMS = [
 export const navigationCase = (
     component: ComponentName,
     ids: typeof testIds.navigationBar | typeof testIds.navigationRail,
+    anatomy: typeof navigationBarAnatomy | typeof navigationRailAnatomy,
 ): ComponentCase => {
     const items = (host: HTMLElement) => [
         ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
@@ -97,14 +102,17 @@ export const navigationCase = (
                 { key: " ", does: "change" },
             ],
         },
+        indication: itemSources(anatomy, ITEMS),
     };
 };
 
 export const navigationBar = navigationCase(
     "NavigationBar",
     testIds.navigationBar,
+    navigationBarAnatomy,
 );
 export const navigationRail = navigationCase(
     "NavigationRail",
     testIds.navigationRail,
+    navigationRailAnatomy,
 );

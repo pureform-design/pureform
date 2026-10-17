@@ -47,8 +47,20 @@ export type ComponentName = (typeof COMPONENT_NAMES)[number];
  *  names. Use `className`-free props here; per-binding names (`class`, `className`) differ. */
 export type SceneProps = Readonly<Record<string, unknown>>;
 
+/** An indication by name, so a scene stays plain data the server can take: Material's (with
+ *  the ink well, the sparkle, or no ripple), none, or the suites' own (`harness/indications.ts`).
+ *  Each binding's `scene.tsx` turns the name into its indication. */
+export type SceneIndication =
+    | "material"
+    | "ink-sparkle"
+    | "no-ripple"
+    | "none"
+    | "custom";
+
 /** The provider's options a scene sets. */
 export interface SceneProvider {
+    /** The provider's indication, which every component under it takes. */
+    readonly indication?: SceneIndication | undefined;
     readonly dir?: "ltr" | "rtl" | undefined;
     readonly motion?: "system" | "reduce" | "full" | undefined;
     /** A named theme from the suites' config (`teal`, `sharp`, `dense`). */
@@ -61,8 +73,21 @@ export interface SceneProvider {
     readonly overrides?: Readonly<Record<string, string>> | undefined;
 }
 
+/** A component rendered around the scene's, which becomes its children. */
+export interface SceneWrapper {
+    readonly component: ComponentName;
+    readonly props?: SceneProps | undefined;
+    /** The wrapper's `indication` prop, by name. */
+    readonly indication?: SceneIndication | undefined;
+}
+
 export interface Scene {
     readonly component: ComponentName;
     readonly props?: SceneProps | undefined;
+    /** The component's `indication` prop, by name (an indication in `props` works too, in the
+     *  browser alone). */
+    readonly indication?: SceneIndication | undefined;
     readonly provider?: SceneProvider | undefined;
+    /** A component the scene's renders inside, as its children. */
+    readonly wrapper?: SceneWrapper | undefined;
 }

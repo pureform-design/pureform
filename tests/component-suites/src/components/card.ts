@@ -1,10 +1,10 @@
 // The card: no state of its own. A surface, or, rendered `as: "button"` here, an interactive card
 // that Enter and Space click, with its touch target.
 
-import { testIds } from "@pureform/anatomy";
+import { cardAnatomy, testIds } from "@pureform/anatomy";
 
 import type { ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.card;
 
@@ -27,4 +27,5 @@ export const card: ComponentCase = {
             { key: " ", does: "click" },
         ],
     },
+    indication: ownSource(cardAnatomy),
 };

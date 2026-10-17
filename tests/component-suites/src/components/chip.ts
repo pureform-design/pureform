@@ -1,11 +1,11 @@
 // The chip: `selected` for a filter chip, a native `<button>` that submits as the form's
 // submitter, and Enter and Space to click.
 
-import { testIds } from "@pureform/anatomy";
+import { chipAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.chip;
 
@@ -64,4 +64,5 @@ export const chip: ComponentCase = {
             { key: " ", does: "click" },
         ],
     },
+    indication: ownSource(chipAnatomy),
 };

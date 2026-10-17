@@ -1,11 +1,11 @@
 // The button: `selected` when it toggles, a native `<button>` that submits as the form's
 // submitter, and Enter and Space to click.
 
-import { testIds } from "@pureform/anatomy";
+import { buttonAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ComponentCase } from "./types";
-import { byTestId } from "./types";
+import { byTestId, ownSource } from "./types";
 
 const ids = testIds.button;
 
@@ -64,4 +64,5 @@ export const button: ComponentCase = {
             { key: " ", does: "click" },
         ],
     },
+    indication: ownSource(buttonAnatomy),
 };

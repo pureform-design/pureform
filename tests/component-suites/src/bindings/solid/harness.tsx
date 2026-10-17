@@ -1,10 +1,12 @@
 // The Solid harness: mounts and hydrates scenes with `@solidjs/web`, and sets props through a
 // signal, as an owner would.
 
+import { createInteractionSource, useInteractionState } from "@pureform/solid";
+import type { MutableInteractionSource } from "@pureform/solid";
 import { hydrate, render } from "@solidjs/web";
 import { createSignal, flush } from "solid-js";
 
-import type { Harness, Mounted } from "../../harness/harness";
+import type { Harness, Mounted, ObservedSource } from "../../harness/harness";
 import { track } from "../../harness/mounts";
 import type { Scene, SceneProps } from "../../harness/scene";
 import { SceneView } from "./scene";
@@ -35,6 +37,24 @@ const start = (
     });
 };
 
+const STATE = "data-interaction-state";
+
+const observe = (): ObservedSource => {
+    const host = document.body.appendChild(document.createElement("div"));
+    let source!: MutableInteractionSource;
+    const dispose = render(() => {
+        source = createInteractionSource();
+        const state = useInteractionState(source);
+        return <output {...{ [STATE]: JSON.stringify(state()) }} />;
+    }, host);
+    flush();
+    track({ host, update: settle, unmount: dispose });
+    return {
+        source,
+        state: () => JSON.parse(host.firstElementChild!.getAttribute(STATE)!),
+    };
+};
+
 export const harness: Harness = {
     name: "solid",
     mount: (
@@ -46,5 +66,6 @@ export const harness: Harness = {
         await settle();
         return mounted;
     },
+    observe,
     settle,
 };
