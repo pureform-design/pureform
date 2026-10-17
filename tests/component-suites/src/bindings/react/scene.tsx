@@ -9,7 +9,10 @@ import { Chip } from "@pureform/react/chip";
 import { Fab } from "@pureform/react/fab";
 import { IconButton } from "@pureform/react/icon-button";
 import { RadioGroup } from "@pureform/react/radio-group";
+import { Select } from "@pureform/react/select";
 import { Switch } from "@pureform/react/switch";
+import { TextArea } from "@pureform/react/text-area";
+import { TextField } from "@pureform/react/text-field";
 import { createElement, type ComponentType, type ReactNode } from "react";
 
 import { registry } from "#registry";
@@ -25,7 +28,10 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Fab,
     IconButton,
     RadioGroup,
+    Select,
     Switch,
+    TextArea,
+    TextField,
 };
 
 export function SceneView(props: {

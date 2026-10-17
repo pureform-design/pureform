@@ -6,7 +6,10 @@ import { chip } from "./chip";
 import { fab } from "./fab";
 import { iconButton } from "./icon-button";
 import { radioGroup } from "./radio-group";
+import { select } from "./select";
 import { switchControl } from "./switch";
+import { textArea } from "./text-area";
+import { textField } from "./text-field";
 import type { ComponentCase } from "./types";
 
 export const COMPONENTS: readonly ComponentCase[] = [
@@ -16,7 +19,10 @@ export const COMPONENTS: readonly ComponentCase[] = [
     fab,
     iconButton,
     radioGroup,
+    select,
     switchControl,
+    textArea,
+    textField,
 ];
 
 export type * from "./types";

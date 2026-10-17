@@ -8,7 +8,10 @@ import { Chip } from "@pureform/solid/chip";
 import { Fab } from "@pureform/solid/fab";
 import { IconButton } from "@pureform/solid/icon-button";
 import { RadioGroup } from "@pureform/solid/radio-group";
+import { Select } from "@pureform/solid/select";
 import { Switch } from "@pureform/solid/switch";
+import { TextArea } from "@pureform/solid/text-area";
+import { TextField } from "@pureform/solid/text-field";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import type { Accessor } from "solid-js";
@@ -26,7 +29,10 @@ export const components: Record<ComponentName, ValidComponent> = {
     Fab,
     IconButton,
     RadioGroup,
+    Select,
     Switch,
+    TextArea,
+    TextField,
 };
 
 export function SceneView(props: {

@@ -50,6 +50,7 @@ const submit = (
 
 describe.each(controls)("$component", (component) => {
     const form = component.form;
+    const aria = (host: HTMLElement) => form.aria?.(host) ?? form.control(host);
 
     describe("submitting", () => {
         it("adds its entries to the form's data", async () => {
@@ -288,13 +289,11 @@ describe.each(controls)("$component", (component) => {
                 const scene = mountCase(component, form.invalid!.props, {
                     host,
                 });
-                expect(form.control(host).getAttribute("aria-invalid")).toBe(
+                expect(aria(host).getAttribute("aria-invalid")).toBe("true");
+                await scene.update({ invalid: false });
+                expect(aria(host).getAttribute("aria-invalid")).not.toBe(
                     "true",
                 );
-                await scene.update({ invalid: false });
-                expect(
-                    form.control(host).getAttribute("aria-invalid"),
-                ).not.toBe("true");
             },
         );
 
@@ -304,9 +303,8 @@ describe.each(controls)("$component", (component) => {
                 const error = form.error!;
                 const { host, form: element } = inForm();
                 mountCase(component, error.props, { host });
-                expect(form.control(host).getAttribute("aria-invalid")).toBe(
-                    "true",
-                );
+                await harness.settle();
+                expect(aria(host).getAttribute("aria-invalid")).toBe("true");
                 expect(form.control(host).validationMessage).toBe(
                     error.message,
                 );
@@ -317,11 +315,3 @@ describe.each(controls)("$component", (component) => {
         );
     });
 });
-
-// No component takes `error` yet: the text inputs bring it (p6b), and their cases set
-// `form.error`, which runs the case above.
-if (!controls.some((component) => component.form.error)) {
-    it.todo(
-        "`error` blocks submitting with its message (no component takes `error` yet; p6b)",
-    );
-}

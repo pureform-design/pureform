@@ -5,7 +5,7 @@
 // A runtime theme from teal's seed draws teal's colors, in both schemes.
 
 import { preloadTheme } from "@pureform/styling";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -16,6 +16,10 @@ import type { ComponentCase } from "./components";
 import type { Mounted } from "./harness/harness";
 import { hostIn, mountCase } from "./harness/page";
 import { countedSeedTheme } from "./harness/themes";
+
+// The emulated scheme belongs to the page, which later test files reuse: put it back, or a file
+// that reads the page's colors (axe's contrast) runs in the dark scheme.
+afterAll(() => commands.emulateColorScheme("light"));
 
 /** The demo's named themes. */
 const THEMES = ["teal", "sharp", "dense"] as const;
