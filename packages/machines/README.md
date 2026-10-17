@@ -124,8 +124,12 @@ its own, since its API reads one).
 - **The innermost claims a press**: a press handler claims its event (`claimEvent`), so a
   pressable inside another emits a press once, from the inner one.
 - **Disabled ends what's in progress**: when the machine becomes disabled (prop or fieldset), it
-  emits a cancel, a drag stop, a hover exit, and a blur for what each surface had started. A
+  emits a cancel, a drag stop, a hover exit, and a blur for what each surface had started. An
+  item that becomes disabled alone (a tab, radio, destination, menu item, or option) does the
+  same for itself once the render that disabled it is done (`InteractionEmitter.disabled()`). A
   menu or select ends everything when it closes; every machine does when it stops.
+- **A radio is let go wherever the pointer comes up**, as `:active` is: Zag's radio group only
+  let go when it came up on the radio.
 - **Origins**: a press's `origin` is the pointer's `clientX`/`clientY`, or `"center"`; the
   emit's own origin argument is the element the handler ran on (`undefined` for a highlight or a
   key on a list item, which the item itself didn't receive).

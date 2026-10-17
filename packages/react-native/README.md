@@ -158,7 +158,12 @@ import { registry } from "./.pureform";
   sets none (the controls' state layers), where the web's is `currentColor`. `"ink-sparkle"`
   draws the ink well: React Native has no sparkle.
 - **Disabled shows no interaction:** a disabled component (or item) selects as idle even when a
-  shared source is pressed, and ends what it had in progress.
+  shared source is pressed, and ends what it had in progress. The navigation bar and rail take
+  `disabled` for every destination, as on the web.
+- **Focus stays with its surface:** a shared source carries presses and hover to every component
+  on it, but each selects focus (and the focus indicator) from its own interaction alone.
+- **The slider takes focus** and steps with the arrow keys (sideways by direction), Home, and End,
+  and the `increment` and `decrement` accessibility actions.
 - **The search bar** hears its root's hover and press and its input's focus (always visible, as a
   text field's), but has no indication entry, so no ripple.
 - **A component's states are one set:** a component with two icons mirrors both when either is

@@ -443,7 +443,7 @@ providerIndicationOverrides(indication): ThemeOverrides | undefined;
 //   theme-level paths: opacity.stateHover, …, sizes.focusIndicatorThickness, sizes.focusIndicatorOuterOffset
 componentIndicationTokens(indication, providerColor): Record<string, string> | undefined;
 //   the component's instance tokens: the providers' focusIndicatorColor, then the prop's tokens
-indicationTokenValues(tokens); // lengths given as numbers become px
+indicationTokenValues(tokens); // lengths given as numbers become px, opacities percentages (0.08 → "8%")
 dropsFocusIndicator(indication); droppedFocusIndicatorMessage(indication);
 
 // What the web bindings share
