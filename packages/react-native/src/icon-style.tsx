@@ -53,7 +53,8 @@ export const iconStyleOf = (
 };
 
 /** Provides an icon slot's style to the icon inside it: the slot's plain `style` and
- *  `iconFill` from its selection, and its style from the engine as `motion`. */
+ *  `iconFill` from its selection, and its style from the engine as `motion`. A string is drawn
+ *  as a `Glyph`. */
 export function IconSlot(props: {
     readonly style: Style | undefined;
     readonly iconFill: number | undefined;
@@ -66,7 +67,15 @@ export function IconSlot(props: {
         () => ({ icon, text: ownText(motion) }),
         [icon, motion],
     );
-    return <IconContext value={value}>{props.children}</IconContext>;
+    return (
+        <IconContext value={value}>
+            {typeof props.children === "string" ? (
+                <Glyph glyph={props.children} />
+            ) : (
+                props.children
+            )}
+        </IconContext>
+    );
 }
 
 /** An icon slot of a selection, for `IconSlot`. */

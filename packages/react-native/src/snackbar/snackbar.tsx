@@ -10,7 +10,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { Glyph, IconSlot, iconSlot } from "../icon-style";
+import { IconSlot, iconSlot } from "../icon-style";
 import { testIdOf, unselectable, usePress, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -62,11 +62,7 @@ function SnackbarButtonImpl(props: {
                 {...iconSlot(selected, props.part)}
                 motion={s[props.part]}
             >
-                {typeof props.children === "string" ? (
-                    <Glyph glyph={props.children} />
-                ) : (
-                    props.children
-                )}
+                {props.children}
             </IconSlot>
         </engine.Pressable>
     );
