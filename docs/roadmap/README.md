@@ -128,10 +128,10 @@ while phase 3 builds components.
 
 Parallel subphases.
 
-|     | Subphase                                                           | Depends on | Output context   |
-| --- | ------------------------------------------------------------------ | ---------- | ---------------- |
-| [ ] | [p5a: CSS and Tailwind targets](phases/p5a-css-tailwind-parity.md) | p3c, p4c   | `context/p5a.md` |
-| [ ] | [p5b: runtime themes](phases/p5b-runtime-themes.md)                | p3c        | `context/p5b.md` |
+|     | Subphase                                                           | Depends on | Output context                     |
+| --- | ------------------------------------------------------------------ | ---------- | ---------------------------------- |
+| [x] | [p5a: CSS and Tailwind targets](phases/p5a-css-tailwind-parity.md) | p3c, p4c   | [`context/p5a.md`](context/p5a.md) |
+| [ ] | [p5b: runtime themes](phases/p5b-runtime-themes.md)                | p3c        | `context/p5b.md`                   |
 
 ### Phase 6: component rollout
 
