@@ -6,7 +6,7 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
-import { partAttributes } from "@pureform/anatomy";
+import { partAttributes, partSlot } from "@pureform/anatomy";
 import type { AttributeState, StateAttribute } from "@pureform/core";
 import { STATE_ATTRIBUTES } from "@pureform/core";
 import type { SlotClasses } from "@pureform/styling";
@@ -60,8 +60,9 @@ export const isUnstyled = (
 ): boolean =>
     typeof unstyled === "object" ? unstyled[part] === true : unstyled === true;
 
-/** A part's classes and token style from the registry, or `undefined` when it has none: an
- *  unstyled part, or an extra part outside the AST's slots (a select's hidden `<select>`). */
+/** A part's classes and token style from the registry, by the slot that draws it (a menu's
+ *  `content` is drawn by its `root` slot), or `undefined` when it has none: an unstyled part, or an
+ *  extra part outside the AST's slots (a select's hidden `<select>`). */
 export const partClasses = <A extends ComponentAnatomy>(
     anatomy: A,
     part: PartName<A>,
@@ -71,7 +72,8 @@ export const partClasses = <A extends ComponentAnatomy>(
     if (unstyled || !slots) return undefined;
     const spec = (anatomy.parts as ComponentAnatomy["parts"])[part];
     if (!spec?.styled) return undefined;
-    return slots[part];
+    const slot = partSlot(spec);
+    return slot === null ? undefined : slots[slot];
 };
 
 /** Whether a part is an icon slot: one that takes `mirror` and provides `useIconStyle()`. */
@@ -132,7 +134,7 @@ export interface PartSourcesInput<A extends ComponentAnatomy> {
 
 /** A part's props sources, in the order they merge: the machine's part props, the anatomy's
  *  `data-scope`/`data-pf-part`/`data-testid`, the `data-pf-*` state attributes, the registry's
- *  class and token style (unless unstyled), the provider's `slotProps` for the part, and the
+ *  class and token style (unless unstyled), the provider's `slotProps` for the part's slot, and the
  *  user's props. Pass them to `combineProps` with the binding's rules. */
 export const partSources = <A extends ComponentAnatomy>(
     input: PartSourcesInput<A>,
@@ -140,16 +142,22 @@ export const partSources = <A extends ComponentAnatomy>(
     const { anatomy, part } = input;
     const unstyled =
         isUnstyled(input.unstyled, part) || input.partUnstyled === true;
-    const provided = (
-        input.slotProps as
-            | Readonly<
-                  Record<
-                      string,
-                      Readonly<Record<string, Dict | undefined>> | undefined
-                  >
-              >
-            | undefined
-    )?.[anatomy.name]?.[part];
+    const spec = (anatomy.parts as ComponentAnatomy["parts"])[part];
+    const slot = spec ? partSlot(spec) : part;
+    const provided =
+        slot === null
+            ? undefined
+            : (
+                  input.slotProps as
+                      | Readonly<
+                            Record<
+                                string,
+                                | Readonly<Record<string, Dict | undefined>>
+                                | undefined
+                            >
+                        >
+                      | undefined
+              )?.[anatomy.name]?.[slot];
     return [
         input.machine as Dict | undefined,
         partAttributes(anatomy, part, input.testId) as unknown as Dict,

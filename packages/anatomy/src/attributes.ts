@@ -1,7 +1,7 @@
 // The attributes a binding writes on each part, and the test id rules: `pf-<component>-<part>` by
 // default, or the `testId` given to Root, as a prefix for every part or per part.
 
-import type { ComponentAnatomy, PartName } from "./types";
+import type { ComponentAnatomy, PartAnatomy, PartName } from "./types";
 
 /** The attribute naming a part (`data-pf-part="label"`). */
 export const PART_ATTRIBUTE = "data-pf-part";
@@ -65,3 +65,8 @@ export const partAttributes = <A extends ComponentAnatomy>(
         [TEST_ID_ATTRIBUTE]: id,
     };
 };
+
+/** The registry slot a part reads its classes and the provider's `slotProps` from: its `slot`, else
+ *  its name. `null` when it has none. */
+export const partSlot = (part: PartAnatomy): string | null =>
+    part.slot === undefined ? part.name : part.slot;

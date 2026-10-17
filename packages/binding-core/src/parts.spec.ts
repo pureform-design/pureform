@@ -1,4 +1,8 @@
-import { buttonAnatomy, selectAnatomy } from "@pureform/anatomy";
+import {
+    buttonAnatomy,
+    menuOverlayAnatomy,
+    selectAnatomy,
+} from "@pureform/anatomy";
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import {
@@ -55,6 +59,15 @@ describe("partClasses", () => {
     it("returns nothing for an unstyled part, or before the classes exist", () => {
         expect(partClasses(buttonAnatomy, "root", slots, true)).toBeUndefined();
         expect(partClasses(buttonAnatomy, "root", undefined)).toBeUndefined();
+    });
+
+    it("returns the slot that draws a part named otherwise, and nothing for a part with none", () => {
+        const menu = { root: { class: "surface" }, item: { class: "i" } };
+        expect(partClasses(menuOverlayAnatomy, "content", menu)).toBe(
+            menu.root,
+        );
+        expect(partClasses(menuOverlayAnatomy, "item", menu)).toBe(menu.item);
+        expect(partClasses(menuOverlayAnatomy, "root", menu)).toBeUndefined();
     });
 
     it("returns nothing for an extra part outside the slots", () => {
@@ -127,6 +140,18 @@ describe("partSources", () => {
             { title: "provided" },
             { title: "user" },
         ]);
+    });
+
+    it("gives the provider's slot props by the slot that draws the part", () => {
+        const provided = { menu: { root: { title: "surface" } } };
+        const source = (part: "root" | "content") =>
+            partSources({
+                anatomy: menuOverlayAnatomy,
+                part,
+                slotProps: provided,
+            })[4];
+        expect(source("content")).toEqual({ title: "surface" });
+        expect(source("root")).toBeUndefined();
     });
 
     it("drops the registry's classes for an unstyled part, from Root or its own", () => {
