@@ -32,6 +32,8 @@ export interface SliderProps extends DirectionProperty, CommonProperties {
     /** @default 1 */
     step?: number | undefined;
     disabled?: boolean | undefined;
+    /** Shows the value but takes no change: the native range input has no `readonly`, so the
+     *  binding puts the input back after each change, as for a controlled slider. */
     readOnly?: boolean | undefined;
     invalid?: boolean | undefined;
     /** The name the input submits its value under. */
@@ -43,7 +45,7 @@ export interface SliderProps extends DirectionProperty, CommonProperties {
 type PropsWithDefault = "min" | "max" | "step" | "defaultValue";
 
 export interface SliderSchema {
-    state: "idle";
+    state: "idle" | "dragging";
     props: RequiredBy<SliderProps, PropsWithDefault>;
     context: {
         value: number;
@@ -67,8 +69,16 @@ export interface SliderApi<T extends PropTypes = PropTypes> {
     value: number;
     /** The value as a fraction of the range, 0 to 1. */
     fraction: number;
+    /** The value as a percentage of the range, 0 to 100: the preset's `value` token. */
+    percent: number;
+    /** Whether the pointer is down on the slider, dragging its handle. */
+    dragging: boolean;
     disabled: boolean;
+    /** Asks for a value, clamped to the range and snapped to the step. */
     setValue: (value: number) => void;
+    /** Puts the value back after a form reset, as a user change. */
+    reset: (value: number) => void;
+    focus: () => void;
     getRootProps: () => T["element"];
     /** The native `<input type="range">` that takes every interaction. */
     getInputProps: () => T["input"];
