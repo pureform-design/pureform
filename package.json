@@ -47,6 +47,7 @@
         "@pureform/machines": "workspace:^",
         "@pureform/binding-core": "workspace:^",
         "@pureform/react": "workspace:^",
+        "@pureform/react-native": "workspace:^",
         "@pureform/solid": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/tailwind-adapter": "workspace:^",

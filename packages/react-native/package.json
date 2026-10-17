@@ -1,0 +1,296 @@
+{
+    "name": "@pureform/react-native",
+    "version": "0.0.0-semantically-released",
+    "description": "React Native bindings for pureform",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        },
+        "./svg": {
+            "types": "./dist/engines/svg.d.ts",
+            "import": {
+                "development": "./src/engines/svg.ts",
+                "default": "./dist/svg.mjs"
+            }
+        },
+        "./reanimated": {
+            "types": "./dist/engines/reanimated.d.ts",
+            "import": {
+                "development": "./src/engines/reanimated.ts",
+                "default": "./dist/reanimated.mjs"
+            }
+        },
+        "./reanimated-svg": {
+            "types": "./dist/engines/reanimated-svg.d.ts",
+            "import": {
+                "development": "./src/engines/reanimated-svg.ts",
+                "default": "./dist/reanimated-svg.mjs"
+            }
+        },
+        "./avatar": {
+            "types": "./dist/avatar/index.d.ts",
+            "import": {
+                "development": "./src/avatar/index.ts",
+                "default": "./dist/avatar.mjs"
+            }
+        },
+        "./button": {
+            "types": "./dist/button/index.d.ts",
+            "import": {
+                "development": "./src/button/index.ts",
+                "default": "./dist/button.mjs"
+            }
+        },
+        "./card": {
+            "types": "./dist/card/index.d.ts",
+            "import": {
+                "development": "./src/card/index.ts",
+                "default": "./dist/card.mjs"
+            }
+        },
+        "./checkbox": {
+            "types": "./dist/checkbox/index.d.ts",
+            "import": {
+                "development": "./src/checkbox/index.ts",
+                "default": "./dist/checkbox.mjs"
+            }
+        },
+        "./chip": {
+            "types": "./dist/chip/index.d.ts",
+            "import": {
+                "development": "./src/chip/index.ts",
+                "default": "./dist/chip.mjs"
+            }
+        },
+        "./circular-progress": {
+            "types": "./dist/circular-progress/index.d.ts",
+            "import": {
+                "development": "./src/circular-progress/index.ts",
+                "default": "./dist/circular-progress.mjs"
+            }
+        },
+        "./dialog": {
+            "types": "./dist/dialog/index.d.ts",
+            "import": {
+                "development": "./src/dialog/index.ts",
+                "default": "./dist/dialog.mjs"
+            }
+        },
+        "./fab": {
+            "types": "./dist/fab/index.d.ts",
+            "import": {
+                "development": "./src/fab/index.ts",
+                "default": "./dist/fab.mjs"
+            }
+        },
+        "./icon": {
+            "types": "./dist/icon/index.d.ts",
+            "import": {
+                "development": "./src/icon/index.ts",
+                "default": "./dist/icon.mjs"
+            }
+        },
+        "./icon-button": {
+            "types": "./dist/icon-button/index.d.ts",
+            "import": {
+                "development": "./src/icon-button/index.ts",
+                "default": "./dist/icon-button.mjs"
+            }
+        },
+        "./linear-progress": {
+            "types": "./dist/linear-progress/index.d.ts",
+            "import": {
+                "development": "./src/linear-progress/index.ts",
+                "default": "./dist/linear-progress.mjs"
+            }
+        },
+        "./list-item": {
+            "types": "./dist/list-item/index.d.ts",
+            "import": {
+                "development": "./src/list-item/index.ts",
+                "default": "./dist/list-item.mjs"
+            }
+        },
+        "./media": {
+            "types": "./dist/media/index.d.ts",
+            "import": {
+                "development": "./src/media/index.ts",
+                "default": "./dist/media.mjs"
+            }
+        },
+        "./menu": {
+            "types": "./dist/menu/index.d.ts",
+            "import": {
+                "development": "./src/menu/index.ts",
+                "default": "./dist/menu.mjs"
+            }
+        },
+        "./navigation-bar": {
+            "types": "./dist/navigation-bar/index.d.ts",
+            "import": {
+                "development": "./src/navigation-bar/index.ts",
+                "default": "./dist/navigation-bar.mjs"
+            }
+        },
+        "./navigation-rail": {
+            "types": "./dist/navigation-rail/index.d.ts",
+            "import": {
+                "development": "./src/navigation-rail/index.ts",
+                "default": "./dist/navigation-rail.mjs"
+            }
+        },
+        "./radio-group": {
+            "types": "./dist/radio-group/index.d.ts",
+            "import": {
+                "development": "./src/radio-group/index.ts",
+                "default": "./dist/radio-group.mjs"
+            }
+        },
+        "./scrim": {
+            "types": "./dist/scrim/index.d.ts",
+            "import": {
+                "development": "./src/scrim/index.ts",
+                "default": "./dist/scrim.mjs"
+            }
+        },
+        "./search-bar": {
+            "types": "./dist/search-bar/index.d.ts",
+            "import": {
+                "development": "./src/search-bar/index.ts",
+                "default": "./dist/search-bar.mjs"
+            }
+        },
+        "./select": {
+            "types": "./dist/select/index.d.ts",
+            "import": {
+                "development": "./src/select/index.ts",
+                "default": "./dist/select.mjs"
+            }
+        },
+        "./separator": {
+            "types": "./dist/separator/index.d.ts",
+            "import": {
+                "development": "./src/separator/index.ts",
+                "default": "./dist/separator.mjs"
+            }
+        },
+        "./slider": {
+            "types": "./dist/slider/index.d.ts",
+            "import": {
+                "development": "./src/slider/index.ts",
+                "default": "./dist/slider.mjs"
+            }
+        },
+        "./snackbar": {
+            "types": "./dist/snackbar/index.d.ts",
+            "import": {
+                "development": "./src/snackbar/index.ts",
+                "default": "./dist/snackbar.mjs"
+            }
+        },
+        "./supporting-text": {
+            "types": "./dist/supporting-text/index.d.ts",
+            "import": {
+                "development": "./src/supporting-text/index.ts",
+                "default": "./dist/supporting-text.mjs"
+            }
+        },
+        "./switch": {
+            "types": "./dist/switch/index.d.ts",
+            "import": {
+                "development": "./src/switch/index.ts",
+                "default": "./dist/switch.mjs"
+            }
+        },
+        "./tabs": {
+            "types": "./dist/tabs/index.d.ts",
+            "import": {
+                "development": "./src/tabs/index.ts",
+                "default": "./dist/tabs.mjs"
+            }
+        },
+        "./text": {
+            "types": "./dist/text/index.d.ts",
+            "import": {
+                "development": "./src/text/index.ts",
+                "default": "./dist/text.mjs"
+            }
+        },
+        "./text-area": {
+            "types": "./dist/text-area/index.d.ts",
+            "import": {
+                "development": "./src/text-area/index.ts",
+                "default": "./dist/text-area.mjs"
+            }
+        },
+        "./text-field": {
+            "types": "./dist/text-field/index.d.ts",
+            "import": {
+                "development": "./src/text-field/index.ts",
+                "default": "./dist/text-field.mjs"
+            }
+        },
+        "./tooltip": {
+            "types": "./dist/tooltip/index.d.ts",
+            "import": {
+                "development": "./src/tooltip/index.ts",
+                "default": "./dist/tooltip.mjs"
+            }
+        }
+    },
+    "publishConfig": {
+        "access": "public"
+    },
+    "dependencies": {
+        "@pureform/anatomy": "catalog:",
+        "@pureform/binding-core": "catalog:"
+    },
+    "devDependencies": {
+        "@pureform/preset": "catalog:",
+        "@pureform/rn-adapter": "catalog:",
+        "@pureform/styling": "catalog:",
+        "@pureform/tsconfig": "catalog:",
+        "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
+        "@testing-library/dom": "catalog:",
+        "@testing-library/react": "catalog:",
+        "@types/node": "catalog:",
+        "@types/react": "catalog:",
+        "@types/react-dom": "catalog:",
+        "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
+        "react": "catalog:",
+        "react-dom": "catalog:",
+        "react-native": "catalog:",
+        "react-native-reanimated": "catalog:",
+        "react-native-svg": "catalog:",
+        "react-native-web": "catalog:",
+        "react-native-worklets": "catalog:",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+        "vitest": "catalog:"
+    },
+    "peerDependencies": {
+        "@pureform/rn-adapter": "catalog:",
+        "@pureform/styling": "catalog:",
+        "react": "^19.0.0",
+        "react-native": "catalog:",
+        "react-native-reanimated": "catalog:",
+        "react-native-svg": "catalog:"
+    },
+    "peerDependenciesMeta": {
+        "react-native-reanimated": {
+            "optional": true
+        },
+        "react-native-svg": {
+            "optional": true
+        }
+    }
+}
