@@ -22,8 +22,10 @@ bun run dev
   It switches the scheme, the teal theme, the registry (precomputed, or a registry of
   `nativeFactory` over the runtime styles), reduced motion (`motion`), slow motion (`timeScale`),
   the motion engine (Animated or Reanimated, with or without SVG), and an override of the primary
-  color. The shapes section draws icon buttons, a FAB, an avatar, and media in Material's shapes,
-  and ripples clip to them.
+  color, and the provider's `indication` (Material's, without the ripple, or none). A shared
+  source section puts a button, a chip, and an icon button on one `useInteractionSource()`, with
+  what `useInteractionState` reports. The shapes section draws icon buttons, a FAB, an avatar, and
+  media in Material's shapes, and ripples clip to them.
 - `src/custom.tsx`: the config's own components (panel, swatch, tweens) on the package's hooks
   (`useSelectedStyles`, `useComponentSlots`), and the shapes and picture the page shows.
 
@@ -33,5 +35,6 @@ bun run dev
 Chromium: every component's parts by test id, each drawing its generated factory's styles, the
 runtime registry drawing the same, the scheme switch, the controls, the select's menu, tabs and
 navigation, shapes drawn with SVG under each engine without losing the page's state, and a ripple
-in each surface the anatomy names (the controls' and the snackbar's buttons too). Set
+in each surface the anatomy names (the controls' and the snackbar's buttons too), a press shown
+on every component sharing a source, and the indication switch removing the ripple layers. Set
 `CHROMIUM_PATH` (`.env.local`) to use a system Chromium.

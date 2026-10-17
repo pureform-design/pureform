@@ -66,8 +66,12 @@ the server with Panda's styles, and it hydrates in Chromium without an error. `C
 `PureformProvider` with the registry above: every button variant, sizes with icons, colors, a
 mirrored icon, a toggle, a composed button, every checkbox state, an indeterminate parent over
 three children, a form that submits and resets (with a checkbox in a disabled fieldset), and a
-switch between left to right and right to left. It renders on the server and hydrates, like the
-rest of the app. `apps/react-demo` is the same page in React.
+switch between left to right and right to left. Its indication section switches the provider's
+`indication` (Material's, Material's without the ripple, none) and shows a button, a chip, and an
+icon button on one interaction source (`createInteractionSource`), with what
+`useInteractionState` reports. It renders on the server and hydrates, like the rest of the app.
+`apps/react-demo` has the same buttons and checkboxes in React. The smoke test (`test:e2e`) also
+presses the shared source and switches the indication.
 
 `vite.config.ts` keeps `@pureform/*` in the server bundle (`ssr.noExternal`): `@pureform/solid`
 ships JSX for the app's Solid plugin to compile, and in development the workspace packages
