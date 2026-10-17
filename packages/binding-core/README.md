@@ -1,7 +1,7 @@
 # @pureform/binding-core
 
-The framework-free half of pureform's bindings. Everything `@pureform/solid` and
-`@pureform/react` (and later `@pureform/react-native`) would otherwise write twice lives here:
+The framework-free half of pureform's bindings. Everything `@pureform/solid`,
+`@pureform/react`, and `@pureform/react-native` would otherwise write twice lives here:
 what `PureformProvider` takes and how nested providers combine, runtime themes and token
 overrides as CSS, selections over the provider's defaults, a part's state attributes and how its props merge, controllable state, reduced
 motion, an icon slot's measured style, and each component's contract: the props Root takes and
@@ -373,7 +373,8 @@ Each entry is a registry entry the component draws, with the variant groups its 
 the registry as given, by the prop that sets them (`text`'s `style` comes from `textStyle`).
 A group left out is computed by the component (a FAB's `extended`, a dialog's `icon`, a select's
 icons, a card's `interactive`) and keeps every value. Also: `BINDING_PACKAGES`,
-`REGISTRY_HOOKS` (`useClasses`, `useStyles` select; `useClassFactory`, `useLazyClassFactory`,
+`REGISTRY_HOOKS` (`useClasses`, `useStyles`, and React Native's `useComponentSlots` and
+`useSelectedStyles` select; `useClassFactory`, `useLazyClassFactory`,
 `useStyleFactory` hand out a factory), `ANATOMY_HOOK` (`useComponent`), and `PROVIDER`
 (`PureformProvider` and its `defaults` prop).
 
