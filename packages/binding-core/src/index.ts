@@ -49,6 +49,22 @@ export {
 } from "./components/content";
 export type { IconOnlyName } from "./components/content";
 export {
+    DIALOG_CONTENT_PROPS,
+    DIALOG_ROOT_PROPS,
+    dialogBackdropLayout,
+    dialogMachineProps,
+    dialogPositionerLayout,
+    dialogSelection,
+} from "./components/dialog";
+export type {
+    DialogBehaviorProps,
+    DialogContentProps,
+    DialogElementIds,
+    DialogPart,
+    DialogRootOwnProps,
+    DialogVariantProps,
+} from "./components/dialog";
+export {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
     fabMachineProps,
@@ -73,6 +89,28 @@ export type {
     IconButtonRootOwnProps,
     IconButtonVariantProps,
 } from "./components/icon-button";
+export {
+    MENU_CONTENT_PROPS,
+    MENU_ROOT_PROPS,
+    menuItemProps,
+    menuMachineProps,
+    menuSelection,
+} from "./components/menu";
+export type {
+    MenuBehaviorProps,
+    MenuContentProps,
+    MenuElementIds,
+    MenuItem,
+    MenuPart,
+    MenuRootOwnProps,
+    MenuSelectDetails,
+    MenuVariantProps,
+} from "./components/menu";
+export { overlayPositionerProps } from "./components/overlay";
+export type {
+    OverlayPlacement,
+    OverlayPositioning,
+} from "./components/overlay";
 export {
     RADIO_GROUP_CONTENT_PROPS,
     RADIO_GROUP_ROOT_PROPS,
@@ -125,6 +163,22 @@ export type {
     SelectVariantProps,
 } from "./components/select";
 export {
+    SNACKBAR_CONTENT_PROPS,
+    SNACKBAR_ROOT_PROPS,
+    snackbarMachineProps,
+    snackbarSelection,
+} from "./components/snackbar";
+export type {
+    SnackbarBehaviorProps,
+    SnackbarContentProps,
+    SnackbarElementIds,
+    SnackbarOpenChangeDetails,
+    SnackbarOpenChangeReason,
+    SnackbarPart,
+    SnackbarRootOwnProps,
+    SnackbarVariantProps,
+} from "./components/snackbar";
+export {
     SWITCH_CONTENT_PROPS,
     SWITCH_INPUT_LABEL_PROPS,
     SWITCH_ROOT_PROPS,
@@ -163,6 +217,21 @@ export type {
     TextFieldRootOwnProps,
     TextFieldVariantProps,
 } from "./components/text-field";
+export {
+    isRichTooltip,
+    TOOLTIP_CONTENT_PROPS,
+    TOOLTIP_ROOT_PROPS,
+    tooltipMachineProps,
+    tooltipSelection,
+} from "./components/tooltip";
+export type {
+    TooltipBehaviorProps,
+    TooltipContentProps,
+    TooltipElementIds,
+    TooltipPart,
+    TooltipRootOwnProps,
+    TooltipVariantProps,
+} from "./components/tooltip";
 export type { VariantProp } from "./components/variants";
 export {
     controllableNames,
