@@ -215,6 +215,8 @@ describe("list item", () => {
                 { color: "b", tokens: { paddingInline: 2 } as never },
             ),
         ).toEqual({
+            lines: undefined,
+            interactive: undefined,
             density: "compact",
             color: "b",
             tokens: { gap: 1, paddingInline: 2 },

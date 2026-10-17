@@ -56,12 +56,14 @@ export const LIST_CONTENT_PROPS = [
     "items",
 ] as const satisfies readonly (keyof ListContentProps<unknown>)[];
 
-/** A list item's variants over its list's: the item's own win; tokens merge. */
+/** A list item's variants over its list's: the item's own win; tokens merge. Reads only the
+ *  variant props, so a binding's props (with their children) can be passed as they are. */
 export const listItemVariants = (
-    list: ListVariantProps | undefined,
+    list: ListVariantProps | null | undefined,
     item: ListItemVariantProps,
 ): ListItemVariantProps => ({
-    ...item,
+    lines: item.lines,
+    interactive: item.interactive,
     density: item.density ?? list?.density,
     color: item.color ?? list?.color,
     tokens:
