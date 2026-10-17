@@ -1,7 +1,6 @@
 // The demo's pureform config: Material's defaults and a teal theme, two shapes that morph when
-// pressed, a panel that lays out by its container's width, a square whose typed tokens tween,
-// and the components the React
-// Native adapter covers.
+// pressed, a panel that lays out by its container's width, a gradient swatch, and a square whose
+// typed tokens tween. The bundler plugin (and `pureform generate`) write `.pureform/` from it.
 
 import { defineComponent, defineSlotComponent } from "@pureform/core";
 import {
@@ -158,11 +157,14 @@ const tweens = defineSlotComponent({
     },
 });
 
-export const config = {
+const config = {
     ...preset,
     components: { ...preset.components, panel, swatch, tweens },
 };
 
+export default config;
+
+/** The components the page draws. */
 export const COMPONENTS = [
     "panel",
     "swatch",

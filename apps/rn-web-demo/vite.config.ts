@@ -1,15 +1,19 @@
 import { createRequire } from "node:module";
 import { dirname } from "node:path";
 
+import pureform from "@pureform/bundler/vite";
 import { materialColor } from "@pureform/material";
-import { pureform } from "@pureform/preset";
-import { precompute, resolveTheme, runtimeStyles } from "@pureform/rn-adapter";
+import { pureform as preset } from "@pureform/preset";
+import { resolveTheme, runtimeStyles } from "@pureform/rn-adapter";
 import type { ThemeValues } from "@pureform/rn-adapter";
+import { instanceTokenKeys } from "@pureform/rn-adapter/codegen";
 import { createConfig } from "@pureform/vite-config/app";
 import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 
 import packageJson from "./package.json";
+import config, { BRAND_TOKENS, BRANDS, COMPONENTS } from "./pureform.config";
+import { glue } from "./pureform.glue";
 
 const require = createRequire(import.meta.url);
 
@@ -27,14 +31,13 @@ const WEB_EXTENSIONS = [
     ".tsx",
     ".json",
 ];
-import { BRAND_TOKENS, BRANDS, COMPONENTS, config } from "./src/config";
 
 const STYLES_ID = "virtual:pureform-rn";
 
 // Each brand's primary family for light and dark, generated from its seed here, so the page
 // overrides with plain values and ships no color generation.
 const brandOverrides = () => {
-    const generated = pureform({
+    const generated = preset({
         themes: Object.fromEntries(
             Object.entries(BRANDS).map(([name, seed]) => [
                 name,
@@ -69,18 +72,26 @@ const brandOverrides = () => {
     );
 };
 
-// The styles are built here, so the page ships the runtime and the data, not the config,
-// the lowering, or the color library.
+// The page's other styles, built here, so it ships the runtime and the data, not the config,
+// the lowering, or the color library: every component's styles resolved at runtime (the
+// generated registry holds them precomputed), each one's instance tokens by theme key, and the
+// brand colors.
 const pureformRn = (): Plugin => ({
     name: "pureform-rn",
     resolveId: (id) => (id === STYLES_ID ? `\0${id}` : undefined),
     load: (id) => {
         if (id !== `\0${STYLES_ID}`) return undefined;
-        // React Native Web passes font families to CSS, so the whole stack applies.
         const options = { components: COMPONENTS, fontStack: "all" as const };
+        const specs = config.components as unknown as Record<string, never>;
+        const tokens = Object.fromEntries(
+            COMPONENTS.map((name) => [
+                name,
+                instanceTokenKeys(name, specs[name]!),
+            ]),
+        );
         return [
-            `export const precomputed = ${JSON.stringify(precompute(config, options))};`,
             `export const runtime = ${JSON.stringify(runtimeStyles(config, options))};`,
+            `export const runtimeTokens = ${JSON.stringify(tokens)};`,
             `export const brands = ${JSON.stringify(brandOverrides())};`,
         ].join("\n");
     },
@@ -89,7 +100,9 @@ const pureformRn = (): Plugin => ({
 export default createConfig({
     package: packageJson,
     overrides: {
-        plugins: [react(), pureformRn()],
+        // pureform writes `.pureform/`, the registry of the components' factories, when dev or
+        // build starts.
+        plugins: [pureform(glue), react(), pureformRn()],
         resolve: {
             // React Native libraries such as react-native-svg pick their web build by these.
             extensions: WEB_EXTENSIONS,
