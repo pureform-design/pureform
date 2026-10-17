@@ -29,6 +29,7 @@ import { Button } from "./button";
 import { Card } from "./card";
 import { Checkbox } from "./checkbox";
 import { IconButton } from "./icon-button";
+import { NavigationBar } from "./navigation-bar";
 import { Radio } from "./radio-group";
 import { Slider } from "./slider";
 import { Snackbar } from "./snackbar";
@@ -47,6 +48,7 @@ beforeAll(async () => {
         "card",
         "checkbox",
         "iconButton",
+        "navigationBar",
         "radio",
         "slider",
         "snackbar",
@@ -182,19 +184,93 @@ describe("the interaction source from Pressable", () => {
         });
     });
 
+    it("ends a destination's press when the whole navigation becomes disabled", async () => {
+        const source = createInteractionSource();
+        const disabled = outside(false);
+        await render(
+            <disabled.Holder>
+                {(value) => (
+                    <NavigationBar
+                        aria-label="Main"
+                        disabled={value}
+                        items={[
+                            {
+                                value: "home",
+                                label: "Home",
+                                interactionSource: source,
+                            },
+                        ]}
+                    />
+                )}
+            </disabled.Holder>,
+        );
+        const item = byTestId("pf-navigation-bar-item");
+        const box = item.getBoundingClientRect();
+        const at = {
+            bubbles: true,
+            button: 0,
+            clientX: box.left + 4,
+            clientY: box.top + 4,
+        };
+        await act(async () => {
+            item.dispatchEvent(new MouseEvent("mousedown", at));
+        });
+        expect(source.state.pressed).toBe(true);
+        await disabled.set(true);
+        await settle();
+        expect(source.state.pressed).toBe(false);
+        expect(item.getAttribute("aria-disabled")).toBe("true");
+        await act(async () => {
+            document.dispatchEvent(new MouseEvent("mouseup", at));
+        });
+    });
+
     it("presses and drags a slider", async () => {
         const source = createInteractionSource();
         const heard: string[] = [];
         source.subscribe((interaction) => heard.push(interaction.type));
         await render(<Slider aria-label="Volume" interactionSource={source} />);
         await interact(() => userEvent.click(byTestId("pf-slider-root")));
+        // A click focuses it, as a pressed range input is.
         expect(heard).toEqual([
             "hoverEnter",
             "press",
             "dragStart",
+            "focus",
             "dragStop",
             "release",
         ]);
+    });
+});
+
+describe("the slider and the keyboard", () => {
+    it("takes focus, shows it, and steps with the arrow keys by direction", async () => {
+        const source = createInteractionSource();
+        const value = outside<"ltr" | "rtl">("ltr");
+        await render(
+            <value.Holder>
+                {(dir) => (
+                    <PureformProvider registry={registry} dir={dir}>
+                        <Slider
+                            aria-label="Volume"
+                            defaultValue={40}
+                            interactionSource={source}
+                        />
+                    </PureformProvider>
+                )}
+            </value.Holder>,
+        );
+        await settle(FOCUS_AFTER_PRESS_MS);
+        const root = byTestId("pf-slider-root");
+        await act(async () => root.focus());
+        expect(source.state.focusVisible).toBe(true);
+        await interact(() => userEvent.keyboard("{ArrowRight}"));
+        expect(root.getAttribute("aria-valuenow")).toBe("41");
+        await interact(() => userEvent.keyboard("{End}"));
+        expect(root.getAttribute("aria-valuenow")).toBe("100");
+        await value.set("rtl");
+        await interact(() => userEvent.keyboard("{ArrowRight}"));
+        expect(root.getAttribute("aria-valuenow")).toBe("99");
     });
 });
 
@@ -501,6 +577,22 @@ describe("a shared source", () => {
         expect(ripples("a-root")).toBe(1);
         expect(ripples("b-root")).toBe(1);
         expect(state!.pressed).toBe(false);
+    });
+
+    it("never shows one component's focus on another", async () => {
+        const source = createInteractionSource();
+        await render(
+            <>
+                <Button label="A" interactionSource={source} testId="a" />
+                <Button label="B" interactionSource={source} testId="b" />
+            </>,
+        );
+        await settle(FOCUS_AFTER_PRESS_MS);
+        await act(async () => byTestId("a-root").focus());
+        await settle(FADE_MS);
+        expect(source.state.focusVisible).toBe(true);
+        expect(getComputedStyle(byTestId("a-root")).outlineWidth).toBe("3px");
+        expect(getComputedStyle(byTestId("b-root")).outlineWidth).toBe("0px");
     });
 
     it("reaches every subscriber with an app's own kind, and leaves the state alone", async () => {
