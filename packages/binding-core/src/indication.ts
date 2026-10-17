@@ -9,10 +9,12 @@ import type { InteractionSource } from "./interaction";
 import type { AnyRegistry, Direction } from "./provider";
 
 /**
- * The token values an indication sets, by the component tokens' names. They're static, so the
- * server renders them: on the web as CSS vars (theme-level from the provider, on the component's
- * root from its `indication` prop), on React Native in the selection's overrides. Each left out
- * keeps the theme's value.
+ * The token values an indication sets, by the component tokens' names: every interactive
+ * component has all seven, each defaulting to the theme's (its state opacities, its focus
+ * indicator's thickness and outer offset, and `secondary`) and set back to the theme's on the
+ * component's root. They're static, so the server renders them: on the web as CSS vars
+ * (theme-level from the provider, on the component's root from its `indication` prop), on React
+ * Native in the selection's overrides. Each left out keeps the theme's value.
  */
 export interface IndicationTokens {
     /** The state layer's opacity while hovered. */
