@@ -4,6 +4,8 @@
 
 import type { CoreConfig } from "@pureform/core/types";
 
+import type { VariantUsage } from "./usage";
+
 /** Where the generated factories run: `web` modules export a `ClassFactory`, `native` modules a
  *  `StyleFactory`. */
 export type Platform = "web" | "native";
@@ -45,6 +47,11 @@ export interface CodegenContext<Options = Record<string, unknown>> {
     /** The components to generate, in the config's order: every component, or the build's
      *  allow-list. Generate a module for each of these and no others. */
     readonly components: readonly string[];
+    /** The variant values the app uses, when the bundler plugin pruned the build: narrow
+     *  stylesheets, `staticCss`, and precomputed tables to them (`narrowConfig` does it for a
+     *  config). A component or group left out keeps every value; empty or absent when nothing
+     *  narrows. Factory modules don't change. */
+    readonly variants?: VariantUsage;
     /** The adapter's own build options, as the bundler plugin or the CLI passed them (`prefix`,
      *  `classPrefix`, …). They're part of the header hash. */
     readonly options: Options;

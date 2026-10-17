@@ -264,6 +264,73 @@ describe("generate", () => {
         );
     });
 
+    describe("usage", () => {
+        it("keeps the used components within the allow-list, and drops lazy names left out", async () => {
+            const root = tempRoot();
+            const adapter = fakeAdapter();
+            const result = await generate({
+                root,
+                config: fixtureConfig(),
+                target: adapter,
+                components: ["button"],
+                lazy: ["button"],
+                usage: { components: ["button", "chip", "card"] },
+            });
+            expect(result.components).toEqual(["button"]);
+            expect(adapter.calls[0]!.variants).toEqual({});
+
+            const pruned = await generate({
+                root,
+                config: fixtureConfig(),
+                target: adapter,
+                lazy: ["button"],
+                usage: { components: ["chip"] },
+            });
+            expect(pruned.components).toEqual(["chip"]);
+            expect(read(root, "index.ts")).not.toContain("lazy");
+            expect(existsSync(join(root, ".pureform/web/button.ts"))).toBe(
+                false,
+            );
+        });
+
+        it("hands the adapter the variants that narrow, and hashes them", async () => {
+            const root = tempRoot();
+            const adapter = fakeAdapter();
+            const full = await generate({
+                root,
+                config: fixtureConfig(),
+                target: adapter,
+            });
+            const same = await generate({
+                root,
+                config: fixtureConfig(),
+                target: adapter,
+                usage: {
+                    components: ["button", "chip"],
+                    variants: { button: { variant: ["filled", "text"] } },
+                },
+            });
+            expect(same.hash).toBe(full.hash);
+            expect(same.changed).toBe(false);
+            expect(adapter.calls[1]!.variants).toEqual({});
+
+            const narrowed = await generate({
+                root,
+                config: fixtureConfig(),
+                target: adapter,
+                usage: {
+                    components: ["button", "chip"],
+                    variants: { button: { variant: [] } },
+                },
+            });
+            expect(adapter.calls[2]!.variants).toEqual({
+                button: { variant: ["filled"] },
+            });
+            expect(narrowed.hash).not.toBe(full.hash);
+            expect(narrowed.components).toEqual(["button", "chip"]);
+        });
+    });
+
     it("rejects an allow-list or lazy list naming components the config doesn't have", async () => {
         const root = tempRoot();
         const unknown = await rejection(
