@@ -6,12 +6,23 @@ import { describe, expect, it } from "vitest";
 import * as machines from ".";
 
 describe("@pureform/machines", () => {
-    it("re-exports Zag's machines unchanged", () => {
+    it("re-exports Zag's machines unchanged, but for the form rules of the switch and radio group", () => {
         expect(machines.checkbox.machine).toBe(zagCheckbox.machine);
         expect(machines.checkbox.connect).toBe(zagCheckbox.connect);
-        expect(machines.switchControl.machine).toBe(zagSwitch.machine);
-        expect(machines.radioGroup.machine).toBe(zagRadioGroup.machine);
+        expect(machines.switchControl.connect).toBe(zagSwitch.connect);
+        expect(machines.switchControl.machine.on).toBe(zagSwitch.machine.on);
+        expect(machines.radioGroup.connect).toBe(zagRadioGroup.connect);
         expect(machines.radioGroup.itemProps).toBe(zagRadioGroup.itemProps);
+        expect(machines.radioGroup.machine.states).toBe(
+            zagRadioGroup.machine.states,
+        );
+        expect(
+            machines.radioGroup.machine.implementations?.effects
+                ?.trackFormControlState,
+        ).not.toBe(
+            zagRadioGroup.machine.implementations?.effects
+                ?.trackFormControlState,
+        );
     });
 
     it("gives every machine Zag's shape", () => {
