@@ -17,14 +17,30 @@ export interface ServerRender {
 export const renderOnServer = (scene: Scene): Promise<ServerRender> =>
     commands.renderOnServer(scene);
 
-/** Runs every `<script>` in `markup`, which `innerHTML` leaves inert. */
-export const runScripts = (markup: string): void => {
+/** The scope of a runtime theme's block (Solid's `data-pf-theme`, React's `data-href`). */
+const blockScope = (element: Element): string | null =>
+    element.getAttribute("data-pf-theme") ?? element.getAttribute("data-href");
+
+/** Puts the server's head markup in the page, as a page load would: every `<script>` runs (which
+ *  `innerHTML` leaves inert), and every other tag (a runtime theme's `<style>` block) goes into
+ *  `<head>`, in place of a block an earlier render left for the same theme. */
+export const applyHead = (markup: string): void => {
     const template = document.createElement("template");
     template.innerHTML = markup;
-    for (const script of template.content.querySelectorAll("script")) {
-        const live = document.createElement("script");
-        live.textContent = script.textContent;
-        document.head.append(live);
-        live.remove();
+    for (const element of Array.from(template.content.children)) {
+        if (element.tagName === "SCRIPT") {
+            const live = document.createElement("script");
+            live.textContent = element.textContent;
+            document.head.append(live);
+            live.remove();
+            continue;
+        }
+        const scope = blockScope(element);
+        if (scope !== null) {
+            for (const old of document.head.querySelectorAll("style")) {
+                if (blockScope(old) === scope) old.remove();
+            }
+        }
+        document.head.append(element);
     }
 };

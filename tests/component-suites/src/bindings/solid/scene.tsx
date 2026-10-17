@@ -11,6 +11,7 @@ import type { Accessor } from "solid-js";
 import { registry } from "#registry";
 
 import type { ComponentName, Scene, SceneProps } from "../../harness/scene";
+import { sceneTheme } from "../../harness/themes";
 
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ValidComponent> = {
@@ -27,7 +28,9 @@ export function SceneView(props: {
             registry={registry}
             dir={props.scene.provider?.dir}
             motion={props.scene.provider?.motion}
-            theme={props.scene.provider?.theme}
+            theme={sceneTheme(props.scene.provider)}
+            hydrate={props.scene.provider?.hydrate}
+            overrides={props.scene.provider?.overrides}
         >
             <Dynamic
                 component={components[props.scene.component]}

@@ -9,6 +9,7 @@
         "@pureform/anatomy": "catalog:",
         "@pureform/css-adapter": "catalog:",
         "@pureform/generate": "catalog:",
+        "@pureform/material": "catalog:",
         "@pureform/react": "catalog:",
         "@pureform/solid": "catalog:",
         "@pureform/styling": "catalog:",

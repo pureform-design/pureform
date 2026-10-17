@@ -11,6 +11,7 @@ dependencies:
     - "@pureform/vitest-config"
     - "@pureform/anatomy"
     - "@pureform/styling"
+    - "@pureform/material"
     - "@pureform/solid"
     - "@pureform/react"
     - "@pureform/generate"
