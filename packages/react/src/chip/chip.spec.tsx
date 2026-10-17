@@ -31,10 +31,12 @@ describe("Chip, ready-made", () => {
         expect(root.tagName).toBe("BUTTON");
         expect(root.className).toBe("chip chip--variant-elevated");
         expect(
-            [...root.children].map((child) =>
-                child.getAttribute("data-pf-part"),
+            [...root.children].map(
+                (child) =>
+                    child.getAttribute("data-pf-part") ??
+                    (child.hasAttribute("data-ripple-layer") ? "layer" : null),
             ),
-        ).toEqual(["touch-target", "icon", "label"]);
+        ).toEqual(["layer", "touch-target", "icon", "label"]);
         expect(byTestId(ids.icon).getAttribute("aria-hidden")).toBe("true");
         expect(byTestId(ids.icon).hasAttribute("data-pf-mirror")).toBe(true);
         expect(byTestId(ids.label).textContent).toBe("Vegan");

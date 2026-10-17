@@ -1,7 +1,11 @@
 // What the components on the button machine share: Root's machine, with its id, the provider's
 // direction, and the controllable `selected` of a toggle.
 
-import type { ButtonBehaviorProps } from "@pureform/binding-core";
+import type {
+    ButtonBehaviorProps,
+    InteractionSourceProps,
+} from "@pureform/binding-core";
+import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as button from "@pureform/machines/button";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -21,9 +25,13 @@ export function usePressable(
     props: Pick<
         ButtonBehaviorProps,
         "selected" | "defaultSelected" | "onSelectedChange"
-    >,
+    > &
+        InteractionSourceProps,
     machineProps: MachineProps<button.Schema>,
-): button.Api<PropTypes> {
+): {
+    readonly api: button.Api<PropTypes>;
+    readonly source: MutableInteractionSource | undefined;
+} {
     const id = useId();
     const dir = useDirection();
     const selected = useControllable<"selected", boolean>(
@@ -31,13 +39,13 @@ export function usePressable(
         "selected",
         props,
     );
-    const interaction = useOwnInteractionSource();
+    const source = useOwnInteractionSource(props.interactionSource);
     const service = useMachine(button.machine, {
         id,
-        ...interaction,
+        interactionSource: source,
         dir,
         ...machineProps,
         ...selected.machineProps,
     });
-    return button.connect(service, normalizeProps);
+    return { api: button.connect(service, normalizeProps), source };
 }

@@ -76,10 +76,10 @@ function Root(props: CheckboxRootProps): ReactNode {
     const checked = useControllable("Checkbox", "checked", props);
     const [input, setInput] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(input);
-    const interaction = useOwnInteractionSource();
+    const source = useOwnInteractionSource(props.interactionSource);
     const service = useMachine(checkbox.machine, {
         id,
-        ...interaction,
+        interactionSource: source,
         dir,
         ...checkboxMachineProps(props, fieldsetDisabled),
         ...checked.machineProps,
@@ -116,6 +116,8 @@ function Root(props: CheckboxRootProps): ReactNode {
         selection: checkboxSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, CHECKBOX_ROOT_PROPS);
     return (

@@ -70,10 +70,10 @@ function Root(props: SliderRootProps): ReactNode {
     const dir = useDirection();
     const value = useControllable<"value", number>("Slider", "value", props);
     const [input, setInput] = useState<HTMLInputElement | null>(null);
-    const interaction = useOwnInteractionSource();
+    const source = useOwnInteractionSource(props.interactionSource);
     const service = useMachine(slider.machine, {
         id,
-        ...interaction,
+        interactionSource: source,
         dir,
         ...sliderMachineProps(props),
         ...value.machineProps,
@@ -108,6 +108,8 @@ function Root(props: SliderRootProps): ReactNode {
         selection: sliderSelection(props, api.percent),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, SLIDER_ROOT_PROPS);
     return (

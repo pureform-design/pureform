@@ -15,6 +15,7 @@ import {
     tabsTriggerProps,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     TabsContentProps,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
@@ -25,6 +26,7 @@ import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
 import { useItemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -40,6 +42,7 @@ interface TabsContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: tabs.Api<PropTypes>;
     readonly disabled: boolean | undefined;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What a tab shares with its parts. */
@@ -69,7 +72,7 @@ export interface TabsIconProps extends TabsPartProps {
 }
 
 /** A tab's props: its value, `disabled`, and a part's. */
-export interface TabsTabProps extends TabsPartProps {
+export interface TabsTabProps extends TabsPartProps, InteractionSourceProps {
     readonly value: string;
     readonly disabled?: boolean | undefined;
     /** Whether the tab names its panel (`Tabs.Content` with its value) in `aria-controls`. Turn
@@ -91,10 +94,10 @@ function Root(props: TabsRootProps): ReactNode {
         "value",
         props,
     );
-    const interaction = useItemInteractionSources();
+    const sources = useItemInteractionSources();
     const service = useMachine(tabs.machine, {
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir,
         ...tabsMachineProps(props),
         ...value.machineProps,
@@ -104,10 +107,13 @@ function Root(props: TabsRootProps): ReactNode {
         selection: tabsSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, TABS_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, disabled: props.disabled }}>
+        <context.Provider
+            value={{ scope, api, disabled: props.disabled, sources }}
+        >
             {scope.render("root", {
                 element: "div",
                 as,
@@ -136,14 +142,17 @@ function Tab({
     value,
     disabled,
     controls = true,
+    interactionSource,
     ...props
 }: TabsTabProps): ReactNode {
-    const { scope, api, disabled: tabsDisabled } = context.use("Tab");
+    const { scope, api, disabled: tabsDisabled, sources } = context.use("Tab");
+    const source = sources.item(value, interactionSource);
     const item = tabsItemProps({ value, disabled }, tabsDisabled);
     return (
         <tabContext.Provider value={{ value }}>
             {scope.render("tab", {
                 element: "button",
+                interactionSource: source,
                 machine: tabsTriggerProps(api.getTriggerProps(item), {
                     controls,
                 }),
@@ -238,6 +247,7 @@ function ReadyMade(props: TabsProps): ReactNode {
                         key={item.value}
                         value={item.value}
                         disabled={item.disabled}
+                        interactionSource={item.interactionSource}
                         controls={panels}
                         {...slot("tab")}
                     >

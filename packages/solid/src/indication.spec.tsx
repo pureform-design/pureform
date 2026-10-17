@@ -142,11 +142,10 @@ describe("indication", () => {
         const nested = byTestId("nested-root");
         expect(layerOf(nested)).not.toBe(null);
         expect(targets).toHaveLength(1);
-        expect(targets[0]).toMatchObject({
-            trigger: nested,
-            surface: nested,
-            layer: layerOf(nested),
-        });
+        // Compared one by one: React keeps its fibers on the elements.
+        expect(targets[0]?.trigger).toBe(nested);
+        expect(targets[0]?.surface).toBe(nested);
+        expect(targets[0]?.layer).toBe(layerOf(nested));
         const own = byTestId("own-root");
         expect(
             own.style.getPropertyValue(

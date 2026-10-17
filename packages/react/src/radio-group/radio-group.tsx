@@ -29,6 +29,7 @@ import {
     setRadioDefaults,
     syncRadioInputs,
 } from "@pureform/binding-core/dom";
+import type { Indication } from "@pureform/binding-core/indication";
 import * as radioGroup from "@pureform/machines/radio-group";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -45,6 +46,7 @@ import {
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { useItemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useUnstyledComponent } from "../parts";
@@ -60,6 +62,9 @@ interface RadioGroupContextValue {
     readonly variants: RadioVariantProps;
     /** Puts the radios back to the controlled value after a click; see `ItemInput`. Stable. */
     readonly restoreInputs: () => void;
+    readonly sources: ItemInteractionSources;
+    /** The group's indication, every radio's. */
+    readonly indication: Indication | undefined;
 }
 
 /** What a radio shares with its parts. */
@@ -107,10 +112,10 @@ function Root(props: RadioGroupRootProps): ReactNode {
     );
     const [root, setRoot] = useState<HTMLElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(root);
-    const interaction = useItemInteractionSources();
+    const sources = useItemInteractionSources();
     const service = useMachine(radioGroup.machine, {
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir,
         ...radioGroupMachineProps(props, fieldsetDisabled),
         ...value.machineProps,
@@ -168,6 +173,8 @@ function Root(props: RadioGroupRootProps): ReactNode {
                     tokens: props.tokens,
                 },
                 restoreInputs,
+                sources,
+                indication: props.indication,
             }}
         >
             {scope.render("root", {
@@ -183,7 +190,8 @@ function Root(props: RadioGroupRootProps): ReactNode {
 
 /** A radio: a `<label>` around its native radio, so its touch target checks it. */
 function Item(props: RadioGroupItemProps): ReactNode {
-    const { api, variants } = groupContext.use("Item");
+    const { api, variants, sources, indication } = groupContext.use("Item");
+    const source = sources.item(props.value, props.interactionSource);
     const item = {
         value: props.value,
         disabled: props.disabled,
@@ -193,6 +201,8 @@ function Item(props: RadioGroupItemProps): ReactNode {
         selection: radioSelection(variants, props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, RADIO_PROPS);
     return (
@@ -282,6 +292,7 @@ function ReadyMade(props: RadioGroupProps): ReactNode {
                     disabled={item.disabled}
                     invalid={item.invalid}
                     testId={item.testId}
+                    interactionSource={item.interactionSource}
                     unstyled={unstyled}
                 >
                     <ItemTouchTarget {...slot("touchTarget")} />

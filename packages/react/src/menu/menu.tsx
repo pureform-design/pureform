@@ -13,6 +13,7 @@ import {
     overlayPositionerProps,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     MenuContentProps,
     MenuRootOwnProps,
 } from "@pureform/binding-core";
@@ -24,6 +25,7 @@ import { type ElementType, type ReactNode, useId } from "react";
 import { Button } from "../button";
 import { useControllable } from "../controllable";
 import { useItemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -38,6 +40,7 @@ type Anatomy = typeof menuOverlayAnatomy;
 interface MenuContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: menu.Api<PropTypes>;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What an item shares with its parts. */
@@ -74,7 +77,7 @@ export interface MenuIconProps extends MenuPartProps {
 }
 
 /** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`) and a part's. */
-export interface MenuItemProps extends MenuPartProps {
+export interface MenuItemProps extends MenuPartProps, InteractionSourceProps {
     readonly value: string;
     /** The text typeahead matches, when the label isn't plain text. */
     readonly valueText?: string | undefined;
@@ -87,10 +90,10 @@ function Root(props: MenuRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const open = useControllable<"open", boolean>("Menu", "open", props);
-    const interaction = useItemInteractionSources();
+    const sources = useItemInteractionSources();
     const service = useMachine(menu.machine, {
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir,
         ...menuMachineProps(props),
         ...open.machineProps,
@@ -100,10 +103,11 @@ function Root(props: MenuRootProps): ReactNode {
         selection: menuSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, MENU_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api }}>
+        <context.Provider value={{ scope, api, sources }}>
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
@@ -151,14 +155,17 @@ function Item({
     valueText,
     disabled,
     closeOnSelect,
+    interactionSource,
     ...props
 }: MenuItemProps): ReactNode {
-    const { scope, api } = context.use("Item");
+    const { scope, api, sources } = context.use("Item");
+    const source = sources.item(value, interactionSource);
     const item = { value, valueText, disabled, closeOnSelect };
     return (
         <itemContext.Provider value={{ value }}>
             {scope.render("item", {
                 element: "div",
+                interactionSource: source,
                 machine: api.getItemProps(item),
                 states: { hover: api.getItemState(item).highlighted },
                 unstyled,

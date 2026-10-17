@@ -80,10 +80,10 @@ function Root(props: SwitchRootProps): ReactNode {
     );
     const [input, setInput] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(input);
-    const interaction = useOwnInteractionSource();
+    const source = useOwnInteractionSource(props.interactionSource);
     const service = useMachine(switchControl.machine, {
         id,
-        ...interaction,
+        interactionSource: source,
         dir,
         ...switchMachineProps(props, fieldsetDisabled),
         ...checked.machineProps,
@@ -120,6 +120,8 @@ function Root(props: SwitchRootProps): ReactNode {
         selection: switchSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, SWITCH_ROOT_PROPS);
     return (

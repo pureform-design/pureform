@@ -29,12 +29,32 @@ export const NOT_FORWARDED: ForwardedStates = Object.freeze({
 });
 
 /** A part's roles in a component's indication entries, by entry: an anatomy's `input` trigger
- *  shows its states on `root`, the label around it, as the preset matches them there. */
+ *  shows its states on `root`, the label around it, as the preset matches them there. The same
+ *  list on every call for the same entries and part. */
 export const indicationRoles = (
     entries: readonly IndicationAnatomy[] | undefined,
     part: string,
 ): readonly { readonly entry: number; readonly role: IndicationRole }[] => {
     if (!entries) return NO_ROLES;
+    let byPart = rolesCache.get(entries);
+    if (!byPart) {
+        byPart = new Map();
+        rolesCache.set(entries, byPart);
+    }
+    let roles = byPart.get(part);
+    if (!roles) {
+        roles = partRoles(entries, part);
+        byPart.set(part, roles);
+    }
+    return roles;
+};
+
+type Roles = readonly { readonly entry: number; readonly role: IndicationRole }[];
+
+// The same list for the same anatomy and part, so frameworks can compare it by identity.
+const rolesCache = new WeakMap<readonly IndicationAnatomy[], Map<string, Roles>>();
+
+const partRoles = (entries: readonly IndicationAnatomy[], part: string): Roles => {
     const roles: { entry: number; role: IndicationRole }[] = [];
     entries.forEach((entry, index) => {
         if (entry.trigger === part)

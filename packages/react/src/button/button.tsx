@@ -59,10 +59,10 @@ function Root(props: ButtonRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const selected = useControllable("Button", "selected", props);
-    const interaction = useOwnInteractionSource();
+    const source = useOwnInteractionSource(props.interactionSource);
     const service = useMachine(button.machine, {
         id,
-        ...interaction,
+        interactionSource: source,
         dir,
         ...buttonMachineProps(props),
         ...selected.machineProps,
@@ -72,6 +72,8 @@ function Root(props: ButtonRootProps): ReactNode {
         selection: buttonSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, BUTTON_ROOT_PROPS);
     return (

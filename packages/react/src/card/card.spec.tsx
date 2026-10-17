@@ -54,7 +54,11 @@ describe("Card", () => {
         expect(root.type).toBe("button");
         expect(root.disabled).toBe(true);
         expect(root.className).toContain("card--interactive-true");
-        expect(root.firstElementChild).toBe(byTestId(ids.touchTarget));
+        // The ripple's layer comes first, then the touch target.
+        expect(root.firstElementChild?.hasAttribute("data-ripple-layer")).toBe(
+            true,
+        );
+        expect(root.children[1]).toBe(byTestId(ids.touchTarget));
     });
 
     it("is a link with an href", async () => {

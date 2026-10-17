@@ -11,6 +11,7 @@ import {
     snackbarSelection,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     SnackbarContentProps,
     SnackbarOpenChangeDetails,
     SnackbarRootOwnProps,
@@ -21,11 +22,15 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "../controllable";
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { omitProps } from "../props";
+import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -72,6 +77,7 @@ function Root(props: SnackbarRootProps): ReactNode {
         selection: snackbarSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, SNACKBAR_ROOT_PROPS);
     return (
@@ -97,27 +103,39 @@ function SupportingText({ unstyled, ...props }: SnackbarPartProps): ReactNode {
     });
 }
 
-/** The action, a text button: it calls `onAction`, then the snackbar asks to close. */
-function Action({ unstyled, ...props }: SnackbarPartProps): ReactNode {
-    const { scope, api } = context.use("Action");
-    return scope.render("action", {
-        element: "button",
-        machine: api.getActionProps(),
+/** A button's props: a part's, and the interaction source its presses are emitted to. */
+export interface SnackbarButtonProps
+    extends SnackbarPartProps, InteractionSourceProps {}
+
+// The action and the close button, each a surface with its own source.
+const snackbarButton = (part: "action" | "close", name: string) =>
+    function SnackbarButton({
         unstyled,
-        props,
-    });
-}
+        interactionSource,
+        ...props
+    }: SnackbarButtonProps): ReactNode {
+        const { scope, api } = context.use(name);
+        const source = useOwnInteractionSource(interactionSource);
+        const handlers = useInteractionHandlers(source, false);
+        return scope.render(part, {
+            element: "button",
+            interactionSource: source,
+            machine: combinePartProps([
+                (part === "action"
+                    ? api.getActionProps()
+                    : api.getCloseProps()) as Readonly<Record<string, unknown>>,
+                handlers,
+            ]),
+            unstyled,
+            props,
+        });
+    };
+
+/** The action, a text button: it calls `onAction`, then the snackbar asks to close. */
+const Action = snackbarButton("action", "Action");
 
 /** The close button, an icon button: name it with `aria-label`. */
-function Close({ unstyled, ...props }: SnackbarPartProps): ReactNode {
-    const { scope, api } = context.use("Close");
-    return scope.render("close", {
-        element: "button",
-        machine: api.getCloseProps(),
-        unstyled,
-        props,
-    });
-}
+const Close = snackbarButton("close", "Close");
 
 /** The cross the ready-made close button shows unless given another icon. */
 const CloseIcon = (): ReactNode => (

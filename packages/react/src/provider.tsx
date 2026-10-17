@@ -31,6 +31,7 @@ import {
     unloadedThemeMessage,
 } from "@pureform/binding-core/dom";
 import type { ThemeBlock } from "@pureform/binding-core/dom";
+import { providerIndicationOverrides } from "@pureform/binding-core/indication";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import type { ThemeSchemeVars } from "@pureform/styling";
 import {
@@ -68,7 +69,7 @@ export interface PureformProviderProps
  *  `theme` is a named theme from the config or a runtime theme, scoped by the target's attribute
  *  on the provider's element; a runtime theme's vars go in one `<style href precedence>` block,
  *  which React hoists to the head and dedupes by the theme's scope, and `overrides` in the
- *  element's `style`. Object options (`defaults`, `slotProps`, `overrides`, a runtime `theme`) are
+ *  element's `style`, with the theme-level tokens of its `indication` under them. Object options (`defaults`, `slotProps`, `overrides`, a runtime `theme`) are
  *  compared by identity: keep them stable (module constants or `useMemo`) so components under it
  *  don't re-render needlessly. */
 export function PureformProvider({
@@ -80,6 +81,7 @@ export function PureformProvider({
     theme,
     overrides,
     hydrate,
+    indication,
     style,
     children,
     ...rest
@@ -99,6 +101,7 @@ export function PureformProvider({
                     theme,
                     overrides,
                     hydrate,
+                    indication,
                 },
                 mergePartProps,
             ),
@@ -112,6 +115,7 @@ export function PureformProvider({
             theme,
             overrides,
             hydrate,
+            indication,
         ],
     );
     useEffect(() => {
@@ -120,10 +124,14 @@ export function PureformProvider({
         if (message) warnOnce(message);
     }, [registry]);
     const block = useThemeBlock(theme, state.registry, state.hydrate);
-    const vars = useMemo(
-        () => overrideVars(overrides, state.registry),
-        [overrides, state.registry],
-    );
+    const vars = useMemo(() => {
+        // The indication's theme-level tokens, under the provider's own overrides.
+        const tokens = providerIndicationOverrides(indication);
+        return overrideVars(
+            tokens ? { ...tokens, ...overrides } : overrides,
+            state.registry,
+        );
+    }, [indication, overrides, state.registry]);
     return (
         <PureformContext value={state}>
             <ThemeVarsContext

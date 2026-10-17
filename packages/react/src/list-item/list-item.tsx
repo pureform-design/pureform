@@ -5,6 +5,7 @@
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import {
+    isInteractiveListItem,
     isPresent,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
@@ -20,10 +21,14 @@ import type {
 } from "@pureform/binding-core";
 import { createContext, type ElementType, type ReactNode, use } from "react";
 
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { omitProps } from "../props";
+import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 
 type Anatomy = typeof listItemAnatomy;
@@ -67,17 +72,34 @@ function Root(props: ListItemRootProps): ReactNode {
         href: props.href,
         as: props.as,
     });
+    const interactive = isInteractiveListItem(
+        listItemVariants(list, props),
+        element,
+    );
+    const source = useOwnInteractionSource(props.interactionSource);
+    const handlers = useInteractionHandlers(
+        source,
+        !interactive || !!props.disabled,
+    );
     const scope = useComponent(listItemAnatomy, {
         selection: listItemSelection(listItemVariants(list, props), element),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
+        interactive,
     });
     const { as: _as, ...rest } = omitProps(props, LIST_ITEM_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element,
-                machine: listItemRootProps(props, element),
+                machine: interactive
+                    ? combinePartProps([
+                          listItemRootProps(props, element),
+                          handlers,
+                      ])
+                    : listItemRootProps(props, element),
                 props: rest,
             })}
         </context.Provider>
