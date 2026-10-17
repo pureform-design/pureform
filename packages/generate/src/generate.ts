@@ -113,6 +113,21 @@ const checkPath = (adapter: CodegenAdapter, path: string): void => {
     }
 };
 
+// An HTML attribute name the index can write in a string and the stylesheet can match.
+const ATTRIBUTE_NAME = /^[a-z][a-z0-9-]*$/;
+
+const checkThemeAttribute = (
+    adapter: CodegenAdapter,
+    attribute: string | undefined,
+): void => {
+    if (attribute !== undefined && !ATTRIBUTE_NAME.test(attribute)) {
+        throw adapterError(
+            adapter,
+            `returned the theme attribute ${JSON.stringify(attribute)}; it must be a lowercase attribute name, such as "data-theme".`,
+        );
+    }
+};
+
 const selectComponents = (
     config: CoreConfig,
     option: readonly string[] | undefined,
@@ -360,6 +375,7 @@ export const generate = async <Options = Record<string, unknown>>(
     };
     const output = await adapter.codegen(context);
     const entries = glueEntries(adapter, output, components, lazy, shape);
+    checkThemeAttribute(adapter, output.themeAttribute);
 
     const planned: PlannedFile[] = [];
     const add = (path: string, contents: string, header = true) => {
@@ -381,7 +397,12 @@ export const generate = async <Options = Record<string, unknown>>(
     }
     add(
         INDEX_FILE,
-        registryIndex(entries, Object.keys(config.themes ?? {}), trainVersion),
+        registryIndex(
+            entries,
+            Object.keys(config.themes ?? {}),
+            trainVersion,
+            output.themeAttribute,
+        ),
     );
     add(DECLARATIONS_FILE, registryDeclarations(entries));
 

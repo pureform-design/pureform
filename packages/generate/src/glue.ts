@@ -30,12 +30,13 @@ const key = (name: string): string =>
 export const moduleSpecifier = (path: string): string =>
     `./${path.replace(/\.(?:tsx?|m?js)$/, "")}`;
 
-/** The registry index: every entry, static by default, the train's version, the theme names,
- *  and the component names as a type. */
+/** The registry index: every entry, static by default, the train's version and the target's
+ *  theme attribute, the theme names, and the component names as a type. */
 export const registryIndex = (
     entries: readonly GlueEntry[],
     themes: readonly string[],
     version: string,
+    themeAttribute?: string,
 ): string => {
     const imports = entries
         .filter((entry) => !entry.lazy)
@@ -62,7 +63,9 @@ export const registryIndex = (
         ...(registry.length > 0
             ? ["    {", ...registry, "    },"]
             : ["    {},"]),
-        "    { version },",
+        themeAttribute === undefined
+            ? "    { version },"
+            : `    { version, themeAttribute: ${JSON.stringify(themeAttribute)} },`,
         ");",
         "",
         `export const themes = [${themes.map((theme) => JSON.stringify(theme)).join(", ")}] as const;`,

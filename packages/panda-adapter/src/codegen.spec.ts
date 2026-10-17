@@ -135,6 +135,11 @@ describe("the Panda codegen", () => {
         expect(output.files?.map((file) => file.path)).toEqual(["panda.ts"]);
     });
 
+    it("scopes named themes with Panda's data-panda-theme", async () => {
+        const { output } = await run();
+        expect(output.themeAttribute).toBe("data-panda-theme");
+    });
+
     it("writes the modules it's given, from Panda's outdir", async () => {
         const { files } = await run({ outdir: "src/panda" }, ["icon"]);
         expect(Object.keys(files)).toEqual(["web/icon.ts", "panda.ts"]);

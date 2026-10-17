@@ -24,6 +24,7 @@ export type {
     RegistryOptions,
     StaticEntry,
     StaticEntryName,
+    ThemeAttributes,
 } from "./registry";
 export { joinClasses, tokenStyle, withTokenStyle } from "./tokens";
 export type { TokenVars } from "./tokens";

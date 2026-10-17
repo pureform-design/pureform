@@ -203,6 +203,12 @@ describe("the CSS codegen", () => {
         ]);
     });
 
+    it("scopes named themes with the stylesheet's theme attribute", async () => {
+        expect((await run()).output.themeAttribute).toBe("data-theme");
+        const custom = await run({ themeAttribute: "data-pf-theme" });
+        expect(custom.output.themeAttribute).toBe("data-pf-theme");
+    });
+
     it("writes each slot's classes over the selection, and adds instance tokens", async () => {
         const { files } = await run({ classPrefix: "pf", prefix: "pf" });
         expect(files["web/iconButton.ts"]).toMatchSnapshot();

@@ -96,7 +96,9 @@ ClassFactory<"<name>">`. It imports the component's recipe from its own file
   into `panda.config.ts`'s `staticCss` (it's build time only: the factories import
   `styled-system/`, which Panda writes from this config).
 
-`generate` adds the header, `index.ts` (the registry), and `registry.d.ts` (the types).
+`generate` adds the header, `index.ts` (the registry), and `registry.d.ts` (the types). The
+codegen returns `themeAttribute: "data-panda-theme"` (`THEME_ATTRIBUTE`), the attribute Panda
+scopes themes by, so `registry.themeAttributes("teal")` is `{ "data-panda-theme": "teal" }`.
 
 ## States
 

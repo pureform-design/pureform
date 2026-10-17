@@ -11,7 +11,7 @@ import {
     usesColorScheme,
 } from "@pureform/css-lowering";
 
-import { pandaContext, tokenCurly } from "./options";
+import { THEME_ATTRIBUTE, pandaContext, tokenCurly } from "./options";
 import type { CompileCtx, CompileOptions } from "./options";
 import { compileRecipes } from "./recipes";
 import {
@@ -115,7 +115,7 @@ const themeComponentVars = (config: CoreConfig, ctx: CompileCtx) => {
     for (const [name, override] of Object.entries(config.themes ?? {})) {
         const vars = componentTokenVars(override, ctx);
         if (Object.keys(vars).length > 0) {
-            rules[`[data-panda-theme=${name}]`] = vars;
+            rules[`[${THEME_ATTRIBUTE}=${name}]`] = vars;
         }
     }
     return Object.keys(rules).length > 0 ? rules : undefined;

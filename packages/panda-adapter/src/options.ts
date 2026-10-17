@@ -4,6 +4,9 @@ import type { PortableCondition } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import type { LowerCtx, VarPrefix } from "@pureform/css-lowering";
 
+/** The attribute Panda scopes its themes by: `[data-panda-theme=teal]`. */
+export const THEME_ATTRIBUTE = "data-panda-theme";
+
 export interface CompileOptions {
     /** Preset name. Default `"pureform"`. */
     name?: string;

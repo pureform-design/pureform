@@ -7,6 +7,7 @@ import { defineCodegen } from "@pureform/generate";
 
 import { factoryModule, recipeFile, tokenVars } from "./codegen/factory";
 import { staticCssModule } from "./codegen/static-css";
+import { THEME_ATTRIBUTE } from "./options";
 
 export { factoryModule, recipeFile, tokenVars } from "./codegen/factory";
 export type { FactoryModuleInput } from "./codegen/factory";
@@ -24,7 +25,8 @@ export interface PandaCodegenOptions {
 /** The file `panda.config.ts` imports `staticCss` from, relative to `.pureform/`. */
 export const STATIC_CSS_FILE = "panda.ts";
 
-/** The Panda adapter's codegen: `web/<name>.ts` per component, and `panda.ts`. */
+/** The Panda adapter's codegen: `web/<name>.ts` per component, and `panda.ts`. The registry
+ *  scopes named themes with Panda's own `data-panda-theme`. */
 export const codegen = defineCodegen<PandaCodegenOptions>({
     name: "panda",
     platform: "web",
@@ -59,6 +61,7 @@ export const codegen = defineCodegen<PandaCodegenOptions>({
                     ),
                 },
             ],
+            themeAttribute: THEME_ATTRIBUTE,
         };
     },
 });
