@@ -70,12 +70,16 @@ export interface KeyCase {
     /** The key, in `userEvent.keyboard` syntax: `"{Enter}"`, `" "`. */
     readonly key: string;
     readonly does: KeyEffect;
+    /** The state a change moves to, when it isn't the state's `to`: an arrow key in a radio
+     *  group moves to the radio before or after. */
+    readonly to?: unknown;
     /** Props for this case, over the component's. */
     readonly props?: SceneProps | undefined;
 }
 
 export interface KeyboardCase {
-    /** The element Tab moves focus to. */
+    /** The element Tab moves focus to, and where focus is after each key: a radio group's
+     *  checked radio, which an arrow key moves. */
     focusable(host: HTMLElement): HTMLElement;
     readonly keys: readonly KeyCase[];
     /** Arrow keys by direction. Left out: arrows do nothing in either direction. */

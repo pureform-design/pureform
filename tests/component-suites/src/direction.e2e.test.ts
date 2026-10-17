@@ -39,10 +39,11 @@ const measure = async (
     const scene = mountCase(component, props, { provider: { dir } });
     await harness.settle();
     const root = byTestId(scene.host, component.root);
+    // A part the CSS hides (an icon button's outline unless outlined) has no box to mirror.
     const parts = Object.fromEntries(
-        [...root.querySelectorAll<HTMLElement>("[data-pf-part]")].map(
-            (part) => [part.dataset.pfPart!, part],
-        ),
+        [...root.querySelectorAll<HTMLElement>("[data-pf-part]")]
+            .filter((part) => part.getClientRects().length > 0)
+            .map((part) => [part.dataset.pfPart!, part]),
     );
     const drawn = Object.fromEntries(
         (component.unmirrored ?? []).map((name) => {
