@@ -40,6 +40,30 @@ covers it pureform's own attributes: `data-pf-hover`, `data-pf-active` (a keyboa
 these; a behavior library's attributes, such as Zag's `data-state="checked"` or
 `data-selected`, don't style anything.
 
+## Indication
+
+Every interactive component shows Material's state layer (a tint of its content color while
+hovered, focused, pressed, or dragged) and focus indicator (a ring outside it on keyboard focus),
+from seven component tokens: `stateHoverOpacity`, `stateFocusOpacity`, `statePressedOpacity`,
+`stateDraggedOpacity`, `focusIndicatorThickness`, `focusIndicatorOuterOffset`, and
+`focusIndicatorColor` (`--components-button-stateHoverOpacity`, …). Each defaults to the theme's
+value (the state contract's opacities, its focus indicator's 3px and 2px, and `secondary`), and
+each component's base sets them back to the theme's on its root. So a provider's theme values
+reach every component, and a component's own tokens change it but not a component of the same
+kind nested inside it.
+
+A custom component takes the same tokens with the exported pieces: spread `INDICATION_TOKENS`
+into its tokens and into its root's `tokens`, and draw its state layer with
+`stateLayer(ref, { base, content })`, `ref` being its own token reader.
+
+Each interactive component also declares where it shows indication (its spec's `indication`):
+the slot that takes the interactions, the slot the state layer tints and a ripple fills, whether
+the ripple is centered, and the slot that draws the focus indicator. `@pureform/anatomy` writes
+it into each component's anatomy, and a spec checks that each declared surface draws the state
+layer. The search bar draws a state layer but no indication: its field draws its own indicator.
+A state layer that follows another slot (`slotStateLayer`: the controls, the icon button, the
+FAB, navigation) has no drag state, so their `stateDraggedOpacity` is declared but unread.
+
 ## Reduced motion
 
 Under reduced motion, components stop moving but keep fading: a switch handle, a radio dot, a

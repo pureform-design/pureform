@@ -55,6 +55,13 @@ export const button = defineComponent({
 });
 ```
 
+### Indication
+
+A component spec's `indication` says where it shows Material's state layer, ripple, and focus
+indicator: one `IndicationDeclaration` per interactive surface, `{ trigger, surface, centered,
+focus }`, each a slot (typed recipes check them). `@pureform/anatomy` derives each component's
+`indication` entry from it, so bindings wire every component the same way.
+
 ### State attributes
 
 On the web a state is matched on the native pseudo-class first (`:hover`, `:checked`,
