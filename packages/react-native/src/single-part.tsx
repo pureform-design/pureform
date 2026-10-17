@@ -1,0 +1,247 @@
+// The single-part components: text in a type style, the avatar, the standalone icon, the
+// separator, supporting text, the scrim, and media. Each is one view (or text, or image) in its
+// component's style; they don't move, so they render without the engine's animated views.
+
+import {
+    avatarAnatomy,
+    iconAnatomy,
+    mediaAnatomy,
+    scrimAnatomy,
+    separatorAnatomy,
+    supportingTextAnatomy,
+    textAnatomy,
+} from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
+import {
+    avatarSelection,
+    iconSelection,
+    mediaSelection,
+    scrimSelection,
+    separatorSelection,
+    supportingTextSelection,
+    textSelection,
+} from "@pureform/binding-core";
+import type {
+    AvatarVariantProps,
+    IconVariantProps,
+    MediaVariantProps,
+    ScrimVariantProps,
+    SeparatorVariantProps,
+    SupportingTextVariantProps,
+    TextVariantProps,
+} from "@pureform/binding-core";
+import type { Selected, Style } from "@pureform/rn-adapter/factory";
+import { useTokens } from "@pureform/rn-adapter/react";
+import type { ReactNode } from "react";
+import { Image, Text as NativeText, View } from "react-native";
+import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
+
+import { IconSlot, ownText } from "./icon-style";
+import { testIdOf, withEngine } from "./parts";
+import { useEngine } from "./provider";
+import { useSelectedStyles } from "./styles";
+
+// The one style of a component: under `root` where it has slots, else `""`.
+const rootOf = (selected: Selected): Style =>
+    selected.styles.root ?? selected.styles[""] ?? {};
+const rootDrawing = (selected: Selected) =>
+    selected.drawings.root ?? selected.drawings[""];
+
+type Root = "root";
+
+export interface TextProps extends TextVariantProps {
+    readonly children?: ReactNode;
+    readonly style?: StyleProp<TextStyle>;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+/** Text in a type style: `<Text textStyle="titleLarge">Inbox</Text>`. Nothing inherits on React
+ *  Native, so it takes the surface's text color unless its style says otherwise. */
+export function Text(props: TextProps): ReactNode {
+    const selected = useSelectedStyles("text", textSelection(props));
+    const tokens = useTokens();
+    return (
+        <NativeText
+            style={[
+                { color: String(tokens["colors.onSurface"]) },
+                rootOf(selected) as TextStyle,
+                props.style,
+            ]}
+            testID={testIdOf(textAnatomy, "root", props.testId)}
+        >
+            {props.children}
+        </NativeText>
+    );
+}
+
+export interface AvatarProps extends AvatarVariantProps {
+    /** Who it stands for, for assistive technology. */
+    readonly label?: string | undefined;
+    /** Initials, or anything else to show. */
+    readonly children?: ReactNode;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+function AvatarImpl(props: AvatarProps): ReactNode {
+    const engine = useEngine();
+    const selected = useSelectedStyles("avatar", avatarSelection(props));
+    const style = rootOf(selected);
+    const Drawing = engine.Drawing;
+    return (
+        <View
+            role="img"
+            {...(props.label === undefined
+                ? {}
+                : { "aria-label": props.label })}
+            style={style as ViewStyle}
+            testID={testIdOf(avatarAnatomy, "root", props.testId)}
+        >
+            {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
+            <NativeText style={ownText(style) as TextStyle}>
+                {props.children}
+            </NativeText>
+        </View>
+    );
+}
+
+/** Material's avatar, in its shape: `<Avatar label="Ada Lovelace">AL</Avatar>`. */
+export const Avatar = withEngine(AvatarImpl, "Avatar");
+
+export interface IconProps extends IconVariantProps {
+    /** The icon's name for assistive technology; without it, the icon is decorative. */
+    readonly label?: string | undefined;
+    /** Flips a pointing icon under right to left. */
+    readonly mirror?: boolean | undefined;
+    /** The icon: anything reading `useIconStyle()`, or a `Glyph`. */
+    readonly children?: ReactNode;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+/** A standalone icon in Material's sizes and colors: `<Icon label="Star"><Glyph glyph="★" />
+ *  </Icon>`. Without a color, it takes the surface's text color. */
+export function Icon(props: IconProps): ReactNode {
+    const selected = useSelectedStyles(
+        "icon",
+        iconSelection(props),
+        props.mirror ? { mirrored: true } : {},
+    );
+    const tokens = useTokens();
+    const own = rootOf(selected);
+    const style = { color: String(tokens["colors.onSurface"]), ...own };
+    return (
+        <View
+            {...(props.label === undefined
+                ? { "aria-hidden": true }
+                : { role: "img", "aria-label": props.label })}
+            style={own as ViewStyle}
+            testID={testIdOf(iconAnatomy, "root", props.testId)}
+        >
+            <IconSlot
+                style={style}
+                iconFill={selected.iconFills.root ?? selected.iconFills[""]}
+                motion={style}
+            >
+                {props.children}
+            </IconSlot>
+        </View>
+    );
+}
+
+export interface SeparatorProps extends SeparatorVariantProps {
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+/** Material's divider: `<Separator inset="start" />`. */
+export function Separator(props: SeparatorProps): ReactNode {
+    const selected = useSelectedStyles("separator", separatorSelection(props));
+    return (
+        <View
+            role="separator"
+            style={rootOf(selected) as ViewStyle}
+            testID={testIdOf(separatorAnatomy, "root", props.testId)}
+        />
+    );
+}
+
+export interface SupportingTextProps extends SupportingTextVariantProps {
+    readonly children?: ReactNode;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+/** Text under a control, in a tone: `<SupportingText tone="error">…</SupportingText>`. */
+export function SupportingText(props: SupportingTextProps): ReactNode {
+    const selected = useSelectedStyles(
+        "supportingText",
+        supportingTextSelection(props),
+    );
+    return (
+        <NativeText
+            style={rootOf(selected) as TextStyle}
+            testID={testIdOf(supportingTextAnatomy, "root", props.testId)}
+        >
+            {props.children}
+        </NativeText>
+    );
+}
+
+export interface ScrimProps extends ScrimVariantProps {
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+/** A layer dimming what sits behind it, over the whole of its parent. */
+export function Scrim(props: ScrimProps): ReactNode {
+    const selected = useSelectedStyles("scrim", scrimSelection(props));
+    return (
+        <View
+            pointerEvents="none"
+            style={rootOf(selected) as ViewStyle}
+            testID={testIdOf(scrimAnatomy, "root", props.testId)}
+        />
+    );
+}
+
+export interface MediaProps extends MediaVariantProps {
+    /** The picture. */
+    readonly source: { readonly uri: string };
+    /** What it shows, for assistive technology; empty when decorative. */
+    readonly alt?: string | undefined;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+function MediaImpl(props: MediaProps): ReactNode {
+    const engine = useEngine();
+    const selected = useSelectedStyles("media", mediaSelection(props));
+    const { objectFit, ...style } = rootOf(selected);
+    const fit = objectFit === "contain" ? "contain" : "cover";
+    const drawing = rootDrawing(selected);
+    const testID = testIdOf(mediaAnatomy, "root", props.testId);
+    const Drawing = engine.Drawing;
+    // A shaped picture is drawn clipped to its shape; React Native's Image can't clip to one.
+    if (drawing && Drawing) {
+        return (
+            <View
+                role="img"
+                aria-label={props.alt ?? ""}
+                style={style as ViewStyle}
+                testID={testID}
+            >
+                <Drawing
+                    drawing={drawing}
+                    image={{ uri: props.source.uri, fit }}
+                />
+            </View>
+        );
+    }
+    return (
+        <Image
+            source={{ uri: props.source.uri }}
+            accessibilityLabel={props.alt ?? ""}
+            resizeMode={fit}
+            style={style as ImageStyle}
+            testID={testID}
+        />
+    );
+}
+
+/** A picture in Material's aspects and shapes: `<Media source={{ uri }} aspect="square" />`. */
+export const Media = withEngine(MediaImpl, "Media");

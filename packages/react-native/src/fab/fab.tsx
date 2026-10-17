@@ -1,0 +1,100 @@
+// The floating action button: a pressable root with its touch target, a container (drawn in its
+// shape with SVG) holding the icon, and the label of an extended FAB.
+
+import { fabAnatomy } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
+import { fabSelection } from "@pureform/binding-core";
+import type {
+    FabContentProps,
+    FabPart,
+    FabVariantProps,
+} from "@pureform/binding-core";
+import type { ReactNode } from "react";
+
+import { IconSlot, iconSlot } from "../icon-style";
+import {
+    testIdOf,
+    unselectable,
+    useInk,
+    usePress,
+    withEngine,
+    withInk,
+} from "../parts";
+import { useEngine } from "../provider";
+import { useComponentSlots } from "../styles";
+
+export interface FabProps extends FabVariantProps, FabContentProps<ReactNode> {
+    /** What the button does, for assistive technology; the label's text by default. */
+    readonly "aria-label"?: string | undefined;
+    readonly disabled?: boolean | undefined;
+    readonly onPress?: (() => void) | undefined;
+    readonly testId?: TestIdOverride<FabPart> | undefined;
+}
+
+const present = (node: ReactNode) => node != null && node !== false;
+
+function FabImpl(props: FabProps): ReactNode {
+    const engine = useEngine();
+    const { state, handlers } = usePress({
+        ...(props.disabled ? { disabled: true } : {}),
+        ...(props.mirrorIcon ? { mirrored: true } : {}),
+    });
+    const { styles: s, selected } = useComponentSlots(
+        "fab",
+        fabSelection({
+            ...props,
+            extended: props.extended ?? present(props.label),
+        }),
+        state,
+    );
+    const ink = useInk(selected, {
+        slot: "container",
+        disabled: props.disabled ?? false,
+    });
+    const Drawing = engine.Drawing;
+    const id = (part: FabPart) => testIdOf(fabAnatomy, part, props.testId);
+    const label =
+        props["aria-label"] ??
+        (typeof props.label === "string" ? props.label : undefined);
+    return (
+        <engine.Pressable
+            {...withInk(handlers, ink)}
+            role="button"
+            {...(label === undefined ? {} : { "aria-label": label })}
+            disabled={props.disabled}
+            onPress={props.onPress}
+            style={{ ...s.root, ...unselectable }}
+            testID={id("root")}
+        >
+            <engine.View
+                pointerEvents="none"
+                style={s.touchTarget}
+                testID={id("touchTarget")}
+            />
+            <engine.View style={s.container} testID={id("container")}>
+                {Drawing ? (
+                    <Drawing drawing={selected.drawings.container} />
+                ) : null}
+                <engine.View style={s.icon} testID={id("icon")}>
+                    <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
+                        {props.icon}
+                    </IconSlot>
+                </engine.View>
+                {present(props.label) ? (
+                    <engine.Text
+                        selectable={false}
+                        style={s.label}
+                        testID={id("label")}
+                    >
+                        {props.label}
+                    </engine.Text>
+                ) : null}
+                {ink.layer}
+            </engine.View>
+        </engine.Pressable>
+    );
+}
+
+/** Material's floating action button: `<Fab icon={<Glyph glyph="+" />} aria-label="New" />`,
+ *  extended with a `label`. */
+export const Fab = withEngine(FabImpl, "Fab");
