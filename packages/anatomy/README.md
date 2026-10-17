@@ -155,6 +155,15 @@ by the scrim's entry (`name: "scrim"`) under the dialog's scope (`pf-dialog-back
 ids are in `compositeTestIds.menu`, `.tooltip`, `.dialog`, `.dialogBackdrop`; the snackbar uses
 its generated anatomy as is.
 
+**The tabs** (`tabsCompositeAnatomy`) are the same idea: an unstyled `root` (`pf-tabs-root`, Zag's
+root) around the tab list and the panels. The preset's `root` slot is the tab list, so its part
+is `list` (`data-pf-part="list"`, `pf-tabs-list`, `slot: "root"`), holding `tab`, `icon`,
+`label`, and `indicator` as the preset has them; each panel is an unstyled `content`
+(`pf-tabs-content`). **The list** (`listAnatomy`) is the preset-less `<ul>` around list items:
+`root` (`pf-list-root`) and `item` (`pf-list-item`, the `<li>` around each list item), both
+unstyled. Their test ids are in `compositeTestIds.tabs` and `.list`. The navigation bar and rail
+and the list item use their generated anatomies as they are.
+
 ## Building and testing
 
 - `task_run` `build` and `test:unit` on `@pureform/anatomy`.
