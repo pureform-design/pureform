@@ -211,6 +211,8 @@
         "unplugin": "catalog:",
       },
       "devDependencies": {
+        "@pureform/css-adapter": "catalog:",
+        "@pureform/preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
