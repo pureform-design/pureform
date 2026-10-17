@@ -12,7 +12,10 @@ export const COMPONENT_NAMES = [
     "Fab",
     "IconButton",
     "RadioGroup",
+    "Select",
     "Switch",
+    "TextArea",
+    "TextField",
 ] as const;
 
 export type ComponentName = (typeof COMPONENT_NAMES)[number];

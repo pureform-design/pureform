@@ -27,12 +27,19 @@ export interface ActOptions {
 }
 
 /** The native element a component submits, disables, and validates with. */
-export type FormControl = HTMLInputElement | HTMLButtonElement;
+export type FormControl =
+    | HTMLInputElement
+    | HTMLButtonElement
+    | HTMLTextAreaElement
+    | HTMLSelectElement;
 
 /** How the component takes part in a native form (design doc §9.5). */
 export interface FormCase {
     /** The native element the browser treats as the form control. */
     control(host: HTMLElement): FormControl;
+    /** The element assistive technology reads, which carries `aria-invalid`, when it isn't
+     *  `control`: a select's combobox, over its hidden native select. */
+    aria?(host: HTMLElement): HTMLElement;
     /** Whether the machine shows the component disabled (`data-disabled`, `aria-disabled`). */
     disabled(host: HTMLElement): boolean;
     /** Props under which it submits, and the entries it adds to the form's data. */

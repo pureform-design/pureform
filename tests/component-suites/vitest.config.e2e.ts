@@ -55,6 +55,7 @@ const machines = (from: string): string[] =>
         "core",
         "dom-query",
         "radio-group",
+        "select",
         "switch",
         "types",
         "utils",

@@ -5,7 +5,7 @@
 // component must respond. Controlled and default state render on the server.
 
 import { themeScope } from "@pureform/styling";
-import { describe, expect, it, vi } from "vitest";
+import { afterAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -17,6 +17,10 @@ import { hostIn, stateNames, watchConsole } from "./harness/page";
 import type { Scene, SceneProps } from "./harness/scene";
 import { applyHead, renderOnServer } from "./harness/server";
 import { countedSeedTheme, generated } from "./harness/themes";
+
+// The emulated scheme belongs to the page, which later test files reuse: put it back, or a file
+// that reads the page's colors (axe's contrast) runs in the dark scheme.
+afterAll(() => commands.emulateColorScheme("light"));
 
 /** Every element under `host` with its attributes, in document order. */
 const snapshot = (host: HTMLElement) =>
