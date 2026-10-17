@@ -19,6 +19,7 @@ import type {
     DurationRole,
     EasingRole,
     ElevationProvider,
+    FocusIndicatorRole,
     LayoutProvider,
     MotionProvider,
     ShapeProvider,
@@ -181,9 +182,17 @@ export const MATERIAL_OPACITIES: Record<StateRole, number> = {
     scrim: 32,
 };
 
-/** Material's state opacities. `opacities` changes or adds opacities, in percent. */
+/** Material's focus indicator, in px: a 3px ring, 2px outside the focused element. */
+export const MATERIAL_FOCUS_INDICATOR: Record<FocusIndicatorRole, number> = {
+    focusIndicatorThickness: 3,
+    focusIndicatorOuterOffset: 2,
+};
+
+/** Material's state opacities and focus indicator. `opacities` changes or adds opacities, in
+ *  percent; `focusIndicator` changes the focus indicator's lengths, in px. */
 export const materialState = (
     opacities: Partial<Record<StateRole, number>> & Record<string, number> = {},
+    focusIndicator: Partial<Record<FocusIndicatorRole, number>> = {},
 ): StateProvider =>
     defineProvider({
         domain: "state",
@@ -194,6 +203,12 @@ export const materialState = (
                     ([name, value]) => [name, pct(value)],
                 ),
             ) as Record<StateRole, NumericScalarNode>,
+            focusIndicator: Object.fromEntries(
+                Object.entries({
+                    ...MATERIAL_FOCUS_INDICATOR,
+                    ...focusIndicator,
+                }).map(([name, value]) => [name, px(value)]),
+            ) as Record<FocusIndicatorRole, NumericScalarNode>,
         }),
     });
 

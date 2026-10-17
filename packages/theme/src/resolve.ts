@@ -28,6 +28,7 @@ import {
     DURATION_ROLES,
     EASING_ROLES,
     ELEVATION_LEVELS,
+    FOCUS_INDICATOR_ROLES,
     SHAPE_ROLES,
     SIZE_ROLES,
     SPACING_STEPS,
@@ -438,6 +439,18 @@ export const resolveTheme = <
     const state = step("state", providers.state, (c, where) => {
         requireNames(where, "opacity", c.opacities, STATE_ROLES);
         requireKind(where, "opacity", c.opacities, KINDS.percent);
+        requireNames(
+            where,
+            "focus indicator length",
+            c.focusIndicator,
+            FOCUS_INDICATOR_ROLES,
+        );
+        requireKind(
+            where,
+            "focus indicator length",
+            c.focusIndicator,
+            KINDS.length,
+        );
     });
     const motion = step("motion", providers.motion, (c, where) => {
         requireNames(where, "duration", c.durations, DURATION_ROLES);
@@ -458,7 +471,7 @@ export const resolveTheme = <
             colors: color.primitives ?? {},
             radii: shape.radii,
             spacing: layout.spacing,
-            sizes: layout.sizes,
+            sizes: { ...layout.sizes, ...state.focusIndicator },
             opacity: state.opacities,
         },
         semanticTokens: { colors: color.roles },

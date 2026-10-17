@@ -45,6 +45,7 @@ describe("resolveTheme", () => {
         expect(config.tokens.spacing?.["4"]).toEqual(px(16));
         expect(config.tokens.sizes?.touchTarget).toEqual(px(40));
         expect(config.tokens.opacity?.stateDragged).toEqual(pct(10));
+        expect(config.tokens.sizes?.focusIndicatorThickness).toEqual(px(3));
         expect(config.durations?.medium2).toEqual(numeric(200, "ms"));
         expect(config.easings?.emphasized).toBeDefined();
         expect(config.fonts?.brand).toEqual(fontFamily(["Fraunces"], "serif"));
@@ -205,6 +206,7 @@ describe("resolveTheme", () => {
         bad(
             {
                 state: stateFromTokens({
+                    ...theme.state.generate({} as never),
                     opacities: {
                         ...theme.state.generate({} as never).opacities,
                         stateHover: px(8),

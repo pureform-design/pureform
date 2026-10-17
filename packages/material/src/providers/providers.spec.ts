@@ -101,7 +101,10 @@ describe("Material providers", () => {
             ...material(),
             shape: materialShape({ medium: 10, pill: 999 }),
             layout: materialLayout({ grid: 5, sizes: { touchTarget: 44 } }),
-            state: materialState({ stateHover: 6 }),
+            state: materialState(
+                { stateHover: 6 },
+                { focusIndicatorThickness: 4 },
+            ),
             motion: materialMotion({
                 durations: { medium2: 200 },
                 easings: { bounce: cubicBezier([0.3, 1.5, 0.6, 1]) },
@@ -112,6 +115,15 @@ describe("Material providers", () => {
         expect(theme.layout.spacing["4"]).toEqual(px(20));
         expect(theme.layout.sizes.touchTarget).toEqual(px(44));
         expect(theme.state.opacities.stateHover).toEqual(pct(6));
+        expect(theme.state.focusIndicator.focusIndicatorThickness).toEqual(
+            px(4),
+        );
+        expect(theme.state.focusIndicator.focusIndicatorOuterOffset).toEqual(
+            px(2),
+        );
+        expect(theme.config.tokens.sizes.focusIndicatorThickness).toEqual(
+            px(4),
+        );
         expect(theme.motion.durations.medium2).toEqual(numeric(200, "ms"));
         expect(theme.motion.easings.bounce).toBeDefined();
     });
