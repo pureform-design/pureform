@@ -2,6 +2,8 @@ node_modules
 .turbo
 coverage
 dist
+# Vitest browser mode's attachments, such as failure screenshots
+.vitest
 # Machine-specific settings, such as CHROMIUM_PATH for the browser tests
 .env.local
 .env.*.local
