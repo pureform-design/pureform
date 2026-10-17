@@ -26,6 +26,17 @@
                 "development": "./src/dom.ts",
                 "default": "./dist/dom.mjs"
             }
+        },
+        "./usage": {
+            "types": "./dist/usage.d.ts",
+            "import": {
+                "development": "./src/usage.ts",
+                "default": "./dist/usage.mjs"
+            },
+            "require": {
+                "development": "./src/usage.ts",
+                "default": "./dist/usage.mjs"
+            }
         }
     },
     "dependencies": {
