@@ -27,7 +27,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFormReset } from "../form";
-import { ownInteractionSource } from "../interaction";
+import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -70,10 +70,10 @@ function Root(props: SliderRootProps): JSX.Element {
         undefined,
         { ownedWrite: true },
     );
-    const interaction = ownInteractionSource();
+    const source = useOwnInteractionSource(() => props.interactionSource);
     const service = useMachine(slider.machine, () => ({
         id,
-        ...interaction,
+        interactionSource: source(),
         dir: dir(),
         ...sliderMachineProps(props),
         ...value.machineProps(),
@@ -94,6 +94,8 @@ function Root(props: SliderRootProps): JSX.Element {
         selection: () => sliderSelection(props, api().percent),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
     });
     return (
         <context.Provider value={{ scope, api, setInput }}>

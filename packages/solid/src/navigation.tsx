@@ -25,6 +25,7 @@ import type {
     NavigationItemOwnProps,
     NavigationRootOwnProps,
 } from "@pureform/binding-core";
+import type { InteractionSource } from "@pureform/binding-core/interaction";
 import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -39,6 +40,7 @@ import {
 
 import { useControllable } from "./controllable";
 import { itemInteractionSources } from "./interaction";
+import type { ItemInteractionSources } from "./interaction";
 import { normalizeProps, useMachine } from "./internal/zag";
 import type { PropTypes } from "./internal/zag";
 import { createPartContext } from "./part-context";
@@ -54,11 +56,13 @@ type Anatomy = typeof navigationBarAnatomy | typeof navigationRailAnatomy;
 interface NavigationContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<navigation.Api<PropTypes>>;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What a destination shares with its parts. */
 interface ItemContextValue {
     readonly value: Accessor<string>;
+    readonly source: Accessor<InteractionSource | undefined>;
 }
 
 /** Root's props, for the component `C`: the variants and tokens, the machine's props (`value`,
@@ -115,10 +119,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
             "value",
             props,
         );
-        const interaction = itemInteractionSources();
+        const sources = itemInteractionSources();
         const service = useMachine(navigation.machine, () => ({
             id,
-            ...interaction,
+            ...sources.machineProps,
             dir: dir(),
             ...navigationMachineProps(props),
             ...value.machineProps(),
@@ -131,9 +135,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
                 navigationSelection(props) as Selection<Anatomy["name"]>,
             testId: () => props.testId,
             unstyled: () => props.unstyled,
+            indication: () => props.indication,
         });
         return (
-            <context.Provider value={{ scope, api }}>
+            <context.Provider value={{ scope, api, sources }}>
                 {scope.render("root", {
                     element: "nav",
                     as: () => props.as,
@@ -147,12 +152,17 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** A destination: a link with an `href`, else a button. The current one is marked with
      *  `aria-current`. */
     function Item(props: NavigationItemProps): JSX.Element {
-        const { scope, api } = context.use("Item");
+        const { scope, api, sources } = context.use("Item");
         const item = () => navigationItemMachineProps(props);
+        const source = sources.item(
+            () => props.value,
+            () => props.interactionSource,
+        );
         return (
-            <itemContext.Provider value={{ value: () => props.value }}>
+            <itemContext.Provider value={{ value: () => props.value, source }}>
                 {scope.render("item", {
                     element: navigationItemElement(props),
+                    interactionSource: source,
                     machine: () =>
                         combinePartProps([
                             api().getItemProps(item()) as Readonly<
@@ -173,9 +183,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The pill behind the icon, which takes the state layer. */
     function Indicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("Indicator");
-        itemContext.use("Indicator");
+        const { source } = itemContext.use("Indicator");
         return scope.render("indicator", {
             element: "span",
+            interactionSource: source,
             unstyled: () => props.unstyled,
             props: omit(props, "unstyled"),
         });
@@ -247,6 +258,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
                             value={item().value}
                             href={item().href}
                             disabled={item().disabled}
+                            interactionSource={item().interactionSource}
                             {...slot("item")}
                         >
                             <Indicator {...slot("indicator")}>

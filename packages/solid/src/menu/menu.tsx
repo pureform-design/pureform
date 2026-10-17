@@ -14,6 +14,7 @@ import {
     overlayPositionerProps,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     MenuContentProps,
     MenuItem,
     MenuRootOwnProps,
@@ -32,6 +33,7 @@ import {
 import { Button } from "../button";
 import { useControllable } from "../controllable";
 import { itemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -46,6 +48,7 @@ type Anatomy = typeof menuOverlayAnatomy;
 interface MenuContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<menu.Api<PropTypes>>;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What an item shares with its parts. */
@@ -82,7 +85,7 @@ export interface MenuIconProps extends MenuPartProps {
 }
 
 /** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`) and a part's. */
-export interface MenuItemProps extends MenuPartProps {
+export interface MenuItemProps extends MenuPartProps, InteractionSourceProps {
     readonly value: string;
     /** The text typeahead matches, when the label isn't plain text. */
     readonly valueText?: string | undefined;
@@ -90,17 +93,23 @@ export interface MenuItemProps extends MenuPartProps {
     readonly closeOnSelect?: boolean | undefined;
 }
 
-const ITEM_PROPS = ["value", "valueText", "disabled", "closeOnSelect"] as const;
+const ITEM_PROPS = [
+    "value",
+    "valueText",
+    "disabled",
+    "closeOnSelect",
+    "interactionSource",
+] as const;
 
 /** The menu's root, a `<div>` around the trigger and the menu. The registry doesn't style it. */
 function Root(props: MenuRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
     const open = useControllable<"open", boolean>("Menu", "open", props);
-    const interaction = itemInteractionSources();
+    const sources = itemInteractionSources();
     const service = useMachine(menu.machine, () => ({
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir: dir(),
         ...menuMachineProps(props),
         ...open.machineProps(),
@@ -110,9 +119,10 @@ function Root(props: MenuRootProps): JSX.Element {
         selection: () => menuSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
     });
     return (
-        <context.Provider value={{ scope, api }}>
+        <context.Provider value={{ scope, api, sources }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -160,7 +170,11 @@ function Content(props: MenuPartProps): JSX.Element {
 
 /** An item; the highlighted one shows the hover state. */
 function Item(props: MenuItemProps): JSX.Element {
-    const { scope, api } = context.use("Item");
+    const { scope, api, sources } = context.use("Item");
+    const source = sources.item(
+        () => props.value,
+        () => props.interactionSource,
+    );
     const item = () => ({
         value: props.value,
         valueText: props.valueText,
@@ -171,6 +185,7 @@ function Item(props: MenuItemProps): JSX.Element {
         <itemContext.Provider value={{ value: () => props.value }}>
             {scope.render("item", {
                 element: "div",
+                interactionSource: source,
                 machine: () => api().getItemProps(item()),
                 states: () => ({
                     hover: api().getItemState(item()).highlighted,

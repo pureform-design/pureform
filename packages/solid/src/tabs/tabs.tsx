@@ -17,6 +17,7 @@ import {
     tabsTriggerProps,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     TabsContentProps,
     TabsItem,
     TabsRootOwnProps,
@@ -35,6 +36,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { itemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -50,6 +52,7 @@ interface TabsContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<tabs.Api<PropTypes>>;
     readonly disabled: Accessor<boolean | undefined>;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What a tab shares with its parts. */
@@ -79,7 +82,7 @@ export interface TabsIconProps extends TabsPartProps {
 }
 
 /** A tab's props: its value, `disabled`, and a part's. */
-export interface TabsTabProps extends TabsPartProps {
+export interface TabsTabProps extends TabsPartProps, InteractionSourceProps {
     readonly value: string;
     readonly disabled?: boolean | undefined;
     /** Whether the tab names its panel (`Tabs.Content` with its value) in `aria-controls`. Turn
@@ -101,10 +104,10 @@ function Root(props: TabsRootProps): JSX.Element {
         "value",
         props,
     );
-    const interaction = itemInteractionSources();
+    const sources = itemInteractionSources();
     const service = useMachine(tabs.machine, () => ({
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir: dir(),
         ...tabsMachineProps(props),
         ...value.machineProps(),
@@ -114,10 +117,11 @@ function Root(props: TabsRootProps): JSX.Element {
         selection: () => tabsSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
     });
     return (
         <context.Provider
-            value={{ scope, api, disabled: () => props.disabled }}
+            value={{ scope, api, disabled: () => props.disabled, sources }}
         >
             {scope.render("root", {
                 element: "div",
@@ -143,18 +147,30 @@ function List(props: TabsPartProps): JSX.Element {
 /** A tab: a button, selected with a click or the arrow keys. Only the selected tab takes focus
  *  from Tab. */
 function Tab(props: TabsTabProps): JSX.Element {
-    const { scope, api, disabled } = context.use("Tab");
+    const { scope, api, disabled, sources } = context.use("Tab");
     const item = () => tabsItemProps(props, disabled());
+    const source = sources.item(
+        () => props.value,
+        () => props.interactionSource,
+    );
     return (
         <tabContext.Provider value={{ value: () => props.value }}>
             {scope.render("tab", {
                 element: "button",
+                interactionSource: source,
                 machine: () =>
                     tabsTriggerProps(api().getTriggerProps(item()), {
                         controls: props.controls ?? true,
                     }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "value", "disabled", "controls"),
+                props: omit(
+                    props,
+                    "unstyled",
+                    "value",
+                    "disabled",
+                    "controls",
+                    "interactionSource",
+                ),
             })}
         </tabContext.Provider>
     );
@@ -250,6 +266,7 @@ function ReadyMade(props: TabsProps): JSX.Element {
                         <Tab
                             value={item().value}
                             disabled={item().disabled}
+                            interactionSource={item().interactionSource}
                             controls={panels()}
                             {...slot("tab")}
                         >

@@ -17,6 +17,7 @@ import type {
     MotionSetting,
     ProviderOptions,
     ProviderState,
+    ThemeOverrides,
 } from "@pureform/binding-core";
 import {
     THEME_BLOCK_ATTRIBUTE,
@@ -29,6 +30,8 @@ import {
     unloadedThemeMessage,
 } from "@pureform/binding-core/dom";
 import type { ThemeBlock } from "@pureform/binding-core/dom";
+import { providerIndicationOverrides } from "@pureform/binding-core/indication";
+import type { Indication } from "@pureform/binding-core/indication";
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import type { ThemeSchemeVars } from "@pureform/styling";
 import { isDev, isServer, useHead } from "@solidjs/web";
@@ -74,12 +77,14 @@ const OPTIONS = [
     "theme",
     "overrides",
     "hydrate",
+    "indication",
 ] as const;
 
 /** Provides the registry and the settings components read, over the nearest provider's. A
  *  `theme` is a named theme from the config or a runtime theme, scoped by the target's attribute
  *  on the provider's element; a runtime theme's vars go in one `<style>` block in the head
- *  (`useHead`, keyed by the theme's scope), and `overrides` in the element's `style`. */
+ *  (`useHead`, keyed by the theme's scope), and `overrides` in the element's `style`, with the
+ *  theme-level tokens of its `indication` under them. */
 export function PureformProvider(props: PureformProviderProps): JSX.Element {
     const parent = useContext(PureformContext);
     const parentVars = useContext(ThemeVarsContext);
@@ -95,6 +100,7 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
                 theme: props.theme,
                 overrides: props.overrides,
                 hydrate: props.hydrate,
+                indication: props.indication,
             },
             mergePartProps,
         ),
@@ -126,7 +132,13 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
                     {...attributes()}
                     style={mergeStyles([
                         { display: "contents" },
-                        overrideVars(props.overrides, state().registry),
+                        overrideVars(
+                            withIndicationOverrides(
+                                props.indication,
+                                props.overrides,
+                            ),
+                            state().registry,
+                        ),
                         props.style,
                     ])}
                 >
@@ -136,6 +148,15 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
         </PureformContext>
     );
 }
+
+// The provider's own indication's theme-level tokens, under its own overrides.
+const withIndicationOverrides = (
+    indication: Indication | undefined,
+    overrides: ThemeOverrides | undefined,
+): ThemeOverrides | undefined => {
+    const tokens = providerIndicationOverrides(indication);
+    return tokens ? { ...tokens, ...overrides } : overrides;
+};
 
 // A runtime theme's block: generated on the server, kept or generated again while hydrating, and
 // generated after its generator loads when the theme changes. Written to the head with `useHead`,

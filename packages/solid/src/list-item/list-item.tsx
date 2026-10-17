@@ -12,6 +12,7 @@ import {
     listItemLines,
     listItemRootProps,
     listItemSelection,
+    isInteractiveListItem,
     listItemVariants,
 } from "@pureform/binding-core";
 import type {
@@ -29,9 +30,14 @@ import {
     useContext,
 } from "solid-js";
 
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 
 type Anatomy = typeof listItemAnatomy;
@@ -76,18 +82,34 @@ function Root(props: ListItemRootProps): JSX.Element {
     const element = createMemo(() =>
         listItemElement<ValidComponent>({ href: props.href, as: props.as }),
     );
+    const interactive = () =>
+        isInteractiveListItem(listItemVariants(list?.(), props), element());
+    const source = useOwnInteractionSource(() => props.interactionSource);
+    const handlers = useInteractionHandlers(
+        source,
+        () => !interactive() || !!props.disabled,
+    );
     const scope = useComponent(listItemAnatomy, {
         selection: () =>
             listItemSelection(listItemVariants(list?.(), props), element()),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
+        interactionSource: source,
+        interactive,
     });
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element: "div",
                 as: () => (element() === "div" ? undefined : element()),
-                machine: () => listItemRootProps(props, element()),
+                machine: () =>
+                    interactive()
+                        ? combinePartProps([
+                              listItemRootProps(props, element()),
+                              handlers(),
+                          ])
+                        : listItemRootProps(props, element()),
                 props: omit(props, "as", ...LIST_ITEM_ROOT_PROPS),
             })}
         </context.Provider>

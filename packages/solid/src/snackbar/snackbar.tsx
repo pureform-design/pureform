@@ -12,6 +12,7 @@ import {
     snackbarSelection,
 } from "@pureform/binding-core";
 import type {
+    InteractionSourceProps,
     SnackbarContentProps,
     SnackbarOpenChangeDetails,
     SnackbarRootOwnProps,
@@ -27,11 +28,16 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -78,6 +84,7 @@ function Root(props: SnackbarRootProps): JSX.Element {
         selection: () => snackbarSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication: () => props.indication,
     });
     return (
         <context.Provider value={{ scope, api }}>
@@ -102,27 +109,38 @@ function SupportingText(props: SnackbarPartProps): JSX.Element {
     });
 }
 
+/** A button's props: a part's, and the interaction source its presses are emitted to. */
+export interface SnackbarButtonProps
+    extends SnackbarPartProps, InteractionSourceProps {}
+
+// The action and the close button, each a surface with its own source.
+const snackbarButton = (part: "action" | "close", name: string) =>
+    function SnackbarButton(props: SnackbarButtonProps): JSX.Element {
+        const { scope, api } = context.use(name);
+        const source = useOwnInteractionSource(() => props.interactionSource);
+        const handlers = useInteractionHandlers(source, () => false);
+        return scope.render(part, {
+            element: "button",
+            interactionSource: source,
+            machine: () =>
+                combinePartProps([
+                    (part === "action"
+                        ? api().getActionProps()
+                        : api().getCloseProps()) as Readonly<
+                        Record<string, unknown>
+                    >,
+                    handlers(),
+                ]),
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled", "interactionSource"),
+        });
+    };
+
 /** The action, a text button: it calls `onAction`, then the snackbar asks to close. */
-function Action(props: SnackbarPartProps): JSX.Element {
-    const { scope, api } = context.use("Action");
-    return scope.render("action", {
-        element: "button",
-        machine: () => api().getActionProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const Action = snackbarButton("action", "Action");
 
 /** The close button, an icon button: name it with `aria-label`. */
-function Close(props: SnackbarPartProps): JSX.Element {
-    const { scope, api } = context.use("Close");
-    return scope.render("close", {
-        element: "button",
-        machine: () => api().getCloseProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const Close = snackbarButton("close", "Close");
 
 /** The cross the ready-made close button shows unless given another icon. */
 const CloseIcon = (): JSX.Element => (

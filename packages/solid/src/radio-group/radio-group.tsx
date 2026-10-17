@@ -31,6 +31,7 @@ import {
     setRadioDefaults,
     syncRadioInputs,
 } from "@pureform/binding-core/dom";
+import type { Indication } from "@pureform/binding-core/indication";
 import * as radioGroup from "@pureform/machines/radio-group";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -47,6 +48,7 @@ import {
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { itemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -63,6 +65,9 @@ interface RadioGroupContextValue {
     readonly variants: Accessor<RadioVariantProps>;
     /** The group's element, whose radios a controlled click puts back. */
     readonly root: Accessor<HTMLElement | undefined>;
+    readonly sources: ItemInteractionSources;
+    /** The group's indication, every radio's. */
+    readonly indication: Accessor<Indication | undefined>;
 }
 
 /** What a radio shares with its parts. */
@@ -108,10 +113,10 @@ function Root(props: RadioGroupRootProps): JSX.Element {
         ownedWrite: true,
     });
     const fieldsetDisabled = useFieldsetDisabled(root);
-    const interaction = itemInteractionSources();
+    const sources = itemInteractionSources();
     const service = useMachine(radioGroup.machine, () => ({
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir: dir(),
         ...radioGroupMachineProps(props, fieldsetDisabled()),
         ...value.machineProps(),
@@ -146,6 +151,8 @@ function Root(props: RadioGroupRootProps): JSX.Element {
                     tokens: props.tokens,
                 }),
                 root,
+                sources,
+                indication: () => props.indication,
             }}
         >
             {scope.render("root", {
@@ -161,7 +168,11 @@ function Root(props: RadioGroupRootProps): JSX.Element {
 
 /** A radio: a `<label>` around its native radio, so its touch target checks it. */
 function Item(props: RadioGroupItemProps): JSX.Element {
-    const { api, variants } = groupContext.use("Item");
+    const { api, variants, sources, indication } = groupContext.use("Item");
+    const source = sources.item(
+        () => props.value,
+        () => props.interactionSource,
+    );
     const item = () => ({
         value: props.value,
         disabled: props.disabled,
@@ -171,6 +182,8 @@ function Item(props: RadioGroupItemProps): JSX.Element {
         selection: () => radioSelection(variants(), props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
+        indication,
+        interactionSource: source,
     });
     return (
         <itemContext.Provider value={{ scope, item }}>
@@ -279,6 +292,7 @@ function ReadyMade(props: RadioGroupProps): JSX.Element {
                         disabled={item().disabled}
                         invalid={item().invalid}
                         testId={item().testId}
+                        interactionSource={item().interactionSource}
                         unstyled={props.unstyled}
                     >
                         <ItemTouchTarget {...slot("touchTarget")} />
