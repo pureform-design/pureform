@@ -1,0 +1,59 @@
+import { testIds } from "@pureform/anatomy";
+import { describe, expect, it } from "vitest";
+
+import { Card } from ".";
+import { PureformProvider } from "..";
+import { displayRegistry } from "../__fixtures__/registry";
+import { byTestId, mount, settle } from "../testing/mount";
+
+const ids = testIds.card;
+
+const withRegistry = (view: () => unknown) =>
+    mount(() => (
+        <PureformProvider registry={displayRegistry()}>
+            {view() as never}
+        </PureformProvider>
+    ));
+
+describe("Card", () => {
+    it("is a static surface around its children by default", async () => {
+        withRegistry(() => (
+            <Card variant="outlined">
+                <p>Plan</p>
+            </Card>
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(root.tagName).toBe("DIV");
+        expect(root.className).toBe(
+            "card card--variant-outlined card--interactive-false",
+        );
+        expect(root.textContent).toBe("Plan");
+        expect(
+            document.querySelector(`[data-testid="${ids.touchTarget}"]`),
+        ).toBe(null);
+    });
+
+    it("is an interactive button with its touch target, disabled natively", async () => {
+        withRegistry(() => (
+            <Card as="button" disabled>
+                Plan
+            </Card>
+        ));
+        await settle();
+        const root = byTestId<HTMLButtonElement>(ids.root);
+        expect(root.tagName).toBe("BUTTON");
+        expect(root.type).toBe("button");
+        expect(root.disabled).toBe(true);
+        expect(root.className).toContain("card--interactive-true");
+        expect(root.firstElementChild).toBe(byTestId(ids.touchTarget));
+    });
+
+    it("is a link with an href", async () => {
+        withRegistry(() => <Card href="#plan">Plan</Card>);
+        await settle();
+        const root = byTestId(ids.root);
+        expect(root.tagName).toBe("A");
+        expect(root.getAttribute("href")).toBe("#plan");
+    });
+});
