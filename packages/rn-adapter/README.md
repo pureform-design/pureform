@@ -7,7 +7,7 @@ lower to CSS; this one lowers the same AST to style templates that React Native 
 ## Where it sits
 
 ```
-@pureform/core ──► @pureform/rn-adapter ──► apps/rn-web-demo (and @pureform/react-native, planned)
+@pureform/core ──► @pureform/rn-adapter ──► @pureform/react-native ──► apps/rn-web-demo
 @pureform/preset (tests and demos)
 ```
 
@@ -42,7 +42,7 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | `factory.ts`                     | `nativeFactory`: a component's `StyleFactory`, selecting once per selection and environment. |
 | `codegen.ts`                     | The `native` target's codegen for `@pureform/generate`: a factory module per component.      |
 | `motion.ts`                      | Pure motion helpers: easing curves, interpolation, and which token tweens run.               |
-| `react.ts`                       | `PureformProvider`, `useComponentState`, `useComponentStyles`, `useReducedMotion`, …         |
+| `react.ts`                       | `StylesProvider`, `PureformProvider`, `useComponentState`, `useComponentStyles`, …           |
 | `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, and press ripples.               |
 | `reanimated.ts`, `css-motion.ts` | The Reanimated 4 entry: transitions and keyframes as CSS animation properties.               |
 | `svg.ts`, `reanimated-svg.ts`    | Shapes, gradients, and ripples drawn with `react-native-svg`.                                |
@@ -50,16 +50,16 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 
 ## Public API
 
-| Entry                                         | Exports                                                                                                          |
-| --------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                   |
-| `@pureform/rn-adapter/react`                  | `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useReducedMotion`, `pressableState` |
-| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles` and `useRipple`, through React Native's Animated                                    |
-| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles` and `cssMotion`, through Reanimated 4                                             |
-| `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                          |
-| `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                             |
-| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, and the `NativeFactory` types; no React, no lowering      |
-| `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`             |
+| Entry                                         | Exports                                                                                                                                                   |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                            |
+| `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState` |
+| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles` and `useRipple`, through React Native's Animated                                                                             |
+| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles` and `cssMotion`, through Reanimated 4                                                                                      |
+| `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
+| `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
+| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                               |
+| `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`                                                      |
 
 ```tsx
 import { precompute } from "@pureform/rn-adapter";
@@ -107,10 +107,15 @@ const progress = nativeFactory("linearProgress", styles, {
 progress({ tokens: { value: 40 } }).indicator.style; // resolved with the token, cached per value
 ```
 
-The hooks select through the same factories: `useComponentState` looks up
-`componentFactory(styles, name)` (one per provider styles and component) in the provider's
-environment, so every instance of a component shares one table, and a state change is a
-`Map.get`. Token tweening passes each frame's tokens as the selection's `tokens`.
+The hooks select through the same factories, from whatever source the provider holds:
+`StylesProvider` takes a `StyleSource` (`factory(name)` and `themeValues()`, both called while
+rendering, so they may suspend), which `@pureform/react-native`'s provider fills from the
+generated registry; `PureformProvider` is `StylesProvider` over `stylesSource(styles)`, whose
+factories are `componentFactory(styles, name)` (one per styles and component). Either way every
+instance of a component shares one table in the provider's environment, and a state change is a
+`Map.get`. Token tweening passes each frame's tokens as the selection's `tokens`. A factory's
+`tokens` names the theme key each instance token sets. `useStyleEnvironment()` gives the
+environment the caller renders in, for calling a factory directly.
 
 `pureform generate` with the `native` target (`@pureform/rn-adapter/codegen`) writes one module
 per allow-listed component, `.pureform/native/<name>.ts`, exporting a `NativeFactory<"name">`
@@ -129,8 +134,9 @@ cases, so selection drops the transitions that move (a switch handle's `start`, 
 indicator's `width`) and keeps the color, opacity, and elevation fades, as the web does. A
 token's own tween carries its `valueType` from the lowering; under reduced motion,
 `tokenTransitions` (in `motion.ts`) skips lengths, percentages, angles, and numbers and keeps
-colors. Ripples don't start under reduced motion. The `motion="system" | "reduce" | "full"`
-setting and reading `AccessibilityInfo` are planned for `@pureform/react-native` (roadmap p8).
+colors. Ripples don't start under reduced motion. `@pureform/react-native`'s provider takes
+`motion="system" | "reduce" | "full"` and reads `AccessibilityInfo` for `"system"`, and passes the
+result here as `reducedMotion`.
 
 ## Direction
 
@@ -138,19 +144,22 @@ Logical properties lower to React Native's (`insetInlineStart` to `start`), whic
 `I18nManager.isRTL`. Styles with no logical form use the `ltr` and `rtl` conditions, which
 selection matches from the `rtl` state: pass `{ rtl: true }` and the switch's handle centers
 from the other side, and the indeterminate linear progress runs `linearProgressSlideRtl`
-(`src/direction.spec.ts`). Nothing sets `rtl` for you yet: the provider's `dir`, defaulting to
-`I18nManager.isRTL`, is planned for `@pureform/react-native` (roadmap p8).
+(`src/direction.spec.ts`). `StylesProvider`'s `rtl` adds the state to every selection (only when
+it holds); `@pureform/react-native`'s provider sets it from its `dir`, which defaults to
+`I18nManager.isRTL`.
 
 An icon that points flips under `rtl` when it's marked: pass `{ rtl: true, mirrored: true }`
 and the icon slot gets `transform: [{ scaleX: -1 }]` (after its own transform, such as a field
-icon's centering). The state is the component's, so a component with two icons resolves the
-marked one separately; the icon part doing that is planned for p8.
+icon's centering). The state is the component's, so a component with two icons flips both when
+either is marked (`@pureform/react-native` sets it from the component's `mirrorIcon` props).
 
 ## Icon fonts
 
-React Native has no variable font axes: `fontVariationSettings` (Material Symbols' `FILL`,
-which the web reads) drops without a diagnostic. An app that swaps a filled icon in needs the
-fill another way; `useIconStyle()` returning `filled` is planned for p8.
+React Native has no variable font axes, so `fontVariationSettings` never reaches a style: its
+`FILL` axis (Material Symbols' fill, which the web reads) lowers to a private key that selection
+moves out beside the style, as `Selected.iconFills[slot]` and `NativeSlot.iconFill` (0 or 1;
+`src/icon-fill.spec.ts`). Other axes drop. `@pureform/react-native`'s `useIconStyle()` returns it
+as `filled`, for apps that swap a filled icon in.
 
 ## Build and test
 

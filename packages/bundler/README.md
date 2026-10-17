@@ -11,7 +11,8 @@ first and generates only the components the app draws and the variant values it 
   plugin for every bundler), `@pureform/binding-core/usage` (what each component draws),
   `@pureform/anatomy` (anatomy names), `oxc-parser` (the scan), `@pureform/styling` and
   `@pureform/core` (types).
-- **Depended on by:** apps' bundler configs (every app under `apps/` but `rn-web-demo`).
+- **Depended on by:** apps' bundler configs (every app under `apps/`; `rn-web-demo` uses the Vite
+  plugin with the `native` target).
 - Part of the core train: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§6 generated glue](../../docs/design/component-architecture.md#6-generated-glue),
