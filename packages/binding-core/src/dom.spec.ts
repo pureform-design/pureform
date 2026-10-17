@@ -9,6 +9,7 @@ import {
     subscribeReducedMotion,
     syncCheckedInput,
     syncRadioInputs,
+    syncTextInput,
     systemReducedMotion,
 } from "./dom";
 import type { IconStyle } from "./icon-style";
@@ -109,6 +110,19 @@ describe("syncCheckedInput", () => {
         expect([input.checked, input.indeterminate]).toEqual([false, true]);
         syncCheckedInput(input, true);
         expect([input.checked, input.indeterminate]).toEqual([true, false]);
+    });
+});
+
+describe("syncTextInput", () => {
+    it("puts the text back, and leaves an equal value and its caret alone", () => {
+        const input = document.createElement("input");
+        document.body.append(input);
+        input.value = "Adam";
+        input.setSelectionRange(1, 1);
+        syncTextInput(input, "Adam");
+        expect(input.selectionStart).toBe(1);
+        syncTextInput(input, "Ada");
+        expect(input.value).toBe("Ada");
     });
 });
 

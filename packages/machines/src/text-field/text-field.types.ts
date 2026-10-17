@@ -90,6 +90,8 @@ export interface TextFieldApi<T extends PropTypes = PropTypes> {
     /** The message the supporting text shows instead of its own: `error`, or the browser's
      *  `validationMessage` under `validate="native"`. */
     errorText: string | undefined;
+    /** The supporting text's id, for the input's `aria-describedby` while it shows. */
+    supportingTextId: string;
     setValue: (value: string) => void;
     /** Puts the value back after a form reset, and forgets the user's interaction. */
     reset: (value: string) => void;

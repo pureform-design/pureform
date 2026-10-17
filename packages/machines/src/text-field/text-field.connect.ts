@@ -57,6 +57,7 @@ export function connect<T extends PropTypes>(
         disabled,
         invalid,
         errorText: computed("errorText"),
+        supportingTextId: dom.getSupportingTextId(scope),
         setValue(next) {
             send({ type: "VALUE.SET", value: next });
         },
