@@ -117,7 +117,7 @@ import { Checkbox } from "@pureform/solid/checkbox";
     motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { class: "caps" } } }}
-    theme="teal"
+    theme="teal" // a named theme: the registry's themeAttributes("teal") on its element
     overrides={{}}
     hydrate="reuse" // carried, applied in p5b
 >
@@ -125,9 +125,10 @@ import { Checkbox } from "@pureform/solid/checkbox";
 </PureformProvider>
 ```
 
-It renders a `div` with `display: contents` holding `dir` and `data-pf-motion`, so the CSS (which
-reads both from an ancestor) and the browser agree with what components read. Other props
-(`class`, `style`, `data-*`) go on that element. Nested providers inherit what they leave out.
+It renders a `div` with `display: contents` holding `dir`, `data-pf-motion`, and its theme's
+attributes, so the CSS (which reads them from an ancestor) and the browser agree with what
+components read. Other props (`class`, `style`, `data-*`) go on that element. Nested providers
+inherit what they leave out.
 
 | Hook             | Returns                                                                        |
 | ---------------- | ------------------------------------------------------------------------------ |
@@ -287,7 +288,8 @@ check the cross-cutting rules against Solid and React together (see that package
 
 ## Worth knowing
 
-- **Stubs:** `theme`, `overrides`, and `hydrate` do nothing yet (p5b). The development warning for
+- **Stubs:** `overrides` and `hydrate` do nothing yet, nor runtime themes (p5b); a named
+  `theme` writes the target's attribute (`registry.themeAttributes(theme)`). The development warning for
   a stale glue version calls `trainVersionMismatch`, which finds nothing until p4a records it.
 - A registry entry's kind is read once per component instance; swapping the registry for one
   whose entry kind differs isn't followed.

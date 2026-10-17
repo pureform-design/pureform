@@ -44,8 +44,9 @@ export interface PureformProviderProps
     ref?: Ref<HTMLDivElement> | undefined;
 }
 
-/** Provides the registry and the settings components read, over the nearest provider's. Its
- *  `theme`, `overrides`, and `hydrate` are carried but not applied yet: runtime themes are p5b.
+/** Provides the registry and the settings components read, over the nearest provider's. A
+ *  `theme` names one of the config's themes, scoped by the target's attribute on the provider's
+ *  element; `overrides` and `hydrate` are carried but not applied yet: runtime themes are p5b.
  *  Object options (`defaults`, `slotProps`, `overrides`) are compared by identity: keep them
  *  stable (module constants or `useMemo`) so components under it don't re-render needlessly. */
 export function PureformProvider({
@@ -99,7 +100,7 @@ export function PureformProvider({
         <PureformContext value={state}>
             <div
                 {...rest}
-                {...providerAttributes({ motion }, state)}
+                {...providerAttributes({ motion, theme }, state)}
                 style={{ display: "contents", ...style }}
             >
                 {children}

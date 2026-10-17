@@ -49,12 +49,13 @@ The root entry uses no DOM API, so React Native can import it.
 type Direction = "ltr" | "rtl";
 interface ProviderOptions<P> {           // P: the binding's props for one part
     registry?; dir?; motion?; defaults?; slotProps?;
-    theme?; overrides?; hydrate?;        // carried, applied by runtime themes (p5b)
+    theme?;                              // a named theme: the registry's themeAttributes(theme)
+    overrides?; hydrate?;                // carried, applied by runtime themes (p5b)
 }
 interface ProviderState<P> { registry; dir; motion; defaults; slotProps; theme; overrides; hydrate }
 const ROOT_PROVIDER: ProviderState<never>;           // ltr, system, reuse, nothing else
 resolveProvider(parent, own, merge?): ProviderState<P>;
-providerAttributes(own, state): { dir; "data-pf-motion": "reduce" | "full" | undefined };
+providerAttributes(own, state): { dir; "data-pf-motion": "reduce" | "full" | undefined; ...themeAttributes };
 requireRegistry(state): AnyRegistry;     // throws, naming PureformProvider, when there's none
 withDefaults(defaults, selection): Selection<C>;
 selectionSignature(selection): string;   // equal exactly when two selections select the same
@@ -156,8 +157,12 @@ of it, so a controlled checkbox whose owner ignores the change would otherwise s
 
 ## Worth knowing
 
-- **Stubs:** `theme`, `overrides`, and `hydrate` are carried through nesting but nothing applies
-  them (p5b).
+- **Themes:** a provider's own `theme` (a name from the config) becomes the registry's
+  `themeAttributes(theme)` on its element, so the target decides the attribute (`data-theme`,
+  `data-panda-theme`) and no binding hard-codes a selector. An inherited theme writes nothing:
+  the ancestor's attribute already scopes it.
+- **Stubs:** `overrides` and `hydrate` are carried through nesting but nothing applies them
+  (p5b), nor runtime themes.
 - **Train version check:** `@pureform/generate` passes the core train's version to
   `createRegistry`, and the providers call `trainVersionMismatch(registry)` in development; it
   returns a warning when `registry.version` differs from `@pureform/styling`'s `VERSION`. A
