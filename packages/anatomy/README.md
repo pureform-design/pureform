@@ -18,15 +18,15 @@ generator and the drift test read it, and nothing at runtime does.
                     src/anatomy.spec.ts ◄─────────┘ compares them ──────────────┘
 ```
 
-| Module          | What it does                                                                                      |
-| --------------- | ------------------------------------------------------------------------------------------------- |
-| `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                       |
-| `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`.        |
-| `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                           |
-| `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                                 |
-| `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.                 |
-| `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                         |
-| `composites.ts` | Written by hand: anatomies outside the preset's slots (`radioGroupAnatomy`, `selectMenuAnatomy`). |
+| Module          | What it does                                                                                                    |
+| --------------- | --------------------------------------------------------------------------------------------------------------- |
+| `types.ts`      | `ComponentAnatomy`, `PartAnatomy`, `ExtraPart`, `PartName`.                                                     |
+| `generated.ts`  | Generated. One constant per component (`buttonAnatomy`), `anatomy` by name, and `testIds`.                      |
+| `components.ts` | Types over the generated anatomy: `Anatomies`, `AnatomyName`, `PartOf`.                                         |
+| `attributes.ts` | The attribute names, `kebabCase`, `partTestId`, `partAttributes`.                                               |
+| `derive.ts`     | The `/derive` subpath: `deriveAnatomy`, `deriveAnatomies`, `renderAnatomyModule`.                               |
+| `extras.ts`     | `EXTRA_PARTS`: parts that aren't AST slots (the select's `hiddenSelect`).                                       |
+| `composites.ts` | Written by hand: anatomies outside the preset's slots (`radioGroupAnatomy`, `selectMenuAnatomy`, the overlays). |
 
 **Generated, not derived at import.** Deriving at import would pull the whole preset (every
 recipe, the theme) into every app bundle just to learn part names. The generated module is plain
@@ -55,6 +55,7 @@ interface PartAnatomy<P extends string = string> {
     readonly children: readonly P[];
     readonly styled: boolean; // false for extra parts, which the registry doesn't style
     readonly mirror: boolean; // an icon slot: takes `mirror`, sets data-pf-mirror
+    readonly slot?: string | null; // the registry slot that draws it, when not its name; null: none
 }
 ```
 
@@ -101,6 +102,7 @@ partTestId(buttonAnatomy, "label", { root: "save" }); // "pf-button-label"
 | `partAttributes(component, part, testId?)`                                 | `data-scope`, `data-pf-part`, `data-testid` for a part.          |
 | `PART_ATTRIBUTE`, `SCOPE_ATTRIBUTE`, `TEST_ID_ATTRIBUTE`, `TEST_ID_PREFIX` | The attribute names, and `"pf"`.                                 |
 | `kebabCase(name)`                                                          | `touchTarget` → `touch-target`.                                  |
+| `partSlot(part)`                                                           | The registry slot a part is drawn by: its `slot`, else its name. |
 | `ComponentAnatomy`, `PartAnatomy`, `PartName<A>`, `ExtraPart`              | The shape.                                                       |
 | `Anatomies`, `AnatomyName`, `PartOf<N>`                                    | Types over the preset's components: `PartOf<"button">`.          |
 
@@ -141,6 +143,17 @@ and its part names are the menu's slots (`root`, `item`, `itemLabel`) plus an un
 `positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
 `data-pf-part="content"` and `pf-select-content`, then `pf-select-item`, `pf-select-item-label`,
 `pf-select-positioner` (`compositeTestIds.selectMenu`).
+
+**The overlays** (`menuOverlayAnatomy`, `tooltipOverlayAnatomy`, `dialogOverlayAnatomy`) are the
+menu, tooltip, and dialog as the bindings render them: an unstyled `root` (the element around
+everything, `pf-<scope>-root`), `trigger`, and `positioner`, then the preset's slots. The preset's
+`root` slot is the surface, so its part is `content` (`data-pf-part="content"`,
+`pf-menu-content`) with `slot: "root"`: a part's `slot` names the registry slot that draws it and
+takes the provider's `slotProps` (`partSlot(part)` reads it; `null` for none, as on the wrapper).
+The dialog also has an unstyled `closeTrigger`, and its backdrop is `dialogBackdropAnatomy`, drawn
+by the scrim's entry (`name: "scrim"`) under the dialog's scope (`pf-dialog-backdrop`). Their test
+ids are in `compositeTestIds.menu`, `.tooltip`, `.dialog`, `.dialogBackdrop`; the snackbar uses
+its generated anatomy as is.
 
 ## Building and testing
 

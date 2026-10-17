@@ -68,9 +68,11 @@ lazyFactoryError(name): Error; serverLazyFactoryMessage(name): string;
 
 // Parts
 stateAttributes({ pressed: true, hover: false }) // { "data-pf-active": "", "data-pf-hover": undefined }
-partClasses(anatomy, part, slots, unstyled?): SlotClasses | undefined;
+partClasses(anatomy, part, slots, unstyled?): SlotClasses | undefined; // by the part's slot
 partSources({ anatomy, part, machine, states, testId, unstyled, partUnstyled, classes, slotProps, props })
     // [machine, part attributes, state attributes, registry, provider slotProps, user props]
+    // the registry's classes and the provider's slotProps are the part's slot's (partSlot):
+    // a menu's `content` part reads the menu's `root` slot
 spreadableProps(props);                  // without children and ref
 cx("a", ["b", { c: true }]);             // "a b c", as clsx joins
 forSlot(slotKeyed, slot); isUnstyled(unstyled, part); isIconPart(anatomy, part);
@@ -183,6 +185,46 @@ selectSupportingTextId(props, id);
 selectInputProps(zagTriggerProps, valueText, dir); // a read-only <input>; rtl swaps the sideways arrows
 selectPositionerProps(p, open);          // hidden while closed
 selectHiddenSelectProps(p);              // without aria-labelledby
+
+// Overlays: the menu, tooltip, and dialog render in place, inside an unstyled Root (no portal)
+type OverlayPlacement; interface OverlayPositioning { placement; gutter; sameWidth; strategy; flip }
+overlayPositionerProps(p, open);         // hidden while closed
+
+// Menu: Zag's menu; menuOverlayAnatomy (root, trigger, positioner, content, item, …)
+interface MenuRootOwnProps               // color, density, tokens, onSelect, closeOnSelect, loopFocus,
+                                         // typeahead, positioning, aria-label, ids, open,
+                                         // defaultOpen, onOpenChange, testId, unstyled
+interface MenuItem<Node> { value; label; valueText?; disabled?; closeOnSelect?; leadingIcon?;
+                           trailingIcon?; trailingText?; mirrorLeadingIcon?; mirrorTrailingIcon? }
+MENU_ROOT_PROPS; MENU_CONTENT_PROPS;     // trigger, items
+menuSelection(props); menuMachineProps(props); // placement "bottom-start" unless given
+menuItemProps(item);                     // Zag's item props from an item's data
+
+// Tooltip: Zag's tooltip; tooltipOverlayAnatomy
+interface TooltipRootOwnProps            // variant, tokens, openDelay, closeDelay, disabled,
+                                         // interactive, closeOnEscape, closeOnClick, positioning,
+                                         // ids, open, defaultOpen, onOpenChange, testId, unstyled
+TOOLTIP_ROOT_PROPS; TOOLTIP_CONTENT_PROPS; // trigger, supportingText, subhead, actions
+tooltipSelection(props); isRichTooltip(props);
+tooltipMachineProps(props);              // a rich tooltip is interactive; placement "bottom"
+
+// Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
+type DialogPart                          // the overlay's parts, and "backdrop"
+interface DialogRootOwnProps             // icon (the variant), tokens, modal, role,
+                                         // closeOnInteractOutside, closeOnEscape, restoreFocus,
+                                         // initialFocusEl, finalFocusEl, aria-label, ids (headline,
+                                         // body: Zag's title and description), open, defaultOpen,
+                                         // onOpenChange, testId, unstyled
+DIALOG_ROOT_PROPS; DIALOG_CONTENT_PROPS; // trigger, mirrorIcon, headline, body, actions (and icon)
+dialogSelection(props); dialogMachineProps(props);
+dialogPositionerLayout(open);            // hidden while closed; fixed over the viewport, centering
+dialogBackdropLayout();                  // the scrim fixed over the viewport
+
+// Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
+interface SnackbarRootOwnProps           // tokens, duration, onAction, id, ids, open, defaultOpen,
+                                         // onOpenChange ({ open, reason }), testId, unstyled
+SNACKBAR_ROOT_PROPS; SNACKBAR_CONTENT_PROPS; // supportingText, action, closeLabel, closeIcon
+snackbarSelection(props); snackbarMachineProps(props);
 
 // Content
 isPresent(node);                         // not undefined, null, or false

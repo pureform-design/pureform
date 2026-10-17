@@ -7,16 +7,17 @@ framework's Zag adapter, and spreads the part props `connect` returns on its ele
 here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
-`utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, and `select` machines) and on
+`utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`, and
+`tooltip` machines) and on
 `@pureform/js-effects` for the ripple. The bindings depend on it.
 
 ## Architecture
 
 ```
 @zag-js/checkbox, switch, radio-group, ──re-exported─┐
-  select                                             │
+  select, menu, dialog, tooltip                      │
 own machines (button, ripple, text field,            ├──► @pureform/machines ──► bindings:
-  slider stub) ── Zag's shape ───────────────────────┤                         useMachine(machine, props)
+  snackbar, slider stub) ── Zag's shape ─────────────┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
 form helpers (native defaults, reset, fieldsets) ────┘                         spread part props
 ```
@@ -40,6 +41,8 @@ callback reports user actions only, with a details object.
 | `button/`                                                 | Press, focus, hover, and an optional toggle (`selected`).                                            |
 | `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                              |
 | `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).         |
+| `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.           |
+| `menu.ts`, `dialog.ts`, `tooltip.ts`                      | Zag's machines, re-exported unchanged (none is a form control).                                      |
 | `slider/`                                                 | Stub for p6e: the value only.                                                                        |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported; all but the checkbox's with pureform's form rules.                      |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
@@ -56,6 +59,10 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules      |
 | `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                  |
 | `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules    |
+| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                         |
+| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                     |
+| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                   |
+| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                        |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
 | `@pureform/machines/text-field`  | `textField`'s members                                                                                       |
 | `@pureform/machines/slider`      | `slider`'s members (stub)                                                                                   |
@@ -137,6 +144,22 @@ the browser has reset the input, which also forgets the user's interaction. `con
 `validationMessage` under `validate="native"` once the user has interacted), `supportingTextId`,
 `setValue`, `reset`, `focus`, and the parts' props.
 
+### Snackbar
+
+| Prop                                  | Type                                                    | Notes                                                                    |
+| ------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------ |
+| `id`, `ids`                           | `string`, `{ root?, supportingText?, action?, close? }` | element ids: `snackbar:<id>`, `…:supporting-text`, `…:action`, `…:close` |
+| `open`, `defaultOpen`, `onOpenChange` | `boolean`, `boolean`, `({ open, reason }) => void`      | controllable; `reason` is `open`, `timeout`, `action`, `close`, `escape` |
+| `duration`                            | `number \| null`                                        | milliseconds open, default 5000; `null` stays until closed               |
+| `onAction`                            | `() => void`                                            | called when the user chooses the action, before it asks to close         |
+| `dir`, `getRootNode`                  |                                                         | as in Zag                                                                |
+
+States: `closed`, `open` (counting down `duration`), and `paused` (the pointer is over it or focus
+is inside it; the countdown starts again from the start once both leave). A controlled snackbar
+only asks, as Zag's dialog does, and moves with the prop. `connect` returns `open`, `paused`,
+`setOpen(open)`, and part props for `root` (`role="status"`, `hidden` while closed; Escape inside
+it closes it), `supportingText`, `action`, and `close` (both `type="button"`).
+
 ### Ripple
 
 `ripple.machine` attaches `@pureform/js-effects`'s `ripple` to the layer's parent (or
@@ -193,12 +216,14 @@ trackFormReset(input, {
 
 ## Good to know
 
-- The checkbox, switch, radio group, and select are re-exported so far; p6 adds Zag's tabs,
-  menu, dialog, and tooltip as their components land. The checkbox's machine is still Zag's
+- The checkbox, switch, radio group, select, menu, dialog, and tooltip are re-exported so far;
+  p6d adds Zag's tabs. The menu, dialog, and tooltip are unchanged: they aren't form controls. The checkbox's machine is still Zag's
   own (its reset and closest-fieldset tracking don't show through the bindings; see the shared
   suites); give it `withFieldsetRule` if that changes.
 - The slider is a stub with its final shape; p6e fills it in, and its `todo` tests list what's
   missing.
 - `setNativeDefault` keeps what an unedited text control or select shows: writing a default
   alone would change it.
+- The snackbar's `paused` isn't marked on its root: the pointer resting on it would change the
+  markup a server rendered while it hydrates.
 - Design doc: §8 (behavior), §9.4 (controlled state), §9.5 (forms).
