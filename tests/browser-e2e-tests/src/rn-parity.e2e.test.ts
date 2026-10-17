@@ -1,5 +1,5 @@
 // Parity between the React Native adapter and the CSS adapter: each component's slots render
-// through React Native Web with the styles `select` picks, and as markup styled by the CSS
+// through React Native Web with the styles its factory selects, and as markup styled by the CSS
 // adapter's stylesheet, nested as the component's structure says so CSS inheritance applies.
 // Key properties must compute the same: colors, border widths, radii, padding, opacity, type,
 // and the sizes the React Native styles set in pixels. Layout that React Native Web does its
@@ -8,13 +8,18 @@
 // Native.
 
 import { classesFor } from "@pureform/css-adapter";
-import { select, stylesFor, themeKey } from "@pureform/rn-adapter";
+import { stylesFor, themeKey } from "@pureform/rn-adapter";
 import type {
     PrecomputedStyles,
     Resolved,
     State,
     Style,
 } from "@pureform/rn-adapter";
+import { componentFactory } from "@pureform/rn-adapter/factory";
+import type {
+    AnyComponent,
+    NativeSelection,
+} from "@pureform/rn-adapter/factory";
 import chroma from "chroma-js";
 import { createElement } from "react";
 import type { ReactElement } from "react";
@@ -147,17 +152,32 @@ const cssMarkup = (list: Item[], styles: Resolved, scenario: Scenario) => {
         : html;
 };
 
+// A component's styles by slot as the app selects them: through its factory, which resolves the
+// component again with the tokens its variants set (a color group's, a density's).
+const selectedStyles = (
+    styles: PrecomputedStyles,
+    name: string,
+    selection: Record<string, string>,
+    scenario: Scenario,
+) =>
+    componentFactory(styles, name)
+        .for({
+            ...(scenario.theme ? { theme: scenario.theme } : {}),
+            scheme: scenario.scheme ?? "light",
+        })
+        .selected({
+            ...selection,
+            ...scenario.state,
+        } as NativeSelection<AnyComponent>).styles;
+
 const rnTree = (
     list: Item[],
-    styles: Resolved,
+    styles: PrecomputedStyles,
     scenario: Scenario,
 ): ReactElement[] =>
     list.flatMap(({ id, name, selection }) => {
-        const component = styles[name]!;
-        const bySlot = select(component, selection, {
-            scheme: scenario.scheme ?? "light",
-            ...scenario.state,
-        });
+        const component = styles.templates[name]!;
+        const bySlot = selectedStyles(styles, name, selection, scenario);
         const element = (slot: string): ReactElement | null =>
             SKIPPED.has(slot)
                 ? null
@@ -308,17 +328,14 @@ describe("the React Native adapter matches the CSS adapter", () => {
         const root = createRoot(host);
         flushSync(() =>
             root.render(
-                createElement(View, null, ...rnTree(list, resolved, scenario)),
+                createElement(View, null, ...rnTree(list, styles, scenario)),
             ),
         );
 
         const differences: string[] = [];
         let compared = 0;
         for (const { id, name, selection } of list) {
-            const bySlot = select(resolved[name]!, selection, {
-                scheme: scenario.scheme ?? "light",
-                ...scenario.state,
-            });
+            const bySlot = selectedStyles(styles, name, selection, scenario);
             for (const slot of Object.keys(bySlot)) {
                 if (SKIPPED.has(slot)) continue;
                 const key = `${id}.${slot}`;
