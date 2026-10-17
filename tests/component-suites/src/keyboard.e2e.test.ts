@@ -33,7 +33,7 @@ const focusWithTab = async (
  *  component without its state (a plain button); a change or nothing, with its state. */
 const pressAndCheck = async (
     component: ComponentCase,
-    { key, does, props = {} }: KeyCase,
+    { key, does, to, props = {} }: KeyCase,
     dir: "ltr" | "rtl" = "ltr",
 ) => {
     const state = does === "click" ? undefined : component.state;
@@ -60,19 +60,18 @@ const pressAndCheck = async (
         },
         dir,
     );
-    const focused = component.keyboard.focusable(host);
-    expect(document.activeElement).toBe(focused);
+    expect(document.activeElement).toBe(component.keyboard.focusable(host));
     await userEvent.keyboard(key);
     await harness.settle();
     if (does === "click") expect(onClick).toHaveBeenCalledTimes(1);
     if (does === "nothing") expect(onClick).not.toHaveBeenCalled();
     if (state) {
         expect(state.read(host)).toEqual(
-            does === "change" ? state.to : state.from,
+            does === "change" ? (to ?? state.to) : state.from,
         );
         expect(onChange).toHaveBeenCalledTimes(does === "change" ? 1 : 0);
     }
-    expect(document.activeElement).toBe(focused);
+    expect(document.activeElement).toBe(component.keyboard.focusable(host));
 };
 
 describe.each(COMPONENTS)("$component", (component) => {

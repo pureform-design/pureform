@@ -91,7 +91,9 @@ describe.each(controls)("$component", (component) => {
     });
 
     describe.runIf(form.resets && component.state)("reset", () => {
-        const state = component.state!;
+        // Collected even when skipped: a component without a state has nothing to reset.
+        const state = component.state;
+        if (!state) return;
         const names = stateNames(state.prop);
 
         it("uncontrolled: goes back to the default, reported with reason reset", async () => {

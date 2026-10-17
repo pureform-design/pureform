@@ -5,6 +5,11 @@
 import { PureformProvider } from "@pureform/react";
 import { Button } from "@pureform/react/button";
 import { Checkbox } from "@pureform/react/checkbox";
+import { Chip } from "@pureform/react/chip";
+import { Fab } from "@pureform/react/fab";
+import { IconButton } from "@pureform/react/icon-button";
+import { RadioGroup } from "@pureform/react/radio-group";
+import { Switch } from "@pureform/react/switch";
 import { createElement, type ComponentType, type ReactNode } from "react";
 
 import { registry } from "#registry";
@@ -16,6 +21,11 @@ import { sceneTheme } from "../../harness/themes";
 export const components: Record<ComponentName, ComponentType<never>> = {
     Button,
     Checkbox,
+    Chip,
+    Fab,
+    IconButton,
+    RadioGroup,
+    Switch,
 };
 
 export function SceneView(props: {
