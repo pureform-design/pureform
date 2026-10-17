@@ -11,7 +11,7 @@ import {
 import type { TooltipVariantProps } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { Glyph, IconSlot } from "../icon-style";
+import { IconSlot } from "../icon-style";
 import { testIdOf, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
@@ -44,11 +44,7 @@ function TooltipImpl(props: TooltipProps): ReactNode {
                     iconFill={undefined}
                     motion={s.root}
                 >
-                    {typeof props.supportingText === "string" ? (
-                        <Glyph glyph={props.supportingText} />
-                    ) : (
-                        props.supportingText
-                    )}
+                    {props.supportingText}
                 </IconSlot>
             </engine.View>
         );
