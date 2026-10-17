@@ -82,6 +82,50 @@
                 "default": "./dist/radio-group.jsx"
             }
         },
+        "./menu": {
+            "types": "./dist/menu/index.d.ts",
+            "solid": {
+                "development": "./src/menu/index.ts",
+                "default": "./dist/menu.jsx"
+            },
+            "import": {
+                "development": "./src/menu/index.ts",
+                "default": "./dist/menu.jsx"
+            }
+        },
+        "./dialog": {
+            "types": "./dist/dialog/index.d.ts",
+            "solid": {
+                "development": "./src/dialog/index.ts",
+                "default": "./dist/dialog.jsx"
+            },
+            "import": {
+                "development": "./src/dialog/index.ts",
+                "default": "./dist/dialog.jsx"
+            }
+        },
+        "./tooltip": {
+            "types": "./dist/tooltip/index.d.ts",
+            "solid": {
+                "development": "./src/tooltip/index.ts",
+                "default": "./dist/tooltip.jsx"
+            },
+            "import": {
+                "development": "./src/tooltip/index.ts",
+                "default": "./dist/tooltip.jsx"
+            }
+        },
+        "./snackbar": {
+            "types": "./dist/snackbar/index.d.ts",
+            "solid": {
+                "development": "./src/snackbar/index.ts",
+                "default": "./dist/snackbar.jsx"
+            },
+            "import": {
+                "development": "./src/snackbar/index.ts",
+                "default": "./dist/snackbar.jsx"
+            }
+        },
         "./select": {
             "types": "./dist/select/index.d.ts",
             "solid": {
