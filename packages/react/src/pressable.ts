@@ -8,6 +8,7 @@ import type { PropTypes } from "@zag-js/react";
 import { useId } from "react";
 
 import { useControllable } from "./controllable";
+import { useOwnInteractionSource } from "./interaction";
 import { useMachine } from "./machine";
 import type { MachineProps } from "./machine";
 import { useDirection } from "./provider";
@@ -30,8 +31,10 @@ export function usePressable(
         "selected",
         props,
     );
+    const interaction = useOwnInteractionSource();
     const service = useMachine(button.machine, {
         id,
+        ...interaction,
         dir,
         ...machineProps,
         ...selected.machineProps,

@@ -44,6 +44,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { useItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useUnstyledComponent } from "../parts";
@@ -106,8 +107,10 @@ function Root(props: RadioGroupRootProps): ReactNode {
     );
     const [root, setRoot] = useState<HTMLElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(root);
+    const interaction = useItemInteractionSources();
     const service = useMachine(radioGroup.machine, {
         id,
+        ...interaction,
         dir,
         ...radioGroupMachineProps(props, fieldsetDisabled),
         ...value.machineProps,

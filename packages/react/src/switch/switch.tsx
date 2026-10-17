@@ -33,6 +33,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -79,8 +80,10 @@ function Root(props: SwitchRootProps): ReactNode {
     );
     const [input, setInput] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(input);
+    const interaction = useOwnInteractionSource();
     const service = useMachine(switchControl.machine, {
         id,
+        ...interaction,
         dir,
         ...switchMachineProps(props, fieldsetDisabled),
         ...checked.machineProps,

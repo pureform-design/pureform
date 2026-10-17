@@ -32,6 +32,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { ownInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -76,8 +77,10 @@ function Root(props: CheckboxRootProps): JSX.Element {
         { ownedWrite: true },
     );
     const fieldsetDisabled = useFieldsetDisabled(input);
+    const interaction = ownInteractionSource();
     const service = useMachine(checkbox.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         ...checkboxMachineProps(props, fieldsetDisabled()),
         ...checked.machineProps(),

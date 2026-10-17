@@ -29,6 +29,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "./controllable";
+import { useItemInteractionSources } from "./interaction";
 import { useMachine } from "./machine";
 import { createPartContext } from "./part-context";
 import { slotPartProps, useComponent } from "./parts";
@@ -104,8 +105,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
             "value",
             props,
         );
+        const interaction = useItemInteractionSources();
         const service = useMachine(navigation.machine, {
             id,
+            ...interaction,
             dir,
             ...navigationMachineProps(props),
             ...value.machineProps,

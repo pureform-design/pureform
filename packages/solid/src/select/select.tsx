@@ -42,6 +42,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { itemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -122,8 +123,10 @@ function Root(props: SelectRootProps): JSX.Element {
             ...SELECT_COLLECTION,
         }),
     );
+    const interaction = itemInteractionSources();
     const service = useMachine(select.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         collection: collection(),
         ...selectMachineProps(props, fieldsetDisabled()),

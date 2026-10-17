@@ -34,6 +34,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { itemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -100,8 +101,10 @@ function Root(props: TabsRootProps): JSX.Element {
         "value",
         props,
     );
+    const interaction = itemInteractionSources();
     const service = useMachine(tabs.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         ...tabsMachineProps(props),
         ...value.machineProps(),

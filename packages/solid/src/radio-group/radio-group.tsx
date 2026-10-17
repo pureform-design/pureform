@@ -46,6 +46,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { itemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -107,8 +108,10 @@ function Root(props: RadioGroupRootProps): JSX.Element {
         ownedWrite: true,
     });
     const fieldsetDisabled = useFieldsetDisabled(root);
+    const interaction = itemInteractionSources();
     const service = useMachine(radioGroup.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         ...radioGroupMachineProps(props, fieldsetDisabled()),
         ...value.machineProps(),

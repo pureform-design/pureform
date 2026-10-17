@@ -31,6 +31,7 @@ import {
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
+import { itemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -96,8 +97,10 @@ function Root(props: MenuRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
     const open = useControllable<"open", boolean>("Menu", "open", props);
+    const interaction = itemInteractionSources();
     const service = useMachine(menu.machine, () => ({
         id,
+        ...interaction,
         dir: dir(),
         ...menuMachineProps(props),
         ...open.machineProps(),

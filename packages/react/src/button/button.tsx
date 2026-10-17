@@ -17,6 +17,7 @@ import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "../controllable";
+import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -58,8 +59,10 @@ function Root(props: ButtonRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const selected = useControllable("Button", "selected", props);
+    const interaction = useOwnInteractionSource();
     const service = useMachine(button.machine, {
         id,
+        ...interaction,
         dir,
         ...buttonMachineProps(props),
         ...selected.machineProps,
