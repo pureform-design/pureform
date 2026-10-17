@@ -387,6 +387,112 @@ export const dialogBackdropAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+/** The tabs as the bindings render them: Root, an unstyled element around the tab list and the
+ *  panels; the tab list (`list`, the preset's `root` slot) with its tabs, which the tabs' registry
+ *  entry styles; and a panel per tab (`content`), also unstyled. */
+export const tabsCompositeAnatomy = {
+    name: "tabs",
+    scope: "tabs",
+    root: "root",
+    partNames: ["root", "list", "tab", "icon", "label", "indicator", "content"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-tabs-root",
+            parent: null,
+            children: ["list", "content"],
+            styled: false,
+            mirror: false,
+            slot: null,
+        },
+        list: {
+            name: "list",
+            attribute: "list",
+            testId: "pf-tabs-list",
+            parent: "root",
+            children: ["tab"],
+            styled: true,
+            mirror: false,
+            slot: "root",
+        },
+        tab: {
+            name: "tab",
+            attribute: "tab",
+            testId: "pf-tabs-tab",
+            parent: "list",
+            children: ["icon", "label", "indicator"],
+            styled: true,
+            mirror: false,
+        },
+        icon: {
+            name: "icon",
+            attribute: "icon",
+            testId: "pf-tabs-icon",
+            parent: "tab",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+        label: {
+            name: "label",
+            attribute: "label",
+            testId: "pf-tabs-label",
+            parent: "tab",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        indicator: {
+            name: "indicator",
+            attribute: "indicator",
+            testId: "pf-tabs-indicator",
+            parent: "tab",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        content: {
+            name: "content",
+            attribute: "content",
+            testId: "pf-tabs-content",
+            parent: "root",
+            children: [],
+            styled: false,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
+/** The list: a `<ul>` around list items, each in an `<li>` (`item`), so a list item can be a link
+ *  or a button inside it. Neither is styled: the preset draws only the list item. */
+export const listAnatomy = {
+    name: "list",
+    scope: "list",
+    root: "root",
+    partNames: ["root", "item"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-list-root",
+            parent: null,
+            children: ["item"],
+            styled: false,
+            mirror: false,
+        },
+        item: {
+            name: "item",
+            attribute: "item",
+            testId: "pf-list-item",
+            parent: "root",
+            children: [],
+            styled: false,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 /** The composites' default test ids, by composite and part: `compositeTestIds.radioGroup.root`. */
 export const compositeTestIds = {
     radioGroup: { root: "pf-radio-group-root" },
@@ -428,4 +534,14 @@ export const compositeTestIds = {
         closeTrigger: "pf-dialog-close-trigger",
     },
     dialogBackdrop: { root: "pf-dialog-backdrop" },
+    tabs: {
+        root: "pf-tabs-root",
+        list: "pf-tabs-list",
+        tab: "pf-tabs-tab",
+        icon: "pf-tabs-icon",
+        label: "pf-tabs-label",
+        indicator: "pf-tabs-indicator",
+        content: "pf-tabs-content",
+    },
+    list: { root: "pf-list-root", item: "pf-list-item" },
 } as const;
