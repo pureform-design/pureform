@@ -23,6 +23,8 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@testing-library/react",
             "@zag-js/react",
             "@zag-js/checkbox",
+            "@pureform/machines > @zag-js/radio-group",
+            "@pureform/machines > @zag-js/switch",
         ],
     },
     test: {

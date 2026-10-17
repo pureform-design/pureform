@@ -20,6 +20,11 @@ export interface FormResetOptions {
     /** Sends the machine the default after the browser's reset, unless the reset was prevented.
      *  Wrap the send in `ControllableState.reset` so callbacks report `reason: "reset"`. */
     readonly onReset: () => void;
+    /** Writes the native default: `setNativeDefault` on the input unless given. A radio group
+     *  writes every radio's. */
+    readonly writeDefault?:
+        | ((input: Element, value: NativeDefault) => void)
+        | undefined;
 }
 
 /** Wires a control's native input into its form's reset: the input's native default follows
@@ -33,13 +38,17 @@ export function useFormReset(
     const latest = useRef(options);
     useLayoutEffect(() => {
         latest.current = options;
-        setNativeDefault(input, options.resetsTo);
+        if (input)
+            (options.writeDefault ?? setNativeDefault)(input, options.resetsTo);
     });
     useEffect(() => {
         if (!input) return undefined;
         return trackFormReset(input, {
             onBeforeReset: () => {
-                setNativeDefault(input, latest.current.resetsTo);
+                (latest.current.writeDefault ?? setNativeDefault)(
+                    input,
+                    latest.current.resetsTo,
+                );
                 latest.current.onBeforeReset?.();
             },
             onReset: () => latest.current.onReset(),
