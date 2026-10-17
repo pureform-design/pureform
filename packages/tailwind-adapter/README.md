@@ -106,7 +106,7 @@ variant name, `theme-<name>` by default).
 
 Its options are `TailwindOptions` (`classPrefix` and `prefix` name the factories' classes and
 vars too). It returns `themeAttribute` (the option, default `data-theme`) for the registry's
-`themeAttributes`. `generate` adds `index.ts` and `registry.d.ts`.
+`themeAttributes`, and `vars` (`prefix`, `tokenPrefix`) for its `vars`. `generate` adds `index.ts` and `registry.d.ts`.
 
 There's no `@source inline(...)`: Tailwind v4 generates only utilities from the classes its
 scanner sees, and keeps every rule of the components layer as written, so the factories'

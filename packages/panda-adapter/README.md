@@ -98,7 +98,9 @@ ClassFactory<"<name>">`. It imports the component's recipe from its own file
 
 `generate` adds the header, `index.ts` (the registry), and `registry.d.ts` (the types). The
 codegen returns `themeAttribute: "data-panda-theme"` (`THEME_ATTRIBUTE`), the attribute Panda
-scopes themes by, so `registry.themeAttributes("teal")` is `{ "data-panda-theme": "teal" }`.
+scopes themes by, so `registry.themeAttributes("teal")` is `{ "data-panda-theme": "teal" }`, and
+`vars: { prefix, tokenPrefix }` from its options. Set `tokenPrefix` to Panda's own `prefix` when
+the app's Panda config sets one: providers name token overrides and runtime theme vars with it.
 
 ## States
 

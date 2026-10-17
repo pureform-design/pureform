@@ -132,9 +132,9 @@ import { Checkbox } from "@pureform/react/checkbox";
     motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { className: "caps" } } }}
-    theme="teal" // a named theme: the registry's themeAttributes("teal") on its element
-    overrides={{}}
-    hydrate="reuse" // carried, applied in p5b
+    theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
+    overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
+    hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
 >
     <App />
 </PureformProvider>
@@ -142,15 +142,28 @@ import { Checkbox } from "@pureform/react/checkbox";
 
 It renders a `div` with `display: contents` holding `dir`, `data-pf-motion`, and its theme's
 attributes. Other props (`className`, `style`, `data-*`, `ref`) go on that element. Nested
-providers inherit what they leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`, and
-`overrides` stable (module constants or `useMemo`).
+providers inherit what they leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`,
+`overrides`, and a runtime `theme` stable (module constants or `useMemo`).
 
-| Hook             | Returns                                                              |
-| ---------------- | -------------------------------------------------------------------- |
-| `usePureform()`  | `PureformState`: the resolved provider state, the root's with none   |
-| `useRegistry()`  | `AnyRegistry`; throws when no provider has a registry                |
-| `useDirection()` | `"ltr" \| "rtl"`: pass it to every machine as `dir`                  |
-| `useMotion()`    | `MotionSetting`: the nearest `"reduce"` or `"full"`, else `"system"` |
+**Themes at run time.** `overrides` (token paths, as React Native takes them) become CSS vars in
+the element's `style`, named by the registry's `vars`, on the server too. A runtime theme (a
+`RuntimeTheme` such as `seedTheme` from `@pureform/material/runtime-theme`) puts the theme
+attribute on the element with its scope, `pf-<hash>` of its input, and both schemes' vars in one
+`<style href="pf-…" precedence="pureform">`, which React hoists into the head and dedupes by
+`href`. On the server the generator must be loaded: `await preloadTheme(theme)` before rendering
+(it warns once in development otherwise). With `hydrate: "reuse"` (the default) the client
+adopts the server's block and loads nothing; with `"regenerate"`, or without a server block, it
+generates (loading the generator after mount the first time). `useThemeVars()` gives the
+generated vars. React never removes a hoisted style, so a theme the app switches away from stays
+in the head (unused).
+
+| Hook             | Returns                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `usePureform()`  | `PureformState`: the resolved provider state, the root's with none                 |
+| `useRegistry()`  | `AnyRegistry`; throws when no provider has a registry                              |
+| `useDirection()` | `"ltr" \| "rtl"`: pass it to every machine as `dir`                                |
+| `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
+| `useMotion()`    | `MotionSetting`: the nearest `"reduce"` or `"full"`, else `"system"`               |
 
 ### Registry hooks
 
@@ -291,9 +304,8 @@ Through the omni MCP (or `omni run`):
 
 ## Worth knowing
 
-- **Stubs:** `overrides` and `hydrate` do nothing yet, nor runtime themes (p5b); a named
-  `theme` writes the target's attribute (`registry.themeAttributes(theme)`). The development warning for
-  a stale glue version calls `trainVersionMismatch`, which finds nothing until p4a records it.
+- The development warning for a stale glue version calls `trainVersionMismatch`, which finds
+  nothing until p4a records it.
 - Server rendering isn't exercised by these tests (p3c's hydration suite).
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
   transition.

@@ -107,7 +107,8 @@ provider can set the attribute on any element. `apps/css-demo` is a working exam
 else needs to import it. The components become `ClassFactory` modules in `.pureform/`,
 registered in its `index.ts` and typed by its `registry.d.ts` (both written by `generate`), and
 the stylesheet becomes a file next to them. It returns `themeAttribute` (the option, default
-`data-theme`), which the index passes to the registry.
+`data-theme`) and `vars` (the `prefix` and `tokenPrefix` options), which the index passes to the
+registry.
 
 ```ts
 import { generate } from "@pureform/generate";

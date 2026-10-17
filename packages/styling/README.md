@@ -30,7 +30,8 @@ generated index ──► createRegistry({ button, card: { lazy } }) ──► e
 | `cache.ts`             | `selectionCache`: a factory's results per selection key, frozen.             |
 | `tokens.ts`            | Instance tokens as CSS vars, and `joinClasses`.                              |
 | `component-classes.ts` | `componentClasses`, the CSS adapter's manifest-driven class function.        |
-| `theme-vars.ts`        | The `/theme-vars` subpath: `themeVars` from `@pureform/css-lowering`.        |
+| `runtime-theme.ts`     | Runtime themes: `defineRuntimeTheme`, `themeScope`, `preloadTheme`.          |
+| `theme-vars.ts`        | The `/theme-vars` subpath: `themeVars` from css-lowering, and `tokenVar`.    |
 
 ## Public API
 
@@ -110,6 +111,38 @@ Panda's glue passes `data-panda-theme`, the CSS and Tailwind targets their `them
 option (default `data-theme`), and React Native nothing, so its `themeAttributes` is always
 empty.
 
+The glue also records how the target names its CSS vars, `vars: { prefix, tokenPrefix }` (from
+the adapter's options), as `registry.vars` (`{}` when it recorded none). Providers name token
+overrides and runtime theme vars with it.
+
+### Runtime themes
+
+A runtime theme is generated while the app runs rather than compiled into the stylesheet: a
+source (a named generator, loaded on demand) and its input (JSON). Pass one as a provider's
+`theme`:
+
+```ts
+import {
+    defineRuntimeTheme,
+    preloadTheme,
+    themeScope,
+} from "@pureform/styling";
+
+const seedTheme = defineRuntimeTheme<{ seed: string }>(
+    "my-seed",
+    () => import("./generate"),
+);
+const theme = seedTheme({ seed: "#006A60" }); // { source, input }, frozen
+themeScope(theme); // "pf-1x2y3z": a hash of the source's name and the input
+await preloadTheme(theme); // on the server, before rendering
+theme.source.loaded; // the generator once loaded, else undefined
+```
+
+A generator, `(input, vars: VarOptions) => { light, dark? }`, returns CSS vars named the target's
+way (`light` applies in both schemes, `dark` holds what differs). It must be pure: the server and
+the client run it apart. `@pureform/material/runtime-theme`'s `seedTheme` is the one pureform
+ships.
+
 ### Writing a factory
 
 ```ts
@@ -150,8 +183,11 @@ export const button: ClassFactory<"button"> = (s) =>
   class name runtime. `@pureform/css-adapter/runtime` re-exports them, and its generated
   modules still import from there.
 - `@pureform/styling/theme-vars` re-exports `themeVars` and `ThemeVarsOptions` from
-  `@pureform/css-lowering`, where they still live (they need its lowering). The root entry
-  doesn't import it, so React Native doesn't pull in CSS lowering.
+  `@pureform/css-lowering`, where they still live (they need its lowering), and adds
+  `tokenVar(path, vars)`: a token path's CSS var (`"colors.primary"` → `--colors-primary`,
+  `"components.button.container"` → `--pf-components-button-container` with `prefix: "pf"`; a
+  `--var` passes through). The root entry doesn't import it, so React Native doesn't pull in CSS
+  lowering.
 
 ## Build and test
 

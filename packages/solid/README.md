@@ -117,9 +117,9 @@ import { Checkbox } from "@pureform/solid/checkbox";
     motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { class: "caps" } } }}
-    theme="teal" // a named theme: the registry's themeAttributes("teal") on its element
-    overrides={{}}
-    hydrate="reuse" // carried, applied in p5b
+    theme="teal" // a named theme, or a runtime one: seedTheme({ seed: "#006A60" })
+    overrides={{ "colors.primary": "#006a60" }} // token vars in its element's style
+    hydrate="reuse" // or "regenerate": how the client gets a server-rendered runtime theme
 >
     <App />
 </PureformProvider>
@@ -130,12 +130,25 @@ attributes, so the CSS (which reads them from an ancestor) and the browser agree
 components read. Other props (`class`, `style`, `data-*`) go on that element. Nested providers
 inherit what they leave out.
 
-| Hook             | Returns                                                                        |
-| ---------------- | ------------------------------------------------------------------------------ |
-| `usePureform()`  | `Accessor<PureformState>`: the resolved provider state, the root's with none   |
-| `useRegistry()`  | `Accessor<AnyRegistry>`; reading it throws when no provider has a registry     |
-| `useDirection()` | `Accessor<"ltr" \| "rtl">`: pass it to every machine as `dir`                  |
-| `useMotion()`    | `Accessor<MotionSetting>`: the nearest `"reduce"` or `"full"`, else `"system"` |
+**Themes at run time.** `overrides` (token paths, as React Native takes them) become CSS vars in
+the element's `style`, named by the registry's `vars`, on the server too. A runtime theme (a
+`RuntimeTheme` such as `seedTheme` from `@pureform/material/runtime-theme`) puts the theme
+attribute on the element with its scope, `pf-<hash>` of its input, and both schemes' vars in one
+`<style data-pf-theme="pf-…">` block in the head, through `useHead` from `@solidjs/web` keyed by
+the scope (providers with the same theme share it). On the server the generator must be loaded:
+`await preloadTheme(theme)` before rendering (it warns once in development otherwise). With
+`hydrate: "reuse"` (the default) the client adopts the server's block and loads nothing; with
+`"regenerate"`, or without a server block, it generates (loading the generator after mount the
+first time). `useThemeVars()` gives the generated vars. A server render with `renderToString`
+and no `</head>` hands the head tags to its `onHead` option.
+
+| Hook             | Returns                                                                            |
+| ---------------- | ---------------------------------------------------------------------------------- |
+| `usePureform()`  | `Accessor<PureformState>`: the resolved provider state, the root's with none       |
+| `useRegistry()`  | `Accessor<AnyRegistry>`; reading it throws when no provider has a registry         |
+| `useDirection()` | `Accessor<"ltr" \| "rtl">`: pass it to every machine as `dir`                      |
+| `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
+| `useMotion()`    | `Accessor<MotionSetting>`: the nearest `"reduce"` or `"full"`, else `"system"`     |
 
 ### Registry hooks
 
@@ -288,9 +301,8 @@ check the cross-cutting rules against Solid and React together (see that package
 
 ## Worth knowing
 
-- **Stubs:** `overrides` and `hydrate` do nothing yet, nor runtime themes (p5b); a named
-  `theme` writes the target's attribute (`registry.themeAttributes(theme)`). The development warning for
-  a stale glue version calls `trainVersionMismatch`, which finds nothing until p4a records it.
+- The development warning for a stale glue version calls `trainVersionMismatch`, which finds
+  nothing until p4a records it.
 - A registry entry's kind is read once per component instance; swapping the registry for one
   whose entry kind differs isn't followed.
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
