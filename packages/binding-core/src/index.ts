@@ -90,6 +90,33 @@ export type {
     IconButtonVariantProps,
 } from "./components/icon-button";
 export {
+    LIST_CONTENT_PROPS,
+    LIST_ROOT_PROPS,
+    listItemVariants,
+} from "./components/list";
+export type {
+    ListContentProps,
+    ListItemData,
+    ListPart,
+    ListRootOwnProps,
+    ListVariantProps,
+} from "./components/list";
+export {
+    LIST_ITEM_CONTENT_PROPS,
+    LIST_ITEM_ROOT_PROPS,
+    listItemElement,
+    listItemLines,
+    listItemRootProps,
+    listItemSelection,
+} from "./components/list-item";
+export type {
+    ListItemContentProps,
+    ListItemPart,
+    ListItemRootOwnProps,
+    ListItemStateProps,
+    ListItemVariantProps,
+} from "./components/list-item";
+export {
     MENU_CONTENT_PROPS,
     MENU_ROOT_PROPS,
     menuItemProps,
@@ -106,6 +133,27 @@ export type {
     MenuSelectDetails,
     MenuVariantProps,
 } from "./components/menu";
+export {
+    NAVIGATION_CONTENT_PROPS,
+    NAVIGATION_ITEM_PROPS,
+    NAVIGATION_ROOT_PROPS,
+    navigationItemElement,
+    navigationItemElementProps,
+    navigationItemMachineProps,
+    navigationMachineProps,
+    navigationSelection,
+} from "./components/navigation";
+export type {
+    NavigationBehaviorProps,
+    NavigationComponent,
+    NavigationContentProps,
+    NavigationElementIds,
+    NavigationItem,
+    NavigationItemOwnProps,
+    NavigationPart,
+    NavigationRootOwnProps,
+    NavigationVariantProps,
+} from "./components/navigation";
 export { overlayPositionerProps } from "./components/overlay";
 export type {
     OverlayPlacement,
@@ -195,6 +243,27 @@ export type {
     SwitchRootOwnProps,
     SwitchVariantProps,
 } from "./components/switch";
+export {
+    TABS_CONTENT_PROPS,
+    TABS_LIST_LABEL_PROPS,
+    TABS_ROOT_PROPS,
+    tabsDefaultValue,
+    tabsHaveIcons,
+    tabsHavePanels,
+    tabsItemProps,
+    tabsMachineProps,
+    tabsSelection,
+    tabsTriggerProps,
+} from "./components/tabs";
+export type {
+    TabsBehaviorProps,
+    TabsContentProps,
+    TabsElementIds,
+    TabsItem,
+    TabsPart,
+    TabsRootOwnProps,
+    TabsVariantProps,
+} from "./components/tabs";
 export {
     TEXT_AREA_INPUT_PROPS,
     TEXT_AREA_ROOT_PROPS,
