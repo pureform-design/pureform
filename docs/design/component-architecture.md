@@ -979,6 +979,13 @@ controllable semantics and a `reason` in its details (`timeout`, `action`, `clos
 it and starts again once both leave, and `onAction`. Zag's toast was passed over: it's a toaster
 store with a queue and placement, where the preset's snackbar is one element an app places.
 
+**Built (p6d):** the tabs are Zag's, re-exported unchanged; their arrow keys follow `dir` (Zag
+reads them through `getEventKey` with the direction). The navigation bar and rail share pureform's
+own `navigation` machine rather than Zag's tabs or toggle group: their destinations are links or
+buttons that Tab reaches in turn, with the current one marked `aria-current`, which neither Zag
+machine models. It holds only the controllable `value` and stops a click on a disabled
+destination. The list and list item have no machine.
+
 **Built** (`@pureform/machines`, p1g): every machine is a namespace in Zag's shape
 (`machine`, `connect`, `anatomy`, `props`, and its types), from the root or its own subpath.
 Zag's checkbox, switch (as `switchControl`, since `switch` can't be an import name), and radio
@@ -1066,6 +1073,16 @@ for `textField` and `slider`. The specs run them through Zag's vanilla adapter i
   list is the menu's). `Trigger` and the dialog's `CloseTrigger` are `<button>`s that take `as`
   (`as={Button}`), and the ready-mades draw their trigger as the pureform `Button` labeled with
   `trigger`. The snackbar is its generated anatomy, Root being the surface.
+- **Built (p6d):** `tabs`, `navigation-bar`, `navigation-rail`, `list`, and `list-item` subpaths in
+  both bindings. The tabs render through `tabsCompositeAnatomy`: an unstyled `Root` (Zag's root)
+  around `List`, the preset's `root` slot (`slot: "root"`, `data-pf-part="list"`), whose `Tab`s
+  hold `Icon`, `Label`, and `Indicator`, then an unstyled `Content` panel per tab. Each tab draws
+  its own indicator (the preset's), not Zag's single measured one. The bar and rail share one
+  factory per binding (`createNavigation`) over their identical generated anatomies; an `Item` is
+  an `<a>` with an `href`, else a `<button>`. The preset has no list, only the list item, so the
+  list is a composite (`listAnatomy`): an unstyled `<ul>` with an unstyled `<li>` (`List.Item`)
+  around each list item, whose Root is a `<div>`, an `<a>` with an `href`, or any element with
+  `as`. The list's `density`, `color`, and `tokens` are its items' defaults.
 
 ### 9.2 What every part does
 
@@ -1174,6 +1191,10 @@ component), Zag's shape, identical in Solid and React:
   dialog, and snackbar, as Zag's (the details are `{ open }`; the snackbar's add a `reason`). A
   controlled overlay asks and moves only with the prop: a click on the trigger, a key, or the
   snackbar's close button each ask once.
+- **Built (p6d):** `value` on the tabs (`string | null`; the ready-made selects the first enabled
+  tab unless given one, since only the selected tab takes focus from Tab) and on the navigation bar
+  and rail (the current destination). A list item's `selected` isn't controllable state: the app
+  marks the current item, as it would a link to the current page.
 
 ### 9.5 Forms
 
@@ -1363,6 +1384,10 @@ icon only has to follow them.
 - **Built (p6c):** a case's `opened` renderings (overlays open) run in the axe and direction
   suites in the browser alone; `keyboard.disables: false` marks a component with no disabled state
   of its own, and `keyboard.focused` the state focus moves it to (a tooltip opens on Tab).
+- **Built (p6d):** cases for the tabs, the navigation bar and rail (one case factory), the list, and
+  the list item (rendered `as: "button"`, so it has focus and a disabled state). Contract helpers
+  read named props only: spreading a Solid props object reads its `children` and renders them
+  outside their Root, which the server rendering suite caught.
 
 ## 10. CLI
 
