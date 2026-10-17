@@ -18,7 +18,8 @@ how they map onto the selection and the machine.
 ```
 
 It's in the core train (`cog.toml`'s `core-train`). A binding adds only what needs its
-framework: context, memos, effects, and rendering.
+framework: context, memos, effects, and rendering. `@pureform/bundler` reads its `/usage` subpath
+to prune builds.
 
 ## Architecture
 
@@ -37,6 +38,7 @@ framework: context, memos, effects, and rendering.
 | `version.ts`      | `trainVersionMismatch`: the glue's recorded train version against the running `@pureform/styling`'s `VERSION`                                                                                                                          |
 | `warn.ts`         | `warnOnce`                                                                                                                                                                                                                             |
 | `web-theme.ts`    | Runtime themes' `<style>` blocks, overrides as vars, and when to generate or keep the server's block (on `/dom`)                                                                                                                       |
+| `usage.ts`        | `COMPONENT_USAGE` and the hook and provider names the bundler's pruning scan reads (on `/usage`)                                                                                                                                       |
 | `dom.ts`          | The web half, on its own subpath: reduced motion, measuring an icon slot, checkbox and radio inputs kept in step, `web-theme.ts`                                                                                                       |
 
 The root entry uses no DOM API and no CSS lowering, so React Native can import it.
@@ -356,10 +358,35 @@ of it, so a controlled checkbox whose owner ignores the change would otherwise s
 `observeIconStyle` re-reads after an attribute changes anywhere in the icon's component (its
 `data-scope` root), after a transition there ends, and when the slot resizes.
 
+### `@pureform/binding-core/usage`
+
+Data for usage-based pruning (design doc §7), keyed by component subpath, the same in every
+binding (`@pureform/solid/<key>`, `@pureform/react/<key>`):
+
+```ts
+COMPONENT_USAGE.select;
+// { entries: { select: { variant: "variant", color: "color", density: "density" },
+//              menu: { color: "color", density: "density" } } }
+```
+
+Each entry is a registry entry the component draws, with the variant groups its props pass to
+the registry as given, by the prop that sets them (`text`'s `style` comes from `textStyle`).
+A group left out is computed by the component (a FAB's `extended`, a dialog's `icon`, a select's
+icons, a card's `interactive`) and keeps every value. Also: `BINDING_PACKAGES`,
+`REGISTRY_HOOKS` (`useClasses`, `useStyles` select; `useClassFactory`, `useLazyClassFactory`,
+`useStyleFactory` hand out a factory), `ANATOMY_HOOK` (`useComponent`), and `PROVIDER`
+(`PureformProvider` and its `defaults` prop).
+
+**Keep it current:** a new component needs an entry, and a new group a component computes must
+stay off its list. `usage.spec.ts` checks the subpaths against both bindings' exports, the listed
+groups against the selection functions, the entries against the anatomies each component folder
+uses (and `as={Button}`), and that no Solid or React source sets a listed group from anything
+but its own prop.
+
 ## Building and testing
 
-- `task_run` `build` on `@pureform/binding-core`: Vite library build, two entries (`index`,
-  `dom`), with declarations.
+- `task_run` `build` on `@pureform/binding-core`: Vite library build, three entries (`index`,
+  `dom`, `usage`), with declarations.
 - `task_run` `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`),
   with type checks. A browser command, `emulateReducedMotion`, flips the media query
   (`src/testing/commands.ts`).

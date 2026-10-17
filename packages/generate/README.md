@@ -33,23 +33,24 @@ generate(options)
   └─ write.ts         write what changed, remove what's no longer wanted, or compare (check)
 ```
 
-| Module            | What it does                                                                  |
-| ----------------- | ----------------------------------------------------------------------------- |
-| `adapter.ts`      | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, … |
-| `shape.ts`        | `componentShape(spec)`: a component's groups, defaults, slots, and tokens     |
-| `generate.ts`     | `generate(options)`: the whole step                                           |
-| `config.ts`       | `loadConfig(path, options)`                                                   |
-| `imports.ts`      | `scanConfigImports(entry, options)`, `formatImportViolations`                 |
-| `train.ts`        | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`         |
-| `semver.ts`       | `compareVersions`, `satisfies`: just enough semver for the train check        |
-| `hash.ts`         | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)      |
-| `glue.ts`         | `registryIndex`, `registryDeclarations`                                       |
-| `write.ts`        | `writeFiles`, `compareFiles`                                                  |
-| `missing.ts`      | `missingGlueMessage`, `assertGlue`                                            |
-| `errors.ts`       | `GenerateError` with a `code`, `isGenerateError`                              |
-| `load-adapter.ts` | `loadAdapter(target, root)`                                                   |
-| `runner.ts`       | `createGlueRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`           |
-| `watch.ts`        | `watchGlue(options, watching)`: generate on every change, without a bundler   |
+| Module            | What it does                                                                     |
+| ----------------- | -------------------------------------------------------------------------------- |
+| `adapter.ts`      | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …    |
+| `shape.ts`        | `componentShape(spec)`: a component's groups, defaults, slots, and tokens        |
+| `generate.ts`     | `generate(options)`: the whole step                                              |
+| `config.ts`       | `loadConfig(path, options)`                                                      |
+| `imports.ts`      | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative` |
+| `usage.ts`        | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`    |
+| `train.ts`        | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`            |
+| `semver.ts`       | `compareVersions`, `satisfies`: just enough semver for the train check           |
+| `hash.ts`         | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)         |
+| `glue.ts`         | `registryIndex`, `registryDeclarations`                                          |
+| `write.ts`        | `writeFiles`, `compareFiles`                                                     |
+| `missing.ts`      | `missingGlueMessage`, `assertGlue`                                               |
+| `errors.ts`       | `GenerateError` with a `code`, `isGenerateError`                                 |
+| `load-adapter.ts` | `loadAdapter(target, root)`                                                      |
+| `runner.ts`       | `createGlueRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`              |
+| `watch.ts`        | `watchGlue(options, watching)`: generate on every change, without a bundler      |
 
 ## Public API
 
@@ -67,7 +68,13 @@ const result = await generate({
     lazy: ["checkbox"], // optional: lazy registry entries
     outDir: ".pureform", // default
     check: false, // true: compare, write nothing
+    // optional: what the app uses (the bundler plugin's pruning)
+    usage: {
+        components: ["button"],
+        variants: { button: { variant: ["text"], "*": [] } },
+    },
 });
+result.components; // ["button"]: what was generated
 result.files; // [{ path: "web/button.ts", status: "written" | "unchanged" | "removed" | … }]
 result.ok; // check mode: up to date
 result.dependencies; // the config and the files it imports: what to watch
@@ -77,6 +84,34 @@ result.hints; // e.g. add ".pureform/**/*" to the tsconfig's include
 Errors are `GenerateError`s with a `code`: `config-not-found`, `config-load`,
 `config-export`, `config-imports`, `adapter-not-found`, `adapter-invalid`,
 `adapter-output`, `components`, `train-mismatch`, `missing-glue`.
+
+### Pruning: `usage`
+
+The bundler plugin scans an app in builds and passes what it found as `usage` (design doc §7):
+
+```ts
+interface Usage {
+    readonly components: readonly string[]; // drawn; within the allow-list, the rest left out
+    readonly variants?: VariantUsage; // values selected
+}
+// component → group → values. A component or group left out keeps every value, and so does a
+// group listed as ["*"]; a "*" group stands for the groups not listed.
+type VariantUsage = Readonly<
+    Record<string, Readonly<Record<string, readonly string[]>>>
+>;
+```
+
+- `components` narrows the generated components (names the config lacks are ignored; lazy
+  names left out are dropped).
+- `variants` reaches the adapter as `context.variants`, normalized by `normalizeVariants`:
+  only generated components and real groups, each narrowed group with its default, in the
+  config's order, and no group that keeps every value. Adapters narrow their styles to it; the
+  factory modules and the declarations don't change. `narrowConfig(config, components,
+variants)` gives the config with only those components and the values in use (their compound
+  variants too), for adapters that compile styles from the config. `keepsValue` answers for one
+  value.
+- The hash covers `variants` only when they narrow something, so glue made with a usage that
+  narrows nothing equals unpruned glue.
 
 ### What it writes
 
@@ -126,8 +161,9 @@ export type Components = "button" | "checkbox";
   runs the adapter and compares contents (`modified`), and lists generated files no longer
   wanted (`extra`).
 - **The hash** covers the config, the target's name and platform, the adapter's options, the
-  allow-list and lazy list, every installed train and binding package's version, and a
-  format number for what `generate` itself writes.
+  allow-list and lazy list (after pruning), the pruned variants when they narrow anything,
+  every installed train and binding package's version, and a format number for what
+  `generate` itself writes.
 
 ### The adapter codegen interface
 
@@ -154,6 +190,9 @@ export const codegen = defineCodegen<{ prefix?: string }>({
     }),
 });
 ```
+
+The context also carries `variants` in a pruned build (empty or absent otherwise): narrow the
+stylesheet, `staticCss`, or precomputed tables to it, never the modules (see Pruning above).
 
 `themeAttribute` is the attribute the target's stylesheet matches named themes with; the index
 passes it to `createRegistry`, whose `themeAttributes(name)` providers write on their element.

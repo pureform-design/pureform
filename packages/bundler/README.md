@@ -4,16 +4,19 @@ The pureform bundler plugin. It writes the `.pureform/` glue (the style registry
 declarations) when `vite dev` or `vite build` starts, writes it again in dev when the config
 changes, and serves the generated index as `virtual:pureform/registry`. Generation itself is
 `@pureform/generate`'s, the same step `pureform generate` (`@pureform/cli`) runs, so the plugin
-and the command can't produce different glue.
+and the command can't produce different glue. In builds it prunes: it scans the app's source
+first and generates only the components the app draws and the variant values it selects.
 
 - **Depends on:** `@pureform/generate` (generation, the runner and watcher), `unplugin` (one
-  plugin for every bundler), `@pureform/styling` and `@pureform/core` (types).
-- **Depended on by:** apps' bundler configs (`apps/solid-demo`, `apps/react-demo`).
+  plugin for every bundler), `@pureform/binding-core/usage` (what each component draws),
+  `@pureform/anatomy` (anatomy names), `oxc-parser` (the scan), `@pureform/styling` and
+  `@pureform/core` (types).
+- **Depended on by:** apps' bundler configs (every app under `apps/` but `rn-web-demo`).
 - Part of the core train: released at the same version as `core`, `styling`, and the adapters.
 
 Design: [§6 generated glue](../../docs/design/component-architecture.md#6-generated-glue),
-[§7 tree shaking](../../docs/design/component-architecture.md#7-tree-shaking) (the allow-list;
-pruning is p7's), [§3 package layout](../../docs/design/component-architecture.md#3-package-layout).
+[§7 tree shaking](../../docs/design/component-architecture.md#7-tree-shaking) (the allow-list and
+pruning), [§3 package layout](../../docs/design/component-architecture.md#3-package-layout).
 
 ## Architecture
 
@@ -21,7 +24,8 @@ pruning is p7's), [§3 package layout](../../docs/design/component-architecture.
 vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
         │
      plugin.ts ── createGlueRunner (@pureform/generate)
-        │            config hook (Vite)    generate before any plugin's configResolved
+        │            config hook (Vite)    scan the app (builds), then generate before any
+        │                                  plugin's configResolved
         │            buildStart            generate (once), watch the config and its imports
         │            watchChange           generate again when one of them changes
         │            resolveId             virtual:pureform/registry → <outDir>/index.ts;
@@ -29,16 +33,20 @@ vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
      metro.ts ── watchGlue (@pureform/generate)
                      withPureformGlue      generate before Metro starts, keep watching,
                                            resolve virtual:pureform/registry
-     options.ts      the shared options, generateOptions, describeResult
+     options.ts      the shared options, generateOptions, pruneOptions, describeResult
+     prune/
+       scan.ts       scanUsage: the app's files → Usage (components, variant values)
+       index.ts      findUsage (scan + the prune options), describePruning
 ```
 
-| Module        | What it does                                                                |
-| ------------- | --------------------------------------------------------------------------- |
-| `options.ts`  | `PureformPluginOptions`, `REGISTRY_ID`, `generateOptions`, `describeResult` |
-| `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                       |
-| `vite.ts` …   | `pureform` for one bundler, also the default export                         |
-| `metro.ts`    | `withPureformGlue(metroConfig, options)`                                    |
-| `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)  |
+| Module        | What it does                                                                                                |
+| ------------- | ----------------------------------------------------------------------------------------------------------- |
+| `options.ts`  | `PureformPluginOptions`, `PruneOptions`, `REGISTRY_ID`, `generateOptions`, `pruneOptions`, `describeResult` |
+| `prune/`      | `scanUsage`, `findUsage`, `describePruning`                                                                 |
+| `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                                                       |
+| `vite.ts` …   | `pureform` for one bundler, also the default export                                                         |
+| `metro.ts`    | `withPureformGlue(metroConfig, options)`                                                                    |
+| `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)                                  |
 
 ## Public API
 
@@ -72,6 +80,7 @@ export default defineConfig({
 | `trainCheck` | `true`                                    | Fail when installed pureform packages disagree in version      |
 | `imports`    | `true`                                    | The config's import rules, or `{ allow }`, or `false`          |
 | `watch`      | `true`                                    | Generate again in dev and watch builds when the config changes |
+| `prune`      | `true` (Metro: `false`)                   | Usage-based pruning in builds, or `PruneOptions` (below)       |
 
 The app reads the registry from the folder or from the virtual id:
 
@@ -117,7 +126,9 @@ module.exports = withPureformGlue(getDefaultConfig(__dirname), {
 It returns a promise of the config (Metro accepts one): it generates first (failing like a
 build when that fails), keeps regenerating on changes with an unref'd watcher (so a one-off
 bundle still exits), and resolves `virtual:pureform/registry` before the config's own
-`resolveRequest`.
+`resolveRequest`. Metro serves and bundles from one config, so it doesn't prune unless asked:
+pass `prune: true` in the config a release bundle uses. It scans once, before Metro starts, and
+regenerations keep that usage, so don't prune a config a dev server runs.
 
 ## How it behaves
 
@@ -135,14 +146,75 @@ bundle still exits), and resolves `virtual:pureform/registry` before the config'
 - **Regeneration.** Only changes to the config and the files it imports (relative paths)
   trigger it; generation rewrites only files whose contents differ, so unchanged glue doesn't
   reload anything. Changes to installed packages need a restart.
-- **No pruning yet.** Usage-based pruning (design doc §7, item 3) is p7's.
+- **Pruning writes in place.** A pruned build writes the pruned glue to `.pureform/`, as Panda
+  writes `styled-system/`; the next dev server or `pureform generate` writes the full glue back
+  (the hash covers what pruning narrowed). An app that commits `.pureform/`, or whose folder other
+  tools read during builds, sets `prune: false` (`react-demo`, `solid-demo`).
+
+## Pruning
+
+`vite build` (and Rollup, Rolldown, and esbuild builds) prunes by default; dev servers and
+watch builds never do. Before generating, the plugin scans the app and passes what it found to
+`generate` as `usage`: the registry, the declarations, and the factory modules keep only the
+components the app draws, and the target narrows its styles to the variant values it selects
+(Panda's `staticCss`, the CSS and Tailwind stylesheets, the native precomputed tables).
+
+```ts
+pureform({
+    target: "css",
+    prune: {
+        include: ["src"], // where to start (default: every script under the root)
+        exclude: ["src/stories"], // besides node_modules, dot folders, dist, build, tests, …
+        keep: ["dialog"], // whole components, whatever the scan finds
+        variants: false, // prune components only
+    },
+});
+```
+
+**What the scan reads**, in every script under the root (or `include`) and what they import by
+relative path (`node_modules`, dot folders, `dist`, `build`, `coverage`, `styled-system`, the glue,
+the bundler's `outDir`, and test and story files are skipped):
+
+- imports of component subpaths (`@pureform/solid/button`, `/react/…`, `/react-native/…`):
+  each draws the registry entries `COMPONENT_USAGE` lists (a dialog draws `dialog`, `scrim`,
+  and `button`);
+- the JSX that renders them (`<Button variant="text">`, `<Button.Root>`, `<ns.Button>`): a
+  written-out value (a string, number, boolean, `undefined`, a template without expressions,
+  or `a ? "x" : "y"`) selects those values; anything else keeps every value of that group; a
+  spread, or the component used other than as a tag (`as={Button}`, `<Dynamic component>`,
+  passed to a function, re-exported), keeps every value of every group;
+- `useClasses(name, selection)` and `useStyles`: the selection's written-out values (an object,
+  or a function returning one), other groups at their defaults; `useClassFactory(name)`,
+  `useLazyClassFactory`, `useStyleFactory`: the entry with every value;
+- `useComponent(anatomy, { selection })` with an anatomy from `@pureform/anatomy`;
+- `registry.entry("name")` and `.preload("name")` on the glue's `registry` or `useRegistry()`,
+  and imports of `.pureform/web/<name>`: the entry with every value;
+- `<PureformProvider defaults={{ button: { variant: "text" } }}>`: those values (any other
+  `defaults` keeps every value of every component).
+
+Groups a component sets itself (a FAB's `extended`, a text field's icons, a card's
+`interactive`) keep every value. Defaults are always kept.
+
+**When it keeps everything** and warns (`pureform: pruning kept every component and variant,
+since …`): a file that doesn't parse, a registry hook or `registry.entry` with a name it can't
+read, `useComponent` with an anatomy it can't name, an unknown component subpath, re-exported or
+dynamically imported registry hooks, or the glue imported as a namespace or dynamically.
+
+**What it can't see** (use `keep`, or `prune: false`): components drawn from packages under
+`node_modules` (a design system that wraps pureform), names passed through `usePureform()`'s
+registry or a registry passed around under another name, and calls of the registry hooks through
+a wrapper the app writes. The scan isn't the bundler's module graph: unused files under the root
+count as used.
 
 ## Build and test
 
 - `task_run` `test:unit` on `@pureform/bundler`: Vite builds and dev servers on temporary apps
   with a fake adapter (generation before `configResolved`, the options, a failing build,
   regeneration on a change, missing glue in dev), a Rolldown build, the hooks called directly,
-  the Metro wrapper, and a `tsc` run over the client types.
+  the Metro wrapper, and a `tsc` run over the client types. Pruning: `prune/scan.spec.ts` (what
+  the scan reads and when it keeps everything), pruned Vite, dev, and Rolldown builds in
+  `plugin.spec.ts`, and `prune/fixture.spec.ts`, a fixture app on the CSS target with the whole
+  preset whose build ships only the components and values its source uses.
 - `task_run` `build` on `@pureform/bundler`: `dist/{index,vite,rollup,rolldown,esbuild,metro}.mjs`.
 
 ## Surprises

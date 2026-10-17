@@ -11,7 +11,7 @@ bun run dev
 ## How it's wired
 
 ```
-pureform.config.ts ──► pureform.glue.ts { target: "css", options, components }
+pureform.config.ts ──► pureform.glue.ts { target: "css", options }
                               │
         vite.config.ts: pureform(glue) ──► .pureform/  (ignored by git)
                               │              ├── web/<name>.ts   ClassFactory per component
@@ -24,9 +24,11 @@ src/main.tsx: imports reset.css and .pureform/styles.css,
 
 - `pureform.config.ts`: Material's defaults and a teal theme.
 - `pureform.glue.ts`: the target and its options (`prefix: "pf"`, `classPrefix: "pf"`, so classes
-  read `pf-button__root`), and the components the page uses, which the registry and the
-  stylesheet are trimmed to. `vite.config.ts` passes it to the bundler plugin, and
-  `pureform generate` (the omni `generate` task) reads it.
+  read `pf-button__root`). `vite.config.ts` passes it to the bundler plugin, and
+  `pureform generate` (the omni `generate` task) reads it. `vite build` prunes the registry
+  and the stylesheet to the 10 components the page draws and the variant values it selects
+  (the bundler's `prune`): the CSS goes from 847 kB (124 kB gzipped) with every component to
+  429 kB (80 kB), the script from 167 kB to 140 kB.
 - `src/main.tsx`: imports `@pureform/css-adapter/reset.css` and `.pureform/styles.css`, and renders
   the page inside `PureformProvider`. The theme buttons set the provider's `theme`, which writes
   `registry.themeAttributes(theme)` (`data-theme="teal"`) on its element; the scheme buttons put

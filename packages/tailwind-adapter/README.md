@@ -97,7 +97,8 @@ variant name, `theme-<name>` by default).
   `componentModules`), since the Tailwind stylesheet keeps the CSS adapter's class names. See
   [the CSS adapter's codegen](../css-adapter/README.md#generated-glue-codegen).
 - **`styles.css`**: `compileTailwind` over the config with only those components (tokens,
-  themes, variants, and keyframes stay). The app imports it after Tailwind:
+  themes, variants, and keyframes stay), narrowed to the variant values a pruned build uses
+  (`subsetConfig` with `context.variants`, as the CSS target does). The app imports it after Tailwind:
 
     ```css
     @import "tailwindcss";
