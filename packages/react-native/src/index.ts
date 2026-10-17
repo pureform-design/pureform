@@ -1,6 +1,6 @@
 // pureform's React Native bindings: the provider, the style registry's hooks, motion engines,
-// icons, and what components build on. The components are at their own subpaths
-// (`@pureform/react-native/button`, …).
+// icons, indication and interaction sources, and what components build on. The components are
+// at their own subpaths (`@pureform/react-native/button`, …).
 
 export { animated, pressNow } from "./engine";
 export type {
@@ -18,15 +18,20 @@ export {
     useIconStyle,
 } from "./icon-style";
 export {
-    testIdOf,
-    unselectable,
-    useControllable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "./parts";
-export type { InkSlotOptions, PressHandlers } from "./parts";
+    DEFAULT_INDICATION,
+    materialIndication,
+    nativeIndication,
+    useIndication,
+} from "./indication";
+export type { SurfaceIndication, UseIndicationOptions } from "./indication";
+export {
+    FOCUS_AFTER_PRESS_MS,
+    focusFollowsPress,
+    useInteractionSource,
+    useInteractionState,
+} from "./interaction";
+export type { PressableEvent, PressableHandlers } from "./interaction";
+export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export {
     PureformProvider,
     useDirection,
@@ -69,3 +74,24 @@ export type {
     IconStyle,
     MotionSetting,
 } from "@pureform/binding-core";
+export {
+    defineIndication,
+    noIndication,
+} from "@pureform/binding-core/indication";
+export type {
+    Indication,
+    IndicationTokens,
+    MaterialIndicationOptions,
+    MaterialRipple,
+    NativeIndicationComponent,
+    NativeIndicationProps,
+    NativeIndicationSurface,
+} from "@pureform/binding-core/indication";
+export type {
+    Interaction,
+    InteractionKinds,
+    InteractionSource,
+    InteractionState,
+    MutableInteractionSource,
+    PointerKind,
+} from "@pureform/binding-core/interaction";

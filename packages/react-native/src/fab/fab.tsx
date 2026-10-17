@@ -8,22 +8,20 @@ import type {
     FabContentProps,
     FabPart,
     FabVariantProps,
+    InteractiveProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface FabProps extends FabVariantProps, FabContentProps<ReactNode> {
+const [INDICATION] = fabAnatomy.indication!;
+
+export interface FabProps
+    extends FabVariantProps, FabContentProps<ReactNode>, InteractiveProps {
     /** What the button does, for assistive technology; the label's text by default. */
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
@@ -35,22 +33,24 @@ const present = (node: ReactNode) => node != null && node !== false;
 
 function FabImpl(props: FabProps): ReactNode {
     const engine = useEngine();
-    const { state, handlers } = usePress({
-        ...(props.disabled ? { disabled: true } : {}),
-        ...(props.mirrorIcon ? { mirrored: true } : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "fab",
-        fabSelection({
-            ...props,
-            extended: props.extended ?? present(props.label),
+        indication.select(
+            fabSelection({
+                ...props,
+                extended: props.extended ?? present(props.label),
+            }),
+        ),
+        indication.states({
+            ...(props.disabled ? { disabled: true } : {}),
+            ...(props.mirrorIcon ? { mirrored: true } : {}),
         }),
-        state,
     );
-    const ink = useInk(selected, {
-        slot: "container",
-        disabled: props.disabled ?? false,
-    });
     const Drawing = engine.Drawing;
     const id = (part: FabPart) => testIdOf(fabAnatomy, part, props.testId);
     const label =
@@ -58,7 +58,7 @@ function FabImpl(props: FabProps): ReactNode {
         (typeof props.label === "string" ? props.label : undefined);
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="button"
             {...(label === undefined ? {} : { "aria-label": label })}
             disabled={props.disabled}
@@ -89,7 +89,7 @@ function FabImpl(props: FabProps): ReactNode {
                         {props.label}
                     </engine.Text>
                 ) : null}
-                {ink.layer}
+                {indication.layer(selected)}
             </engine.View>
         </engine.Pressable>
     );

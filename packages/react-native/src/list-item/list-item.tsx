@@ -9,6 +9,7 @@ import {
     listItemSelection,
 } from "@pureform/binding-core";
 import type {
+    InteractiveProps,
     ListItemContentProps,
     ListItemPart,
     ListItemVariantProps,
@@ -16,19 +17,18 @@ import type {
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
+const [INDICATION] = listItemAnatomy.indication!;
+
 export interface ListItemProps
-    extends ListItemVariantProps, ListItemContentProps<ReactNode> {
+    extends
+        ListItemVariantProps,
+        ListItemContentProps<ReactNode>,
+        InteractiveProps {
     /** The current item, such as the page a navigation list is on. */
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
@@ -40,24 +40,30 @@ export interface ListItemProps
 function ListItemImpl(props: ListItemProps): ReactNode {
     const engine = useEngine();
     const interactive = props.onPress !== undefined;
-    const { state, handlers } = usePress({
-        selected: props.selected ?? false,
-        ...(props.disabled ? { disabled: true } : {}),
-        ...(props.mirrorLeading || props.mirrorTrailing
-            ? { mirrored: true }
-            : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
+        interactive,
     });
     const { styles: s, selected } = useComponentSlots(
         "listItem",
-        listItemSelection(
-            { ...props, lines: props.lines ?? listItemLines(props) },
-            interactive ? "button" : "div",
+        indication.select(
+            listItemSelection(
+                { ...props, lines: props.lines ?? listItemLines(props) },
+                interactive ? "button" : "div",
+            ),
         ),
-        interactive ? state : {},
+        interactive
+            ? indication.states({
+                  selected: props.selected ?? false,
+                  ...(props.disabled ? { disabled: true } : {}),
+                  ...(props.mirrorLeading || props.mirrorTrailing
+                      ? { mirrored: true }
+                      : {}),
+              })
+            : {},
     );
-    const ink = useInk(selected, {
-        disabled: !interactive || (props.disabled ?? false),
-    });
     const id = (part: ListItemPart) =>
         testIdOf(listItemAnatomy, part, props.testId);
     const line = (part: ListItemPart, value: ReactNode) =>
@@ -76,7 +82,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         ) : null;
     return (
         <engine.Pressable
-            {...(interactive ? withInk(handlers, ink) : {})}
+            {...(interactive ? indication.handlers : {})}
             role={interactive ? "button" : "listitem"}
             {...(interactive
                 ? { onPress: props.onPress, disabled: props.disabled }
@@ -92,7 +98,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </engine.View>
             {icon("trailing", props.trailing)}
             {line("trailingText", props.trailingText)}
-            {ink.layer}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }

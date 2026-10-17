@@ -1,25 +1,29 @@
-// The slider: a track, its active part, a state layer, and the handle, dragged by pointer or
-// touch. Its value's position along the track is the instance's `value` token, a percentage,
-// which the active track and the handle follow.
+// The slider: a track, its active part, a state layer (where it ripples), and the handle, dragged
+// by pointer or touch, which presses and drags it in its interaction source. Its value's position
+// along the track is the instance's `value` token, a percentage, which the active track and the
+// handle follow.
 
 import { sliderAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { sliderSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    InteractiveProps,
     SliderPart,
     SliderVariantProps,
 } from "@pureform/binding-core";
-import { pressableState } from "@pureform/rn-adapter/react";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import type { ReactNode } from "react";
 import type { GestureResponderEvent } from "react-native";
 
+import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface SliderProps extends SliderVariantProps {
+const [INDICATION] = sliderAnatomy.indication!;
+
+export interface SliderProps extends SliderVariantProps, InteractiveProps {
     /** The value. Controlled when defined. */
     readonly value?: number | undefined;
     readonly defaultValue?: number | undefined;
@@ -66,8 +70,6 @@ function SliderImpl(props: SliderProps): ReactNode {
         props.onValueChange,
         min,
     );
-    const [dragged, setDragged] = useState(false);
-    const [hovered, setHovered] = useState(false);
     // Where the track sits on the page, read when a drag starts; until then, none.
     const origin = useRef<{ x: number; width: number }>(undefined);
     const root = useRef<Measurable>(null);
@@ -75,12 +77,18 @@ function SliderImpl(props: SliderProps): ReactNode {
         max > min
             ? ((Math.min(Math.max(value, min), max) - min) / (max - min)) * 100
             : 0;
-    const { styles: s } = useComponentSlots(
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
+    });
+    const { interaction } = indication;
+    const { styles: s, selected } = useComponentSlots(
         "slider",
-        sliderSelection(props, percent),
+        indication.select(sliderSelection(props, percent)),
         {
-            ...pressableState({ pressed: dragged, hovered }),
-            dragged,
+            ...indication.states(),
+            dragged: indication.state.dragged,
             ...(props.disabled ? { disabled: true } : {}),
         },
     );
@@ -97,9 +105,11 @@ function SliderImpl(props: SliderProps): ReactNode {
         );
         if (next !== value) setValue(next);
     };
-    const end = () => {
+    const end = (cancelled: boolean) => {
         origin.current = undefined;
-        setDragged(false);
+        interaction.dragStop();
+        if (cancelled) interaction.cancel();
+        else interaction.release();
     };
     const id = (part: SliderPart) =>
         testIdOf(sliderAnatomy, part, props.testId);
@@ -114,12 +124,13 @@ function SliderImpl(props: SliderProps): ReactNode {
             aria-valuemin={min}
             aria-valuemax={max}
             aria-disabled={props.disabled}
-            onPointerEnter={() => setHovered(true)}
-            onPointerLeave={() => setHovered(false)}
+            onPointerEnter={interaction.handlers.onHoverIn}
+            onPointerLeave={interaction.handlers.onHoverOut}
             onStartShouldSetResponder={() => !props.disabled}
             onMoveShouldSetResponder={() => !props.disabled}
             onResponderGrant={(event: GestureResponderEvent) => {
-                setDragged(true);
+                interaction.press(event);
+                interaction.dragStart();
                 const pageX = event.nativeEvent.pageX;
                 const start = (x: number, width: number) => {
                     origin.current = { x, width };
@@ -135,8 +146,8 @@ function SliderImpl(props: SliderProps): ReactNode {
                     );
             }}
             onResponderMove={move}
-            onResponderRelease={end}
-            onResponderTerminate={end}
+            onResponderRelease={() => end(false)}
+            onResponderTerminate={() => end(true)}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
@@ -154,7 +165,9 @@ function SliderImpl(props: SliderProps): ReactNode {
                 pointerEvents="none"
                 style={s.stateLayer}
                 testID={id("stateLayer")}
-            />
+            >
+                {indication.layer(selected)}
+            </engine.View>
             <engine.View
                 pointerEvents="none"
                 style={s.handle}

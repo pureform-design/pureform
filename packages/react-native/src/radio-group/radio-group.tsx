@@ -1,41 +1,41 @@
 // The radio group and its radios. A radio is a pressable root with its touch target and its ring,
-// which holds the dot. In a `RadioGroup`, a radio is checked when its value is the group's, and a
-// press picks it; on its own, it takes `checked` and `onPress`.
+// which holds the dot, and ripples from its center. In a `RadioGroup`, a radio is checked when its
+// value is the group's, and a press picks it; on its own, it takes `checked` and `onPress`.
 
 import { radioAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { radioSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
+    InteractiveProps,
     RadioGroupItem,
     RadioPart,
     RadioVariantProps,
 } from "@pureform/binding-core";
+import type { Indication } from "@pureform/binding-core/indication";
 import { createContext, useContext } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
-import {
-    testIdOf,
-    unselectable,
-    useControllable,
-    usePress,
-    withEngine,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
+
+const [INDICATION] = radioAnatomy.indication!;
 
 interface GroupContext extends RadioVariantProps {
     readonly value: string | null;
     readonly disabled: boolean;
     readonly invalid: boolean;
+    readonly indication: Indication | undefined;
     readonly pick: (value: string) => void;
 }
 
 const RadioGroupContext = createContext<GroupContext | undefined>(undefined);
 
-export interface RadioProps extends RadioVariantProps {
+export interface RadioProps extends RadioVariantProps, InteractiveProps {
     /** The radio's value in its group. */
     readonly value?: string | undefined;
     /** Whether it's checked, outside a group. */
@@ -57,20 +57,24 @@ function RadioImpl(props: RadioProps): ReactNode {
             : (props.checked ?? false);
     const disabled = (props.disabled ?? false) || (group?.disabled ?? false);
     const invalid = (props.invalid ?? false) || (group?.invalid ?? false);
-    const { state, handlers } = usePress({
-        checked,
-        ...(disabled ? { disabled: true } : {}),
-        ...(invalid ? { invalid: true } : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication ?? group?.indication,
+        interactionSource: props.interactionSource,
+        disabled,
     });
-    const { styles: s } = useComponentSlots(
+    const { styles: s, selected } = useComponentSlots(
         "radio",
-        radioSelection(group ?? {}, props),
-        state,
+        indication.select(radioSelection(group ?? {}, props)),
+        indication.states({
+            checked,
+            ...(disabled ? { disabled: true } : {}),
+            ...(invalid ? { invalid: true } : {}),
+        }),
     );
     const id = (part: RadioPart) => testIdOf(radioAnatomy, part, props.testId);
     return (
         <engine.Pressable
-            {...handlers}
+            {...indication.handlers}
             role="radio"
             aria-checked={checked}
             {...(props["aria-label"] === undefined
@@ -92,6 +96,7 @@ function RadioImpl(props: RadioProps): ReactNode {
             <engine.View style={s.ring} testID={id("ring")}>
                 <engine.View style={s.dot} testID={id("dot")} />
             </engine.View>
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }
@@ -100,6 +105,8 @@ function RadioImpl(props: RadioProps): ReactNode {
 export const Radio = withEngine(RadioImpl, "Radio");
 
 export interface RadioGroupProps extends RadioVariantProps {
+    /** The radios' indication, over the provider's; a radio's own `indication` goes over it. */
+    readonly indication?: Indication | undefined;
     /** The checked radio's value, `null` for none. Controlled when defined. */
     readonly value?: string | null | undefined;
     readonly defaultValue?: string | null | undefined;
@@ -130,6 +137,7 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
         value,
         disabled: props.disabled ?? false,
         invalid: props.invalid ?? false,
+        indication: props.indication,
         pick: (next) => {
             if (next !== value) setValue(next);
         },
@@ -153,6 +161,9 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
                         aria-label={item.label}
                         {...(item.disabled ? { disabled: true } : {})}
                         {...(item.invalid ? { invalid: true } : {})}
+                        {...(item.interactionSource === undefined
+                            ? {}
+                            : { interactionSource: item.interactionSource })}
                         {...(item.testId === undefined
                             ? {}
                             : { testId: item.testId })}

@@ -12,6 +12,7 @@ dependencies:
     - "@pureform/styling"
     - "@pureform/anatomy"
     - "@pureform/binding-core"
+    - "@pureform/machines"
     - "@pureform/rn-adapter"
     - "@pureform/preset"
 

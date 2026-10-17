@@ -1,21 +1,28 @@
-// The snackbar's surface: its message, an action, and a close button. When it shows, and for how
-// long, is the app's.
+// The snackbar's surface: its message, an action, and a close button, each rippling when pressed.
+// When it shows, and for how long, is the app's.
 
 import { snackbarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { isPresent, snackbarSelection } from "@pureform/binding-core";
 import type {
+    IndicationProps,
     SnackbarPart,
     SnackbarVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import { testIdOf, unselectable, usePress, withEngine } from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface SnackbarProps extends SnackbarVariantProps {
+// The action's and the close button's.
+const INDICATIONS = Object.fromEntries(
+    snackbarAnatomy.indication!.map((entry) => [entry.trigger, entry]),
+);
+
+export interface SnackbarProps extends SnackbarVariantProps, IndicationProps {
     /** The message. */
     readonly supportingText?: ReactNode;
     /** The action's label. */
@@ -37,15 +44,17 @@ function SnackbarButtonImpl(props: {
     readonly children: ReactNode;
 }): ReactNode {
     const engine = useEngine();
-    const { state, handlers } = usePress({});
+    const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
+        indication: props.snackbar.indication,
+    });
     const { styles: s, selected } = useComponentSlots(
         "snackbar",
-        snackbarSelection(props.snackbar),
-        state,
+        indication.select(snackbarSelection(props.snackbar)),
+        indication.states(),
     );
     return (
         <engine.Pressable
-            {...handlers}
+            {...indication.handlers}
             role="button"
             {...(props.label === undefined
                 ? {}
@@ -64,6 +73,7 @@ function SnackbarButtonImpl(props: {
             >
                 {props.children}
             </IconSlot>
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }

@@ -6,6 +6,7 @@ import { menuAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { isPresent, menuSelection } from "@pureform/binding-core";
 import type {
+    IndicationProps,
     MenuItem,
     MenuSelectDetails,
     MenuVariantProps,
@@ -13,21 +14,17 @@ import type {
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
-import {
-    testIdOf,
-    unselectable,
-    useInk,
-    usePress,
-    withEngine,
-    withInk,
-} from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 /** The menu's parts this binding renders. */
 type Part = PartName<typeof menuAnatomy>;
 
-export interface MenuProps extends MenuVariantProps {
+const [INDICATION] = menuAnatomy.indication!;
+
+export interface MenuProps extends MenuVariantProps, IndicationProps {
     readonly items: readonly MenuItem<ReactNode>[];
     /** The item shown selected, such as a select's value. */
     readonly value?: string | null | undefined;
@@ -43,22 +40,22 @@ function MenuItemImpl(props: {
 }): ReactNode {
     const { menu, item } = props;
     const engine = useEngine();
-    const { state, handlers } = usePress({
-        selected: menu.value === item.value,
-        disabled: item.disabled ?? false,
-        ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon
-            ? { mirrored: true }
-            : {}),
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: menu.indication,
+        interactionSource: item.interactionSource,
+        disabled: item.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "menu",
-        menuSelection(menu),
-        state,
+        indication.select(menuSelection(menu)),
+        indication.states({
+            selected: menu.value === item.value,
+            disabled: item.disabled ?? false,
+            ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon
+                ? { mirrored: true }
+                : {}),
+        }),
     );
-    const ink = useInk(selected, {
-        slot: "item",
-        ...(item.disabled ? { disabled: true } : {}),
-    });
     const id = (part: Part) => testIdOf(menuAnatomy, part, menu.testId);
     const icon = (part: "itemLeading" | "itemTrailing", node: ReactNode) =>
         isPresent(node) ? (
@@ -70,7 +67,7 @@ function MenuItemImpl(props: {
         ) : null;
     return (
         <engine.Pressable
-            {...withInk(handlers, ink)}
+            {...indication.handlers}
             role="menuitem"
             disabled={item.disabled}
             onPress={() => menu.onSelect?.({ value: item.value })}
@@ -95,7 +92,7 @@ function MenuItemImpl(props: {
                     {item.trailingText}
                 </engine.Text>
             ) : null}
-            {ink.layer}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }

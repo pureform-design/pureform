@@ -1,17 +1,24 @@
 // The card: a surface for its content. With `onPress`, the whole card acts: it's interactive,
-// lifts on hover, and renders its touch target.
+// lifts on hover, ripples when pressed, and renders its touch target.
 
 import { cardAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import { cardSelection } from "@pureform/binding-core";
-import type { CardPart, CardVariantProps } from "@pureform/binding-core";
+import type {
+    CardPart,
+    CardVariantProps,
+    InteractiveProps,
+} from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { testIdOf, unselectable, usePress, withEngine } from "../parts";
+import { useSurfaceIndication } from "../indication";
+import { testIdOf, unselectable, withEngine } from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
-export interface CardProps extends CardVariantProps {
+const [INDICATION] = cardAnatomy.indication!;
+
+export interface CardProps extends CardVariantProps, InteractiveProps {
     readonly children?: ReactNode;
     /** Makes the whole card act. */
     readonly onPress?: (() => void) | undefined;
@@ -22,13 +29,16 @@ export interface CardProps extends CardVariantProps {
 function CardImpl(props: CardProps): ReactNode {
     const engine = useEngine();
     const acts = props.onPress !== undefined;
-    const { state, handlers } = usePress(
-        props.disabled ? { disabled: true } : {},
-    );
-    const { styles: s } = useComponentSlots(
+    const indication = useSurfaceIndication(INDICATION!, {
+        indication: props.indication,
+        interactionSource: props.interactionSource,
+        disabled: props.disabled,
+        interactive: acts,
+    });
+    const { styles: s, selected } = useComponentSlots(
         "card",
-        cardSelection(props, acts ? "button" : "div"),
-        acts ? state : {},
+        indication.select(cardSelection(props, acts ? "button" : "div")),
+        acts ? indication.states(props.disabled ? { disabled: true } : {}) : {},
     );
     const id = (part: CardPart) => testIdOf(cardAnatomy, part, props.testId);
     if (!acts) {
@@ -40,7 +50,7 @@ function CardImpl(props: CardProps): ReactNode {
     }
     return (
         <engine.Pressable
-            {...handlers}
+            {...indication.handlers}
             role="button"
             disabled={props.disabled}
             onPress={props.onPress}
@@ -53,6 +63,7 @@ function CardImpl(props: CardProps): ReactNode {
                 testID={id("touchTarget")}
             />
             {props.children}
+            {indication.layer(selected)}
         </engine.Pressable>
     );
 }
