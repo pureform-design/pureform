@@ -25,6 +25,7 @@ export default createConfig({
                     "text-field": "src/text-field/index.ts",
                     slider: "src/slider/index.ts",
                     form: "src/form/index.ts",
+                    interaction: "src/interaction/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>

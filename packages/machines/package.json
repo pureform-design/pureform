@@ -116,6 +116,13 @@
                 "development": "./src/form/index.ts",
                 "default": "./dist/form.mjs"
             }
+        },
+        "./interaction": {
+            "types": "./dist/interaction/index.d.ts",
+            "import": {
+                "development": "./src/interaction/index.ts",
+                "default": "./dist/interaction.mjs"
+            }
         }
     },
     "dependencies": {

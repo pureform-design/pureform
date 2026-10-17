@@ -57,24 +57,25 @@ callback reports user actions only, with a details object.
 
 ## Public API
 
-| Import                           | Exports                                                                                                                                                 |
-| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@pureform/machines`             | the namespaces below, the form helpers, Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types, and `InteractionProps`, `ItemInteractionProps` |
-| `@pureform/machines/button`      | `button`'s members                                                                                                                                      |
-| `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                                                                      |
-| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                  |
-| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                              |
-| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules                                                |
-| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                     |
-| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                 |
-| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                               |
-| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                     |
-| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                                                                    |
-| `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                  |
-| `@pureform/machines/ripple`      | `ripple`'s members                                                                                                                                      |
-| `@pureform/machines/text-field`  | `textField`'s members                                                                                                                                   |
-| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                                                                     |
-| `@pureform/machines/form`        | the form helpers                                                                                                                                        |
+| Import                           | Exports                                                                                                                                                                                                                                 |
+| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/machines`             | the namespaces below, the form helpers, Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types, and `InteractionProps`, `ItemInteractionProps`                                                                                 |
+| `@pureform/machines/button`      | `button`'s members                                                                                                                                                                                                                      |
+| `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                                                                                                                                                      |
+| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                                                                                                  |
+| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                                                                                                              |
+| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules                                                                                                                                |
+| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
+| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                                                                                                 |
+| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
+| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
+| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                                                                                                                                                    |
+| `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                                                                                                  |
+| `@pureform/machines/ripple`      | `ripple`'s members                                                                                                                                                                                                                      |
+| `@pureform/machines/text-field`  | `textField`'s members                                                                                                                                                                                                                   |
+| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                                                                                                                                                     |
+| `@pureform/machines/form`        | the form helpers                                                                                                                                                                                                                        |
+| `@pureform/machines/interaction` | `InteractionEmitter`, `InteractionEmitters`, `claimEvent`, `pointerKind`, `isFocusVisible`, `withInteraction`, `chainProps`, `emittersOf`: emitting to an interaction source from a machine of your own (or React Native's `Pressable`) |
 
 ```ts
 import { button } from "@pureform/machines";
