@@ -1,2 +1,2 @@
-src/pureform.gen.css
-src/pureform.d.ts
+# pureform's glue: the bundler plugin writes it when dev or build starts.
+.pureform
