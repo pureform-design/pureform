@@ -17,7 +17,7 @@ It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-que
 @zag-js/checkbox, switch, radio-group, ──re-exported─┐
   select, menu, dialog, tooltip, tabs                │
 own machines (button, ripple, text field,            ├──► @pureform/machines ──► bindings:
-  snackbar, navigation, slider stub) ── Zag's shape ─┤                         useMachine(machine, props)
+  snackbar, navigation, slider) ────── Zag's shape ─┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
 form helpers (native defaults, reset, fieldsets) ────┘                         spread part props
 ```
@@ -44,7 +44,7 @@ callback reports user actions only, with a details object.
 | `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.           |
 | `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.           |
 | `menu.ts`, `dialog.ts`, `tooltip.ts`, `tabs.ts`           | Zag's machines, re-exported unchanged (none is a form control).                                      |
-| `slider/`                                                 | Stub for p6e: the value only.                                                                        |
+| `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.          |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported; all but the checkbox's with pureform's form rules.                      |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
 | `form/`                                                   | Native defaults, form reset, and disabled fieldsets.                                                 |
@@ -68,7 +68,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/navigation`  | `navigation`'s members                                                                                      |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
 | `@pureform/machines/text-field`  | `textField`'s members                                                                                       |
-| `@pureform/machines/slider`      | `slider`'s members (stub)                                                                                   |
+| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                         |
 | `@pureform/machines/form`        | the form helpers                                                                                            |
 
 ```ts
@@ -180,6 +180,28 @@ current })` (`aria-current` set to `current`, `"page"` by default, while it's th
 `aria-disabled`, `data-disabled`, `data-value`), `icon` (`aria-hidden`), and `label`. Destinations
 are links or buttons, each reached with Tab: no roving focus, and arrow keys do nothing.
 
+### Slider
+
+| Prop                                     | Type                                      | Notes                                                        |
+| ---------------------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
+| `id`, `ids`                              | `string`, `{ root?, input? }`             | element ids: `slider:<id>`, `slider:<id>:input`              |
+| `value`, `defaultValue`, `onValueChange` | `number`, `number`, `({ value }) => void` | controllable; the default is `min`                           |
+| `min`, `max`, `step`                     | `number`                                  | 0, 100, 1                                                    |
+| `disabled`, `readOnly`, `invalid`        | `boolean`                                 | `readOnly` takes no change (a range input has no `readonly`) |
+| `name`, `form`                           | `string`                                  | forwarded to the native input                                |
+| `dir`, `getRootNode`                     |                                           | as in Zag                                                    |
+
+The native `<input type="range">` takes the pointer, the keyboard (its arrow keys follow `dir`),
+the form, and assistive technology; the machine follows it. States: `idle` and `dragging` (the
+pointer is down on the input, until it's let go anywhere). A value from outside is written back
+to the input; one the user moves is clamped and snapped to the step from `min`
+(`snapValue(value, { min, max, step })`). The fieldsets around the input disable it by the
+browser's rule. A form reset is the binding's: it calls `reset(value)` after the browser's.
+`connect` returns `value`, `fraction` (0 to 1), `percent` (0 to 100, the preset's `value` token),
+`dragging`, `disabled`, `setValue`, `reset`, `focus`, and part props for `root` and `input`
+(`type="range"`, `min`, `max`, `step`, the value as `defaultValue`, `aria-invalid`,
+`aria-readonly`, `data-dragging`).
+
 ### Ripple
 
 `ripple.machine` attaches `@pureform/js-effects`'s `ripple` to the layer's parent (or
@@ -240,8 +262,8 @@ trackFormReset(input, {
   p6d adds Zag's tabs. The menu, dialog, and tooltip are unchanged: they aren't form controls. The checkbox's machine is still Zag's
   own (its reset and closest-fieldset tracking don't show through the bindings; see the shared
   suites); give it `withFieldsetRule` if that changes.
-- The slider is a stub with its final shape; p6e fills it in, and its `todo` tests list what's
-  missing.
+- The slider has one thumb: a range slider with two would need its own inputs (or Zag's slider,
+  which owns the pointer and a focusable thumb instead of a native input).
 - `setNativeDefault` keeps what an unedited text control or select shows: writing a default
   alone would change it.
 - The snackbar's `paused` isn't marked on its root: the pointer resting on it would change the

@@ -265,6 +265,53 @@ interface ListItemData<Node>             // a list item's content, variants, val
 LIST_ROOT_PROPS; LIST_CONTENT_PROPS;     // items
 listItemVariants(list, item);            // the item's own over the list's; reads named props only
 
+// Linear and circular progress (no machine)
+type ProgressComponent = "linearProgress" | "circularProgress";
+type LinearProgressPart; type CircularProgressPart;
+interface ProgressRootOwnProps<C>        // indeterminate, color, tokens, value, min, max, testId,
+                                         // unstyled
+PROGRESS_ROOT_PROPS;
+isIndeterminate(props);                  // indeterminate, else no value (undefined or null)
+progressPercent(props);                  // the value as a clamped percentage of min to max
+progressSelection(props);                // the value token from the percentage, unless indeterminate
+progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
+
+// Slider: pureform's slider machine over a native range input
+type SliderPart; interface SliderRootOwnProps // color, tokens, min, max, step, disabled,
+                                         // readOnly, invalid, name, form, id, ids, value,
+                                         // defaultValue, onValueChange, testId, unstyled
+SLIDER_ROOT_PROPS; SLIDER_INPUT_LABEL_PROPS; // aria-label, -labelledby, -describedby, -valuetext
+sliderSelection(props, percent);         // the value token from the machine's percent
+sliderMachineProps(props); sliderNativeDefault(resetsTo, min); // a reset shows the default, else min
+
+// Card (no machine)
+type CardPart; interface CardRootOwnProps // variant, interactive, tokens, disabled, testId, unstyled
+CARD_ROOT_PROPS; cardElement({ href, as }); // "a" with an href, else as, else "div"
+isInteractiveCard(props, element);       // interactive, else a link or a button
+cardSelection(props, element); cardRootProps(props, element); // a button's type; disabled
+
+// Search bar: the text field machine
+type SearchBarPart; interface SearchBarRootOwnProps // tokens, disabled, required, readOnly,
+                                         // placeholder, name, form, id, ids, value, …
+SEARCH_BAR_ROOT_PROPS; SEARCH_BAR_INPUT_PROPS; SEARCH_BAR_CONTENT_PROPS; // leading, trailing, mirror*
+searchBarSelection(props); searchBarMachineProps(props); // the placeholder is the input's own
+
+// Ripple: pureform's ripple machine
+type RipplePart; interface RippleRootOwnProps // tokens, disabled, effect, centered,
+                                         // allowPropagation, getSurfaceEl, id, testId, unstyled
+RIPPLE_ROOT_PROPS; rippleSelection(props); rippleMachineProps(props); // effect → the machine's variant
+
+// Single-part components: Root is the component
+AVATAR_ROOT_PROPS; avatarSelection; avatarElement({ src, as }); // img with a src, else span
+avatarRootProps(props, element);         // src and alt; else role img named by label, or hidden
+MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape
+SEPARATOR_ROOT_PROPS; separatorSelection; separatorRootProps(element); // role on anything but hr
+SCRIM_ROOT_PROPS; scrimSelection;
+SUPPORTING_TEXT_ROOT_PROPS; supportingTextSelection; // tone
+TEXT_ROOT_PROPS; textSelection;          // textStyle, the preset's `style` group
+ICON_ROOT_PROPS; iconSelection; iconRootProps(props); // role img named by label, or hidden
+TOUCH_TARGET_ROOT_PROPS;
+
 // Content
 isPresent(node);                         // not undefined, null, or false
 type IconOnlyName;                       // aria-label or aria-labelledby, required
