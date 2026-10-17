@@ -117,7 +117,10 @@ per allow-listed component, `.pureform/native/<name>.ts`, exporting a `NativeFac
 over that component's own precomputed templates and values (`splitPrecomputed`), parsed from a
 JSON string, and `.pureform/native/theme-values.ts`, the themes' token values and formulas they
 share. Its options are `precompute`'s (`remBase`, `fontStack`, `themes`, `schemes`, `target`).
-Each module's declared `states` are the ones its key reads.
+Each module's declared `states` are the ones its key reads. A pruned build (the bundler's
+`prune`, design doc §7) precomputes `narrowConfig(config, components, variants)`: only the
+variant values the app uses (and their compound variants), so each module carries less; the
+values it keeps select exactly as before.
 
 ## Reduced motion
 

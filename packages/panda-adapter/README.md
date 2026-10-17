@@ -134,8 +134,11 @@ in `tests/browser-e2e-tests` compare it with the other adapters, and
 ## Worth knowing
 
 - Panda's static extractor can't see variants picked at runtime, so the codegen's `panda.ts`
-  lists every variant of every generated component in `staticCss` (design doc §5.2); usage
-  pruning (p7) narrows it later.
+  lists every variant of every generated component in `staticCss` (design doc §5.2). A pruned
+  build (the bundler's `prune`, design doc §7) narrows each component it can to a rule listing
+  every group, with the values in use or `["*"]`: `button: [{ variant: ["filled", "text"], size:
+["*"] }]`. Panda adds each group's default itself, and every compound variant of a generated
+  recipe, so the rule needs neither. The factory modules don't change.
 - Pass the same `prefix` to `compilePreset` and to the codegen: the factories name instance
   tokens' vars with it.
 - `prefix` (Panda's own class prefix, `pandaPrefix` here) doesn't change the recipe functions,

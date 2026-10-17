@@ -175,6 +175,11 @@ export const button: ClassFactory<"button"> = (s) =>
   override sets and the stylesheet reads.
 - **The allow-list** (`components`) limits the modules and the stylesheet's component rules;
   tokens, themes, and keyframes are always in it.
+- **Pruning** (the bundler's `prune`, design doc §7) narrows the stylesheet to the variant values
+  the app uses: `subsetConfig(config, components, variants)` is `narrowConfig` from
+  `@pureform/generate`, which drops the values left out and the compound variants matching them.
+  The factory modules don't change. The spec checks, over the whole preset, that the pruned
+  stylesheet's rules are the full one's minus exactly the rules of the values left out.
 
 | Export (`/codegen`)                       | What it is                                                                        |
 | ----------------------------------------- | --------------------------------------------------------------------------------- |
