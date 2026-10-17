@@ -56,6 +56,8 @@ export {
     findInstalled,
 } from "./train";
 export type { InstalledPackage, TrainCheck, TrainProblem } from "./train";
+export { keepsValue, narrowConfig, normalizeVariants } from "./usage";
+export type { Usage, VariantUsage } from "./usage";
 export { watchGlue } from "./watch";
 export type { GlueWatcher, WatchGlueOptions } from "./watch";
 export type { FileResult, FileStatus } from "./write";

@@ -30,6 +30,8 @@ import { isAdapter, loadAdapter } from "./load-adapter";
 import { VERSION } from "./package-version";
 import { componentShape } from "./shape";
 import { checkTrain, findInstalled } from "./train";
+import { normalizeVariants } from "./usage";
+import type { Usage } from "./usage";
 import { compareFiles, readGenerated, writeFiles } from "./write";
 import type { FileResult, PlannedFile } from "./write";
 
@@ -48,8 +50,12 @@ export interface GenerateOptions<Options = Record<string, unknown>> {
     readonly options?: Options;
     /** The allow-list: generate only these components, in the config's order. Default: all. */
     readonly components?: readonly string[];
-    /** Components whose registry entries load on demand rather than statically. */
+    /** Components whose registry entries load on demand rather than statically. Names that
+     *  `usage` leaves out are dropped. */
     readonly lazy?: readonly string[];
+    /** What the app uses (the bundler plugin's pruning): the glue keeps only the components it
+     *  names, within the allow-list, and adapters narrow styles to its variants. */
+    readonly usage?: Usage;
     /** The app's root. Default: the working directory. */
     readonly root?: string;
     /** The folder to write, relative to `root`. Default `.pureform`. */
@@ -86,6 +92,8 @@ export interface GenerateResult {
     /** The config file and the files it imports, absolute, for watching. Empty for a config
      *  passed as an object. */
     readonly dependencies: readonly string[];
+    /** The components generated, in the config's order. */
+    readonly components: readonly string[];
 }
 
 const toPosix = (path: string): string => path.split(sep).join("/");
@@ -281,12 +289,17 @@ export const generate = async <Options = Record<string, unknown>>(
         );
     }
 
+    const usage = options.usage;
     const components = selectComponents(
         config,
         options.components,
         "components",
+    ).filter((name) => !usage || usage.components.includes(name));
+    const lazy = new Set(
+        selectComponents(config, options.lazy ?? [], "lazy").filter(
+            (name) => !usage || components.includes(name),
+        ),
     );
-    const lazy = new Set(selectComponents(config, options.lazy ?? [], "lazy"));
     const notGenerated = [...lazy].filter((name) => !components.includes(name));
     if (notGenerated.length > 0) {
         throw new GenerateError(
@@ -296,6 +309,24 @@ export const generate = async <Options = Record<string, unknown>>(
     }
     const adapterOptions = (options.options ?? {}) as Options;
 
+    const shapes = new Map<string, ComponentShape>();
+    const shape = (name: string): ComponentShape => {
+        const spec = config.components[name];
+        if (!spec) {
+            throw new GenerateError(
+                "components",
+                `pureform: the config has no component "${name}".`,
+            );
+        }
+        let found = shapes.get(name);
+        if (!found) {
+            found = componentShape(spec);
+            shapes.set(name, found);
+        }
+        return found;
+    };
+    const variants = normalizeVariants(usage?.variants, components, shape);
+
     const hash = hashOf({
         format: GLUE_FORMAT,
         config,
@@ -303,6 +334,8 @@ export const generate = async <Options = Record<string, unknown>>(
         options: adapterOptions,
         components,
         lazy: [...lazy],
+        // Only when it narrows anything, so unpruned glue keeps its hash.
+        ...(Object.keys(variants).length > 0 && { variants }),
         versions: Object.fromEntries(
             installed.map((entry) => [entry.name, entry.version]),
         ),
@@ -324,6 +357,7 @@ export const generate = async <Options = Record<string, unknown>>(
             ok: options.check ? !changed : true,
             hints,
             dependencies: loaded?.dependencies ?? [],
+            components,
         };
     };
 
@@ -348,25 +382,10 @@ export const generate = async <Options = Record<string, unknown>>(
         }
     }
 
-    const shapes = new Map<string, ComponentShape>();
-    const shape = (name: string): ComponentShape => {
-        const spec = config.components[name];
-        if (!spec) {
-            throw new GenerateError(
-                "components",
-                `pureform: the config has no component "${name}".`,
-            );
-        }
-        let found = shapes.get(name);
-        if (!found) {
-            found = componentShape(spec);
-            shapes.set(name, found);
-        }
-        return found;
-    };
     const context: CodegenContext<Options> = {
         config,
         components,
+        variants,
         options: adapterOptions,
         root,
         outDir,
