@@ -94,8 +94,14 @@ describe("a pruned build", () => {
             const full = await built(root, false);
             const pruned = await built(root, true);
 
-            // The registry: only the components drawn.
-            expect(pruned.names).toEqual(["button", "checkbox", "text"]);
+            // The registry: only the components drawn, and the ripple their indication's layer
+            // is drawn with.
+            expect(pruned.names).toEqual([
+                "button",
+                "checkbox",
+                "ripple",
+                "text",
+            ]);
             expect(full.names).toContain("iconButton");
             expect(full.js).toContain("iconButton");
             expect(pruned.js).not.toContain("iconButton");

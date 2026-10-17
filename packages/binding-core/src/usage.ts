@@ -3,7 +3,9 @@
 // every binding. Each entry lists the variant groups the component's props pass to the registry
 // as given, by the prop that sets them (`<Button variant="filled">` selects `filled`). A group
 // left out is computed inside the component (a FAB's `extended` from its label) or set by it,
-// so pruning keeps every value of it.
+// so pruning keeps every value of it. A component that shows indication also draws the `ripple`
+// entry, whose root is the layer inside each surface, unless every indication the app passes has
+// no layer (`INDICATION`).
 
 /** What one component draws: the registry entries, each with the groups its props set. */
 export interface ComponentUsage {
@@ -24,37 +26,53 @@ const same = <const G extends readonly string[]>(
 export const COMPONENT_USAGE = {
     avatar: { entries: { avatar: same("size", "color", "shape") } },
     button: {
-        entries: { button: same("color", "variant", "size", "density") },
+        entries: {
+            button: same("color", "variant", "size", "density"),
+            ripple: {},
+        },
     },
     // `interactive` follows the element.
-    card: { entries: { card: same("variant") } },
-    checkbox: { entries: { checkbox: same("color", "density") } },
-    chip: { entries: { chip: same("variant", "color", "density") } },
+    card: { entries: { card: same("variant"), ripple: {} } },
+    checkbox: { entries: { checkbox: same("color", "density"), ripple: {} } },
+    chip: {
+        entries: { chip: same("variant", "color", "density"), ripple: {} },
+    },
     // `indeterminate` follows the value.
     "circular-progress": { entries: { circularProgress: same("color") } },
     // `icon` follows the icon content; the backdrop is a scrim, and the trigger a button.
-    dialog: { entries: { dialog: {}, scrim: {}, button: {} } },
+    dialog: { entries: { dialog: {}, scrim: {}, button: {}, ripple: {} } },
     // `extended` follows the label.
-    fab: { entries: { fab: same("color", "variant", "size", "shape") } },
+    fab: {
+        entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },
+    },
     icon: { entries: { icon: same("size", "color", "filled") } },
     // `toggle` follows `selected`.
     "icon-button": {
         entries: {
             iconButton: same("color", "variant", "shape", "size", "density"),
+            ripple: {},
         },
     },
     "linear-progress": { entries: { linearProgress: same("color") } },
     // An unstyled `ul` around list items.
     list: { entries: {} },
     // `lines` follows the content, `interactive` the element.
-    "list-item": { entries: { listItem: same("density", "color") } },
+    "list-item": {
+        entries: { listItem: same("density", "color"), ripple: {} },
+    },
     media: { entries: { media: same("aspect", "shape") } },
     // The trigger is a button.
-    menu: { entries: { menu: same("color", "density"), button: {} } },
-    "navigation-bar": { entries: { navigationBar: same("color") } },
-    "navigation-rail": { entries: { navigationRail: same("color") } },
+    menu: {
+        entries: { menu: same("color", "density"), button: {}, ripple: {} },
+    },
+    "navigation-bar": {
+        entries: { navigationBar: same("color"), ripple: {} },
+    },
+    "navigation-rail": {
+        entries: { navigationRail: same("color"), ripple: {} },
+    },
     // The group's color and density reach each radio.
-    "radio-group": { entries: { radio: same("color", "density") } },
+    "radio-group": { entries: { radio: same("color", "density"), ripple: {} } },
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
@@ -64,15 +82,16 @@ export const COMPONENT_USAGE = {
         entries: {
             select: same("variant", "color", "density"),
             menu: same("color", "density"),
+            ripple: {},
         },
     },
     separator: { entries: { separator: same("inset") } },
-    slider: { entries: { slider: same("color") } },
-    snackbar: { entries: { snackbar: {} } },
+    slider: { entries: { slider: same("color"), ripple: {} } },
+    snackbar: { entries: { snackbar: {}, ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },
-    switch: { entries: { switchControl: same("color") } },
+    switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.
-    tabs: { entries: { tabs: same("variant", "color") } },
+    tabs: { entries: { tabs: same("variant", "color"), ripple: {} } },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons follow their content.
     "text-area": {
@@ -84,7 +103,7 @@ export const COMPONENT_USAGE = {
         entries: { textField: same("variant", "color", "density") },
     },
     // The trigger is a button.
-    tooltip: { entries: { tooltip: same("variant"), button: {} } },
+    tooltip: { entries: { tooltip: same("variant"), button: {}, ripple: {} } },
     "touch-target": { entries: { touchTarget: {} } },
 } as const satisfies Readonly<Record<string, ComponentUsage>>;
 
@@ -121,4 +140,21 @@ export const ANATOMY_HOOK = "useComponent";
 export const PROVIDER = {
     name: "PureformProvider",
     defaults: "defaults",
+} as const;
+
+/** How the app chooses indication, for pruning: the `ripple` entry every component with an
+ *  indication entry draws is dropped only when every provider passes an indication with no
+ *  layer, every component's `indication` prop is one, and nothing else draws the ripple. */
+export const INDICATION = {
+    /** The registry entry an indication's layer is drawn with. */
+    entry: "ripple",
+    /** The prop a provider and an interactive component take. */
+    prop: "indication",
+    /** The hook that gives an app's own surface the provider's indication. */
+    hook: "useIndication",
+    /** The bindings' exports: an indication with no layer, Material's (no layer with
+     *  `{ ripple: false }`), and an app's own (no layer unless `layer: true`). */
+    none: "noIndication",
+    material: "materialIndication",
+    define: "defineIndication",
 } as const;

@@ -110,8 +110,10 @@ const drawnBy = (text: string): Set<string> => {
     for (const [, key] of text.matchAll(/\b(\w+Anatomy)\b/g)) {
         const found = anatomyNames.get(key!);
         if (found?.styled) drawn.add(found.name);
+        // A surface that shows indication holds the ripple's layer.
+        if (found?.indicated) drawn.add("ripple");
     }
-    if (/\bas=\{Button\}/.test(text)) drawn.add("button");
+    if (/\bas=\{Button\}/.test(text)) drawn.add("button").add("ripple");
     return drawn;
 };
 
@@ -123,6 +125,9 @@ const anatomyNames = new Map(
                       key,
                       {
                           name: (value as { name: string }).name,
+                          indicated:
+                              ((value as { indication?: readonly unknown[] })
+                                  .indication?.length ?? 0) > 0,
                           // Drawn when any part is styled.
                           styled: Object.values(
                               (
