@@ -161,4 +161,13 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   unstyled group element, `compositeTestIds.radioGroup.root`; its radios repeat the radio's test
   ids, so cases find them by value), select (opened with a click and chosen from its list, which
   takes focus while open; `src/components/select.ts`), switch, text area, and text field (one
-  shared case, `src/components/text-input.ts`: `value` from `""` to `"a"`, typed).
+  shared case, `src/components/text-input.ts`: `value` from `""` to `"a"`, typed), and the
+  overlays (menu, tooltip, dialog, snackbar).
+- **Navigation and lists** (`tabs.ts`, `navigation.ts`, `list.ts`): the tabs' `value` moves with
+  a click, Home and End, and the sideways arrows by direction (`read` checks each panel's `hidden`
+  against its tab); `keyboard.focusable` is the selected tab, the only one Tab reaches. The
+  navigation bar and rail share one case factory (`navigationCase`): Tab reaches the first
+  destination, and Enter or Space choose it, so the state starts at the second (`from:
+"search"`). The list item's case renders it as a button (`as: "button"`, plain data), so it
+  has a focusable element and a disabled state; the list's case is a list of links (Enter clicks
+  the first, `keyboard.disables: false`). Neither has state.

@@ -226,6 +226,45 @@ interface SnackbarRootOwnProps           // tokens, duration, onAction, id, ids,
 SNACKBAR_ROOT_PROPS; SNACKBAR_CONTENT_PROPS; // supportingText, action, closeLabel, closeIcon
 snackbarSelection(props); snackbarMachineProps(props);
 
+// Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, icon, label, indicator, content)
+interface TabsRootOwnProps               // variant, icon (the variant), color, tokens, activationMode,
+                                         // loopFocus, disabled, id, ids, value, defaultValue,
+                                         // onValueChange, testId, unstyled
+interface TabsItem<Node> { value; label; icon?; mirrorIcon?; disabled?; content? }
+TABS_ROOT_PROPS; TABS_CONTENT_PROPS;     // items
+TABS_LIST_LABEL_PROPS;                   // aria-label, aria-labelledby: on the tab list
+tabsSelection(props); tabsMachineProps(props); tabsItemProps(item, tabsDisabled);
+tabsTriggerProps(p, { controls });       // without data-ssr; without aria-controls when no panel
+tabsDefaultValue(props, items);          // the ready-made's: the first enabled tab, unless given
+tabsHaveIcons(items); tabsHavePanels(items);
+
+// Navigation bar and rail: pureform's navigation machine; their generated anatomies
+type NavigationComponent = "navigationBar" | "navigationRail"; type NavigationPart;
+interface NavigationRootOwnProps<C>      // color, tokens, disabled, id, ids, value, defaultValue,
+                                         // onValueChange, testId, unstyled
+interface NavigationItemOwnProps { value; href?; disabled? }
+interface NavigationItem<Node> extends NavigationItemOwnProps { label; icon?; mirrorIcon? }
+NAVIGATION_ROOT_PROPS; NAVIGATION_ITEM_PROPS; NAVIGATION_CONTENT_PROPS; // items
+navigationSelection(props); navigationMachineProps(props);
+navigationItemElement(item);             // "a" with an href, else "button"
+navigationItemMachineProps(item);        // aria-current "page" for a link, "true" for a button
+navigationItemElementProps(item, disabled); // a button's type and disabled
+
+// List item (no machine) and list (listAnatomy: an unstyled ul, an li per item)
+interface ListItemRootOwnProps           // lines, interactive, density, color, tokens, selected,
+                                         // disabled, testId, unstyled
+LIST_ITEM_ROOT_PROPS; LIST_ITEM_CONTENT_PROPS; // headline, overline, supportingText, leading,
+                                         // trailing, trailingText, mirrorLeading, mirrorTrailing
+listItemElement({ href, as });           // "a" with an href, else as, else "div"
+listItemSelection(props, element);       // interactive defaults to a link or a button
+listItemRootProps(props, element);       // aria-current while selected; disabled or aria-disabled
+listItemLines(content);                  // one, two (overline or supporting text), three (both)
+interface ListRootOwnProps               // density, color, tokens (every item's defaults), testId
+interface ListItemData<Node>             // a list item's content, variants, value, href,
+                                         // selected, disabled, testId
+LIST_ROOT_PROPS; LIST_CONTENT_PROPS;     // items
+listItemVariants(list, item);            // the item's own over the list's; reads named props only
+
 // Content
 isPresent(node);                         // not undefined, null, or false
 type IconOnlyName;                       // aria-label or aria-labelledby, required

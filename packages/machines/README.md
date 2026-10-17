@@ -7,17 +7,17 @@ framework's Zag adapter, and spreads the part props `connect` returns on its ele
 here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
-`utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`, and
-`tooltip` machines) and on
+`utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`,
+`tooltip`, and `tabs` machines) and on
 `@pureform/js-effects` for the ripple. The bindings depend on it.
 
 ## Architecture
 
 ```
 @zag-js/checkbox, switch, radio-group, ──re-exported─┐
-  select, menu, dialog, tooltip                      │
+  select, menu, dialog, tooltip, tabs                │
 own machines (button, ripple, text field,            ├──► @pureform/machines ──► bindings:
-  snackbar, slider stub) ── Zag's shape ─────────────┤                         useMachine(machine, props)
+  snackbar, navigation, slider stub) ── Zag's shape ─┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
 form helpers (native defaults, reset, fieldsets) ────┘                         spread part props
 ```
@@ -42,7 +42,8 @@ callback reports user actions only, with a details object.
 | `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                              |
 | `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).         |
 | `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.           |
-| `menu.ts`, `dialog.ts`, `tooltip.ts`                      | Zag's machines, re-exported unchanged (none is a form control).                                      |
+| `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.           |
+| `menu.ts`, `dialog.ts`, `tooltip.ts`, `tabs.ts`           | Zag's machines, re-exported unchanged (none is a form control).                                      |
 | `slider/`                                                 | Stub for p6e: the value only.                                                                        |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported; all but the checkbox's with pureform's form rules.                      |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
@@ -62,7 +63,9 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                         |
 | `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                     |
 | `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                   |
+| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                         |
 | `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                        |
+| `@pureform/machines/navigation`  | `navigation`'s members                                                                                      |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
 | `@pureform/machines/text-field`  | `textField`'s members                                                                                       |
 | `@pureform/machines/slider`      | `slider`'s members (stub)                                                                                   |
@@ -159,6 +162,23 @@ is inside it; the countdown starts again from the start once both leave). A cont
 only asks, as Zag's dialog does, and moves with the prop. `connect` returns `open`, `paused`,
 `setOpen(open)`, and part props for `root` (`role="status"`, `hidden` while closed; Escape inside
 it closes it), `supportingText`, `action`, and `close` (both `type="button"`).
+
+### Navigation
+
+| Prop                                     | Type                                                      | Notes                                                  |
+| ---------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------ |
+| `id`, `ids`                              | `string`, `{ root?, item?(value) }`                       | element ids: `navigation:<id>`, `…:item:<value>`       |
+| `value`, `defaultValue`, `onValueChange` | `string \| null`, `string \| null`, `({ value }) => void` | controllable; the current destination, `null` for none |
+| `disabled`                               | `boolean`                                                 | every destination                                      |
+| `dir`, `getRootNode`                     |                                                           | as in Zag                                              |
+
+One state, `idle`. A click on an enabled destination sets the value (a controlled one only asks);
+a click on a disabled one is stopped (`preventDefault`, so a link doesn't follow its `href`).
+`connect` returns `value`, `setValue(value)` (reported through `onValueChange`, as Zag's `setValue` is), `getItemState({
+value, disabled })` → `{ current, disabled }`, and part props for `root`, `item({ value, disabled,
+current })` (`aria-current` set to `current`, `"page"` by default, while it's the current one;
+`aria-disabled`, `data-disabled`, `data-value`), `icon` (`aria-hidden`), and `label`. Destinations
+are links or buttons, each reached with Tab: no roving focus, and arrow keys do nothing.
 
 ### Ripple
 

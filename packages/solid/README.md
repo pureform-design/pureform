@@ -2,7 +2,7 @@
 
 pureform's bindings for Solid 2: the provider, the style registry's hooks, the helpers
 components build their parts from, and the components themselves (button, checkbox, switch, radio
-group, chip, icon button, and FAB so far),
+group, chip, icon button, FAB, text inputs, overlays, tabs, navigation, and lists so far),
 on top of a port of Zag.js's Solid adapter to Solid 2. Each component wires its anatomy to a
 machine to the registry, and comes ready-made and as compound parts.
 
@@ -40,6 +40,9 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 | `checkbox/`                                                | `@pureform/solid/checkbox`: the same layout                                                                                                          |
 | `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/` | The other components, in the same layout                                                                                                             |
 | `text-field/`, `text-area/`, `select/`                     | The text inputs, in the same layout                                                                                                                  |
+| `tabs/`, `navigation-bar/`, `navigation-rail/`             | Navigation, in the same layout                                                                                                                       |
+| `list/`, `list-item/`                                      | The list and list item, in the same layout                                                                                                           |
+| `navigation.tsx`                                           | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                        |
 | `text-input.tsx`                                           | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                        |
 | `pressable.ts`                                             | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                     |
 | `internal/zag/`                                            | The Zag port (below)                                                                                                                                 |
@@ -66,6 +69,10 @@ import { Checkbox } from "@pureform/solid/checkbox";
 import { Dialog } from "@pureform/solid/dialog";
 import { Menu } from "@pureform/solid/menu";
 import { Snackbar } from "@pureform/solid/snackbar";
+import { Tabs } from "@pureform/solid/tabs";
+import { NavigationBar } from "@pureform/solid/navigation-bar";
+import { List } from "@pureform/solid/list";
+import { ListItem } from "@pureform/solid/list-item";
 import { Tooltip } from "@pureform/solid/tooltip";
 
 <Button label="Save" icon={<SaveIcon />} variant="tonal" type="submit" />
@@ -118,6 +125,18 @@ import { Tooltip } from "@pureform/solid/tooltip";
     actions={<Button label="Cancel" variant="text" />}
 />
 <Snackbar open={saved()} onOpenChange={(d) => setSaved(d.open)} supportingText="Saved" action="Undo" closeLabel="Dismiss" />
+<Tabs
+    aria-label="Trips" // on the tab list
+    items={[{ value: "flights", label: "Flights", icon: <PlaneIcon />, content: <Flights /> }]}
+    onValueChange={(d) => setTab(d.value)}
+/>
+<NavigationBar
+    aria-label="Main"
+    value={route()}
+    items={[{ value: "home", label: "Home", icon: <HomeIcon />, href: "/" }]} // links; without href, buttons
+/>
+<List items={[{ headline: "Inbox", supportingText: "3 new", leading: <InboxIcon />, href: "/inbox", selected: true }]} />
+<ListItem as="button" headline="Archive" onClick={archive} />
 <Menu.Root onSelect={(d) => run(d.value)}>
     <Menu.Trigger as={IconButton} icon={<MoreIcon />} aria-label="More" />
     <Menu.Positioner>
@@ -137,21 +156,25 @@ import { Tooltip } from "@pureform/solid/tooltip";
 </Checkbox.Root>
 ```
 
-| Component               | Parts (element)                                                                                                                                                                                                                                                                  | Machine                                              |
-| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `Button`                | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
-| `Checkbox`              | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                                                                                                                                                                             | Zag's checkbox, through `internal/zag`               |
-| `Switch`                | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`                                                                                                                                                                     | Zag's switch (`@pureform/machines/switch`)           |
-| `RadioGroup`            | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot`                                                                                                                                                        | Zag's radio group (`@pureform/machines/radio-group`) |
-| `Chip`                  | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
-| `IconButton`            | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                                                                                                                                                                        | `@pureform/machines/button`                          |
-| `Fab`                   | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                                                                                                                                                                          | `@pureform/machines/button` (never a toggle)         |
-| `TextField`, `TextArea` | `Root` (`div`), `Container` (`div`), `LeadingIcon`, `Input` (`input` or `textarea`), `Label` (`label`), `TrailingIcon`, `SupportingText` (`span`)                                                                                                                                | `@pureform/machines/text-field`                      |
-| `Select`                | the field's (`Input` is a read-only `input`), `HiddenSelect` (`select`, unstyled), `Positioner` (`div`, unstyled), `Content` (`div`), and per option `Item` (`div`), `ItemLabel` (`span`)                                                                                        | Zag's select (`@pureform/machines/select`)           |
-| `Menu`                  | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the menu's `root` slot), per item `Item` (`div`), `ItemLeading`, `ItemLabel`, `ItemTrailing`, `ItemTrailingText` (`span`)                                             | Zag's menu (`@pureform/machines/menu`)               |
-| `Tooltip`               | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the tooltip's `root` slot), `Subhead`, `SupportingText` (`span`), `Actions` (`div`)                                                                                   | Zag's tooltip (`@pureform/machines/tooltip`)         |
-| `Dialog`                | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`) | Zag's dialog (`@pureform/machines/dialog`)           |
-| `Snackbar`              | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Action`, `Close` (`button`)                                                                                                                                                                                         | `@pureform/machines/snackbar`                        |
+| Component                         | Parts (element)                                                                                                                                                                                                                                                                  | Machine                                              |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Button`                          | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
+| `Checkbox`                        | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                                                                                                                                                                             | Zag's checkbox, through `internal/zag`               |
+| `Switch`                          | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`                                                                                                                                                                     | Zag's switch (`@pureform/machines/switch`)           |
+| `RadioGroup`                      | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot`                                                                                                                                                        | Zag's radio group (`@pureform/machines/radio-group`) |
+| `Chip`                            | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                                                                                                       | `@pureform/machines/button`                          |
+| `IconButton`                      | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                                                                                                                                                                        | `@pureform/machines/button`                          |
+| `Fab`                             | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                                                                                                                                                                          | `@pureform/machines/button` (never a toggle)         |
+| `TextField`, `TextArea`           | `Root` (`div`), `Container` (`div`), `LeadingIcon`, `Input` (`input` or `textarea`), `Label` (`label`), `TrailingIcon`, `SupportingText` (`span`)                                                                                                                                | `@pureform/machines/text-field`                      |
+| `Select`                          | the field's (`Input` is a read-only `input`), `HiddenSelect` (`select`, unstyled), `Positioner` (`div`, unstyled), `Content` (`div`), and per option `Item` (`div`), `ItemLabel` (`span`)                                                                                        | Zag's select (`@pureform/machines/select`)           |
+| `Menu`                            | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the menu's `root` slot), per item `Item` (`div`), `ItemLeading`, `ItemLabel`, `ItemTrailing`, `ItemTrailingText` (`span`)                                             | Zag's menu (`@pureform/machines/menu`)               |
+| `Tooltip`                         | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the tooltip's `root` slot), `Subhead`, `SupportingText` (`span`), `Actions` (`div`)                                                                                   | Zag's tooltip (`@pureform/machines/tooltip`)         |
+| `Dialog`                          | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`) | Zag's dialog (`@pureform/machines/dialog`)           |
+| `Snackbar`                        | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Action`, `Close` (`button`)                                                                                                                                                                                         | `@pureform/machines/snackbar`                        |
+| `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                                                          | Zag's tabs (`@pureform/machines/tabs`)               |
+| `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                             | `@pureform/machines/navigation`                      |
+| `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                | none                                                 |
+| `List`                            | `Root` (`ul`, unstyled), per item `Item` (`li`, unstyled) holding a `ListItem`                                                                                                                                                                                                   | none                                                 |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -231,6 +254,38 @@ import { Tooltip } from "@pureform/solid/tooltip";
   only when given), `closeLabel` (the close button's name; it renders only when given), and
   `closeIcon` (a cross unless given). Placing it is the app's. `class`, `style`, and `slotProps` are
   keyed by part on every ready-made.
+- **The tabs** are an unstyled `Root` (Zag's root, `pf-tabs-root`) around the tab list (`List`,
+  `data-pf-part="list"`, drawn by the tabs' `root` slot) and the panels (`Content`, unstyled, one
+  per tab, `hidden` while its tab isn't selected). Only the selected tab takes focus from Tab; the
+  arrow keys left and right select the tab before or after, by direction, and Home and End the
+  first and last (`activationMode="manual"` waits for Enter or Space). `value` is controllable
+  (`string | null`). The ready-made takes `items` (`{ value, label, icon?, mirrorIcon?, disabled?,
+content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on the `icon`
+  variant when any tab has an icon, selects the first enabled tab unless given a value, and
+  renders a panel per item with `content`. Tabs without panels switch something else and name no
+  panel (`Tab`'s `controls={false}` in compound use). Each tab draws its own indicator; Zag's
+  moving indicator isn't used.
+- **The navigation bar and rail** share their parts and behavior: a `<nav>` (name it with
+  `aria-label`) of destinations, each a link when it has an `href` and a button otherwise, reached
+  in turn with Tab (arrow keys do nothing). `value` (the current destination, controllable) marks
+  its item with `aria-current` (`"page"` on a link, `"true"` on a button), which draws its pill and
+  fills its icon. A click asks to move; with links, the app's router follows the `href` as usual.
+  `disabled` on Root or an item disables buttons and marks links `aria-disabled` (their click is
+  stopped). The ready-made takes `items` (`{ value, label, icon?, mirrorIcon?, href?, disabled?
+}`).
+- **The list item** has no machine. Root is a `<div>` row, a link with `href`, or any element with
+  `as` (`as="button"` gets `type="button"`); a link or a button is `interactive` (state layer, focus
+  ring) unless told otherwise. `selected` sets `aria-current`, `disabled` a button's `disabled` or
+  `aria-disabled`. The ready-made takes `headline`, `overline`, `supportingText`, `leading`,
+  `trailing`, `trailingText`, `mirrorLeading`, `mirrorTrailing`, and sets `lines` from them (one,
+  two with an overline or supporting text, three with both) unless given. `Leading` and `Trailing`
+  are `aria-hidden` (give `aria-hidden={false}` to one that says something).
+- **The list** is an unstyled `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an
+  unstyled `<li>` (`List.Item`, `pf-list-item`). Its `density`, `color`, and `tokens` are every
+  item's defaults. The ready-made takes `items` (a list item's content and props, with an optional
+  `value` as its key), and `slotProps` and `unstyled` keyed by the list item's parts, applied to
+  every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
+  your own `<ul>`.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label for>` at `ids.input`; don't
   wrap it in another label. The input carries every native state the CSS reads (`:checked`,
