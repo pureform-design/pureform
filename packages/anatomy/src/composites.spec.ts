@@ -1,12 +1,22 @@
 import { describe, expect, it } from "vitest";
 
-import { partAttributes } from "./attributes";
+import { partAttributes, partSlot } from "./attributes";
 import {
     compositeTestIds,
+    dialogBackdropAnatomy,
+    dialogOverlayAnatomy,
+    menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
+    tooltipOverlayAnatomy,
 } from "./composites";
-import { anatomy, menuAnatomy } from "./generated";
+import {
+    anatomy,
+    dialogAnatomy,
+    menuAnatomy,
+    tooltipAnatomy,
+} from "./generated";
+import type { ComponentAnatomy } from "./types";
 
 describe("composites", () => {
     it("aren't preset components, and the registry doesn't style them", () => {
@@ -38,6 +48,59 @@ describe("composites", () => {
             "data-scope": "select",
             "data-pf-part": "content",
             "data-testid": "pf-select-content",
+        });
+    });
+
+    it.each([
+        ["menu", menuOverlayAnatomy, menuAnatomy, compositeTestIds.menu],
+        [
+            "tooltip",
+            tooltipOverlayAnatomy,
+            tooltipAnatomy,
+            compositeTestIds.tooltip,
+        ],
+        [
+            "dialog",
+            dialogOverlayAnatomy,
+            dialogAnatomy,
+            compositeTestIds.dialog,
+        ],
+    ] as const)(
+        "the %s's overlay draws every slot of the preset's, its surface as content, and wraps it in unstyled parts",
+        (_, overlay, preset, ids) => {
+            const parts = overlay.parts as ComponentAnatomy["parts"];
+            const slots = Object.values(parts)
+                .filter((part) => part.styled)
+                .map(partSlot);
+            expect(slots.sort()).toEqual([...preset.partNames].sort());
+            expect(partSlot(parts.content!)).toBe("root");
+            expect(partSlot(parts.root!)).toBeNull();
+            for (const name of ["root", "trigger", "positioner"]) {
+                expect(parts[name]!.styled).toBe(false);
+            }
+            for (const name of overlay.partNames) {
+                expect(parts[name]!.testId).toBe(
+                    (ids as Record<string, string>)[name],
+                );
+                if (parts[name]!.styled && name !== "content") {
+                    expect(parts[name]!.mirror).toBe(
+                        (preset.parts as ComponentAnatomy["parts"])[name]!
+                            .mirror,
+                    );
+                }
+            }
+            expect(partAttributes(overlay, "root")["data-testid"]).toBe(
+                preset.parts.root.testId,
+            );
+        },
+    );
+
+    it("the dialog's backdrop is drawn by the scrim, under the dialog's scope", () => {
+        expect(dialogBackdropAnatomy.name).toBe("scrim");
+        expect(partAttributes(dialogBackdropAnatomy, "root")).toEqual({
+            "data-scope": "dialog",
+            "data-pf-part": "backdrop",
+            "data-testid": compositeTestIds.dialogBackdrop.root,
         });
     });
 });

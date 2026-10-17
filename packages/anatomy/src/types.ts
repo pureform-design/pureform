@@ -17,6 +17,10 @@ export interface PartAnatomy<P extends string = string> {
     /** Whether it's an icon that flips under `rtl` when marked: the part takes a `mirror` prop
      *  and sets `data-pf-mirror` (or the `mirrored` state on React Native). */
     readonly mirror: boolean;
+    /** The registry slot that styles it and takes the provider's `slotProps`, when that isn't
+     *  its name, or `null` for none: a menu's surface is its `content` part, drawn by the menu's
+     *  `root` slot, while its unstyled `root` wraps the trigger and the surface. */
+    readonly slot?: string | null;
 }
 
 /** A component's anatomy: its parts, by name, and where they sit. */
