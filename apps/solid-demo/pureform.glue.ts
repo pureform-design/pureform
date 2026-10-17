@@ -11,4 +11,7 @@ export const PREFIX = "pf";
 export const glue = {
     target: "panda",
     options: { prefix: PREFIX },
+    // No pruning: the browser suites read this folder's registry (every component) and Panda's
+    // stylesheet built from it, and a build would rewrite it with only what the page draws.
+    prune: false,
 } satisfies PureformPluginOptions<PandaCodegenOptions>;
