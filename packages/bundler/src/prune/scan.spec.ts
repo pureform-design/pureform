@@ -137,7 +137,7 @@ describe("scanUsage", () => {
                 avatar: { size: ["large"], "*": [] },
                 card: { variant: ["elevated"], "*": [] },
                 media: { aspect: ["landscape"], "*": [] },
-                text: { "*": [] },
+                text: { style: ["*"], "*": [] },
             },
         });
     });

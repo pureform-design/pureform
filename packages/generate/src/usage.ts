@@ -7,8 +7,9 @@ import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
 import type { ComponentShape } from "./adapter";
 
 /** Variant values in use, by component and group: `{ button: { variant: ["filled"] } }`. A
- *  component or a group left out keeps every value. A `"*"` group stands for every group not
- *  listed: `{ text: { "*": [] } }` keeps only the defaults. */
+ *  component or a group left out keeps every value, and so does a group listed as `["*"]`. A
+ *  `"*"` group stands for every group not listed: `{ text: { "*": [] } }` keeps only the
+ *  defaults, `{ text: { "*": [], style: ["*"] } }` every style and the others' defaults. */
 export type VariantUsage = Readonly<
     Record<string, Readonly<Record<string, readonly string[]>>>
 >;
@@ -39,7 +40,7 @@ export const normalizeVariants = (
         const narrowed: Record<string, readonly string[]> = {};
         for (const [group, all] of Object.entries(values)) {
             const used = groups[group] ?? groups["*"];
-            if (!used) continue;
+            if (!used || used.includes("*")) continue;
             const kept = all.filter(
                 (value) => used.includes(value) || defaults[group] === value,
             );
