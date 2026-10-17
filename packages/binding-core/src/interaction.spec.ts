@@ -2,6 +2,7 @@ import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import {
     createInteractionSource,
+    createInteractionSources,
     IDLE_INTERACTION_STATE,
     type Interaction,
     type InteractionState,
@@ -242,5 +243,16 @@ describe("createInteractionSource", () => {
     it("types the source as never null", () => {
         expectTypeOf(createInteractionSource()).not.toBeNullable();
         expectTypeOf(createInteractionSource().state).not.toBeNullable();
+    });
+});
+
+describe("createInteractionSources", () => {
+    it("makes one source per key, the first time it's asked for", () => {
+        const sourceOf = createInteractionSources();
+        const a = sourceOf("a");
+        expect(sourceOf("a")).toBe(a);
+        expect(sourceOf("b")).not.toBe(a);
+        a.emit({ type: "hoverEnter" });
+        expect(sourceOf("b").state.hovered).toBe(false);
     });
 });
