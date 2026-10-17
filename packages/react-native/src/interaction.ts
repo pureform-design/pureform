@@ -22,6 +22,7 @@ import type { State } from "@pureform/rn-adapter/factory";
 import {
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
     useSyncExternalStore,
@@ -109,6 +110,14 @@ const pointerOf = (native: NativeLike): PointerKind => {
 const originOf = (event: PressableEvent | undefined): unknown =>
     event?.currentTarget ?? undefined;
 
+/** Whether a surface itself has focus, and whether it shows. */
+export interface OwnFocus {
+    readonly focused: boolean;
+    readonly visible: boolean;
+}
+
+const NOT_FOCUSED: OwnFocus = Object.freeze({ focused: false, visible: false });
+
 /** One surface's interactions from `Pressable` (or a responder view), emitted to the source
  *  `source()` returns when each happens. A press's origin is its page point (`pageX`, `pageY`),
  *  or the center for a key. */
@@ -116,6 +125,8 @@ export class NativeInteraction {
     readonly emitter: InteractionEmitter;
     // Whether the press in progress counts among the pointer presses focus follows.
     #pointer = false;
+    #focus: OwnFocus = NOT_FOCUSED;
+    readonly #focusListeners = new Set<() => void>();
 
     constructor(source: () => MutableInteractionSource | undefined) {
         this.emitter = new InteractionEmitter(source);
@@ -164,13 +175,39 @@ export class NativeInteraction {
         this.emitter.hoverExit(originOf(event));
     }
 
+    /** Whether this surface itself has focus, and whether it shows: a source shared with others
+     *  never carries focus to them. */
+    get ownFocus(): OwnFocus {
+        return this.#focus;
+    }
+
+    /** Calls `listener` when `ownFocus` changes; returns what stops it. */
+    readonly subscribeFocus = (listener: () => void): (() => void) => {
+        this.#focusListeners.add(listener);
+        return () => this.#focusListeners.delete(listener);
+    };
+
+    #setFocus(focus: OwnFocus): void {
+        if (
+            focus.focused === this.#focus.focused &&
+            focus.visible === this.#focus.visible
+        ) {
+            return;
+        }
+        this.#focus = focus;
+        for (const listener of this.#focusListeners) listener();
+    }
+
     /** Focuses, visibly unless the focus follows a press. */
     focus(event?: PressableEvent): void {
-        this.emitter.focus(!focusFollowsPress(), originOf(event));
+        const visible = !focusFollowsPress();
+        this.emitter.focus(visible, originOf(event));
+        this.#setFocus({ focused: true, visible });
     }
 
     blur(event?: PressableEvent): void {
         this.emitter.blur(originOf(event));
+        this.#setFocus(NOT_FOCUSED);
     }
 
     dragStart(): void {
@@ -185,6 +222,7 @@ export class NativeInteraction {
     end(): void {
         this.emitter.end();
         this.#ended();
+        this.#setFocus(NOT_FOCUSED);
     }
 
     /** The callbacks to spread on a `Pressable`. */
@@ -217,7 +255,8 @@ export function useNativeInteraction(
 }
 
 /** What a component's surface interacts through: its source (the app's, else its own), what
- *  emits to it, and the state it adds up to, idle while disabled. */
+ *  emits to it, and the state it adds up to, idle while disabled. Focus is the surface's own:
+ *  another surface's focus on a shared source never shows here. */
 export interface Interaction {
     readonly source: MutableInteractionSource;
     readonly interaction: NativeInteraction;
@@ -232,7 +271,20 @@ export function useInteraction(
     const own = useInteractionSource();
     const source = given ?? own;
     const interaction = useNativeInteraction(source, disabled);
-    const state = useInteractionState(source);
+    const shared = useInteractionState(source);
+    const focus = useSyncExternalStore(
+        interaction.subscribeFocus,
+        () => interaction.ownFocus,
+        () => interaction.ownFocus,
+    );
+    const state = useMemo(
+        () => ({
+            ...shared,
+            focused: focus.focused,
+            focusVisible: focus.visible,
+        }),
+        [shared, focus],
+    );
     return {
         source,
         interaction,

@@ -18,7 +18,7 @@ import type { GestureResponderEvent } from "react-native";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useEngine } from "../provider";
+import { useDirection, useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = sliderAnatomy.indication!;
@@ -56,6 +56,9 @@ interface Measurable {
         ) => void,
     ) => void;
 }
+
+// What assistive technology can do to it.
+const ADJUSTABLE = [{ name: "increment" }, { name: "decrement" }] as const;
 
 function SliderImpl(props: SliderProps): ReactNode {
     const engine = useEngine();
@@ -113,6 +116,20 @@ function SliderImpl(props: SliderProps): ReactNode {
     };
     const id = (part: SliderPart) =>
         testIdOf(sliderAnatomy, part, props.testId);
+    // The keys a range input takes: a step by the arrows (sideways by direction), the ends by
+    // Home and End.
+    const forward = useDirection() === "rtl" ? "ArrowLeft" : "ArrowRight";
+    const backward = forward === "ArrowLeft" ? "ArrowRight" : "ArrowLeft";
+    const stepBy = (by: number) =>
+        setValue(Math.min(max, Math.max(min, value + by * step)));
+    const onKeyDown = (event: { nativeEvent: { key?: string } }) => {
+        if (props.disabled) return;
+        const key = event.nativeEvent.key;
+        if (key === forward || key === "ArrowUp") stepBy(1);
+        else if (key === backward || key === "ArrowDown") stepBy(-1);
+        else if (key === "Home") setValue(min);
+        else if (key === "End") setValue(max);
+    };
     return (
         <engine.View
             ref={root as never}
@@ -124,6 +141,14 @@ function SliderImpl(props: SliderProps): ReactNode {
             aria-valuemin={min}
             aria-valuemax={max}
             aria-disabled={props.disabled}
+            focusable={!props.disabled}
+            accessibilityActions={ADJUSTABLE}
+            onAccessibilityAction={(event: {
+                nativeEvent: { actionName: string };
+            }) => stepBy(event.nativeEvent.actionName === "increment" ? 1 : -1)}
+            {...({ onKeyDown } as object)}
+            onFocus={interaction.handlers.onFocus}
+            onBlur={interaction.handlers.onBlur}
             onPointerEnter={interaction.handlers.onHoverIn}
             onPointerLeave={interaction.handlers.onHoverOut}
             onStartShouldSetResponder={() => !props.disabled}

@@ -156,6 +156,8 @@ export const Tabs = withEngine(TabsImpl, "Tabs");
 export interface NavigationProps<C extends NavigationComponent>
     extends NavigationVariantProps<C>, IndicationProps {
     readonly items: readonly NavigationItem<ReactNode>[];
+    /** Disables every destination. */
+    readonly disabled?: boolean | undefined;
     /** The current destination's value. Controlled when defined. */
     readonly value?: string | undefined;
     readonly defaultValue?: string | undefined;
@@ -180,10 +182,11 @@ function DestinationImpl<C extends NavigationComponent>(props: {
 }): ReactNode {
     const { name, navigation, item } = props;
     const engine = useEngine();
+    const disabled = item.disabled === true || navigation.disabled === true;
     const indication = useSurfaceIndication(ANATOMIES[name].indication![0]!, {
         indication: navigation.indication,
         interactionSource: item.interactionSource,
-        disabled: item.disabled,
+        disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         name,
@@ -194,7 +197,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
         ),
         indication.states({
             selected: props.selected,
-            ...(item.disabled ? { disabled: true } : {}),
+            ...(disabled ? { disabled: true } : {}),
             ...(item.mirrorIcon ? { mirrored: true } : {}),
         }),
     );
@@ -209,7 +212,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
             {...indication.handlers}
             role="link"
             aria-current={props.selected ? "page" : undefined}
-            disabled={item.disabled}
+            disabled={disabled}
             onPress={props.onPress}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
