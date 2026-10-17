@@ -8,8 +8,9 @@ here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
 `utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`,
-`tooltip`, and `tabs` machines) and on
-`@pureform/js-effects` for the ripple. The bindings depend on it.
+`tooltip`, and `tabs` machines), on `@pureform/js-effects` for the ripple, and on
+`@pureform/binding-core/interaction` for the interaction source its machines emit to. The bindings
+depend on it.
 
 ## Architecture
 
@@ -20,6 +21,8 @@ own machines (button, ripple, text field,            ├──► @pureform/mach
   snackbar, navigation, slider) ────── Zag's shape ─┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
 form helpers (native defaults, reset, fieldsets) ────┘                         spread part props
+
+machine ──emit──► InteractionSource (props.interactionSource / itemInteractionSource(value))
 ```
 
 Every machine, Zag's or ours, is a namespace with the same members:
@@ -36,40 +39,42 @@ Our own machines keep controllable state the way Zag does (its `bindable`): a pr
 `undefined` controls the state, its `default*` prop is read at the start, and the change
 callback reports user actions only, with a details object.
 
-| Module                                                    | What it does                                                                                         |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `button/`                                                 | Press, focus, hover, and an optional toggle (`selected`).                                            |
-| `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                              |
-| `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).         |
-| `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.           |
-| `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.           |
-| `menu.ts`, `dialog.ts`, `tooltip.ts`, `tabs.ts`           | Zag's machines, re-exported unchanged (none is a form control).                                      |
-| `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.          |
-| `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported; all but the checkbox's with pureform's form rules.                      |
-| `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped. |
-| `form/`                                                   | Native defaults, form reset, and disabled fieldsets.                                                 |
-| `testing/`                                                | The test harness: runs a machine with Zag's vanilla adapter. Not exported.                           |
+| Module                                                    | What it does                                                                                                                                |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `button/`                                                 | Press, focus, hover, and an optional toggle (`selected`).                                                                                   |
+| `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                                                                     |
+| `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).                                                |
+| `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.                                                  |
+| `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.                                                  |
+| `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                               |
+| `dialog.ts`, `tooltip.ts`                                 | Zag's machines, re-exported unchanged.                                                                                                      |
+| `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.                                                 |
+| `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                          |
+| `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped.                                        |
+| `interaction/`                                            | How machines emit to an interaction source: an emitter per surface, Zag machines wrapped (`withInteraction`), handlers chained after Zag's. |
+| `form/`                                                   | Native defaults, form reset, and disabled fieldsets.                                                                                        |
+| `testing/`                                                | The test harness: runs a machine with Zag's vanilla adapter. Not exported.                                                                  |
 
 ## Public API
 
-| Import                           | Exports                                                                                                     |
-| -------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| `@pureform/machines`             | the namespaces below, the form helpers, and Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types |
-| `@pureform/machines/button`      | `button`'s members                                                                                          |
-| `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                          |
-| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules      |
-| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                  |
-| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules    |
-| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                         |
-| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                     |
-| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                   |
-| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                         |
-| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                        |
-| `@pureform/machines/navigation`  | `navigation`'s members                                                                                      |
-| `@pureform/machines/ripple`      | `ripple`'s members                                                                                          |
-| `@pureform/machines/text-field`  | `textField`'s members                                                                                       |
-| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                         |
-| `@pureform/machines/form`        | the form helpers                                                                                            |
+| Import                           | Exports                                                                                                                                                 |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/machines`             | the namespaces below, the form helpers, Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types, and `InteractionProps`, `ItemInteractionProps` |
+| `@pureform/machines/button`      | `button`'s members                                                                                                                                      |
+| `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                                                                      |
+| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                  |
+| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                              |
+| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules                                                |
+| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                     |
+| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                 |
+| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                               |
+| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                     |
+| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                                                                    |
+| `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                  |
+| `@pureform/machines/ripple`      | `ripple`'s members                                                                                                                                      |
+| `@pureform/machines/text-field`  | `textField`'s members                                                                                                                                   |
+| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                                                                     |
+| `@pureform/machines/form`        | the form helpers                                                                                                                                        |
 
 ```ts
 import { button } from "@pureform/machines";
@@ -94,7 +99,38 @@ browser's rule, with pureform's
 `trackFieldsetDisabled`, and no longer resets during the form's `reset` event. Zag reads only the
 closest fieldset, so a group in the first legend of a disabled fieldset came out disabled; and the
 switch's own reset sent an untrusted change that React reported twice. The bindings own the reset
-(design doc §9.5). Everything else, `connect` included, is Zag's.
+(design doc §9.5).
+
+### Interaction sources
+
+The button, checkbox, switch, radio group, slider, menu, select, tabs, and navigation machines emit
+what happens to their surfaces to an interaction source (`@pureform/binding-core/interaction`,
+design doc §9.8). A machine with one surface takes it as `interactionSource`; a composite takes
+`itemInteractionSource(value)`, one source per radio, tab, menu item, option, or destination. A
+binding makes them and passes them in; without one, nothing is emitted (the button keeps a source of
+its own, since its API reads one).
+
+| Machine          | Surface (element the handlers are on)  | Emits                                                                                                                  |
+| ---------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| button           | root                                   | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
+| checkbox, switch | root (label) and native input          | pointer press and hover on the root; Space press and focus on the input                                                |
+| radio group      | each item (label) and its native input | the same, per radio                                                                                                    |
+| slider           | native input                           | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
+| tabs, navigation | each tab or destination                | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
+| menu, select     | each item or option                    | the highlighted one hovers (no origin element); pointer press; Enter or Space presses and releases the highlighted one |
+
+- **Touch never hovers**: a `pointerType` of `touch` emits no `hoverEnter`.
+- **The innermost claims a press**: a press handler claims its event (`claimEvent`), so a
+  pressable inside another emits a press once, from the inner one.
+- **Disabled ends what's in progress**: when the machine becomes disabled (prop or fieldset), it
+  emits a cancel, a drag stop, a hover exit, and a blur for what each surface had started. A
+  menu or select ends everything when it closes; every machine does when it stops.
+- **Origins**: a press's `origin` is the pointer's `clientX`/`clientY`, or `"center"`; the
+  emit's own origin argument is the element the handler ran on (`undefined` for a highlight or a
+  key on a list item, which the item itself didn't receive).
+- **Zag's machines** are wrapped, not changed: `withInteraction(machine, watch)` adds the
+  emitters to its refs, an effect that ends them on stop, and a `watch`; `connect` chains
+  the emitting handlers after Zag's on the normalized part props (`chainProps`).
 
 ### Button
 
@@ -113,13 +149,15 @@ on the button, and ends when the pointer is released anywhere (as `:active` does
 released, or, for a keyboard press, focus leaves. A toggle flips on `click`, so the pointer and
 the keyboard both toggle it.
 
-`connect` returns `pressed`, `focused`, `focusVisible` (what `:focus-visible` says at focus),
-`hovered` (mouse and pen only), `disabled`, `toggle`, `selected`, `setSelected(selected)`,
-`toggleSelected()`, and part props for `root` (a native `button`, with `aria-pressed` on a
-toggle), `label`, and `icon` (`aria-hidden`). The parts carry Zag-style `data-active`,
-`data-focus`, `data-focus-visible`, `data-hover`, `data-disabled`, and `data-state` (`on` or
-`off` on a toggle); they style nothing, since pureform's CSS reads native and ARIA states
-and `data-pf-*` (bindings set `data-pf-active` from `pressed`).
+`connect` returns `pressed`, `hovered`, and `focusVisible`, read from the interaction source's
+state (which a press from another component sharing the source changes too), `focused`,
+`disabled`, `toggle`, `selected`, `setSelected(selected)`, `toggleSelected()`, and part props for
+`root` (a native `button`, with `aria-pressed` on a toggle), `label`, and `icon` (`aria-hidden`).
+The parts carry `data-focus`, `data-disabled`, and `data-state` (`on` or `off` on a toggle); they
+style nothing, since pureform's CSS reads native and ARIA states and `data-pf-*` (bindings set
+`data-pf-active` from `pressed`). Zag's `data-active`, `data-hover`, and `data-focus-visible`
+aren't written. The `interactionSource` prop is the source it emits to; without one it makes its
+own when it first emits.
 
 ### Text field
 
@@ -258,14 +296,17 @@ trackFormReset(input, {
 
 ## Good to know
 
-- The checkbox, switch, radio group, select, menu, dialog, and tooltip are re-exported so far;
-  p6d adds Zag's tabs. The menu, dialog, and tooltip are unchanged: they aren't form controls. The checkbox's machine is still Zag's
-  own (its reset and closest-fieldset tracking don't show through the bindings; see the shared
-  suites); give it `withFieldsetRule` if that changes.
+- The checkbox, switch, radio group, select, menu, dialog, tooltip, and tabs are Zag's. The
+  dialog and tooltip are unchanged; the others keep Zag's states and transitions and gain the
+  interaction emitters. The checkbox's form tracking is still Zag's own (its reset and
+  closest-fieldset tracking don't show through the bindings; see the shared suites); give it
+  `withFieldsetRule` if that changes.
+- A per-item `disabled` (a tab, a destination, a radio) stops new interactions but doesn't end
+  one in progress; only the machine's own `disabled` does.
 - The slider has one thumb: a range slider with two would need its own inputs (or Zag's slider,
   which owns the pointer and a focusable thumb instead of a native input).
 - `setNativeDefault` keeps what an unedited text control or select shows: writing a default
   alone would change it.
 - The snackbar's `paused` isn't marked on its root: the pointer resting on it would change the
   markup a server rendered while it hydrates.
-- Design doc: §8 (behavior), §9.4 (controlled state), §9.5 (forms).
+- Design doc: §8 (behavior), §9.4 (controlled state), §9.5 (forms), §9.8 (interaction sources).

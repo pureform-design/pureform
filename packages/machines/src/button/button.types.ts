@@ -1,3 +1,8 @@
+import type {
+    InteractionState,
+    PointerKind,
+    PressOrigin,
+} from "@pureform/binding-core/interaction";
 import type { Machine, Service } from "@zag-js/core";
 import type {
     CommonProperties,
@@ -5,6 +10,8 @@ import type {
     PropTypes,
     RequiredBy,
 } from "@zag-js/types";
+
+import type { InteractionEmitter, InteractionProps } from "../interaction";
 
 export interface SelectedChangeDetails {
     selected: boolean;
@@ -15,7 +22,8 @@ export interface ElementIds {
     label?: string | undefined;
 }
 
-export interface ButtonProps extends DirectionProperty, CommonProperties {
+export interface ButtonProps
+    extends DirectionProperty, CommonProperties, InteractionProps {
     /** The ids of the elements in the button. Useful for composition. */
     ids?: ElementIds | undefined;
     /** Whether the button is disabled. A disabled fieldset around it disables it too. */
@@ -45,29 +53,33 @@ type PropsWithDefault = "type" | "toggle" | "defaultSelected";
 export type PressSource = "pointer" | "keyboard";
 
 export type ButtonEvent =
-    | { type: "PRESS.START"; source: PressSource }
+    | {
+          type: "PRESS.START";
+          source: PressSource;
+          origin: PressOrigin;
+          pointer: PointerKind;
+      }
     | { type: "PRESS.END" }
     | { type: "PRESS.CANCEL" }
     | { type: "BLUR" }
     | { type: "SELECTED.TOGGLE" }
     | { type: "SELECTED.SET"; selected: boolean }
-    | { type: "CONTEXT.SET"; context: Partial<InteractionContext> };
-
-export interface InteractionContext {
-    focused: boolean;
-    focusVisible: boolean;
-    hovered: boolean;
-}
+    | { type: "CONTEXT.SET"; context: { focused?: boolean } };
 
 export interface ButtonSchema {
     state: "idle" | "pressed";
     props: RequiredBy<ButtonProps, PropsWithDefault>;
-    context: InteractionContext & {
+    context: {
         selected: boolean;
+        focused: boolean;
         fieldsetDisabled: boolean;
+        /** The interaction source's state, kept in step with it while the machine runs. */
+        interaction: InteractionState;
     };
     refs: {
         pressSource: PressSource | null;
+        /** Emits to `interactionSource`, or to a source of the machine's own without one. */
+        interaction: InteractionEmitter;
     };
     computed: {
         disabled: boolean;
@@ -82,13 +94,15 @@ export type ButtonService = Service<ButtonSchema>;
 export type ButtonMachine = Machine<ButtonSchema>;
 
 export interface ButtonApi<T extends PropTypes = PropTypes> {
-    /** Whether the button is pressed: a pointer is down on it, or Enter or Space is held. */
+    /** Whether the button's interaction source is pressed: a pointer is down on it, Enter or
+     *  Space is held, or a press came from another component sharing the source. */
     pressed: boolean;
     /** Whether the button has focus. */
     focused: boolean;
-    /** Whether the button has focus the browser would show a focus ring for. */
+    /** Whether the button's interaction source has focus the browser would show a focus ring
+     *  for. */
     focusVisible: boolean;
-    /** Whether a mouse or pen hovers the button. */
+    /** Whether the button's interaction source is hovered, by a mouse or pen. */
     hovered: boolean;
     /** Whether the button is disabled, by its prop or a disabled fieldset. */
     disabled: boolean;

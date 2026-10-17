@@ -79,13 +79,11 @@ describe("button machine", () => {
             await settle();
             expect(service.state.matches("pressed")).toBe(true);
             expect(api().pressed).toBe(true);
-            expect(root.hasAttribute("data-active")).toBe(true);
 
             document.body.dispatchEvent(pointer("pointerup"));
             await settle();
             expect(service.state.get()).toBe("idle");
             expect(api().pressed).toBe(false);
-            expect(root.hasAttribute("data-active")).toBe(false);
         });
 
         it("ends a press the browser cancels", async () => {
@@ -150,7 +148,6 @@ describe("button machine", () => {
             expect(document.activeElement).toBe(root);
             expect(api().focused).toBe(true);
             expect(api().focusVisible).toBe(true);
-            expect(root.hasAttribute("data-focus-visible")).toBe(true);
 
             root.blur();
             await settle();
@@ -168,11 +165,26 @@ describe("button machine", () => {
             await userEvent.hover(root);
             await settle();
             expect(api().hovered).toBe(true);
-            expect(root.hasAttribute("data-hover")).toBe(true);
             await userEvent.unhover(root);
             await settle();
             expect(api().hovered).toBe(false);
         });
+    });
+
+    it("marks none of Zag's interaction attributes, which no style matches", async () => {
+        const { root } = mount();
+        await userEvent.hover(root);
+        root.focus();
+        root.dispatchEvent(pointer("pointerdown"));
+        await settle();
+        for (const name of [
+            "data-active",
+            "data-hover",
+            "data-focus-visible",
+        ]) {
+            expect(root.hasAttribute(name), name).toBe(false);
+        }
+        window.dispatchEvent(pointer("pointerup"));
     });
 
     describe("disabled", () => {

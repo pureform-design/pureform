@@ -11,23 +11,35 @@ import { describe, expect, it } from "vitest";
 import * as machines from ".";
 
 describe("@pureform/machines", () => {
-    it("re-exports Zag's machines unchanged, but for the form rules of the switch, radio group, and select", () => {
-        expect(machines.checkbox.machine).toBe(zagCheckbox.machine);
-        expect(machines.checkbox.connect).toBe(zagCheckbox.connect);
-        expect(machines.menu.machine).toBe(zagMenu.machine);
+    it("re-exports Zag's dialog and tooltip unchanged", () => {
         expect(machines.dialog.machine).toBe(zagDialog.machine);
+        expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
-        expect(machines.tabs.machine).toBe(zagTabs.machine);
-        expect(machines.switchControl.connect).toBe(zagSwitch.connect);
-        expect(machines.switchControl.machine.on).toBe(zagSwitch.machine.on);
-        expect(machines.radioGroup.connect).toBe(zagRadioGroup.connect);
+        expect(machines.tooltip.connect).toBe(zagTooltip.connect);
+    });
+
+    it("keeps Zag's states and transitions for the machines that emit to an interaction source", () => {
+        const zag = {
+            checkbox: zagCheckbox,
+            menu: zagMenu,
+            radioGroup: zagRadioGroup,
+            select: zagSelect,
+            switchControl: zagSwitch,
+            tabs: zagTabs,
+        };
+        for (const [name, own] of Object.entries(zag)) {
+            const ours = machines[name as keyof typeof zag];
+            expect(ours.machine.states, name).toBe(own.machine.states);
+            expect(ours.machine.on, name).toBe(own.machine.on);
+            expect(ours.machine.context, name).toBe(own.machine.context);
+            expect(ours.machine, name).not.toBe(own.machine);
+            expect(ours.connect, name).not.toBe(own.connect);
+        }
         expect(machines.radioGroup.itemProps).toBe(zagRadioGroup.itemProps);
-        expect(machines.radioGroup.machine.states).toBe(
-            zagRadioGroup.machine.states,
-        );
-        expect(machines.select.connect).toBe(zagSelect.connect);
         expect(machines.select.collection).toBe(zagSelect.collection);
-        expect(machines.select.machine.states).toBe(zagSelect.machine.states);
+    });
+
+    it("swaps the form rules of the switch, radio group, and select", () => {
         expect(
             machines.select.machine.implementations?.effects
                 ?.trackFormControlState,
@@ -40,6 +52,12 @@ describe("@pureform/machines", () => {
         ).not.toBe(
             zagRadioGroup.machine.implementations?.effects
                 ?.trackFormControlState,
+        );
+        expect(
+            machines.checkbox.machine.implementations?.effects
+                ?.trackFormControlState,
+        ).toBe(
+            zagCheckbox.machine.implementations?.effects?.trackFormControlState,
         );
     });
 

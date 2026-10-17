@@ -1,7 +1,14 @@
+import {
+    createInteractionSource,
+    IDLE_INTERACTION_STATE,
+    type InteractionState,
+    type MutableInteractionSource,
+} from "@pureform/binding-core/interaction";
 import { createGuards, createMachine } from "@zag-js/core";
 import { addDomEvent } from "@zag-js/dom-query";
 
 import { trackFormControl } from "../form/control";
+import { InteractionEmitter } from "../interaction";
 import * as dom from "./button.dom";
 import type { ButtonSchema } from "./button.types";
 
@@ -34,16 +41,26 @@ export const machine = createMachine<ButtonSchema>({
                 },
             })),
             focused: bindable<boolean>(() => ({ defaultValue: false })),
-            focusVisible: bindable<boolean>(() => ({ defaultValue: false })),
-            hovered: bindable<boolean>(() => ({ defaultValue: false })),
             fieldsetDisabled: bindable<boolean>(() => ({
                 defaultValue: false,
+            })),
+            interaction: bindable<InteractionState>(() => ({
+                defaultValue: IDLE_INTERACTION_STATE,
             })),
         };
     },
 
-    refs() {
-        return { pressSource: null };
+    refs({ prop }) {
+        // A source of its own, made when it first emits, for a button run without one.
+        let own: MutableInteractionSource | undefined;
+        return {
+            pressSource: null,
+            interaction: new InteractionEmitter(
+                () =>
+                    prop("interactionSource") ??
+                    (own ??= createInteractionSource()),
+            ),
+        };
     },
 
     computed: {
@@ -62,7 +79,7 @@ export const machine = createMachine<ButtonSchema>({
         );
     },
 
-    effects: ["trackFormControl"],
+    effects: ["trackFormControl", "trackInteractionSource"],
 
     on: {
         "SELECTED.TOGGLE": {
@@ -84,7 +101,7 @@ export const machine = createMachine<ButtonSchema>({
                 "PRESS.START": {
                     guard: not("isDisabled"),
                     target: "pressed",
-                    actions: ["setPressSource"],
+                    actions: ["setPressSource", "emitPress"],
                 },
             },
         },
@@ -92,9 +109,13 @@ export const machine = createMachine<ButtonSchema>({
             effects: ["trackPointerRelease"],
             exit: ["clearPressSource"],
             on: {
-                "PRESS.END": { target: "idle" },
-                "PRESS.CANCEL": { target: "idle" },
-                BLUR: { guard: "isKeyboardPress", target: "idle" },
+                "PRESS.END": { target: "idle", actions: ["emitRelease"] },
+                "PRESS.CANCEL": { target: "idle", actions: ["emitCancel"] },
+                BLUR: {
+                    guard: "isKeyboardPress",
+                    target: "idle",
+                    actions: ["emitCancel"],
+                },
             },
         },
     },
@@ -114,6 +135,23 @@ export const machine = createMachine<ButtonSchema>({
                         context.set("fieldsetDisabled", disabled);
                     },
                 });
+            },
+
+            // The API reads the source's state, which may change from another component sharing
+            // it. Stopping ends what the button has in progress, so a shared source doesn't stay
+            // pressed.
+            trackInteractionSource({ refs, context, scope }) {
+                const emitter = refs.get("interaction");
+                const source = emitter.source();
+                if (!source) return;
+                context.set("interaction", source.state);
+                const unsubscribe = source.subscribe((_, state) =>
+                    context.set("interaction", state),
+                );
+                return () => {
+                    emitter.end(dom.getRootEl(scope));
+                    unsubscribe();
+                };
             },
 
             // A pointer press ends wherever the pointer is released, as `:active` does.
@@ -141,10 +179,24 @@ export const machine = createMachine<ButtonSchema>({
             clearPressSource({ refs }) {
                 refs.set("pressSource", null);
             },
-            clearInteraction({ context }) {
+            emitPress({ refs, event, scope }) {
+                if (event.type !== "PRESS.START") return;
+                refs.get("interaction").press(
+                    event.origin,
+                    event.pointer,
+                    dom.getRootEl(scope),
+                );
+            },
+            emitRelease({ refs, scope }) {
+                refs.get("interaction").release(dom.getRootEl(scope));
+            },
+            emitCancel({ refs, scope }) {
+                refs.get("interaction").cancel(dom.getRootEl(scope));
+            },
+            // Ends what's in progress, as a disabled button can't be hovered, focused, or pressed.
+            clearInteraction({ context, refs, scope }) {
                 context.set("focused", false);
-                context.set("focusVisible", false);
-                context.set("hovered", false);
+                refs.get("interaction").end(dom.getRootEl(scope));
             },
             setContext({ context, event }) {
                 if (event.type !== "CONTEXT.SET") return;

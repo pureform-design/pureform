@@ -6,6 +6,8 @@ import type {
     RequiredBy,
 } from "@zag-js/types";
 
+import type { InteractionProps } from "../interaction";
+
 export interface ValueChangeDetails {
     value: number;
 }
@@ -15,7 +17,8 @@ export interface ElementIds {
     input?: string | undefined;
 }
 
-export interface SliderProps extends DirectionProperty, CommonProperties {
+export interface SliderProps
+    extends DirectionProperty, CommonProperties, InteractionProps {
     /** The ids of the elements in the slider. Useful for composition. */
     ids?: ElementIds | undefined;
     /** The controlled value. */

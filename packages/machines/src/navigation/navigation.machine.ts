@@ -1,8 +1,9 @@
-import { createMachine } from "@zag-js/core";
+import { createMachine, type Machine } from "@zag-js/core";
 
+import { withInteraction } from "../interaction";
 import type { NavigationSchema } from "./navigation.types";
 
-export const machine = createMachine<NavigationSchema>({
+const navigation = createMachine<NavigationSchema>({
     initialState() {
         return "idle";
     },
@@ -36,4 +37,15 @@ export const machine = createMachine<NavigationSchema>({
             },
         },
     },
+});
+
+/** The navigation machine, keeping an interaction emitter per destination and ending what they
+ *  have in progress when it becomes disabled. */
+export const machine: Machine<NavigationSchema> = withInteraction<
+    NavigationSchema,
+    object
+>(navigation, ({ track, prop }, emitters) => {
+    track([() => !!prop("disabled")], () => {
+        if (prop("disabled")) emitters.end();
+    });
 });

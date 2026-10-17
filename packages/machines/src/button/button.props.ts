@@ -11,6 +11,7 @@ export const props = createProps<ButtonProps>()([
     "getRootNode",
     "id",
     "ids",
+    "interactionSource",
     "name",
     "onSelectedChange",
     "selected",
