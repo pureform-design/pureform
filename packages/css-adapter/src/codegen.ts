@@ -8,6 +8,7 @@ import type { CodegenContext, ComponentModule } from "@pureform/generate";
 
 import { manifestOf } from "./classes";
 import { factoryModule, tokenVars } from "./codegen/factory";
+import { themeAttributeOf } from "./options";
 import type { CssOptions } from "./options";
 import { compileCss } from "./stylesheet";
 
@@ -50,7 +51,8 @@ export const componentModules = (
         };
     });
 
-/** The CSS adapter's codegen: `web/<name>.ts` per component, and `styles.css` for them. */
+/** The CSS adapter's codegen: `web/<name>.ts` per component, and `styles.css` for them. The
+ *  registry scopes named themes with the stylesheet's `themeAttribute`. */
 export const codegen = defineCodegen<CssCodegenOptions>({
     name: "css",
     platform: "web",
@@ -65,6 +67,7 @@ export const codegen = defineCodegen<CssCodegenOptions>({
                 ),
             },
         ],
+        themeAttribute: themeAttributeOf(context.options),
     }),
 });
 

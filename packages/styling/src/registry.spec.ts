@@ -156,4 +156,35 @@ describe("createRegistry", () => {
             "0.4.0",
         );
     });
+
+    describe("themeAttributes", () => {
+        it("gives the target's attribute for a named theme", () => {
+            const registry = createRegistry(
+                { chip },
+                { themeAttribute: "data-theme" },
+            );
+            expect(registry.themeAttribute).toBe("data-theme");
+            expect(registry.themeAttributes("teal")).toEqual({
+                "data-theme": "teal",
+            });
+            expect(Object.isFrozen(registry.themeAttributes("teal"))).toBe(
+                true,
+            );
+        });
+
+        it("gives nothing for the base theme", () => {
+            const registry = createRegistry(
+                { chip },
+                { themeAttribute: "data-theme" },
+            );
+            expect(registry.themeAttributes(undefined)).toEqual({});
+            expect(registry.themeAttributes("")).toEqual({});
+        });
+
+        it("gives nothing on a target without one", () => {
+            const registry = createRegistry({ chip });
+            expect(registry.themeAttribute).toBeUndefined();
+            expect(registry.themeAttributes("teal")).toEqual({});
+        });
+    });
 });

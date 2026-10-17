@@ -96,6 +96,20 @@ Generated glue passes the core train's version as a second argument,
 development the bindings compare it with `VERSION`, this package's own version, and warn
 once when they differ (the glue is stale, or two copies of `@pureform/styling` are installed).
 
+It also passes the attribute the target scopes named themes with, and
+`registry.themeAttributes(name)` gives the attributes that put an element and everything under
+it in that theme. Providers write them on their element; an app can spread them anywhere:
+
+```ts
+const registry = createRegistry({ button }, { themeAttribute: "data-theme" });
+registry.themeAttributes("teal"); // { "data-theme": "teal" }, frozen
+registry.themeAttributes(undefined); // {}: the base theme
+```
+
+Panda's glue passes `data-panda-theme`, the CSS and Tailwind targets their `themeAttribute`
+option (default `data-theme`), and React Native nothing, so its `themeAttributes` is always
+empty.
+
 ### Writing a factory
 
 ```ts

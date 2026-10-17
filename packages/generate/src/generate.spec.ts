@@ -118,6 +118,44 @@ describe("generate", () => {
         );
     });
 
+    it("passes the target's theme attribute to the registry", async () => {
+        const root = tempRoot();
+        const adapter = fakeAdapter();
+        await generate({
+            root,
+            config: fixtureConfig(),
+            target: defineCodegen({
+                ...adapter,
+                codegen: async (context) => ({
+                    ...(await adapter.codegen(context)),
+                    themeAttribute: "data-theme",
+                }),
+            }),
+        });
+        expect(body(read(root, "index.ts"))).toContain(
+            '    { version, themeAttribute: "data-theme" },\n);',
+        );
+    });
+
+    it("rejects a theme attribute that isn't an attribute name", async () => {
+        const adapter = fakeAdapter();
+        const error = await rejection(
+            generate({
+                root: tempRoot(),
+                config: fixtureConfig(),
+                target: defineCodegen({
+                    ...adapter,
+                    codegen: async (context) => ({
+                        ...(await adapter.codegen(context)),
+                        themeAttribute: 'data-theme"]',
+                    }),
+                }),
+            }),
+        );
+        expect(isGenerateError(error)).toBe(true);
+        expect((error as Error).message).toContain("theme attribute");
+    });
+
     it("declares each component's shape on ComponentRegistry", async () => {
         const root = tempRoot();
         await generate({

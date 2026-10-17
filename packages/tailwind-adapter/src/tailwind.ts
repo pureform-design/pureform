@@ -9,7 +9,7 @@
 import { tokenValue } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, Token } from "@pureform/core/types";
-import { compileCss } from "@pureform/css-adapter";
+import { compileCss, themeAttributeOf } from "@pureform/css-adapter";
 import type { CssOptions } from "@pureform/css-adapter";
 import {
     REDUCED_MOTION_RULES,
@@ -193,7 +193,7 @@ export const toTailwind = (
         theme[`--breakpoint-${hyphenate(name)}`] = compileNodeToCSS(size, ctx);
         clear.add("breakpoint");
     }
-    const attribute = options.themeAttribute ?? "data-theme";
+    const attribute = themeAttributeOf(options);
     const themeVariant = options.themeVariant ?? ((name) => `theme-${name}`);
     return {
         theme,

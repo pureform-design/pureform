@@ -110,7 +110,7 @@ export const registry = createRegistry(
         button,
         checkbox: { lazy: () => import("./web/checkbox") },
     },
-    { version },
+    { version, themeAttribute: "data-panda-theme" },
 );
 
 export const themes = ["teal", "sharp", "dense"] as const;
@@ -149,9 +149,14 @@ export const codegen = defineCodegen<{ prefix?: string }>({
         files: [
             { path: "panda.ts", contents: "export const staticCss = …;\n" },
         ],
+        themeAttribute: "data-panda-theme", // how the stylesheet scopes named themes
     }),
 });
 ```
+
+`themeAttribute` is the attribute the target's stylesheet matches named themes with; the index
+passes it to `createRegistry`, whose `themeAttributes(name)` providers write on their element.
+Leave it out on targets without selectors (React Native).
 
 The context gives the config, the components to generate, the adapter's options, the root
 and output folder, `shape(name)` (groups, defaults, slots, tokens from the config), and

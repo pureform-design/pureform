@@ -23,7 +23,7 @@ import {
 } from "@pureform/css-lowering";
 import type { LowerCtx } from "@pureform/css-lowering";
 
-import { className, cssContext } from "./options";
+import { className, cssContext, themeAttributeOf } from "./options";
 import type { CssOptions } from "./options";
 import { ROOT_SCHEMES, addStyle, block, printRule } from "./serialize";
 import type { Block, SchemeRules } from "./serialize";
@@ -80,7 +80,7 @@ const themeRules = (
     ctx: LowerCtx,
     options: CssOptions,
 ): string[] =>
-    rule(`[${options.themeAttribute ?? "data-theme"}="${name}"]`, {
+    rule(`[${themeAttributeOf(options)}="${name}"]`, {
         ...tokenVars(override, ctx, options.tokenPrefix),
         ...componentTokenVars(override, ctx),
     });

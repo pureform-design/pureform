@@ -203,6 +203,15 @@ describe("the Tailwind codegen", () => {
         }
     });
 
+    it("scopes named themes with the attribute its theme variants match", async () => {
+        const base = await codegen.codegen(context({}));
+        expect(base.themeAttribute).toBe("data-theme");
+        const custom = await codegen.codegen(
+            context({ themeAttribute: "data-pf-theme" }),
+        );
+        expect(custom.themeAttribute).toBe("data-pf-theme");
+    });
+
     it("compiles the Tailwind stylesheet for the given components only, with the options", async () => {
         const options = { classPrefix: "pf", layer: "ui", replace: true };
         const files = await filesOf(options, ["icon"]);

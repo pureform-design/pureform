@@ -96,6 +96,10 @@ export interface CodegenOutput {
     readonly components: readonly ComponentModule[];
     /** Other files, written alongside. */
     readonly files?: readonly GeneratedFile[];
+    /** The attribute the target's stylesheet scopes named themes with (`data-theme`). The index
+     *  passes it to the registry, whose `themeAttributes(name)` providers write. Leave it out on
+     *  targets without selectors. */
+    readonly themeAttribute?: string;
 }
 
 /** What an adapter's `/codegen` subpath exports as `codegen` (or as its default export). */

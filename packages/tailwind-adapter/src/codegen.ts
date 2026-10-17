@@ -7,6 +7,7 @@
 // classes (only utilities are generated from what it sees), so the factories' classes need no
 // `@source inline(...)`.
 
+import { themeAttributeOf } from "@pureform/css-adapter";
 import {
     STYLESHEET_FILE,
     componentModules,
@@ -24,7 +25,8 @@ export { STYLESHEET_FILE } from "@pureform/css-adapter/codegen";
 export type TailwindCodegenOptions = TailwindOptions;
 
 /** The Tailwind adapter's codegen: `web/<name>.ts` per component, and `styles.css`, the
- *  Tailwind stylesheet for them, which the app imports after `tailwindcss`. */
+ *  Tailwind stylesheet for them, which the app imports after `tailwindcss`. The registry scopes
+ *  named themes with `themeAttribute`, the attribute the `theme-<name>` variants match. */
 export const codegen = defineCodegen<TailwindCodegenOptions>({
     name: "tailwind",
     platform: "web",
@@ -39,6 +41,7 @@ export const codegen = defineCodegen<TailwindCodegenOptions>({
                 ),
             },
         ],
+        themeAttribute: themeAttributeOf(context.options),
     }),
 });
 

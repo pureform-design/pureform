@@ -5,6 +5,9 @@ import type { CoreConfig } from "@pureform/core/types";
 import type { LowerCtx, VarPrefix } from "@pureform/css-lowering";
 import { varTokenRef } from "@pureform/css-lowering";
 
+/** The attribute named themes are scoped by when `themeAttribute` isn't set. */
+export const DEFAULT_THEME_ATTRIBUTE = "data-theme";
+
 export interface CssOptions {
     /** The component var prefix, as in the Panda adapter. Default none. */
     prefix?: VarPrefix;
@@ -44,6 +47,10 @@ export const cssContext = (
     ...(options.classPrefix ? { classPrefix: options.classPrefix } : {}),
     conditionKey: (condition) => SCHEME_KEY[condition],
 });
+
+/** The attribute that scopes named themes under these options. */
+export const themeAttributeOf = (options: Pick<CssOptions, "themeAttribute">) =>
+    options.themeAttribute ?? DEFAULT_THEME_ATTRIBUTE;
 
 /** A class name, after the class prefix. */
 export const className = (name: string, options: CssOptions): string =>
