@@ -22,8 +22,12 @@
         "@pureform/preset": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
+        "@pureform/vitest-config": "catalog:",
         "@solidjs/vite-plugin": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
+        "playwright": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:"
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

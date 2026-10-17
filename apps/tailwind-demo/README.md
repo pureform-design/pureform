@@ -28,3 +28,10 @@ bun run dev
   adapter's `dark:` and `theme-teal:` variants. The theme buttons set the provider's `theme`,
   which writes `data-theme="teal"` on its element (`registry.themeAttributes`), the attribute
   the `theme-teal:` variant matches too.
+
+## Test
+
+`test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) is a smoke test: the page
+renders in Chromium from the glue the bundler plugin writes, its buttons styled by the Tailwind
+stylesheet, without an error. `build` runs it first. Set `CHROMIUM_PATH` (`.env.local`) to use a
+system Chromium.

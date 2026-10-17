@@ -54,7 +54,11 @@ variants picked at run time, which the bundler plugin's usage scan doesn't read,
 build would keep only the button, checkbox, and ripple, and drop the rest from `staticCss`.
 
 The browser suites don't read this demo: they test their own copy of the Panda setup
-(`tests/panda-fixture`), so the demo can change freely.
+(`tests/panda-fixture`), so the demo can change freely. Its own check is a smoke test
+(`src/demo.e2e.test.ts`, the omni `test:e2e` task, after `prepare`): a global setup
+(`vitest-e2e-server.ts`) starts the demo's dev server on a free port, the home page renders on
+the server with Panda's styles, and it hydrates in Chromium without an error. `CHROMIUM_PATH`
+(`.env.local`) picks a system Chromium.
 
 ### The components page
 
@@ -119,6 +123,8 @@ These are `fullstack`'s pillars, unchanged — its README teaches each in depth:
 ## Testing
 
 Two vitest projects, as in `fullstack`: `client` runs the component test in jsdom, `server` runs the session suite in node against the real server runtime, with the plugin's env module stubbed (`vitest-env-server-stub.ts`).
+
+`vitest.config.e2e.ts` runs the smoke test described under "pureform in this demo".
 
 ## Usage
 

@@ -8,6 +8,7 @@ dependencies:
   append:
     - "@pureform/tsconfig"
     - "@pureform/vite-config"
+    - "@pureform/vitest-config"
     - "@pureform/solid"
     - "@pureform/styling"
     - "@pureform/tailwind-adapter"
@@ -34,8 +35,13 @@ tasks:
   test:integration:
     enabled: false
 
+  # A smoke test: the page in Chromium, from the glue the bundler plugin writes.
   test:e2e:
-    enabled: false
+    enabled: true
+    # The packages the bundler plugin loads, built.
+    dependencies:
+      append:
+        - generate
 
   test:
     enabled: true

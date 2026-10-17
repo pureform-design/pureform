@@ -37,3 +37,10 @@ src/main.tsx: imports reset.css and .pureform/styles.css,
 
 The build's script is about 40 kB gzipped (Solid, the button and checkbox with their Zag
 machines, and the registry); the config, providers, and color generation stay at build time.
+
+## Test
+
+`test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) is a smoke test: the page
+renders in Chromium from the glue the bundler plugin writes, its buttons styled by the generated
+stylesheet, without an error. `build` runs it first. Set `CHROMIUM_PATH` (`.env.local`) to use a
+system Chromium.

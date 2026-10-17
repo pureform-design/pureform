@@ -33,7 +33,7 @@ cache:
 
 tasks:
   test:
-    enabled: false
+    enabled: true
 
   test:unit:
     enabled: false
@@ -41,8 +41,18 @@ tasks:
   test:integration:
     enabled: false
 
+  # A smoke test: the dev server renders the home page, and it hydrates in Chromium.
   test:e2e:
-    enabled: false
+    enabled: true
+    cache:
+      key:
+        files:
+          append:
+            - "./vitest-e2e-server.ts"
+    # Panda's codegen, which the pages import, after the glue.
+    dependencies:
+      append:
+        - prepare
 
   # Writes `.pureform/` (ignored by git) from `pureform.config.ts` with the built Panda adapter's
   # codegen, for Panda's codegen and `tsc`; `vite dev` and `vite build` write it themselves.
@@ -65,7 +75,8 @@ tasks:
   build:
     enabled: true
     dependencies:
-      - prepare
+      append:
+        - prepare
 
     cache:
       output:
