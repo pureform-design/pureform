@@ -1,0 +1,22 @@
+{
+    "extends": ["@pureform/tsconfig/base.json"],
+    "compilerOptions": {
+        "rootDir": ".",
+        "noEmit": true,
+        "jsx": "preserve",
+        "jsxImportSource": "@solidjs/web",
+        "paths": {
+            "$*": ["./styled-system/*"]
+        }
+    },
+    // The page, the pureform config, and `.pureform/` (the registry and the declarations that type
+    // it; TypeScript's globs skip dot folders unless named). Not `panda.config.ts`, which the demos
+    // leave out too: Panda's own presets don't check against its `Preset` type under strict options.
+    "include": [
+        "src",
+        "pureform.config.ts",
+        "pureform.glue.ts",
+        "panda.pureform.ts",
+        ".pureform/**/*.*"
+    ]
+}
