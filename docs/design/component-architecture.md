@@ -1936,6 +1936,23 @@ React Native runs the same rules through the selection, and RN-web in
 `tests/browser-e2e-tests`. A benchmark mounts 1,000 list items, with and without the layer
 element, and records mount time and style recalculation, for the layer decision above.
 
+**Built (p9e):** `tests/component-suites/src/indication.e2e.test.ts` runs the rules above for every
+component whose case has an `indication` (its anatomy, how a source and disabling reach it), on all
+six projects, with the real mouse; `tests/browser-e2e-tests/src/rn-indication.e2e.test.ts` runs them
+on React Native Web. What they found, now fixed: an opacity given as a number (`noIndication`'s 0)
+was written as a bare number, which `color-mix()` rejects, so the surface lost its color (numbers are
+fractions, written as percentages on the web); an item disabled alone didn't end its press on the web;
+Zag's radio stayed pressed when the pointer came up elsewhere; on React Native a shared source carried
+focus to every component on it, the slider couldn't take focus, and the navigation had no `disabled`.
+Known, kept as expected failures: the ripple's opacity reads the theme's pressed opacity, not the
+surface's `statePressedOpacity`, and an override of a component's indication token above its root
+doesn't reach it. **The benchmark** (`indication-benchmark.e2e.test.ts`, 1,000 list items, Panda):
+the layer adds about 20% to Solid's mount and 50% to React's, mostly the binding re-rendering each
+surface once its layer element is known, with about 3 ms of style recalculation and 7 ms of layout;
+sources made beforehand save nothing measurable. So sources stay eager, and the layer's wiring is the
+thing to make lazy (find the layer at the first press instead of tracking it from mount), keeping the
+element in the markup.
+
 #### Where it lives
 
 - `@pureform/binding-core/interaction`: the source and its state, framework-free.
