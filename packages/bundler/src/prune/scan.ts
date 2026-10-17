@@ -122,6 +122,8 @@ class Collector {
                 const groups: Record<string, string[]> = {};
                 for (const [group, values] of state.listed) {
                     if (values !== ALL) groups[group] = [...values].sort();
+                    // Every value, against a rest that narrows.
+                    else if (state.rest !== ALL) groups[group] = ["*"];
                 }
                 if (state.rest !== ALL) groups["*"] = [...state.rest].sort();
                 if (Object.keys(groups).length > 0) variants[entry] = groups;
