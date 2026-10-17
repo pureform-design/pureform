@@ -43,6 +43,8 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 | `button/`                                                  | `@pureform/react/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                     |
 | `checkbox/`                                                | `@pureform/react/checkbox`: the same layout                                                                                               |
 | `switch/`, `radio-group/`, `chip/`, `icon-button/`, `fab/` | The other components, in the same layout                                                                                                  |
+| `text-field/`, `text-area/`, `select/`                     | The text inputs, in the same layout                                                                                                       |
+| `text-input.tsx`                                           | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                             |
 | `pressable.ts`                                             | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                          |
 | `env.ts`                                                   | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`                                                               |
 
@@ -100,6 +102,15 @@ import { Checkbox } from "@pureform/react/checkbox";
 <Chip label="Vegan" defaultSelected={false} /> // a filter chip
 <IconButton icon={<StarIcon />} aria-label="Favorite" defaultSelected={false} variant="filled" />
 <Fab icon={<EditIcon />} label="Compose" /> // extended, since it has a label
+<TextField label="Email" name="email" type="email" supportingText="We won't share it" />
+<TextField label="Name" value={name} onValueChange={(d) => setName(d.value)} error={taken ? "Taken" : undefined} />
+<TextArea label="Bio" name="bio" rows={3} autoGrow />
+<Select
+    label="Size"
+    name="size"
+    defaultValue="m"
+    items={[{ value: "s", label: "Small" }, { value: "m", label: "Medium" }]}
+/>
 
 <Checkbox.Root ids={{ input: "terms" }} color="error" invalid>
     <Checkbox.TouchTarget />
@@ -111,15 +122,17 @@ import { Checkbox } from "@pureform/react/checkbox";
 </Checkbox.Root>
 ```
 
-| Component    | Parts (element)                                                                                                           | Machine                                              |
-| ------------ | ------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
-| `Button`     | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
-| `Checkbox`   | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                      | Zag's checkbox                                       |
-| `Switch`     | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`              | Zag's switch (`@pureform/machines/switch`)           |
-| `RadioGroup` | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot` | Zag's radio group (`@pureform/machines/radio-group`) |
-| `Chip`       | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                | `@pureform/machines/button`                          |
-| `IconButton` | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                 | `@pureform/machines/button`                          |
-| `Fab`        | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                   | `@pureform/machines/button` (never a toggle)         |
+| Component               | Parts (element)                                                                                                                                                                           | Machine                                              |
+| ----------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------- |
+| `Button`                | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                | `@pureform/machines/button`                          |
+| `Checkbox`              | `Root` (`label`), `TouchTarget` (`span`), `Input` (`input`), `Box`, `CheckIcon`, `IndeterminateIcon`                                                                                      | Zag's checkbox                                       |
+| `Switch`                | `Root` (`label`), `TouchTarget`, `Input` (`input`, `role="switch"`), `Track`, `StateLayer`, `Handle`, `Icon`                                                                              | Zag's switch (`@pureform/machines/switch`)           |
+| `RadioGroup`            | `Root` (`div`, unstyled), and per radio `Item` (`label`), `ItemTouchTarget`, `ItemInput` (`input`), `ItemRing`, `ItemDot`                                                                 | Zag's radio group (`@pureform/machines/radio-group`) |
+| `Chip`                  | `Root` (`button`), `TouchTarget`, `Icon`, `Label` (`span`)                                                                                                                                | `@pureform/machines/button`                          |
+| `IconButton`            | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Outline` (`span`)                                                                                                                 | `@pureform/machines/button`                          |
+| `Fab`                   | `Root` (`button`), `TouchTarget`, `Container`, `Icon`, `Label` (`span`)                                                                                                                   | `@pureform/machines/button` (never a toggle)         |
+| `TextField`, `TextArea` | `Root` (`div`), `Container` (`div`), `LeadingIcon`, `Input` (`input` or `textarea`), `Label` (`label`), `TrailingIcon`, `SupportingText` (`span`)                                         | `@pureform/machines/text-field`                      |
+| `Select`                | the field's (`Input` is a read-only `input`), `HiddenSelect` (`select`, unstyled), `Positioner` (`div`, unstyled), `Content` (`div`), and per option `Item` (`div`), `ItemLabel` (`span`) | Zag's select (`@pureform/machines/select`)           |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -140,6 +153,26 @@ import { Checkbox } from "@pureform/react/checkbox";
   toggle when given `selected` or `defaultSelected` (a toggle icon button also selects the
   `toggle` variant); the FAB is extended when its ready-made has a `label`. Icon-only components
   need `aria-label` or `aria-labelledby`, and warn in development without one.
+- **The text field and text area** float their label over a native `<input>` or `<textarea>`
+  (its placeholder is one space by default, so the CSS sees when it holds a value; the container
+  also gets `data-pf-filled`). The ready-made takes `label`, `supportingText`, `leadingIcon`,
+  `trailingIcon` (each icon part renders only when given, and turns on Root's `leadingIcon` or
+  `trailingIcon` variant), `mirrorLeadingIcon`, `mirrorTrailingIcon`, and the input's attributes
+  (`type`, `autocomplete`, `maxlength`, `rows`, `aria-label`, …), which go on the input. `error`
+  marks the field invalid, shows in place of the supporting text, and blocks submitting (custom
+  validity); `validate="native"` shows the browser's message once the user commits a change or
+  the form is checked; `invalid` only marks it. A controlled field the owner doesn't update puts
+  the typed text back.
+- **The select** is the text field's look over Zag's select: the `Input` part is a read-only
+  combobox `<input>` showing the chosen option's label, the arrow is the trailing icon (a
+  drop-down arrow unless given), and the list opens in a `Positioner` (placed by Zag under the
+  field, as wide as it) holding `Content`, drawn with the menu's registry entry
+  (`selectMenuAnatomy`: test ids `pf-select-content`, `pf-select-item`, …; the highlighted option
+  shows the hover state). A hidden native `<select>` with an option per item submits, resets, and
+  validates. `value` is one string or `null`; `open` is controllable too. Enter, Space, and the
+  arrow keys up and down open the list; the sideways arrow keys choose the option before or after,
+  by direction. Root takes `items` (`{ value, label, disabled? }`); the ready-made renders every
+  part. One value only: no `multiple` yet.
 - **The checkbox is a `<label>`** around the native input, as Zag expects, so a click on its touch
   target toggles it. Name it with `aria-label`, or point a `<label htmlFor>` at `ids.input`;
   don't wrap it in another label. The input carries every native state the CSS reads
@@ -323,7 +356,7 @@ Through the omni MCP (or `omni run`):
 - `test:unit`: Vitest in browser mode (Chromium; `CHROMIUM_PATH` from `.env.local`) with React
   Testing Library, and type checks. The specs use a fake registry
   (`src/__fixtures__/registry.ts`, with button and checkbox factories that name the selection,
-  and `togglesRegistry()` for the other components)
+  `togglesRegistry()` for the toggles, and `textInputsRegistry()` for the text field, text area, select, and the menu the select draws its list with)
   and the example button. The component specs mirror `@pureform/solid`'s case by case;
   `src/testing/render.tsx` has `outside` (a value set from the test, as a Solid signal) and an
   error boundary. Interactions go through

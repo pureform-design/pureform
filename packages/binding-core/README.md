@@ -155,6 +155,35 @@ ICON_BUTTON_ROOT_PROPS; ICON_BUTTON_CONTENT_PROPS; iconButtonSelection(props); /
 isToggle(props);                         // toggle ?? (selected or defaultSelected given)
 FAB_ROOT_PROPS; FAB_CONTENT_PROPS; fabSelection(props); fabMachineProps(props); // never a toggle
 
+// Text field and text area: on pureform's text field machine; one contract for both
+interface TextFieldRootOwnProps          // variant, color, density, leadingIcon, trailingIcon (room
+                                         // for the icons), tokens, disabled, invalid, error,
+                                         // validate, required, readOnly, placeholder, name, form,
+                                         // id, ids, value, defaultValue, onValueChange, testId, unstyled
+interface TextAreaRootOwnProps           // the same, and autoGrow
+TEXT_FIELD_ROOT_PROPS; TEXT_AREA_ROOT_PROPS; TEXT_FIELD_CONTENT_PROPS; // label, supportingText,
+                                         // leadingIcon, trailingIcon, mirrorLeadingIcon, mirrorTrailingIcon
+TEXT_FIELD_INPUT_PROPS; TEXT_AREA_INPUT_PROPS; // the ready-made's props that go on the input,
+                                         // spelled alike in both frameworks (each binding adds its own)
+textFieldSelection(props); textAreaSelection(props); textFieldMachineProps(props);
+textFieldNativeDefault(resetsTo): string;
+
+// Select: Zag's select; the list is drawn as a menu (selectMenuAnatomy)
+interface SelectRootOwnProps             // variant, color, density, leadingIcon, tokens, items,
+                                         // disabled, invalid, error, required, readOnly, name, form,
+                                         // autoComplete, positioning, id, ids, value, defaultValue,
+                                         // onValueChange, open, defaultOpen, onOpenChange, testId, unstyled
+interface SelectItem { value; label; disabled? }
+SELECT_ROOT_PROPS; SELECT_INPUT_LABEL_PROPS; SELECT_CONTENT_PROPS; SELECT_COLLECTION;
+selectSelection(props);                  // trailingIcon always on: the arrow
+selectMenuSelection(props);              // the menu's color and density
+toZagValue(value); fromZagValue(list);   // one value or null <-> Zag's list
+selectValueProps(controllableMachineProps); selectMachineProps(props, fieldsetDisabled);
+selectSupportingTextId(props, id);
+selectInputProps(zagTriggerProps, valueText, dir); // a read-only <input>; rtl swaps the sideways arrows
+selectPositionerProps(p, open);          // hidden while closed
+selectHiddenSelectProps(p);              // without aria-labelledby
+
 // Content
 isPresent(node);                         // not undefined, null, or false
 type IconOnlyName;                       // aria-label or aria-labelledby, required
@@ -175,6 +204,7 @@ syncCheckedInput(input, checked);              // a native checkbox back to the 
 radioInputs(group): HTMLInputElement[];        // a radio group's native radios
 syncRadioInputs(group, value);                 // the radios back to the group's value
 setRadioDefaults(group, value);                // each radio's default, written only when it differs
+syncTextInput(input, value);                   // a text input or text area back to its value
 
 // Runtime themes and overrides
 themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions

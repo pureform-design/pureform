@@ -92,7 +92,9 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
     - `state` (if a user changes it): the prop, two values, the action between them, and how to
       read the state from the page;
     - `form` (if it's a form control): the native control, how the machine shows disabled, what it
-      submits, and whether it resets, takes `required`, `invalid`, `error`;
+      submits, and whether it resets, takes `required`, `invalid`, `error`; `aria`, when the
+      element carrying `aria-invalid` isn't the native control (a select's combobox over its
+      hidden select);
     - `keyboard`: the focusable element (read again after each key, so it can follow focus: a
       radio group's checked radio), what each key does (a `change` can name the state it moves
       to with `to`), and `arrows` by direction if arrow keys do anything;
@@ -122,7 +124,6 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 
 ## Worth knowing
 
-- **Stubs:** `error` has no component yet (the text inputs bring it in p6b); an `it.todo`.
 - **Targets differ only in their stylesheet and registry.** No suite branches on the target; a
   case that needs to know reads the registry (`#registry`), as the themes suite reads
   `registry.themeAttributes`.
@@ -137,8 +138,13 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 - React's `settle` waits a frame and two tasks: React syncs the native input in a passive effect,
   which can land after a single timeout.
 - The browser context emulates reduced motion, so boxes are measured at rest.
+- **The emulated color scheme belongs to the page**, which later test files reuse: the suites that
+  emulate one put `light` back in `afterAll`, or a later file reads colors (axe's contrast) in
+  the dark scheme against a light page.
 - The direction suite skips parts with no box (`display: none`): an icon button's outline unless
   it's outlined.
 - **Components so far:** button, checkbox, chip, FAB, icon button, radio group (its `root` is the
   unstyled group element, `compositeTestIds.radioGroup.root`; its radios repeat the radio's test
-  ids, so cases find them by value), and switch.
+  ids, so cases find them by value), select (opened with a click and chosen from its list, which
+  takes focus while open; `src/components/select.ts`), switch, text area, and text field (one
+  shared case, `src/components/text-input.ts`: `value` from `""` to `"a"`, typed).
