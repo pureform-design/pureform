@@ -1488,6 +1488,11 @@ icon only has to follow them.
   root's box in its host (which takes the direction too), and holds animations at one time, since
   indeterminate progress animates under reduced motion; the themes suite measures both renderings
   where the pointer can't hover them.
+- **Test fixtures, not demos:** both browser suites take their Panda setup from
+  `tests/panda-fixture` (the config every target and adapter is compiled from, the Panda preset,
+  the generated registry, the stylesheet, and the visual suite's page), not from a demo, so a
+  demo can change, prune, or rebuild without changing what the suites test. Each web demo has
+  its own smoke test instead (its `test:e2e`: the page renders in Chromium without an error).
 
 ### 9.8 Indication
 
