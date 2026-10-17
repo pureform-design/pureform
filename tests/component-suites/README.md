@@ -88,6 +88,16 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
 | `indication.e2e.test.ts`       | §9.8, for every component with an `indication` case, per anatomy entry (the snackbar has two): hover, a press, and keyboard focus tint the surface, and a drag the slider's; a press ripples in the surface's layer, from the center when the entry says so, and not under reduced motion; `noIndication` on the provider tints nothing, draws no layer, and keeps the focus indicator; inside an interactive card with its own `indication`, the component draws exactly as alone; a shared source shows a press on a button (`data-pf-active`) and the button's press on it, never focus, and `useInteractionState` reports it; disabling it (or its item) while pressed ends the press; an app's own interaction kind reaches subscribers and changes no state; a custom indication on the provider and the component hydrates unchanged. Known gaps are `it.fails` tests at the end. |
 | `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule; a named theme's attribute renders on the server; a runtime theme renders its scope and block on the server, hydrates in both schemes keeping the server's block and generating nothing (`"reuse"`), and regenerates the same block (`"regenerate"`); overrides render and hydrate unchanged.                                                                                                                                                                                                                                                                              |
 
+`indication-benchmark.e2e.test.ts` isn't a suite: it mounts 1,000 interactive list items with and
+without the layer element, and with eager sources or sources made beforehand, and logs the mount
+time and Chromium's style recalculation and layout (the `performanceMetrics` command). It's
+skipped unless `VITE_PUREFORM_BENCH` is set:
+
+```sh
+VITE_PUREFORM_BENCH=1 bun x vitest --config vitest.config.e2e.ts run src/indication-benchmark \
+    --project '*/panda' --silent=false
+```
+
 ## Adding a component
 
 1. Add its name to `COMPONENT_NAMES` in `src/harness/scene.ts`.

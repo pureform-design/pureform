@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 
 import solid from "@solidjs/vite-plugin";
 import react from "@vitejs/plugin-react";
+import type { CDPSession } from "playwright";
 import { createServer, type Plugin, type ViteDevServer } from "vite";
 import type { BrowserCommand } from "vitest/node";
 
@@ -107,7 +108,33 @@ const mouse: BrowserCommand<
     if (action === "up") await context.page.mouse.up();
 };
 
-export const commands = { renderOnServer, emulateColorScheme, mouse };
+// One DevTools session per page, which keeps Chromium's performance counters running.
+const sessions = new WeakMap<object, Promise<CDPSession>>();
+
+// Chromium's performance counters for the page (its frames run in the same process):
+// `RecalcStyleDuration`, `RecalcStyleCount`, `LayoutDuration`, and the rest, cumulative.
+const performanceMetrics: BrowserCommand<[]> = async (context) => {
+    let session = sessions.get(context.page);
+    if (!session) {
+        session = (async () => {
+            const opened = await context.page
+                .context()
+                .newCDPSession(context.page);
+            await opened.send("Performance.enable");
+            return opened;
+        })();
+        sessions.set(context.page, session);
+    }
+    const { metrics } = await (await session).send("Performance.getMetrics");
+    return Object.fromEntries(metrics.map(({ name, value }) => [name, value]));
+};
+
+export const commands = {
+    renderOnServer,
+    emulateColorScheme,
+    mouse,
+    performanceMetrics,
+};
 
 /** Closes the server-rendering Vite servers with the test server, so the run can exit. */
 export const closeServers: Plugin = {
@@ -128,5 +155,7 @@ declare module "vitest/browser" {
         /** The real mouse at a point in the test's viewport: it moves there, then goes down or
          *  up, so `:hover` and `:active` match as they would for a user. */
         mouse: (action: MouseAction, x: number, y: number) => Promise<void>;
+        /** Chromium's performance counters for the page, cumulative. */
+        performanceMetrics: () => Promise<Record<string, number>>;
     }
 }

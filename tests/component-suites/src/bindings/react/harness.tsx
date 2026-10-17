@@ -66,6 +66,19 @@ const observe = (): ObservedSource => {
     };
 };
 
+const sources = (count: number): MutableInteractionSource[] => {
+    let made: MutableInteractionSource[] = [];
+    // The same number of hooks on every render, so React keeps them in order.
+    function Maker(): ReactNode {
+        made = Array.from({ length: count }, useInteractionSource);
+        return null;
+    }
+    const root = createRoot(document.createElement("div"));
+    flushSync(() => root.render(<Maker />));
+    root.unmount();
+    return made;
+};
+
 export const harness: Harness = {
     name: "react",
     mount: (
@@ -88,5 +101,6 @@ export const harness: Harness = {
         return mounted;
     },
     observe,
+    sources,
     settle,
 };

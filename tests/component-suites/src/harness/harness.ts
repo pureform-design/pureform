@@ -38,6 +38,8 @@ export interface Harness {
     hydrate(scene: Scene, host: HTMLElement): Promise<Mounted>;
     /** Makes a source in a component of its own, which renders its state. */
     observe(): ObservedSource;
+    /** Makes `count` sources as an app makes them, rendering nothing that stays. */
+    sources(count: number): MutableInteractionSource[];
     /** Waits until the binding and the machines have applied everything queued: microtasks (Zag's
      *  sends), the framework's updates, and the next task. */
     settle(): Promise<void>;
