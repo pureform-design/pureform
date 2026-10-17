@@ -52,6 +52,7 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 | `navigation.tsx`                                                                                   | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                                  |
 | `text-input.tsx`                                                                                   | `createTextInput` (internal): the text field's and text area's parts and ready-made component                                                                                                  |
 | `interaction.ts`                                                                                   | `useOwnInteractionSource`, `useItemInteractionSources` (internal): each interactive component's interaction source (one per item for composites), made on the client and passed to its machine |
+| `indication.tsx`                                                                                   | `useInteractionSource`, `useInteractionState`, `useIndication`; and (internal) how `useComponent` resolves the indication and wires each part the anatomy's indication entry names             |
 | `pressable.ts`                                                                                     | `usePressable` (internal): the button machine for Root, shared by the chip, icon button, and FAB                                                                                               |
 | `env.ts`                                                                                           | `isDev` (`process.env.NODE_ENV`, left for the app's bundler) and `isServer`                                                                                                                    |
 
@@ -379,6 +380,81 @@ in the head (unused).
 | `useDirection()` | `"ltr" \| "rtl"`: pass it to every machine as `dir`                                |
 | `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
 | `useMotion()`    | `MotionSetting`: the nearest `"reduce"` or `"full"`, else `"system"`               |
+
+### Indication
+
+How interactive components show hover, focus, and press (design doc §9.8): the state layer and
+the focus indicator are the preset's CSS, and the indication picks their tokens; the ripple
+draws in a layer element inside each surface.
+
+```tsx
+import {
+    defineIndication,
+    materialIndication,
+    noIndication,
+} from "@pureform/react";
+
+<PureformProvider registry={registry} indication={noIndication}>
+    {" "}
+    {/* every component under it */}
+    <Button
+        label="Save"
+        indication={materialIndication({ ripple: "ink-sparkle" })}
+    />
+</PureformProvider>;
+
+// An app's own: a softer hover, a thicker focus ring, and a press that scales the surface.
+const soft = defineIndication({
+    name: "app:soft",
+    tokens: { stateHoverOpacity: 0.04, focusIndicatorThickness: 4 },
+    web(target, source) {
+        return source.subscribe((_, state) => {
+            target.surface.style.scale = state.pressed ? "0.98" : "";
+        });
+    },
+});
+```
+
+- **The default** is `materialIndication()` (the ink-well ripple). The provider's `indication`
+  is inherited and overridable by a nested provider; a component's `indication` prop overrides
+  it for that component. The provider writes its indication's tokens as theme-level vars on its
+  element (`--opacity-state-hover`, `--sizes-focus-indicator-thickness`); a component's prop
+  writes them as instance tokens on its root, so they don't reach a nested component. A
+  provider's `focusIndicatorColor` has no theme-level token, so it reaches each component's
+  root as an instance token. An indication that sets `focusIndicatorThickness` to 0 warns once
+  in development.
+- **The layer** is an empty `<span aria-hidden="true" data-ripple-layer>` with the ripple's
+  `root` class, rendered first inside the anatomy's surface while the indication has
+  `layer: true`, on the server too. The card and the list item show indication only while
+  interactive (a link, a button, or `interactive`).
+- **The effect** (`web`) runs after mount with the trigger, the surface, the layer, the source,
+  and `{ centered, reducedMotion(), dir(), registry }`.
+- **Sources.** Every interactive component takes `interactionSource` (on Root and the
+  ready-made component; a composite's items take one each: `Tabs.Tab`, `Menu.Item`,
+  `RadioGroup.Item`, a navigation `Item`, or `interactionSource` in an item's data; the
+  snackbar's `Action` and `Close`). Components sharing a source show each other's hover and
+  press: the binding marks a hover or press from another origin with `data-pf-hover` or
+  `data-pf-active` on the element the preset matches it on (the trigger, or the root around a
+  native input), after mount only. Focus is never forwarded.
+
+| Hook                                  | Returns                                                                                                                                                  |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useInteractionSource()`              | a stable `MutableInteractionSource`                                                                                                                      |
+| `useInteractionState(source)`         | `InteractionState` (through `useSyncExternalStore`): hovered, focused, focusVisible, pressed, dragged; idle on the server                                |
+| `useIndication(source, { centered })` | `{ surface, layer }`: props for an app's own surface (ref, handlers that emit to `source`, forwarded attributes) and the layer to render first inside it |
+
+```tsx
+function Tile() {
+    const source = useInteractionSource();
+    const indication = useIndication(source, { centered: false });
+    return (
+        <div className="tile" {...indication.surface}>
+            {indication.layer}
+            Open
+        </div>
+    );
+}
+```
 
 ### Registry hooks
 
