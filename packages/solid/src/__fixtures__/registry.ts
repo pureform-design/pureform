@@ -158,3 +158,38 @@ export const textInputsRegistry = () =>
         select: named("select", FIELD_SLOTS),
         menu: named("menu", ["root", "item", "itemLabel"]),
     });
+
+/** The overlays' fake factories, all static: the menu, tooltip, dialog, scrim, and snackbar, and
+ *  the button their ready-made triggers draw. */
+export const overlaysRegistry = () =>
+    createRegistry({
+        menu: named("menu", [
+            "root",
+            "item",
+            "itemLeading",
+            "itemLabel",
+            "itemTrailing",
+            "itemTrailingText",
+        ]),
+        tooltip: named("tooltip", [
+            "root",
+            "subhead",
+            "supportingText",
+            "actions",
+        ]),
+        dialog: named("dialog", [
+            "root",
+            "icon",
+            "headline",
+            "body",
+            "actions",
+        ]),
+        scrim: named("scrim", ["root"]),
+        snackbar: named("snackbar", [
+            "root",
+            "supportingText",
+            "action",
+            "close",
+        ]),
+        button: named("button", ["root", "touchTarget", "icon", "label"]),
+    });
