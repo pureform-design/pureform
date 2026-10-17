@@ -139,7 +139,7 @@ export const overridesFor = (
  *  overridden one, directly or through others, takes its new value. One given outright stays
  *  as given. */
 export const withDerived = (
-    styles: Styles,
+    styles: Pick<Styles, "themes" | "formulas">,
     key: string,
     overrides: ThemeValues,
 ): ThemeValues => {

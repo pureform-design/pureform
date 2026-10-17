@@ -107,6 +107,8 @@ export interface NativeFactory<
     readonly styles: Styles;
     /** The groups and states its key is made of. */
     readonly order: SelectionOrder;
+    /** The theme key each instance token sets, by the token's name. */
+    readonly tokens: Readonly<Record<string, string>>;
     /** The factory in an environment, one per environment. */
     for(environment?: Environment): NativeStyleFactory<C>;
 }
@@ -356,6 +358,7 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
         component,
         styles,
         order,
+        tokens,
         for: at,
         selected: base.selected,
     });

@@ -6,9 +6,12 @@ import { renderToString } from "react-dom/server";
 import { describe, expect, it } from "vitest";
 
 import { precompute, runtimeStyles } from "./build";
+import { nativeFactory } from "./factory";
 import {
     PureformProvider,
+    StylesProvider,
     pressableState,
+    useStyleEnvironment,
     useComponentState,
     useComponentStyles,
     useTokens,
@@ -149,6 +152,101 @@ describe("PureformProvider and useComponentStyles", () => {
         expect(() => renderToString(createElement(Probe))).toThrow(
             "needs a PureformProvider",
         );
+    });
+});
+
+describe("StylesProvider", () => {
+    const switchStyles = precompute(config, {
+        components: ["switchControl"],
+        schemes: ["light"],
+    });
+    const factory = nativeFactory("switchControl", switchStyles);
+    const source = {
+        factory: () => factory,
+        themeValues: () => switchStyles,
+    };
+    const handle = (rtl: boolean) => {
+        const Probe = () =>
+            createElement(
+                "pre",
+                null,
+                JSON.stringify(
+                    useComponentStyles("switchControl", {}, { checked: true })
+                        .handle,
+                ),
+            );
+        const html = renderToString(
+            createElement(
+                StylesProvider,
+                { source, scheme: "light", rtl },
+                createElement(Probe),
+            ),
+        );
+        return JSON.parse(
+            html.replace(/^<pre>|<\/pre>$/g, "").replaceAll("&quot;", '"'),
+        ) as Record<string, unknown>;
+    };
+
+    it("selects from the source's factories as PureformProvider does", () => {
+        const Probe = () =>
+            createElement(
+                "pre",
+                null,
+                JSON.stringify(useComponentStyles("switchControl")),
+            );
+        const render = (provider: unknown) =>
+            renderToString(
+                createElement(
+                    provider as typeof StylesProvider,
+                    {
+                        source,
+                        styles: switchStyles,
+                        scheme: "light",
+                    } as never,
+                    createElement(Probe),
+                ),
+            );
+        expect(render(StylesProvider)).toBe(render(PureformProvider));
+    });
+
+    it("selects the styles under rtl when the layout runs right to left", () => {
+        expect(handle(true).transform).not.toEqual(handle(false).transform);
+        expect(handle(false)).toEqual(
+            factory.selected({ checked: true }).styles.handle,
+        );
+        expect(handle(true)).toEqual(
+            factory.selected({ checked: true, rtl: true }).styles.handle,
+        );
+    });
+
+    it("gives the environment to call a factory in", () => {
+        const Probe = () =>
+            createElement("pre", null, JSON.stringify(useStyleEnvironment()));
+        const html = renderToString(
+            createElement(
+                StylesProvider,
+                {
+                    source,
+                    scheme: "dark",
+                    theme: "teal",
+                    svg: true,
+                    width: 400,
+                },
+                createElement(Probe),
+            ),
+        );
+        expect(
+            JSON.parse(
+                html.replace(/^<pre>|<\/pre>$/g, "").replaceAll("&quot;", '"'),
+            ),
+        ).toEqual({
+            theme: "teal",
+            scheme: "dark",
+            overrides: {},
+            svg: true,
+            width: 400,
+            containers: {},
+        });
     });
 });
 

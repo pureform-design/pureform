@@ -16,28 +16,45 @@ import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
 import { curve } from "./animate/curve";
 import { componentFactory } from "./factory";
+import type { Environment, NativeFactory } from "./factory";
 import { movingTokens, tokenTransitions, tokensAt } from "./motion";
-import { overridesFor, resolvedWith, themeKey, withDerived } from "./resolve";
-import type { Overrides, Resolved, Styles } from "./resolve";
+import { overridesFor, themeKey, withDerived } from "./resolve";
+import type { Overrides, Styles } from "./resolve";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
 import type { ThemeValues, Transition } from "./values";
 
 interface Context {
-    styles: Styles;
-    key: string;
+    factory: (name: string) => NativeFactory;
     theme: string | undefined;
     overrides: ThemeValues;
-    resolved: Resolved;
     tokens: ThemeValues;
     scheme: Scheme;
     reducedMotion: boolean;
+    rtl: boolean;
     width: number | undefined;
     svg: boolean;
     timeScale: number;
 }
 
 const PureformContext = createContext<Context | undefined>(undefined);
+
+/** Where the hooks get each component's styles: its factory, and the token values and formulas
+ *  `useTokens()` reads. A binding's provider gives its registry's factories; `PureformProvider`
+ *  gives factories over its `styles`. */
+export interface StyleSource {
+    /** A component's factory, by name. Called while rendering, so it may suspend. */
+    factory(name: string): NativeFactory;
+    /** Each theme's token values and formulas by theme key, as every factory's `styles` holds
+     *  them. Called while rendering, so it may suspend. */
+    themeValues(): Pick<Styles, "themes" | "formulas">;
+}
+
+/** A source over styles from `precompute` or `runtimeStyles`. */
+export const stylesSource = (styles: Styles): StyleSource => ({
+    factory: (name) => componentFactory(styles, name),
+    themeValues: () => styles,
+});
 
 export interface PureformProviderProps {
     /** From `precompute` or `runtimeStyles`. */
@@ -65,52 +82,73 @@ export interface PureformProviderProps {
     children?: ReactNode;
 }
 
-export const PureformProvider = (props: PureformProviderProps) => {
-    const { styles, scheme, theme } = props;
+/** What `StylesProvider` takes: `PureformProvider`'s props, with a source in place of the
+ *  styles, and the direction. */
+export interface StylesProviderProps extends Omit<
+    PureformProviderProps,
+    "styles"
+> {
+    source: StyleSource;
+    /** Whether the layout runs right to left: styles under `rtl` apply. Default `false`. */
+    rtl?: boolean;
+}
+
+/** The provider the hooks read, over any source of factories. Bindings build theirs on it. */
+export const StylesProvider = (props: StylesProviderProps) => {
+    const { source, scheme, theme } = props;
     const key = themeKey(theme, scheme);
     const overrides = overridesFor(props.overrides, scheme);
     // Overrides are compared by contents, so an inline object doesn't recompute every render.
     const overrideKey = JSON.stringify(overrides ?? {});
-    const resolved = useMemo(
-        () => resolvedWith(styles, key, overrides),
-        [styles, key, overrideKey],
-    );
+    const values = source.themeValues();
     const tokens = useMemo(
         () => ({
-            ...styles.themes[key],
-            ...withDerived(styles, key, overrides),
+            ...values.themes[key],
+            ...withDerived(values, key, overrides),
         }),
-        [styles, key, overrideKey],
+        [values, key, overrideKey],
     );
     const reducedMotion = props.reducedMotion ?? false;
+    const rtl = props.rtl ?? false;
     const svg = props.svg ?? false;
     const timeScale = props.timeScale ?? 1;
     const value = useMemo(
         () => ({
-            styles,
-            key,
+            factory: source.factory,
             theme,
             overrides,
-            resolved,
             tokens,
             scheme,
             reducedMotion,
+            rtl,
             width: props.width,
             svg,
             timeScale,
         }),
         [
-            resolved,
+            source,
+            overrideKey,
             tokens,
             theme,
             scheme,
             reducedMotion,
+            rtl,
             props.width,
             svg,
             timeScale,
         ],
     );
     return createElement(PureformContext.Provider, { value }, props.children);
+};
+
+/** The styles' provider: the hooks select from `styles` in its scheme, theme, and
+ *  overrides. */
+export const PureformProvider = ({
+    styles,
+    ...props
+}: PureformProviderProps) => {
+    const source = useMemo(() => stylesSource(styles), [styles]);
+    return createElement(StylesProvider, { ...props, source });
 };
 
 // A selection's motion, `by` times as long.
@@ -200,6 +238,25 @@ export const useReducedMotion = (): boolean =>
 export const useTokens = (): ThemeValues =>
     useContextOrThrow("useTokens").tokens;
 
+/** Where the caller renders, for calling a component's factory directly: the provider's theme,
+ *  scheme, overrides, and drawing, the window's width, and the containers around it.
+ *  `factory.for(useStyleEnvironment())` selects as the hooks do. */
+export const useStyleEnvironment = (): Environment => {
+    const context = useContextOrThrow("useStyleEnvironment");
+    const containers = useContext(ContainerContext);
+    return useMemo(
+        () => ({
+            ...(context.theme === undefined ? {} : { theme: context.theme }),
+            scheme: context.scheme,
+            overrides: context.overrides,
+            svg: context.svg,
+            ...(context.width === undefined ? {} : { width: context.width }),
+            containers,
+        }),
+        [context, containers],
+    );
+};
+
 // The selection for given token values, from the component's factory over the provider's
 // styles: one cached, frozen selection per variants and state.
 const useSelected = (
@@ -210,7 +267,7 @@ const useSelected = (
 ): Selected => {
     const context = useContextOrThrow("useComponentStyles");
     const containers = useContext(ContainerContext);
-    const factory = componentFactory(context.styles, name);
+    const factory = context.factory(name);
     const {
         scheme = context.scheme,
         svg = context.svg,
@@ -234,6 +291,8 @@ const useSelected = (
     );
     const selected = at.selected({
         reducedMotion: context.reducedMotion,
+        // Only when it holds, so left to right selects as with no direction at all.
+        ...(context.rtl ? { rtl: true } : {}),
         ...states,
         ...variants,
         ...(tokens ? { tokens } : {}),
