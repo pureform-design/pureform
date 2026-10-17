@@ -67,5 +67,7 @@ export const harness: Harness = {
         return mounted;
     },
     observe,
+    sources: (count) =>
+        Array.from({ length: count }, () => createInteractionSource()),
     settle,
 };

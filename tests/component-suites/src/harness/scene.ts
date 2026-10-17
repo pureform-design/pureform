@@ -48,14 +48,16 @@ export type ComponentName = (typeof COMPONENT_NAMES)[number];
 export type SceneProps = Readonly<Record<string, unknown>>;
 
 /** An indication by name, so a scene stays plain data the server can take: Material's (with
- *  the ink well, the sparkle, or no ripple), none, or the suites' own (`harness/indications.ts`).
+ *  the ink well, the sparkle, or no ripple), none, the suites' own (`harness/indications.ts`), or
+ *  Material's without its layer element, for the benchmark.
  *  Each binding's `scene.tsx` turns the name into its indication. */
 export type SceneIndication =
     | "material"
     | "ink-sparkle"
     | "no-ripple"
     | "none"
-    | "custom";
+    | "custom"
+    | "no-layer";
 
 /** The provider's options a scene sets. */
 export interface SceneProvider {

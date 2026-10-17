@@ -99,6 +99,11 @@ const indications: Record<SceneIndication, Indication> = {
     "no-ripple": materialIndication({ ripple: false }),
     none: noIndication,
     custom: customIndication(materialIndication()),
+    "no-layer": {
+        ...materialIndication(),
+        name: "bench:no-layer",
+        layer: false,
+    },
 };
 
 const indicationOf = (name: SceneIndication | undefined) =>
