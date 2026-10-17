@@ -1830,6 +1830,36 @@ From today's preset:
   with an indication entry, unless the provider passes `noIndication` or a custom one with no
   layer and the scan can see it.
 
+**Built (p9c), the web:** `@pureform/binding-core/indication` holds `materialIndication({ ripple })`
+(its `web` subscribes to the source and draws through `createRipple` from `@pureform/js-effects`,
+which `ripple()` now runs on too; the controller is made on the first press) and `noIndication`, the
+tokens as CSS, and `IndicationHost`, which both web bindings use to tie the anatomy's entries to a
+component's elements. `useComponent` takes `indication`, `interactionSource`, and `interactive`, and
+`render` takes an item's `interactionSource`; every part the entry names is wired from there, so a
+component only passes its source. What differs from the sketch:
+
+- **"Over the ripple machine"** is over its drawing code: binding-core can't depend on
+  `@pureform/machines` (which depends on it), so the indication draws with `createRipple` directly.
+  The standalone `Ripple` component stays on the ripple machine.
+- **The layer carries no `data-pf-part`**: it's `<span aria-hidden="true" data-ripple-layer>` with the
+  ripple's `root` class, first inside the surface. Marking it the ripple's root part made selectors
+  like `[data-pf-part=root]` inside a component match it.
+- **A provider's `focusIndicatorColor`** has no theme-level token (it's `secondary`), and each root
+  resets the component token, so the provider's color goes on each interactive component's root as an
+  instance token, resolved through nesting (`ProviderState.focusIndicatorColor`). The other six tokens
+  are theme-level vars on the provider's element, under its `overrides`.
+- **Forwarded states** are marked on the element the preset matches them on: the trigger, or the root
+  (the label) around a native input (the checkbox, radio, switch, slider), since the preset reads
+  hover and press there. An emit is forwarded when its origin isn't one of the surface's own elements.
+- **Reduced motion** in the context reads the provider's setting and the media query at the press,
+  rather than subscribing per component.
+- **The card, list item, and snackbar's action and close** emit through `pressableItemProps` from
+  `@pureform/machines/interaction`; the card and list item only while interactive (the binding
+  decides, from the element or `interactive`).
+- **Pruning** counts the ripple for every component with an indication entry, `useIndication`, and an
+  indicated anatomy passed to `useComponent`, and drops it only when every provider and every
+  component prop it sees passes a layerless indication.
+
 #### Behavior rules
 
 - **Reduced motion** (§5.8): the ripple stops; the state layer's fades and the focus
