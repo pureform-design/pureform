@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -223,5 +223,38 @@ describe("generate with the Panda target", () => {
             check: true,
         });
         expect(check.ok).toBe(true);
+    });
+
+    it("narrows staticCss to the variants a pruned build uses, and leaves the factories alone", async () => {
+        const root = mkdtempSync(join(tmpdir(), "pureform-panda-"));
+        const full = await run({ prefix: "pf" });
+        await generate<PandaCodegenOptions>({
+            root,
+            config: config(),
+            target: codegen,
+            options: { prefix: "pf" },
+            usage: {
+                components: ["iconButton", "icon"],
+                variants: {
+                    iconButton: { variant: [], toggle: ["true"] },
+                    icon: { filled: ["inherit"] },
+                },
+            },
+        });
+        const read = (path: string) =>
+            readFileSync(join(root, ".pureform", path), "utf8")
+                .split("\n")
+                .slice(3)
+                .join("\n");
+        expect(read("panda.ts")).toContain(
+            [
+                "    recipes: {",
+                '        iconButton: [{ variant: ["filled"], toggle: ["*"] }],',
+                '        icon: [{ filled: ["inherit"] }],',
+                "    },",
+            ].join("\n"),
+        );
+        expect(read("web/iconButton.ts")).toBe(full.files["web/iconButton.ts"]);
+        expect(existsSync(join(root, ".pureform/web/divider.ts"))).toBe(false);
     });
 });

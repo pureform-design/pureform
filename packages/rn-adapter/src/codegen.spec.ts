@@ -23,7 +23,11 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
-import { componentShape, generate } from "@pureform/generate";
+import {
+    componentShape,
+    generate,
+    normalizeVariants,
+} from "@pureform/generate";
 import type { CodegenContext, ComponentShape } from "@pureform/generate";
 import { pureform } from "@pureform/preset";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -377,6 +381,73 @@ describe("generate with the native target", () => {
         it("registers every component", { timeout: 60_000 }, () => {
             expect(glue.registry.names).toEqual(Object.keys(preset.components));
         });
+
+        it(
+            "precomputes only the values a pruned build uses, and selects them as the whole config does",
+            { timeout: 120_000 },
+            async () => {
+                // Every component keeps the first two values of each group, and its default.
+                const names = Object.keys(preset.components);
+                const shape = (name: string) =>
+                    componentShape(preset.components[name]!);
+                const variants = normalizeVariants(
+                    Object.fromEntries(
+                        names.map((name) => [
+                            name,
+                            Object.fromEntries(
+                                Object.entries(shape(name).variants).map(
+                                    ([group, values]) => [
+                                        group,
+                                        values.slice(0, 2),
+                                    ],
+                                ),
+                            ),
+                        ]),
+                    ),
+                    names,
+                    shape,
+                );
+                const prunedRoot = appRoot();
+                await generate<RnCodegenOptions>({
+                    root: prunedRoot,
+                    config: preset,
+                    target: codegen,
+                    usage: { components: names, variants },
+                    trainCheck: false,
+                });
+                const pruned = await importGlue(prunedRoot);
+                let count = 0;
+                let smaller = 0;
+                for (const name of names) {
+                    const kept = Object.fromEntries(
+                        Object.entries(whole.templates[name]!.variants).map(
+                            ([group, values]) => [
+                                group,
+                                variants[name]?.[group] ?? values,
+                            ],
+                        ),
+                    );
+                    const factory = factoryOf(pruned, name);
+                    const over = nativeFactory(name, whole);
+                    for (const selection of combinations(kept)) {
+                        if (
+                            json(factory(selection)) !== json(over(selection))
+                        ) {
+                            expect(factory(selection)).toEqual(over(selection));
+                        }
+                        count++;
+                    }
+                    const size = (root: string) =>
+                        readFileSync(
+                            join(root, ".pureform", "native", `${name}.ts`),
+                            "utf8",
+                        ).length;
+                    if (size(prunedRoot) < size(root)) smaller++;
+                }
+                expect(count).toBeGreaterThan(300);
+                expect(smaller).toBeGreaterThan(names.length / 2);
+            },
+        );
 
         it(
             "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values",

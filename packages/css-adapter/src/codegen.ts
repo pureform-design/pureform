@@ -3,8 +3,12 @@
 // those components. The bundler plugin (`@pureform/bundler`) and `pureform generate` run it.
 
 import type { CoreConfig } from "@pureform/core/types";
-import { defineCodegen } from "@pureform/generate";
-import type { CodegenContext, ComponentModule } from "@pureform/generate";
+import { defineCodegen, narrowConfig } from "@pureform/generate";
+import type {
+    CodegenContext,
+    ComponentModule,
+    VariantUsage,
+} from "@pureform/generate";
 
 import { manifestOf } from "./classes";
 import { factoryModule, tokenVars } from "./codegen/factory";
@@ -22,16 +26,13 @@ export type CssCodegenOptions = CssOptions;
 /** The stylesheet's file, relative to `.pureform/`. */
 export const STYLESHEET_FILE = "styles.css";
 
-/** The config with only the given components, in that order. */
+/** The config with only the given components, in that order, each narrowed to the variant
+ *  values a pruned build uses (`narrowConfig` from `@pureform/generate`). */
 export const subsetConfig = (
     config: CoreConfig,
     components: readonly string[],
-): CoreConfig => ({
-    ...config,
-    components: Object.fromEntries(
-        components.map((name) => [name, config.components[name]!]),
-    ),
-});
+    variants?: VariantUsage,
+): CoreConfig => narrowConfig(config, components, variants);
 
 /** `web/<name>.ts` for each of the context's components: its `ClassFactory`, classed as the
  *  stylesheet names them. Other web adapters over this stylesheet reuse it. */
@@ -62,7 +63,11 @@ export const codegen = defineCodegen<CssCodegenOptions>({
             {
                 path: STYLESHEET_FILE,
                 contents: compileCss(
-                    subsetConfig(context.config, context.components),
+                    subsetConfig(
+                        context.config,
+                        context.components,
+                        context.variants,
+                    ),
                     context.options,
                 ),
             },

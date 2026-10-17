@@ -36,7 +36,11 @@ export const codegen = defineCodegen<TailwindCodegenOptions>({
             {
                 path: STYLESHEET_FILE,
                 contents: compileTailwind(
-                    subsetConfig(context.config, context.components),
+                    subsetConfig(
+                        context.config,
+                        context.components,
+                        context.variants,
+                    ),
                     context.options,
                 ),
             },

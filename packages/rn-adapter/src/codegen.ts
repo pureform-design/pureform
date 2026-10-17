@@ -4,7 +4,7 @@
 
 import { tokenValue } from "@pureform/core";
 import type { AnyComponentSpec } from "@pureform/core/types";
-import { defineCodegen } from "@pureform/generate";
+import { defineCodegen, narrowConfig } from "@pureform/generate";
 import type { ComponentModule } from "@pureform/generate";
 
 import { precompute, splitPrecomputed } from "./build";
@@ -121,7 +121,13 @@ export const codegen = defineCodegen<RnCodegenOptions>({
     name: "native",
     platform: "native",
     codegen: (context) => {
-        const styles = precompute(context.config, {
+        // A pruned build precomputes only the variant values it uses.
+        const config = narrowConfig(
+            context.config,
+            context.components,
+            context.variants,
+        );
+        const styles = precompute(config, {
             ...context.options,
             components: [...context.components],
         });
