@@ -1,6 +1,7 @@
-// `PureformProvider`: the registry, direction, motion, defaults, and slot props for everything
-// under it. It writes `dir` and `data-pf-motion` on its own element (`display: contents`), so the
-// CSS and the browser agree with what components read from it.
+// `PureformProvider`: the registry, direction, motion, defaults, slot props, and theme for
+// everything under it. It writes `dir`, `data-pf-motion`, the theme's attribute, and token
+// overrides on its own element (`display: contents`), so the CSS and the browser agree with what
+// components read from it, and a runtime theme's `<style>` block in the head with `useHead`.
 
 import {
     providerAttributes,
@@ -17,14 +18,29 @@ import type {
     ProviderOptions,
     ProviderState,
 } from "@pureform/binding-core";
-import { isDev } from "@solidjs/web";
+import {
+    THEME_BLOCK_ATTRIBUTE,
+    generatedBlock,
+    initialThemeBlock,
+    loadThemeVars,
+    needsThemeLoad,
+    overrideVars,
+    serverThemeCss,
+    unloadedThemeMessage,
+} from "@pureform/binding-core/dom";
+import type { ThemeBlock } from "@pureform/binding-core/dom";
+import { isRuntimeTheme, themeScope } from "@pureform/styling";
+import type { ThemeSchemeVars } from "@pureform/styling";
+import { isDev, isServer, useHead } from "@solidjs/web";
 import type { JSX } from "@solidjs/web";
 import {
     type Accessor,
     createContext,
     createEffect,
     createMemo,
+    createSignal,
     omit,
+    untrack,
     useContext,
 } from "solid-js";
 
@@ -36,6 +52,10 @@ export type PureformState = ProviderState<PartProps>;
 
 const PureformContext = createContext<Accessor<PureformState>>(
     () => ROOT_PROVIDER,
+);
+
+const ThemeVarsContext = createContext<Accessor<ThemeSchemeVars | undefined>>(
+    () => undefined,
 );
 
 export interface PureformProviderProps
@@ -57,10 +77,12 @@ const OPTIONS = [
 ] as const;
 
 /** Provides the registry and the settings components read, over the nearest provider's. A
- *  `theme` names one of the config's themes, scoped by the target's attribute on the provider's
- *  element; `overrides` and `hydrate` are carried but not applied yet: runtime themes are p5b. */
+ *  `theme` is a named theme from the config or a runtime theme, scoped by the target's attribute
+ *  on the provider's element; a runtime theme's vars go in one `<style>` block in the head
+ *  (`useHead`, keyed by the theme's scope), and `overrides` in the element's `style`. */
 export function PureformProvider(props: PureformProviderProps): JSX.Element {
     const parent = useContext(PureformContext);
+    const parentVars = useContext(ThemeVarsContext);
     const state = createMemo(() =>
         resolveProvider(
             parent(),
@@ -86,6 +108,7 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
             },
         );
     }
+    const themeBlock = useThemeBlock(props, state);
     const rest = omit(props, ...OPTIONS, "children", "style");
     const attributes = createMemo(() =>
         providerAttributes(
@@ -93,18 +116,97 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
             state(),
         ),
     );
+    const themeVars = (): ThemeSchemeVars | undefined =>
+        props.theme === undefined ? parentVars() : themeBlock()?.vars;
     return (
         <PureformContext value={state}>
-            <div
-                {...rest}
-                {...attributes()}
-                style={mergeStyles([{ display: "contents" }, props.style])}
-            >
-                {props.children}
-            </div>
+            <ThemeVarsContext value={themeVars}>
+                <div
+                    {...rest}
+                    {...attributes()}
+                    style={mergeStyles([
+                        { display: "contents" },
+                        overrideVars(props.overrides, state().registry),
+                        props.style,
+                    ])}
+                >
+                    {props.children}
+                </div>
+            </ThemeVarsContext>
         </PureformContext>
     );
 }
+
+// A runtime theme's block: generated on the server, kept or generated again while hydrating, and
+// generated after its generator loads when the theme changes. Written to the head with `useHead`,
+// keyed by its scope, so providers with the same theme share one block.
+const useThemeBlock = (
+    props: PureformProviderProps,
+    state: Accessor<PureformState>,
+): Accessor<ThemeBlock | undefined> => {
+    const [loaded, setLoaded] = createSignal<ThemeBlock | undefined>();
+    const block = createMemo(() => {
+        const theme = props.theme;
+        if (!isRuntimeTheme(theme)) return undefined;
+        const { registry, hydrate } = state();
+        const generated = loaded();
+        if (generated?.scope === themeScope(theme)) return generated;
+        const initial = untrack(() =>
+            initialThemeBlock(theme, registry, {
+                hydrate,
+                server: isServer,
+                existing: serverThemeCss,
+            }),
+        );
+        if (isServer && isDev && initial.css === undefined) {
+            warnOnce(unloadedThemeMessage(theme));
+        }
+        return initial;
+    });
+    createEffect(
+        () => block(),
+        (current) => {
+            const theme = props.theme;
+            if (isServer || !current || !isRuntimeTheme(theme)) return;
+            const { registry, hydrate } = untrack(state);
+            if (!needsThemeLoad(current, hydrate)) return;
+            let active = true;
+            loadThemeVars(theme, registry).then(
+                (vars) => {
+                    if (active)
+                        setLoaded(generatedBlock(theme, registry, vars));
+                },
+                (error: unknown) =>
+                    warnOnce(
+                        `pureform: the runtime theme "${theme.source.name}" failed to load: ${String(error)}`,
+                    ),
+            );
+            return () => {
+                active = false;
+            };
+        },
+    );
+    useHead(() => {
+        const current = block();
+        return current?.css === undefined
+            ? []
+            : {
+                  tag: "style",
+                  key: `pureform-theme:${current.scope}`,
+                  props: {
+                      [THEME_BLOCK_ATTRIBUTE]: current.scope,
+                      children: current.css,
+                  },
+              };
+    });
+    return block;
+};
+
+/** The vars of the nearest provider's runtime theme, when it generated them: on the server,
+ *  while hydrating with `hydrate: "regenerate"`, and after the theme changes on the client.
+ *  `undefined` while it reuses the server's block, under a named theme, and with none. */
+export const useThemeVars = (): Accessor<ThemeSchemeVars | undefined> =>
+    useContext(ThemeVarsContext);
 
 /** The nearest provider's state, or the root's defaults with none. */
 export const usePureform = (): Accessor<PureformState> =>

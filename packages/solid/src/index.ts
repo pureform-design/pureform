@@ -30,14 +30,20 @@ export {
     useMotion,
     usePureform,
     useRegistry,
+    useThemeVars,
 } from "./provider";
 export type { PureformProviderProps, PureformState } from "./provider";
+export { preloadTheme } from "@pureform/styling";
+export type { RuntimeTheme, ThemeSchemeVars } from "@pureform/styling";
 
 export type {
     ChangeDetails,
     ChangeReason,
     Controllable,
     Direction,
+    ProviderTheme,
+    ThemeHydration,
+    ThemeOverrides,
     IconStyle,
     MotionSetting,
     PartStates,

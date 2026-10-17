@@ -1,4 +1,9 @@
-import { createRegistry } from "@pureform/styling";
+import {
+    createRegistry,
+    defineRuntimeTheme,
+    themeScope,
+} from "@pureform/styling";
+import type { ThemeGenerator } from "@pureform/styling";
 import { createSignal, Errored, flush, Loading } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -10,6 +15,7 @@ import {
     useLazyClassFactory,
     useMotion,
     usePureform,
+    useThemeVars,
 } from ".";
 import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
 import { byTestId, mount, settle } from "./testing/mount";
@@ -122,7 +128,126 @@ describe("PureformProvider", () => {
         expect(element.style.color).toBe("red");
     });
 
-    it.todo("writes a runtime theme and token overrides (p5b)");
+    it("writes its own token overrides as vars in its style", () => {
+        const registry = createRegistry({ button }, { vars: { prefix: "pf" } });
+        mount(() => (
+            <PureformProvider
+                data-testid="p"
+                registry={registry}
+                overrides={{
+                    "colors.primary": "rgb(0, 106, 96)",
+                    "components.button.container": "red",
+                }}
+                style={{ color: "blue" }}
+            >
+                <PureformProvider data-testid="inner" />
+            </PureformProvider>
+        ));
+        const element = byTestId("p");
+        expect(element.style.getPropertyValue("--colors-primary")).toBe(
+            "rgb(0, 106, 96)",
+        );
+        expect(
+            element.style.getPropertyValue("--pf-components-button-container"),
+        ).toBe("red");
+        expect(element.style.color).toBe("blue");
+        // Inherited overrides reach the inner provider through the cascade.
+        expect(byTestId("inner").getAttribute("style")).toBe(
+            "display: contents;",
+        );
+        expect(
+            getComputedStyle(byTestId("inner")).getPropertyValue(
+                "--colors-primary",
+            ),
+        ).toBe("rgb(0, 106, 96)");
+    });
+
+    describe("with a runtime theme", () => {
+        type Seed = { seed: string };
+        const generate: ThemeGenerator<Seed> = (input) => ({
+            light: { "--colors-primary": input.seed },
+            dark: { "--colors-primary": "black" },
+        });
+        const registry = createRegistry(
+            { button },
+            { themeAttribute: "data-theme" },
+        );
+        const blocks = () =>
+            document.head.querySelectorAll("style[data-pf-theme]");
+
+        it("scopes it by its hash and writes its block once the generator loads", async () => {
+            let release!: () => void;
+            const loading = new Promise<void>((resolve) => (release = resolve));
+            const seedTheme = defineRuntimeTheme<Seed>("seed", async () => {
+                await loading;
+                return generate;
+            });
+            const theme = seedTheme({ seed: "rgb(0, 106, 96)" });
+            const scope = themeScope(theme);
+            mount(() => (
+                <PureformProvider
+                    data-testid="p"
+                    registry={registry}
+                    theme={theme}
+                >
+                    <span data-testid="child" />
+                </PureformProvider>
+            ));
+            expect(byTestId("p").getAttribute("data-theme")).toBe(scope);
+            await settle();
+            expect(blocks()).toHaveLength(0);
+            release();
+            await settle();
+            await settle();
+            expect(blocks()).toHaveLength(1);
+            expect(blocks()[0]!.getAttribute("data-pf-theme")).toBe(scope);
+            expect(blocks()[0]!.textContent).toContain(
+                `[data-theme="${scope}"]`,
+            );
+            expect(
+                getComputedStyle(byTestId("child")).getPropertyValue(
+                    "--colors-primary",
+                ),
+            ).toBe("rgb(0, 106, 96)");
+        });
+
+        it("shares one block between providers, follows a changed theme, and gives its vars", async () => {
+            const seedTheme = defineRuntimeTheme<Seed>("seed", () => generate);
+            const [seed, setSeed] = createSignal("rgb(1, 2, 3)");
+            function Probe() {
+                const vars = useThemeVars();
+                return (
+                    <span data-testid="probe">
+                        {vars()?.light["--colors-primary"]}
+                    </span>
+                );
+            }
+            mount(() => (
+                <PureformProvider
+                    registry={registry}
+                    theme={seedTheme({ seed: seed() })}
+                >
+                    <PureformProvider theme={seedTheme({ seed: seed() })}>
+                        <Probe />
+                    </PureformProvider>
+                </PureformProvider>
+            ));
+            await settle();
+            await settle();
+            expect(blocks()).toHaveLength(1);
+            expect(byTestId("probe").textContent).toBe("rgb(1, 2, 3)");
+            setSeed("rgb(4, 5, 6)");
+            flush();
+            await settle();
+            await settle();
+            expect(blocks()).toHaveLength(1);
+            expect(blocks()[0]!.textContent).toContain("rgb(4, 5, 6)");
+            expect(byTestId("probe").textContent).toBe("rgb(4, 5, 6)");
+            expect(blocks()[0]!.getAttribute("data-pf-theme")).toBe(
+                themeScope(seedTheme({ seed: "rgb(4, 5, 6)" })),
+            );
+        });
+    });
 });
 
 function ButtonClasses(props: {
