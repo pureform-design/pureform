@@ -1,7 +1,3 @@
-import { mkdtemp, readFile, rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { px } from "@pureform/core/ast";
 import { materialColor } from "@pureform/material";
 import { pureform } from "@pureform/preset";
@@ -9,7 +5,6 @@ import { compile } from "@tailwindcss/node";
 import { describe, expect, it } from "vitest";
 
 import { compileTailwind, toTailwind } from "./tailwind";
-import { pureformTailwind } from "./vite";
 
 const config = {
     ...pureform({
@@ -171,29 +166,5 @@ describe("compileTailwind", () => {
         ]);
         expect(out).not.toContain(".bg-red-500");
         expect(out).toContain(".bg-primary");
-    });
-});
-
-describe("pureformTailwind", () => {
-    it("writes the stylesheet before the build starts", async () => {
-        const dir = await mkdtemp(join(tmpdir(), "pureform-tailwind-"));
-        try {
-            const outFile = join(dir, "pureform.gen.css");
-            const plugin = pureformTailwind({
-                config,
-                outFile,
-                classPrefix: "pf",
-            });
-            await (plugin.buildStart as () => Promise<void>)();
-            const css = await readFile(outFile, "utf8");
-            expect(css).toBe(compileTailwind(config, { classPrefix: "pf" }));
-            expect(css).toContain(".pf-button__root {");
-            const components = await (
-                plugin.load as (id: string) => Promise<string>
-            )("\0virtual:pureform/components");
-            expect(components).toContain('"className":"pf-button"');
-        } finally {
-            await rm(dir, { recursive: true });
-        }
     });
 });

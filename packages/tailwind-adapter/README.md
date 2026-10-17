@@ -21,7 +21,6 @@ and reuses the CSS adapter's codegen.
 | Module        | What it does                                                                                            |
 | ------------- | ------------------------------------------------------------------------------------------------------- |
 | `tailwind.ts` | `toTailwind`: the config as Tailwind's pieces (theme, variants, components); `tailwindCss` writes them. |
-| `vite.ts`     | `pureformTailwind`: a Vite plugin writing the stylesheet to a file before Tailwind's plugin reads it.   |
 | `codegen.ts`  | `codegen`: the `tailwind` target's factory modules and stylesheet, for `@pureform/generate`.            |
 
 The theme is `@theme inline`: each Tailwind variable names the pureform var it stands for, so a
@@ -32,21 +31,57 @@ dark scheme or a named theme switches utilities and components alike.
 | Entry                                | Exports                                                         |
 | ------------------------------------ | --------------------------------------------------------------- |
 | `@pureform/tailwind-adapter`         | `compileTailwind`, `toTailwind`, `tailwindCss`, and their types |
-| `@pureform/tailwind-adapter/vite`    | `pureformTailwind`                                              |
 | `@pureform/tailwind-adapter/codegen` | `codegen`, `TailwindCodegenOptions`, `STYLESHEET_FILE`          |
 
-```ts
-// vite.config.ts
-import { pureformTailwind } from "@pureform/tailwind-adapter/vite";
-import tailwindcss from "@tailwindcss/vite";
+An app uses the target through the bundler plugin (`@pureform/bundler`) or `pureform generate`,
+which write the stylesheet and the registry into `.pureform/`:
 
-export default {
-    plugins: [
-        pureformTailwind({ config, outFile: "src/pureform.gen.css" }),
-        tailwindcss(),
-    ],
-};
-```
+1. `pureform.config.ts` (default export) and a glue file:
+
+    ```ts
+    // pureform.glue.ts
+    import type { PureformPluginOptions } from "@pureform/bundler";
+    import type { TailwindCodegenOptions } from "@pureform/tailwind-adapter/codegen";
+
+    export const glue = {
+        target: "tailwind",
+        options: { prefix: "pf", classPrefix: "pf" },
+    } satisfies PureformPluginOptions<TailwindCodegenOptions>;
+    ```
+
+2. The bundler plugin before Tailwind's, so the stylesheet exists when Tailwind reads it (add
+   `.pureform` to `.gitignore`, and `".pureform/**/*.*"` to the tsconfig's `include`):
+
+    ```ts
+    // vite.config.ts
+    import pureform from "@pureform/bundler/vite";
+    import tailwindcss from "@tailwindcss/vite";
+    import { glue } from "./pureform.glue";
+
+    export default { plugins: [pureform(glue), tailwindcss(), solid()] };
+    ```
+
+3. The app's CSS imports Tailwind, then the generated stylesheet; the provider takes the
+   registry:
+
+    ```css
+    @import "tailwindcss";
+    @import "../.pureform/styles.css";
+    ```
+
+    ```tsx
+    import { registry } from "../.pureform";
+
+    <PureformProvider registry={registry} theme="teal">
+        …
+    </PureformProvider>;
+    ```
+
+Named themes are scoped by `themeAttribute` (default `data-theme`), the attribute the
+`theme-<name>` variants match: the provider's `theme` writes `registry.themeAttributes(theme)` on
+its element, so components and utilities switch together. Utilities override a component
+through its slot classes (`class={{ root: "rounded-none" }}`), since they sit in a later layer.
+`apps/tailwind-demo` is a working example.
 
 Options are the CSS adapter's, plus `palette` (map the raw palette too), `replace` (clear
 Tailwind's defaults in the namespaces pureform fills), and `themeVariant` (a named theme's
@@ -70,7 +105,8 @@ variant name, `theme-<name>` by default).
     ```
 
 Its options are `TailwindOptions` (`classPrefix` and `prefix` name the factories' classes and
-vars too). `generate` adds `index.ts` and `registry.d.ts`.
+vars too). It returns `themeAttribute` (the option, default `data-theme`) for the registry's
+`themeAttributes`. `generate` adds `index.ts` and `registry.d.ts`.
 
 There's no `@source inline(...)`: Tailwind v4 generates only utilities from the classes its
 scanner sees, and keeps every rule of the components layer as written, so the factories'
@@ -95,7 +131,8 @@ Through the omni MCP (or `omni run`):
 - `build`: Vite library build into `dist/`.
 - `test:unit`: Vitest, including builds through Tailwind's compiler. `codegen.spec.ts`
   generates the preset's glue into a temp app and checks every selection of every component
-  against the Vite plugin's classes, and the stylesheet against the plugin's.
+  against `componentClasses`, and the stylesheet against `compileTailwind`.
 
 `tests/browser-e2e-tests` checks it computes the same styles as the Panda preset, and the
-reduced motion fixtures.
+reduced motion fixtures. `tests/component-suites` runs the bindings' shared suites on this
+target, with Tailwind's preflight and Vite plugin.

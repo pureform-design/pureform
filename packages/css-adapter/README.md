@@ -22,8 +22,9 @@ error.
 
 Its `/codegen` subpath is the CSS target's codegen for `@pureform/generate`: it writes the
 `.pureform/` factory modules the bindings read through the style registry, with every class
-written out, and the stylesheet for those components. It succeeds the Vite plugin's
-`virtual:pureform/components` ([below](#generated-glue-codegen)).
+written out, and the stylesheet for those components ([below](#generated-glue-codegen)). That's
+how an app uses this target: through the bundler plugin (`@pureform/bundler`) or
+`pureform generate` ([app setup](#an-app-on-the-css-target)).
 
 ## Where it sits
 
@@ -36,73 +37,77 @@ written out, and the stylesheet for those components. It succeeds the Vite plugi
 
 `@pureform/panda-adapter` lowers through the same `css-lowering`, so both adapters emit the same
 selectors and compute the same styles. `@pureform/tailwind-adapter` puts this stylesheet inside
-Tailwind's components layer and reuses the Vite plugin.
+Tailwind's components layer and reuses the codegen's factory modules.
 
 ## Architecture
 
-| Module                | What it does                                                                              |
-| --------------------- | ----------------------------------------------------------------------------------------- |
-| `stylesheet.ts`       | `compileCss`: tokens, themes, keyframes, and component rules, in cascade layers.          |
-| `serialize.ts`        | Lowered style objects to nested CSS, with color scheme and reduced motion rules expanded. |
-| `options.ts`          | `CssOptions`, the lowering context, and class prefixing.                                  |
-| `classes.ts`          | `manifestOf` (a component's classes, variants, defaults) and `classesFor`.                |
-| `runtime.ts`          | Re-exports `componentClasses` from `@pureform/styling`.                                   |
-| `generate.ts`         | The ahead-of-time output: the stylesheet, `components.js`, and `components.d.ts`.         |
-| `build.ts`, `vite.ts` | `buildCss` writes that output to a folder; `pureformCss` serves it as virtual modules.    |
-| `codegen.ts`          | The `/codegen` entry: `codegen`, the CSS target's adapter for `@pureform/generate`.       |
-| `codegen/factory.ts`  | One component's `ClassFactory` module source, and its instance tokens' vars.              |
+| Module               | What it does                                                                              |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| `stylesheet.ts`      | `compileCss`: tokens, themes, keyframes, and component rules, in cascade layers.          |
+| `serialize.ts`       | Lowered style objects to nested CSS, with color scheme and reduced motion rules expanded. |
+| `options.ts`         | `CssOptions`, the lowering context, and class prefixing.                                  |
+| `classes.ts`         | `manifestOf` (a component's classes, variants, defaults) and `classesFor`.                |
+| `runtime.ts`         | Re-exports `componentClasses` from `@pureform/styling`.                                   |
+| `codegen.ts`         | The `/codegen` entry: `codegen`, the CSS target's adapter for `@pureform/generate`.       |
+| `codegen/factory.ts` | One component's `ClassFactory` module source, and its instance tokens' vars.              |
 
-## Ahead of time
+## An app on the CSS target
 
-Compile once at build time, so the app ships only the stylesheet, the runtime, and each
-component's variant manifest. The config, theme providers, and color generation stay out of
-the bundle.
+Compile at build time, so the app ships only the stylesheet and each component's factory: the
+config, theme providers, and color generation stay out of the bundle.
 
-```ts
-// scripts/build-css.ts
-import { buildCss } from "@pureform/css-adapter/build";
-import { pureform } from "@pureform/preset";
+1. Put the config in `pureform.config.ts` (default export), and the target in a glue file the
+   bundler plugin and the CLI share:
 
-await buildCss(pureform(), { outDir: "src/pureform" });
-// src/pureform/styles.css
-// src/pureform/components.js     (export const button = componentClasses({…}), one per component)
-// src/pureform/components.d.ts   (typed from each component's variant values)
-```
+    ```ts
+    // pureform.glue.ts
+    import type { PureformPluginOptions } from "@pureform/bundler";
+    import type { CssCodegenOptions } from "@pureform/css-adapter/codegen";
 
-```ts
-import "./pureform/styles.css";
-import { button } from "./pureform/components";
-```
+    export const glue = {
+        target: "css",
+        options: { prefix: "pf", classPrefix: "pf" },
+        components: ["button", "checkbox"], // optional allow-list
+    } satisfies PureformPluginOptions<CssCodegenOptions>;
+    ```
 
-Each export is a pure call, so bundlers drop the components you don't import.
+2. Add the bundler plugin, which writes `.pureform/` when dev or build starts (add `.pureform` to
+   `.gitignore`, and `".pureform/**/*.*"` to the tsconfig's `include`):
 
-### Vite
+    ```ts
+    // vite.config.ts
+    import pureform from "@pureform/bundler/vite";
+    import solid from "@solidjs/vite-plugin";
+    import { glue } from "./pureform.glue";
 
-The plugin serves the same output as virtual modules, and writes their declarations when given
-a path:
+    export default defineConfig({ plugins: [pureform(glue), solid()] });
+    ```
 
-```ts
-// vite.config.ts
-import { pureformCss } from "@pureform/css-adapter/vite";
-import { pureform } from "@pureform/preset";
+    Without a bundler, `pureform generate` (from `@pureform/cli`) writes the same folder.
 
-export default defineConfig({
-    plugins: [pureformCss({ config: pureform(), dts: "src/pureform.d.ts" })],
-});
-```
+3. Import the reset and the generated stylesheet, and hand the registry to the provider:
 
-```ts
-import "virtual:pureform.css";
-import { button } from "virtual:pureform/components";
-```
+    ```tsx
+    import "@pureform/css-adapter/reset.css";
+    import "../.pureform/styles.css";
+    import { registry } from "../.pureform";
+
+    <PureformProvider registry={registry} theme="teal">
+        <App />
+    </PureformProvider>;
+    ```
+
+Named themes are scoped by `themeAttribute` (default `data-theme`): the provider's `theme` writes
+`registry.themeAttributes(theme)`, `{ "data-theme": "teal" }`, on its element, and an app without a
+provider can set the attribute on any element. `apps/css-demo` is a working example.
 
 ## Generated glue (codegen)
 
 `@pureform/css-adapter/codegen` is what `@pureform/generate` loads for `target: "css"`; nothing
-else needs to import it. It succeeds `virtual:pureform/components`: the components become
-`ClassFactory` modules in `.pureform/`, registered in its `index.ts` and typed by its
-`registry.d.ts` (both written by `generate`), and the stylesheet becomes a file next to them.
-The Vite plugin stays until the bundler plugin replaces it (p4c).
+else needs to import it. The components become `ClassFactory` modules in `.pureform/`,
+registered in its `index.ts` and typed by its `registry.d.ts` (both written by `generate`), and
+the stylesheet becomes a file next to them. It returns `themeAttribute` (the option, default
+`data-theme`), which the index passes to the registry.
 
 ```ts
 import { generate } from "@pureform/generate";
@@ -183,7 +188,7 @@ export const button: ClassFactory<"button"> = (s) =>
 
 ## Options
 
-`compileCss`, `buildCss`, and the plugin take:
+`compileCss` and the codegen take:
 
 | Option           | Default      | Sets                                                                   |
 | ---------------- | ------------ | ---------------------------------------------------------------------- |
@@ -193,13 +198,11 @@ export const button: ClassFactory<"button"> = (s) =>
 | `themeAttribute` | `data-theme` | The attribute that switches named themes: `[data-theme=teal]`          |
 | `layer`          | `pureform`   | The cascade layer everything sits in, or `false` for none              |
 
-`buildCss` and the plugin also take `transform`, a `(css) => css` post-process, and `runtime`,
-where the generated modules import the runtime from.
+`DEFAULT_THEME_ATTRIBUTE` and `themeAttributeOf(options)` give the theme attribute in effect.
 
-The runtime, `componentClasses`, lives in [`@pureform/styling`](../styling/README.md), the
-package every binding and generated factory uses at runtime. `@pureform/css-adapter/runtime`
-re-exports it (with `ComponentManifest`, `ComponentClasses`, `Choice`), and stays the default
-`runtime`, so generated modules and `.d.ts` files written before the move keep working.
+The class name runtime, `componentClasses`, lives in [`@pureform/styling`](../styling/README.md).
+`@pureform/css-adapter/runtime` re-exports it (with `ComponentManifest`, `ComponentClasses`,
+`Choice`); `classesFor(config)` builds on it. The generated factories don't need it.
 
 ## The stylesheet
 
@@ -234,8 +237,8 @@ The stylesheet uses native nesting (baseline since 2023), `oklch()`, `color-mix(
 ranges. To reach older browsers, run it through Lightning CSS, which flattens nesting with the
 same specificity, adds color fallbacks, rewrites media ranges, and minifies.
 
-With Vite, set Lightning CSS as the CSS transformer; it then processes the stylesheet like any
-other, from a file or from the plugin:
+With Vite, set Lightning CSS as the CSS transformer; it then processes the generated
+`styles.css` like any other stylesheet:
 
 ```ts
 export default defineConfig({
@@ -244,23 +247,7 @@ export default defineConfig({
 });
 ```
 
-Elsewhere, pass it as the build's `transform`:
-
-```ts
-import browserslist from "browserslist";
-import { browserslistToTargets, transform } from "lightningcss";
-
-await buildCss(config, {
-    outDir: "src/pureform",
-    transform: (css) =>
-        transform({
-            filename: "styles.css",
-            code: Buffer.from(css),
-            targets: browserslistToTargets(browserslist("defaults")),
-            minify: true,
-        }).code.toString(),
-});
-```
+Elsewhere, run Lightning CSS over `compileCss`'s output or the generated file.
 
 Lightning CSS can't lower `@layer`, `shape()`, or `corner-shape`; components that use the last
 two fall back to rounded corners where they're missing.
@@ -292,3 +279,7 @@ app, imports its registry, and compares every factory with `componentClasses` fo
 combination of every group's values (about 50,000 selections); it also checks the stylesheet
 equals `compileCss`, that it reads every instance token's var, and that the glue type-checks
 with TypeScript's `tsc`.
+
+`tests/component-suites` runs the bindings' shared suites (state, forms, accessibility, keyboard,
+direction, named themes, server rendering) on this target too, over glue generated from the demo's
+config.

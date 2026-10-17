@@ -147,7 +147,7 @@ const selections = (
         [{}],
     );
 
-// The classes `virtual:pureform/components` gives, as slots.
+// The classes the runtime's `componentClasses` gives, as slots.
 const runtimeSlots = (
     spec: AnyComponentSpec,
     options: TailwindCodegenOptions,
@@ -338,7 +338,7 @@ describe("generate with the Tailwind target", () => {
         );
 
         it(
-            "writes the stylesheet the Vite plugin writes for the config",
+            "writes compileTailwind's stylesheet for the config",
             { timeout: 60_000 },
             async () => {
                 expect(body(read(STYLESHEET_FILE))).toBe(
