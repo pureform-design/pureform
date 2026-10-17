@@ -54,7 +54,10 @@ export interface ProviderOptions<P = object> {
     readonly defaults?: ComponentDefaults | undefined;
     /** Props per component and slot. */
     readonly slotProps?: ProviderSlotProps<P> | undefined;
-    /** Stub: a static theme's name. Runtime themes land with the runtime themes phase (p5b). */
+    /** A named theme from the config, for everything under the provider. The provider writes
+     *  the registry's `themeAttributes(theme)` on its element, the target's own scope
+     *  (`data-theme`, `data-panda-theme`). Runtime themes land with the runtime themes phase
+     *  (p5b). */
     readonly theme?: ThemeName | undefined;
     /** Stub: token overrides, written as CSS vars by the runtime themes phase (p5b). */
     readonly overrides?: ThemeOverrides | undefined;
@@ -170,18 +173,26 @@ export const resolveProvider = <P>(
     };
 };
 
-/** The attributes a provider writes on its element. */
+/** The attributes a provider writes on its element: the direction, the motion setting, and its
+ *  theme's attributes, which depend on the target. */
 export interface ProviderAttributes {
     readonly dir: Direction;
     readonly [MOTION_ATTRIBUTE]: "reduce" | "full" | undefined;
+    readonly [themeAttribute: string]: string | undefined;
 }
 
-/** A provider's attributes: the direction in effect, and its own motion setting unless it's
- *  `"system"` (the CSS reads `data-pf-motion` from the nearest ancestor that has it). */
+/** A provider's attributes: the direction in effect, its own motion setting unless it's
+ *  `"system"` (the CSS reads `data-pf-motion` from the nearest ancestor that has it), and its
+ *  own theme's attributes from the registry in effect (an inherited theme's are on an
+ *  ancestor already). */
 export const providerAttributes = (
-    own: Pick<ProviderOptions, "motion">,
-    state: Pick<ProviderState, "dir">,
+    own: Pick<ProviderOptions, "motion" | "theme">,
+    state: Pick<ProviderState, "dir"> &
+        Partial<Pick<ProviderState, "registry">>,
 ): ProviderAttributes => ({
+    ...(own.theme === undefined
+        ? undefined
+        : state.registry?.themeAttributes(own.theme)),
     dir: state.dir,
     [MOTION_ATTRIBUTE]:
         own.motion === "reduce" || own.motion === "full"

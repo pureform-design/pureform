@@ -56,8 +56,9 @@ const OPTIONS = [
     "hydrate",
 ] as const;
 
-/** Provides the registry and the settings components read, over the nearest provider's. Its
- *  `theme`, `overrides`, and `hydrate` are carried but not applied yet: runtime themes are p5b. */
+/** Provides the registry and the settings components read, over the nearest provider's. A
+ *  `theme` names one of the config's themes, scoped by the target's attribute on the provider's
+ *  element; `overrides` and `hydrate` are carried but not applied yet: runtime themes are p5b. */
 export function PureformProvider(props: PureformProviderProps): JSX.Element {
     const parent = useContext(PureformContext);
     const state = createMemo(() =>
@@ -87,7 +88,10 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
     }
     const rest = omit(props, ...OPTIONS, "children", "style");
     const attributes = createMemo(() =>
-        providerAttributes({ motion: props.motion }, state()),
+        providerAttributes(
+            { motion: props.motion, theme: props.theme },
+            state(),
+        ),
     );
     return (
         <PureformContext value={state}>

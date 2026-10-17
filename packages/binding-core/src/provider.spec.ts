@@ -143,6 +143,34 @@ describe("providerAttributes", () => {
             "data-pf-motion": "full",
         });
     });
+
+    it("writes its own theme's attributes from the registry", () => {
+        const themed = createRegistry(
+            { button: () => ({ root: { class: "button" } }) },
+            { themeAttribute: "data-theme" },
+        );
+        expect(
+            providerAttributes(
+                { theme: "teal" },
+                { dir: "ltr", registry: themed },
+            ),
+        ).toEqual({
+            "data-theme": "teal",
+            dir: "ltr",
+            "data-pf-motion": undefined,
+        });
+        // Inherited themes are on an ancestor; a target without an attribute writes none.
+        expect(
+            providerAttributes({}, { dir: "ltr", registry: themed }),
+        ).toEqual({ dir: "ltr", "data-pf-motion": undefined });
+        expect(
+            providerAttributes({ theme: "teal" }, { dir: "ltr", registry }),
+        ).toEqual({ dir: "ltr", "data-pf-motion": undefined });
+        expect(providerAttributes({ theme: "teal" }, { dir: "ltr" })).toEqual({
+            dir: "ltr",
+            "data-pf-motion": undefined,
+        });
+    });
 });
 
 describe("requireRegistry", () => {

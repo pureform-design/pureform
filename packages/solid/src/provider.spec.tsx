@@ -1,3 +1,4 @@
+import { createRegistry } from "@pureform/styling";
 import { createSignal, Errored, flush, Loading } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -10,7 +11,7 @@ import {
     useMotion,
     usePureform,
 } from ".";
-import { deferredLoader, fakeRegistry } from "./__fixtures__/registry";
+import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
 import { byTestId, mount, settle } from "./testing/mount";
 
 const neverLoads = () => new Promise<never>(() => {});
@@ -49,6 +50,33 @@ describe("PureformProvider", () => {
         flush();
         expect(element.getAttribute("dir")).toBe("rtl");
         expect(element.getAttribute("data-pf-motion")).toBe("full");
+    });
+
+    it("writes its theme's attributes from the registry, and follows a changed theme", () => {
+        const registry = createRegistry(
+            { button },
+            { themeAttribute: "data-theme" },
+        );
+        const [theme, setTheme] = createSignal<string | undefined>("teal");
+        mount(() => (
+            <PureformProvider
+                data-testid="outer"
+                registry={registry}
+                theme={theme()}
+            >
+                <PureformProvider data-testid="inner" />
+            </PureformProvider>
+        ));
+        const outer = byTestId("outer");
+        expect(outer.getAttribute("data-theme")).toBe("teal");
+        // An inherited theme's attribute is on the ancestor already.
+        expect(byTestId("inner").hasAttribute("data-theme")).toBe(false);
+        setTheme("sharp");
+        flush();
+        expect(outer.getAttribute("data-theme")).toBe("sharp");
+        setTheme(undefined);
+        flush();
+        expect(outer.hasAttribute("data-theme")).toBe(false);
     });
 
     it("gives components the settings in effect, inherited through nested providers", () => {

@@ -132,7 +132,7 @@ import { Checkbox } from "@pureform/react/checkbox";
     motion="reduce" // "system" | "reduce" | "full"; writes data-pf-motion unless "system"
     defaults={{ button: { variant: "tonal" } }}
     slotProps={{ button: { label: { className: "caps" } } }}
-    theme="teal"
+    theme="teal" // a named theme: the registry's themeAttributes("teal") on its element
     overrides={{}}
     hydrate="reuse" // carried, applied in p5b
 >
@@ -140,9 +140,9 @@ import { Checkbox } from "@pureform/react/checkbox";
 </PureformProvider>
 ```
 
-It renders a `div` with `display: contents` holding `dir` and `data-pf-motion`. Other props
-(`className`, `style`, `data-*`, `ref`) go on that element. Nested providers inherit what they
-leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`, and
+It renders a `div` with `display: contents` holding `dir`, `data-pf-motion`, and its theme's
+attributes. Other props (`className`, `style`, `data-*`, `ref`) go on that element. Nested
+providers inherit what they leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`, and
 `overrides` stable (module constants or `useMemo`).
 
 | Hook             | Returns                                                              |
@@ -291,7 +291,8 @@ Through the omni MCP (or `omni run`):
 
 ## Worth knowing
 
-- **Stubs:** `theme`, `overrides`, and `hydrate` do nothing yet (p5b). The development warning for
+- **Stubs:** `overrides` and `hydrate` do nothing yet, nor runtime themes (p5b); a named
+  `theme` writes the target's attribute (`registry.themeAttributes(theme)`). The development warning for
   a stale glue version calls `trainVersionMismatch`, which finds nothing until p4a records it.
 - Server rendering isn't exercised by these tests (p3c's hydration suite).
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no

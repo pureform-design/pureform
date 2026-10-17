@@ -1,3 +1,4 @@
+import { createRegistry } from "@pureform/styling";
 import { screen } from "@testing-library/react";
 import { Suspense, useState } from "react";
 import { describe, expect, it } from "vitest";
@@ -11,7 +12,7 @@ import {
     useMotion,
     usePureform,
 } from ".";
-import { deferredLoader, fakeRegistry } from "./__fixtures__/registry";
+import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
 import {
     Errored,
     interact,
@@ -60,6 +61,38 @@ describe("PureformProvider", () => {
         await interact(async () => update());
         expect(element.getAttribute("dir")).toBe("rtl");
         expect(element.getAttribute("data-pf-motion")).toBe("full");
+    });
+
+    it("writes its theme's attributes from the registry, and follows a changed theme", async () => {
+        const registry = createRegistry(
+            { button },
+            { themeAttribute: "data-theme" },
+        );
+        let pick!: (theme: string | undefined) => void;
+        function App() {
+            const [theme, setTheme] = useState<string | undefined>("teal");
+            pick = setTheme;
+            return (
+                <PureformProvider
+                    data-testid="outer"
+                    registry={registry}
+                    theme={theme}
+                >
+                    <PureformProvider data-testid="inner" />
+                </PureformProvider>
+            );
+        }
+        mount(<App />);
+        const outer = screen.getByTestId("outer");
+        expect(outer.getAttribute("data-theme")).toBe("teal");
+        // An inherited theme's attribute is on the ancestor already.
+        expect(screen.getByTestId("inner").hasAttribute("data-theme")).toBe(
+            false,
+        );
+        await interact(async () => pick("sharp"));
+        expect(outer.getAttribute("data-theme")).toBe("sharp");
+        await interact(async () => pick(undefined));
+        expect(outer.hasAttribute("data-theme")).toBe(false);
     });
 
     it("gives components the settings in effect, inherited through nested providers", () => {
