@@ -67,11 +67,17 @@ function Root(props: IconButtonRootProps): ReactNode {
     if (isDev && !hasAccessibleName(props)) {
         warnOnce(missingNameMessage("IconButton"));
     }
-    const api = usePressable("IconButton", props, buttonMachineProps(props));
+    const { api, source } = usePressable(
+        "IconButton",
+        props,
+        buttonMachineProps(props),
+    );
     const scope = useComponent(iconButtonAnatomy, {
         selection: iconButtonSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, ICON_BUTTON_ROOT_PROPS);
     return (

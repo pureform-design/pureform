@@ -55,10 +55,12 @@ describe("Checkbox, ready-made", () => {
         expect(root.tagName).toBe("LABEL");
         expect(root.className).toBe("checkbox checkbox--error");
         expect(
-            [...root.children].map((child) =>
-                child.getAttribute("data-pf-part"),
+            [...root.children].map(
+                (child) =>
+                    child.getAttribute("data-pf-part") ??
+                    (child.hasAttribute("data-ripple-layer") ? "layer" : null),
             ),
-        ).toEqual(["touch-target", "input", "box"]);
+        ).toEqual(["layer", "touch-target", "input", "box"]);
         expect(
             [...byTestId(ids.box).children].map((child) =>
                 child.getAttribute("data-pf-part"),

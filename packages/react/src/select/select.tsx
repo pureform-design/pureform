@@ -41,6 +41,7 @@ import {
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
 import { useItemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
@@ -63,6 +64,7 @@ interface SelectContextValue {
     readonly supportingTextId: string;
     readonly errorText: string | undefined;
     readonly setHiddenSelect: (element: HTMLSelectElement | null) => void;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What an option shares with its parts. */
@@ -120,10 +122,10 @@ function Root(props: SelectRootProps): ReactNode {
             }),
         [items],
     );
-    const interaction = useItemInteractionSources();
+    const sources = useItemInteractionSources();
     const service = useMachine(select.machine, {
         id,
-        ...interaction,
+        ...sources.machineProps,
         dir,
         collection,
         ...selectMachineProps(props, fieldsetDisabled),
@@ -154,6 +156,7 @@ function Root(props: SelectRootProps): ReactNode {
     const menu = useComponent(selectMenuAnatomy, {
         selection: selectMenuSelection(props),
         testId: typeof props.testId === "string" ? props.testId : undefined,
+        indication: props.indication,
     });
     const { as, ...rest } = omitProps(props, SELECT_ROOT_PROPS);
     return (
@@ -167,6 +170,7 @@ function Root(props: SelectRootProps): ReactNode {
                 supportingTextId: selectSupportingTextId(props, id),
                 errorText: props.error || undefined,
                 setHiddenSelect: setHidden,
+                sources,
             }}
         >
             {scope.render("root", {
@@ -320,11 +324,13 @@ function Content({ unstyled, ...props }: SelectPartProps): ReactNode {
 
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 function Item({ unstyled, item, ...props }: SelectItemProps): ReactNode {
-    const { menu, api } = context.use("Item");
+    const { menu, api, sources } = context.use("Item");
+    const source = sources.item(item.value, item.interactionSource);
     return (
         <itemContext.Provider value={{ item }}>
             {menu.render("item", {
                 element: "div",
+                interactionSource: source,
                 machine: api.getItemProps({ item }),
                 states: { hover: api.getItemState({ item }).highlighted },
                 unstyled,

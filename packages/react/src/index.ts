@@ -12,6 +12,37 @@ export type {
 export { useFieldsetDisabled, useFormReset } from "./form";
 export type { FormResetOptions } from "./form";
 export { IconPartContext, useIconStyle } from "./icon-style";
+export {
+    useIndication,
+    useInteractionSource,
+    useInteractionState,
+} from "./indication";
+export type {
+    SurfaceIndication,
+    SurfaceProps,
+    UseIndicationOptions,
+} from "./indication";
+export {
+    defineIndication,
+    materialIndication,
+    noIndication,
+} from "@pureform/binding-core/indication";
+export type {
+    Indication,
+    IndicationContext,
+    IndicationTarget,
+    IndicationTokens,
+    MaterialIndicationOptions,
+    MaterialRipple,
+} from "@pureform/binding-core/indication";
+export type {
+    Interaction,
+    InteractionKinds,
+    InteractionSource,
+    InteractionState,
+    MutableInteractionSource,
+    PointerKind,
+} from "@pureform/binding-core/interaction";
 export { useReducedMotion } from "./motion";
 export { createPartContext } from "./part-context";
 export type { PartContext } from "./part-context";

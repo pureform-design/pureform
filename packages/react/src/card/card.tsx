@@ -13,10 +13,14 @@ import {
 import type { CardRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
+import {
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { omitProps } from "../props";
+import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 
 type Anatomy = typeof cardAnatomy;
@@ -50,17 +54,31 @@ function Root(props: CardRootProps): ReactNode {
         href: props.href,
         as: props.as,
     });
+    const interactive = isInteractiveCard(props, element);
+    const source = useOwnInteractionSource(props.interactionSource);
+    const handlers = useInteractionHandlers(
+        source,
+        !interactive || !!props.disabled,
+    );
     const scope = useComponent(cardAnatomy, {
         selection: cardSelection(props, element),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
+        interactive,
     });
     const { as: _as, ...rest } = omitProps(props, CARD_ROOT_PROPS);
     return (
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element,
-                machine: cardRootProps(props, element),
+                machine: interactive
+                    ? combinePartProps([
+                          cardRootProps(props, element),
+                          handlers,
+                      ])
+                    : cardRootProps(props, element),
                 props: rest,
             })}
         </context.Provider>

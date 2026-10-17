@@ -45,10 +45,12 @@ describe("Button, ready-made", () => {
         expect(root.getAttribute("data-scope")).toBe("button");
         expect(root.className).toBe("button button--text button--large");
         expect(
-            [...root.children].map((child) =>
-                child.getAttribute("data-pf-part"),
+            [...root.children].map(
+                (child) =>
+                    child.getAttribute("data-pf-part") ??
+                    (child.hasAttribute("data-ripple-layer") ? "layer" : null),
             ),
-        ).toEqual(["touch-target", "label"]);
+        ).toEqual(["layer", "touch-target", "label"]);
         expect(byTestId(ids.touchTarget).className).toBe(
             "button__touch-target",
         );

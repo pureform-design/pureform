@@ -22,6 +22,7 @@ import type {
     NavigationItemOwnProps,
     NavigationRootOwnProps,
 } from "@pureform/binding-core";
+import type { InteractionSource } from "@pureform/binding-core/interaction";
 import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
 import { normalizeProps } from "@zag-js/react";
@@ -30,6 +31,7 @@ import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "./controllable";
 import { useItemInteractionSources } from "./interaction";
+import type { ItemInteractionSources } from "./interaction";
 import { useMachine } from "./machine";
 import { createPartContext } from "./part-context";
 import { slotPartProps, useComponent } from "./parts";
@@ -44,11 +46,13 @@ type Anatomy = typeof navigationBarAnatomy | typeof navigationRailAnatomy;
 interface NavigationContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: navigation.Api<PropTypes>;
+    readonly sources: ItemInteractionSources;
 }
 
 /** What a destination shares with its parts. */
 interface ItemContextValue {
     readonly value: string;
+    readonly source: InteractionSource | undefined;
 }
 
 /** Root's props, for the component `C`: the variants and tokens, the machine's props (`value`,
@@ -105,10 +109,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
             "value",
             props,
         );
-        const interaction = useItemInteractionSources();
+        const sources = useItemInteractionSources();
         const service = useMachine(navigation.machine, {
             id,
-            ...interaction,
+            ...sources.machineProps,
             dir,
             ...navigationMachineProps(props),
             ...value.machineProps,
@@ -118,10 +122,11 @@ export function createNavigation<C extends NavigationComponent>(config: {
             selection: navigationSelection(props) as Selection<Anatomy["name"]>,
             testId: props.testId,
             unstyled: props.unstyled,
+            indication: props.indication,
         });
         const { as, ...rest } = omitProps(props, NAVIGATION_ROOT_PROPS);
         return (
-            <context.Provider value={{ scope, api }}>
+            <context.Provider value={{ scope, api, sources }}>
                 {scope.render("root", {
                     element: "nav",
                     as,
@@ -138,15 +143,18 @@ export function createNavigation<C extends NavigationComponent>(config: {
         unstyled,
         value,
         disabled,
+        interactionSource,
         ...props
     }: NavigationItemProps): ReactNode {
-        const { scope, api } = context.use("Item");
+        const { scope, api, sources } = context.use("Item");
+        const source = sources.item(value, interactionSource);
         const own = { value, disabled, href: props.href };
         const item = navigationItemMachineProps(own);
         return (
-            <itemContext.Provider value={{ value }}>
+            <itemContext.Provider value={{ value, source }}>
                 {scope.render("item", {
                     element: navigationItemElement(own),
+                    interactionSource: source,
                     machine: combinePartProps([
                         api.getItemProps(item) as Readonly<
                             Record<string, unknown>
@@ -166,8 +174,13 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The pill behind the icon, which takes the state layer. */
     function Indicator({ unstyled, ...props }: NavigationPartProps): ReactNode {
         const { scope } = context.use("Indicator");
-        itemContext.use("Indicator");
-        return scope.render("indicator", { element: "span", unstyled, props });
+        const { source } = itemContext.use("Indicator");
+        return scope.render("indicator", {
+            element: "span",
+            interactionSource: source,
+            unstyled,
+            props,
+        });
     }
 
     /** The fill that grows inside the pill once the destination is current. Empty. */
@@ -237,6 +250,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
                         value={item.value}
                         href={item.href}
                         disabled={item.disabled}
+                        interactionSource={item.interactionSource}
                         {...slot("item")}
                     >
                         <Indicator {...slot("indicator")}>

@@ -60,10 +60,12 @@ describe("NavigationBar, ready-made", () => {
         const indicator = items()[0]!.firstElementChild!;
         expect(indicator.getAttribute("data-pf-part")).toBe("indicator");
         expect(
-            [...indicator.children].map((part) =>
-                part.getAttribute("data-pf-part"),
+            [...indicator.children].map(
+                (part) =>
+                    part.getAttribute("data-pf-part") ??
+                    (part.hasAttribute("data-ripple-layer") ? "layer" : null),
             ),
-        ).toEqual(["active-indicator", "icon"]);
+        ).toEqual(["layer", "active-indicator", "icon"]);
         expect(byTestId(ids.icon).getAttribute("aria-hidden")).toBe("true");
         expect(items()[2]!.querySelector(`[data-testid="${ids.icon}"]`)).toBe(
             null,

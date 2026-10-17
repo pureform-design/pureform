@@ -9,13 +9,24 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
-import { forSlot, isIconPart, partSources } from "@pureform/binding-core";
+import {
+    forSlot,
+    isIconPart,
+    isUnstyled,
+    partSources,
+} from "@pureform/binding-core";
 import type {
     ClassValue,
     PartStates,
     SlotKeyed,
     Unstyled,
 } from "@pureform/binding-core";
+import {
+    componentIndicationTokens,
+    indicationRoles,
+} from "@pureform/binding-core/indication";
+import type { Indication } from "@pureform/binding-core/indication";
+import type { InteractionSource } from "@pureform/binding-core/interaction";
 import type {
     ClassSlots,
     ComponentName,
@@ -36,6 +47,12 @@ import {
 
 import { useClasses } from "./classes";
 import { IconPartContext } from "./icon-style";
+import {
+    usePartIndication,
+    useIndicationScope,
+    withForwarded,
+} from "./indication";
+import type { IndicationScope, PartIndication } from "./indication";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
 import { usePureform } from "./provider";
@@ -52,6 +69,15 @@ export interface ComponentOptions<A extends ComponentAnatomy> {
     readonly testId?: TestIdOverride<PartName<A>> | undefined;
     /** Root's `unstyled`: every part, or some, without the registry's styles. */
     readonly unstyled?: Unstyled<PartName<A>> | undefined;
+    /** Root's `indication` prop, over the provider's. Its tokens go on Root, as instance tokens
+     *  do, for a component whose anatomy has an indication entry. */
+    readonly indication?: Indication | undefined;
+    /** The source the component's machine emits to, which the parts its anatomy's indication
+     *  entry names draw from. A composite's item parts pass their own to `render`. */
+    readonly interactionSource?: InteractionSource | undefined;
+    /** Whether the component shows indication now: a card or a list item only with an action.
+     *  Always, by default. */
+    readonly interactive?: boolean | undefined;
 }
 
 /** What a part merges besides its anatomy's attributes and the registry's classes. */
@@ -75,6 +101,9 @@ export interface RenderOptions extends PartOptions {
     readonly as?: ElementType | undefined;
     /** A ref of the component's own, alongside the user's. */
     readonly ref?: Ref<HTMLElement> | undefined;
+    /** The source of the item this part belongs to, for a composite's parts that show an item's
+     *  indication; others draw from the component's. */
+    readonly interactionSource?: InteractionSource | undefined;
 }
 
 /** The means to build a component's parts. */
@@ -163,6 +192,38 @@ function PartElement({
     return <IconPartContext value={element}>{node}</IconPartContext>;
 }
 
+interface IndicatedPartElementProps extends PartElementProps {
+    readonly indication: PartIndication;
+}
+
+// A part its component's indication names: its layer first inside it when it's a surface, and a
+// hover or press forwarded from another origin marked on it.
+function IndicatedPartElement({
+    tag,
+    props,
+    icon,
+    ownRef,
+    userRef,
+    children,
+    indication,
+}: IndicatedPartElementProps): ReactNode {
+    const [element, setElement] = useState<HTMLElement | null>(null);
+    const ref = useMemo(
+        () => mergeRefs<HTMLElement>(setElement, ownRef, userRef),
+        [ownRef, userRef],
+    );
+    const { forwarded, layer } = usePartIndication(indication, element);
+    const merged = { ...withForwarded(props, forwarded), ref };
+    // Only a surface holds the layer, in the same place while it comes and goes: a trigger may be
+    // a void element (an input).
+    const surface = indication.roles.some(({ role }) => role === "surface");
+    const node = surface
+        ? createElement(tag, merged, layer, children)
+        : createElement(tag, merged, children);
+    if (!icon) return node;
+    return <IconPartContext value={element}>{node}</IconPartContext>;
+}
+
 const createPartScope = <A extends ComponentAnatomy>(
     anatomy: A,
     options: UnstyledComponentOptions<A> & {
@@ -170,6 +231,7 @@ const createPartScope = <A extends ComponentAnatomy>(
     },
     classes: Readonly<Record<string, SlotClasses>> | undefined,
     slotProps: object | undefined,
+    indication?: IndicationScope,
 ): PartScope<A> => {
     const scope: PartScope<A> = {
         anatomy,
@@ -193,6 +255,32 @@ const createPartScope = <A extends ComponentAnatomy>(
             const user = renderOptions.props as
                 | { children?: ReactNode; ref?: Ref<HTMLElement> }
                 | undefined;
+            const roles = indication
+                ? indicationRoles(indication.entries, part)
+                : [];
+            if (indication && roles.length > 0) {
+                return (
+                    <IndicatedPartElement
+                        tag={renderOptions.as ?? renderOptions.element}
+                        props={scope.part(part, renderOptions)}
+                        icon={isIconPart(anatomy, part)}
+                        ownRef={renderOptions.ref}
+                        userRef={user?.ref}
+                        indication={{
+                            scope: indication,
+                            roles,
+                            source:
+                                renderOptions.interactionSource ??
+                                indication.source,
+                            unstyled:
+                                isUnstyled(options.unstyled, part) ||
+                                !!renderOptions.unstyled,
+                        }}
+                    >
+                        {user?.children}
+                    </IndicatedPartElement>
+                );
+            }
             return (
                 <PartElement
                     tag={renderOptions.as ?? renderOptions.element}
@@ -216,12 +304,41 @@ export function useComponent<A extends ComponentAnatomy>(
     options: ComponentOptions<A>,
 ): ComponentScope<A> {
     const state = usePureform();
+    const entries = anatomy.indication;
+    // Hooks run in the same order every render: an anatomy's entries never change.
+    const indication = entries?.length
+        ? useIndicationScope(entries, {
+              indication: options.indication,
+              interactive: options.interactive,
+              source: options.interactionSource,
+          })
+        : undefined;
+    // The indication prop's tokens, and the providers' focus indicator color, go on Root under
+    // the component's own tokens.
+    const tokens =
+        indication?.interactive === true
+            ? componentIndicationTokens(
+                  options.indication,
+                  state.focusIndicatorColor,
+              )
+            : undefined;
     const classes = useClasses(
         anatomy.name as ComponentOf<A>,
-        options.selection,
+        tokens
+            ? ({
+                  ...options.selection,
+                  tokens: { ...tokens, ...options.selection.tokens },
+              } as Selection<ComponentOf<A>>)
+            : options.selection,
     );
     return {
-        ...createPartScope(anatomy, options, classes, state.slotProps),
+        ...createPartScope(
+            anatomy,
+            options,
+            classes,
+            state.slotProps,
+            indication,
+        ),
         classes,
     };
 }

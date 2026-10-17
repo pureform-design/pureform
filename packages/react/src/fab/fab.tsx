@@ -39,8 +39,6 @@ interface FabContextValue {
 
 const context = createPartContext<FabContextValue>("Fab");
 
-const NOT_A_TOGGLE = {};
-
 /** Root's props: the variants and tokens, the machine's props (`disabled`, `type`, …), `testId`
  *  and `unstyled` for every part, `as`, and the element's own props. */
 export interface FabRootProps
@@ -61,11 +59,17 @@ export interface FabIconProps extends FabPartProps {
 
 /** The FAB's root: a native `<button>` that runs the machine and shares it with its parts. */
 function Root(props: FabRootProps): ReactNode {
-    const api = usePressable("Fab", NOT_A_TOGGLE, fabMachineProps(props));
+    const { api, source } = usePressable(
+        "Fab",
+        { interactionSource: props.interactionSource },
+        fabMachineProps(props),
+    );
     const scope = useComponent(fabAnatomy, {
         selection: fabSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
+        indication: props.indication,
+        interactionSource: source,
     });
     const { as, ...rest } = omitProps(props, FAB_ROOT_PROPS);
     return (
