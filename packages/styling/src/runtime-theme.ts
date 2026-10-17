@@ -5,7 +5,8 @@
 
 import type { VarOptions } from "./registry";
 
-/** Plain data a generator takes. It's hashed to name the theme's scope, so keep it JSON. */
+/** Plain data a generator takes: JSON, since it's hashed to name the theme's scope. Generators
+ *  may type their input more narrowly. */
 export type ThemeInput =
     | string
     | number
@@ -26,13 +27,13 @@ export interface ThemeSchemeVars {
 
 /** Turns a theme's input into its vars, named the way the target names them. It must be pure:
  *  the server and the client run it apart and must agree. */
-export type ThemeGenerator<I extends ThemeInput = ThemeInput> = (
+export type ThemeGenerator<I = ThemeInput> = (
     input: I,
     vars: VarOptions,
 ) => ThemeSchemeVars;
 
 /** A generator, loaded on demand and shared by every theme made from it. */
-export interface ThemeSource<I extends ThemeInput = ThemeInput> {
+export interface ThemeSource<I = ThemeInput> {
     /** Names the generator in the theme's hash and in messages: `"material-seed"`. */
     readonly name: string;
     /** The generator once loaded, else `undefined`. */
@@ -43,7 +44,7 @@ export interface ThemeSource<I extends ThemeInput = ThemeInput> {
 }
 
 /** A theme generated at run time: a source and its input. Pass it as a provider's `theme`. */
-export interface RuntimeTheme<I extends ThemeInput = ThemeInput> {
+export interface RuntimeTheme<I = ThemeInput> {
     readonly source: ThemeSource<I>;
     readonly input: I;
 }
@@ -51,15 +52,13 @@ export interface RuntimeTheme<I extends ThemeInput = ThemeInput> {
 /** Any runtime theme, whatever its input. */
 export type AnyRuntimeTheme = RuntimeTheme<any>;
 
-type Loaded<I extends ThemeInput> =
-    | ThemeGenerator<I>
-    | { readonly default: ThemeGenerator<I> };
+type Loaded<I> = ThemeGenerator<I> | { readonly default: ThemeGenerator<I> };
 
 /** Declares a kind of runtime theme: `defineRuntimeTheme("material-seed", () =>
  *  import("./generate"))` returns a function from an input to a theme. The loader's module gives
  *  the generator as itself or its default export, and only loads when a theme needs
  *  generating, so apps that never generate one don't ship the generator. */
-export const defineRuntimeTheme = <I extends ThemeInput>(
+export const defineRuntimeTheme = <I>(
     name: string,
     load: () => Loaded<I> | Promise<Loaded<I>>,
 ): ((input: I) => RuntimeTheme<I>) => {
@@ -105,12 +104,12 @@ export const preloadTheme = (theme: AnyRuntimeTheme): Promise<void> =>
     );
 
 // Keys sorted, `undefined` left out, so equal inputs serialize the same.
-const stable = (value: ThemeInput | undefined): string => {
+const stable = (value: unknown): string => {
     if (value === null || typeof value !== "object") {
         return JSON.stringify(value) ?? "null";
     }
     if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
-    const record = value as { readonly [key: string]: ThemeInput | undefined };
+    const record = value as Readonly<Record<string, unknown>>;
     return `{${Object.keys(record)
         .filter((key) => record[key] !== undefined)
         .sort()

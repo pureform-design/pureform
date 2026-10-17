@@ -14,11 +14,23 @@
                 "development": "./src/index.ts",
                 "default": "./dist/index.mjs"
             }
+        },
+        "./runtime-theme": {
+            "types": "./dist/runtime-theme/index.d.ts",
+            "import": {
+                "development": "./src/runtime-theme/index.ts",
+                "default": "./dist/runtime-theme.mjs"
+            },
+            "require": {
+                "development": "./src/runtime-theme/index.ts",
+                "default": "./dist/runtime-theme.mjs"
+            }
         }
     },
     "dependencies": {
         "@material/material-color-utilities": "catalog:",
         "@pureform/core": "catalog:",
+        "@pureform/styling": "catalog:",
         "@pureform/theme": "catalog:",
         "@pureform/utils": "catalog:",
         "chroma-js": "catalog:"
