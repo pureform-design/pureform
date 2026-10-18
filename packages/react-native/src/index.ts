@@ -33,6 +33,8 @@ export {
 export type { PressableEvent, PressableHandlers } from "./interaction";
 export { useLayer } from "./layer";
 export type { StackingLayer } from "./layer";
+export { dismissTopOverlay, placeOverlay, useDismiss } from "./overlay";
+export type { PlaceOptions, Placed } from "./overlay";
 export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export { Portal } from "./portal";
 export type { PortalProps } from "./portal";
