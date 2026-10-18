@@ -15,8 +15,10 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     optimizeDeps: {
         include: [
             "@zag-js/checkbox",
+            "@zag-js/collection",
             "@zag-js/dialog",
             "@zag-js/menu",
+            "@zag-js/presence",
             "@zag-js/radio-group",
             "@zag-js/select",
             "@zag-js/switch",
