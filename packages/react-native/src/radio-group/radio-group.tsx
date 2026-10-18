@@ -13,13 +13,20 @@ import type {
     RadioVariantProps,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
-import { createContext, useContext } from "react";
+import { createContext, memo, useContext, useMemo } from "react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import type { StyleProp, ViewStyle } from "react-native";
 
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
+import {
+    testIdOf,
+    unselectable,
+    useControllable,
+    useStableCallback,
+    useStableSelection,
+    withEngine,
+} from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -101,8 +108,9 @@ function RadioImpl(props: RadioProps): ReactNode {
     );
 }
 
-/** Material's radio button: in a `RadioGroup` by `value`, or on its own with `checked`. */
-export const Radio = withEngine(RadioImpl, "Radio");
+/** Material's radio button: in a `RadioGroup` by `value`, or on its own with `checked`. It renders
+ *  again only when its props, its group, or the provider change. */
+export const Radio = memo(withEngine(RadioImpl, "Radio"));
 
 export interface RadioGroupProps extends RadioVariantProps {
     /** The radios' indication, over the provider's; a radio's own `indication` goes over it. */
@@ -133,18 +141,28 @@ export function RadioGroup(props: RadioGroupProps): ReactNode {
         props.onValueChange,
         null,
     );
-    const context: GroupContext = {
-        value,
-        disabled: props.disabled ?? false,
-        invalid: props.invalid ?? false,
-        indication: props.indication,
-        pick: (next) => {
-            if (next !== value) setValue(next);
-        },
+    const pick = useStableCallback((next: string) => {
+        if (next !== value) setValue(next);
+    });
+    const variants = useStableSelection({
         ...(props.color === undefined ? {} : { color: props.color }),
         ...(props.density === undefined ? {} : { density: props.density }),
         ...(props.tokens === undefined ? {} : { tokens: props.tokens }),
-    };
+    });
+    const disabled = props.disabled ?? false;
+    const invalid = props.invalid ?? false;
+    // The radios render again with the group only when what they read from it changes.
+    const context = useMemo<GroupContext>(
+        () => ({
+            ...variants,
+            value,
+            disabled,
+            invalid,
+            indication: props.indication,
+            pick,
+        }),
+        [variants, value, disabled, invalid, props.indication, pick],
+    );
     return (
         <View
             role="radiogroup"

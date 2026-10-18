@@ -1,5 +1,6 @@
-// What the components share: controlled and uncontrolled state, test ids, and starting a
-// component over when the provider's engine changes (its hooks differ).
+// What the components share: controlled and uncontrolled state, test ids, starting a component
+// over when the provider's engine changes (its hooks differ), and what keeps a composite's rows
+// from rendering again with it: a stable callback and a selection kept while it selects the same.
 
 import { partTestId } from "@pureform/anatomy";
 import type {
@@ -7,9 +8,20 @@ import type {
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
-import { createControlTracker, warnOnce } from "@pureform/binding-core";
+import {
+    createControlTracker,
+    selectionSignature,
+    warnOnce,
+} from "@pureform/binding-core";
 import type { ChangeDetails } from "@pureform/binding-core";
-import { createElement, useRef, useState } from "react";
+import {
+    createElement,
+    useCallback,
+    useLayoutEffect,
+    useMemo,
+    useRef,
+    useState,
+} from "react";
 import type { ComponentType, ReactNode } from "react";
 
 import { isDev } from "./env";
@@ -66,4 +78,22 @@ export function useControllable<N extends string, T>(
             onChange?.({ [name]: next } as ChangeDetails<N, T>);
         },
     ];
+}
+
+/** A function that stays the same across renders and calls the latest `callback`, for a row that
+ *  shouldn't render again when its parent does. Call it from handlers, not while rendering. */
+export function useStableCallback<A extends unknown[], R>(
+    callback: (...args: A) => R,
+): (...args: A) => R {
+    const latest = useRef(callback);
+    useLayoutEffect(() => {
+        latest.current = callback;
+    });
+    return useCallback((...args: A) => latest.current(...args), []);
+}
+
+/** `selection`, or the one from an earlier render while it selects the same (variants and tokens
+ *  compared by value), so rows given it can skip rendering. */
+export function useStableSelection<S extends object>(selection: S): S {
+    return useMemo(() => selection, [selectionSignature(selection)]);
 }
