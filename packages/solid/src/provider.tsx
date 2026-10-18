@@ -185,9 +185,8 @@ const useThemeBlock = (
         return initial;
     });
     createEffect(
-        () => block(),
-        (current) => {
-            const theme = props.theme;
+        () => ({ current: block(), theme: props.theme }),
+        ({ current, theme }) => {
             if (isServer || !current || !isRuntimeTheme(theme)) return;
             const { registry, hydrate } = untrack(state);
             if (!needsThemeLoad(current, hydrate)) return;
