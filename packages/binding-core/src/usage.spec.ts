@@ -33,6 +33,7 @@ const select = (
         case "card:card":
             return core.cardSelection(p, "div");
         case "list-item:listItem":
+        case "list:listItem":
             return core.listItemSelection(p, "div");
         case "circular-progress:circularProgress":
         case "linear-progress:linearProgress":
@@ -104,8 +105,8 @@ const sharedSources = (binding: Binding, subpath: string) =>
         .filter(([, users]) => users.includes(subpath))
         .map(([file]) => SOURCES[`../../${binding}/src/${file}`]!);
 
-// The entries a component's sources draw, by the anatomies they name.
-const drawnBy = (text: string): Set<string> => {
+// The entries a component's sources draw by the anatomies they name.
+const anatomiesIn = (text: string): Set<string> => {
     const drawn = new Set<string>();
     for (const [, key] of text.matchAll(/\b(\w+Anatomy)\b/g)) {
         const found = anatomyNames.get(key!);
@@ -113,7 +114,21 @@ const drawnBy = (text: string): Set<string> => {
         // A surface that shows indication holds the ripple's layer.
         if (found?.indicated) drawn.add("ripple");
     }
+    return drawn;
+};
+
+// The entries a component's sources draw: by the anatomies they name, a trigger drawn as a button,
+// and the components they render (`import { ListItem } from "../list-item/list-item"`), by those
+// components' anatomies.
+const drawnBy = (binding: Binding, text: string): Set<string> => {
+    const drawn = anatomiesIn(text);
     if (/\bas=\{Button\}/.test(text)) drawn.add("button").add("ripple");
+    for (const [, subpath] of text.matchAll(
+        /^import \{[^}]*\} from "\.\.\/([a-z-]+)(?:\/[a-z-]+)?";$/gm,
+    )) {
+        for (const entry of anatomiesIn(sources(binding, subpath!).join("\n")))
+            drawn.add(entry);
+    }
     return drawn;
 };
 
@@ -217,6 +232,7 @@ describe("COMPONENT_USAGE", () => {
                 ),
             );
             const drawn = drawnBy(
+                "react-native",
                 [
                     ...sources("react-native", subpath),
                     ...sharedSources("react-native", subpath),
@@ -233,7 +249,10 @@ describe("COMPONENT_USAGE", () => {
                 for (const [subpath, { entries }] of Object.entries(
                     COMPONENT_USAGE,
                 )) {
-                    const drawn = drawnBy(sources(binding, subpath).join("\n"));
+                    const drawn = drawnBy(
+                        binding,
+                        sources(binding, subpath).join("\n"),
+                    );
                     const own = Object.keys(entries);
                     expect(own.sort(), subpath).toEqual([...drawn].sort());
                 }
