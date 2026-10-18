@@ -50,6 +50,7 @@ import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { isDev } from "./env";
 import { providerIndicationValues } from "./indication-tokens";
+import { PortalHost, useHasPortalHost } from "./portal-host";
 
 /** Overrides resolved for each scheme. */
 export interface SchemeOverrides {
@@ -81,6 +82,9 @@ const NO_OVERRIDES: SchemeOverrides = Object.freeze({
 });
 
 const PureformContext = createContext<PureformState | undefined>(undefined);
+
+// Whether the nearest provider reduces motion, as it gave its styles.
+const ReducedMotionContext = createContext(false);
 
 export interface PureformProviderProps {
     /** The generated registry (`.pureform`'s `registry`), whose entries are each component's
@@ -352,22 +356,82 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         state.motion,
         useSystemReducedMotion(state.motion === "system"),
     );
+    // The root provider holds the overlays' host, unless the app placed one around it.
+    const hosted = useHasPortalHost();
+    return (
+        <Provide state={state} reducedMotion={reducedMotion}>
+            {parent || hosted ? (
+                props.children
+            ) : (
+                <PortalHost>{props.children}</PortalHost>
+            )}
+        </Provide>
+    );
+}
+
+// What a provider gives what's under it: its state, and the styles' environment from it.
+function Provide(props: {
+    readonly state: PureformState;
+    readonly reducedMotion: boolean;
+    readonly children?: ReactNode;
+}): ReactNode {
+    const { state } = props;
     return (
         <PureformContext value={state}>
-            <StylesProvider
-                source={registrySource(state.registry)}
-                scheme={state.scheme}
-                {...(state.theme === undefined ? {} : { theme: state.theme })}
-                overrides={state.overrides}
-                reducedMotion={reducedMotion}
-                rtl={state.dir === "rtl"}
-                {...(state.width === undefined ? {} : { width: state.width })}
-                svg={state.engine.svg}
-                timeScale={state.timeScale}
-            >
-                {props.children}
-            </StylesProvider>
+            <ReducedMotionContext value={props.reducedMotion}>
+                <StylesProvider
+                    source={registrySource(state.registry)}
+                    scheme={state.scheme}
+                    {...(state.theme === undefined
+                        ? {}
+                        : { theme: state.theme })}
+                    overrides={state.overrides}
+                    reducedMotion={props.reducedMotion}
+                    rtl={state.dir === "rtl"}
+                    {...(state.width === undefined
+                        ? {}
+                        : { width: state.width })}
+                    svg={state.engine.svg}
+                    timeScale={state.timeScale}
+                >
+                    {props.children}
+                </StylesProvider>
+            </ReducedMotionContext>
         </PureformContext>
+    );
+}
+
+/** The nearest provider, as a portal carries it to its host: its state and whether it reduces
+ *  motion. */
+export interface PureformScope {
+    readonly state: PureformState;
+    readonly reducedMotion: boolean;
+}
+
+/** The nearest provider's scope, `undefined` outside one. */
+export function usePureformScope(): PureformScope | undefined {
+    const state = useContext(PureformContext);
+    const reducedMotion = useContext(ReducedMotionContext);
+    return useMemo(
+        () => (state ? { state, reducedMotion } : undefined),
+        [state, reducedMotion],
+    );
+}
+
+/** Provides `scope` again, elsewhere: what's under it renders as under the provider it came
+ *  from (a container's width aside, which stays where it was measured). */
+export function PureformScopeProvider(props: {
+    readonly scope: PureformScope | undefined;
+    readonly children?: ReactNode;
+}): ReactNode {
+    if (!props.scope) return props.children;
+    return (
+        <Provide
+            state={props.scope.state}
+            reducedMotion={props.scope.reducedMotion}
+        >
+            {props.children}
+        </Provide>
     );
 }
 
