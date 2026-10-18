@@ -35,7 +35,14 @@ import { Switch } from "./switch";
 import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, computed, interact, mount, settle } from "./testing/render";
+import {
+    byTestId,
+    computed,
+    interact,
+    mount,
+    outside,
+    settle,
+} from "./testing/render";
 import { Text } from "./text";
 import { TextArea } from "./text-area";
 import { TextField } from "./text-field";
@@ -292,6 +299,38 @@ describe("controlled and uncontrolled state", () => {
         expect((byTestId("pf-select-input") as HTMLInputElement).value).toBe(
             "Large",
         );
+    });
+
+    it("keeps a select's label for its value after the item leaves, until the value changes", async () => {
+        const SMALL = { value: "s", label: "Small" };
+        const MEDIUM = { value: "m", label: "Medium" };
+        const state = outside<{
+            items: readonly (typeof SMALL)[];
+            value: string | null;
+        }>({ items: [SMALL, MEDIUM], value: "m" });
+        await render(
+            <state.Holder>
+                {({ items, value }) => (
+                    <Select label="Size" items={items} value={value} />
+                )}
+            </state.Holder>,
+        );
+        const shown = () =>
+            (byTestId("pf-select-input") as HTMLInputElement).value;
+        expect(shown()).toBe("Medium");
+        await state.set({ items: [SMALL], value: "m" });
+        expect(shown()).toBe("Medium");
+        await state.set({ items: [SMALL], value: "s" });
+        expect(shown()).toBe("Small");
+        await state.set({ items: [SMALL], value: "m" });
+        expect(shown()).toBe("");
+        await state.set({ items: [SMALL, MEDIUM], value: "m" });
+        expect(shown()).toBe("Medium");
+        await state.set({ items: [SMALL], value: null });
+        expect(shown()).toBe("");
+        await state.set({ items: [SMALL, MEDIUM], value: "m" });
+        await state.set({ items: [{ value: "m", label: "Mid" }], value: "m" });
+        expect(shown()).toBe("Mid");
     });
 });
 

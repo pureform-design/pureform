@@ -37,6 +37,19 @@ interface Measurable {
     ) => void;
 }
 
+// The picked item's label. An item that leaves `items` while it's picked keeps its label until
+// the value changes, as Zag's select keeps it on the web; a value that's in no item shows none.
+const useShownLabel = (
+    items: readonly SelectItem[],
+    value: string | null,
+): string => {
+    const kept = useRef<SelectItem | null>(null);
+    const found = items.find((item) => item.value === value);
+    if (found) kept.current = found;
+    else if (kept.current?.value !== value) kept.current = null;
+    return kept.current?.label ?? "";
+};
+
 export interface SelectProps
     extends
         Omit<SelectVariantProps, "leadingIcon">,
@@ -84,7 +97,7 @@ export function Select(props: SelectProps): ReactNode {
         container.current?.measureInWindow((left, top, width, height) =>
             setMenu({ left, top: top + height, width }),
         );
-    const shown = items.find((item) => item.value === value)?.label ?? "";
+    const shown = useShownLabel(items, value);
     return (
         <View>
             <Field
