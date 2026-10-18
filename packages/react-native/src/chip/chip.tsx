@@ -28,6 +28,9 @@ export interface ChipProps extends ChipVariantProps, InteractiveProps {
     readonly selected?: boolean | undefined;
     readonly disabled?: boolean | undefined;
     readonly onPress?: (() => void) | undefined;
+    /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
+     *  shows its tooltip so). */
+    readonly onLongPress?: (() => void) | undefined;
     readonly testId?: TestIdOverride<ChipPart> | undefined;
 }
 
@@ -56,6 +59,7 @@ function ChipImpl(props: ChipProps): ReactNode {
             {...indication.handlers}
             role="button"
             disabled={props.disabled}
+            onLongPress={props.onLongPress}
             onPress={props.onPress}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}

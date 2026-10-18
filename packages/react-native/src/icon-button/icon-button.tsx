@@ -37,6 +37,9 @@ export interface IconButtonProps
         | ((details: ChangeDetails<"selected", boolean>) => void)
         | undefined;
     readonly onPress?: (() => void) | undefined;
+    /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
+     *  shows its tooltip so). */
+    readonly onLongPress?: (() => void) | undefined;
     readonly testId?: TestIdOverride<IconButtonPart> | undefined;
 }
 
@@ -80,6 +83,7 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
             aria-label={props["aria-label"]}
             {...(toggle ? { "aria-checked": selected } : {})}
             disabled={props.disabled}
+            onLongPress={props.onLongPress}
             onPress={() => {
                 if (toggle) setSelected(!selected);
                 props.onPress?.();
