@@ -5,7 +5,7 @@ import {
 } from "@pureform/styling";
 import type { ThemeGenerator } from "@pureform/styling";
 import { createSignal, Errored, flush, Loading } from "solid-js";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 
 import {
     PureformProvider,
@@ -212,6 +212,7 @@ describe("PureformProvider", () => {
         });
 
         it("shares one block between providers, follows a changed theme, and gives its vars", async () => {
+            const warn = vi.spyOn(console, "warn");
             const seedTheme = defineRuntimeTheme<Seed>("seed", () => generate);
             const [seed, setSeed] = createSignal("rgb(1, 2, 3)");
             function Probe() {
@@ -246,6 +247,13 @@ describe("PureformProvider", () => {
             expect(blocks()[0]!.getAttribute("data-pf-theme")).toBe(
                 themeScope(seedTheme({ seed: "rgb(4, 5, 6)" })),
             );
+            // The theme prop is read where it's tracked, not in the effect's callback.
+            expect(
+                warn.mock.calls.filter(([message]) =>
+                    String(message).includes("STRICT_READ_UNTRACKED"),
+                ),
+            ).toEqual([]);
+            warn.mockRestore();
         });
     });
 });
