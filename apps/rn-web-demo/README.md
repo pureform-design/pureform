@@ -11,7 +11,7 @@ bun run dev
 - `pureform.config.ts`: the config (Material's defaults and a teal theme, two shapes that morph
   while pressed, a panel laid out by its container's width, a gradient swatch, and a square whose
   typed tokens tween), and the components the page draws.
-- `pureform.glue.ts` and `vite.config.ts`: the bundler plugin (`@pureform/bundler/vite`, target
+- `pureform.codegen.ts` and `vite.config.ts`: the bundler plugin (`@pureform/bundler/vite`, target
   `native`) writes `.pureform/` (ignored by git) when dev or build starts: one `StyleFactory`
   module per component and the registry. A small plugin serves `virtual:pureform-rn`: the same
   components' styles resolved at runtime, each one's instance token keys, and each brand's

@@ -4,16 +4,16 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 
 import {
+    codegenSource,
     configSource,
-    glueFile,
-    glueSource,
+    outputFile,
     run,
     tempApp,
 } from "./__fixtures__/app";
 import { main } from "./program";
 
 describe("pureform generate", () => {
-    it("writes .pureform/ from the config and the glue file, and says what it wrote", async () => {
+    it("writes .pureform/ from the config and the codegen file, and says what it wrote", async () => {
         const root = tempApp(["chip", "divider"], {
             options: { prefix: "x-" },
         });
@@ -24,15 +24,15 @@ describe("pureform generate", () => {
             "pureform: updated .pureform/ (4 written)",
         );
         expect(first.stdout).toContain("  written web/chip.ts");
-        expect(glueFile(root, "web/chip.ts")).toContain('class: "x-chip"');
-        expect(glueFile(root, "index.ts")).toContain("divider");
+        expect(outputFile(root, "web/chip.ts")).toContain('class: "x-chip"');
+        expect(outputFile(root, "index.ts")).toContain("divider");
 
         const second = await run(root, ["generate"]);
         expect(second.code).toBe(0);
         expect(second.stdout).toBe("pureform: .pureform/ is up to date");
     });
 
-    it("takes the flags over the glue file", async () => {
+    it("takes the flags over the codegen file", async () => {
         const root = tempApp(["chip", "divider", "badge"], {
             options: { prefix: "x-" },
             components: ["chip"],
@@ -45,15 +45,15 @@ describe("pureform generate", () => {
             "--options",
             '{"prefix":"y-"}',
             "--out-dir",
-            "glue",
+            "generated",
         ]);
         expect(result.code).toBe(0);
-        const index = readFileSync(join(root, "glue/index.ts"), "utf8");
+        const index = readFileSync(join(root, "generated/index.ts"), "utf8");
         expect(index).toContain("badge");
         expect(index).not.toContain("chip");
-        expect(readFileSync(join(root, "glue/web/badge.ts"), "utf8")).toContain(
-            'class: "y-badge"',
-        );
+        expect(
+            readFileSync(join(root, "generated/web/badge.ts"), "utf8"),
+        ).toContain('class: "y-badge"');
     });
 
     it("runs from another folder with --root, and prints paths from the working directory", async () => {
@@ -70,7 +70,7 @@ describe("pureform generate", () => {
     });
 
     describe("--check", () => {
-        it("fails on missing glue and writes nothing", async () => {
+        it("fails on missing output and writes nothing", async () => {
             const root = tempApp();
             const result = await run(root, ["generate", "--check"]);
             expect(result.code).toBe(1);
@@ -81,10 +81,10 @@ describe("pureform generate", () => {
                 "Run `pureform generate` to update it.",
             );
             expect(result.stderr).toContain("  missing index.ts");
-            expect(() => glueFile(root, "index.ts")).toThrow();
+            expect(() => outputFile(root, "index.ts")).toThrow();
         });
 
-        it("passes on fresh glue", async () => {
+        it("passes on fresh output", async () => {
             const root = tempApp();
             await run(root, ["generate"]);
             const result = await run(root, ["generate", "--check"]);
@@ -93,10 +93,10 @@ describe("pureform generate", () => {
             expect(result.stderr).toBe("");
         });
 
-        it("fails on stale glue after the config changes, and leaves it as it was", async () => {
+        it("fails on stale output after the config changes, and leaves it as it was", async () => {
             const root = tempApp(["chip"]);
             await run(root, ["generate"]);
-            const before = glueFile(root, "index.ts");
+            const before = outputFile(root, "index.ts");
             writeFileSync(
                 join(root, "pureform.config.ts"),
                 configSource("chip", "badge"),
@@ -106,13 +106,13 @@ describe("pureform generate", () => {
             expect(result.code).toBe(1);
             expect(result.stderr).toMatch(/is out of date \(.*stale/);
             expect(result.stderr).toContain("  stale index.ts");
-            expect(glueFile(root, "index.ts")).toBe(before);
+            expect(outputFile(root, "index.ts")).toBe(before);
 
             await run(root, ["generate"]);
             expect((await run(root, ["generate", "--check"])).code).toBe(0);
         });
 
-        it("fails on stale glue after the adapter's options change", async () => {
+        it("fails on stale output after the adapter's options change", async () => {
             const root = tempApp();
             await run(root, ["generate"]);
             const result = await run(root, [
@@ -148,7 +148,7 @@ describe("pureform generate", () => {
             );
         });
 
-        it("asks for a target when there's no glue file", async () => {
+        it("asks for a target when there's no codegen file", async () => {
             const root = tempApp(["chip"], false);
             const result = await run(root, ["generate"]);
             expect(result.code).toBe(1);
@@ -157,16 +157,16 @@ describe("pureform generate", () => {
             );
         });
 
-        it("names a glue file without the options", async () => {
+        it("names a codegen file without the options", async () => {
             const root = tempApp();
             writeFileSync(
-                join(root, "pureform.glue.ts"),
+                join(root, "pureform.codegen.ts"),
                 "export const other = 1;\n",
             );
             const result = await run(root, ["generate"]);
             expect(result.code).toBe(1);
             expect(result.stderr).toContain(
-                "should export the generate options as `glue`",
+                "should export the generate options as `codegen`",
             );
         });
     });
@@ -180,7 +180,7 @@ describe("pureform generate", () => {
             }
         };
 
-        it("generates again when the config, a file it imports, or the glue file changes", async () => {
+        it("generates again when the config, a file it imports, or the codegen file changes", async () => {
             const root = tempApp(["chip"]);
             const stdout: string[] = [];
             const stderr: string[] = [];
@@ -195,7 +195,7 @@ describe("pureform generate", () => {
             await until(() => stdout.some((line) => line.includes("watching")));
             expect(stdout[0]).toContain("updated .pureform/");
             expect(stdout.at(-1)).toBe(
-                "pureform: watching pureform.config.ts and the files it imports, and pureform.glue.ts (Ctrl+C to stop)",
+                "pureform: watching pureform.config.ts and the files it imports, and pureform.codegen.ts (Ctrl+C to stop)",
             );
 
             writeFileSync(
@@ -204,7 +204,7 @@ describe("pureform generate", () => {
             );
             await until(() => {
                 try {
-                    return glueFile(root, "index.ts").includes("badge");
+                    return outputFile(root, "index.ts").includes("badge");
                 } catch {
                     return false;
                 }
@@ -218,14 +218,14 @@ describe("pureform generate", () => {
                 join(root, "pureform.config.ts"),
                 configSource("chip"),
             );
-            await until(() => !glueFile(root, "index.ts").includes("badge"));
+            await until(() => !outputFile(root, "index.ts").includes("badge"));
 
             writeFileSync(
-                join(root, "pureform.glue.ts"),
-                glueSource({ options: { prefix: "w-" } }),
+                join(root, "pureform.codegen.ts"),
+                codegenSource({ options: { prefix: "w-" } }),
             );
             await until(() =>
-                glueFile(root, "web/chip.ts").includes('"w-chip"'),
+                outputFile(root, "web/chip.ts").includes('"w-chip"'),
             );
 
             controller.abort();

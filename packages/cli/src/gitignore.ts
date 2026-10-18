@@ -1,6 +1,6 @@
 // The `.gitignore` hint: `pureform generate` doesn't edit `.gitignore`, but names the line to add
 // when git neither ignores the generated folder nor tracks any of it (tracking it means the app
-// commits its glue on purpose).
+// commits its registry on purpose).
 
 import { spawnSync } from "node:child_process";
 import { join, relative, sep } from "node:path";

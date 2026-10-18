@@ -3,18 +3,18 @@
 
 import { parseArgs } from "node:util";
 
+import { TARGETS } from "./codegen-file";
+import type { GenerateFlags } from "./codegen-file";
 import { CliError } from "./errors";
 import { runGenerate } from "./generate";
 import type { CliIO } from "./generate";
-import { TARGETS } from "./glue";
-import type { GenerateFlags } from "./glue";
 import { VERSION } from "./package-version";
 
 export const USAGE = `Usage: pureform <command> [options]
 
 Commands:
-  generate    Write the .pureform/ glue (the style registry and its declarations)
-              from pureform.config.ts, without a bundler.
+  generate    Write the generated registry to .pureform/ (the style registry's modules
+              and declarations) from pureform.config.ts, without a bundler.
 
 Options:
   -h, --help     Show this help, or a command's with \`pureform <command> --help\`.
@@ -22,21 +22,21 @@ Options:
 
 export const GENERATE_USAGE = `Usage: pureform generate [options]
 
-Writes the .pureform/ glue from pureform.config.ts with the target's adapter, as the
-bundler plugin does when dev or build starts. The options come from the glue file's
-\`glue\` export (pureform.glue.ts), with these flags over them.
+Writes the generated registry to .pureform/ from pureform.config.ts with the target's
+adapter, as the bundler plugin does when dev or build starts. The options come from the
+codegen file's \`codegen\` export (pureform.codegen.ts), with these flags over them.
 
 Options:
   --check              Compare .pureform/ with what would be written, write nothing,
-                       and exit 1 when it differs (for committed glue in CI).
+                       and exit 1 when it differs (for a committed registry in CI).
   --watch              Generate again whenever the config or a file it imports changes.
   --root <dir>         The app's root (default: the working directory).
   --config <file>      The config, relative to the root
                        (default: the first pureform.config.{ts,mts,cts,js,mjs,cjs}).
-  --glue <file>        The module exporting the options as \`glue\` or by default
-                       (default: the first pureform.glue.{ts,mts,cts,js,mjs,cjs} in the root).
+  --codegen <file>     The module exporting the options as \`codegen\` or by default
+                       (default: the first pureform.codegen.{ts,mts,cts,js,mjs,cjs} in the root).
   --target <target>    The adapter to generate with: ${TARGETS.join(", ")}.
-  --options <json>     The adapter's options as a JSON object, over the glue file's.
+  --options <json>     The adapter's options as a JSON object, over the codegen file's.
   --components <names> The components to generate, comma-separated (default: all).
   --lazy <names>       The components whose registry entries load on demand.
   --out-dir <dir>      The folder to write, relative to the root (default: .pureform).
@@ -65,7 +65,7 @@ export const parseGenerateFlags = (
                 watch: { type: "boolean" },
                 root: { type: "string" },
                 config: { type: "string" },
-                glue: { type: "string" },
+                codegen: { type: "string" },
                 target: { type: "string" },
                 options: { type: "string" },
                 components: { type: "string" },

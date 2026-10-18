@@ -1,4 +1,4 @@
-// Test fixtures: a temporary app with a config, a glue file holding a fake adapter, and a way to
+// Test fixtures: a temporary app with a config, a codegen file holding a fake adapter, and a way to
 // run the command and keep what it printed.
 
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
@@ -25,23 +25,26 @@ export const configSource = (...names: string[]): string =>
 
 const partsSource = `const part = (name) => ({ kind: "component", name, recipe: { base: {} } });\nexport const parts = { chip: part("chip"), divider: part("divider"), badge: part("badge") };\n`;
 
-/** A glue file whose target is a fake web adapter writing one module per component. */
-export const glueSource = (
+/** A codegen file whose target is a fake web adapter writing one module per component. */
+export const codegenSource = (
     options: Record<string, unknown> = {},
-    exportName = "glue",
+    exportName = "codegen",
 ): string =>
     `const fake = {\n    name: "fake",\n    platform: "web",\n    codegen: (context) => ({\n        components: context.components.map((name) => ({\n            name,\n            path: \`web/\${name}.ts\`,\n            contents: \`export const \${name} = () => ({ root: { class: "\${context.options.prefix ?? ""}\${name}" } });\\n\`,\n        })),\n    }),\n};\n${exportName === "default" ? "export default" : `export const ${exportName} =`} { target: fake, ...${JSON.stringify(options)} };\n`;
 
-/** Writes an app into `root`: a config of `names` and, unless `glue` is `false`, a glue file. */
+/** Writes an app into `root`: a config of `names` and, unless `codegen` is `false`, a codegen
+ *  file. */
 export const writeApp = (
     root: string,
     names: readonly string[] = ["chip", "divider"],
-    glue: Record<string, unknown> | false = {},
+    codegen: Record<string, unknown> | false = {},
 ): string => {
     writeTree(root, {
         "pureform.config.ts": configSource(...names),
         "parts.ts": partsSource,
-        ...(glue === false ? {} : { "pureform.glue.ts": glueSource(glue) }),
+        ...(codegen === false
+            ? {}
+            : { "pureform.codegen.ts": codegenSource(codegen) }),
     });
     return root;
 };
@@ -49,12 +52,12 @@ export const writeApp = (
 /** A fresh app root, as `writeApp` writes it. */
 export const tempApp = (
     names?: readonly string[],
-    glue?: Record<string, unknown> | false,
+    codegen?: Record<string, unknown> | false,
 ): string =>
-    writeApp(mkdtempSync(join(tmpdir(), "pureform-cli-")), names, glue);
+    writeApp(mkdtempSync(join(tmpdir(), "pureform-cli-")), names, codegen);
 
 /** Reads a file under an app's `.pureform/`. */
-export const glueFile = (root: string, path: string): string =>
+export const outputFile = (root: string, path: string): string =>
     readFileSync(join(root, ".pureform", path), "utf8");
 
 export interface Run {

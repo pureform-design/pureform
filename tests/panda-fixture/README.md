@@ -1,14 +1,14 @@
 # @pureform/panda-fixture
 
 The Panda setup the browser suites test against: a pureform config, the Panda preset compiled
-from it, the glue `pureform generate` writes from it, Panda's codegen, a stylesheet, and a page
+from it, the registry `pureform generate` writes from it, Panda's codegen, a stylesheet, and a page
 of every component. Private; nothing ships it. It belongs to the tests, so the demos can change,
 prune, and rebuild without touching what the suites read.
 
 - **Depends on:** `@pureform/panda-adapter` (the preset and the codegen), `@pureform/preset`,
   `@pureform/material`, `@pureform/theme`, `@pureform/core` (the config), `@pureform/cli` (the
-  `generate` task), `@pureform/styling` and `@pureform/js-effects` (what the glue and the page
-  import at run time), and Panda.
+  `generate` task), `@pureform/styling` and `@pureform/js-effects` (what the generated registry and
+  the page import at run time), and Panda.
 - **Used by:** `tests/component-suites` (the Panda target's registry and stylesheet, and the
   config the CSS and Tailwind targets are generated from) and `tests/browser-e2e-tests` (the
   config, the preset, the registry, the stylesheet, and the page).
@@ -18,7 +18,7 @@ prune, and rebuild without touching what the suites read.
 ```
 pureform.config.ts   the config: Material's defaults, two morphing shapes, named densities,
                      a monospace text style, and the teal, sharp, and dense themes
-pureform.glue.ts     the options `pureform generate` reads: the Panda target, prefix "pf"
+pureform.codegen.ts     the options `pureform generate` reads: the Panda target, prefix "pf"
 panda.pureform.ts    compilePreset(config) → pureformPreset; re-exports PREFIX and the config
 panda.config.ts      Panda's config: the base presets, pureformPreset, every variant as staticCss
 src/styles.css       the stylesheet root: Panda's layer declaration, which Panda's Vite plugin fills
@@ -40,12 +40,12 @@ it loads) and then `panda codegen`. The suites' `test:e2e` tasks depend on it (`
 their cache keys include the fixture's files. It has no tests or build of its own.
 
 `bun x` runs the CLI under Node, as Vite runs the bundler plugin: the preset computes a shape
-morph differently under Bun, which changes the glue's hash.
+morph differently under Bun, which changes the registry's hash.
 
 ## Worth knowing
 
 - **Changing the config changes what every suite tests**, on every target: the component suites
-  generate the CSS and Tailwind glue from this config too, and the browser tests compile every
+  generate the CSS and Tailwind registries from this config too, and the browser tests compile every
   adapter from it. Screenshots (`tests/browser-e2e-tests/src/__screenshots__/`) and the
   indication fixtures (`tests/browser-e2e-tests/src/__fixtures__/indication/`) record what it
   draws; update them only when the change is intended.

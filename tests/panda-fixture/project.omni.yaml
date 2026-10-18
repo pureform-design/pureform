@@ -25,7 +25,7 @@ cache:
         - panda.config.ts
         - panda.pureform.ts
         - pureform.config.ts
-        - pureform.glue.ts
+        - pureform.codegen.ts
         - "src/**/*.css"
 
 tasks:
@@ -33,7 +33,7 @@ tasks:
   # codegen, for Panda's codegen and the suites.
   generate:
     # `bun x` runs the bin under Node (its shebang), as Vite runs the plugin: the preset computes
-    # some values (shape morphs) differently under Bun, which changes the glue's hash.
+    # some values (shape morphs) differently under Bun, which changes the registry's hash.
     exec: bun x pureform generate
     dependencies:
       - ^build

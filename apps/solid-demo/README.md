@@ -125,7 +125,7 @@ in `vite.config.ts`) runs `@pureform/generate` with the Panda adapter's codegen
 (`@pureform/panda-adapter/codegen`, with the preset's `prefix`) over every component of the
 config when `vite dev` or `vite build` starts, before Panda's own plugin reads `panda.config.ts`,
 and again in dev when `pureform.config.ts` or a file it imports changes. Its options live in
-`pureform.glue.ts`. Don't edit the folder; change the config.
+`pureform.codegen.ts`. Don't edit the folder; change the config.
 
 Steps without Vite need the folder too: Panda's codegen (`panda.config.ts` imports
 `.pureform/panda`) and `tsc`. Through omni, `prepare` runs the `generate` task
@@ -133,7 +133,7 @@ Steps without Vite need the folder too: Panda's codegen (`panda.config.ts` impor
 `panda codegen`; by hand, `bun x pureform generate` (`--watch` to keep it current,
 `--check` to compare without writing). The command runs under Node, as Vite does (`bun x` follows
 the bin's shebang): the preset computes a shape morph differently under Bun, which changes the
-glue's hash.
+registry's hash.
 
 | File            | What it is                                                                                                                |
 | --------------- | ------------------------------------------------------------------------------------------------------------------------- |
@@ -147,8 +147,8 @@ glue's hash.
 **Builds prune** (the plugin's default, design doc §7): before generating, the plugin scans the
 app's source for the components it imports and the variant values it writes, and the build keeps
 only those: 24 of the config's 33 components, and a client stylesheet of 270 kB (24 kB gzipped)
-instead of 1258 kB (139 kB). A pruned build writes the pruned glue to `.pureform/` in place; the
-next dev server or `pureform generate` writes the full glue back. A component the scan can't see
+instead of 1258 kB (139 kB). A pruned build writes the pruned registry to `.pureform/` in place; the
+next dev server or `pureform generate` writes the full registry back. A component the scan can't see
 (one drawn from a package under `node_modules`, or a registry entry looked up by a computed name)
 goes in the plugin's `prune.keep`.
 

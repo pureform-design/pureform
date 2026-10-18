@@ -28,7 +28,7 @@ cache:
         - panda.config.ts
         - panda.pureform.ts
         - pureform.config.ts
-        - pureform.glue.ts
+        - pureform.codegen.ts
         - vite.config.ts
 
 tasks:
@@ -49,7 +49,7 @@ tasks:
         files:
           append:
             - "./vitest-e2e-server.ts"
-    # Panda's codegen, which the pages import, after the glue.
+    # Panda's codegen, which the pages import, after the registry.
     dependencies:
       append:
         - prepare
@@ -58,7 +58,7 @@ tasks:
   # codegen, for Panda's codegen and `tsc`; `vite dev` and `vite build` write it themselves.
   generate:
     # `bun x` runs the bin under Node (its shebang), as Vite runs the plugin: the preset computes
-    # some values (shape morphs) differently under Bun, which changes the glue's hash.
+    # some values (shape morphs) differently under Bun, which changes the registry's hash.
     exec: bun x pureform generate
     dependencies:
       - ^build

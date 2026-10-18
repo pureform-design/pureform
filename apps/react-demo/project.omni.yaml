@@ -27,7 +27,7 @@ cache:
         - panda.config.ts
         - panda.pureform.ts
         - pureform.config.ts
-        - pureform.glue.ts
+        - pureform.codegen.ts
         - vite.config.ts
         - index.html
 
@@ -38,10 +38,10 @@ tasks:
   test:integration:
     enabled: false
 
-  # A smoke test: the page in Chromium, from the generated glue and Panda's stylesheet.
+  # A smoke test: the page in Chromium, from the generated registry and Panda's stylesheet.
   test:e2e:
     enabled: true
-    # Panda's codegen, which the page's stylesheet and the config read, after the glue.
+    # Panda's codegen, which the page's stylesheet and the config read, after the registry.
     dependencies:
       append:
         - prepare
@@ -52,7 +52,7 @@ tasks:
   # Writes `.pureform/` (ignored) from `pureform.config.ts` with the built Panda adapter's codegen.
   generate:
     # `bun x` runs the bin under Node (its shebang), as Vite runs the plugin: the preset computes
-    # some values (shape morphs) differently under Bun, which changes the glue's hash.
+    # some values (shape morphs) differently under Bun, which changes the registry's hash.
     exec: bun x pureform generate
     dependencies:
       - ^build

@@ -4,12 +4,12 @@ import { createConfig } from "@pureform/vite-config/app";
 import react from "@vitejs/plugin-react";
 
 import packageJson from "./package.json";
-import { glue } from "./pureform.glue";
+import { codegen } from "./pureform.codegen";
 
 export default createConfig({
     package: packageJson,
     overrides: {
         // pureform writes `.pureform/` before Panda reads its config.
-        plugins: [pureform(glue), pandacss(), react()],
+        plugins: [pureform(codegen), pandacss(), react()],
     },
 });
