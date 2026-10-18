@@ -38,7 +38,6 @@ import {
     useStableSelection,
     withEngine,
 } from "./parts";
-import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
@@ -72,13 +71,16 @@ interface TabProps {
 
 function TabImpl(props: TabProps): ReactNode {
     const { item } = props;
-    const engine = useEngine();
     const indication = useSurfaceIndication(TAB_INDICATION!, {
         indication: props.indication,
         interactionSource: item.interactionSource,
         disabled: item.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<TabsPart>(
         "tabs",
         indication.select(props.selection),
         indication.states({
@@ -89,7 +91,7 @@ function TabImpl(props: TabProps): ReactNode {
     );
     const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.tab.Pressable
             {...indication.handlers}
             role="tab"
             aria-selected={props.selected}
@@ -99,33 +101,32 @@ function TabImpl(props: TabProps): ReactNode {
             testID={id("tab")}
         >
             {isPresent(item.icon) ? (
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {item.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
             ) : null}
-            <engine.Text
+            <v.label.Text
                 selectable={false}
                 style={s.label}
                 testID={id("label")}
             >
                 {item.label}
-            </engine.Text>
-            <engine.View
+            </v.label.Text>
+            <v.indicator.View
                 pointerEvents="none"
                 style={s.indicator}
                 testID={id("indicator")}
             />
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.tab.Pressable>
     );
 }
 
 const Tab = memo(withEngine(TabImpl, "Tab"));
 
 function TabsImpl(props: TabsProps): ReactNode {
-    const engine = useEngine();
     const icon = tabsHaveIcons(props.items);
     const [value, setValue] = useControllable(
         "Tabs",
@@ -139,9 +140,12 @@ function TabsImpl(props: TabsProps): ReactNode {
     const pick = useStableCallback((next: string) => {
         if (next !== value) setValue(next);
     });
-    const { styles: s } = useComponentSlots("tabs", selection);
+    const { styles: s, views: v } = useComponentSlots<TabsPart>(
+        "tabs",
+        selection,
+    );
     return (
-        <engine.View
+        <v.root.View
             role="tablist"
             {...(props["aria-label"] === undefined
                 ? {}
@@ -160,7 +164,7 @@ function TabsImpl(props: TabsProps): ReactNode {
                     onPick={pick}
                 />
             ))}
-        </engine.View>
+        </v.root.View>
     );
 }
 
@@ -203,14 +207,17 @@ interface DestinationProps {
 
 function DestinationImpl(props: DestinationProps): ReactNode {
     const { name, item } = props;
-    const engine = useEngine();
     const disabled = item.disabled === true || props.disabled;
     const indication = useSurfaceIndication(ANATOMIES[name].indication![0]!, {
         indication: props.indication,
         interactionSource: item.interactionSource,
         disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<NavigationPart>(
         name,
         indication.select(props.selection),
         indication.states({
@@ -226,7 +233,7 @@ function DestinationImpl(props: DestinationProps): ReactNode {
             props.testId,
         );
     return (
-        <engine.Pressable
+        <v.item.Pressable
             {...indication.handlers}
             role="link"
             aria-current={props.selected ? "page" : undefined}
@@ -235,27 +242,27 @@ function DestinationImpl(props: DestinationProps): ReactNode {
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
         >
-            <engine.View style={s.indicator} testID={id("indicator")}>
-                <engine.View
+            <v.indicator.View style={s.indicator} testID={id("indicator")}>
+                <v.activeIndicator.View
                     pointerEvents="none"
                     style={s.activeIndicator}
                     testID={id("activeIndicator")}
                 />
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {item.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
                 {indication.layer(selected)}
-            </engine.View>
-            <engine.Text
+            </v.indicator.View>
+            <v.label.Text
                 selectable={false}
                 style={s.label}
                 testID={id("label")}
             >
                 {item.label}
-            </engine.Text>
-        </engine.Pressable>
+            </v.label.Text>
+        </v.item.Pressable>
     );
 }
 
@@ -264,7 +271,6 @@ const Destination = memo(withEngine(DestinationImpl, "NavigationDestination"));
 function NavigationImpl<C extends NavigationComponent>(
     props: NavigationProps<C> & { readonly name: C },
 ): ReactNode {
-    const engine = useEngine();
     const [value, setValue] = useControllable(
         props.name,
         "value",
@@ -281,9 +287,12 @@ function NavigationImpl<C extends NavigationComponent>(
     const pick = useStableCallback((next: string) => {
         if (next !== value) setValue(next);
     });
-    const { styles: s } = useComponentSlots(props.name, selection);
+    const { styles: s, views: v } = useComponentSlots<NavigationPart>(
+        props.name,
+        selection,
+    );
     return (
-        <engine.View
+        <v.root.View
             role="navigation"
             {...(props["aria-label"] === undefined
                 ? {}
@@ -308,7 +317,7 @@ function NavigationImpl<C extends NavigationComponent>(
                     onPick={pick}
                 />
             ))}
-        </engine.View>
+        </v.root.View>
     );
 }
 

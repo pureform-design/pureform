@@ -34,7 +34,11 @@ export interface DialogProps extends Omit<DialogVariantProps, "icon"> {
 
 function DialogImpl(props: DialogProps): ReactNode {
     const engine = useEngine();
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<Part>(
         "dialog",
         dialogSelection({ ...props, icon: isPresent(props.icon) }),
         props.mirrorIcon ? { mirrored: true } : {},
@@ -42,8 +46,10 @@ function DialogImpl(props: DialogProps): ReactNode {
     const presence = useOverlayPresence(props.open, "dialog");
     const id = (part: Part) => testIdOf(dialogAnatomy, part, props.testId);
     if (!presence.present) return null;
+    // The engine's view where it enters and leaves, the slot's own while it's still.
+    const Root = props.open === undefined ? v.root : engine;
     return (
-        <engine.View
+        <Root.View
             {...presence.props}
             role="dialog"
             {...(typeof props.headline === "string"
@@ -53,26 +59,26 @@ function DialogImpl(props: DialogProps): ReactNode {
             testID={id("root")}
         >
             {isPresent(props.icon) ? (
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
             ) : null}
             {isPresent(props.headline) ? (
-                <engine.Text style={s.headline} testID={id("headline")}>
+                <v.headline.Text style={s.headline} testID={id("headline")}>
                     {props.headline}
-                </engine.Text>
+                </v.headline.Text>
             ) : null}
-            <engine.Text style={s.body} testID={id("body")}>
+            <v.body.Text style={s.body} testID={id("body")}>
                 {props.children}
-            </engine.Text>
+            </v.body.Text>
             {isPresent(props.actions) ? (
-                <engine.View style={s.actions} testID={id("actions")}>
+                <v.actions.View style={s.actions} testID={id("actions")}>
                     {props.actions}
-                </engine.View>
+                </v.actions.View>
             ) : null}
-        </engine.View>
+        </Root.View>
     );
 }
 

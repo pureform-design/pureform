@@ -27,7 +27,6 @@ import {
     useStableSelection,
     withEngine,
 } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = radioAnatomy.indication!;
@@ -56,7 +55,6 @@ export interface RadioProps extends RadioVariantProps, InteractiveProps {
 }
 
 function RadioImpl(props: RadioProps): ReactNode {
-    const engine = useEngine();
     const group = useContext(RadioGroupContext);
     const checked =
         group && props.value !== undefined
@@ -69,7 +67,11 @@ function RadioImpl(props: RadioProps): ReactNode {
         interactionSource: props.interactionSource,
         disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<RadioPart>(
         "radio",
         indication.select(radioSelection(group ?? {}, props)),
         indication.states({
@@ -80,7 +82,7 @@ function RadioImpl(props: RadioProps): ReactNode {
     );
     const id = (part: RadioPart) => testIdOf(radioAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="radio"
             aria-checked={checked}
@@ -95,16 +97,16 @@ function RadioImpl(props: RadioProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
-            <engine.View style={s.ring} testID={id("ring")}>
-                <engine.View style={s.dot} testID={id("dot")} />
-            </engine.View>
+            <v.ring.View style={s.ring} testID={id("ring")}>
+                <v.dot.View style={s.dot} testID={id("dot")} />
+            </v.ring.View>
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

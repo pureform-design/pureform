@@ -14,7 +14,6 @@ import type { ReactNode } from "react";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = switchControlAnatomy.indication!;
@@ -37,7 +36,6 @@ export interface SwitchProps extends SwitchVariantProps, InteractiveProps {
 }
 
 function SwitchImpl(props: SwitchProps): ReactNode {
-    const engine = useEngine();
     const [checked, setChecked] = useControllable(
         "Switch",
         "checked",
@@ -51,7 +49,11 @@ function SwitchImpl(props: SwitchProps): ReactNode {
         interactionSource: props.interactionSource,
         disabled: props.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<SwitchPart>(
         "switchControl",
         indication.select(switchSelection(props)),
         indication.states({
@@ -64,7 +66,7 @@ function SwitchImpl(props: SwitchProps): ReactNode {
     const id = (part: SwitchPart) =>
         testIdOf(switchControlAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="switch"
             aria-checked={checked}
@@ -78,26 +80,29 @@ function SwitchImpl(props: SwitchProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
-            <engine.View style={s.track} testID={id("track")}>
-                <engine.View style={s.stateLayer} testID={id("stateLayer")}>
+            <v.track.View style={s.track} testID={id("track")}>
+                <v.stateLayer.View
+                    style={s.stateLayer}
+                    testID={id("stateLayer")}
+                >
                     {indication.layer(selected)}
-                </engine.View>
-                <engine.View style={s.handle} testID={id("handle")}>
-                    <engine.Text
+                </v.stateLayer.View>
+                <v.handle.View style={s.handle} testID={id("handle")}>
+                    <v.icon.Text
                         selectable={false}
                         style={s.icon}
                         testID={id("icon")}
                     >
                         {checked ? (props.checkedIcon ?? "✓") : ""}
-                    </engine.Text>
-                </engine.View>
-            </engine.View>
-        </engine.Pressable>
+                    </v.icon.Text>
+                </v.handle.View>
+            </v.track.View>
+        </v.root.Pressable>
     );
 }
 

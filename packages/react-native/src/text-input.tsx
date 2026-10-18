@@ -31,7 +31,6 @@ import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useControllable, withEngine } from "./parts";
-import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 /** What every text input takes. */
@@ -65,7 +64,6 @@ export interface FieldOptions extends FieldProps {
 }
 
 function FieldImpl(props: FieldOptions): ReactNode {
-    const engine = useEngine();
     const [ownFocus, setFocused] = useState(false);
     const [value, setValue] = useControllable(
         props.name,
@@ -77,24 +75,25 @@ function FieldImpl(props: FieldOptions): ReactNode {
     );
     const focused = ownFocus || (props.expanded ?? false);
     const mirrored = props.mirrorLeadingIcon || props.mirrorTrailingIcon;
-    const { styles: s, selected } = useComponentSlots(
-        props.name,
-        props.selection,
-        {
-            focus: focused,
-            focusVisible: focused,
-            filled: value !== "",
-            invalid: props.invalid ?? false,
-            disabled: props.disabled ?? false,
-            expanded: props.expanded ?? false,
-            ...(props.readOnly ? { readOnly: true } : {}),
-            ...(mirrored ? { mirrored: true } : {}),
-        },
-    );
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<FieldPart>(props.name, props.selection, {
+        focus: focused,
+        focusVisible: focused,
+        filled: value !== "",
+        invalid: props.invalid ?? false,
+        disabled: props.disabled ?? false,
+        expanded: props.expanded ?? false,
+        ...(props.readOnly ? { readOnly: true } : {}),
+        ...(mirrored ? { mirrored: true } : {}),
+    });
     const id = props.testId;
-    const icon = (part: "leadingIcon" | "trailingIcon", node: ReactNode) =>
-        isPresent(node) ? (
-            <engine.View
+    const icon = (part: "leadingIcon" | "trailingIcon", node: ReactNode) => {
+        const Slot = v[part];
+        return isPresent(node) ? (
+            <Slot.View
                 {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
                 style={s[part]}
                 testID={id(part)}
@@ -102,17 +101,18 @@ function FieldImpl(props: FieldOptions): ReactNode {
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
                     {node}
                 </IconSlot>
-            </engine.View>
+            </Slot.View>
         ) : null;
+    };
     return (
-        <engine.View style={s.root} testID={id("root")}>
-            <engine.View
+        <v.root.View style={s.root} testID={id("root")}>
+            <v.container.View
                 ref={props.container as never}
                 style={s.container}
                 testID={id("container")}
             >
                 {icon("leadingIcon", props.leadingIcon)}
-                <engine.TextInput
+                <v.input.TextInput
                     {...props.inputProps}
                     value={value}
                     onChangeText={setValue}
@@ -130,25 +130,25 @@ function FieldImpl(props: FieldOptions): ReactNode {
                     style={s.input}
                     testID={id("input")}
                 />
-                <engine.Text
+                <v.label.Text
                     selectable={false}
                     pointerEvents="none"
                     style={s.label}
                     testID={id("label")}
                 >
                     {props.label}
-                </engine.Text>
+                </v.label.Text>
                 {icon("trailingIcon", props.trailingIcon)}
-            </engine.View>
+            </v.container.View>
             {isPresent(props.supportingText) ? (
-                <engine.Text
+                <v.supportingText.Text
                     style={s.supportingText}
                     testID={id("supportingText")}
                 >
                     {props.supportingText}
-                </engine.Text>
+                </v.supportingText.Text>
             ) : null}
-        </engine.View>
+        </v.root.View>
     );
 }
 

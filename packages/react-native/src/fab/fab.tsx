@@ -38,7 +38,11 @@ function FabImpl(props: FabProps): ReactNode {
         interactionSource: props.interactionSource,
         disabled: props.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<FabPart>(
         "fab",
         indication.select(
             fabSelection({
@@ -57,7 +61,7 @@ function FabImpl(props: FabProps): ReactNode {
         props["aria-label"] ??
         (typeof props.label === "string" ? props.label : undefined);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="button"
             {...(label === undefined ? {} : { "aria-label": label })}
@@ -66,32 +70,32 @@ function FabImpl(props: FabProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
-            <engine.View style={s.container} testID={id("container")}>
+            <v.container.View style={s.container} testID={id("container")}>
                 {Drawing ? (
                     <Drawing drawing={selected.drawings.container} />
                 ) : null}
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
                 {present(props.label) ? (
-                    <engine.Text
+                    <v.label.Text
                         selectable={false}
                         style={s.label}
                         testID={id("label")}
                     >
                         {props.label}
-                    </engine.Text>
+                    </v.label.Text>
                 ) : null}
                 {indication.layer(selected)}
-            </engine.View>
-        </engine.Pressable>
+            </v.container.View>
+        </v.root.Pressable>
     );
 }
 

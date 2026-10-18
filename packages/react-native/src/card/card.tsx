@@ -13,7 +13,6 @@ import type { ReactNode } from "react";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = cardAnatomy.indication!;
@@ -27,7 +26,6 @@ export interface CardProps extends CardVariantProps, InteractiveProps {
 }
 
 function CardImpl(props: CardProps): ReactNode {
-    const engine = useEngine();
     const acts = props.onPress !== undefined;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
@@ -35,7 +33,11 @@ function CardImpl(props: CardProps): ReactNode {
         disabled: props.disabled,
         interactive: acts,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<CardPart>(
         "card",
         indication.select(cardSelection(props, acts ? "button" : "div")),
         acts ? indication.states(props.disabled ? { disabled: true } : {}) : {},
@@ -43,13 +45,13 @@ function CardImpl(props: CardProps): ReactNode {
     const id = (part: CardPart) => testIdOf(cardAnatomy, part, props.testId);
     if (!acts) {
         return (
-            <engine.View style={s.root} testID={id("root")}>
+            <v.root.View style={s.root} testID={id("root")}>
                 {props.children}
-            </engine.View>
+            </v.root.View>
         );
     }
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="button"
             disabled={props.disabled}
@@ -57,14 +59,14 @@ function CardImpl(props: CardProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
             {props.children}
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

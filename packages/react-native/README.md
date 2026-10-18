@@ -107,9 +107,10 @@ import { registry } from "./.pureform";
   animation, parent, icon fill per slot), over the provider's defaults, with the direction and
   reduced motion added; the same selection returns the same frozen object.
   `useStyleFactory(name)` gives the entry's factory in the provider's environment. A lazy entry
-  suspends both until it loads. `useComponentSlots(name, selection, state)` is what components
-  use: the engine's animated styles, and the plain selection; instance tokens are named as the
-  component names them (`{ value: 40 }`) and tween.
+  suspends both until it loads. `useComponentSlots<Part>(name, selection, state)` is what
+  components use: the engine's animated styles, the plain selection, and each slot's views
+  (`views.label.Text`); instance tokens are named as the component names them (`{ value: 40 }`)
+  and tween.
 - **Layers:** `useLayer(name)` gives the theme's z-index for a stacking layer (`zIndices.<name>`:
   `menu` 200, `scrim` 300, `dialog` 400, `snackbar` 500, `tooltip` 600), with the provider's
   overrides; `undefined` for a layer the theme doesn't name. See "Overlays stack from their
@@ -160,7 +161,9 @@ import { registry } from "./.pureform";
   prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
   (`rows.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
   (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
-  the menu's own z-index can't), and presence (`presence.spec.tsx`: the motions are the preset's;
+  the menu's own z-index can't), views (`views.spec.tsx`: a list item's still slots are plain and
+  its surface the engine's, with both engines, through a change of state; a moving slot still
+  tweens; a factory without `moving` keeps every slot on the engine), and presence (`presence.spec.tsx`: the motions are the preset's;
   with each engine, the select's menu grows in and stays until it has faded out, reduced motion
   only fades, a reopened overlay enters again, the dialog and scrim, snackbar, and tooltip
   `open`). Node-side commands (`src/testing/commands.ts`) precompute the
@@ -210,7 +213,7 @@ import { registry } from "./.pureform";
     A `Modal` (as the select's menu uses) draws over everything already, and on Android a sibling
     with a higher `elevation` can still draw over it.
 
-- **Long lists:** each interactive `ListItem` takes about 0.7 to 1 ms to mount in development
+- **Long lists:** each interactive `ListItem` takes about 0.4 to 0.5 ms to mount in development
   (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
   the rows near the screen. Key rows by their value, not their index, memoize the row, and keep
   what it's given stable (`onOpen` here comes from a `useCallback` or the module), so scrolling and
@@ -247,6 +250,15 @@ import { registry } from "./.pureform";
     }
     ```
 
+- **Still slots take plain views:** a slot renders with the engine's animated views only where
+  the component's styles ever move it (a transition of a style property or a keyframe animation,
+  in any variant or state: the factory's `moving`); the rest take React Native's own `View`,
+  `Text`, `Pressable`, and `TextInput`, which mount for less. It's decided from the component, not
+  its state, so a slot never swaps views (and remounts) on screen. A list item's surface tweens
+  its background, so it stays animated; its content and lines are plain. A slot that never moves
+  doesn't tween on a scheme change either, as before. An overlay given `open` moves its root
+  with the engine's view. A `Glyph` is animated text only where its icon slot's style is
+  animated.
 - **Rows render with what changed:** the tabs', navigation's, menu's, and radio group's rows get
   only what they read, kept while the component renders with equal props (variants and tokens by
   value, callbacks through a stable function that calls the latest one). So a parent's render

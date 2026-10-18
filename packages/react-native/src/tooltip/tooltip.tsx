@@ -35,13 +35,16 @@ export interface TooltipProps extends TooltipVariantProps {
 
 function TooltipImpl(props: TooltipProps): ReactNode {
     const engine = useEngine();
-    const { styles: s, selected } = useComponentSlots(
-        "tooltip",
-        tooltipSelection(props),
-    );
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<Part>("tooltip", tooltipSelection(props));
     const presence = useOverlayPresence(props.open, "popup");
     const id = (part: Part) => testIdOf(tooltipAnatomy, part, props.testId);
     if (!presence.present) return null;
+    // The engine's view where it enters and leaves, the slot's own while it's still.
+    const Root = props.open === undefined ? v.root : engine;
     const root = {
         ...presence.props,
         role: "tooltip",
@@ -50,7 +53,7 @@ function TooltipImpl(props: TooltipProps): ReactNode {
     };
     if (!isRichTooltip(props)) {
         return (
-            <engine.View {...root}>
+            <Root.View {...root}>
                 <IconSlot
                     style={selected.styles.root}
                     iconFill={undefined}
@@ -58,25 +61,28 @@ function TooltipImpl(props: TooltipProps): ReactNode {
                 >
                     {props.supportingText}
                 </IconSlot>
-            </engine.View>
+            </Root.View>
         );
     }
     return (
-        <engine.View {...root}>
+        <Root.View {...root}>
             {isPresent(props.subhead) ? (
-                <engine.Text style={s.subhead} testID={id("subhead")}>
+                <v.subhead.Text style={s.subhead} testID={id("subhead")}>
                     {props.subhead}
-                </engine.Text>
+                </v.subhead.Text>
             ) : null}
-            <engine.Text style={s.supportingText} testID={id("supportingText")}>
+            <v.supportingText.Text
+                style={s.supportingText}
+                testID={id("supportingText")}
+            >
                 {props.supportingText}
-            </engine.Text>
+            </v.supportingText.Text>
             {isPresent(props.actions) ? (
-                <engine.View style={s.actions} testID={id("actions")}>
+                <v.actions.View style={s.actions} testID={id("actions")}>
                     {props.actions}
-                </engine.View>
+                </v.actions.View>
             ) : null}
-        </engine.View>
+        </Root.View>
     );
 }
 

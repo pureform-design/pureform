@@ -60,13 +60,16 @@ interface ItemProps {
 
 function MenuItemImpl(props: ItemProps): ReactNode {
     const { item } = props;
-    const engine = useEngine();
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: item.interactionSource,
         disabled: item.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<Part>(
         "menu",
         indication.select(props.selection),
         indication.states({
@@ -78,16 +81,18 @@ function MenuItemImpl(props: ItemProps): ReactNode {
         }),
     );
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-    const icon = (part: "itemLeading" | "itemTrailing", node: ReactNode) =>
-        isPresent(node) ? (
-            <engine.View style={s[part]} testID={id(part)}>
+    const icon = (part: "itemLeading" | "itemTrailing", node: ReactNode) => {
+        const Slot = v[part];
+        return isPresent(node) ? (
+            <Slot.View style={s[part]} testID={id(part)}>
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
                     {node}
                 </IconSlot>
-            </engine.View>
+            </Slot.View>
         ) : null;
+    };
     return (
-        <engine.Pressable
+        <v.item.Pressable
             {...indication.handlers}
             role="menuitem"
             disabled={item.disabled}
@@ -96,25 +101,25 @@ function MenuItemImpl(props: ItemProps): ReactNode {
             testID={id("item")}
         >
             {icon("itemLeading", item.leadingIcon)}
-            <engine.Text
+            <v.itemLabel.Text
                 selectable={false}
                 style={s.itemLabel}
                 testID={id("itemLabel")}
             >
                 {item.label}
-            </engine.Text>
+            </v.itemLabel.Text>
             {icon("itemTrailing", item.trailingIcon)}
             {isPresent(item.trailingText) ? (
-                <engine.Text
+                <v.itemTrailingText.Text
                     selectable={false}
                     style={s.itemTrailingText}
                     testID={id("itemTrailingText")}
                 >
                     {item.trailingText}
-                </engine.Text>
+                </v.itemTrailingText.Text>
             ) : null}
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.item.Pressable>
     );
 }
 
@@ -126,11 +131,13 @@ function MenuImpl(props: MenuProps): ReactNode {
     const select = useStableCallback((value: string) =>
         props.onSelect?.({ value }),
     );
-    const { styles: s } = useComponentSlots("menu", selection);
+    const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
     const presence = useOverlayPresence(props.open, "popup");
     if (!presence.present) return null;
+    // The engine's view where it enters and leaves, the slot's own while it's still.
+    const Root = props.open === undefined ? v.root : engine;
     return (
-        <engine.View
+        <Root.View
             {...presence.props}
             role="menu"
             {...(props["aria-label"] === undefined
@@ -150,7 +157,7 @@ function MenuImpl(props: MenuProps): ReactNode {
                     onSelect={select}
                 />
             ))}
-        </engine.View>
+        </Root.View>
     );
 }
 

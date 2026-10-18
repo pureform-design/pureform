@@ -2,20 +2,22 @@
 // props (`<MyIcon size={size} color={color} />`), since nothing inherits on React Native. Icon
 // parts provide them from their selection; React Native has no font axes, so the fill is the
 // slot's `FILL` axis that selection returns beside the style. `Glyph` draws a text glyph as an
-// icon, moving with the slot's color.
+// icon, moving with the slot's color: an animated text where the slot's style moves, plain text
+// elsewhere.
 
 import { DEFAULT_ICON_STYLE } from "@pureform/binding-core";
 import type { IconStyle } from "@pureform/binding-core";
 import type { Selected, Style } from "@pureform/rn-adapter/factory";
 import { createContext, useContext, useMemo } from "react";
-import type { ReactNode } from "react";
-import { Animated } from "react-native";
-import type { TextStyle } from "react-native";
+import type { ComponentType, ReactNode } from "react";
+import { Animated, Text } from "react-native";
 
 interface IconPart {
     readonly icon: IconStyle;
     /** The slot's text properties, animated where they move. */
     readonly text: Record<string, unknown>;
+    /** Whether any of them is animated. */
+    readonly moves: boolean;
 }
 
 const IconContext = createContext<IconPart | undefined>(undefined);
@@ -63,10 +65,17 @@ export function IconSlot(props: {
 }): ReactNode {
     const { style, iconFill, motion } = props;
     const icon = useMemo(() => iconStyleOf(style, iconFill), [style, iconFill]);
-    const value = useMemo(
-        () => ({ icon, text: ownText(motion) }),
-        [icon, motion],
-    );
+    const value = useMemo(() => {
+        const text = ownText(motion);
+        return {
+            icon,
+            text,
+            // An animated value is an object; a still one a number or a string.
+            moves: Object.values(text).some(
+                (value) => typeof value === "object" && value !== null,
+            ),
+        };
+    }, [icon, motion]);
     return (
         <IconContext value={value}>
             {typeof props.children === "string" ? (
@@ -90,15 +99,17 @@ export function useIconStyle(): IconStyle {
     return useContext(IconContext)?.icon ?? DEFAULT_ICON_STYLE;
 }
 
-/** A text glyph standing in for an icon, in its icon slot's type and color, moving with them. */
+/** A text glyph standing in for an icon, in its icon slot's type and color, moving with them. A
+ *  glyph holds no state, so it can change between animated and plain text as its slot does. */
 export function Glyph(props: { readonly glyph: string }): ReactNode {
-    const text = useContext(IconContext)?.text;
+    const part = useContext(IconContext);
+    const text = part?.text;
+    const GlyphText = (part?.moves ? Animated.Text : Text) as ComponentType<
+        Record<string, unknown>
+    >;
     return (
-        <Animated.Text
-            selectable={false}
-            style={text as Animated.WithAnimatedValue<TextStyle>}
-        >
+        <GlyphText selectable={false} style={text}>
             {props.glyph}
-        </Animated.Text>
+        </GlyphText>
     );
 }

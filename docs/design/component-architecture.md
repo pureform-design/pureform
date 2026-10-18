@@ -453,8 +453,24 @@ function useClasses(name, selection) {
   named as the component names them (`{ value: 40 }`) and tween. The provider compares
   `registry`, `defaults`, `engine`, and `indication` by identity and `overrides` by value, so an
   app keeps the former stable; an inline `defaults` renders every styled component again. A
-  mounted interactive list item costs about 0.7 to 1 ms in development, so long lists go in a
-  `FlatList` keyed by value, with memoized rows.
+  mounted interactive list item costs about 0.4 to 0.5 ms in development (0.7 to 1 ms before
+  still slots took plain views), so long lists go in a `FlatList` keyed by value, with memoized
+  rows.
+- **Built (still slots), React Native:** a slot renders with the engine's animated views only
+  where the component's styles ever move it: each factory's `moving` (`movingSlots` in
+  `rn-adapter`) names the slots with a transition of a style property or a keyframe animation in
+  any rule, whatever its variants, states, or conditions, and `useComponentSlots` gives each slot
+  its views (`views.<slot>.View`, `.Text`, `.Pressable`, `.TextInput`): the engine's for those,
+  React Native's plain ones for the rest. The decision is the component's, never its state or
+  variants, so a slot never changes views (and remounts, losing focus or a press) while it's on
+  screen. A scheme change tweens colors only through a slot's transitions, so a still slot jumped
+  before too. A `Glyph` follows its icon slot's style (animated text only where a value in it is
+  animated), since a text glyph holds no state. Animated's transitions also make their animated
+  values on a value's first change rather than at mount. Overlays given `open` render their root
+  with the engine's view, which their enter and exit need. In a 200-row list (development, React
+  Native Web, Animated), a still list item's mount went from about 0.45 to 0.3 ms and an
+  interactive one's from 0.65 to 0.45 ms; most of it was the animated values, about a quarter
+  the views.
 
 ```tsx
 // Solid
