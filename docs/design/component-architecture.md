@@ -1065,7 +1065,10 @@ already see (an item still in the collection is read from it), so nothing has to
 behaviour for items that leave the collection stays: a selected item that leaves keeps its last
 label until it's deselected, and is forgotten then. One difference: a controlled select whose owner
 turns down a change keeps its value's remembered item, where Zag's dropped it while recording the
-change it proposed.
+change it proposed. React's select also rendered twice when its value emptied or filled, in
+development and production alike: the hidden select's callback ref depended on whether the value
+was empty, so React detached and reattached the element, and the state that ref sets rendered Root
+again. The callback now reads that through a React ref and stays the same.
 
 **Built (p6b):** the text field machine is pureform's own (`@pureform/machines/text-field`),
 shared by the text field and the text area: the value with Zag's controllable semantics (its

@@ -114,7 +114,7 @@ describe("Select, ready-made", () => {
         expect(item("l").getAttribute("aria-disabled")).toBe("true");
     });
 
-    it("controlled: shows the prop's option as it changes, in one render", async () => {
+    it("controlled: shows the prop's option as it changes, and empties, in one render", async () => {
         const commits: string[] = [];
         const { Controlled, set } = controlled("m");
         withRegistry(
@@ -130,14 +130,15 @@ describe("Select, ready-made", () => {
         await settle();
         const input = byTestId<HTMLInputElement>(ids.input);
         const hidden = byTestId<HTMLSelectElement>(ids.hiddenSelect);
-        for (const next of ["s", "m", "s", "m"]) {
+        for (const next of ["s", "m", null, "s", null, "m"]) {
             commits.length = 0;
             await set(next);
             await settle();
-            const label = ITEMS.find((option) => option.value === next)!.label;
+            const label =
+                ITEMS.find((option) => option.value === next)?.label ?? "";
             expect(commits).toEqual([label]);
             expect(input.value).toBe(label);
-            expect(hidden.value).toBe(next);
+            expect(hidden.value).toBe(next ?? "");
         }
         await interact(() => userEvent.click(input));
         await frames();

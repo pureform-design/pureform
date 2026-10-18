@@ -36,6 +36,7 @@ import {
     useEffect,
     useId,
     useMemo,
+    useRef,
     useState,
 } from "react";
 
@@ -276,15 +277,18 @@ function SupportingText({ unstyled, ...props }: SelectPartProps): ReactNode {
 function HiddenSelect({ unstyled, ...props }: SelectPartProps): ReactNode {
     const { scope, api, items, setHiddenSelect } = context.use("HiddenSelect");
     // A select shows its first option until told otherwise, and Zag's machine only clears it once
-    // it starts; with no value, nothing is selected from the start, so `required` holds.
-    const empty = api.value.length === 0;
+    // it starts; with no value, nothing is selected from the start, so `required` holds. The
+    // callback reads the value through a ref: a new callback would detach and reattach the select
+    // as the value empties or fills, setting Root's state and rendering it again.
+    const empty = useRef(false);
+    empty.current = api.value.length === 0;
     const ref = useCallback(
         (element: HTMLElement | null) => {
-            if (element instanceof HTMLSelectElement && empty)
+            if (element instanceof HTMLSelectElement && empty.current)
                 element.selectedIndex = -1;
             setHiddenSelect(element as HTMLSelectElement | null);
         },
-        [empty, setHiddenSelect],
+        [setHiddenSelect],
     );
     return scope.render("hiddenSelect", {
         element: "select",
