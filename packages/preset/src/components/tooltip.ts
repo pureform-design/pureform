@@ -2,7 +2,8 @@
 // rich tooltip, a surface with a subhead, supporting text, and actions.
 //
 // Showing it on hover and focus, placing it, and linking it with `aria-describedby` are the
-// app's job.
+// app's job. It stacks at the theme's `tooltip` layer, and grows in from its anchor while Zag's
+// `data-state` is `open`.
 //
 //   <div class={root} role="tooltip" id="tip">Save to drafts</div>
 //
@@ -14,8 +15,9 @@
 
 import { typed } from "@pureform/core";
 import { column, end, flex, px, row } from "@pureform/core/ast";
-import { radius, spacing, textStyle } from "@pureform/theme";
+import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
+import { overlayMotion, POPUP_MOTION } from "./overlay";
 import { componentTokens, surface, sys } from "./shared";
 
 const pf = typed();
@@ -46,6 +48,8 @@ export const tooltip = pf.slotComponent({
     recipe: () => ({
         base: {
             root: {
+                ...overlayMotion({ ...POPUP_MOTION, fromAnchor: true }),
+                zIndex: zIndex("tooltip"),
                 display: flex,
                 flexDirection: column,
                 minHeight: ref("minHeight"),
