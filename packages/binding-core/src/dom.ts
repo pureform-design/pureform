@@ -143,25 +143,39 @@ export const syncTextInput = (
     if (input.value !== value) input.value = value;
 };
 
+// The `z-index` each positioner was given here, so a later call knows an inline one of the app's.
+const stacked = new WeakMap<HTMLElement, string>();
+
 /** Stacks an overlay's positioner at its surface's layer, as Zag's popper does for a floating
  *  one: the surface's computed `z-index` (the preset's, from the theme's stacking scale) becomes
- *  the positioner's `--z-index`, which its inline `z-index` reads. A positioner fixed over the
- *  viewport, as the dialog's, makes a stacking context of its own, so the surface's `z-index`
- *  alone would stack it nowhere. An inline `z-index` of the app's own stays. */
+ *  the positioner's. A positioner fixed over the viewport, as the dialog's, makes a stacking
+ *  context of its own, so the surface's `z-index` alone would stack it nowhere. An inline
+ *  `z-index` of the app's own stays.
+ *
+ *  It runs in the next animation frame, before it's drawn: by then the overlay's opening has
+ *  written all it writes, so reading the surface's style costs only the recalculation the frame
+ *  needs anyway, where reading it at once would force one more. Returns what cancels it. */
 export const stackPositioner = (
     positioner: HTMLElement,
     surface: HTMLElement,
-): void => {
-    const own = positioner.style.getPropertyValue("z-index");
-    if (own && own !== "var(--z-index)") return;
-    const zIndex = getComputedStyle(surface).zIndex;
+): (() => void) => {
+    const frame = requestAnimationFrame(() => stackNow(positioner, surface));
+    return () => cancelAnimationFrame(frame);
+};
+
+const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
+    const own = positioner.style.zIndex;
+    if (own && own !== stacked.get(positioner)) return;
+    const { zIndex } = getComputedStyle(surface);
     if (zIndex === "auto") {
-        positioner.style.removeProperty("--z-index");
         positioner.style.removeProperty("z-index");
+        stacked.delete(positioner);
         return;
     }
-    positioner.style.setProperty("--z-index", zIndex);
-    positioner.style.setProperty("z-index", "var(--z-index)");
+    // The `z-index` itself, not a custom property: one would be inherited, so changing it would
+    // restyle everything inside the positioner.
+    positioner.style.zIndex = zIndex;
+    stacked.set(positioner, positioner.style.zIndex);
 };
 
 export {

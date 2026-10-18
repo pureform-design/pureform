@@ -581,7 +581,8 @@ const fieldsetDisabled = useFieldsetDisabled(input); // OR it into the machine's
 - `usePresence(open, onShow?): { present: boolean; ref }`: an overlay's presence on Zag's
   presence machine: `present` while open and while the surface given to `ref` runs its exit
   animation, `false` once it ends (at once when none runs). `onShow` gets the surface each time it
-  shows (the dialog stacks its positioner there).
+  shows, and may return what undoes it (the dialog stacks its positioner there, in the next
+  frame).
 - `useIconStyle(): IconStyle`: inside an icon part, its measured `{ size, color, filled }`,
   following the component's state; elsewhere `{ size: undefined, color: "currentColor",
 filled: false }`.

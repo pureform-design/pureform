@@ -151,7 +151,7 @@ export const dialogMachineProps = (props: DialogBehaviorProps) => ({
 /** What the positioner adds to Zag's props: hidden once the dialog is gone (closed, and its exit
  *  animation over), and fixed over the viewport, centering the dialog. Normalize it with the
  *  framework's `normalizeProps` and merge it after Zag's. Once it shows, `stackPositioner` (from
- *  `/dom`) stacks it at the surface's layer. */
+ *  `/dom`) stacks it at the surface's layer, in the next frame. */
 export const dialogPositionerLayout = (present: boolean) => ({
     hidden: !present,
     style: {

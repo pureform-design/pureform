@@ -121,7 +121,8 @@ function Root(props: DialogRootProps): JSX.Element {
     let positioner: HTMLElement | undefined;
     const presence = usePresence(
         () => api().open,
-        (surface) => positioner && stackPositioner(positioner, surface),
+        (surface) =>
+            positioner ? stackPositioner(positioner, surface) : undefined,
     );
     const scope = useComponent(dialogOverlayAnatomy, {
         selection: () => dialogSelection(props),

@@ -119,9 +119,11 @@ function Root(props: DialogRootProps): ReactNode {
     });
     const api = dialog.connect(service, normalizeProps);
     const positioner = useRef<HTMLElement | null>(null);
-    const presence = usePresence(api.open, (surface) => {
-        if (positioner.current) stackPositioner(positioner.current, surface);
-    });
+    const presence = usePresence(api.open, (surface) =>
+        positioner.current
+            ? stackPositioner(positioner.current, surface)
+            : undefined,
+    );
     const scope = useComponent(dialogOverlayAnatomy, {
         selection: dialogSelection(props),
         testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
