@@ -46,6 +46,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `interaction.ts`                                                        | `useInteractionSource`, `useInteractionState`; `NativeInteraction` (Pressable's callbacks → the source), focus visibility |
 | `indication.tsx`, `indication-tokens.ts`                                | `materialIndication` (with its native ripple), `useIndication`; each component's `useSurfaceIndication` (internal)        |
 | `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
+| `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                           |
 | `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
 | `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
 | `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                     |
@@ -107,6 +108,10 @@ import { registry } from "./.pureform";
   suspends both until it loads. `useComponentSlots(name, selection, state)` is what components
   use: the engine's animated styles, and the plain selection; instance tokens are named as the
   component names them (`{ value: 40 }`) and tween.
+- **Layers:** `useLayer(name)` gives the theme's z-index for a stacking layer (`zIndices.<name>`:
+  `menu` 200, `scrim` 300, `dialog` 400, `snackbar` 500, `tooltip` 600), with the provider's
+  overrides; `undefined` for a layer the theme doesn't name. See "Overlays stack from their
+  wrapper" below.
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in
   the slot's type and color, moving with it; a string given as an icon is drawn as one.
@@ -143,7 +148,9 @@ import { registry } from "./.pureform";
   suspending on a lazy entry, instance tokens by name), the components (test ids,
   controlled and uncontrolled state, the select's menu, icon fills, engines), and indication
   (`indication.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
-  prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface). Node-side
+  prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), and layers
+  (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
+  the menu's own z-index can't). Node-side
   commands (`src/testing/commands.ts`) precompute the preset's styles for a test registry.
 - `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package.
 
@@ -154,6 +161,68 @@ import { registry } from "./.pureform";
 - **Overlays are surfaces:** the menu, dialog, snackbar, and tooltip render their surface; when
   and where they show (a `Modal`, a timer) is the app's. The select is the exception: it opens
   its menu in a `Modal` under the field.
+- **Overlays stack from their wrapper:** React Native's `zIndex` only orders a view among its
+  siblings, and React Native Web gives every `View` `position: relative` and `z-index: 0`, so the
+  layer a surface takes in its own style (the menu's 200, the dialog's 400) never lifts it out of
+  the view it sits in. Put the layer on the overlay's outermost wrapper, the view that's a sibling
+  of what it covers:
+
+    ```tsx
+    function Popup(props: { children: ReactNode }) {
+        const zIndex = useLayer("menu");
+        return (
+            <View style={{ position: "absolute", top: 48, zIndex }}>
+                {props.children}
+            </View>
+        );
+    }
+    ```
+
+    A `Modal` (as the select's menu uses) draws over everything already, and on Android a sibling
+    with a higher `elevation` can still draw over it.
+
+- **Long lists:** each interactive `ListItem` takes about 0.7 to 1 ms to mount in development
+  (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
+  the rows near the screen. Key rows by their value, not their index, memoize the row, and keep
+  what it's given stable (`onOpen` here comes from a `useCallback` or the module), so scrolling and
+  a parent's render don't render every row again:
+
+    ```tsx
+    const Row = memo(function Row(props: {
+        mail: Mail;
+        onOpen: (id: string) => void;
+    }) {
+        const { mail, onOpen } = props;
+        return (
+            <ListItem
+                headline={mail.subject}
+                supportingText={mail.from}
+                onPress={() => onOpen(mail.id)}
+            />
+        );
+    });
+
+    function Inbox(props: {
+        mails: readonly Mail[];
+        onOpen: (id: string) => void;
+    }) {
+        return (
+            <FlatList
+                data={props.mails}
+                keyExtractor={(mail) => mail.id}
+                renderItem={({ item }) => (
+                    <Row mail={item} onOpen={props.onOpen} />
+                )}
+            />
+        );
+    }
+    ```
+
+- **Keep the provider's props stable:** `registry`, `defaults`, `engine`, and `indication` are
+  compared by identity, so define them once (at module level, or with `useMemo`;
+  `materialIndication(options)` already gives the same object for the same options). An inline
+  `defaults={{ … }}` makes a new provider value on every render, and every styled component under
+  it renders again. `overrides` are compared by value, so an inline object is fine.
 - **The ripple's color** is the surface's `color`, or the theme's `onSurface` for a surface that
   sets none (the controls' state layers), where the web's is `currentColor`. `"ink-sparkle"`
   draws the ink well: React Native has no sparkle.
