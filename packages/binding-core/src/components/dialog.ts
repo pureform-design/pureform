@@ -148,11 +148,12 @@ export const dialogMachineProps = (props: DialogBehaviorProps) => ({
     },
 });
 
-/** What the positioner adds to Zag's props: hidden while closed, and fixed over the viewport,
- *  centering the dialog. Normalize it with the framework's `normalizeProps` and merge it after
- *  Zag's. */
-export const dialogPositionerLayout = (open: boolean) => ({
-    hidden: !open,
+/** What the positioner adds to Zag's props: hidden once the dialog is gone (closed, and its exit
+ *  animation over), and fixed over the viewport, centering the dialog. Normalize it with the
+ *  framework's `normalizeProps` and merge it after Zag's. Once it shows, `stackPositioner` (from
+ *  `/dom`) stacks it at the surface's layer. */
+export const dialogPositionerLayout = (present: boolean) => ({
+    hidden: !present,
     style: {
         position: "fixed",
         inset: "0",
@@ -164,8 +165,9 @@ export const dialogPositionerLayout = (open: boolean) => ({
     } as const,
 });
 
-/** What the backdrop adds to Zag's props: the scrim covers the viewport rather than its
- *  container. Normalize it and merge it after Zag's. */
-export const dialogBackdropLayout = () => ({
+/** What the backdrop adds to Zag's props: hidden once the dialog is gone, and the scrim covering
+ *  the viewport rather than its container. Normalize it and merge it after Zag's. */
+export const dialogBackdropLayout = (present: boolean) => ({
+    hidden: !present,
     style: { position: "fixed" } as const,
 });

@@ -11,6 +11,7 @@ import {
     menuMachineProps,
     menuSelection,
     overlayPositionerProps,
+    presentProps,
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
@@ -30,6 +31,8 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -41,6 +44,7 @@ interface MenuContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: menu.Api<PropTypes>;
     readonly sources: ItemInteractionSources;
+    readonly presence: Presence;
 }
 
 /** What an item shares with its parts. */
@@ -99,6 +103,7 @@ function Root(props: MenuRootProps): ReactNode {
         ...open.machineProps,
     });
     const api = menu.connect(service, normalizeProps);
+    const presence = usePresence(api.open);
     const scope = useComponent(menuOverlayAnatomy, {
         selection: menuSelection(props),
         testId: props.testId,
@@ -107,7 +112,7 @@ function Root(props: MenuRootProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, MENU_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, sources }}>
+        <context.Provider value={{ scope, api, sources, presence }}>
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
@@ -125,24 +130,29 @@ function Trigger({ unstyled, as, ...props }: MenuTriggerProps): ReactNode {
     });
 }
 
-/** Places the menu under the trigger; hidden while it's closed. The registry doesn't style it. */
+/** Places the menu under the trigger; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
 function Positioner({ unstyled, ...props }: MenuPartProps): ReactNode {
-    const { scope, api } = context.use("Positioner");
+    const { scope, api, presence } = context.use("Positioner");
     return scope.render("positioner", {
         element: "div",
-        machine: overlayPositionerProps(api.getPositionerProps(), api.open),
+        machine: overlayPositionerProps(
+            api.getPositionerProps(),
+            presence.present,
+        ),
         unstyled,
         props,
     });
 }
 
 /** The menu's surface, which holds focus while it's open and moves through the items with the
- *  arrow keys. */
+ *  arrow keys. It stays while its exit animation runs. */
 function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
-    const { scope, api } = context.use("Content");
+    const { scope, api, presence } = context.use("Content");
     return scope.render("content", {
         element: "div",
-        machine: api.getContentProps(),
+        ref: presence.ref,
+        machine: presentProps(api.getContentProps(), presence.present),
         unstyled,
         props,
     });

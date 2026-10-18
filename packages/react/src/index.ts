@@ -46,6 +46,8 @@ export type {
 export { useReducedMotion } from "./motion";
 export { createPartContext } from "./part-context";
 export type { PartContext } from "./part-context";
+export { usePresence } from "./presence";
+export type { Presence } from "./presence";
 export {
     mergeRefs,
     slotPartProps,

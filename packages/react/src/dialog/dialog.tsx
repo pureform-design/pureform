@@ -15,6 +15,7 @@ import {
     dialogPositionerLayout,
     dialogSelection,
     isPresent,
+    presentProps,
 } from "@pureform/binding-core";
 import type {
     DialogContentProps,
@@ -22,10 +23,17 @@ import type {
     DialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import { stackPositioner } from "@pureform/binding-core/dom";
 import * as dialog from "@pureform/machines/dialog";
 import { mergeProps, normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import {
+    type ElementType,
+    type ReactNode,
+    type RefObject,
+    useId,
+    useRef,
+} from "react";
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
@@ -33,6 +41,8 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -45,6 +55,8 @@ interface DialogContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly backdrop: ComponentScope<BackdropAnatomy>;
     readonly api: dialog.Api<PropTypes>;
+    readonly presence: Presence;
+    readonly positioner: RefObject<HTMLElement | null>;
 }
 
 const context = createPartContext<DialogContextValue>("Dialog");
@@ -106,6 +118,10 @@ function Root(props: DialogRootProps): ReactNode {
         ...open.machineProps,
     });
     const api = dialog.connect(service, normalizeProps);
+    const positioner = useRef<HTMLElement | null>(null);
+    const presence = usePresence(api.open, (surface) => {
+        if (positioner.current) stackPositioner(positioner.current, surface);
+    });
     const scope = useComponent(dialogOverlayAnatomy, {
         selection: dialogSelection(props),
         testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
@@ -118,7 +134,9 @@ function Root(props: DialogRootProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, DIALOG_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, backdrop, api }}>
+        <context.Provider
+            value={{ scope, backdrop, api, presence, positioner }}
+        >
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
@@ -136,41 +154,44 @@ function Trigger({ unstyled, as, ...props }: DialogTriggerProps): ReactNode {
     });
 }
 
-/** Dims the page behind the dialog, drawn by the scrim; hidden while it's closed. */
+/** Dims the page behind the dialog, drawn by the scrim; hidden once it's closed and its exit
+ *  animation is over. */
 function Backdrop({ unstyled, ...props }: DialogPartProps): ReactNode {
-    const { backdrop, api } = context.use("Backdrop");
+    const { backdrop, api, presence } = context.use("Backdrop");
     return backdrop.render("root", {
         element: "div",
         machine: mergeProps(
             api.getBackdropProps(),
-            normalizeProps.element(dialogBackdropLayout()),
+            normalizeProps.element(dialogBackdropLayout(presence.present)),
         ),
         unstyled,
         props,
     });
 }
 
-/** Covers the viewport and centers the dialog; hidden while it's closed. The registry doesn't
- *  style it. */
+/** Covers the viewport and centers the dialog, stacked at its surface's layer; hidden once it's
+ *  closed and its exit animation is over. The registry doesn't style it. */
 function Positioner({ unstyled, ...props }: DialogPartProps): ReactNode {
-    const { scope, api } = context.use("Positioner");
+    const { scope, api, presence, positioner } = context.use("Positioner");
     return scope.render("positioner", {
         element: "div",
+        ref: positioner,
         machine: mergeProps(
             api.getPositionerProps(),
-            normalizeProps.element(dialogPositionerLayout(api.open)),
+            normalizeProps.element(dialogPositionerLayout(presence.present)),
         ),
         unstyled,
         props,
     });
 }
 
-/** The dialog's surface. */
+/** The dialog's surface. It stays while its exit animation runs. */
 function Content({ unstyled, ...props }: DialogPartProps): ReactNode {
-    const { scope, api } = context.use("Content");
+    const { scope, api, presence } = context.use("Content");
     return scope.render("content", {
         element: "div",
-        machine: api.getContentProps(),
+        ref: presence.ref,
+        machine: presentProps(api.getContentProps(), presence.present),
         unstyled,
         props,
     });

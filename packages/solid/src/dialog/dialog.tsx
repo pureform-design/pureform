@@ -16,6 +16,7 @@ import {
     dialogPositionerLayout,
     dialogSelection,
     isPresent,
+    presentProps,
 } from "@pureform/binding-core";
 import type {
     DialogContentProps,
@@ -23,6 +24,7 @@ import type {
     DialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
+import { stackPositioner } from "@pureform/binding-core/dom";
 import * as dialog from "@pureform/machines/dialog";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -40,6 +42,8 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -51,6 +55,8 @@ interface DialogContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly backdrop: ComponentScope<BackdropAnatomy>;
     readonly api: Accessor<dialog.Api<PropTypes>>;
+    readonly presence: Presence;
+    readonly setPositioner: (element: HTMLElement) => void;
 }
 
 const context = createPartContext<DialogContextValue>("Dialog");
@@ -112,6 +118,11 @@ function Root(props: DialogRootProps): JSX.Element {
         ...open.machineProps(),
     }));
     const api = createMemo(() => dialog.connect(service, normalizeProps));
+    let positioner: HTMLElement | undefined;
+    const presence = usePresence(
+        () => api().open,
+        (surface) => positioner && stackPositioner(positioner, surface),
+    );
     const scope = useComponent(dialogOverlayAnatomy, {
         selection: () => dialogSelection(props),
         testId: () => props.testId as TestIdOverride<keyof Anatomy["parts"]>,
@@ -123,7 +134,17 @@ function Root(props: DialogRootProps): JSX.Element {
         unstyled: () => backdropUnstyled(props.unstyled),
     });
     return (
-        <context.Provider value={{ scope, backdrop, api }}>
+        <context.Provider
+            value={{
+                scope,
+                backdrop,
+                api,
+                presence,
+                setPositioner: (element) => {
+                    positioner = element;
+                },
+            }}
+        >
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -145,43 +166,51 @@ function Trigger(props: DialogTriggerProps): JSX.Element {
     });
 }
 
-/** Dims the page behind the dialog, drawn by the scrim; hidden while it's closed. */
+/** Dims the page behind the dialog, drawn by the scrim; hidden once it's closed and its exit
+ *  animation is over. */
 function Backdrop(props: DialogPartProps): JSX.Element {
-    const { backdrop, api } = context.use("Backdrop");
+    const { backdrop, api, presence } = context.use("Backdrop");
     return backdrop.render("root", {
         element: "div",
         machine: () =>
             mergeProps(
                 api().getBackdropProps(),
-                normalizeProps.element(dialogBackdropLayout()),
+                normalizeProps.element(
+                    dialogBackdropLayout(presence.present()),
+                ),
             ),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
 }
 
-/** Covers the viewport and centers the dialog; hidden while it's closed. The registry doesn't
- *  style it. */
+/** Covers the viewport and centers the dialog, stacked at its surface's layer; hidden once it's
+ *  closed and its exit animation is over. The registry doesn't style it. */
 function Positioner(props: DialogPartProps): JSX.Element {
-    const { scope, api } = context.use("Positioner");
+    const { scope, api, presence, setPositioner } = context.use("Positioner");
     return scope.render("positioner", {
         element: "div",
+        ref: setPositioner,
         machine: () =>
             mergeProps(
                 api().getPositionerProps(),
-                normalizeProps.element(dialogPositionerLayout(api().open)),
+                normalizeProps.element(
+                    dialogPositionerLayout(presence.present()),
+                ),
             ),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
 }
 
-/** The dialog's surface. */
+/** The dialog's surface. It stays while its exit animation runs. */
 function Content(props: DialogPartProps): JSX.Element {
-    const { scope, api } = context.use("Content");
+    const { scope, api, presence } = context.use("Content");
     return scope.render("content", {
         element: "div",
-        machine: () => api().getContentProps(),
+        ref: presence.ref,
+        machine: () =>
+            presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });

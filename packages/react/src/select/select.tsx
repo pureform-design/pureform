@@ -14,6 +14,7 @@ import {
     selectMachineProps,
     selectMenuSelection,
     selectPositionerProps,
+    presentProps,
     selectSelection,
     selectSupportingTextId,
     selectValueProps,
@@ -46,6 +47,8 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -65,6 +68,7 @@ interface SelectContextValue {
     readonly errorText: string | undefined;
     readonly setHiddenSelect: (element: HTMLSelectElement | null) => void;
     readonly sources: ItemInteractionSources;
+    readonly presence: Presence;
 }
 
 /** What an option shares with its parts. */
@@ -133,6 +137,7 @@ function Root(props: SelectRootProps): ReactNode {
         ...open.machineProps,
     });
     const api = select.connect(service, normalizeProps);
+    const presence = usePresence(api.open);
     useFormReset(hidden, {
         resetsTo: value.resetsTo ?? null,
         onBeforeReset: value.beforeReset,
@@ -171,6 +176,7 @@ function Root(props: SelectRootProps): ReactNode {
                 errorText: props.error || undefined,
                 setHiddenSelect: setHidden,
                 sources,
+                presence,
             }}
         >
             {scope.render("root", {
@@ -300,23 +306,28 @@ function HiddenSelect({ unstyled, ...props }: SelectPartProps): ReactNode {
     });
 }
 
-/** Places the list under the field. The registry doesn't style it. */
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
 function Positioner({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { menu, api } = context.use("Positioner");
+    const { menu, api, presence } = context.use("Positioner");
     return menu.render("positioner", {
         element: "div",
-        machine: selectPositionerProps(api.getPositionerProps(), api.open),
+        machine: selectPositionerProps(
+            api.getPositionerProps(),
+            presence.present,
+        ),
         unstyled,
         props,
     });
 }
 
-/** The list of options, drawn as a menu. */
+/** The list of options, drawn as a menu. It stays while its exit animation runs. */
 function Content({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { menu, api } = context.use("Content");
+    const { menu, api, presence } = context.use("Content");
     return menu.render("root", {
         element: "div",
-        machine: api.getContentProps(),
+        ref: presence.ref,
+        machine: presentProps(api.getContentProps(), presence.present),
         unstyled,
         props,
     });

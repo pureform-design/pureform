@@ -43,6 +43,8 @@ export type {
 } from "@pureform/binding-core/interaction";
 export { useReducedMotion } from "./motion";
 export { createPartContext } from "./part-context";
+export { usePresence } from "./presence";
+export type { Presence } from "./presence";
 export type { PartContext } from "./part-context";
 export { slotPartProps, useComponent, useUnstyledComponent } from "./parts";
 export type {

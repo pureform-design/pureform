@@ -190,12 +190,14 @@ toZagValue(value); fromZagValue(list);   // one value or null <-> Zag's list
 selectValueProps(controllableMachineProps); selectMachineProps(props, fieldsetDisabled);
 selectSupportingTextId(props, id);
 selectInputProps(zagTriggerProps, valueText, dir); // a read-only <input>; rtl swaps the sideways arrows
-selectPositionerProps(p, open);          // hidden while closed
+selectPositionerProps(p, present);       // hidden once gone (closed, and its exit animation over)
 selectHiddenSelectProps(p);              // without aria-labelledby
 
 // Overlays: the menu, tooltip, and dialog render in place, inside an unstyled Root (no portal)
 type OverlayPlacement; interface OverlayPositioning { placement; gutter; sameWidth; strategy; flip }
-overlayPositionerProps(p, open);         // hidden while closed
+overlayPresent(open, present);           // open, or still animating out (Zag's presence)
+presentProps(p, present);                // hidden once gone, over Zag's hidden-at-close
+overlayPositionerProps(p, present);      // the same, for a positioner
 
 // Menu: Zag's menu; menuOverlayAnatomy (root, trigger, positioner, content, item, …)
 interface MenuRootOwnProps               // color, density, tokens, onSelect, closeOnSelect, loopFocus,
@@ -224,8 +226,8 @@ interface DialogRootOwnProps             // icon (the variant), tokens, modal, r
                                          // onOpenChange, testId, unstyled
 DIALOG_ROOT_PROPS; DIALOG_CONTENT_PROPS; // trigger, mirrorIcon, headline, body, actions (and icon)
 dialogSelection(props); dialogMachineProps(props);
-dialogPositionerLayout(open);            // hidden while closed; fixed over the viewport, centering
-dialogBackdropLayout();                  // the scrim fixed over the viewport
+dialogPositionerLayout(present);         // hidden once gone; fixed over the viewport, centering
+dialogBackdropLayout(present);           // hidden once gone; the scrim fixed over the viewport
 
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // tokens, duration, onAction, id, ids, open, defaultOpen,
@@ -340,6 +342,7 @@ radioInputs(group): HTMLInputElement[];        // a radio group's native radios
 syncRadioInputs(group, value);                 // the radios back to the group's value
 setRadioDefaults(group, value);                // each radio's default, written only when it differs
 syncTextInput(input, value);                   // a text input or text area back to its value
+stackPositioner(positioner, surface);          // the surface's z-index as the positioner's (the dialog's)
 
 // Runtime themes and overrides
 themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions
