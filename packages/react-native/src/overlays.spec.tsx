@@ -9,6 +9,8 @@ import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
 import { IconButton } from "./icon-button";
 import { Menu } from "./menu";
+import { useSnackbar } from "./snackbar";
+import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import { byTestId, interact, mount, outside, settle } from "./testing/render";
@@ -16,7 +18,7 @@ import { byTestId, interact, mount, outside, settle } from "./testing/render";
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    const names = ["menu", "button", "iconButton", "ripple"];
+    const names = ["menu", "button", "iconButton", "snackbar", "ripple"];
     registry = await presetRegistry(names);
 });
 
@@ -188,3 +190,117 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
     });
 });
+
+describe.each([animated, reanimated])(
+    "the snackbar queue with $name",
+    (engine) => {
+        let snackbars!: Snackbars;
+        function Grab(): ReactNode {
+            snackbars = useSnackbar();
+            return null;
+        }
+        const roots = () => [
+            ...document.querySelectorAll<HTMLElement>('[role="status"]'),
+        ];
+
+        it("shows one at a time at the bottom, each after the one before has gone", async () => {
+            await render(<Grab />, engine);
+            const closed: string[] = [];
+            await interact(() => {
+                snackbars.show({
+                    supportingText: "First",
+                    duration: 300,
+                    onOpenChange: (details) =>
+                        closed.push(`first ${details.reason}`),
+                });
+                snackbars.show({ supportingText: "Second", duration: null });
+            });
+            await settle(100);
+            expect(roots().map((root) => root.textContent)).toEqual([
+                expect.stringContaining("First"),
+            ]);
+            expect(roots()[0]!.getAttribute("aria-live")).toBe("polite");
+            // At the bottom of the host's layer, over the page.
+            expect(
+                window.innerHeight - box(roots()[0]!).bottom,
+            ).toBeGreaterThanOrEqual(16);
+            await settle(700);
+            expect(closed).toEqual(["first timeout"]);
+            expect(roots().map((root) => root.textContent)).toEqual([
+                expect.stringContaining("Second"),
+            ]);
+            await interact(() => snackbars.dismiss());
+            await settle(400);
+            expect(roots()).toEqual([]);
+        });
+
+        it("holds while the pointer is over it, and closes by its action", async () => {
+            await render(<Grab />, engine);
+            const done: string[] = [];
+            await interact(() => {
+                snackbars.show({
+                    supportingText: "Archived",
+                    action: "Undo",
+                    duration: 400,
+                    onAction: () => done.push("undo"),
+                    onOpenChange: (details) => done.push(details.reason),
+                });
+            });
+            await settle(100);
+            const text = document.querySelector<HTMLElement>(
+                '[data-testid="pf-snackbar-supporting-text"]',
+            )!;
+            await interact(() => userEvent.hover(text));
+            await settle(700);
+            expect(roots().length).toBe(1);
+            await interact(() => userEvent.unhover(text));
+            // A press on it holds it too, as a touch does.
+            const holder = roots()[0]!.parentElement!;
+            const at = box(text);
+            const point = {
+                bubbles: true,
+                button: 0,
+                buttons: 1,
+                clientX: at.left + 2,
+                clientY: at.top + 2,
+            };
+            await interact(() => {
+                holder.dispatchEvent(new MouseEvent("mousedown", point));
+            });
+            // React Native Web starts a press 50ms after the pointer goes down.
+            await settle(100);
+            await settle(700);
+            expect(roots().length).toBe(1);
+            await interact(() => {
+                document.dispatchEvent(new MouseEvent("mouseup", point));
+            });
+            await interact(() =>
+                userEvent.click(byTestId("pf-snackbar-action")),
+            );
+            expect(done).toEqual(["undo", "action"]);
+            await settle(400);
+            expect(roots()).toEqual([]);
+        });
+
+        it("keeps the provider show was called under", async () => {
+            await mount(
+                <PureformProvider registry={registry} motion="reduce">
+                    <PureformProvider
+                        overrides={{
+                            "components.snackbar.container": "#123456",
+                        }}
+                    >
+                        <Grab />
+                    </PureformProvider>
+                </PureformProvider>,
+            );
+            await interact(() => {
+                snackbars.show({ supportingText: "Teal", duration: null });
+            });
+            await settle(100);
+            expect(getComputedStyle(roots()[0]!).backgroundColor).toBe(
+                "rgb(18, 52, 86)",
+            );
+        });
+    },
+);

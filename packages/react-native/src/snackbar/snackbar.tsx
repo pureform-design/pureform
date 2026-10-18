@@ -1,5 +1,6 @@
 // The snackbar's surface: its message, an action, and a close button, each rippling when pressed.
-// When it shows, and for how long, is the app's; given `open`, it grows in and fades out.
+// `useSnackbar` (queue.tsx) shows them over the page one at a time; placed by the app instead, when
+// it shows and for how long is the app's, and given `open`, it grows in and fades out.
 
 import { snackbarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -104,6 +105,7 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
         <Root.View
             {...presence.props}
             role="status"
+            aria-live="polite"
             style={{ ...s.root, ...presence.style }}
             testID={id("root")}
         >
