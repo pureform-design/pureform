@@ -137,22 +137,39 @@ describe("stackPositioner", () => {
         return { positioner, surface };
     };
 
-    it("stacks the positioner at its surface's z-index", () => {
+    const frame = () =>
+        new Promise((resolve) => requestAnimationFrame(resolve));
+
+    it("stacks the positioner at its surface's z-index in the next frame", async () => {
         const { positioner, surface } = overlay("z-index: 400");
         stackPositioner(positioner, surface);
-        expect(positioner.style.getPropertyValue("--z-index")).toBe("400");
+        expect(positioner.style.zIndex).toBe("");
+        await frame();
+        expect(positioner.style.zIndex).toBe("400");
         expect(getComputedStyle(positioner).zIndex).toBe("400");
+        surface.style.zIndex = "500";
+        stackPositioner(positioner, surface);
+        await frame();
+        expect(positioner.style.zIndex).toBe("500");
         surface.style.zIndex = "auto";
         stackPositioner(positioner, surface);
+        await frame();
         expect(positioner.getAttribute("style") ?? "").toBe("");
     });
 
-    it("leaves an inline z-index of the app's own", () => {
+    it("leaves an inline z-index of the app's own", async () => {
         const { positioner, surface } = overlay("z-index: 400");
         positioner.style.zIndex = "7";
         stackPositioner(positioner, surface);
+        await frame();
         expect(positioner.style.zIndex).toBe("7");
-        expect(positioner.style.getPropertyValue("--z-index")).toBe("");
+    });
+
+    it("does nothing once cancelled", async () => {
+        const { positioner, surface } = overlay("z-index: 400");
+        stackPositioner(positioner, surface)();
+        await frame();
+        expect(positioner.style.zIndex).toBe("");
     });
 });
 

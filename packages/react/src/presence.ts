@@ -19,10 +19,10 @@ export interface Presence {
 }
 
 /** Whether an overlay with this `open` state is present. `onShow` runs with the surface once it
- *  shows. */
+ *  shows, and may return what undoes it, which runs as it stops showing. */
 export function usePresence(
     open: boolean,
-    onShow?: (surface: HTMLElement) => void,
+    onShow?: (surface: HTMLElement) => (() => void) | void,
 ): Presence {
     const service = useMachine(presence.machine, { present: open });
     const api = presence.connect(service, normalizeProps);
@@ -38,7 +38,7 @@ export function usePresence(
     useLayoutEffect(() => {
         if (!shown || !node.current) return;
         api.setNode(node.current);
-        show.current?.(node.current);
+        return show.current?.(node.current) ?? undefined;
     }, [shown]);
     return { present: overlayPresent(open, api.present), ref };
 }

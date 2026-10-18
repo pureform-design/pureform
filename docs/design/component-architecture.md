@@ -762,7 +762,11 @@ dialog, scrim, and snackbar roots take their layer through `zIndex(name)`. In pl
 `z-index` stacks it only inside its positioner, so the positioner takes it: Zag's popper copies the
 content's computed `z-index` into the floating positioner's `--z-index` (menu, select, tooltip),
 and `stackPositioner` in `@pureform/binding-core/dom` does the same for the dialog's fixed
-positioner once it shows. Nested overlays need no order of their own: a select's list in a dialog
+positioner once it shows, in the next animation frame. Read at once, as it was first, the surface's
+style forced a recalculation of the whole page, after Zag's dismissable layer had forced one to
+mirror the same `z-index` onto the backdrop and positioner; `@pureform/machines/dialog` turns that
+mirroring off, and the frame's read costs only the recalculation the frame does anyway (one full
+recalculation per open instead of two; about 40 to 70 ms at 4x CPU throttling in the demo). Nested overlays need no order of their own: a select's list in a dialog
 stacks inside the dialog's positioner. Without this, a later positioned sibling (a chip with its
 ripple layer) painted over an open list. An app's bars and FABs take `raised` themselves; the preset
 gives no layer to what it doesn't place.

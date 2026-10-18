@@ -342,7 +342,8 @@ radioInputs(group): HTMLInputElement[];        // a radio group's native radios
 syncRadioInputs(group, value);                 // the radios back to the group's value
 setRadioDefaults(group, value);                // each radio's default, written only when it differs
 syncTextInput(input, value);                   // a text input or text area back to its value
-stackPositioner(positioner, surface);          // the surface's z-index as the positioner's (the dialog's)
+stackPositioner(positioner, surface): () => void; // the surface's z-index as the positioner's (the
+                                               // dialog's), in the next frame; returns its cancel
 
 // Runtime themes and overrides
 themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions
