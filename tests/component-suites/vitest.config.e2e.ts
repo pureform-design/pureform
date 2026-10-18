@@ -20,7 +20,7 @@ import {
 } from "vitest/config";
 
 import { closeServers, commands } from "./src/commands";
-import { generateGlue } from "./src/targets/glue";
+import { generateRegistries } from "./src/targets/generated";
 import { TARGETS } from "./src/targets/targets";
 import type { TargetName } from "./src/targets/targets";
 import baseConfig from "./vite.config";
@@ -32,7 +32,7 @@ const targets = fileURLToPath(new URL("./src/targets/", import.meta.url));
 const fixture = fileURLToPath(new URL("../panda-fixture/", import.meta.url));
 
 // The CSS and Tailwind targets' registries and stylesheets, before any project imports them.
-await generateGlue();
+await generateRegistries();
 
 // Every project's Vite server, and each one's server-rendering server, listens for SIGTERM.
 process.setMaxListeners(32);

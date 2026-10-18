@@ -1,3 +1,3 @@
 .vitest/
-# The CSS and Tailwind targets' glue, written by vitest.config.e2e.ts on every run.
+# The CSS and Tailwind targets' generated registries, written by vitest.config.e2e.ts on every run.
 .pureform/

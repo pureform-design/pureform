@@ -11,12 +11,12 @@ It depends on `@pureform/solid`, `@pureform/react`, and a style registry and sty
 target, all from the Panda fixture's config (`tests/panda-fixture/pureform.config.ts`), so every
 component renders with its real classes and layout:
 
-- **Panda:** the fixture's own glue and Panda stylesheet (`tests/panda-fixture/.pureform`,
-  `tests/panda-fixture/src/styles.css`), written by the fixture's omni `generate` and `prepare`
-  tasks.
+- **Panda:** the fixture's own generated registry and Panda stylesheet
+  (`tests/panda-fixture/.pureform`, `tests/panda-fixture/src/styles.css`), written by the
+  fixture's omni `generate` and `prepare` tasks.
 - **CSS and Tailwind:** `.pureform/css` and `.pureform/tailwind` in this folder (ignored by git),
   which `vitest.config.e2e.ts` writes with `@pureform/generate` before the projects start
-  (`src/targets/glue.ts`), with every component of the config.
+  (`src/targets/generated.ts`), with every component of the config.
 
 Each binding's own specs (`packages/<binding>/src`) test the binding's details; these suites test
 what both must agree on, on every target.
@@ -45,9 +45,9 @@ src/*.e2e.test.ts            one suite per rule, written once, framework-free
   the target's styling plugin (Panda's over the fixture's config, Tailwind's, or none for plain
   CSS).
   So every suite file runs six times.
-- **Targets** (`src/targets/`): `targets.ts` lists them; `glue.ts` writes the CSS and Tailwind
-  glue (options `{ prefix: "pf", classPrefix: "pf" }`); each `<target>/registry.ts` re-exports a
-  registry and each `<target>/setup.ts` imports the stylesheet as an app would (the CSS adapter's
+- **Targets** (`src/targets/`): `targets.ts` lists them; `generated.ts` writes the CSS and Tailwind
+  registries (options `{ prefix: "pf", classPrefix: "pf" }`); each `<target>/registry.ts` re-exports
+  a registry and each `<target>/setup.ts` imports the stylesheet as an app would (the CSS adapter's
   reset and `styles.css`; Tailwind's `styles.css`, which imports `tailwindcss` and then the
   generated stylesheet).
 - **A scene** (`src/harness/scene.ts`) is what a suite asks for: a component's name, its props,
@@ -149,8 +149,8 @@ target-specific step. A part of the case left out skips the cases that need it.
 ## Running
 
 Through the omni MCP (or `omni run`): `test:e2e`, which first runs the Panda fixture's `prepare`
-(`pureform generate`, then Panda's codegen) and builds the adapters the CSS and Tailwind glue is
-generated with. `.env.local` at the repo root sets `CHROMIUM_PATH`. One file, one binding, one
+(`pureform generate`, then Panda's codegen) and builds the adapters the CSS and Tailwind registries
+are generated with. `.env.local` at the repo root sets `CHROMIUM_PATH`. One file, one binding, one
 target (`--project` takes globs: `'solid/*'`, `'*/tailwind'`):
 
 ```sh

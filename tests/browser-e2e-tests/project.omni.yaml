@@ -31,7 +31,7 @@ cache:
         - "../panda-fixture/panda.config.ts"
         - "../panda-fixture/panda.pureform.ts"
         - "../panda-fixture/pureform.config.ts"
-        - "../panda-fixture/pureform.glue.ts"
+        - "../panda-fixture/pureform.codegen.ts"
 
 tasks:
   test:e2e:

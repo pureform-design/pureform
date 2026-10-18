@@ -45,7 +45,7 @@ const rnStyles: BrowserCommand<[components?: string[]]> = (
     components = RN_COMPONENTS,
 ) => precompute(pureformConfig, { components, fontStack: "all" });
 
-// Each component's instance tokens by theme key, as the generated glue holds them.
+// Each component's instance tokens by theme key, as the generated registry holds them.
 const rnTokenKeys: BrowserCommand<[components: string[]]> = (
     _context,
     components,
