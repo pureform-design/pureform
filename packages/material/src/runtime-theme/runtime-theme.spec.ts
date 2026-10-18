@@ -1,7 +1,11 @@
 import { isRuntimeTheme, themeScope } from "@pureform/styling";
 import { describe, expect, it } from "vitest";
 
-import { generateSeedTheme } from "./generate";
+import {
+    clearSeedThemeCache,
+    generateSeedTheme,
+    SEED_THEME_CACHE_SIZE,
+} from "./generate";
 import { seedTheme } from "./index";
 
 describe("seedTheme", () => {
@@ -72,5 +76,45 @@ describe("generateSeedTheme", () => {
             light,
             dark,
         });
+    });
+
+    it("gives equal inputs the same frozen theme", () => {
+        clearSeedThemeCache();
+        const first = generateSeedTheme(
+            { seed: "#006A60", overrides: { primary: "#112233" } },
+            { tokenPrefix: "x" },
+        );
+        const again = generateSeedTheme(
+            { overrides: { primary: "#112233" }, seed: "#006A60" },
+            { tokenPrefix: "x" },
+        );
+        expect(again).toBe(first);
+        expect(Object.isFrozen(first)).toBe(true);
+        expect(Object.isFrozen(first.light)).toBe(true);
+        expect(Object.isFrozen(first.dark)).toBe(true);
+        expect(
+            generateSeedTheme(
+                { seed: "#006A60", overrides: { primary: "#112233" } },
+                {},
+            ),
+        ).not.toBe(first);
+    });
+
+    it("keeps the themes it generated last", () => {
+        clearSeedThemeCache();
+        const seed = (n: number) =>
+            `#0000${n.toString(16).padStart(2, "0")}` as const;
+        const oldest = generateSeedTheme({ seed: seed(0) }, {});
+        const used = generateSeedTheme({ seed: seed(1) }, {});
+        for (let n = 2; n < SEED_THEME_CACHE_SIZE; n++) {
+            generateSeedTheme({ seed: seed(n) }, {});
+        }
+        // Used again, so the oldest is the first to go.
+        expect(generateSeedTheme({ seed: seed(1) }, {})).toBe(used);
+        generateSeedTheme({ seed: seed(SEED_THEME_CACHE_SIZE) }, {});
+        expect(generateSeedTheme({ seed: seed(1) }, {})).toBe(used);
+        const regenerated = generateSeedTheme({ seed: seed(0) }, {});
+        expect(regenerated).not.toBe(oldest);
+        expect(regenerated).toEqual(oldest);
     });
 });
