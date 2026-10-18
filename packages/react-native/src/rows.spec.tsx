@@ -1,23 +1,35 @@
-import { Profiler, useId } from "react";
+import { Profiler, useId, useState } from "react";
 import type {
     ComponentProps,
     ProfilerOnRenderCallback,
     ReactNode,
 } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
-import { PureformProvider } from ".";
+import { Glyph, PureformProvider } from ".";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
+import { Menu } from "./menu";
+import { NavigationBar } from "./navigation-bar";
+import { NavigationRail } from "./navigation-rail";
 import { Radio, RadioGroup } from "./radio-group";
+import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { mount, outside } from "./testing/render";
+import { interact, mount, outside } from "./testing/render";
 
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    registry = await presetRegistry(["radio", "ripple"]);
+    registry = await presetRegistry([
+        "radio",
+        "tabs",
+        "menu",
+        "navigationBar",
+        "navigationRail",
+        "ripple",
+    ]);
 });
 
 // Every row's surface is a `Pressable`. This engine profiles each one under its test id and its
@@ -39,6 +51,11 @@ const profiled: MotionEngine = {
     Pressable: ProfiledPressable,
 };
 
+const ITEMS = [
+    { value: "mail", label: "Mail", icon: <Glyph glyph="✉" /> },
+    { value: "chat", label: "Chat", icon: <Glyph glyph="☏" /> },
+    { value: "meet", label: "Meet", icon: <Glyph glyph="☺" /> },
+];
 const TOKENS = { densityOffset: 0 };
 
 // Renders `view` for a value under a parent the test renders again: `rerender()` with the same
@@ -103,5 +120,77 @@ describe("a composite's rows", () => {
         ));
         expect(await children.rerender()).toEqual([]);
         expect(count(await children.set("b"), "pf-radio-root")).toBe(2);
+    });
+
+    it("tabs render again only those whose selection changed", async () => {
+        const tabs = await mountUnder("mail", (value) => (
+            <Tabs
+                items={ITEMS}
+                value={value}
+                onValueChange={() => {}}
+                variant="secondary"
+                tokens={{ ...TOKENS }}
+            />
+        ));
+        expect(await tabs.rerender()).toEqual([]);
+        expect(count(await tabs.set("chat"), "pf-tabs-tab")).toBe(2);
+    });
+
+    it("navigation destinations render again only those whose selection changed", async () => {
+        for (const [Navigation, item] of [
+            [NavigationBar, "pf-navigation-bar-item"],
+            [NavigationRail, "pf-navigation-rail-item"],
+        ] as const) {
+            const navigation = await mountUnder("mail", (value) => (
+                <Navigation
+                    items={ITEMS}
+                    value={value}
+                    onValueChange={() => {}}
+                    tokens={{ ...TOKENS }}
+                />
+            ));
+            expect(await navigation.rerender()).toEqual([]);
+            expect(count(await navigation.set("meet"), item)).toBe(2);
+        }
+    });
+
+    it("a menu's items render again only those whose selection changed", async () => {
+        const menu = await mountUnder("mail", (value) => (
+            <Menu
+                items={ITEMS}
+                value={value}
+                onSelect={() => {}}
+                density="-1"
+                tokens={{ ...TOKENS }}
+            />
+        ));
+        expect(await menu.rerender()).toEqual([]);
+        expect(count(await menu.set("chat"), "pf-menu-item")).toBe(2);
+    });
+
+    it("rows call the latest callback their parent gave", async () => {
+        const picked: string[] = [];
+        function Parent(): ReactNode {
+            const [round, setRound] = useState(0);
+            return (
+                <Menu
+                    items={ITEMS}
+                    onSelect={({ value }) => {
+                        picked.push(`${value}@${round}`);
+                        setRound(round + 1);
+                    }}
+                />
+            );
+        }
+        await mount(
+            <PureformProvider registry={registry} motion="reduce">
+                <Parent />
+            </PureformProvider>,
+        );
+        const items =
+            document.querySelectorAll<HTMLElement>('[role="menuitem"]');
+        await interact(() => userEvent.click(items[1]!));
+        await interact(() => userEvent.click(items[2]!));
+        expect(picked).toEqual(["chat@0", "meet@1"]);
     });
 });

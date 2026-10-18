@@ -11,11 +11,20 @@ import type {
     MenuSelectDetails,
     MenuVariantProps,
 } from "@pureform/binding-core";
+import type { Indication } from "@pureform/binding-core/indication";
+import type { Selection } from "@pureform/styling";
+import { memo } from "react";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import {
+    testIdOf,
+    unselectable,
+    useStableCallback,
+    useStableSelection,
+    withEngine,
+} from "../parts";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -34,29 +43,37 @@ export interface MenuProps extends MenuVariantProps, IndicationProps {
     readonly testId?: TestIdOverride<Part> | undefined;
 }
 
-function MenuItemImpl(props: {
-    readonly menu: MenuProps;
+// An item gets only what it reads, each stable while the menu renders with the same props, so an
+// item renders again when it or its selection changes, not with every render of the menu.
+interface ItemProps {
     readonly item: MenuItem<ReactNode>;
-}): ReactNode {
-    const { menu, item } = props;
+    readonly selection: Selection<"menu">;
+    readonly indication: Indication | undefined;
+    readonly testId: TestIdOverride<Part> | undefined;
+    readonly selected: boolean;
+    readonly onSelect: (value: string) => void;
+}
+
+function MenuItemImpl(props: ItemProps): ReactNode {
+    const { item } = props;
     const engine = useEngine();
     const indication = useSurfaceIndication(INDICATION!, {
-        indication: menu.indication,
+        indication: props.indication,
         interactionSource: item.interactionSource,
         disabled: item.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "menu",
-        indication.select(menuSelection(menu)),
+        indication.select(props.selection),
         indication.states({
-            selected: menu.value === item.value,
+            selected: props.selected,
             disabled: item.disabled ?? false,
             ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon
                 ? { mirrored: true }
                 : {}),
         }),
     );
-    const id = (part: Part) => testIdOf(menuAnatomy, part, menu.testId);
+    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
     const icon = (part: "itemLeading" | "itemTrailing", node: ReactNode) =>
         isPresent(node) ? (
             <engine.View style={s[part]} testID={id(part)}>
@@ -70,7 +87,7 @@ function MenuItemImpl(props: {
             {...indication.handlers}
             role="menuitem"
             disabled={item.disabled}
-            onPress={() => menu.onSelect?.({ value: item.value })}
+            onPress={() => props.onSelect(item.value)}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
         >
@@ -97,11 +114,15 @@ function MenuItemImpl(props: {
     );
 }
 
-const Item = withEngine(MenuItemImpl, "MenuItem");
+const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
 function MenuImpl(props: MenuProps): ReactNode {
     const engine = useEngine();
-    const { styles: s } = useComponentSlots("menu", menuSelection(props));
+    const selection = useStableSelection(menuSelection(props));
+    const select = useStableCallback((value: string) =>
+        props.onSelect?.({ value }),
+    );
+    const { styles: s } = useComponentSlots("menu", selection);
     return (
         <engine.View
             role="menu"
@@ -112,7 +133,15 @@ function MenuImpl(props: MenuProps): ReactNode {
             testID={testIdOf(menuAnatomy, "root", props.testId)}
         >
             {props.items.map((item) => (
-                <Item key={item.value} menu={props} item={item} />
+                <Item
+                    key={item.value}
+                    item={item}
+                    selection={selection}
+                    indication={props.indication}
+                    testId={props.testId}
+                    selected={props.value === item.value}
+                    onSelect={select}
+                />
             ))}
         </engine.View>
     );
