@@ -52,10 +52,12 @@ const machines = (from: string): string[] =>
     [
         "anatomy",
         "checkbox",
+        "collection",
         "core",
         "dialog",
         "dom-query",
         "menu",
+        "presence",
         "radio-group",
         "select",
         "switch",
