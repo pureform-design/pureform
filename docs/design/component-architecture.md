@@ -1012,8 +1012,8 @@ internal API so the swap is local.
   effects only, what a watch writes (a select's highlighted item, from its highlighted value)
   reached readers a flush after what it follows, which Solid's development diagnostics report as
   `EFFECT_RELAY_TEAR`. The effects remain for what changes from outside, such as a prop; a watch
-  that follows a controlled prop still writes a flush later (Zag's select keeps the items of a
-  controlled value in context, from a watch), which only a memo over the prop would avoid.
+  that follows a controlled prop still writes a flush later, so nothing a reader shows may come
+  from such a watch. The select's machine in `@pureform/machines` is built that way (below).
 - `normalizeProps` also maps Zag's React-style camelCase attributes (`tabIndex`,
   `readOnly`, `autoComplete`, …) to Solid 2's lowercase names, and keeps Zag's mapping of
   `defaultChecked`/`defaultValue` to `checked`/`value`, since Zag passes the current state
@@ -1051,6 +1051,21 @@ swapped (`withFieldsetRule`): their fieldset tracking follows the browser's rule
 group read only the closest fieldset, so hydrated in the first legend of a disabled fieldset it
 came out disabled; Zag's switch reset by sending an untrusted change, which React reported twice.
 The chip, icon button, and FAB run the button machine (the FAB with `toggle: false`).
+
+**The select's selected items are derived.** Zag's select keeps them in context
+(`selectedItemMap`), rewritten by watches on the value and the collection, and reads them from
+there (`selectedItems`, `valueAsString`, and the items `onValueChange` reports). A watch on a
+controlled value or on the items prop runs a flush after the prop changes, so in Solid every
+reader of the selected items ran twice per change (`EFFECT_RELAY_TEAR` on the demo's
+router-controlled filter), and in React the select rendered twice. pureform's select machine moves
+that record out of the context into the machine's refs: `selectedItems` is a computed over the value
+and the collection, falling back to the ref only for a selected value that's no longer in the
+collection. The same watches keep the ref, which notifies nobody; what they write is what readers
+already see (an item still in the collection is read from it), so nothing has to run again. Zag's
+behaviour for items that leave the collection stays: a selected item that leaves keeps its last
+label until it's deselected, and is forgotten then. One difference: a controlled select whose owner
+turns down a change keeps its value's remembered item, where Zag's dropped it while recording the
+change it proposed.
 
 **Built (p6b):** the text field machine is pureform's own (`@pureform/machines/text-field`),
 shared by the text field and the text area: the value with Zag's controllable semantics (its

@@ -1,6 +1,6 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
-import { screen } from "@testing-library/react";
-import type { ReactNode } from "react";
+import { act, screen } from "@testing-library/react";
+import { Profiler, type ReactNode, useState } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -40,6 +40,32 @@ const item = (value: string) =>
             `[data-testid="${menu.item}"]`,
         ),
     ].find((element) => element.dataset.value === value)!;
+
+/** A select whose value its parent holds, taking every change it asks for, and `set` to change it
+ *  from outside. */
+const controlled = (initial: string | null) => {
+    const handle = { set: (_value: string | null) => {} };
+    function Controlled(props: { items: typeof ITEMS }): ReactNode {
+        const [value, setValue] = useState(initial);
+        handle.set = setValue;
+        return (
+            <Select
+                label="Size"
+                name="size"
+                items={props.items}
+                value={value}
+                onValueChange={(details) => setValue(details.value)}
+            />
+        );
+    }
+    return {
+        Controlled,
+        set: (value: string | null): Promise<void> =>
+            act(async () => {
+                handle.set(value);
+            }),
+    };
+};
 
 describe("Select, ready-made", () => {
     it("renders the field, a hidden select, and the list drawn as a menu", async () => {
@@ -86,6 +112,71 @@ describe("Select, ready-made", () => {
         expect(input.value).toBe("Small");
         expect(byTestId(menu.root).hidden).toBe(true);
         expect(item("l").getAttribute("aria-disabled")).toBe("true");
+    });
+
+    it("controlled: shows the prop's option as it changes, in one render", async () => {
+        const commits: string[] = [];
+        const { Controlled, set } = controlled("m");
+        withRegistry(
+            <Profiler
+                id="select"
+                onRender={() =>
+                    commits.push(byTestId<HTMLInputElement>(ids.input).value)
+                }
+            >
+                <Controlled items={ITEMS} />
+            </Profiler>,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        const hidden = byTestId<HTMLSelectElement>(ids.hiddenSelect);
+        for (const next of ["s", "m", "s", "m"]) {
+            commits.length = 0;
+            await set(next);
+            await settle();
+            const label = ITEMS.find((option) => option.value === next)!.label;
+            expect(commits).toEqual([label]);
+            expect(input.value).toBe(label);
+            expect(hidden.value).toBe(next);
+        }
+        await interact(() => userEvent.click(input));
+        await frames();
+        await interact(() => userEvent.click(item("s")));
+        expect(input.value).toBe("Small");
+    });
+
+    it("follows its options' labels, and keeps a chosen option's after it leaves them", async () => {
+        const { Controlled, set } = controlled("m");
+        const items = outside(ITEMS);
+        withRegistry(
+            <items.Holder>
+                {(current) => <Controlled items={current} />}
+            </items.Holder>,
+        );
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        for (const label of ["Mid", "Medium", "Mid"]) {
+            await items.set(
+                ITEMS.map((option) =>
+                    option.value === "m" ? { ...option, label } : option,
+                ),
+            );
+            await settle();
+            expect(input.value).toBe(label);
+        }
+        await items.set(ITEMS.filter((option) => option.value !== "m"));
+        await settle();
+        expect(input.value).toBe("Mid");
+        await items.set([...ITEMS, { value: "xl", label: "Extra large" }]);
+        await settle();
+        expect(input.value).toBe("Medium");
+        await set("xl");
+        await settle();
+        expect(input.value).toBe("Extra large");
+        await interact(() => userEvent.click(input));
+        await frames();
+        await interact(() => userEvent.click(item("s")));
+        expect(input.value).toBe("Small");
     });
 
     it("controlled: asks to change, and moves only with the prop", async () => {
