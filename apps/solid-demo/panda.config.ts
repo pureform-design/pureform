@@ -30,9 +30,10 @@ export default defineConfig({
     // Where to look for your css declarations
     include: ["./src/**/*.{js,jsx,ts,tsx}", "./pages/**/*.{js,jsx,ts,tsx}"],
 
-    // The demo picks variants and themes at run time, which static extraction can't see, so
-    // `.pureform/` (generated from `pureform.config.ts`) lists every variant of every pureform
-    // recipe, and every theme.
+    // The components pick variants and the settings pick themes at run time, which static
+    // extraction can't see, so `.pureform/` (generated from `pureform.config.ts`) lists the
+    // pureform recipes' variants and every theme: all of them in dev, and in a build only those
+    // the app's source uses.
     staticCss,
 
     // Files to exclude
