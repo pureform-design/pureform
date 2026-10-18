@@ -1,5 +1,6 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
 import { createSignal } from "solid-js";
+import { attribution } from "solid-js/attribution";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -82,6 +83,30 @@ describe("Select, ready-made", () => {
         expect(input.value).toBe("Small");
         expect(byTestId(menu.root).hidden).toBe(true);
         expect(item("l").getAttribute("aria-disabled")).toBe("true");
+    });
+
+    it("keeps the highlighted option in step with the highlight, with no frame between them", async () => {
+        const warn = vi.spyOn(console, "warn");
+        const release = attribution.enable({ log: false, checks: false });
+        withRegistry(() => (
+            <Select label="Size" items={ITEMS} defaultValue="m" />
+        ));
+        await settle();
+        // Solid reports a relay once it has repeated.
+        for (const value of ["s", "m", "s"]) {
+            await userEvent.click(byTestId(ids.input));
+            await frames();
+            await userEvent.hover(item(value === "s" ? "m" : "s"));
+            await frames();
+            await userEvent.click(item(value));
+            await settle();
+        }
+        release();
+        expect(byTestId<HTMLInputElement>(ids.input).value).toBe("Small");
+        const relays = warn.mock.calls.filter(([message]) =>
+            String(message).startsWith("[EFFECT_RELAY_TEAR]"),
+        );
+        expect(relays).toEqual([]);
     });
 
     it("controlled: asks to change, and moves only with the prop", async () => {

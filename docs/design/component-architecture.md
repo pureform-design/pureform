@@ -1006,7 +1006,14 @@ internal API so the swap is local.
 - `createBindable` reads `ref.current` through a getter rather than an effect that lags
   a write, and boxes its signal's value, since Solid 2 treats a function passed to
   `createSignal` as a computation.
-- `createTrack` uses Solid 2's split `createEffect(compute, effect)`.
+- `createTrack` uses Solid 2's split `createEffect(compute, effect)`. Since then a machine's
+  watches also run right after its own writes (a sent event, a context write, its start), in
+  the same batch and reading the bindables' latest values, as Zag's vanilla adapter does. As
+  effects only, what a watch writes (a select's highlighted item, from its highlighted value)
+  reached readers a flush after what it follows, which Solid's development diagnostics report as
+  `EFFECT_RELAY_TEAR`. The effects remain for what changes from outside, such as a prop; a watch
+  that follows a controlled prop still writes a flush later (Zag's select keeps the items of a
+  controlled value in context, from a watch), which only a memo over the prop would avoid.
 - `normalizeProps` also maps Zag's React-style camelCase attributes (`tabIndex`,
   `readOnly`, `autoComplete`, …) to Solid 2's lowercase names, and keeps Zag's mapping of
   `defaultChecked`/`defaultValue` to `checked`/`value`, since Zag passes the current state

@@ -44,7 +44,7 @@ import {
 
 import { createBindable } from "./bindable";
 import { createRefs } from "./refs";
-import { createTrack } from "./track";
+import { createTracker } from "./track";
 
 /** A machine's props, each optional and allowed to be `undefined`, since a component passes
  *  its own optional props through. */
@@ -73,6 +73,9 @@ export function useMachine<T extends MachineSchema>(
             }) ?? access(userProps),
     );
     const prop: any = createProp(props);
+
+    let status = MachineStatus.NotStarted;
+    const tracker = createTracker(() => status === MachineStatus.Stopped);
 
     // A machine reads its props once while it sets up its context (Zag's select finds the items
     // of its initial value), which isn't a dependency.
@@ -104,7 +107,7 @@ export function useMachine<T extends MachineSchema>(
             return context?.[key].get();
         },
         set(key, value) {
-            context?.[key].set(value);
+            tracker.run(() => context?.[key].set(value));
         },
         initial(key) {
             return context?.[key].initial;
@@ -155,7 +158,7 @@ export function useMachine<T extends MachineSchema>(
         send,
         action,
         guard,
-        track: createTrack,
+        track: tracker.track,
         refs,
         computed,
         flush,
@@ -264,13 +267,11 @@ export function useMachine<T extends MachineSchema>(
         },
     }));
 
-    let status = MachineStatus.NotStarted;
-
     onSettled(() => {
         const started = status === MachineStatus.Started;
         status = MachineStatus.Started;
         debug(started ? "rehydrating..." : "initializing...");
-        state.invoke(state.initial!, INIT_STATE as any);
+        tracker.run(() => state.invoke(state.initial!, INIT_STATE as any));
     });
 
     onCleanup(() => {
@@ -292,35 +293,39 @@ export function useMachine<T extends MachineSchema>(
             if (key && token && replaceTracker.isReplaced(key, token)) return;
             if (status !== MachineStatus.Started) return;
 
-            previousEvent = event;
-            event = sent;
-
-            const current = untrack(() => state.get());
-            const { transitions, source } = findTransition(
-                machine,
-                current,
-                sent.type as string,
-            );
-            const chosen = choose(transitions);
-            if (!chosen) return;
-
-            transition = chosen;
-            const target = resolveStateValue(
-                machine,
-                chosen.target ?? current,
-                source,
-            );
-            debug(
-                "transition",
-                sent.type,
-                chosen.target || current,
-                `(${chosen.actions})`,
-            );
-
-            if (target !== current) state.set(target);
-            else if (chosen.reenter) state.invoke(current, current);
-            else action(chosen.actions);
+            tracker.run(() => transitionOn(sent));
         });
+    };
+
+    const transitionOn = (sent: any) => {
+        previousEvent = event;
+        event = sent;
+
+        const current = untrack(() => state.get());
+        const { transitions, source } = findTransition(
+            machine,
+            current,
+            sent.type as string,
+        );
+        const chosen = choose(transitions);
+        if (!chosen) return;
+
+        transition = chosen;
+        const target = resolveStateValue(
+            machine,
+            chosen.target ?? current,
+            source,
+        );
+        debug(
+            "transition",
+            sent.type,
+            chosen.target || current,
+            `(${chosen.actions})`,
+        );
+
+        if (target !== current) state.set(target);
+        else if (chosen.reenter) state.invoke(current, current);
+        else action(chosen.actions);
     };
 
     machine.watch?.(getParams());
