@@ -3,6 +3,7 @@
 // Each lists the names components read and the kind of value each must hold. A provider may
 // add names beyond these, and they pass through as extra tokens.
 
+import { stack } from "@pureform/core";
 import type {
     ColorValue,
     CornerShapeKeyword,
@@ -117,6 +118,29 @@ export type MaterialDensity = keyof typeof MATERIAL_DENSITIES;
  *  and paddings would go negative, and a checkbox would shrink under its box. */
 export const MIN_DENSITY = -3;
 
+/** The stacking order, lowest first: the page (`base`); what an app places over its content,
+ *  such as app bars, navigation bars, and FABs (`raised`); menus and select lists (`menu`); the
+ *  scrim behind a modal surface (`scrim`); dialogs and modal sheets (`dialog`); snackbars
+ *  (`snackbar`); and tooltips (`tooltip`). Material draws menus, dialogs, and tooltips in
+ *  windows of their own over the app, in this order. */
+export const STACKING_ROLES = [
+    "base",
+    "raised",
+    "menu",
+    "scrim",
+    "dialog",
+    "snackbar",
+    "tooltip",
+] as const;
+
+export type StackingRole = (typeof STACKING_ROLES)[number];
+
+/** The default stacking scale: `STACKING_ROLES` in order, 100 apart from 0. */
+export const MATERIAL_STACKING = stack([...STACKING_ROLES]) as Record<
+    StackingRole,
+    NumericScalarNode
+>;
+
 export interface LayoutContract {
     spacing: Record<SpacingStep, NumericScalarNode> &
         Record<string, NumericScalarNode>;
@@ -126,6 +150,11 @@ export interface LayoutContract {
      *  added to a dense component's height, from `MIN_DENSITY` up. Default Material's `0` to
      *  `-3`. */
     densities?: Record<string, number>;
+    /** The stacking scale, as unitless z-indices by layer: what the overlays stack at, and
+     *  what an app's own layers read through `zIndex(name)`. Build it with `stack([...])` from
+     *  `@pureform/core`. Default `MATERIAL_STACKING`. */
+    zIndices?: Record<StackingRole, NumericScalarNode> &
+        Record<string, NumericScalarNode>;
 }
 
 export const STATE_ROLES = [

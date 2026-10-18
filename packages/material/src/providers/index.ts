@@ -20,6 +20,7 @@ import type {
     EasingRole,
     ElevationProvider,
     FocusIndicatorRole,
+    LayoutContract,
     LayoutProvider,
     MotionProvider,
     ShapeProvider,
@@ -153,6 +154,9 @@ export interface MaterialLayoutOptions {
     densities?: Record<string, number>;
     /** The theme's density: a step's name, or its grid units. Default `0`. */
     density?: string | number;
+    /** The stacking scale, built with `stack([...])` from `@pureform/core`: every layer of
+     *  `STACKING_ROLES`, and any of the app's own. Default `MATERIAL_STACKING`. */
+    zIndices?: LayoutContract["zIndices"];
 }
 
 /** Material's 4px spacing grid and component sizes. */
@@ -166,6 +170,9 @@ export const materialLayout = (
             ? {}
             : { densities: options.densities }),
         ...(options.density === undefined ? {} : { density: options.density }),
+        ...(options.zIndices === undefined
+            ? {}
+            : { zIndices: options.zIndices }),
     });
     return { ...provider, name: "material" };
 };

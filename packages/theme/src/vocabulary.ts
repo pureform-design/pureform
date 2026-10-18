@@ -21,6 +21,7 @@ import type {
     ShapeRole,
     SizeRole,
     SpacingStep,
+    StackingRole,
     StateRole,
 } from "./contracts/foundations";
 import type { BaseFontRole, BaseTextStyle } from "./contracts/typography";
@@ -36,7 +37,7 @@ type ElevationUtility = Omit<StaticUtilityDef, "values"> & {
 };
 
 /** The names in a theme's config, by tier: its color roles, radii, spacing, sizes, opacities,
- *  durations, easings, fonts, text styles (and each style's values), and the elevation
+ *  durations, easings, stacking layers, fonts, text styles (and each style's values), and the elevation
  *  utilities with their levels. */
 export interface ThemeVocabulary<
     G extends string = string,
@@ -64,6 +65,7 @@ export interface ThemeVocabulary<
     textStyles: Tokens<BaseTextStyle | TStyle, StyleMap>;
     durations: Tokens<DurationRole, NumericScalarNode>;
     easings: Tokens<EasingRole, EasingNode>;
+    zIndices: Tokens<StackingRole, NumericScalarNode>;
     utilities: {
         [ELEVATION_UTILITY]: ElevationUtility;
         [ELEVATION_FILTER_UTILITY]: ElevationUtility;

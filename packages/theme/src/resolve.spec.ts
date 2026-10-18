@@ -1,3 +1,4 @@
+import { stack } from "@pureform/core";
 import {
     alias,
     fontFamily,
@@ -22,7 +23,12 @@ import {
     label,
     providers,
 } from "./__fixtures__/theme";
-import { ELEVATION_LEVELS, SHAPE_ROLES } from "./contracts/foundations";
+import {
+    ELEVATION_LEVELS,
+    MATERIAL_STACKING,
+    SHAPE_ROLES,
+    STACKING_ROLES,
+} from "./contracts/foundations";
 import { BASE_TEXT_STYLES } from "./contracts/typography";
 import {
     colorFromTokens,
@@ -34,7 +40,7 @@ import {
     stateFromTokens,
     typographyFromTokens,
 } from "./provider";
-import { colorRole } from "./refs";
+import { colorRole, zIndex } from "./refs";
 import { ContractError, resolveTheme } from "./resolve";
 
 describe("resolveTheme", () => {
@@ -247,6 +253,45 @@ describe("resolveTheme", () => {
                 shape: providers().state as never,
             }),
         ).toThrow("provides state, not shape");
+    });
+
+    it("stacks the layers in Material's order by default", () => {
+        const { layout, config } = resolveTheme(providers());
+        expect(Object.keys(layout.zIndices)).toEqual([...STACKING_ROLES]);
+        expect(config.zIndices).toEqual(MATERIAL_STACKING);
+        const order = STACKING_ROLES.map(
+            (role) => (config.zIndices[role] as { value: number }).value,
+        );
+        expect(order).toEqual([...order].sort((a, b) => a - b));
+        expect(new Set(order).size).toBe(order.length);
+        expect(zIndex("menu")).toEqual(alias("zIndices", "menu"));
+    });
+
+    it("takes a layout's own stacking scale, and checks it", () => {
+        const theme = providers();
+        const layout = (zIndices: object) =>
+            extend(theme.layout, (generated) => ({
+                ...generated,
+                zIndices: zIndices as never,
+            }));
+        const own = stack([...STACKING_ROLES, "debug"], { base: 10, step: 10 });
+        const { config } = resolveTheme({ ...theme, layout: layout(own) });
+        expect(config.zIndices.tooltip).toEqual(unitless(70));
+        expect(config.zIndices.debug).toEqual(unitless(80));
+        expect(() =>
+            resolveTheme({
+                ...theme,
+                layout: layout({ ...own, menu: undefined }),
+            }),
+        ).toThrow('is missing stacking layer "menu"');
+        expect(() =>
+            resolveTheme({
+                ...theme,
+                layout: layout({ ...own, menu: px(4) }),
+            }),
+        ).toThrow(
+            'gives stacking layer "menu" a numeric value, not a unitless whole number',
+        );
     });
 });
 
