@@ -52,7 +52,7 @@ export interface PruneOptions {
      *  path. Default: every script under the root. */
     readonly include?: readonly string[];
     /** Folders and files to skip, relative to the root, besides `node_modules`, dot folders,
-     *  `dist`, `build`, `coverage`, `styled-system`, the glue, and test files. */
+     *  `dist`, `build`, `coverage`, `styled-system`, the generated registry, and test files. */
     readonly exclude?: readonly string[];
     /** Components to keep with every variant, whatever the scan finds: ones the app reaches in
      *  ways it can't see, such as through a package that renders them. */

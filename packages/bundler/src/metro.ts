@@ -4,8 +4,8 @@
 //
 //   // metro.config.js
 //   const { getDefaultConfig } = require("@react-native/metro-config");
-//   const { withPureformGlue } = require("@pureform/bundler/metro");
-//   module.exports = withPureformGlue(getDefaultConfig(__dirname), { options: { fontStack: "all" } });
+//   const { withPureform } = require("@pureform/bundler/metro");
+//   module.exports = withPureform(getDefaultConfig(__dirname), { options: { fontStack: "all" } });
 
 import { existsSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
@@ -14,8 +14,8 @@ import {
     DEFAULT_OUT_DIR,
     GenerateError,
     INDEX_FILE,
-    missingGlueMessage,
-    watchGlue,
+    missingOutputMessage,
+    watchGenerate,
     generate,
 } from "@pureform/generate";
 import type { CodegenAdapter, Target } from "@pureform/generate";
@@ -65,8 +65,11 @@ export interface MetroConfig {
     readonly [key: string]: unknown;
 }
 
-/** The config `withPureformGlue` returns: the one given, with pureform's `resolveRequest`. */
-export type MetroConfigWithGlue<C extends MetroConfig> = Omit<C, "resolver"> & {
+/** The config `withPureform` returns: the one given, with pureform's `resolveRequest`. */
+export type MetroConfigWithPureform<C extends MetroConfig> = Omit<
+    C,
+    "resolver"
+> & {
     readonly resolver: Omit<NonNullable<C["resolver"]>, "resolveRequest"> & {
         readonly resolveRequest: MetroResolveRequest;
     };
@@ -75,10 +78,10 @@ export type MetroConfigWithGlue<C extends MetroConfig> = Omit<C, "resolver"> & {
 /** A Metro config that generates `.pureform/` first, regenerates on changes (unless `watch`
  *  is `false`), and resolves `virtual:pureform/registry`. Fails like a build when the first
  *  generation does. */
-export const withPureformGlue = async <C extends MetroConfig>(
+export const withPureform = async <C extends MetroConfig>(
     config: C,
     options: PureformMetroOptions = {},
-): Promise<MetroConfigWithGlue<C>> => {
+): Promise<MetroConfigWithPureform<C>> => {
     const root = resolve(options.root ?? config.projectRoot ?? process.cwd());
     // Metro serves and bundles from one config, so pruning is the app's call: `prune: true` in a
     // config for release bundles.
@@ -101,7 +104,7 @@ export const withPureformGlue = async <C extends MetroConfig>(
     } else {
         let failure: unknown;
         let started = false;
-        const watcher = watchGlue(settings, {
+        const watcher = watchGenerate(settings, {
             // Metro bundling once should still end.
             unref: true,
             onResult: (result) => {
@@ -139,8 +142,8 @@ export const withPureformGlue = async <C extends MetroConfig>(
             if (!existsSync(index)) {
                 const importer = context.originModulePath;
                 throw new GenerateError(
-                    "missing-glue",
-                    missingGlueMessage(
+                    "missing-output",
+                    missingOutputMessage(
                         `${toPosix(relative(root, join(index, "..")))}/`,
                         importer
                             ? toPosix(relative(root, importer))
@@ -157,5 +160,5 @@ export const withPureformGlue = async <C extends MetroConfig>(
     return {
         ...config,
         resolver: { ...config.resolver, resolveRequest },
-    } as MetroConfigWithGlue<C>;
+    } as MetroConfigWithPureform<C>;
 };

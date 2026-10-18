@@ -33,7 +33,7 @@ export interface ScanOptions {
     /** Folders and files to skip, relative to the root, besides `node_modules`, dot folders,
      *  `dist`, `build`, `coverage`, `styled-system`, and test files. */
     readonly exclude?: readonly string[];
-    /** The glue's folder, absolute: imports into it are the registry. */
+    /** The generated registry's folder, absolute: imports into it are the registry. */
     readonly outDir: string;
 }
 
@@ -275,7 +275,8 @@ const anatomyShowsIndication = (exported: string): boolean =>
             | undefined
     )?.indication?.length ?? 0) > 0;
 
-// A file's bindings: what each local name imported from the bindings, the anatomy, or the glue is.
+// A file's bindings: what each local name imported from the bindings, the anatomy, or the generated
+// registry is.
 interface Bindings {
     readonly components: Map<string, string>; // local → subpath (named import)
     readonly componentNamespaces: Map<string, string>; // local → subpath (namespace import)
@@ -443,20 +444,23 @@ const scanFile = (
             }
             return;
         }
-        const glue = inOutDir(specifier);
-        if (glue !== undefined && node.type === "ImportExpression") {
+        const generated = inOutDir(specifier);
+        if (generated !== undefined && node.type === "ImportExpression") {
             collector.bails.push(
-                `${shown} imports the glue dynamically, whose registry the scan can't follow`,
+                `${shown} imports the generated registry dynamically, which the scan can't follow`,
             );
             return;
         }
-        if (glue !== undefined) {
+        if (generated !== undefined) {
             const module = /^(?:web|native)\/([^/.]+)(?:\.[cm]?[jt]sx?)?$/.exec(
-                glue,
+                generated,
             );
             if (module) {
                 wholeEntry(module[1]!);
-            } else if (glue === "" || /^index(?:\.[cm]?[jt]sx?)?$/.test(glue)) {
+            } else if (
+                generated === "" ||
+                /^index(?:\.[cm]?[jt]sx?)?$/.test(generated)
+            ) {
                 for (const item of specifiers) {
                     const imported =
                         item.type === "ImportSpecifier"
@@ -468,13 +472,13 @@ const scanFile = (
                         );
                     } else if (item.type === "ImportNamespaceSpecifier") {
                         collector.bails.push(
-                            `${shown} imports the glue as a namespace, whose registry the scan can't follow`,
+                            `${shown} imports the generated registry as a namespace, which the scan can't follow`,
                         );
                     }
                 }
                 if (reexport && specifiers.length === 0) {
                     collector.bails.push(
-                        `${shown} re-exports the glue, whose registry the scan can't follow`,
+                        `${shown} re-exports the generated registry, which the scan can't follow`,
                     );
                 }
             }
