@@ -56,7 +56,7 @@ describe.each(overlays)("$component", (component) => {
         const scene = mountCase(
             component,
             { ...overlay.props, defaultOpen: undefined, ...props },
-            { host, provider },
+            provider ? { host, provider } : { host },
         );
         overlay.place?.(host);
         return scene;
