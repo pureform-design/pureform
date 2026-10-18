@@ -22,8 +22,8 @@ error.
 
 Its `/codegen` subpath is the CSS target's codegen for `@pureform/generate`: it writes the
 `.pureform/` factory modules the bindings read through the style registry, with every class
-written out, and the stylesheet for those components ([below](#generated-glue-codegen)). That's
-how an app uses this target: through the bundler plugin (`@pureform/bundler`) or
+written out, and the stylesheet for those components ([below](#generated-registry-codegen)).
+That's how an app uses this target: through the bundler plugin (`@pureform/bundler`) or
 `pureform generate` ([app setup](#an-app-on-the-css-target)).
 
 ## Where it sits
@@ -56,15 +56,15 @@ Tailwind's components layer and reuses the codegen's factory modules.
 Compile at build time, so the app ships only the stylesheet and each component's factory: the
 config, theme providers, and color generation stay out of the bundle.
 
-1. Put the config in `pureform.config.ts` (default export), and the target in a glue file the
+1. Put the config in `pureform.config.ts` (default export), and the target in a codegen file the
    bundler plugin and the CLI share:
 
     ```ts
-    // pureform.glue.ts
+    // pureform.codegen.ts
     import type { PureformPluginOptions } from "@pureform/bundler";
     import type { CssCodegenOptions } from "@pureform/css-adapter/codegen";
 
-    export const glue = {
+    export const codegen = {
         target: "css",
         options: { prefix: "pf", classPrefix: "pf" },
         components: ["button", "checkbox"], // optional allow-list
@@ -78,9 +78,9 @@ config, theme providers, and color generation stay out of the bundle.
     // vite.config.ts
     import pureform from "@pureform/bundler/vite";
     import solid from "@solidjs/vite-plugin";
-    import { glue } from "./pureform.glue";
+    import { codegen } from "./pureform.codegen";
 
-    export default defineConfig({ plugins: [pureform(glue), solid()] });
+    export default defineConfig({ plugins: [pureform(codegen), solid()] });
     ```
 
     Without a bundler, `pureform generate` (from `@pureform/cli`) writes the same folder.
@@ -101,7 +101,7 @@ Named themes are scoped by `themeAttribute` (default `data-theme`): the provider
 `registry.themeAttributes(theme)`, `{ "data-theme": "teal" }`, on its element, and an app without a
 provider can set the attribute on any element. `apps/css-demo` is a working example.
 
-## Generated glue (codegen)
+## Generated registry (codegen)
 
 `@pureform/css-adapter/codegen` is what `@pureform/generate` loads for `target: "css"`; nothing
 else needs to import it. The components become `ClassFactory` modules in `.pureform/`,
@@ -280,12 +280,12 @@ requires the same computed styles. States are compared the same way, set through
 Through omni: `task_run` `build` (writes `dist/`, which `@pureform/generate` loads the
 `/codegen` subpath from) and `test:unit` on `@pureform/css-adapter`.
 
-`src/codegen.spec.ts` checks the codegen end to end: it generates the preset's glue into a temp
-app, imports its registry, and compares every factory with `componentClasses` for every
+`src/codegen.spec.ts` checks the codegen end to end: it generates the preset's registry into a
+temp app, imports its registry, and compares every factory with `componentClasses` for every
 combination of every group's values (about 50,000 selections); it also checks the stylesheet
-equals `compileCss`, that it reads every instance token's var, and that the glue type-checks
-with TypeScript's `tsc`.
+equals `compileCss`, that it reads every instance token's var, and that the registry
+type-checks with TypeScript's `tsc`.
 
 `tests/component-suites` runs the bindings' shared suites (state, forms, accessibility, keyboard,
-direction, named themes, server rendering) on this target too, over glue generated from the
-Panda fixture's config (`tests/panda-fixture`).
+direction, named themes, server rendering) on this target too, over a registry generated from
+the Panda fixture's config (`tests/panda-fixture`).

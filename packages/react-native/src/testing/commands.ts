@@ -1,5 +1,6 @@
 // Commands the browser tests run in Node: the preset's React Native styles, which the lowering
-// computes in Node, and each component's instance token keys, as the generated glue holds them.
+// computes in Node, and each component's instance token keys, as the generated registry holds
+// them.
 
 import { pureform } from "@pureform/preset";
 import { precompute } from "@pureform/rn-adapter";

@@ -1,5 +1,5 @@
-// A registry over the preset's React Native styles, as generated glue would hold it: each entry
-// a component's factory with its instance tokens' keys.
+// A registry over the preset's React Native styles, as the generated registry would hold it:
+// each entry a component's factory with its instance tokens' keys.
 
 import { nativeFactory } from "@pureform/rn-adapter/factory";
 import type { NativeFactory } from "@pureform/rn-adapter/factory";

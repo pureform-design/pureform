@@ -40,14 +40,14 @@ pureform's rule still decides them at runtime.
 An app uses the target through the bundler plugin (`@pureform/bundler`) or `pureform generate`,
 which write the stylesheet and the registry into `.pureform/`:
 
-1. `pureform.config.ts` (default export) and a glue file:
+1. `pureform.config.ts` (default export) and a codegen file:
 
     ```ts
-    // pureform.glue.ts
+    // pureform.codegen.ts
     import type { PureformPluginOptions } from "@pureform/bundler";
     import type { TailwindCodegenOptions } from "@pureform/tailwind-adapter/codegen";
 
-    export const glue = {
+    export const codegen = {
         target: "tailwind",
         options: { prefix: "pf", classPrefix: "pf" },
     } satisfies PureformPluginOptions<TailwindCodegenOptions>;
@@ -60,9 +60,9 @@ which write the stylesheet and the registry into `.pureform/`:
     // vite.config.ts
     import pureform from "@pureform/bundler/vite";
     import tailwindcss from "@tailwindcss/vite";
-    import { glue } from "./pureform.glue";
+    import { codegen } from "./pureform.codegen";
 
-    export default { plugins: [pureform(glue), tailwindcss(), solid()] };
+    export default { plugins: [pureform(codegen), tailwindcss(), solid()] };
     ```
 
 3. The app's CSS imports Tailwind, then the generated stylesheet; the provider takes the
@@ -99,7 +99,7 @@ variant name, `theme-<name>` by default).
 
 - **`web/<name>.ts`**: the CSS adapter's `ClassFactory` modules, byte for byte (its
   `componentModules`), since the Tailwind stylesheet keeps the CSS adapter's class names. See
-  [the CSS adapter's codegen](../css-adapter/README.md#generated-glue-codegen).
+  [the CSS adapter's codegen](../css-adapter/README.md#generated-registry-codegen).
 - **`styles.css`**: `compileTailwind` over the config with only those components (tokens,
   themes, variants, and keyframes stay), narrowed to the variant values a pruned build uses
   (`subsetConfig` with `context.variants`, as the CSS target does). The app imports it after Tailwind:
@@ -135,7 +135,7 @@ Through the omni MCP (or `omni run`):
 
 - `build`: Vite library build into `dist/`.
 - `test:unit`: Vitest, including builds through Tailwind's compiler. `codegen.spec.ts`
-  generates the preset's glue into a temp app and checks every selection of every component
+  generates the preset's registry into a temp app and checks every selection of every component
   against `componentClasses`, and the stylesheet against `compileTailwind`.
 
 `tests/browser-e2e-tests` checks it computes the same styles as the Panda preset, and the

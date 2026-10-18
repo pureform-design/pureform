@@ -128,12 +128,12 @@ type Factory = (
     selection: object,
 ) => Record<string, { class: string; style?: Record<string, string> }>;
 
-interface Glue {
+interface Generated {
     registry: { names: readonly string[]; entry(name: string): unknown };
 }
 
-const factoryOf = (glue: Glue, name: string): Factory =>
-    (glue.registry.entry(name) as { factory: Factory }).factory;
+const factoryOf = (generated: Generated, name: string): Factory =>
+    (generated.registry.entry(name) as { factory: Factory }).factory;
 
 // Every combination of every group's values.
 const selections = (
@@ -295,13 +295,13 @@ describe("generate with the Tailwind target", () => {
         const options = { classPrefix: "pf", prefix: "pf" } as const;
         const preset = pureform();
         let root: string;
-        let glue: Glue;
+        let generated: Generated;
         beforeAll(async () => {
             root = appRoot();
             await generateInto(root, preset, options);
-            glue = (await import(
+            generated = (await import(
                 /* @vite-ignore */ join(root, ".pureform", "index.ts")
-            )) as Glue;
+            )) as Generated;
         }, 60_000);
         const read = (path: string) =>
             readFileSync(join(root, ".pureform", path), "utf8");
@@ -310,7 +310,7 @@ describe("generate with the Tailwind target", () => {
             "registers every component, with the CSS adapter's modules",
             { timeout: 60_000 },
             async () => {
-                expect(glue.registry.names).toEqual(
+                expect(generated.registry.names).toEqual(
                     Object.keys(preset.components),
                 );
                 const css = await cssCodegen.codegen(
@@ -328,7 +328,7 @@ describe("generate with the Tailwind target", () => {
             async () => {
                 let count = 0;
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     const old = runtimeSlots(spec, options);
                     for (const selection of selections(
                         componentShape(spec).variants,
@@ -367,7 +367,7 @@ describe("generate with the Tailwind target", () => {
                 );
                 const returned = new Set<string>();
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     for (const selection of selections(
                         componentShape(spec).variants,
                     )) {
