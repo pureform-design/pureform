@@ -34,10 +34,10 @@ codegen`.
 - `.pureform/` is generated and ignored, as in the other demos: the bundler plugin
   (`@pureform/bundler/vite` in `vite.config.ts`) writes it when `vite dev` or `vite build` starts
   (builds prune it to what the page uses), and `bun x pureform generate` (`@pureform/cli`, the
-  omni `generate` task, before Panda's codegen) writes it without Vite. Both take `pureform.glue.ts`'s options: the Panda adapter's codegen for `button` and
+  omni `generate` task, before Panda's codegen) writes it without Vite. Both take `pureform.codegen.ts`'s options: the Panda adapter's codegen for `button` and
   `checkbox` only (the allow-list: the components the React binding has). The command runs under
   Node, as Vite does (`bun x` follows the bin's shebang): the preset computes a shape morph
-  differently under Bun, which changes the glue's hash. It holds `index.ts` (the registry, both
+  differently under Bun, which changes the registry's hash. It holds `index.ts` (the registry, both
   entries static),
   `web/button.ts` and `web/checkbox.ts` (the class factories over Panda's recipes),
   `registry.d.ts` (types the components' variant props from the registry; the tsconfig includes

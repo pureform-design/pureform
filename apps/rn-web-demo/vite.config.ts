@@ -12,8 +12,8 @@ import react from "@vitejs/plugin-react";
 import type { Plugin } from "vite";
 
 import packageJson from "./package.json";
+import { codegen } from "./pureform.codegen";
 import config, { BRAND_TOKENS, BRANDS, COMPONENTS } from "./pureform.config";
-import { glue } from "./pureform.glue";
 
 const require = createRequire(import.meta.url);
 
@@ -102,7 +102,7 @@ export default createConfig({
     overrides: {
         // pureform writes `.pureform/`, the registry of the components' factories, when dev or
         // build starts.
-        plugins: [pureform(glue), react(), pureformRn()],
+        plugins: [pureform(codegen), react(), pureformRn()],
         resolve: {
             // React Native libraries such as react-native-svg pick their web build by these.
             extensions: WEB_EXTENSIONS,

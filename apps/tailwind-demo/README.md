@@ -12,8 +12,8 @@ bun run dev
 ## How it's wired
 
 - `pureform.config.ts`: Material's defaults and a teal theme.
-- `pureform.glue.ts`: `{ target: "tailwind", options }`, with `prefix: "pf"` and
-  `classPrefix: "pf"`. `vite build` prunes the glue to the 7 components the page draws and the
+- `pureform.codegen.ts`: `{ target: "tailwind", options }`, with `prefix: "pf"` and
+  `classPrefix: "pf"`. `vite build` prunes the registry to the 7 components the page draws and the
   variant values it selects (the bundler's `prune`): the CSS goes from 1004 kB (129 kB gzipped)
   with every component to 386 kB (66 kB). `vite.config.ts` passes it to the
   bundler plugin, which writes `.pureform/` (ignored by git) when dev or build starts, before
@@ -32,6 +32,6 @@ bun run dev
 ## Test
 
 `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) is a smoke test: the page
-renders in Chromium from the glue the bundler plugin writes, its buttons styled by the Tailwind
+renders in Chromium from the registry the bundler plugin writes, its buttons styled by the Tailwind
 stylesheet, without an error. `build` runs it first. Set `CHROMIUM_PATH` (`.env.local`) to use a
 system Chromium.

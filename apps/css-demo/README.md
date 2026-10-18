@@ -11,9 +11,9 @@ bun run dev
 ## How it's wired
 
 ```
-pureform.config.ts ──► pureform.glue.ts { target: "css", options }
+pureform.config.ts ──► pureform.codegen.ts { target: "css", options }
                               │
-        vite.config.ts: pureform(glue) ──► .pureform/  (ignored by git)
+        vite.config.ts: pureform(codegen) ──► .pureform/  (ignored by git)
                               │              ├── web/<name>.ts   ClassFactory per component
                               │              ├── styles.css      the stylesheet, those components only
                               │              ├── index.ts        registry, themes
@@ -23,7 +23,7 @@ src/main.tsx: imports reset.css and .pureform/styles.css,
 ```
 
 - `pureform.config.ts`: Material's defaults and a teal theme.
-- `pureform.glue.ts`: the target and its options (`prefix: "pf"`, `classPrefix: "pf"`, so classes
+- `pureform.codegen.ts`: the target and its options (`prefix: "pf"`, `classPrefix: "pf"`, so classes
   read `pf-button__root`). `vite.config.ts` passes it to the bundler plugin, and
   `pureform generate` (the omni `generate` task) reads it. `vite build` prunes the registry
   and the stylesheet to the 10 components the page draws and the variant values it selects
@@ -41,6 +41,6 @@ machines, and the registry); the config, providers, and color generation stay at
 ## Test
 
 `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) is a smoke test: the page
-renders in Chromium from the glue the bundler plugin writes, its buttons styled by the generated
+renders in Chromium from the registry the bundler plugin writes, its buttons styled by the generated
 stylesheet, without an error. `build` runs it first. Set `CHROMIUM_PATH` (`.env.local`) to use a
 system Chromium.

@@ -6,12 +6,16 @@ export { describeError, runGenerate } from "./generate";
 export type { CliIO } from "./generate";
 export { gitignoreHint } from "./gitignore";
 export {
-    findGlueFile,
-    GLUE_FILES,
-    loadGlue,
-    resolveGlue,
+    findCodegenFile,
+    CODEGEN_FILES,
+    loadCodegenOptions,
+    resolveCodegenOptions,
     TARGETS,
-} from "./glue";
-export type { GenerateFlags, GlueOptions, ResolvedGlue } from "./glue";
+} from "./codegen-file";
+export type {
+    GenerateFlags,
+    CodegenFileOptions,
+    ResolvedCodegenOptions,
+} from "./codegen-file";
 export { VERSION } from "./package-version";
 export { GENERATE_USAGE, main, parseGenerateFlags, USAGE } from "./program";

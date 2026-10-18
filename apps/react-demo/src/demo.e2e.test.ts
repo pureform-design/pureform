@@ -1,5 +1,5 @@
-// A smoke test of the demo: its page renders in Chromium from its glue, styled by Panda's
-// stylesheet, without an error.
+// A smoke test of the demo: its page renders in Chromium from its generated registry, styled by
+// Panda's stylesheet, without an error.
 
 import { afterAll, beforeAll, expect, it, vi } from "vitest";
 import { page } from "vitest/browser";

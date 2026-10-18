@@ -23,7 +23,7 @@ cache:
     files:
       append:
         - pureform.config.ts
-        - pureform.glue.ts
+        - pureform.codegen.ts
         - vite.config.ts
         - index.html
         - src/**/*.css
@@ -35,7 +35,7 @@ tasks:
   test:integration:
     enabled: false
 
-  # A smoke test: the page in Chromium, from the glue the bundler plugin writes.
+  # A smoke test: the page in Chromium, from the registry the bundler plugin writes.
   test:e2e:
     enabled: true
     # The packages the bundler plugin loads, built.
@@ -51,7 +51,7 @@ tasks:
   # themselves.
   generate:
     # `bun x` runs the bin under Node (its shebang), as Vite runs the plugin: the preset computes
-    # some values (shape morphs) differently under Bun, which changes the glue's hash.
+    # some values (shape morphs) differently under Bun, which changes the registry's hash.
     exec: bun x pureform generate
     dependencies:
       - ^build

@@ -5,17 +5,17 @@ import { watch } from "node:fs";
 import type { FSWatcher } from "node:fs";
 import { basename, dirname, relative, resolve, sep } from "node:path";
 
-import { generate, isGenerateError, watchGlue } from "@pureform/generate";
+import { generate, isGenerateError, watchGenerate } from "@pureform/generate";
 import type {
     FileResult,
     GenerateResult,
-    GlueWatcher,
+    GenerateWatcher,
 } from "@pureform/generate";
 
+import { resolveCodegenOptions } from "./codegen-file";
+import type { GenerateFlags, ResolvedCodegenOptions } from "./codegen-file";
 import { CliError } from "./errors";
 import { gitignoreHint } from "./gitignore";
-import { resolveGlue } from "./glue";
-import type { GenerateFlags, ResolvedGlue } from "./glue";
 
 /** Where the command reads and writes: the process's, or a test's. */
 export interface CliIO {
@@ -109,7 +109,7 @@ const reporter = (io: CliIO) => {
 };
 
 /** Runs `pureform generate` with these flags. Resolves to the exit code: 0, or 1 when it fails
- *  or `--check` finds the glue out of date. With `--watch`, resolves when watching stops. */
+ *  or `--check` finds the output out of date. With `--watch`, resolves when watching stops. */
 export const runGenerate = async (
     flags: GenerateFlags,
     io: CliIO,
@@ -119,9 +119,9 @@ export const runGenerate = async (
         return 2;
     }
     const report = reporter(io);
-    if (flags.watch) return watchGenerate(flags, io, report);
+    if (flags.watch) return runWatch(flags, io, report);
     try {
-        const { options } = await resolveGlue(flags, io.cwd);
+        const { options } = await resolveCodegenOptions(flags, io.cwd);
         const result = await generate(options);
         if (flags.check) report.checked(result);
         else report.written(result);
@@ -132,47 +132,47 @@ export const runGenerate = async (
     }
 };
 
-const watchGenerate = async (
+const runWatch = async (
     flags: GenerateFlags,
     io: CliIO,
     report: ReturnType<typeof reporter>,
 ): Promise<number> => {
-    let resolved: ResolvedGlue;
+    let resolved: ResolvedCodegenOptions;
     try {
-        resolved = await resolveGlue(flags, io.cwd);
+        resolved = await resolveCodegenOptions(flags, io.cwd);
     } catch (error) {
         io.stderr(describeError(error));
         return 1;
     }
 
-    let glue: GlueWatcher | undefined;
-    let glueFileWatcher: FSWatcher | undefined;
+    let watcher: GenerateWatcher | undefined;
+    let codegenFileWatcher: FSWatcher | undefined;
     let reloading: ReturnType<typeof setTimeout> | undefined;
     let first = true;
 
-    const start = (options: ResolvedGlue["options"]) => {
-        glue?.close();
-        glue = watchGlue(options, {
+    const start = (options: ResolvedCodegenOptions["options"]) => {
+        watcher?.close();
+        watcher = watchGenerate(options, {
             onResult: (result) => {
                 report.written(result, !first);
                 first = false;
             },
             onError: (error) => io.stderr(describeError(error)),
         });
-        return glue.ready;
+        return watcher.ready;
     };
 
-    // The glue file isn't the config's dependency, so it's watched here: an edit starts over
+    // The codegen file isn't the config's dependency, so it's watched here: an edit starts over
     // with the new options, and a broken edit keeps the old ones.
-    const { glueFile } = resolved;
-    if (glueFile !== undefined) {
+    const codegenFile = resolved.file;
+    if (codegenFile !== undefined) {
         try {
-            glueFileWatcher = watch(dirname(glueFile), (_event, name) => {
-                if (name && basename(name.toString()) !== basename(glueFile))
+            codegenFileWatcher = watch(dirname(codegenFile), (_event, name) => {
+                if (name && basename(name.toString()) !== basename(codegenFile))
                     return;
                 clearTimeout(reloading);
                 reloading = setTimeout(() => {
-                    resolveGlue(flags, io.cwd).then(
+                    resolveCodegenOptions(flags, io.cwd).then(
                         (next) => {
                             first = true;
                             void start(next.options);
@@ -181,9 +181,9 @@ const watchGenerate = async (
                     );
                 }, 50);
             });
-            glueFileWatcher.on("error", () => undefined);
+            codegenFileWatcher.on("error", () => undefined);
         } catch {
-            // Watching the glue file is a convenience; the config is still watched.
+            // Watching the codegen file is a convenience; the config is still watched.
         }
     }
 
@@ -194,14 +194,14 @@ const watchGenerate = async (
             ? report.show(resolve(root, config))
             : "the config";
     io.stdout(
-        `pureform: watching ${configName} and the files it imports${glueFile ? `, and ${report.show(glueFile)}` : ""} (Ctrl+C to stop)`,
+        `pureform: watching ${configName} and the files it imports${codegenFile ? `, and ${report.show(codegenFile)}` : ""} (Ctrl+C to stop)`,
     );
 
     return new Promise<number>((resolveExit) => {
         const stop = () => {
             clearTimeout(reloading);
-            glueFileWatcher?.close();
-            glue?.close();
+            codegenFileWatcher?.close();
+            watcher?.close();
             process.off("SIGINT", stop);
             process.off("SIGTERM", stop);
             resolveExit(0);

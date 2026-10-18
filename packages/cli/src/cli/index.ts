@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // The `pureform` bin. Under Node on purpose, as Vite runs the bundler plugin: Bun evaluates some
-// of the preset's values differently, which would change the glue's hash.
+// of the preset's values differently, which would change the output's hash.
 
 import { main } from "../program";
 

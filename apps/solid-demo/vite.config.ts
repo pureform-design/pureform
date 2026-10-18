@@ -6,7 +6,7 @@ import { routePathFromFile } from "filesystem-routing";
 import { fileRoutes } from "filesystem-routing/vite";
 import { defineConfig } from "vitest/config";
 
-import { glue } from "./pureform.glue";
+import { codegen } from "./pureform.codegen";
 
 export default defineConfig({
     // Turnkey streaming SSR under a third-party router: no index.html and no
@@ -18,7 +18,7 @@ export default defineConfig({
         // Writes `.pureform/` (the registry and Panda's `staticCss`) from pureform.config.ts
         // when dev or build starts, before Panda reads its config, and again when the config
         // changes.
-        pureform(glue),
+        pureform(codegen),
         // Generates src/routeTree.gen.ts from src/routes; must be registered
         // before solid(). Each route's component compiles to a lazy chunk that
         // resolves at the read point during hydration (the router commits the

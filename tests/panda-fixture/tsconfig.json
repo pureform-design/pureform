@@ -15,7 +15,7 @@
     "include": [
         "src",
         "pureform.config.ts",
-        "pureform.glue.ts",
+        "pureform.codegen.ts",
         "panda.pureform.ts",
         ".pureform/**/*.*"
     ]

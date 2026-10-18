@@ -59,8 +59,8 @@ import { brands, runtime, runtimeTokens } from "virtual:pureform-rn";
 import { registry } from "../.pureform";
 import { PICTURE, Panel, SHAPES, Swatch, Tweens } from "./custom";
 
-// The same components over styles resolved at runtime, each a factory as the generated glue's
-// are.
+// The same components over styles resolved at runtime, each a factory as the generated
+// registry's are.
 const runtimeRegistry = createRegistry(
     Object.fromEntries(
         Object.entries(runtimeTokens).map(([name, tokens]) => [

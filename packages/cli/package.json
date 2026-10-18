@@ -1,7 +1,7 @@
 {
     "name": "@pureform/cli",
     "version": "0.0.0-semantically-released",
-    "description": "The pureform command: pureform generate writes the .pureform/ glue without a bundler, watches it, and checks committed glue",
+    "description": "The pureform command: pureform generate writes the generated registry to .pureform/ without a bundler, watches it, and checks a committed one",
     "bin": {
         "pureform": "./dist/pureform.mjs"
     },
