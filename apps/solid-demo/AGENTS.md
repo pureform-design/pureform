@@ -21,3 +21,13 @@ Use these whenever you are debugging reactivity (something doesn't update, updat
     - `{"method":"costs"}` — running cost tables for the open session
 
 Name your signals/memos/effects (the `{ name: "..." }` option) — attribution reports scopes by name.
+
+## This app
+
+The demo's apps, routes, settings, and styling rules are in `README.md`. In short:
+
+- Draw everything with `@pureform/solid` components; lay pages out with Panda's `css()` over the pureform preset's tokens. Never call Panda's recipe functions (`$recipes`) for pureform components: the pruning scan can't see them. A piece pureform has no component for (`src/ui/`) is styled with tokens only: no literal colors, sizes, radii, fonts, or durations.
+- Multi-part ready-made components take `class`, `style`, and `slotProps` keyed by part (`class={{ root: … }}`); single-part ones (`Text`, `Avatar`, `Separator`) take them plain.
+- Pass icons as `<Glyph name="…" />` (`src/ui/icons.tsx`), which makes its element when inserted. An element made directly in an icon prop warns about a hydration key miss, since ready-made components read the prop once to test it.
+- A `useMutation` runs as a Solid transaction: writes made while it's in flight are held until it settles. State that must change at once (the settings) is written outside mutations.
+- Adding an app: a layout route and an entry in `src/apps.ts`.

@@ -3,7 +3,8 @@
 `@pureform/react` on the Panda target: a single page with the button and checkbox in their
 variants and states (sizes, colors, icons, a toggle, a composed button, an indeterminate parent
 checkbox, and a form that submits and resets), with a switch between left to right and right to
-left. It's the React counterpart of `solid-demo`'s components page (`/components`).
+left. (`solid-demo` is a set of small apps instead; the shared suites in `tests/component-suites`
+check the two bindings against each other.)
 
 ```sh
 bun x pureform generate          # writes .pureform/ from pureform.config.ts (needs the packages built)
@@ -27,9 +28,10 @@ codegen`.
                           panda.config.ts ── panda.pureform.ts ── pureform.config.ts
 ```
 
-- `pureform.config.ts` is a copy of `solid-demo`'s config (Material's defaults, the `teal`,
-  `sharp`, and `dense` themes, the named densities), so both demos produce the same recipes;
-  `panda.pureform.ts` compiles it with `prefix: "pf"`.
+- `pureform.config.ts` started as a copy of `solid-demo`'s config: Material's defaults, the
+  `teal`, `sharp`, and `dense` themes, and the named densities (`solid-demo`'s has since gained a
+  named theme per shape and density its settings offer); `panda.pureform.ts` compiles it with
+  `prefix: "pf"`.
 - `.pureform/` is generated and committed (unlike `solid-demo`'s, to keep the committed path of
   design doc §6 in use): the bundler plugin (`@pureform/bundler/vite` in `vite.config.ts`) writes
   it when `vite dev` or `vite build` starts, and `bun x pureform generate` (`@pureform/cli`, the
