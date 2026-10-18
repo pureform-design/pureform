@@ -58,7 +58,7 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, and `reanimatedPresence`, through Reanimated 4                                                               |
 | `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
 | `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
-| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                               |
+| `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `movingSlots`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                |
 | `@pureform/rn-adapter/codegen`                | `codegen` (the `native` target), `instanceTokenKeys`, `factoryModule`, `themesModule`, `THEMES_FILE`                                                      |
 
 ```tsx
@@ -200,5 +200,11 @@ CSS adapter, and `rn-motion` checks transitions and reduced motion.
 
 - React Native has no cascade: selection orders rules by layer, then specificity, then order,
   as selectors would, and passes inherited properties (`color`, fonts) down by hand.
+- **Which slots move:** a factory's `moving` (`movingSlots(template)`) names the slots any rule
+  of which transitions a style property (not a token, not a clip shape) or runs a keyframe
+  animation, across every variant, state, and condition, so a binding can draw the rest with
+  plain views, decided once per component.
+- **Transitions start plain:** Animated's transitions make a value's animated value on its first
+  change, so a component that mounts and never changes has none, and mounts for less.
 - Percent and pixel lengths can't animate into each other in Animated; `sameUnits` resolves
   them against the parent's size where it's known.

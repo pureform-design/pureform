@@ -18,7 +18,12 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import { precompute, runtimeStyles, splitPrecomputed } from "./build";
 import { instanceTokenKeys } from "./codegen";
-import { componentFactory, nativeFactory, selectionOrder } from "./factory";
+import {
+    componentFactory,
+    movingSlots,
+    nativeFactory,
+    selectionOrder,
+} from "./factory";
 import type { NativeFactory, NativeSlots } from "./factory";
 import type { ComponentStyles } from "./lower";
 import { overridesFor, stylesFor, withSetTokens } from "./resolve";
@@ -187,6 +192,68 @@ describe("selectionOrder", () => {
             ],
         });
         expect(order.states).toEqual(["pressed", "rtl", "custom"]);
+    });
+});
+
+describe("movingSlots", () => {
+    const rule = (style: Record<string, Value>, when: string[] = []) => ({
+        when,
+        specificity: when.length,
+        style,
+    });
+    const component = (
+        rules: Record<string, ReturnType<typeof rule>[]>,
+    ): ComponentStyles => ({
+        slots: Object.keys(rules),
+        variants: { size: ["small", "large"] },
+        defaultVariants: { size: "small" },
+        entries: Object.entries(rules).map(([slot, list], index) => ({
+            layer: index % 2 === 0 ? 0 : 1,
+            match: index % 2 === 0 ? {} : { size: "large" },
+            slot,
+            rules: list,
+        })),
+    });
+    const transition = (property: string) => [
+        { property, duration: 100, easing: "linear", delay: 0 },
+    ];
+
+    it("names the slots with a transition of a style property or an animation, in any case", () => {
+        expect(
+            movingSlots(
+                component({
+                    root: [rule({ transition: transition("backgroundColor") })],
+                    // In a variant value and under a state.
+                    handle: [
+                        rule({}),
+                        rule({ transition: transition("start") }, ["pressed"]),
+                    ],
+                    indicator: [rule({ animation: { name: "spin" } as never })],
+                    label: [rule({ color: "red" })],
+                    // A token's own tween and a clip shape's morph move no view.
+                    value: [
+                        rule({
+                            transition: transition("--components.x.value"),
+                        }),
+                    ],
+                    shape: [rule({ transition: transition("clipPath") })],
+                    none: [rule({ transition: "none", animation: "none" })],
+                }),
+            ),
+        ).toEqual(new Set(["root", "handle", "indicator"]));
+    });
+
+    it("gives every factory the preset's moving slots", () => {
+        const styles = precompute(pureform(), {
+            components: ["listItem", "dialog", "linearProgress"],
+        });
+        expect(nativeFactory("listItem", styles).moving).toEqual(
+            new Set(["root"]),
+        );
+        expect(nativeFactory("dialog", styles).moving).toEqual(new Set());
+        expect(nativeFactory("linearProgress", styles).moving).toEqual(
+            new Set(["indicator"]),
+        );
     });
 });
 
