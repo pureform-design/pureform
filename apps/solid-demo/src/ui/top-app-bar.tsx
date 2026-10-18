@@ -9,7 +9,7 @@ import type { JSX } from "@solidjs/web";
 const bar = css({
     position: "sticky",
     top: "0",
-    zIndex: 1,
+    zIndex: "raised",
     display: "flex",
     alignItems: "center",
     gap: "1",

@@ -96,6 +96,13 @@ Two pieces pureform has no component for are the demo's own, styled only with th
   corners, grown with the `medium4` duration and `emphasizedDecelerate` easing (not under reduced
   motion), labels in `Text`, and a `Separator` for the axis.
 
+Layers come from the theme's stacking scale: the top app bar, the navigation bar, and the FABs sit
+at `zIndex: "raised"`, and pureform's overlays at their own layers above (menus and select lists,
+the scrim, dialogs, snackbars, tooltips), so nothing needs a number. The settings panel's side
+sheet is a dialog that slides in from the inline end (`sheetIn` and `sheetOut` in
+`panda.config.ts`, timed by the motion tokens) and only fades under reduced motion, as every
+overlay does.
+
 Icons are Material Icons' paths as inline SVG (`Glyph`, `src/ui/icons.tsx`), 1em in
 `currentColor`, so each component's icon part sizes and colors them. A `Glyph` makes its element
 when it's inserted: ready-made components read an icon prop once to see whether it's there, and

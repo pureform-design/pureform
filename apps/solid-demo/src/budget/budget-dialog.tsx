@@ -13,7 +13,6 @@ import { createSignal, Show, untrack } from "solid-js";
 import { formatMoney, formatWholeMoney, parseAmount } from "../lib/budget";
 import type { CategorySummary } from "../lib/budget";
 import { Glyph } from "../ui/icons";
-import { overlay } from "../ui/layers";
 
 const surface = css({
     width: "calc(token(spacing.16) * 6)",
@@ -107,8 +106,8 @@ export function BudgetDialog(props: {
             }}
             testId="budget"
         >
-            <Dialog.Backdrop class={overlay} />
-            <Dialog.Positioner class={overlay}>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
                 <Dialog.Content class={surface}>
                     <Dialog.Headline>
                         {props.category?.name} budget
