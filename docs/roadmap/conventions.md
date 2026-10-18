@@ -52,6 +52,8 @@ for what they can't do (git, formatting, linting, ad-hoc scripts).
   contexts written before it (p3c to p9c) say the suites read the demo; read them as the
   fixture. Change the fixture to change what the suites test, and a demo for the demo; each web
   demo has its own smoke test (`test:e2e`).
+- **Older contexts' "glue"** is the generated registry (`.pureform/`), and their `pureform.glue.ts`
+  (exporting `glue`) is `pureform.codegen.ts` (exporting `codegen`).
 - **New packages** are scaffolded with the omni `ts-package` generator (see above).
   Dependencies go through the root `package.json` catalog. Test projects live under `tests/`.
 - **Package READMEs:** every package a phase creates gets a `README.md`, and every

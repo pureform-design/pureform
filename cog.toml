@@ -37,7 +37,7 @@ authors = []
 
 [bump_profiles]
 
-# The core train: every package that shares the AST format, the generated glue, or the
+# The core train: every package that shares the AST format, the generated registry, or the
 # factory types. A commit touching any of them bumps them all together.
 [monorepo.packages.core-train]
 path = "."

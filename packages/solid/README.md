@@ -632,7 +632,7 @@ check the cross-cutting rules against Solid and React together (see that package
   dialog subpath brings the button's part code with it.
 - A dialog with no focusable element inside takes focus on its surface (`tabindex="-1"`); after
   the snackbar's action closes it, focus goes back to the page.
-- The development warning for a stale glue version calls `trainVersionMismatch`, which finds
+- The development warning for a stale generated registry calls `trainVersionMismatch`, which finds
   nothing until p4a records it.
 - A registry entry's kind is read once per component instance; swapping the registry for one
   whose entry kind differs isn't followed.

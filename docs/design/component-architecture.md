@@ -864,7 +864,7 @@ translate(-50%, -50%))`; the linear progress's `rtl` keyframes are
   provider's `dir` changes what the styles read, not the layout. The icon parts' `mirror` is the
   component's `mirrorIcon` props, setting the `mirrored` state for the whole component.
 
-## 6. Generated glue
+## 6. The generated registry
 
 `pureform generate` (also run by the bundler plugin in dev and build) writes the factory
 modules of §5.2 to `.pureform/`, and an index, also served as the virtual module
@@ -887,7 +887,7 @@ export type Components = "button" | "checkbox"; // augments typing
   variant props type-check against the user's config, not the preset's defaults.
 - Generated files live in `.pureform/`, like Panda's `styled-system/`.
 
-**Committing it is the app's choice; the advice is not to.** It's glue derived from the
+**Committing it is the app's choice; the advice is not to.** It's derived from the
 config and the installed packages, so committing it only adds diffs to review. Either way:
 
 - **Not committed (recommended):** add `.pureform/` to `.gitignore`. The bundler plugin
@@ -899,10 +899,10 @@ config and the installed packages, so committing it only adds diffs to review. E
   what it would write, for CI.
 - **Staleness.** Every generated file starts with a header holding a hash of the config,
   the build-tool options, and the pureform package versions. The plugin and `generate`
-  rewrite only when it differs, so unchanged glue doesn't trigger a rebuild, and `--check`
+  rewrite only when it differs, so an unchanged registry doesn't trigger a rebuild, and `--check`
   compares hashes before contents.
-- **Missing glue.** If `.pureform/` is missing, importing it fails with a message naming
-  `pureform generate` and the bundler plugin, rather than a bare module-not-found.
+- **Missing generated registry.** If `.pureform/` is missing, importing it fails with a message
+  naming `pureform generate` and the bundler plugin, rather than a bare module-not-found.
 
 Built (p4a) in `@pureform/generate`: `generate(options)` loads the config, runs the target's
 adapter (`@pureform/<target>-adapter/codegen`), and writes the adapter's modules and files,
@@ -913,7 +913,7 @@ versions. The index also exports `version`, the train's version, and passes it t
 `createRegistry` for the development check of §11. Write mode rewrites only files whose
 contents differ and removes generated files no longer wanted; check mode compares the
 index's and every file's hash first (stale without running the adapter), then contents.
-The missing-glue message is `missingGlueMessage`/`assertGlue`, raised by whatever notices
+The missing-output message is `missingOutputMessage`/`assertGenerated`, raised by whatever notices
 first: the bundler plugin when it resolves an import into the missing folder (p4c), the
 CLI, or a test setup. `generate` also returns a hint when the app's `tsconfig.json` doesn't
 include the folder, since TypeScript's globs skip dot folders.
@@ -921,13 +921,13 @@ include the folder, since TypeScript's globs skip dot folders.
 Built (p4c-bundler) in `@pureform/bundler`: one unplugin plugin (`/vite`, `/rollup`,
 `/rolldown`, `/esbuild`) with the options of `generate` (`target`, `options`, `components`,
 `lazy`, `config`, `outDir`, `root`) plus `watch`. In Vite it generates in the `config` hook, so
-the glue exists before any plugin's `configResolved` (Panda's reads `.pureform/panda.ts`
-there); elsewhere in `buildStart`. It regenerates on `watchChange` of the config or a file it
-imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types from
-`@pureform/bundler/client`), and raises the missing-glue error for that id or a relative import
-into a missing folder. Metro gets `withPureformGlue(config, options)` from `/metro` instead of
+the generated registry exists before any plugin's `configResolved` (Panda's reads
+`.pureform/panda.ts` there); elsewhere in `buildStart`. It regenerates on `watchChange` of the
+config or a file it imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types from
+`@pureform/bundler/client`), and raises the missing-output error for that id or a relative import
+into a missing folder. Metro gets `withPureform(config, options)` from `/metro` instead of
 a plugin: it generates before Metro starts, keeps a watcher, and adds the id to
-`resolveRequest`. The regeneration loop (`createGlueRunner`, `watchGlue`) lives in
+`resolveRequest`. The regeneration loop (`createGenerateRunner`, `watchGenerate`) lives in
 `@pureform/generate`, for the CLI's `--watch` too. No app in the repo commits `.pureform/`
 now; the committed path and `--check` stay supported for apps that want them. The hash covers the evaluated config, which the preset
 computes slightly differently under Bun and Node (a shape morph), so one app should generate
@@ -966,12 +966,12 @@ Built (p7): `@pureform/bundler`'s `prune` option, on by default in bundler build
 servers or watch builds; Metro only with `prune: true`). The usage is read **before** the build,
 not from the module graph after it: Panda reads `staticCss` in `configResolved` and Tailwind
 reads the stylesheet while transforming, both before any module graph exists. The scan
-(`scanUsage`, with `oxc-parser`) reads every script under the root (or `prune.include`) and
-what they import by relative path, skipping `node_modules`, dot folders, output folders, the
-glue, and tests; unused files under the root count as used. It reads component subpath imports
+(`scanUsage`, with `oxc-parser`) reads every script under the root (or `prune.include`) and what
+they import by relative path, skipping `node_modules`, dot folders, output folders, the generated
+registry, and tests; unused files under the root count as used. It reads component subpath imports
 (each draws the registry entries `@pureform/binding-core/usage`'s `COMPONENT_USAGE` lists), their
 JSX's written-out variant props, `useClasses`/`useStyles` selections, the factory hooks,
-`useComponent` with an anatomy, `registry.entry("…")` on the glue's registry, and the
+`useComponent` with an anatomy, `registry.entry("…")` on the generated registry, and the
 provider's `defaults`. A value it can't read keeps that group's values; a component used other
 than as a JSX tag keeps all of its own; a name it can't read stops pruning with a warning. Groups
 a component computes itself (a FAB's `extended`) keep every value, and defaults always stay.
@@ -979,8 +979,8 @@ a component computes itself (a FAB's `extended`) keep every value, and defaults 
 and hands adapters `context.variants`: Panda narrows `staticCss` rules, the CSS and Tailwind
 targets compile the stylesheet from `narrowConfig` (values and their compound variants dropped),
 and the native target precomputes from it. Factory modules and declarations don't change. A
-pruned build writes the pruned glue to `.pureform/` in place, as Panda writes `styled-system/`;
-the next dev server or `pureform generate` writes the full glue back (the hash covers what
+pruned build writes the pruned registry to `.pureform/` in place, as Panda writes `styled-system/`;
+the next dev server or `pureform generate` writes the full registry back (the hash covers what
 pruning narrowed), so an app that commits the folder sets `prune: false`. Escape hatches:
 `prune.keep` (whole components), `prune.variants: false`, `prune: false`, and the allow-list.
 
@@ -1528,8 +1528,8 @@ icon only has to follow them.
   (arrow keys in both directions), mirrored boxes and `dir` on every part, and server rendering.
   The selection-by-test-id contract suite against RN-web stays in `tests/browser-e2e-tests`.
 - **Built (p5a):** six projects, one per binding and web target (`solid/panda`, `solid/css`,
-  `solid/tailwind`, and React's three). Each aliases `#registry` to its target's registry and
-  loads that target's stylesheet; the CSS and Tailwind glue is generated from the demo's config
+  `solid/tailwind`, and React's three). Each aliases `#registry` to its target's registry and loads
+  that target's stylesheet; the CSS and Tailwind registries are generated from the demo's config
   before the run. A themes suite checks `themeAttributes` and that a provider's theme draws as
   the attribute set by hand does, and server rendering hydrates a themed provider.
 - **Built (p6c):** a case's `opened` renderings (overlays open) run in the axe and direction
@@ -2026,23 +2026,23 @@ element in the markup.
 
 `@pureform/cli` ships the `pureform` bin. It holds no generation logic of its own: it
 calls `@pureform/generate`, the same step the plugin runs, so the two can't produce
-different glue, and installing the CLI doesn't pull in the bundler plugin. A separate
+different output, and installing the CLI doesn't pull in the bundler plugin. A separate
 package keeps the command where users look for it and gives later commands a home
 without growing the plugin.
 
-- `pureform generate [--watch] [--check]`: writes the `.pureform/` glue and its type
+- `pureform generate [--watch] [--check]`: writes the `.pureform/` registry and its type
   declarations without a bundler, for `tsc`, lint, and tests, or before a dev server
-  starts; `--check` verifies committed glue (§6).
+  starts; `--check` verifies a committed registry (§6).
 
 Built (p4c-cli) in `@pureform/cli`: the bin runs under Node (its shebang), as Vite runs the
 plugin, so both hash the evaluated config alike. The command and the plugin share their
-options through a glue file: `pureform.glue.ts` in the app's root exports them as `glue` (or by
-default), the app's bundler config passes that object to the plugin, and `pureform generate`
-loads it with jiti; flags (`--target`, `--options <json>`, `--components`, `--lazy`,
-`--config`, `--out-dir`, `--root`, `--glue`, `--no-train-check`) override it, and without a
-glue file `--target` is required. `--check` exits 1 when anything is missing, stale, modified,
-or extra. `--watch` is `watchGlue` from `@pureform/generate`, and starts over when the glue
-file changes. The `.gitignore` hint is printed once after a write, when git neither ignores the
+options through a codegen file: `pureform.codegen.ts` in the app's root exports them as `codegen`
+(or by default), the app's bundler config passes that object to the plugin, and `pureform generate`
+loads it with jiti; flags (`--target`, `--options <json>`, `--components`, `--lazy`, `--config`,
+`--out-dir`, `--root`, `--codegen`, `--no-train-check`) override it, and without a codegen file
+`--target` is required. `--check` exits 1 when anything is missing, stale, modified, or extra.
+`--watch` is `watchGenerate` from `@pureform/generate`, and starts over when the codegen file
+changes. The `.gitignore` hint is printed once after a write, when git neither ignores the
 folder nor tracks any of it (tracking means the app commits it on purpose). Flags are parsed
 with Node's `parseArgs`, so the bin needs nothing beyond `@pureform/generate` and jiti. Both
 demos' omni `generate` tasks run `bun x pureform generate`.
@@ -2052,8 +2052,8 @@ Deferred until there's demand:
 - `init`: one-time wiring of the config, bundler, and provider (a README covers it).
 - `eject`: copying a component's file into the app. Slot-keyed overrides and compound
   parts should make it rarely needed.
-- `doctor`: checking the config is importable from build and runtime, and the glue is
-  fresh.
+- `doctor`: checking the config is importable from build and runtime, and the generated registry
+  is fresh.
 
 ## 11. Versioning
 
@@ -2061,7 +2061,7 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
 (`cog.toml`) as today:
 
 - **The core train, in lockstep.** Every package that shares the AST format, the
-  generated glue, or the factory types carries one version and is bumped together as one
+  generated registry, or the factory types carries one version and is bumped together as one
   cocogitto package, `core-train` (tag `core-train-vX`): `core`, `theme`, `material`,
   `preset`, `css-lowering`, every `*-adapter`, `js-effects`, `utils`, `type-utils`,
   `styling`, `anatomy`, `machines`, `generate`, `bundler`, and `cli`. Users never match these by hand, and a mismatch between them is
@@ -2085,9 +2085,9 @@ Two groups, versioned differently, both under Conventional Commits and cocogitto
       Built (p4a): the newest installed train package's version is the train's; the train's
       names are embedded in `@pureform/generate` (a test keeps them equal to `cog.toml`),
       and peer ranges that aren't semver (`workspace:^`) pass.
-    - Runtime, in development: the generated glue records the train's version, and each
+    - Runtime, in development: the generated registry records the train's version, and each
       binding warns once if the runtime `@pureform/styling` differs from it, which means
-      the glue is stale or two copies are installed. Production skips the check.
+      the registry is stale or two copies are installed. Production skips the check.
       Built (p4a): the index passes `{ version }` to `createRegistry`, `registry.version`
       returns it, `@pureform/styling` exports its own `VERSION` (from
       `src/package-version.ts`, which `@pureform/release`'s `set-version` keeps equal to
