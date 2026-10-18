@@ -161,6 +161,9 @@ import { registry } from "./.pureform";
 - **Overlays are surfaces:** the menu, dialog, snackbar, and tooltip render their surface; when
   and where they show (a `Modal`, a timer) is the app's. The select is the exception: it opens
   its menu in a `Modal` under the field.
+- **The select keeps its label:** when the picked item leaves `items`, the field still shows its
+  label until the value changes, as Zag's select does on the web; a value no item has had shows
+  nothing, and `null` clears it.
 - **Overlays stack from their wrapper:** React Native's `zIndex` only orders a view among its
   siblings, and React Native Web gives every `View` `position: relative` and `z-index: 0`, so the
   layer a surface takes in its own style (the menu's 200, the dialog's 400) never lifts it out of
