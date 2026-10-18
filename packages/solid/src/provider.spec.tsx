@@ -4,7 +4,7 @@ import {
     themeScope,
 } from "@pureform/styling";
 import type { ThemeGenerator } from "@pureform/styling";
-import { createSignal, Errored, flush, Loading } from "solid-js";
+import { createMemo, createSignal, Errored, flush, Loading } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -112,6 +112,54 @@ describe("PureformProvider", () => {
             ["rtl", "reduce", "teal"],
             ["ltr", "full", "teal"],
         ]);
+    });
+
+    it("updates a component for the settings it reads, not for the others", () => {
+        const [dir, setDir] = createSignal<"ltr" | "rtl">("ltr");
+        const [motion, setMotion] = createSignal<"system" | "reduce">("system");
+        const [theme, setTheme] = createSignal<string | undefined>(undefined);
+        const [overrides, setOverrides] = createSignal({ "--a": "1" });
+        const runs = { dir: 0, motion: 0, overrides: 0 };
+        function Probe() {
+            const state = usePureform();
+            createMemo(() => {
+                runs.dir++;
+                return state().dir;
+            });
+            createMemo(() => {
+                runs.motion++;
+                return state().motion;
+            });
+            createMemo(() => {
+                runs.overrides++;
+                return state().overrides;
+            });
+            return null;
+        }
+        mount(() => (
+            <PureformProvider dir={dir()} motion={motion()} theme={theme()}>
+                <PureformProvider overrides={overrides()}>
+                    <Probe />
+                </PureformProvider>
+            </PureformProvider>
+        ));
+        expect(runs).toEqual({ dir: 1, motion: 1, overrides: 1 });
+        setMotion("reduce");
+        flush();
+        expect(runs).toEqual({ dir: 1, motion: 2, overrides: 1 });
+        setDir("rtl");
+        flush();
+        expect(runs).toEqual({ dir: 2, motion: 2, overrides: 1 });
+        setTheme("teal");
+        flush();
+        expect(runs).toEqual({ dir: 2, motion: 2, overrides: 1 });
+        // The same overrides again, in a new object.
+        setOverrides({ "--a": "1" });
+        flush();
+        expect(runs).toEqual({ dir: 2, motion: 2, overrides: 1 });
+        setOverrides({ "--a": "2" });
+        flush();
+        expect(runs).toEqual({ dir: 2, motion: 2, overrides: 2 });
     });
 
     it("keeps the user's style and attributes on its element", () => {

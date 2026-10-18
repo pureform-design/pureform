@@ -121,8 +121,11 @@ export function createIndicationScope(
     );
     const host = new IndicationHost(entries, {
         reducedMotion: () =>
-            resolveReducedMotion(untrack(state).motion, systemReducedMotion()),
-        dir: () => untrack(state).dir,
+            resolveReducedMotion(
+                untrack(() => state().motion),
+                systemReducedMotion(),
+            ),
+        dir: () => untrack(() => state().dir),
     });
     createEffect(
         () => [indication(), state().registry] as const,
