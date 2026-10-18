@@ -723,6 +723,20 @@ fixed layer sits in its ancestors' stacking context. The native top layer (`<dia
 `popover`) would escape both without a portal; it's left for later, since Zag's dialog and menu
 manage focus, dismissal, and hiding the page themselves.
 
+**Built (overlay stacking and motion):** the theme's layout carries a stacking scale
+(`LayoutContract.zIndices`, default `MATERIAL_STACKING = stack(STACKING_ROLES)`: `base` 0,
+`raised` 100 for what an app places over its content, `menu` 200, `scrim` 300, `dialog` 400,
+`snackbar` 500, `tooltip` 600), lowered to `config.zIndices` and so to `--z-index-<name>`, Panda's
+`zIndex` tokens, and Tailwind's `z-<name>`. The preset's menu (and so the select's list), tooltip,
+dialog, scrim, and snackbar roots take their layer through `zIndex(name)`. In place, a surface's
+`z-index` stacks it only inside its positioner, so the positioner takes it: Zag's popper copies the
+content's computed `z-index` into the floating positioner's `--z-index` (menu, select, tooltip),
+and `stackPositioner` in `@pureform/binding-core/dom` does the same for the dialog's fixed
+positioner once it shows. Nested overlays need no order of their own: a select's list in a dialog
+stacks inside the dialog's positioner. Without this, a later positioned sibling (a chip with its
+ripple layer) painted over an open list. An app's bars and FABs take `raised` themselves; the preset
+gives no layer to what it doesn't place.
+
 ### 5.8 Reduced motion
 
 Today the web follows `prefers-reduced-motion` in CSS, and the ripple checks it in JS;
@@ -752,6 +766,25 @@ The design makes one setting, followed by everything that moves, on every target
       going on.
     - Zag's enter and exit animations need no change: Zag's presence logic finishes at
       once when no animation runs.
+    - Built (overlay motion): the preset animates each overlay with keyframes on Zag's
+      `data-state` (`overlayMotion` in `components/overlay.ts`, `OVERLAY_KEYFRAMES` added by
+      `pureform()`), every duration and curve a motion token. The menu, select list, tooltip, and
+      snackbar grow from 80% and fade in (`short3`, emphasized decelerate; from the positioner's
+      `--transform-origin` for the floating ones) and fade out (`short2`, emphasized accelerate),
+      as Compose's `DropdownMenu`, tooltip, and snackbar host do. Compose's scale and fade won
+      over material-web's height reveal: transform and opacity need no layout, and reduced motion
+      leaves a plain fade. The dialog comes down 48px and fades in (`long2`) and goes back up
+      (`short3`), as material-web's does; the scrim fades (`long2` in, `short3` out, linear).
+      Under `reducedMotion` each moving keyframe gives way to a fade of the same timing. The
+      exits hold their last frame (`forwards`) until the overlay hides, so a scrim that ends
+      first stays gone. The rules are `rawRules.css`, so React Native, whose overlays draw only
+      their surface, gets no motion (its surfaces do take the `z-index`).
+    - Built (presence): both bindings run Zag's presence machine (`@zag-js/presence`, re-exported
+      as `@pureform/machines/presence`) on the surface through `usePresence(open, onShow?)`; a
+      part shows while `overlayPresent(open, present)` and hides after (`presentProps`, over Zag's
+      `hidden: !open`), so the exit animation runs to its end. With no animation (unstyled) it
+      hides on the next frame. Closed overlays still render hidden on the server, as before; focus
+      stays in a closing overlay until it hides.
     - In the preset, the gate moves from the whole `transition` to each tween:
       `STATE_TWEENS` (colors and elevation) always run, and `tweens(...)` gates only the
       moving properties it's given. This changes output on purpose, so it's checked
