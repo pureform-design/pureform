@@ -51,20 +51,44 @@ export interface PartAttributes {
     readonly [TEST_ID_ATTRIBUTE]: string;
 }
 
-/** A part's `data-scope`, `data-pf-part`, and `data-testid`. */
+// A part's attributes with its default test id, made once per anatomy and part: every instance
+// without a `testId` shares them.
+const defaultAttributes = new WeakMap<
+    ComponentAnatomy,
+    Map<string, PartAttributes>
+>();
+
+/** A part's `data-scope`, `data-pf-part`, and `data-testid`. With no `testId`, the same frozen
+ *  object for the same anatomy and part. */
 export const partAttributes = <A extends ComponentAnatomy>(
     component: A,
     part: PartName<A>,
     testId?: TestIdOverride<PartName<A>>,
 ): PartAttributes => {
-    const id = partTestId(component, part, testId);
-    return {
-        [SCOPE_ATTRIBUTE]: component.scope,
-        [PART_ATTRIBUTE]: (component.parts as ComponentAnatomy["parts"])[part]!
-            .attribute,
-        [TEST_ID_ATTRIBUTE]: id,
-    };
+    if (testId !== undefined) return attributesOf(component, part, testId);
+    let byPart = defaultAttributes.get(component);
+    if (!byPart) {
+        byPart = new Map();
+        defaultAttributes.set(component, byPart);
+    }
+    let attributes = byPart.get(part);
+    if (!attributes) {
+        attributes = Object.freeze(attributesOf(component, part));
+        byPart.set(part, attributes);
+    }
+    return attributes;
 };
+
+const attributesOf = <A extends ComponentAnatomy>(
+    component: A,
+    part: PartName<A>,
+    testId?: TestIdOverride<PartName<A>>,
+): PartAttributes => ({
+    [SCOPE_ATTRIBUTE]: component.scope,
+    [PART_ATTRIBUTE]: (component.parts as ComponentAnatomy["parts"])[part]!
+        .attribute,
+    [TEST_ID_ATTRIBUTE]: partTestId(component, part, testId),
+});
 
 /** The registry slot a part reads its classes and the provider's `slotProps` from: its `slot`, else
  *  its name. `null` when it has none. */

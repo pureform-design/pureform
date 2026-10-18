@@ -66,6 +66,15 @@ describe("partAttributes", () => {
             "data-testid": "save-label",
         });
     });
+
+    it("gives every instance without a test id the same frozen attributes", () => {
+        const attributes = partAttributes(buttonAnatomy, "label");
+        expect(partAttributes(buttonAnatomy, "label")).toBe(attributes);
+        expect(Object.isFrozen(attributes)).toBe(true);
+        expect(partAttributes(buttonAnatomy, "label", "save")).not.toBe(
+            attributes,
+        );
+    });
 });
 
 describe("types", () => {
