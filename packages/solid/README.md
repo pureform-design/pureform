@@ -293,8 +293,9 @@ content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on 
 - **The list** is an unstyled `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an
   unstyled `<li>` (`List.Item`, `pf-list-item`). Its `density`, `color`, and `tokens` are every
   item's defaults. The ready-made takes `items` (a list item's content and props, with an optional
-  `value` as its key), and `slotProps` and `unstyled` keyed by the list item's parts, applied to
-  every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
+  `value` as its key: a row stays while its value, else its index, does, and follows its item's
+  props, so a list made again from data keeps its rows), and `slotProps` and `unstyled` keyed by
+  the list item's parts, applied to every item. A `ListItem` alone isn't in a list; put it in `List.Item`, or give it `as="li"` in
   your own `<ul>`.
 - **Progress indicators** (`LinearProgress`, `CircularProgress`) have no machine: Root is a
   `role="progressbar"` with `aria-valuemin`, `aria-valuemax`, and `aria-valuenow`, and `value`

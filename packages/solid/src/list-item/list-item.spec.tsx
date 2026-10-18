@@ -1,4 +1,5 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { createSignal } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { ListItem } from ".";
@@ -93,5 +94,53 @@ describe("List", () => {
         expect(byTestId("sent-headline").className).toBe(
             "list-item__headline bold",
         );
+    });
+
+    it("keeps an item's row while its value stays, and updates it", async () => {
+        const [items, setItems] = createSignal([
+            { value: "inbox", headline: "Inbox" },
+            { value: "sent", headline: "Sent" },
+        ]);
+        withRegistry(() => <List items={items()} />);
+        await settle();
+        const rows = () => [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${compositeTestIds.list.item}"]`,
+            ),
+        ];
+        const [inbox, sent] = rows();
+        setItems([
+            { value: "drafts", headline: "Drafts" },
+            { value: "inbox", headline: "Inbox (3)" },
+            { value: "sent", headline: "Sent" },
+        ]);
+        await settle();
+        expect(rows().map((row) => row.textContent)).toEqual([
+            "Drafts",
+            "Inbox (3)",
+            "Sent",
+        ]);
+        expect(rows()[1]).toBe(inbox);
+        expect(rows()[2]).toBe(sent);
+    });
+
+    it("leaves a row alone while its item is the same object", async () => {
+        let reads = 0;
+        const inbox = {
+            value: "inbox",
+            get headline() {
+                reads++;
+                return "Inbox";
+            },
+        };
+        const [items, setItems] = createSignal<
+            readonly { value: string; headline: string }[]
+        >([inbox]);
+        withRegistry(() => <List items={items()} />);
+        await settle();
+        const before = reads;
+        setItems([{ value: "drafts", headline: "Drafts" }, inbox]);
+        await settle();
+        expect(reads).toBe(before);
     });
 });
