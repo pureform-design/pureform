@@ -13,7 +13,7 @@ import type {
     Unstyled,
 } from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { For, omit } from "solid-js";
+import { createMemo, For, omit } from "solid-js";
 
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemPartProps, ListItemProps } from "../list-item/list-item";
@@ -86,7 +86,13 @@ const READY_MADE_PROPS = [
     ...LIST_CONTENT_PROPS,
 ] as const;
 
-/** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`. */
+interface ListEntry {
+    readonly key: string | number;
+    readonly item: ListItemData<JSX.Element>;
+}
+
+/** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`. An item's row
+ *  is kept while its `value` (else its index) stays among the items, and follows its props. */
 function ReadyMade(props: ListProps): JSX.Element {
     const shared = {
         get slotProps() {
@@ -96,13 +102,28 @@ function ReadyMade(props: ListProps): JSX.Element {
             return props.unstyled;
         },
     };
+    // An entry per item, kept while its item is the same object, so a row's props change only
+    // when its item does.
+    let previous = new Map<string | number, ListEntry>();
+    const entries = createMemo(() => {
+        const next = new Map<string | number, ListEntry>();
+        const list = (props.items ?? []).map((item, index) => {
+            const key = item.value ?? index;
+            const kept = previous.get(key);
+            const entry = kept?.item === item ? kept : { key, item };
+            next.set(key, entry);
+            return entry;
+        });
+        previous = next;
+        return list;
+    });
     return (
         <Root {...(omit(props, ...READY_MADE_PROPS) as ListRootProps)}>
-            <For each={props.items ?? []}>
-                {(item: ListItemData<JSX.Element>) => (
+            <For each={entries()} keyed={(entry) => entry.key}>
+                {(entry) => (
                     <Item>
                         <ListItem
-                            {...(omit(item, "value") as ListItemProps)}
+                            {...(omit(entry().item, "value") as ListItemProps)}
                             {...(shared as Partial<ListItemProps>)}
                         />
                     </Item>
