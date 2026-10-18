@@ -65,7 +65,7 @@ export {
     useStyleFactory,
     useStyles,
 } from "./styles";
-export type { ComponentSlots } from "./styles";
+export type { ComponentSlots, SlotViews, SlotViewsBySlot } from "./styles";
 export {
     PureformContainer,
     useReducedMotion,

@@ -18,7 +18,6 @@ import type { TextInputProps } from "react-native";
 import { IconSlot, iconSlot } from "../icon-style";
 import { interactionStates, useInteraction } from "../interaction";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 export interface SearchBarProps
@@ -37,7 +36,6 @@ export interface SearchBarProps
 }
 
 function SearchBarImpl(props: SearchBarProps): ReactNode {
-    const engine = useEngine();
     const [value, setValue] = useControllable(
         "SearchBar",
         "value",
@@ -47,7 +45,11 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
         "",
     );
     const { interaction, state } = useInteraction(undefined, props.disabled);
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<SearchBarPart>(
         "searchBar",
         searchBarSelection(props),
         {
@@ -68,23 +70,25 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
     const placeholder = props.placeholder ?? "Search";
     const id = (part: SearchBarPart) =>
         testIdOf(searchBarAnatomy, part, props.testId);
-    const icon = (part: "leading" | "trailing", node: ReactNode) =>
-        isPresent(node) ? (
-            <engine.View style={s[part]} testID={id(part)}>
+    const icon = (part: "leading" | "trailing", node: ReactNode) => {
+        const Slot = v[part];
+        return isPresent(node) ? (
+            <Slot.View style={s[part]} testID={id(part)}>
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
                     {node}
                 </IconSlot>
-            </engine.View>
+            </Slot.View>
         ) : null;
+    };
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...handlers}
             disabled={props.disabled}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
             {icon("leading", props.leading)}
-            <engine.TextInput
+            <v.input.TextInput
                 {...props.inputProps}
                 value={value}
                 onChangeText={setValue}
@@ -101,7 +105,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
                 testID={id("input")}
             />
             {icon("trailing", props.trailing)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

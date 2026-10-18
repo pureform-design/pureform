@@ -19,7 +19,6 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = listItemAnatomy.indication!;
@@ -38,7 +37,6 @@ export interface ListItemProps
 }
 
 function ListItemImpl(props: ListItemProps): ReactNode {
-    const engine = useEngine();
     const interactive = props.onPress !== undefined;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
@@ -46,7 +44,11 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         disabled: props.disabled,
         interactive,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<ListItemPart>(
         "listItem",
         indication.select(
             listItemSelection(
@@ -66,22 +68,26 @@ function ListItemImpl(props: ListItemProps): ReactNode {
     );
     const id = (part: ListItemPart) =>
         testIdOf(listItemAnatomy, part, props.testId);
-    const line = (part: ListItemPart, value: ReactNode) =>
-        isPresent(value) ? (
-            <engine.Text selectable={false} style={s[part]} testID={id(part)}>
+    const line = (part: ListItemPart, value: ReactNode) => {
+        const Slot = v[part];
+        return isPresent(value) ? (
+            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
                 {value}
-            </engine.Text>
+            </Slot.Text>
         ) : null;
-    const icon = (part: "leading" | "trailing", value: ReactNode) =>
-        isPresent(value) ? (
-            <engine.View style={s[part]} testID={id(part)}>
+    };
+    const icon = (part: "leading" | "trailing", value: ReactNode) => {
+        const Slot = v[part];
+        return isPresent(value) ? (
+            <Slot.View style={s[part]} testID={id(part)}>
                 <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
                     {value}
                 </IconSlot>
-            </engine.View>
+            </Slot.View>
         ) : null;
+    };
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...(interactive ? indication.handlers : {})}
             role={interactive ? "button" : "listitem"}
             {...(interactive
@@ -91,15 +97,15 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             testID={id("root")}
         >
             {icon("leading", props.leading)}
-            <engine.View style={s.content} testID={id("content")}>
+            <v.content.View style={s.content} testID={id("content")}>
                 {line("overline", props.overline)}
                 {line("headline", props.headline)}
                 {line("supportingText", props.supportingText)}
-            </engine.View>
+            </v.content.View>
             {icon("trailing", props.trailing)}
             {line("trailingText", props.trailingText)}
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

@@ -57,7 +57,11 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
         interactionSource: props.interactionSource,
         disabled,
     });
-    const { styles: s, selected: slots } = useComponentSlots(
+    const {
+        styles: s,
+        selected: slots,
+        views: v,
+    } = useComponentSlots<IconButtonPart>(
         "iconButton",
         indication.select(iconButtonSelection(props)),
         indication.states({
@@ -70,7 +74,7 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
     const id = (part: IconButtonPart) =>
         testIdOf(iconButtonAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="button"
             aria-label={props["aria-label"]}
@@ -83,24 +87,24 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
-            <engine.View style={s.container} testID={id("container")}>
+            <v.container.View style={s.container} testID={id("container")}>
                 {Drawing ? (
                     <Drawing drawing={slots.drawings.container} />
                 ) : null}
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(slots, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
                 {indication.layer(slots)}
-            </engine.View>
+            </v.container.View>
             {props.variant === "outlined" ? (
-                <engine.View
+                <v.outline.View
                     pointerEvents="none"
                     style={s.outline}
                     testID={id("outline")}
@@ -108,9 +112,9 @@ function IconButtonImpl(props: IconButtonProps): ReactNode {
                     {Drawing ? (
                         <Drawing drawing={slots.drawings.outline} />
                     ) : null}
-                </engine.View>
+                </v.outline.View>
             ) : null}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

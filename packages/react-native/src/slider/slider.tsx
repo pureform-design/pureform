@@ -18,7 +18,7 @@ import type { GestureResponderEvent } from "react-native";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useDirection, useEngine } from "../provider";
+import { useDirection } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = sliderAnatomy.indication!;
@@ -61,7 +61,6 @@ interface Measurable {
 const ADJUSTABLE = [{ name: "increment" }, { name: "decrement" }] as const;
 
 function SliderImpl(props: SliderProps): ReactNode {
-    const engine = useEngine();
     const min = props.min ?? 0;
     const max = props.max ?? 100;
     const step = props.step ?? 1;
@@ -86,7 +85,11 @@ function SliderImpl(props: SliderProps): ReactNode {
         disabled: props.disabled,
     });
     const { interaction } = indication;
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<SliderPart>(
         "slider",
         indication.select(sliderSelection(props, percent)),
         {
@@ -131,7 +134,7 @@ function SliderImpl(props: SliderProps): ReactNode {
         else if (key === "End") setValue(max);
     };
     return (
-        <engine.View
+        <v.root.View
             ref={root as never}
             role="slider"
             {...(props["aria-label"] === undefined
@@ -176,29 +179,29 @@ function SliderImpl(props: SliderProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.track.View
                 pointerEvents="none"
                 style={s.track}
                 testID={id("track")}
             />
-            <engine.View
+            <v.activeTrack.View
                 pointerEvents="none"
                 style={s.activeTrack}
                 testID={id("activeTrack")}
             />
-            <engine.View
+            <v.stateLayer.View
                 pointerEvents="none"
                 style={s.stateLayer}
                 testID={id("stateLayer")}
             >
                 {indication.layer(selected)}
-            </engine.View>
-            <engine.View
+            </v.stateLayer.View>
+            <v.handle.View
                 pointerEvents="none"
                 style={s.handle}
                 testID={id("handle")}
             />
-        </engine.View>
+        </v.root.View>
     );
 }
 

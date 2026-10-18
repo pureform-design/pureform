@@ -47,17 +47,21 @@ function SnackbarButtonImpl(props: {
     readonly onPress: (() => void) | undefined;
     readonly children: ReactNode;
 }): ReactNode {
-    const engine = useEngine();
     const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
         indication: props.snackbar.indication,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<SnackbarPart>(
         "snackbar",
         indication.select(snackbarSelection(props.snackbar)),
         indication.states(),
     );
+    const Surface = v[props.part];
     return (
-        <engine.Pressable
+        <Surface.Pressable
             {...indication.handlers}
             role="button"
             {...(props.label === undefined
@@ -78,7 +82,7 @@ function SnackbarButtonImpl(props: {
                 {props.children}
             </IconSlot>
             {indication.layer(selected)}
-        </engine.Pressable>
+        </Surface.Pressable>
     );
 }
 
@@ -86,7 +90,7 @@ const SnackbarButton = withEngine(SnackbarButtonImpl, "SnackbarButton");
 
 function SnackbarImpl(props: SnackbarProps): ReactNode {
     const engine = useEngine();
-    const { styles: s } = useComponentSlots(
+    const { styles: s, views: v } = useComponentSlots<SnackbarPart>(
         "snackbar",
         snackbarSelection(props),
     );
@@ -94,16 +98,21 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
     const id = (part: SnackbarPart) =>
         testIdOf(snackbarAnatomy, part, props.testId);
     if (!presence.present) return null;
+    // The engine's view where it enters and leaves, the slot's own while it's still.
+    const Root = props.open === undefined ? v.root : engine;
     return (
-        <engine.View
+        <Root.View
             {...presence.props}
             role="status"
             style={{ ...s.root, ...presence.style }}
             testID={id("root")}
         >
-            <engine.Text style={s.supportingText} testID={id("supportingText")}>
+            <v.supportingText.Text
+                style={s.supportingText}
+                testID={id("supportingText")}
+            >
                 {props.supportingText}
-            </engine.Text>
+            </v.supportingText.Text>
             {isPresent(props.action) ? (
                 <SnackbarButton
                     snackbar={props}
@@ -126,7 +135,7 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
             >
                 {props.closeIcon ?? "×"}
             </SnackbarButton>
-        </engine.View>
+        </Root.View>
     );
 }
 

@@ -20,8 +20,11 @@ import {
 } from "@pureform/rn-adapter/react";
 import type { ComponentName, Selection } from "@pureform/styling";
 import { use, useMemo } from "react";
+import type { ComponentType } from "react";
+import { Pressable, Text, TextInput, View } from "react-native";
 
-import type { MotionStyles } from "./engine";
+import { pressNow } from "./engine";
+import type { MotionEngine, MotionStyles } from "./engine";
 import { usePureform } from "./provider";
 
 // The registry entry's factory, loading a lazy one.
@@ -67,11 +70,66 @@ export function useStyles<N extends ComponentName>(
     } as NativeSelection<N>);
 }
 
+/** The views a slot renders with. */
+export interface SlotViews {
+    readonly View: ComponentType<any>;
+    readonly Text: ComponentType<any>;
+    readonly TextInput: ComponentType<any>;
+    readonly Pressable: ComponentType<any>;
+}
+
+/** React Native's own views, for slots that never move: they mount for about half what the
+ *  engines' animated ones do. */
+const STILL: SlotViews = {
+    View,
+    Text,
+    TextInput,
+    Pressable: pressNow(Pressable),
+};
+
+/** Each slot's views, by slot. */
+export type SlotViewsBySlot<P extends string = string> = Readonly<
+    Record<P, SlotViews>
+>;
+
+// Each engine's and component's slot views, decided once from the component's styles.
+const slotViews = new WeakMap<
+    MotionEngine,
+    WeakMap<NativeFactory, SlotViewsBySlot>
+>();
+
+const viewsOf = (
+    engine: MotionEngine,
+    factory: NativeFactory,
+): SlotViewsBySlot => {
+    let byFactory = slotViews.get(engine);
+    if (!byFactory) slotViews.set(engine, (byFactory = new WeakMap()));
+    let views = byFactory.get(factory);
+    if (!views) {
+        // A factory that can't say which slots move (made by hand) moves them all.
+        const moving = factory.moving as ReadonlySet<string> | undefined;
+        views = new Proxy({} as SlotViewsBySlot, {
+            get: (_, slot) =>
+                !moving || (typeof slot === "string" && moving.has(slot))
+                    ? engine
+                    : STILL,
+        });
+        byFactory.set(factory, views);
+    }
+    return views;
+};
+
 /** What a component renders with: its styles from the provider's engine, transitions and
- *  animations running, and its plain selection (drawings, icon fills, and styles at rest). */
-export interface ComponentSlots {
+ *  animations running, its plain selection (drawings, icon fills, and styles at rest), and each
+ *  slot's views. */
+export interface ComponentSlots<P extends string = string> {
     readonly styles: MotionStyles;
     readonly selected: Selected;
+    /** Each slot's views: the engine's where the component's styles ever move it (a transition
+     *  or a keyframe animation, in any variant or state), React Native's plain ones elsewhere.
+     *  It's decided from the component, never its state, so a slot keeps its views while
+     *  mounted: `<views.label.Text style={styles.label}>`. */
+    readonly views: SlotViewsBySlot<P>;
 }
 
 // A selection's variants, and its instance tokens by theme key, which tweens follow.
@@ -97,12 +155,13 @@ const splitSelection = (
 };
 
 /** A component's styles through the provider's engine, for its selection (variants and
- *  instance tokens, over the provider's defaults) and its state. Instance tokens tween. */
-export function useComponentSlots(
+ *  instance tokens, over the provider's defaults) and its state, and its slots' views (`P`, its
+ *  slots' names). Instance tokens tween. */
+export function useComponentSlots<P extends string = string>(
     name: string,
     selection: Record<string, unknown>,
     state: State = {},
-): ComponentSlots {
+): ComponentSlots<P> {
     const provider = usePureform();
     const factory = useEntryFactory(name);
     const { variants, tokens } = splitSelection(
@@ -116,7 +175,7 @@ export function useComponentSlots(
     );
     const styles = provider.engine.useStyles(name, variants, state, tokens);
     const selected = useComponentState(name, variants, state, tokens);
-    return { styles, selected };
+    return { styles, selected, views: viewsOf(provider.engine, factory) };
 }
 
 /** A component's plain selection, without an engine: styles at rest, drawings, and icon fills,

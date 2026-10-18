@@ -14,7 +14,6 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = chipAnatomy.indication!;
@@ -33,13 +32,16 @@ export interface ChipProps extends ChipVariantProps, InteractiveProps {
 }
 
 function ChipImpl(props: ChipProps): ReactNode {
-    const engine = useEngine();
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
         interactionSource: props.interactionSource,
         disabled: props.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<ChipPart>(
         "chip",
         indication.select(chipSelection(props)),
         indication.states({
@@ -50,7 +52,7 @@ function ChipImpl(props: ChipProps): ReactNode {
     );
     const id = (part: ChipPart) => testIdOf(chipAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="button"
             disabled={props.disabled}
@@ -58,27 +60,27 @@ function ChipImpl(props: ChipProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
             {props.icon != null && props.icon !== false ? (
-                <engine.View style={s.icon} testID={id("icon")}>
+                <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
                         {props.icon}
                     </IconSlot>
-                </engine.View>
+                </v.icon.View>
             ) : null}
-            <engine.Text
+            <v.label.Text
                 selectable={false}
                 style={s.label}
                 testID={id("label")}
             >
                 {props.label}
-            </engine.Text>
+            </v.label.Text>
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

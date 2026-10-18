@@ -16,7 +16,6 @@ import type { ReactNode } from "react";
 
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
-import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
 const [INDICATION] = checkboxAnatomy.indication!;
@@ -38,7 +37,6 @@ export interface CheckboxProps extends CheckboxVariantProps, InteractiveProps {
 }
 
 function CheckboxImpl(props: CheckboxProps): ReactNode {
-    const engine = useEngine();
     const [checked, setChecked] = useControllable<"checked", CheckedState>(
         "Checkbox",
         "checked",
@@ -53,7 +51,11 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
         interactionSource: props.interactionSource,
         disabled: props.disabled,
     });
-    const { styles: s, selected } = useComponentSlots(
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<CheckboxPart>(
         "checkbox",
         indication.select(checkboxSelection(props)),
         indication.states({
@@ -67,7 +69,7 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
     const id = (part: CheckboxPart) =>
         testIdOf(checkboxAnatomy, part, props.testId);
     return (
-        <engine.Pressable
+        <v.root.Pressable
             {...indication.handlers}
             role="checkbox"
             aria-checked={indeterminate ? "mixed" : checked}
@@ -81,20 +83,23 @@ function CheckboxImpl(props: CheckboxProps): ReactNode {
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
         >
-            <engine.View
+            <v.touchTarget.View
                 pointerEvents="none"
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
-            <engine.View style={s.box} testID={id("box")}>
-                <engine.View style={s.checkIcon} testID={id("checkIcon")} />
-                <engine.View
+            <v.box.View style={s.box} testID={id("box")}>
+                <v.checkIcon.View
+                    style={s.checkIcon}
+                    testID={id("checkIcon")}
+                />
+                <v.indeterminateIcon.View
                     style={s.indeterminateIcon}
                     testID={id("indeterminateIcon")}
                 />
-            </engine.View>
+            </v.box.View>
             {indication.layer(selected)}
-        </engine.Pressable>
+        </v.root.Pressable>
     );
 }
 

@@ -17,7 +17,6 @@ import type {
 import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "./parts";
-import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 export interface LinearProgressProps
@@ -45,17 +44,16 @@ const valueProps = (
 });
 
 function LinearProgressImpl(props: LinearProgressProps): ReactNode {
-    const engine = useEngine();
-    const { styles: s } = useComponentSlots(
+    const { styles: s, views: v } = useComponentSlots<LinearProgressPart>(
         "linearProgress",
         progressSelection(props) as Record<string, unknown>,
     );
     const id = (part: LinearProgressPart) =>
         testIdOf(linearProgressAnatomy, part, props.testId);
     return (
-        <engine.View {...valueProps(props)} style={s.root} testID={id("root")}>
-            <engine.View style={s.indicator} testID={id("indicator")} />
-        </engine.View>
+        <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+            <v.indicator.View style={s.indicator} testID={id("indicator")} />
+        </v.root.View>
     );
 }
 
@@ -64,22 +62,21 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
 export const LinearProgress = withEngine(LinearProgressImpl, "LinearProgress");
 
 function CircularProgressImpl(props: CircularProgressProps): ReactNode {
-    const engine = useEngine();
-    const { styles: s } = useComponentSlots(
+    const { styles: s, views: v } = useComponentSlots<CircularProgressPart>(
         "circularProgress",
         progressSelection(props) as Record<string, unknown>,
     );
     const id = (part: CircularProgressPart) =>
         testIdOf(circularProgressAnatomy, part, props.testId);
     return (
-        <engine.View {...valueProps(props)} style={s.root} testID={id("root")}>
-            <engine.View style={s.endHalf} testID={id("endHalf")}>
-                <engine.View style={s.endArc} testID={id("endArc")} />
-            </engine.View>
-            <engine.View style={s.startHalf} testID={id("startHalf")}>
-                <engine.View style={s.startArc} testID={id("startArc")} />
-            </engine.View>
-        </engine.View>
+        <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+            <v.endHalf.View style={s.endHalf} testID={id("endHalf")}>
+                <v.endArc.View style={s.endArc} testID={id("endArc")} />
+            </v.endHalf.View>
+            <v.startHalf.View style={s.startHalf} testID={id("startHalf")}>
+                <v.startArc.View style={s.startArc} testID={id("startArc")} />
+            </v.startHalf.View>
+        </v.root.View>
     );
 }
 
