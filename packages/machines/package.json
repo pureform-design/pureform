@@ -68,6 +68,13 @@
                 "default": "./dist/tooltip.mjs"
             }
         },
+        "./presence": {
+            "types": "./dist/presence.d.ts",
+            "import": {
+                "development": "./src/presence.ts",
+                "default": "./dist/presence.mjs"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs.d.ts",
             "import": {
@@ -135,6 +142,7 @@
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/menu": "catalog:",
+        "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/switch": "catalog:",

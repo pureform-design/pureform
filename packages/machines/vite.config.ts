@@ -18,6 +18,7 @@ export default createConfig({
                     menu: "src/menu.ts",
                     dialog: "src/dialog.ts",
                     tooltip: "src/tooltip.ts",
+                    presence: "src/presence.ts",
                     tabs: "src/tabs.ts",
                     navigation: "src/navigation/index.ts",
                     snackbar: "src/snackbar/index.ts",
