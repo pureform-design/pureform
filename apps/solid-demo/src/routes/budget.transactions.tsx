@@ -246,22 +246,24 @@ function Transactions() {
                     </div>
                 }
             >
-                <For each={months()}>
+                {/* Keyed by month: the groups are new on every change of the filters, and a
+                    month that stays keeps its section and rows. */}
+                <For each={months()} keyed={(group) => group.month}>
                     {(group) => (
                         <section class={month}>
                             <div class={monthHeading}>
                                 <Text as="h2" textStyle="titleSmall">
-                                    {formatMonth(group.month)}
+                                    {formatMonth(group().month)}
                                 </Text>
                                 <Text textStyle="labelMedium" class={muted}>
-                                    {formatMoney(net(group.transactions), {
+                                    {formatMoney(net(group().transactions), {
                                         sign: true,
                                     })}
                                 </Text>
                             </div>
                             <div class={flush}>
                                 <TransactionList
-                                    transactions={group.transactions}
+                                    transactions={group().transactions}
                                     categories={categories.data}
                                 />
                             </div>
