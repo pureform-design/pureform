@@ -44,6 +44,11 @@ export default defineConfig({
             ssr: true,
             // Dev-only: capture control at /__solid/diagnostics (see AGENTS.md).
             diagnostics: true,
+            // Dev-only, and on by default: Solid's tracks in Chrome's Performance panel. They
+            // record every computation as it runs, which makes mounting a page several times
+            // slower (a second to bring back the transactions' rows), so they're off; set
+            // `true` while profiling.
+            performanceTracks: false,
             // The configure module runs in the handler graph before any dispatch —
             // it registers the Query single-flight collector.
             serverFunctions: { configure: "./src/server-config.ts" },
