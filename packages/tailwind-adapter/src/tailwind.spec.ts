@@ -46,6 +46,13 @@ describe("toTailwind", () => {
         expect(shared["--spacing-4"]).toMatch(/px|rem/);
     });
 
+    it("declares the stacking scale, which shares Tailwind's names, by value", () => {
+        const { shared } = toTailwind(config);
+        expect(theme["--z-index-menu"]).toBeUndefined();
+        expect(shared["--z-index-menu"]).toBe("200");
+        expect(shared["--z-index-tooltip"]).toBe("600");
+    });
+
     it("leaves the raw palette out unless asked", () => {
         expect(theme["--color-primary40"]).toBeUndefined();
         const all = toTailwind(config, { palette: true }).theme;
@@ -116,7 +123,9 @@ describe("compileTailwind", () => {
             "shadow-level1",
             "medium:p-2",
             "p-4",
+            "z-raised",
         ]);
+        expect(out).toContain("z-index: var(--z-index-raised);");
         expect(out).toContain("padding: var(--spacing-4);");
         expect(out).toContain("background-color: var(--colors-primary);");
         expect(out).toContain("border-radius: var(--radii-large);");

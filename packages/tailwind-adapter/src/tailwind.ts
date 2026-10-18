@@ -98,6 +98,7 @@ const NAMESPACES: [
     ],
     ["font", (config) => [["fonts", config.fonts]]],
     ["ease", (config) => [["easings", config.easings]]],
+    ["z-index", (config) => [["zIndex", config.zIndices]]],
 ];
 
 // Text style properties Tailwind reads alongside `--text-<name>`.
