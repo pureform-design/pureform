@@ -151,7 +151,7 @@ regenerations keep that usage, so don't prune a config a dev server runs.
   writes `styled-system/`; the next dev server or `pureform generate` writes the full glue back
   (the hash covers what pruning narrowed). An app that commits `.pureform/` sets `prune: false`
   (`react-demo`), and so does one that styles components the scan can't see, such as through
-  Panda's recipe functions (`solid-demo`).
+  Panda's recipe functions.
 
 ## Pruning
 
