@@ -28,7 +28,6 @@ import {
 } from "../lib/budget-functions";
 import { budgetCategoriesQuery, prefetch } from "../lib/queries";
 import { Glyph } from "../ui/icons";
-import { overlay } from "../ui/layers";
 import { TopAppBar } from "../ui/top-app-bar";
 
 // The budget app's layout: its own top app bar, a navigation rail on wide screens and a
@@ -98,21 +97,21 @@ const bar = css({
     position: "fixed",
     insetInline: "0",
     bottom: "0",
-    zIndex: 1,
+    zIndex: "raised",
     md: { display: "none" },
 });
 
 const fab = css({
     position: "fixed",
-    zIndex: 1,
+    zIndex: "raised",
     insetInlineEnd: "4",
     bottom: "calc(token(spacing.16) + token(spacing.4) + token(spacing.4))",
     md: { bottom: "4" },
 });
 
+// The snackbar stacks at its own layer, over the bars and FABs.
 const snackbar = css({
     position: "fixed",
-    zIndex: 1,
     insetInline: "4",
     marginInline: "auto",
     width: "fit-content",
@@ -254,8 +253,8 @@ function BudgetLayout() {
                     role="alertdialog"
                     icon
                 >
-                    <Dialog.Backdrop class={overlay} />
-                    <Dialog.Positioner class={overlay}>
+                    <Dialog.Backdrop />
+                    <Dialog.Positioner>
                         <Dialog.Content>
                             <Dialog.Icon>
                                 <Glyph name="restart" />

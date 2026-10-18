@@ -39,7 +39,6 @@ import {
 } from "../lib/settings";
 import type { Settings } from "../lib/settings";
 import { Glyph } from "../ui/icons";
-import { overlay } from "../ui/layers";
 import { useSettings } from "./settings";
 import { swatchTheme } from "./theme";
 
@@ -51,7 +50,7 @@ const FAB_HEIGHT = "token(spacing.12) + token(spacing.2)";
 const NAVIGATION_BAR_HEIGHT = "token(spacing.16) + token(spacing.4)";
 const fab = css({
     position: "fixed",
-    zIndex: 1,
+    zIndex: "raised",
     insetInlineEnd: "calc(token(spacing.4) + token(spacing.2))",
     bottom: "4",
     "html:has([data-app-fab]) &": {
@@ -67,7 +66,9 @@ const fab = css({
     },
 });
 
-// The sheet: full height at the inline end, as wide as Material's side sheet allows.
+// The sheet: full height at the inline end, as wide as Material's side sheet allows. It slides in
+// from that edge and back out, rather than coming down as a dialog does; under reduced motion it
+// only fades, as every overlay does. `sheetIn` and `sheetOut` are in `panda.config.ts`.
 const sheet = css({
     height: "100%",
     width: "calc(token(spacing.16) * 6)",
@@ -78,6 +79,24 @@ const sheet = css({
     gap: "0",
     borderStartEndRadius: "0",
     borderEndEndRadius: "0",
+    "--sheet-offset": "100%",
+    _rtl: { "--sheet-offset": "-100%" },
+    "&[data-state=open]": {
+        animation:
+            "sheetIn token(durations.long2) token(easings.emphasizedDecelerate)",
+        _motionReduce: {
+            animation:
+                "overlayFadeIn token(durations.long2) token(easings.emphasizedDecelerate)",
+        },
+    },
+    "&[data-state=closed]": {
+        animation:
+            "sheetOut token(durations.short4) token(easings.emphasizedAccelerate) forwards",
+        _motionReduce: {
+            animation:
+                "overlayFadeOut token(durations.short4) token(easings.emphasizedAccelerate) forwards",
+        },
+    },
 });
 
 const sheetHeader = css({
@@ -306,6 +325,8 @@ export function SettingsPanel(): JSX.Element {
     const { reset } = useSettings();
     const location = useLocation();
     const [open, setOpen] = createSignal(false);
+    // The panel's tabs mount when it first opens, and stay, so they slide out with the sheet.
+    const [opened, setOpened] = createSignal(false);
     const [tab, setTab] = createSignal<string | null>("settings");
     let button: HTMLElement | undefined;
 
@@ -331,6 +352,7 @@ export function SettingsPanel(): JSX.Element {
                 aria-haspopup="dialog"
                 aria-expanded={open() ? "true" : "false"}
                 onClick={() => {
+                    setOpened(true);
                     setOpen(true);
                 }}
                 data-testid="settings-button"
@@ -342,8 +364,8 @@ export function SettingsPanel(): JSX.Element {
                 tokens={{ container: "var(--colors-surface-container-low)" }}
                 testId="settings"
             >
-                <Dialog.Backdrop class={overlay} />
-                <Dialog.Positioner class={overlay} style={sheetPositioner}>
+                <Dialog.Backdrop />
+                <Dialog.Positioner style={sheetPositioner}>
                     <Dialog.Content class={sheet}>
                         <div class={sheetHeader}>
                             <Dialog.Headline class={grow}>
@@ -355,7 +377,7 @@ export function SettingsPanel(): JSX.Element {
                                 onClick={() => setOpen(false)}
                             />
                         </div>
-                        <Show when={open()}>
+                        <Show when={opened()}>
                             <Tabs
                                 aria-label="Panel"
                                 value={tab()}

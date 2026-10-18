@@ -15,7 +15,6 @@ import { amountText, parseAmount } from "../lib/budget";
 import type { Transaction, TransactionInput } from "../lib/budget";
 import { budgetCategoriesQuery } from "../lib/queries";
 import { Glyph } from "../ui/icons";
-import { overlay } from "../ui/layers";
 import { useBudgetActions } from "./actions";
 
 const surface = css({
@@ -186,8 +185,8 @@ export function TransactionDialog(props: {
             }
             testId="transaction"
         >
-            <Dialog.Backdrop class={overlay} />
-            <Dialog.Positioner class={overlay}>
+            <Dialog.Backdrop />
+            <Dialog.Positioner>
                 <Dialog.Content class={surface} data-transaction-form>
                     <Dialog.Headline>
                         {props.draft?.id

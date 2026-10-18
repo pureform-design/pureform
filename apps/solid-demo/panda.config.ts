@@ -21,6 +21,23 @@ export default defineConfig({
         },
     },
 
+    // The settings panel's side sheet slides in from the inline end (`--sheet-offset`, negative
+    // under `rtl`) and back out.
+    theme: {
+        extend: {
+            keyframes: {
+                sheetIn: {
+                    from: { transform: "translateX(var(--sheet-offset))" },
+                    to: { transform: "translateX(0)" },
+                },
+                sheetOut: {
+                    from: { transform: "translateX(0)" },
+                    to: { transform: "translateX(var(--sheet-offset))" },
+                },
+            },
+        },
+    },
+
     // Allow only tokens to properties with predefined tokens
     //strictTokens: true,
 
