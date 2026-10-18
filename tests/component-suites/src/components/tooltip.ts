@@ -11,7 +11,7 @@ import { overlayParts } from "./overlay";
 import type { ActOptions, ComponentCase } from "./types";
 
 const ids = compositeTestIds.tooltip;
-const { trigger, placed, shown } = overlayParts(ids);
+const { trigger, placed, shown, overlay } = overlayParts(ids);
 
 /** Whether it's open: shown, and the trigger described by it, throwing if they disagree. */
 const read = (host: HTMLElement): boolean => {
@@ -61,6 +61,7 @@ export const tooltip: ComponentCase = {
         },
     },
     state: { prop: "open", from: false, to: true, act: focus, read },
+    overlay: overlay(),
     keyboard: {
         focusable: trigger,
         disables: false,

@@ -6,6 +6,7 @@ import { vi } from "vitest";
 import { harness } from "#binding";
 
 import type { ComponentCase } from "../components";
+import { animationsDone } from "./animations";
 import type { Mounted } from "./harness";
 import type { SceneProps, SceneProvider } from "./scene";
 
@@ -36,11 +37,12 @@ export const renderings = (
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
 
-/** Waits for a mounted scene to settle, and for an overlay in it to be placed: Zag places a
- *  floating one a few frames after it opens, once the trigger has its layout. */
+/** Waits for a mounted scene to settle, and for an overlay in it to be placed and done entering:
+ *  Zag places a floating one a few frames after it opens, once the trigger has its layout. */
 export const settlePlaced = async (): Promise<void> => {
     await harness.settle();
     for (let i = 0; i < 4; i++) await frame();
+    await animationsDone();
     await harness.settle();
 };
 

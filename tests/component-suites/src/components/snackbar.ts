@@ -18,7 +18,7 @@ const action = (host: HTMLElement) =>
 const close = (host: HTMLElement) =>
     byTestId<HTMLButtonElement>(host, ids.close);
 
-/** Whether it shows: a status region that isn't hidden. */
+/** Whether it's open: a status region that isn't hidden, and isn't on its way out. */
 const read = (host: HTMLElement): boolean => {
     const element = root(host);
     if (element.getAttribute("role") !== "status") {
@@ -26,7 +26,7 @@ const read = (host: HTMLElement): boolean => {
             `the snackbar's role is ${element.getAttribute("role")}`,
         );
     }
-    return !element.hidden;
+    return !element.hidden && element.dataset.state !== "closed";
 };
 
 export const snackbar: ComponentCase = {
@@ -69,4 +69,17 @@ export const snackbar: ComponentCase = {
     // Its action and its close button; the ready-made snackbar takes no source for either, and
     // has no disabled state.
     indication: { anatomy: snackbarAnatomy },
+    // Placed as an app places it, fixed at the bottom; it stays until closed.
+    overlay: {
+        surface: root,
+        parts: () => [],
+        props: { duration: null },
+        place: (host) => {
+            Object.assign(root(host).style, {
+                position: "fixed",
+                insetInlineStart: "16px",
+                bottom: "16px",
+            });
+        },
+    },
 };

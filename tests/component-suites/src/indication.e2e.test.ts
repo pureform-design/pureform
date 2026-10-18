@@ -20,6 +20,7 @@ import { harness } from "#binding";
 
 import { COMPONENTS } from "./components";
 import type { ComponentCase, IndicationCase } from "./components";
+import { animationsDone } from "./harness/animations";
 import type { Mounted } from "./harness/harness";
 import { hydrate } from "./harness/hydration";
 import { CUSTOM_PRESSED } from "./harness/indications";
@@ -159,6 +160,13 @@ interface MountOptions {
     readonly wrapper?: SceneWrapper | undefined;
 }
 
+/** A host at the top of the page, clear of an open overlay, which draws over what follows it. */
+const topHost = (): HTMLElement =>
+    document.body.insertBefore(
+        document.createElement("div"),
+        document.body.firstChild,
+    );
+
 /** Mounts the component showing its surfaces, and finds an entry's parts. */
 const mountIndicated = async (
     component: Indicated,
@@ -181,6 +189,8 @@ const mountIndicated = async (
     await component.indication.open?.(mounted.host);
     await harness.settle();
     await frame();
+    // An overlay grows in as it opens; the boxes are measured once it's in place.
+    await animationsDone();
     await away();
     const parts = () =>
         partsOf(mounted.host, component.indication.anatomy, entry);
@@ -437,10 +447,16 @@ describe.each(INDICATED)("$component", (component) => {
             const { parts } = await mountIndicated(component, entry, {
                 props: sourceProps(observed.source),
             });
-            const other = harness.mount({
-                component: "Button",
-                props: { label: "Other", interactionSource: observed.source },
-            });
+            const other = harness.mount(
+                {
+                    component: "Button",
+                    props: {
+                        label: "Other",
+                        interactionSource: observed.source,
+                    },
+                },
+                topHost(),
+            );
             await harness.settle();
             const button = other.host.querySelector<HTMLElement>("button")!;
             await settled(parts().surface);
@@ -474,10 +490,16 @@ describe.each(INDICATED)("$component", (component) => {
             const { mounted, parts } = await mountIndicated(component, entry, {
                 props: sourceProps(observed.source),
             });
-            const other = harness.mount({
-                component: "Button",
-                props: { label: "Other", interactionSource: observed.source },
-            });
+            const other = harness.mount(
+                {
+                    component: "Button",
+                    props: {
+                        label: "Other",
+                        interactionSource: observed.source,
+                    },
+                },
+                topHost(),
+            );
             await harness.settle();
             const button = other.host.querySelector<HTMLElement>("button")!;
             const before = outline(button);

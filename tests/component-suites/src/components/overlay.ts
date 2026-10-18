@@ -1,9 +1,11 @@
 // What the overlay cases share: the trigger, whether the overlay shows (its trigger and surface
-// agreeing), and waiting for Zag to place it, which it does a frame or two after opening.
+// agreeing), and waiting for Zag to place it, which it does a frame or two after opening, and for
+// it to finish entering.
 
 import { userEvent } from "vitest/browser";
 
-import type { ActOptions } from "./types";
+import { animationsDone } from "../harness/animations";
+import type { ActOptions, OverlayCase } from "./types";
 import { byTestId } from "./types";
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
@@ -16,10 +18,15 @@ export const overlayParts = (ids: {
     const trigger = (host: HTMLElement) =>
         byTestId<HTMLButtonElement>(host, ids.trigger);
     const content = (host: HTMLElement) => byTestId(host, ids.content);
-    // Shown: the surface and its positioner aren't hidden.
+    // Shown: the surface and its positioner aren't hidden, and it isn't on its way out (closed,
+    // and still showing while its exit animation runs).
     const shown = (host: HTMLElement) => {
         const surface = content(host);
-        return !surface.hidden && !surface.parentElement!.hidden;
+        return (
+            !surface.hidden &&
+            !surface.parentElement!.hidden &&
+            surface.dataset.state !== "closed"
+        );
     };
     /** Whether it's open: shown, and the trigger says so, throwing if they disagree. */
     const read = (host: HTMLElement): boolean => {
@@ -39,13 +46,31 @@ export const overlayParts = (ids: {
         await userEvent.click(trigger(host), options);
         await placed(host);
     };
-    /** Waits a few frames for the overlay to open and be placed. */
+    /** Waits a few frames for the overlay to open and be placed, then for it to finish
+     *  entering. */
     const placed = async (host: HTMLElement) => {
         for (let i = 0; i < 3; i++) await frame();
         if (shown(host)) {
             await frame();
             await frame();
+            await animationsDone();
         }
     };
-    return { trigger, content, shown, read, click, placed };
+    /** How it comes and goes: the surface, and its positioner (with `parts`, others). */
+    const overlay = (
+        extra: Partial<OverlayCase> & {
+            readonly also?: (host: HTMLElement) => readonly HTMLElement[];
+        } = {},
+    ): OverlayCase => {
+        const { also, ...rest } = extra;
+        return {
+            surface: content,
+            parts: (host) => [
+                content(host).parentElement!,
+                ...(also?.(host) ?? []),
+            ],
+            ...rest,
+        };
+    };
+    return { trigger, content, shown, read, click, placed, overlay };
 };

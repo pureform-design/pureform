@@ -86,6 +86,7 @@ precedence>` blocks (split off the front of its markup). Each awaits `preloadThe
 | `direction.e2e.test.ts`        | §5.9: for every example and opened overlay, every part the machine marks gets the provider's `dir`, and each part's box in `rtl` mirrors its `ltr` box across the root (the mirrored-box helpers from `tests/browser-e2e-tests/src/mirror.ts`); a component with no inner parts mirrors its root across its host, which takes the direction too. Animations are held at 300 ms while measuring.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `themes.e2e.test.ts`           | §5.6: the registry's `themeAttributes(name)` is the target's attribute; a provider's `theme` writes it on its element; the component draws exactly as under that attribute set by hand (both measured where the pointer can't hover), for each of the config's themes; teal draws differently from the base theme (unless `themed: false`); a runtime theme from teal's seed draws teal's colors in both schemes.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `indication.e2e.test.ts`       | §9.8, for every component with an `indication` case, per anatomy entry (the snackbar has two): hover, a press, and keyboard focus tint the surface, and a drag the slider's; a press ripples in the surface's layer, from the center when the entry says so, and not under reduced motion; `noIndication` on the provider tints nothing, draws no layer, and keeps the focus indicator; inside an interactive card with its own `indication`, the component draws exactly as alone; a shared source shows a press on a button (`data-pf-active`) and the button's press on it, never focus, and `useInteractionState` reports it; disabling it (or its item) while pressed ends the press; an app's own interaction kind reaches subscribers and changes no state; a custom indication on the provider and the component hydrates unchanged. Known gaps are `it.fails` tests at the end. |
+| `overlays.e2e.test.ts`         | §5.7, §5.8, for each overlay (menu, select, dialog, tooltip, snackbar): open, it draws over a positioned element that follows it in the page (`elementFromPoint` at its center); opening runs an animation that moves and fades it, and closing one that fades it while it stays shown, then it hides; under reduced motion both only fade. The case's `overlay` names the surface, the parts that come and go with it, and how an app places it.                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | `server-rendering.e2e.test.ts` | §5.7: every example rendered in Node and hydrated, in both color schemes: no warning, no element replaced, no attribute changed; default and controlled state render on the server; the hydrated component responds; hydrated inside a disabled fieldset (and its first legend) it follows the browser's rule; a named theme's attribute renders on the server; a runtime theme renders its scope and block on the server, hydrates in both schemes keeping the server's block and generating nothing (`"reuse"`), and regenerates the same block (`"regenerate"`); overrides render and hydrate unchanged.                                                                                                                                                                                                                                                                              |
 
 `indication-benchmark.e2e.test.ts` isn't a suite: it mounts 1,000 interactive list items with and
@@ -134,6 +135,10 @@ VITE_PUREFORM_BENCH=1 bun x vitest --config vitest.config.e2e.ts run src/indicat
       component with no disabled state, and `drags` for the slider. The suite finds each entry's
       trigger, surface, and focus part by their test ids, and the layer as the surface's
       `[data-ripple-layer]` child.
+    - `overlay` (if it's an overlay): its surface (what animates and stacks), the parts that come
+      and go with it (its positioner, a dialog's backdrop), props it's mounted with, and `place`
+      where placing it is the app's (the snackbar, fixed at the bottom). `overlayParts(ids).overlay()`
+      builds it for a trigger-and-positioner overlay.
 4. Add the case to `COMPONENTS` in `src/components/index.ts`.
 
 Every target's registry must have the component: each is generated with every component of the
@@ -180,7 +185,15 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   where the theme's color is `oklch(…)`.
 - **Overlays** (`src/components/overlay.ts`) are read by their trigger and surface agreeing, and
   acted on by clicking the trigger and waiting a few frames: Zag places a floating overlay a frame
-  or two after it opens. The axe and direction suites wait the same (`settlePlaced`).
+  or two after it opens. They animate in and out, so the waits also wait out every animation that
+  ends (`animationsDone`, `src/harness/animations.ts`), and one closing reads as closed (its
+  surface's `data-state`) while it still shows. The axe and direction suites wait the same
+  (`settlePlaced`); the keyboard suite waits out an overlay's exit before checking where focus is,
+  and the indication suite mounts its other button at the top of the page, clear of an open
+  overlay, which draws over what follows it.
+- **The test browser emulates `prefers-reduced-motion: reduce`** (`vitest.config.e2e.ts`), so
+  boxes are measured at rest; overlays still fade under it. A suite that checks full motion sets
+  the provider's `motion: "full"`.
 - **The pointer rests where the last test left it.** A snackbar under it is held open, and a
   hover onto a trigger it already rests on fires nothing: unhover first, or keep state off hover
   (the tooltip case opens on keyboard focus, since leaving the trigger also asks to close).

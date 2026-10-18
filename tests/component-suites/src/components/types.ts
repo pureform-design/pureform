@@ -167,6 +167,21 @@ export interface ComponentCase {
     /** Where it shows indication, for an interactive component (an anatomy with `indication`
      *  entries). */
     readonly indication?: IndicationCase | undefined;
+    /** How it comes and goes, for an overlay. */
+    readonly overlay?: OverlayCase | undefined;
+}
+
+/** How an overlay comes and goes, for the overlays suite: it opens and closes with its `open`
+ *  prop, stacks over what follows it in the page, and animates in and out. */
+export interface OverlayCase {
+    /** The surface: what animates and stacks, which Zag marks with `data-state`. */
+    surface(host: HTMLElement): HTMLElement;
+    /** The other parts that show and hide with it: its positioner, a dialog's backdrop. */
+    parts(host: HTMLElement): readonly HTMLElement[];
+    /** Props it's mounted with, besides `open`. */
+    readonly props?: SceneProps | undefined;
+    /** Places it as an app would, where placing it is the app's (the snackbar). */
+    place?(host: HTMLElement): void;
 }
 
 /** The element with a test id inside `host`. */
