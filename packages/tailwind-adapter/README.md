@@ -24,7 +24,11 @@ and reuses the CSS adapter's codegen.
 | `codegen.ts`  | `codegen`: the `tailwind` target's factory modules and stylesheet, for `@pureform/generate`.            |
 
 The theme is `@theme inline`: each Tailwind variable names the pureform var it stands for, so a
-dark scheme or a named theme switches utilities and components alike.
+dark scheme or a named theme switches utilities and components alike. Colors, radii, spacing,
+shadows, fonts, easings, text styles, breakpoints, and the stacking scale (`z-raised`,
+`z-dialog`) map to Tailwind's namespaces. Spacing and the stacking scale share Tailwind's own
+variable names (`--spacing-4`, `--z-index-menu`), so they go in a plain `@theme` by value, and
+pureform's rule still decides them at runtime.
 
 ## Public API
 
