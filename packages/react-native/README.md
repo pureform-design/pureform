@@ -48,11 +48,13 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
 | `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                           |
 | `presence.ts`                                                           | `usePresence`: an overlay's enter and exit (the preset's motions), present until the exit ends                            |
+| `portal-host.tsx`, `portal.tsx`                                         | `PortalHost` (the root provider holds one) and `Portal`: overlays rendered over the page, sorted by layer                 |
+| `overlay.tsx`                                                           | `placeOverlay` (placement, flip, shift), the trigger's box from its source, `useDismiss` (Escape and the back button)     |
 | `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
 | `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
 | `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                     |
 | `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                     |
-| `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`               | Lists and surfaces                                                                                                        |
+| `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`               | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`)                        |
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                         |
 
 ```
@@ -62,6 +64,11 @@ PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entr
        └── component ── useComponentSlots(name, selection, state)
                           ├─ engine.useStyles  → animated styles per slot (transitions run)
                           └─ useComponentState → plain selection (drawings, icon fills)
+
+PureformProvider (root) ── PortalHost ── the app, then a layer over it:
+                                          Portal entries sorted by [layer z-index, order], each in
+                                          the provider it was declared under (menu, tooltip,
+                                          snackbar queue); the dialog's Modal holds its own host
 
 Pressable callbacks ── NativeInteraction ──emit──► InteractionSource ──► state → selection
                                                          │
@@ -121,6 +128,14 @@ import { registry } from "./.pureform";
   `present` after `open` turns false until the exit has run to its end, so render the overlay (or
   a `Modal`'s `visible`) from `present`, and give `style` and `props` to the engine's view that
   moves. `overlayMotion(name, tokens, reducedMotion, timeScale)` gives the frames and timings.
+- **Portals:** `Portal` renders its children at the nearest `PortalHost`, in a layer over the
+  page, sorted by the theme's z-index for its `layer` and then by the order each opened (a portal
+  inside another sorts over it), keeping the provider it was declared under. The root
+  `PureformProvider` holds a host; put your own around the provider to give it `insets` (the safe
+  area's, which overlays keep clear of), or inside an app `Modal` whose content opens overlays.
+  `placeOverlay` places a box against a trigger as the ready-made overlays do, `useDismiss(active,
+dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverlay()` is what an
+  app `Modal`'s `onRequestClose` calls.
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in
   the slot's type and color, moving with it; a string given as an icon is drawn as one.
@@ -161,22 +176,95 @@ import { registry } from "./.pureform";
   prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
   (`rows.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
   (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
-  the menu's own z-index can't), views (`views.spec.tsx`: a list item's still slots are plain and
+  the menu's own z-index can't), portals (`portal.spec.tsx`: at the host, sorted by layer and order, the declaring
+  provider carried through, an app's own host), overlays (`overlays.spec.tsx`, with both engines:
+  placement, the menu, the snackbar queue, the tooltip, the modal dialog, and their stacking),
+  views (`views.spec.tsx`: a list item's still slots are plain and
   its surface the engine's, with both engines, through a change of state; a moving slot still
   tweens; a factory without `moving` keeps every slot on the engine), and presence (`presence.spec.tsx`: the motions are the preset's;
   with each engine, the select's menu grows in and stays until it has faded out, reduced motion
   only fades, a reopened overlay enters again, the dialog and scrim, snackbar, and tooltip
   `open`). Node-side commands (`src/testing/commands.ts`) precompute the
   preset's styles for a test registry.
-- `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package.
+- `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package, and opens and
+  dismisses each overlay.
 
 ## Worth knowing
 
 - **Engines change hooks**, so each component starts over (`withEngine`, keyed by the engine's
   name) when the provider's engine changes: the app's state stays, a press in progress doesn't.
-- **Overlays are surfaces:** the menu, dialog, snackbar, tooltip, and scrim render their surface;
-  where they show (a `Modal`, a positioned view) and when (a press, a timer) is the app's. The
-  select is the exception: it opens its menu in a `Modal` under the field.
+- **Overlays open over the page:** a menu or tooltip given a `trigger` renders the trigger in
+  place and opens its surface through the portal host, against the trigger; `useSnackbar()` queues
+  snackbars at the bottom; a dialog given a `trigger`, `onOpenChange`, or `defaultOpen` opens modal,
+  in a `Modal` over a scrim. Each enters and leaves with the engine and closes itself as the web's
+  does:
+
+    ```tsx
+    const snackbars = useSnackbar();
+
+    <Menu
+        items={items}
+        onSelect={({ value }) => run(value)}
+        trigger={(trigger) => (
+            <IconButton {...trigger} aria-label="More" icon="⋮" />
+        )}
+    />
+    <Tooltip
+        supportingText="Save to drafts"
+        trigger={(trigger) => (
+            <IconButton {...trigger} aria-label="Save" icon="⎙" />
+        )}
+    />
+    <Button
+        label="Archive"
+        onPress={() =>
+            snackbars.show({ supportingText: "Archived", action: "Undo", onAction: undo })
+        }
+    />
+    <Dialog
+        trigger="Discard"
+        headline="Discard draft?"
+        actions={({ close }) => (
+            <Button variant="text" label="Cancel" onPress={close} />
+        )}
+    >
+        Your changes won't be saved.
+    </Dialog>
+    ```
+
+    - **The menu** opens under its trigger at its start (`positioning`: `placement`, `gutter`
+      8, `flip`, `sameWidth`), flipped where there's no room and shifted inside the host's insets.
+      A press outside closes it (a layer under the menu takes that press, as a native popup does),
+      as do picking an item (`closeOnSelect`), Escape, and Android's back button. On the web it
+      focuses its first item; the arrow keys, Home, and End move focus, and Tab closes it.
+    - **The tooltip** shows once the pointer rests on its trigger (`openDelay`, 400 ms), at once on
+      keyboard focus, or on a long press, and hides as the pointer leaves (`closeDelay`, 150 ms), on
+      blur, a press, Escape or back, or `LONG_PRESS_TOOLTIP_MS` (1.5 s) after a long press. Give
+      the trigger the `onLongPress` it's given (the button, icon button, FAB, and chip take one), so
+      a long press shows the tooltip rather than pressing. A rich tooltip is interactive.
+    - **The snackbar queue** is the nearest host's: one at a time, each for `duration` (5 s, `null`
+      to stay), held while it's pressed or hovered, closed by its action, its close button, or
+      `dismiss(id)`, with the reason in `onOpenChange`. It's a polite live region; VoiceOver is
+      told the message.
+    - **The dialog** uses a `Modal`, since it's modal: a window of its own on a device that takes
+      the touches, the back button, and the screen reader, and that traps focus on the web. Its
+      `Modal` holds a portal host, so a menu or tooltip opened inside draws over it, and Escape or
+      back closes that first. A press on the scrim closes it, but not an `alertdialog`.
+    - **Triggers say where they are** through the `interactionSource` they're given: the overlay
+      measures the view the source last saw (`measureInWindow`), or opens at the press's point
+      when a trigger doesn't emit.
+
+    Without a trigger (or, for the dialog, `onOpenChange` and `defaultOpen`) each is its surface,
+    as before: the app places it, and given `open` it enters and leaves in place. The select
+    still opens its menu in a `Modal` under the field.
+
+- **What overlays don't do yet:** an open menu or tooltip stays where it opened when the page
+  scrolls under it. Only pureform's provider crosses a portal: read the app's own contexts outside
+  and pass what the overlay needs in. The tooltip's text isn't the trigger's description for
+  assistive technology (give the trigger its own `aria-label`). Safe areas need the app's insets
+  (`<PortalHost insets={useSafeAreaInsets()}>`); the package adds no safe area dependency. A
+  snackbar queued from inside a dialog shows in the dialog's host, over it; one queued outside
+  shows under the dialog's `Modal` on a device.
 - **Overlays move as on the web:** the preset's enter and exit keyframes are raw CSS on Zag's
   `data-state`, which React Native drops, so `presence.ts` holds the same motions (checked against
   the preset's in `presence.spec.tsx`) and runs them through the engine: a menu, select list,
@@ -193,7 +281,8 @@ import { registry } from "./.pureform";
 - **The select keeps its label:** when the picked item leaves `items`, the field still shows its
   label until the value changes, as Zag's select does on the web; a value no item has had shows
   nothing, and `null` clears it.
-- **Overlays stack from their wrapper:** React Native's `zIndex` only orders a view among its
+- **Overlays you place stack from their wrapper** (the ready-made ones are in the host's layer
+  already): React Native's `zIndex` only orders a view among its
   siblings, and React Native Web gives every `View` `position: relative` and `z-index: 0`, so the
   layer a surface takes in its own style (the menu's 200, the dialog's 400) never lifts it out of
   the view it sits in. Put the layer on the overlay's outermost wrapper, the view that's a sibling
