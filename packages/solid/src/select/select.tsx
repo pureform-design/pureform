@@ -210,6 +210,18 @@ function Container(props: SelectPartProps): JSX.Element {
  *  click, Enter, Space, or an arrow key, and changes the value with the arrow keys sideways. */
 function Input(props: SelectPartProps): JSX.Element {
     const { scope, api, dir } = context.use("Input");
+    // The field's own default is the text it shows, so a form reset doesn't clear it; the select's
+    // value, reset or not, decides what it shows.
+    const [element, setElement] = createSignal<HTMLInputElement | undefined>(
+        undefined,
+        { ownedWrite: true },
+    );
+    createEffect(
+        () => [element(), api().valueAsString] as const,
+        ([input, text]) => {
+            if (input && input.defaultValue !== text) input.defaultValue = text;
+        },
+    );
     return scope.render("input", {
         element: "input",
         machine: () =>
@@ -218,6 +230,7 @@ function Input(props: SelectPartProps): JSX.Element {
                 api().valueAsString,
                 dir(),
             ),
+        ref: (input) => setElement(input as HTMLInputElement),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
