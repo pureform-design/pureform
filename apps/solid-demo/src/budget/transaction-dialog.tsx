@@ -15,9 +15,8 @@ import { amountText, parseAmount } from "../lib/budget";
 import type { Transaction, TransactionInput } from "../lib/budget";
 import { budgetCategoriesQuery } from "../lib/queries";
 import { Glyph } from "../ui/icons";
+import { overlay } from "../ui/layers";
 import { useBudgetActions } from "./actions";
-
-const layer = css({ zIndex: 1 });
 
 const surface = css({
     width: "calc(token(spacing.16) * 7)",
@@ -33,7 +32,7 @@ const fields = css({ display: "grid", gap: "4" });
 const row = css({
     display: "grid",
     gridTemplateColumns:
-        "repeat(auto-fit, minmax(calc(token(spacing.16) * 2), 1fr))",
+        "repeat(auto-fit, minmax(calc(token(spacing.16) * 2.5), 1fr))",
     gap: "4",
 });
 
@@ -187,8 +186,8 @@ export function TransactionDialog(props: {
             }
             testId="transaction"
         >
-            <Dialog.Backdrop class={layer} />
-            <Dialog.Positioner class={layer}>
+            <Dialog.Backdrop class={overlay} />
+            <Dialog.Positioner class={overlay}>
                 <Dialog.Content class={surface} data-transaction-form>
                     <Dialog.Headline>
                         {props.draft?.id

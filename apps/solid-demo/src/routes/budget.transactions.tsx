@@ -10,7 +10,7 @@ import { createFileRoute } from "@tanstack/solid-router";
 import { createMemo, For, Show } from "solid-js";
 
 import { TransactionList } from "../budget/transaction-list";
-import { formatMoney, formatMonth, isolate, signedAmount } from "../lib/budget";
+import { count, formatMoney, formatMonth, signedAmount } from "../lib/budget";
 import type { Transaction } from "../lib/budget";
 import {
     budgetCategoriesQuery,
@@ -220,7 +220,7 @@ function Transactions() {
                 </For>
             </div>
             <Text textStyle="bodyMedium" class={muted} aria-live="polite">
-                {isolate(String(shown().length))} transactions,{" "}
+                {count(shown().length, "transaction", "transactions")},{" "}
                 {formatMoney(net(shown()), { sign: true })} net
             </Text>
             <Show

@@ -13,10 +13,10 @@ import { createMemo, createSignal, For } from "solid-js";
 import { useBudgetActions } from "../budget/actions";
 import { BudgetDialog } from "../budget/budget-dialog";
 import {
+    count,
     formatMoney,
     formatMonth,
     formatWholeMoney,
-    isolate,
 } from "../lib/budget";
 import type { CategorySummary } from "../lib/budget";
 import { setCategoryBudget } from "../lib/budget-functions";
@@ -87,7 +87,7 @@ function Categories() {
             .map((c) => ({
                 value: c.id,
                 headline: c.name,
-                supportingText: `${isolate(String(c.count))} payments`,
+                supportingText: count(c.count, "payment", "payments"),
                 leading: (
                     <Avatar color={c.color}>
                         <Glyph name={c.icon} />
@@ -106,7 +106,7 @@ function Categories() {
                 <Text textStyle="bodyMedium" class={muted}>
                     {formatWholeMoney(overview.data.spent)} spent of{" "}
                     {formatWholeMoney(overview.data.budgeted)} budgeted across{" "}
-                    {isolate(String(expenses().length))} categories
+                    {count(expenses().length, "category", "categories")}
                 </Text>
             </div>
 
@@ -136,8 +136,11 @@ function Categories() {
                                             textStyle="bodySmall"
                                             class={muted}
                                         >
-                                            {isolate(String(category.count))}{" "}
-                                            transactions
+                                            {count(
+                                                category.count,
+                                                "transaction",
+                                                "transactions",
+                                            )}
                                         </Text>
                                     </div>
                                 </div>
