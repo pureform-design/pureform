@@ -222,6 +222,31 @@ describe("Select, ready-made", () => {
         expect(relays).toEqual([]);
     });
 
+    it("makes its items once per change when they're written in place", async () => {
+        const [small, setSmall] = createSignal("Small");
+        let made = 0;
+        const sizes = (label: string) => {
+            made++;
+            return [
+                { value: "s", label },
+                { value: "m", label: "Medium" },
+            ];
+        };
+        withRegistry(() => (
+            <Select label="Size" items={sizes(small())} defaultValue="s" />
+        ));
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        await userEvent.click(input);
+        await frames();
+        expect(made).toBe(1);
+        setSmall("Tiny");
+        await settle();
+        expect(made).toBe(2);
+        expect(input.value).toBe("Tiny");
+        expect(item("s").textContent).toBe("Tiny");
+    });
+
     it("submits, and resets to its default with the form", async () => {
         const onValueChange = vi.fn();
         withRegistry(() => (

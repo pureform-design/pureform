@@ -122,7 +122,8 @@ function Root(props: SelectRootProps): JSX.Element {
         { ownedWrite: true },
     );
     const fieldsetDisabled = useFieldsetDisabled(hidden);
-    const items = () => props.items ?? [];
+    // Read once per change: items written in place are made again each time they're read.
+    const items = createMemo(() => props.items ?? []);
     const collection = createMemo(() =>
         select.collection<SelectItem>({
             items: [...items()],
