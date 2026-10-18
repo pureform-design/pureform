@@ -43,9 +43,12 @@ export interface ResolvedTheme<
     color: ColorContract<G>;
     typography: TypographyContract<TFont, TStyle>;
     shape: ShapeContract;
-    /** The layout, with its density steps filled in (Material's when the provider gives
-     *  none). */
-    layout: LayoutContract & { densities: Record<string, number> };
+    /** The layout, with its density steps and stacking scale filled in (Material's when the
+     *  provider gives none). */
+    layout: LayoutContract & {
+        densities: Record<string, number>;
+        zIndices: NonNullable<LayoutContract["zIndices"]>;
+    };
     state: StateContract;
     motion: MotionContract;
     elevation: ElevationContract;

@@ -27,6 +27,7 @@ import {
 } from "../contracts/foundations";
 import type {
     ElevationLevel,
+    LayoutContract,
     ShapeRole,
     SizeRole,
 } from "../contracts/foundations";
@@ -231,6 +232,8 @@ export interface GridLayoutOptions {
     densities?: Record<string, number>;
     /** The theme's density: a step's name, or its grid units. Default `0`. */
     density?: string | number;
+    /** The stacking scale, built with `stack([...])`. Default `MATERIAL_STACKING`. */
+    zIndices?: LayoutContract["zIndices"];
 }
 
 /** The grid units of the theme's density, which must be one of the steps. */
@@ -256,6 +259,7 @@ export const gridLayout = ({
     sizes,
     densities = MATERIAL_DENSITIES,
     density = 0,
+    zIndices,
 }: GridLayoutOptions): LayoutProvider =>
     defineProvider({
         domain: "layout",
@@ -274,6 +278,7 @@ export const gridLayout = ({
                 ],
             ]) as Record<SizeRole, NumericScalarNode>,
             densities,
+            ...(zIndices ? { zIndices } : {}),
         }),
     });
 

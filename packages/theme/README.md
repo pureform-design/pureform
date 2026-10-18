@@ -15,7 +15,7 @@ any provider in its place.
 | `color`      | The surface roles (`surface`, `onSurface`, the container steps, `outline`, `scrim`, …) and, per color group, `g`, `onG`, `gContainer`, `onGContainer`                                                                                                                              |
 | `typography` | `brand` and `plain` font roles and the 15 Material text styles. Add roles and styles freely                                                                                                                                                                                        |
 | `shape`      | Radii `none`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `full`                                                                                                                                                                                                       |
-| `layout`     | Spacing steps `0` through `16` and sizes `iconSmall` through `touchTarget`                                                                                                                                                                                                         |
+| `layout`     | Spacing steps `0` through `16` and sizes `iconSmall` through `touchTarget`; optionally the density steps and the stacking scale (`zIndices`, every layer of `STACKING_ROLES`), Material's when left out                                                                            |
 | `state`      | Opacities `stateHover`, `stateFocus`, `statePressed`, `stateDragged`, `disabledContainer`, `disabledContent`, `scrim`; the focus indicator's `focusIndicatorThickness` and `focusIndicatorOuterOffset` (lengths, lowered beside the sizes and read through `focusIndicator(name)`) |
 | `motion`     | Durations `short1` through `extraLong4` and easings `standard` through `linear`                                                                                                                                                                                                    |
 | `elevation`  | A `{ shadow, tint }` pair for each of `level0` through `level5`                                                                                                                                                                                                                    |
@@ -153,3 +153,12 @@ values refer to.
   from `-3` up (Material's `"0"` to `"-3"` by default), and `density`, the theme's step by name
   or units. It emits the `densityOffset` size, which dense components add to their heights, and
   the steps become their `density` variant.
+- **Stacking:** the layout's `zIndices` is the stacking scale the overlays stack at, lowest first:
+  `base`, `raised` (what an app places over its content: app bars, navigation bars, FABs),
+  `menu` (menus and select lists), `scrim`, `dialog`, `snackbar`, `tooltip`. It defaults to
+  `MATERIAL_STACKING`, `stack(STACKING_ROLES)` (0, 100, … 600). Give `gridLayout` or
+  `materialLayout` your own as `zIndices: stack([...])` (every role, in any order, plus your own
+  layers); it lowers to `config.zIndices`, which every target emits (`--z-index-<name>`, Panda's
+  `zIndex` tokens, Tailwind's `z-<name>`), so a named or runtime theme can change it too. Read a
+  layer in a spec with `zIndex("menu")`, or in an app with the target's token
+  (`css({ zIndex: "raised" })`).

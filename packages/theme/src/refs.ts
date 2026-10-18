@@ -13,6 +13,7 @@ import type {
     ShapeRole,
     SizeRole,
     SpacingStep,
+    StackingRole,
     StateRole,
 } from "./contracts/foundations";
 import type { BaseFontRole, BaseTextStyle } from "./contracts/typography";
@@ -29,6 +30,7 @@ export const PATHS = {
     opacity: ["tokens", "opacity"],
     duration: ["durations"],
     easing: ["easings"],
+    zIndex: ["zIndices"],
     fontSize: ["tokens", "fontSize"],
     lineHeight: ["tokens", "lineHeight"],
     letterSpacing: ["tokens", "letterSpacing"],
@@ -71,3 +73,5 @@ export const opacity = ref<StateRole | (string & {})>(PATHS.opacity);
 export const focusIndicator = ref<FocusIndicatorRole>(PATHS.size);
 export const duration = ref<DurationRole | (string & {})>(PATHS.duration);
 export const easing = ref<EasingRole | (string & {})>(PATHS.easing);
+/** A layer of the stacking scale, for `zIndex`: `zIndex("menu")`. */
+export const zIndex = ref<StackingRole | (string & {})>(PATHS.zIndex);

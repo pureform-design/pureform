@@ -24,6 +24,7 @@ import type { ColorContract } from "./contracts/color";
 import {
     CORNER_SHAPES,
     MATERIAL_DENSITIES,
+    MATERIAL_STACKING,
     MIN_DENSITY,
     DURATION_ROLES,
     EASING_ROLES,
@@ -32,6 +33,7 @@ import {
     SHAPE_ROLES,
     SIZE_ROLES,
     SPACING_STEPS,
+    STACKING_ROLES,
     STATE_ROLES,
 } from "./contracts/foundations";
 import type { ElevationContract } from "./contracts/foundations";
@@ -146,6 +148,13 @@ const KINDS = {
         "%",
     ]),
     percent: numericIn("a percentage", ["%"]),
+    zIndex: {
+        label: "a unitless whole number",
+        test: (node: unknown) =>
+            nodeType(node) === "numeric" &&
+            (node as { unit: string }).unit === "none" &&
+            Number.isInteger((node as { value: number }).value),
+    },
     duration: numericIn("a duration in ms or s", ["ms", "s"]),
     weight: numericIn("a unitless number", ["none"]),
     easing: {
@@ -431,10 +440,15 @@ export const resolveTheme = <
                 );
             }
         }
+        if (c.zIndices !== undefined) {
+            requireNames(where, "stacking layer", c.zIndices, STACKING_ROLES);
+            requireKind(where, "stacking layer", c.zIndices, KINDS.zIndex);
+        }
     });
     const layout = {
         ...resolvedLayout,
         densities: resolvedLayout.densities ?? MATERIAL_DENSITIES,
+        zIndices: resolvedLayout.zIndices ?? MATERIAL_STACKING,
     };
     const state = step("state", providers.state, (c, where) => {
         requireNames(where, "opacity", c.opacities, STATE_ROLES);
@@ -477,6 +491,7 @@ export const resolveTheme = <
         semanticTokens: { colors: color.roles },
         durations: motion.durations,
         easings: motion.easings,
+        zIndices: layout.zIndices,
     };
 
     const { components: _, ...config } = mergeConfigs(
