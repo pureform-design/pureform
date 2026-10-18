@@ -1,44 +1,32 @@
 import {
     HeadContent,
-    Link,
     Outlet,
     createRootRouteWithContext,
 } from "@tanstack/solid-router";
 
+import { prefetch, settingsQuery } from "../lib/queries";
 import type { RouterContext } from "../router";
+import { SettingsProvider } from "../shell/settings";
+import { Shell } from "../shell/shell";
+import { NotFound } from "../ui/not-found";
 
-// The root route: the site-wide layout every route renders inside, plus the
-// not-found boundary. Declaring the RouterContext type here is what types
+// The root route: the shell every app renders inside (the settings as
+// providers, the page's surface, and the floating settings button), plus
+// the not-found boundary. Declaring the RouterContext type here is what types
 // `context` in every loader below. <HeadContent /> renders whatever the
 // matched routes declare in their `head` options (titles here).
 export const Route = createRootRouteWithContext<RouterContext>()({
-    head: () => ({ meta: [{ title: "Solid App" }] }),
+    loader: ({ context }) => prefetch(context.queryClient, settingsQuery()),
+    head: () => ({ meta: [{ title: "pureform demos" }] }),
     component: () => (
         <>
             <HeadContent />
-            <nav class="site-nav">
-                <Link to="/">Home</Link>
-                <Link to="/tokens">Tokens</Link>
-                <Link to="/providers">Providers</Link>
-                <Link to="/components">Components</Link>
-            </nav>
-            <Outlet />
+            <SettingsProvider>
+                <Shell>
+                    <Outlet />
+                </Shell>
+            </SettingsProvider>
         </>
     ),
-    notFoundComponent: () => (
-        <main>
-            <h1>Page Not Found</h1>
-            <p>
-                Visit{" "}
-                <a
-                    href="https://docs.solidjs.com"
-                    target="_blank"
-                    rel="noreferrer"
-                >
-                    docs.solidjs.com
-                </a>{" "}
-                to learn how to build Solid apps.
-            </p>
-        </main>
-    ),
+    notFoundComponent: NotFound,
 });

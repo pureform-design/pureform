@@ -1,3 +1,5 @@
+import { preloadTheme } from "@pureform/solid";
+import { isRuntimeTheme } from "@pureform/styling";
 // The per-request SSR seam (`start.setup` in vite.config.ts): the generated
 // server entry awaits this default export after the middleware chain and
 // renders the returned component in App's place, inside the Document. Each
@@ -6,8 +8,9 @@ import type { RequestEvent, ResponseStub } from "@solidjs/web";
 import { QueryClientProvider } from "@tanstack/solid-query";
 import { RouterProvider, createMemoryHistory } from "@tanstack/solid-router";
 
-import { createQueryClient } from "./lib/queries";
+import { createQueryClient, settingsQuery } from "./lib/queries";
 import { createAppRouter } from "./router";
+import { colorTheme } from "./shell/theme";
 
 export default async function setup(
     // The generated entry builds the event with a mutable `response` head
@@ -48,6 +51,13 @@ export default async function setup(
     // Renders carry their status the same way: not-found answers 404 (an
     // errored load 500) instead of a masquerading 200.
     if (result) event.response.status = result.status;
+
+    // The shell reads the settings before anything else renders, and a seed
+    // color's theme is generated during the render, which is synchronous: so
+    // the settings are read and the theme generator loaded first.
+    const settings = await queryClient.ensureQueryData(settingsQuery());
+    const theme = colorTheme(settings);
+    if (isRuntimeTheme(theme)) await preloadTheme(theme);
 
     // No dehydrate/inline-script handoff: QueryClientProvider streams each
     // query's dehydrated entry as it settles, and RouterProvider serializes each

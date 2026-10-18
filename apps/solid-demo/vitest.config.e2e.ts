@@ -10,5 +10,7 @@ export default mergeConfig(e2eTestConfig, {
         environment: "node",
         globalSetup: ["./vitest-e2e-server.ts"],
         testTimeout: 60_000,
+        // The first visit waits for the dev server to optimize the pages' dependencies.
+        hookTimeout: 120_000,
     },
 } satisfies UserWorkspaceConfig);
