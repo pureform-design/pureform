@@ -157,25 +157,29 @@ const createPartScope = <A extends ComponentAnatomy>(
             const Tag = dynamic(
                 () => renderOptions.as?.() ?? renderOptions.element,
             );
-            const [element, setElement] = createSignal<Element | undefined>(
-                undefined,
-                { ownedWrite: true },
-            );
             const roles = indication
                 ? indicationRoles(indication.entries, part)
                 : [];
-            const shown =
-                indication && roles.length > 0
-                    ? usePartIndication(
-                          indication,
-                          roles,
-                          renderOptions.interactionSource ?? indication.source,
-                          element,
-                          () =>
-                              isUnstyled(options.unstyled?.(), part) ||
-                              !!renderOptions.unstyled?.(),
-                      )
-                    : undefined;
+            const indicated = indication !== undefined && roles.length > 0;
+            const icon = isIconPart(anatomy, part);
+            // The element, for the parts that follow it: an indication's, and an icon's context.
+            const [element, setElement] =
+                indicated || icon
+                    ? createSignal<Element | undefined>(undefined, {
+                          ownedWrite: true,
+                      })
+                    : [undefined, undefined];
+            const shown = indicated
+                ? usePartIndication(
+                      indication,
+                      roles,
+                      renderOptions.interactionSource ?? indication.source,
+                      element!,
+                      () =>
+                          isUnstyled(options.unstyled?.(), part) ||
+                          !!renderOptions.unstyled?.(),
+                  )
+                : undefined;
             const props = scope.part(
                 part,
                 shown
@@ -186,7 +190,7 @@ const createPartScope = <A extends ComponentAnatomy>(
                     : renderOptions,
             );
             const refs = [
-                (el: Element) => setElement(el),
+                setElement && ((el: Element) => setElement(el)),
                 renderOptions.ref,
                 untrack(() => user?.ref),
             ];
@@ -197,8 +201,8 @@ const createPartScope = <A extends ComponentAnatomy>(
                     {user?.children}
                 </Tag>
             );
-            if (!isIconPart(anatomy, part)) return node();
-            return <IconPartContext value={element}>{node()}</IconPartContext>;
+            if (!icon) return node();
+            return <IconPartContext value={element!}>{node()}</IconPartContext>;
         },
     };
     return scope;
