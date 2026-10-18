@@ -797,14 +797,29 @@ The design makes one setting, followed by everything that moves, on every target
       (`short3`), as material-web's does; the scrim fades (`long2` in, `short3` out, linear).
       Under `reducedMotion` each moving keyframe gives way to a fade of the same timing. The
       exits hold their last frame (`forwards`) until the overlay hides, so a scrim that ends
-      first stays gone. The rules are `rawRules.css`, so React Native, whose overlays draw only
-      their surface, gets no motion (its surfaces do take the `z-index`).
+      first stays gone. The rules are `rawRules.css`, which React Native drops; it runs the same
+      motions through its engine (below).
     - Built (presence): both bindings run Zag's presence machine (`@zag-js/presence`, re-exported
       as `@pureform/machines/presence`) on the surface through `usePresence(open, onShow?)`; a
       part shows while `overlayPresent(open, present)` and hides after (`presentProps`, over Zag's
       `hidden: !open`), so the exit animation runs to its end. With no animation (unstyled) it
       hides on the next frame. Closed overlays still render hidden on the server, as before; focus
       stays in a closing overlay until it hides.
+    - Built (React Native overlay motion and presence): React Native drops the raw rules, so
+      `@pureform/react-native` holds the same motions (`OVERLAY_MOTIONS`, `OVERLAY_KEYFRAMES` in
+      `presence.ts`, a spec checks them against the preset's), resolves their durations, curves,
+      and the dialog's 48px from the theme's tokens, times the provider's `timeScale`, and swaps
+      each moving step for a fade under reduced motion. Each engine runs them through a
+      `PresenceDriver` from `@pureform/rn-adapter` (`presence()` on `MotionEngine`):
+      `animatedPresence` drives a progress per step with `Animated.timing` (native driver on a
+      device) and reports `finished`; `reanimatedPresence` gives each step a CSS keyframe
+      animation (the exit `forwards`) and reports `onCSSAnimationEnd`. `usePresence(open,
+motion)` keeps the overlay present until the exit's end is reported, never on a timer; an
+      interrupted step reports nothing, and the next starts from its own first frame, as the
+      web's keyframes do. The select's `Modal` closes once its menu has faded out; the menu,
+      dialog, snackbar, tooltip, and scrim take `open` and render nothing once gone. Scaling has
+      no positioner origin on React Native: the select's menu grows from its top left, the
+      others from their center.
     - In the preset, the gate moves from the whole `transition` to each tween:
       `STATE_TWEENS` (colors and elevation) always run, and `tweens(...)` gates only the
       moving properties it's given. This changes output on purpose, so it's checked

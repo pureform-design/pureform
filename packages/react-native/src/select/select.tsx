@@ -1,6 +1,6 @@
 // The select: a field that takes no typing, whose trailing arrow turns while its menu is open.
 // Pressing it opens a menu of its items below it, over the page in a `Modal`; picking one closes
-// it.
+// it. The menu grows in and fades out as on the web, and the `Modal` closes once it's gone.
 
 import { selectAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -22,6 +22,8 @@ import { Modal, Pressable, StyleSheet, View } from "react-native";
 
 import { Menu } from "../menu/menu";
 import { useControllable } from "../parts";
+import { usePresence } from "../presence";
+import { useEngine } from "../provider";
 import { Field, partId } from "../text-input";
 import type { FieldProps } from "../text-input";
 
@@ -68,6 +70,9 @@ export interface SelectProps
     readonly testId?: TestIdOverride<SelectPart> | undefined;
 }
 
+// The menu grows from the field's side, as the web's grows from its positioner's origin.
+const MENU_ORIGIN = { transformOrigin: "top left" } as const;
+
 /** Material's select: `<Select label="Size" items={sizes} defaultValue="m" />`. */
 export function Select(props: SelectProps): ReactNode {
     const {
@@ -87,16 +92,21 @@ export function Select(props: SelectProps): ReactNode {
         onValueChange,
         null,
     );
+    const engine = useEngine();
     const [menu, setMenu] = useState<{
         left: number;
         top: number;
         width: number;
     }>();
+    const [expanded, setExpanded] = useState(false);
+    const presence = usePresence(expanded, "popup");
     const container = useRef<Measurable>(null);
     const open = () =>
-        container.current?.measureInWindow((left, top, width, height) =>
-            setMenu({ left, top: top + height, width }),
-        );
+        container.current?.measureInWindow((left, top, width, height) => {
+            setMenu({ left, top: top + height, width });
+            setExpanded(true);
+        });
+    const close = () => setExpanded(false);
     const shown = useShownLabel(items, value);
     return (
         <View>
@@ -111,7 +121,7 @@ export function Select(props: SelectProps): ReactNode {
                 trailingIcon={props.trailingIcon ?? "▾"}
                 value={shown}
                 display
-                expanded={menu !== undefined}
+                expanded={expanded}
                 container={container}
             />
             <Pressable
@@ -119,23 +129,33 @@ export function Select(props: SelectProps): ReactNode {
                 {...(typeof props.label === "string"
                     ? { "aria-label": props.label }
                     : {})}
-                aria-expanded={menu !== undefined}
+                aria-expanded={expanded}
                 disabled={props.disabled}
                 onPress={open}
                 style={StyleSheet.absoluteFill}
             />
             <Modal
                 transparent
-                visible={menu !== undefined}
-                onRequestClose={() => setMenu(undefined)}
+                visible={presence.present && menu !== undefined}
+                onRequestClose={close}
             >
                 <Pressable
                     aria-label="Close"
                     style={StyleSheet.absoluteFill}
-                    onPress={() => setMenu(undefined)}
+                    onPress={close}
                 />
-                {menu ? (
-                    <View style={{ position: "absolute", ...menu }}>
+                {presence.present && menu ? (
+                    <engine.View
+                        {...presence.props}
+                        style={{
+                            position: "absolute",
+                            ...menu,
+                            // A closing menu takes no more presses.
+                            pointerEvents: expanded ? "auto" : "none",
+                            ...MENU_ORIGIN,
+                            ...presence.style,
+                        }}
+                    >
                         <Menu
                             {...selectMenuSelection({
                                 color: props.color,
@@ -149,10 +169,10 @@ export function Select(props: SelectProps): ReactNode {
                             onSelect={(details) => {
                                 if (details.value !== value)
                                     setValue(details.value);
-                                setMenu(undefined);
+                                close();
                             }}
                         />
-                    </View>
+                    </engine.View>
                 ) : null}
             </Modal>
         </View>

@@ -35,6 +35,18 @@ export { useLayer } from "./layer";
 export type { StackingLayer } from "./layer";
 export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export {
+    OVERLAY_KEYFRAMES,
+    OVERLAY_MOTIONS,
+    overlayMotion,
+    usePresence,
+} from "./presence";
+export type {
+    OverlayFrame,
+    OverlayMotionName,
+    OverlayMotionStep,
+    Presence,
+} from "./presence";
+export {
     PureformProvider,
     useDirection,
     useEngine,
@@ -61,6 +73,14 @@ export {
     useTokens,
 } from "@pureform/rn-adapter/react";
 export type { PureformContainerProps } from "@pureform/rn-adapter/react";
+export type {
+    PresenceDriver,
+    PresenceFrame,
+    PresenceMotion,
+    PresencePhase,
+    PresenceStep,
+    PresenceView,
+} from "@pureform/rn-adapter/animated";
 export type {
     NativeSelection,
     NativeSlot,

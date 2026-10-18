@@ -47,6 +47,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `indication.tsx`, `indication-tokens.ts`                                | `materialIndication` (with its native ripple), `useIndication`; each component's `useSurfaceIndication` (internal)        |
 | `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
 | `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                           |
+| `presence.ts`                                                           | `usePresence`: an overlay's enter and exit (the preset's motions), present until the exit ends                            |
 | `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
 | `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
 | `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                     |
@@ -113,6 +114,12 @@ import { registry } from "./.pureform";
   `menu` 200, `scrim` 300, `dialog` 400, `snackbar` 500, `tooltip` 600), with the provider's
   overrides; `undefined` for a layer the theme doesn't name. See "Overlays stack from their
   wrapper" below.
+- **Presence:** `usePresence(open, motion?)` gives an overlay its enter and exit through the
+  engine, as the web's preset runs them (`motion`: `"popup"`, the default, for a menu, select
+  list, tooltip, or snackbar; `"dialog"`; `"scrim"`): `{ present, style, props }`. It stays
+  `present` after `open` turns false until the exit has run to its end, so render the overlay (or
+  a `Modal`'s `visible`) from `present`, and give `style` and `props` to the engine's view that
+  moves. `overlayMotion(name, tokens, reducedMotion, timeScale)` gives the frames and timings.
 - **Icons:** icon parts provide `useIconStyle()` → `{ size, color, filled }` (`filled` is the
   slot's `FILL` axis, which selection returns beside the style). `Glyph` draws a text glyph in
   the slot's type and color, moving with it; a string given as an icon is drawn as one.
@@ -153,7 +160,10 @@ import { registry } from "./.pureform";
   prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
   (`rows.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
   (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
-  the menu's own z-index can't). Node-side commands (`src/testing/commands.ts`) precompute the
+  the menu's own z-index can't), and presence (`presence.spec.tsx`: the motions are the preset's;
+  with each engine, the select's menu grows in and stays until it has faded out, reduced motion
+  only fades, a reopened overlay enters again, the dialog and scrim, snackbar, and tooltip
+  `open`). Node-side commands (`src/testing/commands.ts`) precompute the
   preset's styles for a test registry.
 - `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package.
 
@@ -161,9 +171,22 @@ import { registry } from "./.pureform";
 
 - **Engines change hooks**, so each component starts over (`withEngine`, keyed by the engine's
   name) when the provider's engine changes: the app's state stays, a press in progress doesn't.
-- **Overlays are surfaces:** the menu, dialog, snackbar, and tooltip render their surface; when
-  and where they show (a `Modal`, a timer) is the app's. The select is the exception: it opens
-  its menu in a `Modal` under the field.
+- **Overlays are surfaces:** the menu, dialog, snackbar, tooltip, and scrim render their surface;
+  where they show (a `Modal`, a positioned view) and when (a press, a timer) is the app's. The
+  select is the exception: it opens its menu in a `Modal` under the field.
+- **Overlays move as on the web:** the preset's enter and exit keyframes are raw CSS on Zag's
+  `data-state`, which React Native drops, so `presence.ts` holds the same motions (checked against
+  the preset's in `presence.spec.tsx`) and runs them through the engine: a menu, select list,
+  tooltip, or snackbar grows from 80% as it fades in (`short3`, emphasized decelerate) and fades
+  out (`short2`, emphasized accelerate); a dialog comes down 48px as it fades in (`long2`) and
+  goes back up as it fades out (`short3`); a scrim fades (linear). Every duration and curve is the
+  theme's token, times the provider's `timeScale`. Under reduced motion each step that moves is a
+  fade of the same timing, as the web's rule. The select's menu grows from its top left, as the
+  web's grows from its positioner's origin, and its `Modal` closes once the menu has faded out
+  (closing, it takes no presses). The menu, dialog, snackbar, tooltip, and scrim take `open`:
+  with it they enter and leave and render nothing once gone; without it they're shown and still,
+  as before. The engine reports each step's end (Animated's completion, Reanimated's
+  `onCSSAnimationEnd`); an engine without `presence` shows and hides at once.
 - **The select keeps its label:** when the picked item leaves `items`, the field still shows its
   label until the value changes, as Zag's select does on the web; a value no item has had shows
   nothing, and `null` clears it.

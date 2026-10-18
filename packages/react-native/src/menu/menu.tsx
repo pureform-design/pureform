@@ -1,6 +1,6 @@
 // The menu's surface and its items. Each item is a pressable row with its leading icon, label,
 // and trailing icon or text, rippling when pressed. Where the menu shows is the app's (a `Modal`
-// around it, as the select does).
+// around it, as the select does); given `open`, it grows in and fades out.
 
 import { menuAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -25,6 +25,7 @@ import {
     useStableSelection,
     withEngine,
 } from "../parts";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -35,6 +36,9 @@ const [INDICATION] = menuAnatomy.indication!;
 
 export interface MenuProps extends MenuVariantProps, IndicationProps {
     readonly items: readonly MenuItem<ReactNode>[];
+    /** Whether it shows: it grows in when this turns true and fades out when it turns false,
+     *  rendering nothing once it's gone. Without it, the surface is always shown, still. */
+    readonly open?: boolean | undefined;
     /** The item shown selected, such as a select's value. */
     readonly value?: string | null | undefined;
     /** An item was picked. */
@@ -123,13 +127,16 @@ function MenuImpl(props: MenuProps): ReactNode {
         props.onSelect?.({ value }),
     );
     const { styles: s } = useComponentSlots("menu", selection);
+    const presence = useOverlayPresence(props.open, "popup");
+    if (!presence.present) return null;
     return (
         <engine.View
+            {...presence.props}
             role="menu"
             {...(props["aria-label"] === undefined
                 ? {}
                 : { "aria-label": props["aria-label"] })}
-            style={s.root}
+            style={{ ...s.root, ...presence.style }}
             testID={testIdOf(menuAnatomy, "root", props.testId)}
         >
             {props.items.map((item) => (
