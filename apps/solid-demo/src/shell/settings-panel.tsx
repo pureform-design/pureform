@@ -18,6 +18,7 @@ import type { JSX } from "@solidjs/web";
 import { useLocation } from "@tanstack/solid-router";
 import {
     createEffect,
+    createMemo,
     createSignal,
     createUniqueId,
     For,
@@ -287,7 +288,9 @@ function SettingsTab(): JSX.Element {
 
 function AppsTab(): JSX.Element {
     const location = useLocation();
-    const current = () => appAt(location().pathname)?.href ?? "/";
+    // A memo, so the items (and their rows) are made again only when the app changes, not on
+    // every navigation within it.
+    const current = createMemo(() => appAt(location().pathname)?.href ?? "/");
     return (
         <List
             items={[
