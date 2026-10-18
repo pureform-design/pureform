@@ -450,7 +450,11 @@ function useClasses(name, selection) {
   which selects through `rn-adapter`'s hooks: the provider fills `rn-adapter`'s
   `StylesProvider` with a source over the registry's entries, so the animated hooks, ripples,
   SVG drawing, and token tweens run on the generated factories unchanged. Instance tokens are
-  named as the component names them (`{ value: 40 }`) and tween.
+  named as the component names them (`{ value: 40 }`) and tween. The provider compares
+  `registry`, `defaults`, `engine`, and `indication` by identity and `overrides` by value, so an
+  app keeps the former stable; an inline `defaults` renders every styled component again. A
+  mounted interactive list item costs about 0.7 to 1 ms in development, so long lists go in a
+  `FlatList` keyed by value, with memoized rows.
 
 ```tsx
 // Solid
@@ -736,6 +740,12 @@ positioner once it shows. Nested overlays need no order of their own: a select's
 stacks inside the dialog's positioner. Without this, a later positioned sibling (a chip with its
 ripple layer) painted over an open list. An app's bars and FABs take `raised` themselves; the preset
 gives no layer to what it doesn't place.
+
+On React Native there's no positioner to take the layer: `zIndex` orders a view only among its
+siblings (and React Native Web gives every `View` `position: relative` and `z-index: 0`), so a
+surface's layer never leaves the view around it. The app places its overlays, so it puts the layer
+on the overlay's outermost wrapper, `useLayer(name)` in `@pureform/react-native` reading the theme's
+`zIndices.<name>`; a `Modal`, as the select's menu uses, is over everything already.
 
 ### 5.8 Reduced motion
 
