@@ -39,7 +39,7 @@ import { SearchBar } from "@pureform/react-native/search-bar";
 import { Select } from "@pureform/react-native/select";
 import { Separator } from "@pureform/react-native/separator";
 import { Slider } from "@pureform/react-native/slider";
-import { Snackbar } from "@pureform/react-native/snackbar";
+import { Snackbar, useSnackbar } from "@pureform/react-native/snackbar";
 import { SupportingText } from "@pureform/react-native/supporting-text";
 import { animatedSvg } from "@pureform/react-native/svg";
 import { Switch } from "@pureform/react-native/switch";
@@ -116,6 +116,68 @@ const INDICATIONS: Record<string, Indication> = {
     "no ripple": materialIndication({ ripple: false }),
     "no indication": noIndication,
 };
+
+/** The overlays, opened over the page: a menu from an icon button, a tooltip on another, a
+ *  snackbar from the queue, and a modal dialog. */
+function Overlays(props: {
+    readonly choice: string;
+    readonly onChoice: (value: string) => void;
+}) {
+    const snackbars = useSnackbar();
+    return (
+        <View style={styles.row}>
+            <Menu
+                items={MENU}
+                value={props.choice}
+                onSelect={(details) => props.onChoice(details.value)}
+                trigger={(trigger) => (
+                    <IconButton
+                        {...trigger}
+                        aria-label="Edit"
+                        icon={<Glyph glyph="⋮" />}
+                    />
+                )}
+            />
+            <Tooltip
+                supportingText="Save to drafts"
+                trigger={(trigger) => (
+                    <IconButton
+                        {...trigger}
+                        aria-label="Save"
+                        icon={<Glyph glyph="⎙" />}
+                    />
+                )}
+            />
+            <Button
+                variant="tonal"
+                label="Archive"
+                onPress={() =>
+                    snackbars.show({
+                        supportingText: `Archived (${props.choice})`,
+                        action: "Undo",
+                    })
+                }
+            />
+            <Dialog
+                trigger="Discard"
+                icon={<Glyph glyph="⚠" />}
+                headline="Discard draft?"
+                actions={({ close }) => (
+                    <>
+                        <Button variant="text" label="Cancel" onPress={close} />
+                        <Button
+                            variant="text"
+                            label="Discard"
+                            onPress={close}
+                        />
+                    </>
+                )}
+            >
+                Your changes won't be saved.
+            </Dialog>
+        </View>
+    );
+}
 
 /** Three components on one interaction source: pressing or hovering any shows on all three, and
  *  `useInteractionState` reports it. Focus stays with the one that has it. */
@@ -539,6 +601,7 @@ function Page(props: { controls: ReactNode }) {
                 </View>
             </Section>
             <Section title="Menus, dialogs, and messages">
+                <Overlays choice={choice} onChoice={setChoice} />
                 <View style={[styles.row, styles.top]}>
                     <Menu
                         items={MENU}

@@ -254,6 +254,82 @@ describe("rn-web-demo", () => {
         expect(layered()).toBeGreaterThan(0);
     });
 
+    it("opens a menu, a tooltip, a snackbar, and a dialog over the page, and dismisses each", async () => {
+        const named = (name: string) =>
+            [...document.querySelectorAll<HTMLElement>("[role=button]")].find(
+                (element) =>
+                    element.getAttribute("aria-label") === name ||
+                    element.textContent === name,
+            )!;
+        const count = (selector: string) =>
+            document.querySelectorAll(selector).length;
+        // The surfaces shown in the page, besides the overlays.
+        const menus = count("[role=menu]");
+        const tooltips = count("[role=tooltip]");
+        const statuses = count("[role=status]");
+        const dialogs = count('[data-testid="pf-dialog-root"]');
+
+        // The menu opens under its trigger, over what follows it, and picking an item closes it.
+        await press(named("Edit"));
+        expect(count("[role=menu]")).toBe(menus + 1);
+        const menu = [...document.querySelectorAll("[role=menu]")].at(-1)!;
+        const trigger = named("Edit").getBoundingClientRect();
+        expect(menu.getBoundingClientRect().top).toBeGreaterThan(
+            trigger.bottom,
+        );
+        const items = [
+            ...menu.querySelectorAll<HTMLElement>("[role=menuitem]"),
+        ];
+        await press(items.find((item) => item.textContent?.includes("Copy"))!);
+        expect(count("[role=menu]")).toBe(menus);
+        // Escape closes it too.
+        await press(named("Edit"));
+        expect(count("[role=menu]")).toBe(menus + 1);
+        await userEvent.keyboard("{Escape}");
+        await wait(500);
+        expect(count("[role=menu]")).toBe(menus);
+
+        // The tooltip shows once the pointer rests on its trigger, and goes when it leaves.
+        await userEvent.hover(named("Save"));
+        await wait(800);
+        expect(count("[role=tooltip]")).toBe(tooltips + 1);
+        await userEvent.unhover(named("Save"));
+        await wait(600);
+        expect(count("[role=tooltip]")).toBe(tooltips);
+
+        // The snackbar comes from the queue, with the page's choice, and its action closes it.
+        await press(named("Archive"));
+        expect(count("[role=status]")).toBe(statuses + 1);
+        const snackbar = [...document.querySelectorAll("[role=status]")].at(
+            -1,
+        )!;
+        expect(snackbar.textContent).toContain("Archived (copy)");
+        await press(
+            snackbar.querySelector<HTMLElement>(
+                '[data-testid="pf-snackbar-action"]',
+            )!,
+        );
+        expect(count("[role=status]")).toBe(statuses);
+
+        // The dialog opens modal over a scrim; Escape closes it, and so does Cancel.
+        await press(named("Discard"));
+        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs + 1);
+        expect(count('[aria-modal="true"]')).toBeGreaterThan(0);
+        await userEvent.keyboard("{Escape}");
+        await wait(800);
+        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs);
+        await press(named("Discard"));
+        await wait(300);
+        const cancel = [
+            ...document.querySelectorAll<HTMLElement>(
+                '[aria-modal="true"] [role=button]',
+            ),
+        ].find((button) => button.textContent === "Cancel")!;
+        await press(cancel);
+        await wait(300);
+        expect(count('[data-testid="pf-dialog-root"]')).toBe(dialogs);
+    });
+
     it("fills the current destination's icon", () => {
         const factory = registry.entry("navigationBar").factory;
         expect(factory({ selected: true }).icon.iconFill).toBe(1);
