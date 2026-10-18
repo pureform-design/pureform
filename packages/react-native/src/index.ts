@@ -31,6 +31,8 @@ export {
     useInteractionState,
 } from "./interaction";
 export type { PressableEvent, PressableHandlers } from "./interaction";
+export { useLayer } from "./layer";
+export type { StackingLayer } from "./layer";
 export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export {
     PureformProvider,
