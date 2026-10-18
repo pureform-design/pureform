@@ -359,6 +359,7 @@
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/menu": "catalog:",
+        "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/switch": "catalog:",
@@ -930,6 +931,7 @@
     "@zag-js/dialog": "^1.46.0",
     "@zag-js/dom-query": "^1.46.0",
     "@zag-js/menu": "^1.46.0",
+    "@zag-js/presence": "^1.46.0",
     "@zag-js/radio-group": "^1.46.0",
     "@zag-js/react": "^1.46.0",
     "@zag-js/select": "^1.46.0",
@@ -1780,6 +1782,8 @@
     "@zag-js/menu": ["@zag-js/menu@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dismissable": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/focus-visible": "1.46.0", "@zag-js/popper": "1.46.0", "@zag-js/rect-utils": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-oQZ0SUI4AWQP5CocSVyiP55SVQZUa6eHTl3Ia8W0ByH/LK6ShFHTpEr/7eDt6uoHT9pDMpAscIIoMF70LvunTg=="],
 
     "@zag-js/popper": ["@zag-js/popper@1.46.0", "", { "dependencies": { "@floating-ui/dom": "^1.7.6", "@zag-js/dom-query": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-tpTOiwWY8FRQHzKycKbj+aJbhMpjvTsH871XXQdB2H+56eJ7sgffECCJZTByq3qsC+d2g/WCJqAfLJqgtYagww=="],
+
+    "@zag-js/presence": ["@zag-js/presence@1.46.0", "", { "dependencies": { "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/types": "1.46.0" } }, "sha512-WA33+sc7Qqosx+bvU9mZD+fvFdi7x72fXc7m6dIH1pTwaB22YdHmr6zmTDZV6k824Uvcbbo4t2rsNGmMFkKWLw=="],
 
     "@zag-js/radio-group": ["@zag-js/radio-group@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/focus-visible": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-J2CmS3vpJnHKTBR3zsceo4eAMAf4fhljanTETFxkbX/rec23EUpzUBEA3l7LFwz7Iar8VsX8iNbD8thmwPkYpw=="],
 

@@ -6,6 +6,7 @@ export * as checkbox from "./checkbox";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
 export * as navigation from "./navigation";
+export * as presence from "./presence";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";
 export * as select from "./select";

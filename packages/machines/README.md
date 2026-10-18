@@ -8,7 +8,7 @@ here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
 `utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`,
-`tooltip`, and `tabs` machines), on `@pureform/js-effects` for the ripple, and on
+`tooltip`, `tabs`, and `presence` machines), on `@pureform/js-effects` for the ripple, and on
 `@pureform/binding-core/interaction` for the interaction source its machines emit to. The bindings
 depend on it.
 
@@ -16,7 +16,7 @@ depend on it.
 
 ```
 @zag-js/checkbox, switch, radio-group, ──re-exported─┐
-  select, menu, dialog, tooltip, tabs                │
+  select, menu, dialog, tooltip, tabs, presence      │
 own machines (button, ripple, text field,            ├──► @pureform/machines ──► bindings:
   snackbar, navigation, slider) ────── Zag's shape ─┤                         useMachine(machine, props)
                                                      │                         connect(service, normalize)
@@ -48,6 +48,7 @@ callback reports user actions only, with a details object.
 | `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.                                                  |
 | `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                               |
 | `dialog.ts`, `tooltip.ts`                                 | Zag's machines, re-exported unchanged.                                                                                                      |
+| `presence.ts`                                             | Zag's presence, re-exported unchanged: keeps an overlay mounted until its exit animation ends, and lets it go at once when none runs.       |
 | `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.                                                 |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                          |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped.                                        |
@@ -68,6 +69,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
 | `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                                                                                                 |
 | `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
+| `@pureform/machines/presence`    | `@zag-js/presence` (`presence` at the root)                                                                                                                                                                                             |
 | `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
 | `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                                                                                                                                                    |
 | `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                                                                                                  |
