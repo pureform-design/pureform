@@ -11,6 +11,20 @@ import {
     untrack,
 } from "solid-js";
 
+let latestReads = 0;
+
+/** Runs `fn` with every bindable reading its last write, rather than the value Solid shows, which
+ *  only takes a write at the next flush. A machine's watches run this way, so what they write
+ *  lands in the same flush as the write they follow. */
+export function readingLatest<T>(fn: () => T): T {
+    latestReads++;
+    try {
+        return fn();
+    } finally {
+        latestReads--;
+    }
+}
+
 export function createBindable<T>(
     props: Accessor<BindableParams<T>>,
 ): Bindable<T> {
@@ -20,9 +34,15 @@ export function createBindable<T>(
 
     // Boxed, since Solid 2 treats a function passed to `createSignal` as a computation.
     const [value, setValue] = createSignal<{ v: T }>({ v: initial as T });
+    let latest = initial as T;
     const controlled = createMemo(() => props().value !== undefined);
 
-    const read = (): T => (controlled() ? (props().value as T) : value().v);
+    const read = (): T =>
+        controlled()
+            ? (props().value as T)
+            : latestReads > 0
+              ? latest
+              : value().v;
 
     const set = (v: T | ((prev: T) => T)) => {
         const prev = untrack(read);
@@ -33,7 +53,10 @@ export function createBindable<T>(
                 prev,
             });
         }
-        if (!untrack(controlled)) setValue({ v: next });
+        if (!untrack(controlled)) {
+            latest = next;
+            setValue({ v: next });
+        }
         if (!eq(next, prev)) props().onChange?.(next, prev);
     };
 

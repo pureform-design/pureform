@@ -1,0 +1,174 @@
+import { render } from "@solidjs/web";
+import { createMachine } from "@zag-js/core";
+import { createMemo, createSignal, flush } from "solid-js";
+import { afterEach, describe, expect, it, vi } from "vitest";
+
+import { useMachine } from ".";
+
+// A machine with a count, its double kept by a watch (as Zag's select keeps its highlighted
+// item from its highlighted value), and a watch on a prop.
+interface CounterSchema {
+    props: {
+        count?: number | undefined;
+        defaultCount?: number;
+        step?: number;
+        onCountChange?: (count: number, prev: number | undefined) => void;
+        onStepChange?: (step: number | undefined) => void;
+    };
+    context: { count: number; double: number };
+    state: "idle";
+    action: string;
+    event: { type: "INC" } | { type: "SET"; value: number };
+}
+
+const counter = createMachine<CounterSchema>({
+    props: ({ props }) => ({ defaultCount: 0, ...props }),
+    context: ({ bindable, prop }) => ({
+        count: bindable<number>(() => ({
+            value: prop("count"),
+            defaultValue: prop("defaultCount")!,
+            onChange: (count, prev) => prop("onCountChange")?.(count, prev),
+        })),
+        double: bindable<number>(() => ({
+            defaultValue: (prop("count") ?? prop("defaultCount")!) * 2,
+        })),
+    }),
+    initialState: () => "idle",
+    watch({ track, context, prop, action }) {
+        track([() => context.get("count")], () => action(["syncDouble"]));
+        track([() => prop("step")], () => prop("onStepChange")?.(prop("step")));
+    },
+    on: {
+        INC: { actions: ["increment"] },
+        SET: { actions: ["set"] },
+    },
+    states: { idle: {} },
+    implementations: {
+        actions: {
+            increment: ({ context }) =>
+                context.set("count", (prev: number) => prev + 1),
+            set: ({ context, event }) =>
+                context.set("count", (event as { value: number }).value),
+            syncDouble: ({ context }) =>
+                context.set("double", context.get("count") * 2),
+        },
+    },
+});
+
+let dispose: (() => void) | undefined;
+afterEach(() => {
+    dispose?.();
+    dispose = undefined;
+    document.body.innerHTML = "";
+});
+
+const settle = async () => {
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    flush();
+};
+
+/** Runs the counter, recording every pair of count and double a reader saw. */
+const run = (props: () => CounterSchema["props"] = () => ({})) => {
+    const seen: [number, number][] = [];
+    let service!: ReturnType<typeof useMachine<CounterSchema>>;
+    const host = document.createElement("div");
+    document.body.append(host);
+    dispose = render(() => {
+        service = useMachine(counter, props);
+        const pair = createMemo(() => {
+            const next: [number, number] = [
+                service.context.get("count"),
+                service.context.get("double"),
+            ];
+            seen.push(next);
+            return next;
+        });
+        return <p>{pair().join(" ")}</p>;
+    }, host);
+    flush();
+    return {
+        seen,
+        host,
+        send: (event: CounterSchema["event"]) => service.send(event),
+    };
+};
+
+describe("a machine's watches", () => {
+    it("write in the same flush as the write they follow, so no reader sees one without the other", async () => {
+        const { seen, host, send } = run();
+        await settle();
+        send({ type: "INC" });
+        await settle();
+        send({ type: "SET", value: 5 });
+        await settle();
+        expect(host.textContent).toBe("5 10");
+        expect(seen).toEqual([
+            [0, 0],
+            [1, 2],
+            [5, 10],
+        ]);
+    });
+
+    it("don't run for the values they start with", async () => {
+        const onStepChange = vi.fn();
+        const { seen } = run(() => ({
+            defaultCount: 3,
+            step: 1,
+            onStepChange,
+        }));
+        await settle();
+        expect(seen).toEqual([[3, 6]]);
+        expect(onStepChange).not.toHaveBeenCalled();
+    });
+
+    it("run when a prop they read changes", async () => {
+        const onStepChange = vi.fn();
+        const [step, setStep] = createSignal(1);
+        run(() => ({ step: step(), onStepChange }));
+        await settle();
+        setStep(2);
+        await settle();
+        expect(onStepChange).toHaveBeenCalledOnce();
+        expect(onStepChange).toHaveBeenCalledWith(2);
+    });
+
+    it("follow a controlled value once the prop changes", async () => {
+        const [count, setCount] = createSignal(1);
+        const onCountChange = vi.fn((next: number, _prev?: number) =>
+            setCount(next),
+        );
+        const { host, send } = run(() => ({ count: count(), onCountChange }));
+        await settle();
+        expect(host.textContent).toBe("1 2");
+        send({ type: "INC" });
+        await settle();
+        expect(onCountChange).toHaveBeenCalledOnce();
+        expect(onCountChange).toHaveBeenCalledWith(2, 1);
+        expect(host.textContent).toBe("2 4");
+    });
+});
+
+describe("a bindable", () => {
+    it("keeps its own value when uncontrolled, and reports each change once", async () => {
+        const onCountChange = vi.fn();
+        const { host, send } = run(() => ({ defaultCount: 1, onCountChange }));
+        await settle();
+        send({ type: "INC" });
+        await settle();
+        expect(host.textContent).toBe("2 4");
+        expect(onCountChange.mock.calls).toEqual([[2, 1]]);
+        send({ type: "SET", value: 2 });
+        await settle();
+        expect(onCountChange).toHaveBeenCalledOnce();
+    });
+
+    it("only asks to change when controlled", async () => {
+        const onCountChange = vi.fn();
+        const { host, send } = run(() => ({ count: 1, onCountChange }));
+        await settle();
+        send({ type: "INC" });
+        await settle();
+        expect(onCountChange.mock.calls).toEqual([[2, 1]]);
+        expect(host.textContent).toBe("1 2");
+    });
+});
