@@ -1,4 +1,4 @@
 // `@pureform/react-native/dialog`.
 
 export { Dialog } from "./dialog";
-export type { DialogProps } from "./dialog";
+export type { DialogActions, DialogProps, DialogTriggerProps } from "./dialog";

@@ -4,6 +4,8 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider, placeOverlay } from ".";
+import { Button } from "./button";
+import { Dialog } from "./dialog";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
@@ -410,6 +412,137 @@ describe.each([animated, reanimated])("the tooltip with $name", (engine) => {
         expect(tooltip()).toBeNull();
     });
 });
+
+describe.each([animated, reanimated])(
+    "the modal dialog with $name",
+    (engine) => {
+        const dialog = () =>
+            document.querySelector<HTMLElement>(
+                '[data-testid="pf-dialog-root"]',
+            );
+        const scrim = () =>
+            document.querySelector<HTMLElement>(
+                '[data-testid="pf-scrim-root"]',
+            );
+
+        it("opens over a scrim from its trigger, and the scrim, Escape, and its actions close it", async () => {
+            const asked: boolean[] = [];
+            await render(
+                <Dialog
+                    trigger="Discard"
+                    headline="Discard draft?"
+                    onOpenChange={(details) => asked.push(details.open)}
+                    actions={({ close }) => (
+                        <Button variant="text" label="Cancel" onPress={close} />
+                    )}
+                >
+                    Your changes won't be saved.
+                </Dialog>,
+                engine,
+            );
+            const open = async () => {
+                await interact(() =>
+                    userEvent.click(
+                        [
+                            ...document.querySelectorAll<HTMLElement>(
+                                '[role="button"]',
+                            ),
+                        ].find((button) => button.textContent === "Discard")!,
+                    ),
+                );
+                await settle(600);
+                expect(dialog()).not.toBeNull();
+            };
+            expect(dialog()).toBeNull();
+            await open();
+            expect(scrim()).not.toBeNull();
+            expect(dialog()!.getAttribute("aria-label")).toBe("Discard draft?");
+            expect(dialog()!.closest('[aria-modal="true"]')).not.toBeNull();
+            // A press on the scrim, beside the dialog.
+            const beside = document.elementFromPoint(4, 4) as HTMLElement;
+            expect(dialog()!.contains(beside)).toBe(false);
+            await interact(() =>
+                userEvent.click(beside, { position: { x: 4, y: 4 } }),
+            );
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+            expect(scrim()).toBeNull();
+
+            await open();
+            await interact(() => userEvent.keyboard("{Escape}"));
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+
+            await open();
+            await interact(() =>
+                userEvent.click(
+                    [
+                        ...document.querySelectorAll<HTMLElement>(
+                            '[role="button"]',
+                        ),
+                    ].find((button) => button.textContent === "Cancel")!,
+                ),
+            );
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+            expect(asked).toEqual([true, false, true, false, true, false]);
+        });
+
+        it("draws a menu opened inside it over it, and Escape closes the menu first", async () => {
+            await render(
+                <Dialog
+                    defaultOpen
+                    role="alertdialog"
+                    headline="Move to"
+                    actions={<Menu trigger="Folder" items={ITEMS} />}
+                >
+                    Pick a folder.
+                </Dialog>,
+                engine,
+            );
+            await settle(600);
+            expect(dialog()!.getAttribute("role")).toBe("alertdialog");
+            // An alert dialog stays when the scrim is pressed.
+            await interact(() =>
+                userEvent.click(
+                    document.elementFromPoint(4, 4) as HTMLElement,
+                    {
+                        position: { x: 4, y: 4 },
+                    },
+                ),
+            );
+            await settle(400);
+            expect(dialog()).not.toBeNull();
+            await interact(() =>
+                userEvent.click(
+                    [
+                        ...document.querySelectorAll<HTMLElement>(
+                            '[role="button"]',
+                        ),
+                    ].find((button) => button.textContent === "Folder")!,
+                ),
+            );
+            await settle(400);
+            const item = items()[0]!;
+            const at = box(item);
+            expect(
+                item.contains(
+                    document.elementFromPoint(
+                        at.left + at.width / 2,
+                        at.top + at.height / 2,
+                    ),
+                ),
+            ).toBe(true);
+            await interact(() => userEvent.keyboard("{Escape}"));
+            await until(() => menu() === null);
+            expect(menu()).toBeNull();
+            expect(dialog()).not.toBeNull();
+            await interact(() => userEvent.keyboard("{Escape}"));
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+        });
+    },
+);
 
 it("stacks open overlays by their layers: a menu, then a snackbar, then a tooltip", async () => {
     let snackbars!: Snackbars;
