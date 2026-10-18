@@ -1,5 +1,5 @@
 // The snackbar's surface: its message, an action, and a close button, each rippling when pressed.
-// When it shows, and for how long, is the app's.
+// When it shows, and for how long, is the app's; given `open`, it grows in and fades out.
 
 import { snackbarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, withEngine } from "../parts";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -33,6 +34,9 @@ export interface SnackbarProps extends SnackbarVariantProps, IndicationProps {
     /** What the close button shows. Default a multiplication sign. */
     readonly closeIcon?: ReactNode;
     readonly onClose?: (() => void) | undefined;
+    /** Whether it shows: it grows in when this turns true and fades out when it turns false,
+     *  rendering nothing once it's gone. Without it, the surface is always shown, still. */
+    readonly open?: boolean | undefined;
     readonly testId?: TestIdOverride<SnackbarPart> | undefined;
 }
 
@@ -86,10 +90,17 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
         "snackbar",
         snackbarSelection(props),
     );
+    const presence = useOverlayPresence(props.open, "popup");
     const id = (part: SnackbarPart) =>
         testIdOf(snackbarAnatomy, part, props.testId);
+    if (!presence.present) return null;
     return (
-        <engine.View role="status" style={s.root} testID={id("root")}>
+        <engine.View
+            {...presence.props}
+            role="status"
+            style={{ ...s.root, ...presence.style }}
+            testID={id("root")}
+        >
             <engine.Text style={s.supportingText} testID={id("supportingText")}>
                 {props.supportingText}
             </engine.Text>

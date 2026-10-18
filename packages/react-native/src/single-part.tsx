@@ -1,6 +1,7 @@
 // The single-part components: text in a type style, the avatar, the standalone icon, the
 // separator, supporting text, the scrim, and media. Each is one view (or text, or image) in its
-// component's style; they don't move, so they render without the engine's animated views.
+// component's style; they don't move, so they render without the engine's animated views, but for
+// a scrim given `open`, which fades in and out on the engine's view.
 
 import {
     avatarAnatomy,
@@ -38,6 +39,7 @@ import type { ImageStyle, StyleProp, TextStyle, ViewStyle } from "react-native";
 
 import { IconSlot, ownText } from "./icon-style";
 import { testIdOf, withEngine } from "./parts";
+import { useOverlayPresence } from "./presence";
 import { useEngine } from "./provider";
 import { useSelectedStyles } from "./styles";
 
@@ -185,17 +187,34 @@ export function SupportingText(props: SupportingTextProps): ReactNode {
 }
 
 export interface ScrimProps extends ScrimVariantProps {
+    /** Whether it shows: it fades in when this turns true and out when it turns false,
+     *  rendering nothing once it's gone. Without it, the scrim is always shown, still. */
+    readonly open?: boolean | undefined;
     readonly testId?: TestIdOverride<Root> | undefined;
 }
 
 /** A layer dimming what sits behind it, over the whole of its parent. */
 export function Scrim(props: ScrimProps): ReactNode {
+    const engine = useEngine();
     const selected = useSelectedStyles("scrim", scrimSelection(props));
+    const presence = useOverlayPresence(props.open, "scrim");
+    if (!presence.present) return null;
+    const testID = testIdOf(scrimAnatomy, "root", props.testId);
+    if (props.open === undefined) {
+        return (
+            <View
+                pointerEvents="none"
+                style={rootOf(selected) as ViewStyle}
+                testID={testID}
+            />
+        );
+    }
     return (
-        <View
+        <engine.View
+            {...presence.props}
             pointerEvents="none"
-            style={rootOf(selected) as ViewStyle}
-            testID={testIdOf(scrimAnatomy, "root", props.testId)}
+            style={{ ...rootOf(selected), ...presence.style }}
+            testID={testID}
         />
     );
 }

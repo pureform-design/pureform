@@ -5,10 +5,15 @@
 // react-native-svg and Reanimated when it picks an engine that needs them.
 
 import {
+    animatedPresence,
     useAnimatedComponentStyles,
     useRipple,
 } from "@pureform/rn-adapter/animated";
-import type { RippleOptions, Ripples } from "@pureform/rn-adapter/animated";
+import type {
+    PresenceDriver,
+    RippleOptions,
+    Ripples,
+} from "@pureform/rn-adapter/animated";
 import type { Drawing, State, ThemeValues } from "@pureform/rn-adapter/factory";
 import type { SvgDrawingProps } from "@pureform/rn-adapter/svg";
 import { createElement } from "react";
@@ -43,6 +48,9 @@ export interface MotionEngine {
     ): MotionStyles;
     /** Press ripples for a surface. */
     useRipple(options: InkOptions): Ripples;
+    /** What runs one overlay's enter and exit, telling when each step ends. Without it,
+     *  overlays show and go at once. */
+    presence?(): PresenceDriver;
     /** The engine's views, which take its animated styles. */
     readonly View: ComponentType<any>;
     readonly Text: ComponentType<any>;
@@ -68,6 +76,7 @@ export const animated: MotionEngine = {
     svg: false,
     useStyles: useAnimatedComponentStyles,
     useRipple,
+    presence: animatedPresence,
     View: Animated.View,
     Text: Animated.Text,
     TextInput: Animated.createAnimatedComponent(TextInput),
