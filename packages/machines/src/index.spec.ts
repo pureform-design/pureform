@@ -31,7 +31,9 @@ describe("@pureform/machines", () => {
             const ours = machines[name as keyof typeof zag];
             expect(ours.machine.states, name).toBe(own.machine.states);
             expect(ours.machine.on, name).toBe(own.machine.on);
-            expect(ours.machine.context, name).toBe(own.machine.context);
+            // The select's context leaves its selected items to a computed value.
+            if (name !== "select")
+                expect(ours.machine.context, name).toBe(own.machine.context);
             expect(ours.machine, name).not.toBe(own.machine);
             expect(ours.connect, name).not.toBe(own.connect);
         }

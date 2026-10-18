@@ -597,8 +597,10 @@ before the next flush (`readingLatest` in `bindable.ts`). So what a watch derive
 highlighted item, from its highlighted value) reaches readers in the same flush as what it
 follows; as effects only, it came a flush later, and Solid reported `EFFECT_RELAY_TEAR`. Each
 watch's effect stays, for what changes from outside, such as a prop. A watch that follows a
-controlled prop still writes a flush later: the select keeps the items of its value in context
-from a watch, so a controlled select still reports the relay when its value changes.
+controlled prop still writes a flush later, so what readers show must not come from one: the
+select's machine (`@pureform/machines/select`) derives its selected items from its value and its
+items rather than keeping them in context from a watch, so a controlled select updates in one
+flush.
 
 ## Build and test
 

@@ -136,6 +136,92 @@ describe("Select, ready-made", () => {
         ).toBe(-1);
     });
 
+    it("controlled: shows the prop's option as it changes, with no frame between them", async () => {
+        const warn = vi.spyOn(console, "warn");
+        const release = attribution.enable({ log: false, checks: false });
+        const [value, setValue] = createSignal<string | null>("m");
+        withRegistry(() => (
+            <Select
+                label="Size"
+                name="size"
+                items={ITEMS}
+                value={value()}
+                onValueChange={({ value }) => setValue(value)}
+            />
+        ));
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        const hidden = byTestId<HTMLSelectElement>(ids.hiddenSelect);
+        // Solid reports a relay once it has repeated.
+        for (const next of ["s", "m", null, "s", "m"]) {
+            setValue(next);
+            await settle();
+            expect(input.value).toBe(
+                ITEMS.find((item) => item.value === next)?.label ?? "",
+            );
+            expect(hidden.value).toBe(next ?? "");
+        }
+        await userEvent.click(input);
+        await frames();
+        await userEvent.click(item("s"));
+        await settle();
+        release();
+        expect(value()).toBe("s");
+        expect(input.value).toBe("Small");
+        const relays = warn.mock.calls.filter(([message]) =>
+            String(message).startsWith("[EFFECT_RELAY_TEAR]"),
+        );
+        expect(relays).toEqual([]);
+    });
+
+    it("follows its options' labels, and keeps a chosen option's after it leaves them", async () => {
+        const warn = vi.spyOn(console, "warn");
+        const release = attribution.enable({ log: false, checks: false });
+        const [items, setItems] = createSignal(ITEMS);
+        const [value, setValue] = createSignal<string | null>("m");
+        withRegistry(() => (
+            <Select
+                label="Size"
+                items={items()}
+                value={value()}
+                onValueChange={({ value }) => setValue(value)}
+            />
+        ));
+        await settle();
+        const input = byTestId<HTMLInputElement>(ids.input);
+        for (const label of ["Mid", "Medium", "Mid"]) {
+            setItems(
+                ITEMS.map((option) =>
+                    option.value === "m" ? { ...option, label } : option,
+                ),
+            );
+            await settle();
+            expect(input.value).toBe(label);
+        }
+        setItems(ITEMS.filter((option) => option.value !== "m"));
+        await settle();
+        expect(input.value).toBe("Mid");
+        setItems(ITEMS.filter((option) => option.value !== "m").reverse());
+        await settle();
+        expect(input.value).toBe("Mid");
+        setItems([...ITEMS, { value: "xl", label: "Extra large" }]);
+        await settle();
+        expect(input.value).toBe("Medium");
+        setValue("xl");
+        await settle();
+        expect(input.value).toBe("Extra large");
+        await userEvent.click(input);
+        await frames();
+        await userEvent.click(item("s"));
+        await settle();
+        release();
+        expect(input.value).toBe("Small");
+        const relays = warn.mock.calls.filter(([message]) =>
+            String(message).startsWith("[EFFECT_RELAY_TEAR]"),
+        );
+        expect(relays).toEqual([]);
+    });
+
     it("submits, and resets to its default with the form", async () => {
         const onValueChange = vi.fn();
         withRegistry(() => (

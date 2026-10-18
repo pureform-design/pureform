@@ -65,7 +65,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                                                                                                                                                      |
 | `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                                                                                                  |
 | `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                                                                                                              |
-| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules                                                                                                                                |
+| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules and derived selected items                                                                                                     |
 | `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
 | `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                                                                                                 |
 | `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
@@ -103,6 +103,14 @@ browser's rule, with pureform's
 closest fieldset, so a group in the first legend of a disabled fieldset came out disabled; and the
 switch's own reset sent an untrusted change that React reported twice. The bindings own the reset
 (design doc §9.5).
+
+**The select's selected items are derived** from its value and its collection (`selectedItems`
+and `valueAsString`, and the items `onValueChange` reports). Zag kept them in context
+(`selectedItemMap`), rewritten by watches; a watch on a controlled value runs a flush after the
+value changes, so Solid ran every reader twice (`EFFECT_RELAY_TEAR`) and React rendered twice.
+Here the record of selected items lives in the machine's refs, read only for a selected value that
+has left the collection: such an item keeps its last label until it's deselected, as in Zag. The
+context has no `selectedItemMap`; the refs have it.
 
 ### Interaction sources
 
