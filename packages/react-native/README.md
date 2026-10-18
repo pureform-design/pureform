@@ -95,8 +95,9 @@ import { registry } from "./.pureform";
 </PureformProvider>;
 ```
 
-- **Provider:** `registry`, `scheme` (the system's at the root), `theme` (a named theme; runtime
-  themes are web only and throw), `overrides` (by token key, for both schemes or
+- **Provider:** `registry`, `scheme` (the system's at the root), `theme` (a named theme, which
+  combines with the outer providers' as on the web; runtime themes are web only and throw),
+  `overrides` (by token key, for both schemes or
   `{ light, dark }`, merged over the outer provider's), `dir` (`I18nManager.isRTL` at the root;
   `"rtl"` puts `rtl` in every selection), `motion` (`"system"` follows `AccessibilityInfo`'s
   reduce motion setting and its `reduceMotionChanged` event), `defaults`, `engine`, `width` (the
@@ -144,8 +145,9 @@ import { registry } from "./.pureform";
   never import react-native-svg or Reanimated; their engines' subpaths do).
 - `test:unit`: Vitest in Chromium through React Native Web (`vitest.config.unit.ts`), with React
   Testing Library and type checks: the provider (direction, reduced motion from the system,
-  overrides per scheme, inheritance), the hooks (the factory's result, one frozen object,
-  suspending on a lazy entry, instance tokens by name), the components (test ids,
+  overrides per scheme, inheritance; `nested-themes.spec.tsx`: themes for shape, density, and
+  color combining, from a config with named themes), the hooks (the factory's result, one frozen
+  object, suspending on a lazy entry, instance tokens by name), the components (test ids,
   controlled and uncontrolled state, the select's menu, icon fills, engines), and indication
   (`indication.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
   prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
@@ -246,6 +248,15 @@ import { registry } from "./.pureform";
   text field's), but has no indication entry, so no ripple.
 - **A component's states are one set:** a component with two icons mirrors both when either is
   marked, and every slot sees the component's press and hover.
+- **Nested themes combine:** a nested provider's `theme` sets what that theme changes from the
+  base theme, over everything the outer providers' themes and overrides changed, as each theme's
+  block nests on the web (the config emits only what differs from the base). So providers for
+  shape, density, and color nest:
+  `<PureformProvider theme="sharp"><PureformProvider theme="teal">…` draws sharp corners in
+  teal. Inside, the inner theme's tokens win over the outer provider's `overrides` of the same
+  tokens, and its own `overrides` win over both. The provider selects with the innermost theme
+  and passes the rest as overrides, so precomputed styles recompute only the values those
+  tokens reach.
 - **Direction on a device is global:** React Native lays out the whole app by
   `I18nManager.isRTL`; a nested provider's `dir` changes what the styles read, not the layout.
 - **No server rendering and no forms:** React Native has neither, so there's no hydration,

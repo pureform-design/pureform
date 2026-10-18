@@ -15,6 +15,8 @@ dependencies:
     - "@pureform/machines"
     - "@pureform/rn-adapter"
     - "@pureform/preset"
+    - "@pureform/material"
+    - "@pureform/theme"
 
 tasks:
   test:unit:

@@ -253,9 +253,11 @@
         "@pureform/machines": "catalog:"
     },
     "devDependencies": {
+        "@pureform/material": "catalog:",
         "@pureform/preset": "catalog:",
         "@pureform/rn-adapter": "catalog:",
         "@pureform/styling": "catalog:",
+        "@pureform/theme": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
