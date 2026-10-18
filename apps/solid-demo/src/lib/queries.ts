@@ -4,9 +4,45 @@
 // machinery (src/server-config.ts) refreshes them by key — three consumers,
 // one definition.
 import type { FetchQueryOptions } from "@tanstack/solid-query";
-import { QueryClient } from "@tanstack/solid-query";
+import { QueryClient, queryOptions } from "@tanstack/solid-query";
 
+import {
+    getCategories,
+    getOverview,
+    getTransactions,
+} from "./budget-functions";
 import { flightGateSkips } from "./flight";
+import { getSettings } from "./settings-functions";
+
+// The settings are shell state every page reads. The server reads them
+// from the cookie for the first render; after that the browser changes them
+// in the cache and the cookie together, so they never go stale.
+export const settingsQuery = () =>
+    queryOptions({
+        queryKey: ["settings"],
+        queryFn: () => getSettings(),
+        staleTime: Infinity,
+    });
+
+// The budget app's reads, all under `budget`: its mutations name that key,
+// so one mutation refreshes whichever of them the page shows.
+export const budgetOverviewQuery = () =>
+    queryOptions({
+        queryKey: ["budget", "overview"],
+        queryFn: () => getOverview(),
+    });
+
+export const budgetCategoriesQuery = () =>
+    queryOptions({
+        queryKey: ["budget", "categories"],
+        queryFn: () => getCategories(),
+    });
+
+export const budgetTransactionsQuery = () =>
+    queryOptions({
+        queryKey: ["budget", "transactions"],
+        queryFn: () => getTransactions(),
+    });
 
 // One factory for every side that needs a cache: the client boot
 // (src/App.tsx, one for the session), the per-request SSR setup
