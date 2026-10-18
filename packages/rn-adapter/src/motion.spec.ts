@@ -8,6 +8,7 @@ import {
     channels,
     easingPoints,
     interpolates,
+    presenceFrames,
     sameUnits,
     stops,
 } from "./motion";
@@ -215,5 +216,32 @@ describe("token tweens", () => {
             word: "none",
             still: 2,
         });
+    });
+});
+
+describe("presenceFrames", () => {
+    it("gives both ends the same transform steps where either moves", () => {
+        expect(
+            presenceFrames({
+                from: { opacity: 0, scale: 0.8 },
+                to: { opacity: 1 },
+                duration: 150,
+                easing: "linear",
+            }),
+        ).toEqual([
+            { opacity: 0, transform: [{ translateY: 0 }, { scale: 0.8 }] },
+            { opacity: 1, transform: [{ translateY: 0 }, { scale: 1 }] },
+        ]);
+    });
+
+    it("leaves the transform out of a fade", () => {
+        expect(
+            presenceFrames({
+                from: { opacity: 1, translateY: 0 },
+                to: { opacity: 0 },
+                duration: 100,
+                easing: "linear",
+            }),
+        ).toEqual([{ opacity: 1 }, { opacity: 0 }]);
     });
 });

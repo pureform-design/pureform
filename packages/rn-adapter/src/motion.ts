@@ -254,3 +254,75 @@ export const tokensAt = (
     }
     return next;
 };
+
+/** Where an overlay is at one end of its enter or exit: how opaque, and how far it's scaled
+ *  and moved down (in pixels). A move it leaves out is none. */
+export interface PresenceFrame {
+    readonly opacity: number;
+    readonly scale?: number;
+    readonly translateY?: number;
+}
+
+/** One way in or out: from one frame to another, over milliseconds, on a curve as
+ *  transitions take it (`cubic-bezier(...)` or `linear`). */
+export interface PresenceStep {
+    readonly from: PresenceFrame;
+    readonly to: PresenceFrame;
+    readonly duration: number;
+    readonly easing: string;
+}
+
+/** How an overlay enters and leaves. The exit holds its last frame until the overlay goes. */
+export interface PresenceMotion {
+    readonly enter: PresenceStep;
+    readonly exit: PresenceStep;
+}
+
+export type PresencePhase = keyof PresenceMotion;
+
+/** What an engine gives an overlay's moving view for one step. */
+export interface PresenceView {
+    readonly style: Record<string, unknown>;
+    /** Props for the engine's view, such as an end callback it reports through. */
+    readonly props: Record<string, unknown>;
+}
+
+/** Runs one overlay's enter and exit on an engine. `done` hears a step that ran to its end,
+ *  not one cut short. */
+export interface PresenceDriver {
+    /** The moving view's style and props for a step. */
+    view(
+        phase: PresencePhase,
+        motion: PresenceMotion,
+        done: (phase: PresencePhase) => void,
+    ): PresenceView;
+    /** Starts a step once the render commits, where the engine drives it from JavaScript, and
+     *  returns what stops it. */
+    run(
+        phase: PresencePhase,
+        motion: PresenceMotion,
+        done: (phase: PresencePhase) => void,
+    ): (() => void) | undefined;
+}
+
+/** A step's two ends as styles: the opacity, and a transform where either end moves, with the
+ *  same steps at both ends so they interpolate. */
+export const presenceFrames = (
+    step: PresenceStep,
+): [from: Record<string, unknown>, to: Record<string, unknown>] => {
+    const moves = [step.from, step.to].some(
+        (frame) => (frame.scale ?? 1) !== 1 || (frame.translateY ?? 0) !== 0,
+    );
+    const style = (frame: PresenceFrame) => ({
+        opacity: frame.opacity,
+        ...(moves
+            ? {
+                  transform: [
+                      { translateY: frame.translateY ?? 0 },
+                      { scale: frame.scale ?? 1 },
+                  ],
+              }
+            : {}),
+    });
+    return [style(step.from), style(step.to)];
+};

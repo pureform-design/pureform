@@ -41,10 +41,10 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | `select.ts`                      | Picks a component's styles, transitions, and animations for its variants and state.          |
 | `factory.ts`                     | `nativeFactory`: a component's `StyleFactory`, selecting once per selection and environment. |
 | `codegen.ts`                     | The `native` target's codegen for `@pureform/generate`: a factory module per component.      |
-| `motion.ts`                      | Pure motion helpers: easing curves, interpolation, and which token tweens run.               |
+| `motion.ts`                      | Pure motion helpers: easing curves, interpolation, token tweens, and overlay presence types. |
 | `react.ts`                       | `StylesProvider`, `PureformProvider`, `useComponentState`, `useComponentStyles`, …           |
-| `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, and press ripples.               |
-| `reanimated.ts`, `css-motion.ts` | The Reanimated 4 entry: transitions and keyframes as CSS animation properties.               |
+| `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, ripples, and overlay presence.   |
+| `reanimated.ts`, `css-motion.ts` | The Reanimated 4 entry: transitions, keyframes, and overlay presence as CSS animations.      |
 | `svg.ts`, `reanimated-svg.ts`    | Shapes, gradients, and ripples drawn with `react-native-svg`.                                |
 | `metro.ts`                       | Precomputing a config while Metro bundles.                                                   |
 
@@ -54,8 +54,8 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                            |
 | `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState` |
-| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles` and `useRipple`, through React Native's Animated                                                                             |
-| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles` and `cssMotion`, through Reanimated 4                                                                                      |
+| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, and `animatedPresence`, through React Native's Animated                                                        |
+| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, and `reanimatedPresence`, through Reanimated 4                                                               |
 | `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
 | `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
 | `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                               |
@@ -137,6 +137,21 @@ token's own tween carries its `valueType` from the lowering; under reduced motio
 colors. Ripples don't start under reduced motion. `@pureform/react-native`'s provider takes
 `motion="system" | "reduce" | "full"` and reads `AccessibilityInfo` for `"system"`, and passes the
 result here as `reducedMotion`.
+
+## Overlay presence
+
+An overlay's enter and exit is a `PresenceMotion` (`motion.ts`): two steps, each from one frame
+(opacity, scale, a move down) to another over a duration and curve. A `PresenceDriver` runs them
+for one overlay on an engine, and calls `done(phase)` only for a step that ran to its end, which
+is when a binding unmounts a closed overlay:
+
+- `animatedPresence()` drives a progress value per step with `Animated.timing` (the native driver
+  on a device) and reports `start`'s `finished`.
+- `reanimatedPresence()` gives each step a CSS keyframe animation (the exit `forwards`, so it holds
+  its last frame) and reports Reanimated's `onCSSAnimationEnd`, a prop for its view.
+
+`presenceFrames(step)` gives a step's two ends as styles. `@pureform/react-native`'s
+`usePresence` takes the frames and timings from the theme and the preset's overlay keyframes.
 
 ## Direction
 

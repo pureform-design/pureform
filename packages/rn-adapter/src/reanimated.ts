@@ -7,13 +7,27 @@ import { I18nManager, Platform } from "react-native";
 import { cubicBezier } from "react-native-reanimated";
 
 import { cssMotion } from "./css-motion";
-import { easingPoints } from "./motion";
+import { easingPoints, presenceFrames } from "./motion";
+import type {
+    PresenceDriver,
+    PresencePhase,
+    PresenceStep,
+    PresenceView,
+} from "./motion";
 import { useComponentState } from "./react";
 import type { State } from "./select";
 import type { ThemeValues } from "./values";
 
 export { cssMotion } from "./css-motion";
 export type { CssMotion } from "./css-motion";
+export type {
+    PresenceDriver,
+    PresenceFrame,
+    PresenceMotion,
+    PresencePhase,
+    PresenceStep,
+    PresenceView,
+} from "./motion";
 
 /** A CSS curve as Reanimated's: a cubic Bézier as its easing object, `linear` as is. */
 export const cssEasing = (curve: string) => {
@@ -106,4 +120,40 @@ export const useReanimatedComponentStyles = (
             ),
         [styles, transitions, animations],
     );
+};
+
+/** An overlay's enter and exit as Reanimated's CSS animations on the UI thread: each step a
+ *  keyframe animation between its frames, the exit holding its last, ending each step with the
+ *  view's `onCSSAnimationEnd`. Spread the view's props on Reanimated's view. */
+export const reanimatedPresence = (): PresenceDriver => {
+    let done: (phase: PresencePhase) => void = () => {};
+    const views = new WeakMap<PresenceStep, PresenceView>();
+    // A changed animation restarts it, so each step keeps one style.
+    const viewOf = (phase: PresencePhase, step: PresenceStep): PresenceView => {
+        const [from, to] = presenceFrames(step);
+        return {
+            style: {
+                animationName: { from, to },
+                animationDuration: step.duration,
+                animationTimingFunction: cssEasing(step.easing),
+                // The enter shows its first frame from the start, the exit its last until the
+                // overlay goes.
+                animationFillMode: phase === "exit" ? "forwards" : "backwards",
+            },
+            props: { onCSSAnimationEnd: () => done(phase) },
+        };
+    };
+    return {
+        view(phase, motion, ended) {
+            done = ended;
+            const step = motion[phase];
+            let view = views.get(step);
+            if (!view) {
+                view = viewOf(phase, step);
+                views.set(step, view);
+            }
+            return view;
+        },
+        run: () => undefined,
+    };
 };
