@@ -8,11 +8,11 @@ import {
     configSource,
     eventually,
     fakeAdapter,
-    glue,
+    outputFile,
     tempApp,
     writeTree,
 } from "./__fixtures__/app";
-import { withPureformGlue } from "./metro";
+import { withPureform } from "./metro";
 import type { MetroResolutionContext } from "./metro";
 import { REGISTRY_ID } from "./options";
 
@@ -31,15 +31,15 @@ const context = (root: string): MetroResolutionContext => ({
     resolveRequest: (_, moduleName) => ({ type: "context", moduleName }),
 });
 
-describe("withPureformGlue", () => {
+describe("withPureform", () => {
     it("generates before Metro starts, and resolves the registry to the index", async () => {
         const root = tempApp("chip");
-        const config = await withPureformGlue(
+        const config = await withPureform(
             { projectRoot: root, transformer: { keep: true } },
             { target: fakeAdapter(), watch: false },
         );
         expect(config.transformer).toEqual({ keep: true });
-        expect(glue(root, "web/chip.ts")).toContain('"chip"');
+        expect(outputFile(root, "web/chip.ts")).toContain('"chip"');
         const resolve = config.resolver!.resolveRequest!;
         expect(resolve(context(root), REGISTRY_ID, "ios")).toEqual({
             type: "sourceFile",
@@ -57,15 +57,15 @@ describe("withPureformGlue", () => {
         } catch (thrown) {
             error = thrown;
         }
-        expect(isGenerateError(error, "missing-glue")).toBe(true);
+        expect(isGenerateError(error, "missing-output")).toBe(true);
         expect((error as Error).message).toContain(
-            "the generated glue in .pureform/ is missing (imported from App.tsx)",
+            "the generated registry in .pureform/ is missing (imported from App.tsx)",
         );
     });
 
     it("goes through the config's own resolveRequest for other modules", async () => {
         const root = tempApp("chip");
-        const config = await withPureformGlue(
+        const config = await withPureform(
             {
                 projectRoot: root,
                 resolver: {
@@ -89,7 +89,7 @@ describe("withPureformGlue", () => {
         writeTree(root, { "pureform.config.ts": "export default 1;\n" });
         for (const watch of [false, true]) {
             const error = await rejection(
-                withPureformGlue(
+                withPureform(
                     { projectRoot: root },
                     { target: fakeAdapter(), watch },
                 ),
@@ -100,10 +100,7 @@ describe("withPureformGlue", () => {
 
     it("generates again when the config changes", async () => {
         const root = tempApp("chip");
-        await withPureformGlue(
-            { projectRoot: root },
-            { target: fakeAdapter() },
-        );
+        await withPureform({ projectRoot: root }, { target: fakeAdapter() });
         writeFileSync(
             join(root, "pureform.config.ts"),
             configSource("chip", "badge"),

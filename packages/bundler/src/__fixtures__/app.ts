@@ -48,7 +48,7 @@ export const tempApp = (...names: string[]): string => {
 };
 
 /** Reads a file under an app's `.pureform/`. */
-export const glue = (root: string, path: string): string =>
+export const outputFile = (root: string, path: string): string =>
     readFileSync(join(root, ".pureform", path), "utf8");
 
 /** A web adapter writing one module per component, counting its calls. */

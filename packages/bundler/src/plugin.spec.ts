@@ -11,7 +11,7 @@ import {
     configSource,
     eventually,
     fakeAdapter,
-    glue,
+    outputFile,
     tempApp,
     writeTree,
 } from "./__fixtures__/app";
@@ -79,11 +79,11 @@ describe("pureform.vite", () => {
             { root: { class: "pf-divider" } },
         ]);
         expect(app.themes).toEqual(["teal"]);
-        expect(glue(root, "web/chip.ts")).toContain('"pf-chip"');
+        expect(outputFile(root, "web/chip.ts")).toContain('"pf-chip"');
         expect(adapter.calls).toHaveLength(1);
     });
 
-    it("writes the glue before other plugins' configResolved, as Panda's needs", async () => {
+    it("writes the generated registry before other plugins' configResolved, as Panda's needs", async () => {
         const root = tempApp("chip");
         let seen: boolean | undefined;
         const reader: Plugin = {
@@ -118,12 +118,12 @@ describe("pureform.vite", () => {
                 target: fakeAdapter(),
                 components: ["chip", "badge"],
                 lazy: ["badge"],
-                outDir: "src/glue",
+                outDir: "src/generated",
             }),
         ]);
         expect(app.names).toEqual(["chip", "badge"]);
         expect(app.classes).toEqual([{ root: { class: "chip" } }, "lazy"]);
-        expect(existsSync(join(root, "src/glue/index.ts"))).toBe(true);
+        expect(existsSync(join(root, "src/generated/index.ts"))).toBe(true);
         expect(existsSync(join(root, ".pureform"))).toBe(false);
     });
 
@@ -147,7 +147,7 @@ describe("pureform.vite", () => {
             server: { middlewareMode: true, ws: false },
         });
         try {
-            expect(glue(root, "index.ts")).toContain('"chip"');
+            expect(outputFile(root, "index.ts")).toContain('"chip"');
             const resolved =
                 await server.environments.client.pluginContainer.resolveId(
                     REGISTRY_ID,
@@ -174,7 +174,7 @@ describe("pureform.vite", () => {
         }
     });
 
-    it("keeps a dev server going when generating fails, and names the missing glue on import", async () => {
+    it("keeps a dev server going when generating fails, and names the missing generated registry on import", async () => {
         const root = tempApp("chip");
         writeTree(root, { "pureform.config.ts": "export default 1;\n" });
         const errors: string[] = [];
@@ -202,7 +202,7 @@ describe("pureform.vite", () => {
                 ),
             );
             expect(String(error)).toContain(
-                "the generated glue in .pureform/ is missing (imported from main.ts)",
+                "the generated registry in .pureform/ is missing (imported from main.ts)",
             );
             writeFileSync(
                 join(root, "pureform.config.ts"),
@@ -229,12 +229,12 @@ describe("pureform.rolldown", () => {
         const { output } = await bundle.generate({ format: "es" });
         await bundle.close();
         expect(output[0].code).toContain('class: "chip"');
-        expect(glue(root, "index.ts")).toContain("createRegistry");
+        expect(outputFile(root, "index.ts")).toContain("createRegistry");
     });
 });
 
 describe("the plugin's hooks", () => {
-    it("names the missing glue for an import into the folder, and leaves other imports alone", async () => {
+    it("names the missing generated registry for an import into the folder, and leaves other imports alone", async () => {
         const root = tempApp("chip");
         const plugin = hooks({ root, target: fakeAdapter() });
         await plugin.buildStart();
@@ -247,9 +247,9 @@ describe("the plugin's hooks", () => {
         const error = await rejection(
             plugin.resolveId("../.pureform/index", importer),
         );
-        expect(isGenerateError(error, "missing-glue")).toBe(true);
+        expect(isGenerateError(error, "missing-output")).toBe(true);
         expect((error as Error).message).toContain(
-            "pureform: the generated glue in .pureform/ is missing (imported from src/main.ts).",
+            "pureform: the generated registry in .pureform/ is missing (imported from src/main.ts).",
         );
         expect((error as Error).message).toContain("pureform generate");
         expect((error as Error).message).toContain("@pureform/bundler");
@@ -272,7 +272,7 @@ describe("the plugin's hooks", () => {
         plugin.watchChange(join(root, "pureform.config.ts"));
         await plugin.buildStart();
         expect(adapter.calls).toHaveLength(2);
-        expect(glue(root, "index.ts")).toContain('"divider"');
+        expect(outputFile(root, "index.ts")).toContain('"divider"');
     });
 
     it("doesn't watch with watch: false", async () => {
@@ -357,7 +357,7 @@ describe("pruning", () => {
             server: { middlewareMode: true, ws: false },
         });
         try {
-            expect(glue(root, "index.ts")).toContain('"divider"');
+            expect(outputFile(root, "index.ts")).toContain('"divider"');
         } finally {
             await server.close();
         }
@@ -373,7 +373,7 @@ describe("pruning", () => {
         });
         await bundle.generate({ format: "es" });
         await bundle.close();
-        expect(glue(root, "index.ts")).not.toContain('"divider"');
-        expect(glue(root, "index.ts")).toContain('"chip"');
+        expect(outputFile(root, "index.ts")).not.toContain('"divider"');
+        expect(outputFile(root, "index.ts")).toContain('"chip"');
     });
 });

@@ -258,7 +258,7 @@ describe("scanUsage", () => {
         ).toEqual(["chip", "ripple"]);
     });
 
-    it("reads the registry imported from the glue", () => {
+    it("reads the registry imported from the output folder", () => {
         const result = scan({
             "src/app.tsx": `
                 import { registry } from "../.pureform";
@@ -275,7 +275,7 @@ describe("scanUsage", () => {
         });
     });
 
-    it("follows relative imports out of the folders it scans, and skips tests, the glue, and dependencies", () => {
+    it("follows relative imports out of the folders it scans, and skips tests, the generated registry, and dependencies", () => {
         const result = scan(
             {
                 "src/app.tsx": `import "../shared/ui"; import "./missing";`,

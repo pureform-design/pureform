@@ -1,19 +1,19 @@
 // The bundler plugin, written once with unplugin: generate `.pureform/` when dev or build
 // starts, serve `virtual:pureform/registry` (the generated index), generate again when the config
-// or a file it imports changes, and name `pureform generate` when an import reaches glue that
-// isn't there.
+// or a file it imports changes, and name `pureform generate` when an import reaches a generated
+// registry that isn't there.
 
 import { existsSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import {
-    createGlueRunner,
+    createGenerateRunner,
     DEFAULT_OUT_DIR,
     GenerateError,
     INDEX_FILE,
-    missingGlueMessage,
+    missingOutputMessage,
 } from "@pureform/generate";
-import type { GenerateResult, GlueRunner } from "@pureform/generate";
+import type { GenerateResult, GenerateRunner } from "@pureform/generate";
 import { createUnplugin } from "unplugin";
 import type { UnpluginFactory } from "unplugin";
 import type { ViteDevServer } from "vite";
@@ -37,7 +37,7 @@ export const unpluginFactory: UnpluginFactory<
     false
 > = (options) => {
     let root: string | undefined;
-    let runner: GlueRunner | undefined;
+    let runner: GenerateRunner | undefined;
     // The run the next lookup waits for: the first, or the latest regeneration.
     let pending: Promise<GenerateResult> | undefined;
     let serving = false;
@@ -62,7 +62,7 @@ export const unpluginFactory: UnpluginFactory<
             });
             for (const line of pruning.warnings) warn(line);
         }
-        runner = createGlueRunner(
+        runner = createGenerateRunner(
             generateOptions(options, root, pruning?.usage),
         );
     };
@@ -114,8 +114,8 @@ export const unpluginFactory: UnpluginFactory<
         await settled();
         if (existsSync(join(outDir(), INDEX_FILE))) return;
         throw new GenerateError(
-            "missing-glue",
-            missingGlueMessage(
+            "missing-output",
+            missingOutputMessage(
                 `${shown(outDir())}/`,
                 importer && isAbsolute(importer) ? shown(importer) : importer,
             ),
@@ -132,7 +132,7 @@ export const unpluginFactory: UnpluginFactory<
             try {
                 hints(await start(!serving && meta?.watchMode !== true));
             } catch (failure) {
-                // A dev server keeps running on the glue there is; the error shows on import.
+                // A dev server keeps running on the registry there is; the error shows on import.
                 if (!serving) throw failure;
                 error(message(failure));
             }

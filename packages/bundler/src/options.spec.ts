@@ -30,7 +30,7 @@ describe("generateOptions", () => {
                     config: "design.ts",
                     options: { prefix: "pf" },
                     components: ["chip"],
-                    outDir: "glue",
+                    outDir: "generated",
                 },
                 join(root, "other"),
             ),
@@ -39,7 +39,7 @@ describe("generateOptions", () => {
             config: "design.ts",
             options: { prefix: "pf" },
             components: ["chip"],
-            outDir: "glue",
+            outDir: "generated",
             root: join(root, "other"),
         });
     });

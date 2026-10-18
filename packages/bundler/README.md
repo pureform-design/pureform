@@ -1,11 +1,12 @@
 # @pureform/bundler
 
-The pureform bundler plugin. It writes the `.pureform/` glue (the style registry and its
-declarations) when `vite dev` or `vite build` starts, writes it again in dev when the config
-changes, and serves the generated index as `virtual:pureform/registry`. Generation itself is
-`@pureform/generate`'s, the same step `pureform generate` (`@pureform/cli`) runs, so the plugin
-and the command can't produce different glue. In builds it prunes: it scans the app's source
-first and generates only the components the app draws and the variant values it selects.
+The pureform bundler plugin. It writes the generated registry to `.pureform/` (the style
+registry's modules and their declarations) when `vite dev` or `vite build` starts, writes it
+again in dev when the config changes, and serves the generated index as
+`virtual:pureform/registry`. Generation itself is `@pureform/generate`'s, the same step
+`pureform generate` (`@pureform/cli`) runs, so the plugin and the command can't produce
+different output. In builds it prunes: it scans the app's source first and generates only the
+components the app draws and the variant values it selects.
 
 - **Depends on:** `@pureform/generate` (generation, the runner and watcher), `unplugin` (one
   plugin for every bundler), `@pureform/binding-core/usage` (what each component draws),
@@ -15,7 +16,7 @@ first and generates only the components the app draws and the variant values it 
   plugin with the `native` target).
 - Part of the core train: released at the same version as `core`, `styling`, and the adapters.
 
-Design: [§6 generated glue](../../docs/design/component-architecture.md#6-generated-glue),
+Design: [§6 the generated registry](../../docs/design/component-architecture.md#6-the-generated-registry),
 [§7 tree shaking](../../docs/design/component-architecture.md#7-tree-shaking) (the allow-list and
 pruning), [§3 package layout](../../docs/design/component-architecture.md#3-package-layout).
 
@@ -24,15 +25,15 @@ pruning), [§3 package layout](../../docs/design/component-architecture.md#3-pac
 ```
 vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
         │
-     plugin.ts ── createGlueRunner (@pureform/generate)
+     plugin.ts ── createGenerateRunner (@pureform/generate)
         │            config hook (Vite)    scan the app (builds), then generate before any
         │                                  plugin's configResolved
         │            buildStart            generate (once), watch the config and its imports
         │            watchChange           generate again when one of them changes
         │            resolveId             virtual:pureform/registry → <outDir>/index.ts;
-        │                                  an import into a missing outDir → missing-glue error
-     metro.ts ── watchGlue (@pureform/generate)
-                     withPureformGlue      generate before Metro starts, keep watching,
+        │                                  an import into a missing outDir → missing-output error
+     metro.ts ── watchGenerate (@pureform/generate)
+                     withPureform          generate before Metro starts, keep watching,
                                            resolve virtual:pureform/registry
      options.ts      the shared options, generateOptions, pruneOptions, describeResult
      prune/
@@ -46,7 +47,7 @@ vite.ts, rollup.ts, rolldown.ts, esbuild.ts   one unplugin instance per bundler
 | `prune/`      | `scanUsage`, `findUsage`, `describePruning`                                                                 |
 | `plugin.ts`   | `unpluginFactory`, `pureform` (the unplugin instance)                                                       |
 | `vite.ts` …   | `pureform` for one bundler, also the default export                                                         |
-| `metro.ts`    | `withPureformGlue(metroConfig, options)`                                                                    |
+| `metro.ts`    | `withPureform(metroConfig, options)`                                                                        |
 | `client.d.ts` | ambient types for `virtual:pureform/registry` (`@pureform/bundler/client`)                                  |
 
 ## Public API
@@ -72,7 +73,7 @@ export default defineConfig({
 | Option       | Default                                   | What it does                                                   |
 | ------------ | ----------------------------------------- | -------------------------------------------------------------- |
 | `target`     | (required)                                | The adapter: `@pureform/<target>-adapter/codegen`, or one      |
-| `options`    | `{}`                                      | The adapter's build options; part of the glue's hash           |
+| `options`    | `{}`                                      | The adapter's build options; part of the output's hash         |
 | `config`     | the first `pureform.config.{ts,mts,…}`    | A path relative to the root, or the config object              |
 | `components` | every component                           | The allow-list                                                 |
 | `lazy`       | none                                      | Components whose registry entries load on demand               |
@@ -90,18 +91,18 @@ import { registry } from "virtual:pureform/registry"; // resolves to .pureform/i
 // or: import { registry } from "../.pureform";
 ```
 
-Keeping the options in a glue file lets `pureform generate` (`@pureform/cli`) use them too,
-for steps without a bundler: the command reads the `glue` export of `pureform.glue.ts`.
+Keeping the options in a codegen file lets `pureform generate` (`@pureform/cli`) use them too,
+for steps without a bundler: the command reads the `codegen` export of `pureform.codegen.ts`.
 
 ```ts
-// pureform.glue.ts
-export const glue = {
+// pureform.codegen.ts
+export const codegen = {
     target: "panda",
     options: { prefix: "pf" },
 } satisfies PureformPluginOptions<PandaCodegenOptions>;
 
 // vite.config.ts
-plugins: [pureform(glue), pandacss()];
+plugins: [pureform(codegen), pandacss()];
 ```
 
 For TypeScript, add `"@pureform/bundler/client"` to `types` (the registry typed by the
@@ -117,9 +118,9 @@ Metro has no plugin API unplugin reaches, so the config is wrapped. `target` def
 ```js
 // metro.config.js
 const { getDefaultConfig } = require("@react-native/metro-config");
-const { withPureformGlue } = require("@pureform/bundler/metro");
+const { withPureform } = require("@pureform/bundler/metro");
 
-module.exports = withPureformGlue(getDefaultConfig(__dirname), {
+module.exports = withPureform(getDefaultConfig(__dirname), {
     options: { fontStack: "all" },
 });
 ```
@@ -134,21 +135,21 @@ regenerations keep that usage, so don't prune a config a dev server runs.
 ## How it behaves
 
 - **Before other plugins.** In Vite, generation runs in the `config` hook, which Vite runs in
-  order before any plugin's `configResolved`. Panda's plugin loads `panda.config.ts` (which
-  imports `.pureform/panda`) in `configResolved`, so the glue is there first. Other bundlers
+  order before any plugin's `configResolved`. Panda's plugin loads `panda.config.ts` (which imports
+  `.pureform/panda`) in `configResolved`, so the generated registry is there first. Other bundlers
   generate in `buildStart`.
 - **Once per start.** Builds with several environments (client and server) generate once.
 - **Failures.** A failed generation fails a build. A dev server keeps running and logs the
   error (and shows it in the overlay on a later failure); an import of the registry then fails
-  with the missing-glue message if there's no glue at all.
-- **Missing glue.** An import of `virtual:pureform/registry`, or a relative import into the
-  output folder, when `<outDir>/index.ts` doesn't exist, fails with `@pureform/generate`'s
-  `missing-glue` error, naming `pureform generate` and this plugin.
+  with the missing-output message if there's no generated registry at all.
+- **Missing generated registry.** An import of `virtual:pureform/registry`, or a relative import
+  into the output folder, when `<outDir>/index.ts` doesn't exist, fails with `@pureform/generate`'s
+  `missing-output` error, naming `pureform generate` and this plugin.
 - **Regeneration.** Only changes to the config and the files it imports (relative paths)
-  trigger it; generation rewrites only files whose contents differ, so unchanged glue doesn't
-  reload anything. Changes to installed packages need a restart.
-- **Pruning writes in place.** A pruned build writes the pruned glue to `.pureform/`, as Panda
-  writes `styled-system/`; the next dev server or `pureform generate` writes the full glue back
+  trigger it; generation rewrites only files whose contents differ, so an unchanged registry
+  doesn't reload anything. Changes to installed packages need a restart.
+- **Pruning writes in place.** A pruned build writes the pruned registry to `.pureform/`, as Panda
+  writes `styled-system/`; the next dev server or `pureform generate` writes the full registry back
   (the hash covers what pruning narrowed). An app that commits `.pureform/` sets `prune: false`,
   and so does one that styles components the scan can't see, such as through
   Panda's recipe functions.
@@ -174,8 +175,8 @@ pureform({
 ```
 
 **What the scan reads**, in every script under the root (or `include`) and what they import by
-relative path (`node_modules`, dot folders, `dist`, `build`, `coverage`, `styled-system`, the glue,
-the bundler's `outDir`, and test and story files are skipped):
+relative path (`node_modules`, dot folders, `dist`, `build`, `coverage`, `styled-system`, the
+generated registry, the bundler's `outDir`, and test and story files are skipped):
 
 - imports of component subpaths (`@pureform/solid/button`, `/react/…`, `/react-native/…`):
   each draws the registry entries `COMPONENT_USAGE` lists (a dialog draws `dialog`, `scrim`,
@@ -189,7 +190,7 @@ the bundler's `outDir`, and test and story files are skipped):
   or a function returning one), other groups at their defaults; `useClassFactory(name)`,
   `useLazyClassFactory`, `useStyleFactory`: the entry with every value;
 - `useComponent(anatomy, { selection })` with an anatomy from `@pureform/anatomy`;
-- `registry.entry("name")` and `.preload("name")` on the glue's `registry` or `useRegistry()`,
+- `registry.entry("name")` and `.preload("name")` on the generated `registry` or `useRegistry()`,
   and imports of `.pureform/web/<name>`: the entry with every value;
 - `<PureformProvider defaults={{ button: { variant: "text" } }}>`: those values (any other
   `defaults` keeps every value of every component).
@@ -205,10 +206,11 @@ component's `indication` prop: `noIndication`, `materialIndication({ ripple: fal
 `defineIndication({ … })` (or an object) without `layer: true`. With no provider in the scanned
 files, the ripple stays.
 
-**When it keeps everything** and warns (`pureform: pruning kept every component and variant,
-since …`): a file that doesn't parse, a registry hook or `registry.entry` with a name it can't
-read, `useComponent` with an anatomy it can't name, an unknown component subpath, re-exported or
-dynamically imported registry hooks, or the glue imported as a namespace or dynamically.
+**When it keeps everything** and warns (`pureform: pruning kept every component and variant, since
+…`): a file that doesn't parse, a registry hook or `registry.entry` with a name it can't read,
+`useComponent` with an anatomy it can't name, an unknown component subpath, re-exported or
+dynamically imported registry hooks, or the generated registry imported as a namespace or
+dynamically.
 
 **What it can't see** (use `keep`, or `prune: false`): components drawn from packages under
 `node_modules` (a design system that wraps pureform), names passed through `usePureform()`'s
@@ -221,7 +223,7 @@ count as used.
 
 - `task_run` `test:unit` on `@pureform/bundler`: Vite builds and dev servers on temporary apps
   with a fake adapter (generation before `configResolved`, the options, a failing build,
-  regeneration on a change, missing glue in dev), a Rolldown build, the hooks called directly,
+  regeneration on a change, a missing registry in dev), a Rolldown build, the hooks called directly,
   the Metro wrapper, and a `tsc` run over the client types. Pruning: `prune/scan.spec.ts` (what
   the scan reads and when it keeps everything), pruned Vite, dev, and Rolldown builds in
   `plugin.spec.ts`, and `prune/fixture.spec.ts`, a fixture app on the CSS target with the whole
@@ -236,6 +238,6 @@ count as used.
   `pureformTailwind`, `virtual:pureform/components`), which are gone: with `target: "css"` or
   `"tailwind"` it writes `.pureform/styles.css` too, which the app imports (Tailwind: after
   `tailwindcss`, and with this plugin before Tailwind's).
-- **Generate under one runtime.** The glue's hash covers the evaluated config, which the preset
+- **Generate under one runtime.** The output's hash covers the evaluated config, which the preset
   computes slightly differently under Bun than under Node; Vite runs the plugin under Node, and
   so does `pureform generate` (its bin's shebang, which `bun x` follows).
