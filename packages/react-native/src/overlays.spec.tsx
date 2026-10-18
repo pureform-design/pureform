@@ -14,11 +14,21 @@ import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import { byTestId, interact, mount, outside, settle } from "./testing/render";
+import { Tooltip } from "./tooltip";
 
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    const names = ["menu", "button", "iconButton", "snackbar", "ripple"];
+    const names = [
+        "menu",
+        "button",
+        "iconButton",
+        "snackbar",
+        "tooltip",
+        "dialog",
+        "scrim",
+        "ripple",
+    ];
     registry = await presetRegistry(names);
 });
 
@@ -36,6 +46,14 @@ const ITEMS = [
 ];
 
 const box = (element: Element) => element.getBoundingClientRect();
+
+// Settles until `check` holds, or `ms` have passed.
+const until = async (check: () => boolean, ms = 1000) => {
+    for (let waited = 0; waited < ms && !check(); waited += 50) {
+        await settle(50);
+    }
+};
+
 const menu = () => document.querySelector<HTMLElement>('[role="menu"]');
 const items = () => [
     ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
@@ -130,7 +148,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         ).toBe(true);
         await interact(() => userEvent.click(item));
         expect(picked).toEqual(["copy"]);
-        await settle(400);
+        await until(() => menu() === null);
         expect(menu()).toBeNull();
     });
 
@@ -170,7 +188,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         await interact(() => userEvent.keyboard("{Escape}"));
         expect(asked).toEqual([true, false, false]);
         await open.set(false);
-        await settle(400);
+        await until(() => menu() === null);
         expect(menu()).toBeNull();
     });
 
@@ -185,7 +203,7 @@ describe.each([animated, reanimated])("the menu with $name", (engine) => {
         await interact(() => userEvent.keyboard("{ArrowDown}"));
         expect(document.activeElement).toBe(items()[0]);
         await interact(() => userEvent.keyboard("{Escape}"));
-        await settle(400);
+        await until(() => menu() === null);
         expect(menu()).toBeNull();
         expect(document.activeElement).toBe(byTestId("pf-button-root"));
     });
@@ -230,7 +248,7 @@ describe.each([animated, reanimated])(
                 expect.stringContaining("Second"),
             ]);
             await interact(() => snackbars.dismiss());
-            await settle(400);
+            await until(() => roots().length === 0);
             expect(roots()).toEqual([]);
         });
 
@@ -278,7 +296,7 @@ describe.each([animated, reanimated])(
                 userEvent.click(byTestId("pf-snackbar-action")),
             );
             expect(done).toEqual(["undo", "action"]);
-            await settle(400);
+            await until(() => roots().length === 0);
             expect(roots()).toEqual([]);
         });
 
@@ -304,3 +322,122 @@ describe.each([animated, reanimated])(
         });
     },
 );
+
+// A pointer press on an element, held until `release` is called.
+const hold = async (element: HTMLElement) => {
+    const at = box(element);
+    const point = {
+        bubbles: true,
+        button: 0,
+        clientX: at.left + at.width / 2,
+        clientY: at.top + at.height / 2,
+    };
+    await interact(() => {
+        element.dispatchEvent(new MouseEvent("mousedown", point));
+    });
+    return () =>
+        interact(() => {
+            document.dispatchEvent(new MouseEvent("mouseup", point));
+        });
+};
+
+describe.each([animated, reanimated])("the tooltip with $name", (engine) => {
+    const tooltip = () =>
+        document.querySelector<HTMLElement>('[role="tooltip"]');
+    const saveButton = (onPress?: () => void) => (
+        <View style={{ padding: 80 }}>
+            <Tooltip
+                supportingText="Save to drafts"
+                trigger={(trigger) => (
+                    <IconButton
+                        {...trigger}
+                        aria-label="Save"
+                        icon="S"
+                        onPress={onPress}
+                    />
+                )}
+            />
+        </View>
+    );
+
+    it("shows under its trigger once the pointer rests on it, and hides when it leaves", async () => {
+        await render(saveButton(), engine);
+        const trigger = byTestId("pf-icon-button-root");
+        await interact(() => userEvent.hover(trigger));
+        await settle(200);
+        expect(tooltip()).toBeNull();
+        await settle(300);
+        await until(() => tooltip() !== null && box(tooltip()!).top > 0);
+        const shown = box(tooltip()!);
+        const under = box(trigger);
+        expect(shown.top).toBeGreaterThanOrEqual(under.bottom);
+        expect(shown.left + shown.width / 2).toBeCloseTo(
+            under.left + under.width / 2,
+            0,
+        );
+        await interact(() => userEvent.unhover(trigger));
+        await settle(300);
+        await until(() => tooltip() === null);
+        expect(tooltip()).toBeNull();
+    });
+
+    it("shows on a long press instead of pressing, and hides a while after it ends", async () => {
+        const pressed: string[] = [];
+        await render(
+            saveButton(() => pressed.push("press")),
+            engine,
+        );
+        const release = await hold(byTestId("pf-icon-button-root"));
+        await settle(100);
+        await settle(700);
+        expect(tooltip()).not.toBeNull();
+        await release();
+        expect(pressed).toEqual([]);
+        await settle(1000);
+        expect(tooltip()).not.toBeNull();
+        await settle(500);
+        await until(() => tooltip() === null);
+        expect(tooltip()).toBeNull();
+    });
+
+    it("shows when the keyboard focuses its trigger, and Escape hides it", async () => {
+        await render(saveButton(), engine);
+        await interact(() => userEvent.tab());
+        await settle(300);
+        expect(tooltip()).not.toBeNull();
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await until(() => tooltip() === null);
+        expect(tooltip()).toBeNull();
+    });
+});
+
+it("stacks open overlays by their layers: a menu, then a snackbar, then a tooltip", async () => {
+    let snackbars!: Snackbars;
+    function Grab(): ReactNode {
+        snackbars = useSnackbar();
+        return null;
+    }
+    await render(
+        <>
+            <Grab />
+            <Tooltip
+                defaultOpen
+                supportingText="Tip"
+                trigger={(trigger) => (
+                    <IconButton {...trigger} aria-label="Tip" icon="?" />
+                )}
+            />
+            <Menu defaultOpen trigger="Edit" items={ITEMS} />
+        </>,
+    );
+    await interact(() => {
+        snackbars.show({ supportingText: "Saved", duration: null });
+    });
+    await settle(400);
+    const order = [
+        ...document.querySelectorAll(
+            '[role="menu"], [role="status"], [role="tooltip"]',
+        ),
+    ].map((element) => element.getAttribute("role"));
+    expect(order).toEqual(["menu", "status", "tooltip"]);
+});

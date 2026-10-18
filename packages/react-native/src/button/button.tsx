@@ -26,6 +26,9 @@ export interface ButtonProps
         InteractiveProps {
     readonly disabled?: boolean | undefined;
     readonly onPress?: (() => void) | undefined;
+    /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
+     *  shows its tooltip so). */
+    readonly onLongPress?: (() => void) | undefined;
     /** A prefix for every part's test id (`save` → `save-root`), or ids by part. */
     readonly testId?: TestIdOverride<ButtonPart> | undefined;
 }
@@ -56,6 +59,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
             {...indication.handlers}
             role="button"
             disabled={props.disabled}
+            onLongPress={props.onLongPress}
             onPress={props.onPress}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}

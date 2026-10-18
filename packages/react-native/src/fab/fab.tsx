@@ -26,6 +26,9 @@ export interface FabProps
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
     readonly onPress?: (() => void) | undefined;
+    /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
+     *  shows its tooltip so). */
+    readonly onLongPress?: (() => void) | undefined;
     readonly testId?: TestIdOverride<FabPart> | undefined;
 }
 
@@ -66,6 +69,7 @@ function FabImpl(props: FabProps): ReactNode {
             role="button"
             {...(label === undefined ? {} : { "aria-label": label })}
             disabled={props.disabled}
+            onLongPress={props.onLongPress}
             onPress={props.onPress}
             style={{ ...s.root, ...unselectable }}
             testID={id("root")}
