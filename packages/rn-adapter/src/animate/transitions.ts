@@ -1,5 +1,6 @@
 // State transitions: each property with a transition moves from the value on screen to its
-// new one through Animated, and each step of a transform moves on its own.
+// new one through Animated, and each step of a transform moves on its own. A value stays plain
+// until it first changes, so a component that mounts and never changes makes no animated values.
 
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { Animated } from "react-native";
@@ -23,7 +24,7 @@ interface Pending {
     track: Track;
     transition: Transition;
     previous: Animated.CompositeAnimation | undefined;
-    previousProgress: Animated.Value;
+    previousProgress: Animated.Value | undefined;
 }
 
 // A progress value whose listener keeps its track's `at` current, for interruptions.
@@ -40,6 +41,8 @@ const progressOf = (start: number, track: () => Track): Animated.Value => {
  *  views bound to it would update mid-render). */
 export const useTransitions = () => {
     const tracks = useRef(new Map<string, Track>());
+    // Each value that hasn't moved yet, as it was last drawn.
+    const still = useRef(new Map<string, Concrete>());
     const pending = useRef<Pending[]>([]);
 
     // One value under a transition: the animated value, or the target where it can't move.
@@ -52,13 +55,25 @@ export const useTransitions = () => {
         const to = animatable(target);
         let track = tracks.current.get(key);
         if (!track) {
-            track = {
-                progress: progressOf(1, () => track!),
-                from: to,
+            const drawn = still.current.get(key);
+            still.current.set(key, to);
+            if (drawn === undefined || drawn === to) return target;
+            // Its first change: it moves from where it was drawn.
+            still.current.delete(key);
+            const created: Track = {
+                progress: progressOf(0, () => created),
+                from: drawn,
                 to,
-                at: 1,
+                at: 0,
             };
+            track = created;
             tracks.current.set(key, track);
+            pending.current.push({
+                track,
+                transition,
+                previous: undefined,
+                previousProgress: undefined,
+            });
         } else if (track.to !== to) {
             // Start from what's on screen, so an interrupted change doesn't jump.
             const current = track;
@@ -97,7 +112,7 @@ export const useTransitions = () => {
             previousProgress,
         } of pending.current.splice(0)) {
             previous?.stop();
-            previousProgress.removeAllListeners();
+            previousProgress?.removeAllListeners();
             // Colors and layout can't use the native driver, so transitions stay in JS.
             track.animation = Animated.timing(track.progress, {
                 toValue: 1,
@@ -131,10 +146,14 @@ export const useTransitions = () => {
         // A property out from under its transition (a slider's handle while it's dragged)
         // forgets where it was, so when the transition returns it starts from where it is.
         const moving = new Set(transitions.map((t) => `${slot}.${t.property}`));
+        const gone = (key: string) =>
+            key.startsWith(`${slot}.`) &&
+            !moving.has(`${slot}.${key.slice(slot.length + 1).split(".")[0]!}`);
+        for (const key of still.current.keys()) {
+            if (gone(key)) still.current.delete(key);
+        }
         for (const [key, track] of tracks.current) {
-            if (!key.startsWith(`${slot}.`)) continue;
-            const property = key.slice(slot.length + 1).split(".")[0]!;
-            if (moving.has(`${slot}.${property}`)) continue;
+            if (!gone(key)) continue;
             track.animation?.stop();
             track.progress.removeAllListeners();
             tracks.current.delete(key);
