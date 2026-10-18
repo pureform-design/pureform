@@ -773,9 +773,27 @@ gives no layer to what it doesn't place.
 
 On React Native there's no positioner to take the layer: `zIndex` orders a view only among its
 siblings (and React Native Web gives every `View` `position: relative` and `z-index: 0`), so a
-surface's layer never leaves the view around it. The app places its overlays, so it puts the layer
-on the overlay's outermost wrapper, `useLayer(name)` in `@pureform/react-native` reading the theme's
+surface's layer never leaves the view around it. An overlay the app places itself takes the layer
+on its outermost wrapper, `useLayer(name)` in `@pureform/react-native` reading the theme's
 `zIndices.<name>`; a `Modal`, as the select's menu uses, is over everything already.
+
+**Built (React Native portal host):** the ready-made overlays (a menu or tooltip given a
+`trigger`, `useSnackbar()`'s queue) don't render in place: React Native has no DOM portals, and in
+place a clipping or later view covers them. The root `PureformProvider` holds a `PortalHost` (unless
+the app placed one around it), which renders its children and then, while any portal is open, one
+absolutely filled layer (`pointerEvents: "box-none"`) over the view it's in. A `Portal` hands its
+children to the nearest host, which renders them in that layer sorted by a key: the theme's
+z-index for the portal's layer and the order it opened in, after the keys of the portals it's
+inside, so an overlay opened from another sorts over it, as an element inside a stacking context
+does on the web. A tooltip draws over a snackbar over a menu, whatever order they opened in. The
+host's own layer takes the highest z-index among them. What the host renders keeps the provider it
+was declared under (`usePureformScope` captures the provider's state and reduced motion, and
+`PureformScopeProvider` gives them again around the entry): registry, scheme, nested themes,
+overrides, direction, motion, indication, and engine. A container's width and the app's own
+contexts don't cross. A small dependency (`@gorhom/portal`) was passed over: it carries no
+context either, orders hosts by name rather than by layer, and the host is about a hundred lines.
+A `Modal` is a window of its own on a device, which a root layer can't draw over, so the dialog's
+`Modal` holds a host of its own; an app's own `Modal` that opens overlays places one too.
 
 ### 5.8 Reduced motion
 
@@ -838,8 +856,10 @@ motion)` keeps the overlay present until the exit's end is reported, never on a 
       interrupted step reports nothing, and the next starts from its own first frame, as the
       web's keyframes do. The select's `Modal` closes once its menu has faded out; the menu,
       dialog, snackbar, tooltip, and scrim take `open` and render nothing once gone. Scaling has
-      no positioner origin on React Native: the select's menu grows from its top left, the
-      others from their center.
+      no positioner origin on React Native: the select's menu grows from its top left, a menu or
+      tooltip given a trigger from the point of its box nearest the trigger's center (as Zag's
+      `--transform-origin`), the others from their center. The ready-made overlays (below, §8)
+      leave their portal, and the dialog its `Modal`, once the exit has ended.
     - In the preset, the gate moves from the whole `transition` to each tween:
       `STATE_TWEENS` (colors and elevation) always run, and `tweens(...)` gates only the
       moving properties it's given. This changes output on purpose, so it's checked
@@ -1168,6 +1188,34 @@ group are re-exported; the rest follow with their components. Own machines: `but
 `idle` and `pressed`; focus, hover, and an optional toggle on `selected`), `ripple` (the
 js-effects ripple attached to the layer's parent, reading its props at each press), and stubs
 for `textField` and `slider`. The specs run them through Zag's vanilla adapter in Chromium.
+
+**Built (React Native overlays):** React Native runs no Zag machine for its overlays. Zag's menu,
+tooltip, and dialog need the DOM: they find their parts by id (`@zag-js/dom-query`), place the
+floating ones with Floating UI's DOM platform, and the dialog hides the page and traps focus with
+DOM APIs. pureform's snackbar machine is DOM-free, but running it takes a Zag adapter, which
+`@pureform/react-native` doesn't have (`@zag-js/react` renders to the DOM), for a timer and two
+holds. So each overlay keeps a little state of its own, with the web's props and behavior
+(binding-core's `Controllable<"open">`, `OverlayPositioning`, the tooltip's delays, the snackbar's
+`duration` and reasons), and renders through the portal host (§5.7's notes) or, for the dialog, a
+`Modal`:
+
+| Overlay                                              | Opens                                                                                                                                                        | Closes                                                                                                                                                                                                         |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Menu (`trigger` given)                               | The trigger's press; anchored to the trigger's view (`measureInWindow`, from the view its `interactionSource` last saw), `bottom-start`, flipped and shifted | A press outside (a layer under the menu takes it, as a native popup does), picking an item (`closeOnSelect`), Escape on the web, Android's back button; on the web focus goes to the first item and back after |
+| Tooltip (`trigger` given)                            | The pointer resting `openDelay` (400 ms), keyboard focus at once, a long press (`onLongPress`, which keeps the trigger from pressing)                        | The pointer leaving (`closeDelay`, 150 ms), blur, a press on the trigger, Escape or back, 1.5 s after a long press ends; a rich tooltip stays under the pointer, and after a long press until a press outside  |
+| Snackbar (`useSnackbar()`)                           | `show(options)`: queued per host, one at a time, at the bottom above the host's inset                                                                        | `duration` (5 s, `null` to stay; held while pressed or hovered, counted from the start once let go), its action, its close button, `dismiss(id)`; `onOpenChange` says why                                      |
+| Dialog (`trigger`, `onOpenChange`, or `defaultOpen`) | The trigger's press, or `open`                                                                                                                               | A press on the scrim (not an `alertdialog`), Escape, the back button, or `close` given to `actions`                                                                                                            |
+
+The dialog is modal, so it opens in a `Modal` rather than the portal: on a device a `Modal` is a
+window that takes every touch, the back button (`onRequestClose`), and assistive technology (with
+`aria-modal`, VoiceOver's `accessibilityViewIsModal`); a portal would need a view around the app to
+hide it from TalkBack, which the root provider doesn't render. On the web, React Native Web's
+`Modal` traps focus and gives it back to the trigger. The cost is that a `Modal` draws over the
+root's layer, so the dialog's `Modal` holds a host of its own: a menu, tooltip, or snackbar opened
+inside draws over the dialog. Escape and the back button close the topmost overlay first
+(`useDismiss` keeps one stack for both; the `Modal`'s `onRequestClose` and a capturing `keyup` on
+the window call its top), so a menu in a dialog closes before the dialog. Every overlay enters and
+leaves through `usePresence` with the engine, and leaves the host only once its exit has ended.
 
 ## 9. Components
 
@@ -1582,6 +1630,16 @@ icon only has to follow them.
   suite reads: controlled and uncontrolled state, forms, axe in both directions, the keyboard
   (arrow keys in both directions), mirrored boxes and `dir` on every part, and server rendering.
   The selection-by-test-id contract suite against RN-web stays in `tests/browser-e2e-tests`.
+- **Built (React Native overlays):** `@pureform/react-native`'s unit tests render through React
+  Native Web in Chromium: `portal.spec.tsx` (a portal renders at the host after the page, sorted by
+  layer and then by order, nested portals over their parent; the declaring provider's nested
+  themes, overrides, direction, and engine carry through; an app's own host), and
+  `overlays.spec.tsx` with both engines (placement, flip, and shift; the menu over a view that
+  clips it, picking, a press outside, Escape, controlled `open`, and the web's focus and arrow
+  keys; the snackbar queue's order, timeout, holds, action, and provider; the tooltip's hover,
+  long press, and keyboard focus; the modal dialog's scrim, Escape, actions, an alertdialog, and a
+  menu inside it closing first; a menu, snackbar, and tooltip stacked by layer).
+  `apps/rn-web-demo`'s smoke test opens and dismisses each overlay on the demo page.
 - **Built (p5a):** six projects, one per binding and web target (`solid/panda`, `solid/css`,
   `solid/tailwind`, and React's three). Each aliases `#registry` to its target's registry and loads
   that target's stylesheet; the CSS and Tailwind registries are generated from the demo's config
