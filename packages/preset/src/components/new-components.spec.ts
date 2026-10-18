@@ -107,11 +107,13 @@ describe("progress", () => {
 
     it("adds its keyframes to the pureform config", async () => {
         const { pureform } = await import("../pureform");
-        expect(Object.keys(pureform().keyframes ?? {})).toEqual([
-            "linearProgressSlide",
-            "linearProgressSlideRtl",
-            "circularProgressSpin",
-        ]);
+        expect(Object.keys(pureform().keyframes ?? {})).toEqual(
+            expect.arrayContaining([
+                "linearProgressSlide",
+                "linearProgressSlideRtl",
+                "circularProgressSpin",
+            ]),
+        );
     });
 });
 

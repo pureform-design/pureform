@@ -58,6 +58,7 @@ import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
+import { OVERLAY_KEYFRAMES } from "./components/overlay";
 import {
     PROGRESS_KEYFRAMES,
     createCircularProgress,
@@ -437,7 +438,7 @@ export const pureform = <
             theme.config,
             {
                 componentBaseStyles: { fontFamily: fontRole("plain") },
-                keyframes: PROGRESS_KEYFRAMES,
+                keyframes: { ...PROGRESS_KEYFRAMES, ...OVERLAY_KEYFRAMES },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
             },

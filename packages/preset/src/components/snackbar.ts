@@ -2,7 +2,8 @@
 // surface, with an optional action and close button.
 //
 // Placing it (fixed to the bottom, above a navigation bar) and dismissing it are the app's job;
-// announce it with `role="status"`.
+// announce it with `role="status"`. Placed, it stacks at the theme's `snackbar` layer; it grows
+// in while its `data-state` is `open`.
 //
 //   <div class={root} role="status">
 //     <span class={supportingText}>Message archived</span>
@@ -19,9 +20,16 @@ import {
     transparent,
     unitless,
 } from "@pureform/core/ast";
-import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
+import {
+    radius,
+    size as sizeToken,
+    spacing,
+    textStyle,
+    zIndex,
+} from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import { overlayMotion, POPUP_MOTION } from "./overlay";
 import {
     componentTokens,
     INDICATION_ROOT,
@@ -72,6 +80,8 @@ export const snackbar = pf.slotComponent({
             root: {
                 ...INDICATION_ROOT,
                 ...surface(ref("container"), ref("content"), "level3"),
+                ...overlayMotion(POPUP_MOTION),
+                zIndex: zIndex("snackbar"),
                 display: flex,
                 flexDirection: row,
                 alignItems: center,

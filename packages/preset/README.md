@@ -83,6 +83,45 @@ Specs build their transitions with the helpers in `components/shared.ts`:
   (`transitionMoves` from `@pureform/core` decides), and none left is `none`. `tweens` and
   shape morphs build on it.
 
+## Overlays: stacking and motion
+
+The menu (and so a select's list), tooltip, dialog, scrim, and snackbar each stack at a layer of
+the theme's stacking scale (`zIndex(name)` from `@pureform/theme`, lowered to `--z-index-<name>`
+and Panda's `zIndex` tokens), so an open overlay draws over the page around it:
+
+| Layer      | Default | Who                                                           |
+| ---------- | ------- | ------------------------------------------------------------- |
+| `base`     | 0       | the page                                                      |
+| `raised`   | 100     | what an app places over its content: app bars, nav bars, FABs |
+| `menu`     | 200     | `menu`'s root, and so a select's list                         |
+| `scrim`    | 300     | `scrim`'s root, a dialog's backdrop                           |
+| `dialog`   | 400     | `dialog`'s root                                               |
+| `snackbar` | 500     | `snackbar`'s root, once the app places it                     |
+| `tooltip`  | 600     | `tooltip`'s root                                              |
+
+`z-index` only applies to a positioned element. The bindings render each surface in Zag's
+positioner, which takes the surface's `z-index` (Zag's popper does for the menu, select, and
+tooltip; the bindings' `stackPositioner` for the dialog's fixed positioner). A theme changes the
+scale through its layout (`materialLayout({ zIndices: stack([...]) })`).
+
+They animate on Zag's `data-state` (`components/overlay.ts`): the enter's keyframes while it's
+`open`, the exit's once it's `closed`, holding the last frame until the binding hides the
+overlay once the exit ends (Zag's presence). Every duration and curve is a motion token:
+
+| Overlay                    | Enters                                                                                 | Leaves                                                      |
+| -------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| menu, select list, tooltip | grows from 80% and fades in from the side it opens on, `short3`, emphasized decelerate | fades out, `short2`, emphasized accelerate                  |
+| snackbar                   | grows from 80% and fades in, from its center                                           | fades out, `short2`                                         |
+| dialog                     | comes down 48px and fades in, `long2`, emphasized decelerate                           | goes back up and fades out, `short3`, emphasized accelerate |
+| scrim                      | fades in, `long2`, linear                                                              | fades out, `short3`, linear                                 |
+
+The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
+reveal: a transform and opacity need no layout, and reduced motion keeps the fade alone. Under
+reduced motion every moving keyframe gives way to a fade (`overlayFadeIn`, `overlayFadeOut`) of
+the same timing. The keyframes are `OVERLAY_KEYFRAMES`, which `pureform()` adds to the config;
+`overlayMotion` and the `*_MOTION` steps build a surface's styles. React Native draws no overlay
+motion: the rules are web-only (`rawRules.css`).
+
 ## Direction
 
 Components follow the writing direction (`dir="rtl"` on an ancestor on the web, the `rtl`
@@ -531,11 +570,14 @@ one, so the icon and headline center.
 ```
 
 The dialog doesn't trap focus or dim the page by itself. Use a native `<dialog>` (which traps
-focus), or put the `scrim` component behind it.
+focus), or put the `scrim` component behind it. It stacks over the scrim and slides in on
+`data-state` (see [Overlays](#overlays-stacking-and-motion)).
 
 ## Snackbar and tooltip
 
-Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job.
+Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job; placed,
+they stack at their layers and grow in on `data-state` (see
+[Overlays](#overlays-stacking-and-motion)).
 
 ```html
 <div class="{root}" role="status">

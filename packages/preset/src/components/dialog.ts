@@ -3,7 +3,8 @@
 // Markup: the surface holding an optional icon, the headline, the body, and the actions (text
 // buttons, the confirming one last). Turn on `icon` when you render one; Material then centers
 // the icon and headline. Dim the page behind it with the scrim component, or style a native
-// <dialog>'s backdrop yourself.
+// <dialog>'s backdrop yourself. It stacks at the theme's `dialog` layer, over the scrim's, and
+// slides in while Zag's `data-state` is `open`.
 //
 //   <dialog class={root} aria-labelledby="title" open>
 //     <h2 class={headline} id="title">Discard draft?</h2>
@@ -25,9 +26,10 @@ import {
     row,
     unitless,
 } from "@pureform/core/ast";
-import { radius, spacing, textStyle } from "@pureform/theme";
+import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 import { size as sizeToken } from "@pureform/theme";
 
+import { DIALOG_MOTION, overlayMotion } from "./overlay";
 import { componentTokens, iconBox, iconFill, surface, sys } from "./shared";
 
 const { tokens, ref } = componentTokens("dialog", {
@@ -61,6 +63,8 @@ export const dialog = pf.slotComponent({
         base: {
             root: {
                 ...surface(ref("container"), ref("bodyColor"), "level3"),
+                ...overlayMotion(DIALOG_MOTION),
+                zIndex: zIndex("dialog"),
                 display: flex,
                 flexDirection: column,
                 gap: ref("gap"),

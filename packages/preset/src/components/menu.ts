@@ -13,14 +13,16 @@
 //   </div>
 //
 // Mark the chosen item with `aria-selected`, and an unavailable one with
-// `disabled` or `aria-disabled`.
+// `disabled` or `aria-disabled`. It stacks at the theme's `menu` layer, and grows in from the
+// side it opens on while Zag's `data-state` is `open`.
 
 import { typed } from "@pureform/core";
 import { column, flex, pct, px, start, add } from "@pureform/core/ast";
-import { radius, spacing, textStyle } from "@pureform/theme";
+import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { rowGroupColors, rowParts, rowTokens } from "./list";
+import { overlayMotion, POPUP_MOTION } from "./overlay";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -104,6 +106,8 @@ export const createMenu = <
                     root: {
                         ...INDICATION_ROOT,
                         ...surface(ref("container"), ref("content"), "level2"),
+                        ...overlayMotion({ ...POPUP_MOTION, fromAnchor: true }),
+                        zIndex: zIndex("menu"),
                         display: flex,
                         flexDirection: column,
                         borderRadius: ref("radius"),
