@@ -514,7 +514,7 @@ describe("a component's own indication tokens", () => {
             const factory = componentFactory(styles, name).for({
                 scheme: "light",
             });
-            // The factory here has no generated glue to name the tokens, so they go by path.
+            // The factory here has no generated registry to name the tokens, so they go by path.
             const own = Object.fromEntries(
                 Object.entries(NATIVE_OWN_TOKENS).map(([token, value]) => [
                     `components.${name}.${token}`,
