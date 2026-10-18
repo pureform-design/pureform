@@ -39,6 +39,7 @@ import {
 } from "../lib/settings";
 import type { Settings } from "../lib/settings";
 import { Glyph } from "../ui/icons";
+import { overlay } from "../ui/layers";
 import { useSettings } from "./settings";
 import { swatchTheme } from "./theme";
 
@@ -65,8 +66,6 @@ const fab = css({
         },
     },
 });
-
-const layer = css({ zIndex: 1 });
 
 // The sheet: full height at the inline end, as wide as Material's side sheet allows.
 const sheet = css({
@@ -343,8 +342,8 @@ export function SettingsPanel(): JSX.Element {
                 tokens={{ container: "var(--colors-surface-container-low)" }}
                 testId="settings"
             >
-                <Dialog.Backdrop class={layer} />
-                <Dialog.Positioner class={layer} style={sheetPositioner}>
+                <Dialog.Backdrop class={overlay} />
+                <Dialog.Positioner class={overlay} style={sheetPositioner}>
                     <Dialog.Content class={sheet}>
                         <div class={sheetHeader}>
                             <Dialog.Headline class={grow}>

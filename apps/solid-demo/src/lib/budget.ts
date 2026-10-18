@@ -72,6 +72,10 @@ const wholeMoney = new Intl.NumberFormat("en-US", {
  *  currency symbol) in a right-to-left page too. */
 export const isolate = (text: string) => `\u2068${text}\u2069`;
 
+/** `1 transaction`, `3 transactions`: a count, isolated, and its noun. */
+export const count = (n: number, one: string, many: string) =>
+    `${isolate(String(n))} ${n === 1 ? one : many}`;
+
 /** `$1,234.50`, or `+$1,234.50` with `sign`. */
 export const formatMoney = (cents: number, options: { sign?: boolean } = {}) =>
     isolate(
