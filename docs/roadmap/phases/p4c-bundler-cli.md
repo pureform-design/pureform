@@ -25,7 +25,7 @@ Expose generation through the bundler plugin and the `pureform` command.
 
 ## Done when
 
-- `solid-demo` builds from generated glue; the CLI's `--check` fails on stale glue in a
+- `solid-demo` builds from the generated registry; the CLI's `--check` fails on a stale one in a
   test.
 
 ## Output context (required)

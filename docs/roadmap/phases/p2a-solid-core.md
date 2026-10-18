@@ -28,8 +28,8 @@ Give `@pureform/solid` everything a component needs, so p3a only wires anatomy t
   with the development warning when switching between controlled and uncontrolled.
 - The form reset and fieldset helpers from p1g, wired per §9.5.
 - `useReducedMotion()`, `useIconStyle()`.
-- The development warning when the runtime `@pureform/styling` differs from the glue's
-  recorded version (§11) can be a stub until p4a records it.
+- The development warning when the runtime `@pureform/styling` differs from the generated
+  registry's recorded version (§11) can be a stub until p4a records it.
 
 ## Done when
 

@@ -86,7 +86,7 @@ must start at the train's current version; `check` fails until it does.
 
 A package that needs its own version at runtime keeps it in `src/package-version.ts`, as
 `export const VERSION = "…";` (`@pureform/styling` does, for the development check that the
-generated glue matches it). `set-version` rewrites that line with `package.json`, and `check`
+generated registry matches it). `set-version` rewrites that line with `package.json`, and `check`
 fails when the two differ.
 
 ## Build and test

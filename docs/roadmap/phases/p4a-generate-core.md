@@ -24,7 +24,7 @@ The shared build step: load the config, ask each adapter for factory modules, an
   rewrite only on change, `--check` semantics, the registry index and `.d.ts`, static and
   lazy entries.
 - The core-train version check (§11) with a message naming the versions to install.
-- The missing-glue error message (§6); record how it's raised.
+- The missing-output error message (§6); record how it's raised.
 
 ## Done when
 

@@ -607,7 +607,7 @@ Through the omni MCP (or `omni run`):
   dialog subpath brings the button's part code with it.
 - A dialog with no focusable element inside takes focus on its surface (`tabindex="-1"`); after
   the snackbar's action closes it, focus goes back to the page.
-- The development warning for a stale glue version calls `trainVersionMismatch`, which finds
+- The development warning for a stale generated registry calls `trainVersionMismatch`, which finds
   nothing until p4a records it.
 - Server rendering isn't exercised by these tests (p3c's hydration suite).
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
