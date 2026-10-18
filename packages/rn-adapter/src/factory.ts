@@ -28,6 +28,7 @@ import type { Overrides, Styles } from "./resolve";
 import { BOUND, holds, selectWithTransitions } from "./select";
 import type { Drawing, Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
+import { ANIMATION, SHAPE, TOKEN, TRANSITION } from "./values";
 import type { Animation, ThemeValues, Transition, Value } from "./values";
 
 export { overridesFor } from "./resolve";
@@ -113,6 +114,8 @@ export interface NativeFactory<
     readonly order: SelectionOrder;
     /** The theme key each instance token sets, by the token's name. */
     readonly tokens: Readonly<Record<string, string>>;
+    /** The slots its styles ever move (`""` for a component without slots), by `movingSlots`. */
+    readonly moving: ReadonlySet<string>;
     /** The factory in an environment, one per environment. */
     for(environment?: Environment): NativeStyleFactory<C>;
 }
@@ -176,6 +179,47 @@ export const selectionOrder = (
     };
 };
 
+// Whether a transition moves something on the slot's view: a style property, rather than a token
+// or a clip shape, which a drawing moves.
+const movesView = (transition: unknown): boolean => {
+    if (typeof transition === "string" || transition === undefined)
+        return false;
+    if (!Array.isArray(transition)) return transition !== null;
+    return transition.some((t) => {
+        const property = (t as { property?: unknown }).property;
+        return (
+            typeof property !== "string" ||
+            (!property.startsWith(TOKEN) && property !== SHAPE)
+        );
+    });
+};
+
+/** The slots a component's styles ever move on their views: those with a transition of a style
+ *  property, or a keyframe animation, in any rule, whatever its variants, states, or
+ *  conditions. A binding can draw the rest with plain views, and know it from the component
+ *  alone, so a slot never needs another view while it's on screen. A component without slots
+ *  has `""`. */
+export const movingSlots = (
+    component: ComponentStyles<unknown>,
+): ReadonlySet<string> => {
+    const moving = new Set<string>();
+    for (const entry of component.entries) {
+        if (moving.has(entry.slot)) continue;
+        for (const rule of entry.rules) {
+            const style = rule.style as Record<string, unknown>;
+            const animation = style[ANIMATION];
+            if (
+                movesView(style[TRANSITION]) ||
+                (typeof animation === "object" && animation !== null)
+            ) {
+                moving.add(entry.slot);
+                break;
+            }
+        }
+    }
+    return moving;
+};
+
 // An environment as selection reads it: the theme's key, with the provider's overrides for
 // its scheme.
 interface Where {
@@ -233,6 +277,7 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     const template = styles.templates[component];
     if (!template) throw new Error(`no styles for component "${component}"`);
     const order = selectionOrder(template);
+    const moving = movingSlots(template);
     const groups = new Set(order.variants);
 
     // An instance's tokens by theme key, per scheme where it gives them so.
@@ -365,6 +410,7 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
         styles,
         order,
         tokens,
+        moving,
         for: at,
         selected: base.selected,
     });
