@@ -1,5 +1,6 @@
 import { testIds } from "@pureform/anatomy";
 import { createRegistry, withTokenStyle } from "@pureform/styling";
+import { createSignal } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
 import {
@@ -96,6 +97,28 @@ describe("indication", () => {
         expect(layer?.querySelector("[data-ripple]")?.className).toBe(
             "ripple__ink",
         );
+        window.dispatchEvent(pointer("pointerup"));
+    });
+
+    it("finds the layer at a press, after the indication turns it on", async () => {
+        const [indication, setIndication] = createSignal<Indication>(
+            materialIndication({ ripple: false }),
+        );
+        mount(() => (
+            <PureformProvider registry={registry()}>
+                <Button label="Save" indication={indication()} />
+            </PureformProvider>
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(layerOf(root)).toBe(null);
+        setIndication(materialIndication());
+        await settle();
+        const layer = layerOf(root);
+        expect(layer).not.toBe(null);
+        root.dispatchEvent(pointer("pointerdown"));
+        await settle();
+        expect(layer?.querySelectorAll("[data-ripple]")).toHaveLength(1);
         window.dispatchEvent(pointer("pointerup"));
     });
 

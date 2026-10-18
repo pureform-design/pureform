@@ -207,12 +207,19 @@ function IndicatedPartElement({
     children,
     indication,
 }: IndicatedPartElementProps): ReactNode {
+    // The element, in state, only for an icon part's context.
     const [element, setElement] = useState<HTMLElement | null>(null);
+    const { ref: attach, forwarded, layer } = usePartIndication(indication);
     const ref = useMemo(
-        () => mergeRefs<HTMLElement>(setElement, ownRef, userRef),
-        [ownRef, userRef],
+        () =>
+            mergeRefs<HTMLElement>(
+                icon ? setElement : undefined,
+                attach,
+                ownRef,
+                userRef,
+            ),
+        [icon, attach, ownRef, userRef],
     );
-    const { forwarded, layer } = usePartIndication(indication, element);
     const merged = { ...withForwarded(props, forwarded), ref };
     // Only a surface holds the layer, in the same place while it comes and goes: a trigger may be
     // a void element (an input).

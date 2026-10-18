@@ -163,54 +163,51 @@ const LAYER_ATTRIBUTES = {
     "data-ripple-layer": "",
 } as const;
 
-/** Ties a part's element to its component's indication once mounted: what's forwarded to it,
- *  and the layer it holds when it's a surface. */
-export function usePartIndication(
-    part: PartIndication | undefined,
-    element: HTMLElement | null,
-): {
+/** Ties a part to its component's indication: the ref that attaches its element as it mounts
+ *  (a ref rather than state, so the part doesn't render again once it knows its element), what's
+ *  forwarded to it, and the layer it holds when it's a surface. */
+export function usePartIndication(part: PartIndication | undefined): {
+    readonly ref: RefCallback<HTMLElement>;
     readonly forwarded: ForwardedStates;
     readonly layer: ReactElement | null;
 } {
-    const [layer, setLayer] = useState<HTMLElement | null>(null);
     const [forwarded, setForwarded] = useState(NOT_FORWARDED);
     const host = part?.scope.host;
     const source = part?.scope.interactive ? part.source : undefined;
     const roles = part?.roles;
-    useEffect(() => {
-        if (!host || !roles || !source || !element) return;
-        const cleanups = roles.map(({ entry, role }) =>
-            host.instance(entry, source).attach(role, element),
-        );
-        for (const { entry, role } of roles) {
-            if (role === "surface" && layer) {
-                cleanups.push(
-                    host.instance(entry, source).attach("layer", layer),
-                );
+    const ref = useCallback(
+        (element: HTMLElement | null) => {
+            if (!host || !roles || !source || !element) return;
+            const cleanups = roles.map(({ entry, role }) =>
+                host.instance(entry, source).attach(role, element),
+            );
+            for (const { entry, role } of roles) {
+                if (role === "state") {
+                    cleanups.push(
+                        host
+                            .instance(entry, source)
+                            .subscribeForwarded(setForwarded),
+                    );
+                }
             }
-            if (role === "state") {
-                cleanups.push(
-                    host
-                        .instance(entry, source)
-                        .subscribeForwarded(setForwarded),
-                );
-            }
-        }
-        return () => {
-            for (const cleanup of cleanups) cleanup();
-            setForwarded(NOT_FORWARDED);
-        };
-    }, [host, roles, source, element, layer]);
+            return () => {
+                for (const cleanup of cleanups) cleanup();
+                setForwarded(NOT_FORWARDED);
+            };
+        },
+        [host, roles, source],
+    );
     const surface = roles?.some(({ role }) => role === "surface") ?? false;
     return {
+        ref,
         forwarded,
+        // The layer isn't tracked: the indication finds it in the surface when it draws.
         layer:
             part &&
             surface &&
             part.scope.interactive &&
             part.scope.indication.layer ? (
                 <span
-                    ref={setLayer}
                     className={
                         part.unstyled ? undefined : part.scope.layerClass
                     }
@@ -304,11 +301,12 @@ export function useIndication(
         options.centered ? CENTERED_ENTRIES : SURFACE_ENTRIES,
         { source },
     );
-    const [element, setElement] = useState<HTMLElement | null>(null);
-    const { forwarded, layer } = usePartIndication(
-        { scope, roles: SURFACE_ROLES, source, unstyled: false },
-        element,
-    );
+    const { ref, forwarded, layer } = usePartIndication({
+        scope,
+        roles: SURFACE_ROLES,
+        source,
+        unstyled: false,
+    });
     const latest = useRef(source);
     latest.current = source;
     const [emitter] = useState(
@@ -322,7 +320,7 @@ export function useIndication(
         normalizeProps,
     ) as DOMAttributes<HTMLElement>;
     return {
-        surface: withForwarded({ ...handlers, ref: setElement }, forwarded),
+        surface: withForwarded({ ...handlers, ref }, forwarded),
         layer,
     };
 }

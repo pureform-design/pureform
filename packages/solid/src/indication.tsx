@@ -169,36 +169,23 @@ export function usePartIndication(
     const state = usePureform();
     const surface = roles.some(({ role }) => role === "surface");
     const shows = roles.some(({ role }) => role === "state");
-    const [layer, setLayer] = createSignal<HTMLElement | undefined>(undefined, {
-        ownedWrite: true,
-    });
     const [forwarded, setForwarded] = createSignal<ForwardedStates>(
         NOT_FORWARDED,
         { ownedWrite: true },
     );
-    // Created on the server too, where it doesn't run, so hydration finds the same nodes.
+    // Created on the server too, where it doesn't run, so hydration finds the same nodes. The
+    // layer isn't tracked: the indication finds it in the surface when it draws.
     createEffect(
         () =>
             [
                 scope.interactive() ? source() : undefined,
                 element() as HTMLElement | undefined,
-                layer(),
             ] as const,
-        ([current, el, layerEl]) => {
+        ([current, el]) => {
             if (!current || !el) return;
             const cleanups = roles.map(({ entry, role }) =>
                 scope.host.instance(entry, current).attach(role, el),
             );
-            if (surface && layerEl) {
-                for (const { entry, role } of roles) {
-                    if (role !== "surface") continue;
-                    cleanups.push(
-                        scope.host
-                            .instance(entry, current)
-                            .attach("layer", layerEl),
-                    );
-                }
-            }
             if (shows) {
                 const entry = roles.find(({ role }) => role === "state")!;
                 cleanups.push(
@@ -219,11 +206,7 @@ export function usePartIndication(
         states: (own) => (shows ? withForwarded(own, forwarded()) : own),
         layer: surface ? (
             <Show when={scope.interactive() && scope.indication().layer}>
-                <span
-                    ref={(el: HTMLElement) => setLayer(el)}
-                    class={layerClass()}
-                    {...LAYER_ATTRIBUTES}
-                />
+                <span class={layerClass()} {...LAYER_ATTRIBUTES} />
             </Show>
         ) : undefined,
     };

@@ -431,7 +431,9 @@ const soft = defineIndication({
   `layer: true`, on the server too. The card and the list item show indication only while
   interactive (a link, a button, or `interactive`).
 - **The effect** (`web`) runs after mount with the trigger, the surface, the layer, the source,
-  and `{ centered, reducedMotion(), dir(), registry }`.
+  and `{ centered, reducedMotion(), dir(), registry }`. The binding doesn't track the layer
+  element: the target's `layer` finds it in the surface when the ripple draws. A part attaches
+  its element through its ref rather than state, so a surface renders once as it mounts.
 - **Sources.** Every interactive component takes `interactionSource` (on Root and the
   ready-made component; a composite's items take one each: `Tabs.Tab`, `Menu.Item`,
   `RadioGroup.Item`, a navigation `Item`, or `interactionSource` in an item's data; the
