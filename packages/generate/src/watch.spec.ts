@@ -5,8 +5,8 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import { fakeAdapter, tempRoot, writeTree } from "./__fixtures__/project";
 import type { GenerateResult } from "./generate";
-import { watchGlue } from "./watch";
-import type { GlueWatcher } from "./watch";
+import { watchGenerate } from "./watch";
+import type { GenerateWatcher } from "./watch";
 
 const config = (name: string) =>
     `import { ${name} } from "./parts";\nexport default { tokens: {}, semanticTokens: {}, components: { ${name} } };\n`;
@@ -20,8 +20,8 @@ const next = <T>() => {
     return { promise, resolve };
 };
 
-describe("watchGlue", () => {
-    let watcher: GlueWatcher | undefined;
+describe("watchGenerate", () => {
+    let watcher: GenerateWatcher | undefined;
     afterEach(() => watcher?.close());
 
     it("generates, then again when the config or a file it imports changes", async () => {
@@ -33,7 +33,7 @@ describe("watchGlue", () => {
         });
         const adapter = fakeAdapter();
         let result = next<GenerateResult>();
-        watcher = watchGlue(
+        watcher = watchGenerate(
             { root, config: "pureform.config.ts", target: adapter },
             { onResult: (value) => result.resolve(value), delay: 10 },
         );
@@ -63,7 +63,7 @@ describe("watchGlue", () => {
         writeTree(root, { "pureform.config.ts": "export default 1;\n" });
         const error = next<unknown>();
         let result = next<GenerateResult>();
-        watcher = watchGlue(
+        watcher = watchGenerate(
             { root, config: "pureform.config.ts", target: fakeAdapter() },
             {
                 onError: (value) => error.resolve(value),
@@ -86,7 +86,7 @@ describe("watchGlue", () => {
             "parts.ts": parts,
         });
         const adapter = fakeAdapter();
-        watcher = watchGlue(
+        watcher = watchGenerate(
             { root, config: "pureform.config.ts", target: adapter },
             { delay: 10 },
         );

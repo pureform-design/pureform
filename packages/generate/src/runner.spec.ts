@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { fakeAdapter, tempRoot, writeTree } from "./__fixtures__/project";
 import { isGenerateError } from "./errors";
-import { CONFIG_FILES, createGlueRunner, findConfigFile } from "./runner";
+import { CONFIG_FILES, createGenerateRunner, findConfigFile } from "./runner";
 
 const config = (components: string) =>
     `import { ${components} } from "./parts";\nexport default { tokens: {}, semanticTokens: {}, components: { ${components} } };\n`;
@@ -33,14 +33,14 @@ describe("findConfigFile", () => {
     });
 });
 
-describe("createGlueRunner", () => {
+describe("createGenerateRunner", () => {
     it("generates, and knows the config and its imports as dependencies", async () => {
         const root = tempRoot();
         writeTree(root, {
             "pureform.config.ts": config("chip"),
             "parts.ts": parts,
         });
-        const runner = createGlueRunner({
+        const runner = createGenerateRunner({
             root,
             config: "pureform.config.ts",
             target: fakeAdapter(),
@@ -65,7 +65,7 @@ describe("createGlueRunner", () => {
             "parts.ts": parts,
         });
         const adapter = fakeAdapter();
-        const runner = createGlueRunner({
+        const runner = createGenerateRunner({
             root,
             config: "pureform.config.ts",
             target: adapter,
@@ -86,7 +86,7 @@ describe("createGlueRunner", () => {
     it("keeps the config as a dependency when a run fails, and runs again after", async () => {
         const root = tempRoot();
         writeTree(root, { "pureform.config.ts": "export default 1;\n" });
-        const runner = createGlueRunner({
+        const runner = createGenerateRunner({
             root,
             config: "pureform.config.ts",
             target: fakeAdapter(),

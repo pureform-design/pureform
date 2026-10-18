@@ -22,7 +22,7 @@ export type GenerateErrorCode =
      *  the train. */
     | "train-mismatch"
     /** `.pureform/` hasn't been generated. */
-    | "missing-glue";
+    | "missing-output";
 
 export class GenerateError extends Error {
     readonly code: GenerateErrorCode;

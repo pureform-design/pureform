@@ -24,7 +24,7 @@ export const findConfigFile = (root: string = process.cwd()): string =>
     CONFIG_FILES.find((name) => existsSync(resolve(root, name))) ??
     CONFIG_FILES[0];
 
-export interface GlueRunner {
+export interface GenerateRunner {
     /** Generates. A call while a run is going waits for it, then for one more run that every
      *  call made meanwhile shares, so the result reflects the files as they are now. */
     run(): Promise<GenerateResult>;
@@ -38,9 +38,9 @@ export interface GlueRunner {
 }
 
 /** A runner over `generate` with these options. `config` is resolved against `root` once. */
-export const createGlueRunner = <Options = Record<string, unknown>>(
+export const createGenerateRunner = <Options = Record<string, unknown>>(
     options: GenerateOptions<Options>,
-): GlueRunner => {
+): GenerateRunner => {
     const root = resolve(options.root ?? process.cwd());
     const settled = { ...options, root };
     const configFile =

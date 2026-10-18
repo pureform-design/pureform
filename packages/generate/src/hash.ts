@@ -1,5 +1,5 @@
-// Staleness: one hash of everything the glue is made from (the config, the build options, the
-// installed package versions), written into every generated file's header.
+// Staleness: one hash of everything the generated registry is made from (the config, the build
+// options, the installed package versions), written into every generated file's header.
 
 import { createHash } from "node:crypto";
 

@@ -99,7 +99,7 @@ describe("generate", () => {
                 'import { button } from "./web/button";',
                 'import { chip } from "./web/chip";',
                 "",
-                "/** The core train's version this glue was made with. */",
+                "/** The core train's version this registry was made with. */",
                 `export const version = "${VERSION}";`,
                 "",
                 "export const registry = createRegistry(",
@@ -447,7 +447,7 @@ describe("generate", () => {
             return { root, options };
         };
 
-        it("passes fresh glue and writes nothing", async () => {
+        it("passes fresh output and writes nothing", async () => {
             const { root, options } = await setup();
             const modified = statSync(join(root, ".pureform/index.ts")).mtimeMs;
             const result = await generate({ ...options, check: true });
@@ -458,7 +458,7 @@ describe("generate", () => {
             );
         });
 
-        it("fails on missing glue without running the adapter", async () => {
+        it("fails on missing output without running the adapter", async () => {
             const adapter = fakeAdapter();
             const result = await generate({
                 root: tempRoot(),
@@ -471,7 +471,7 @@ describe("generate", () => {
             expect(adapter.calls).toHaveLength(0);
         });
 
-        it("fails on glue made from other inputs by its hashes, without running the adapter", async () => {
+        it("fails on output made from other inputs by its hashes, without running the adapter", async () => {
             const { root, options } = await setup();
             const adapter = fakeAdapter();
             const result = await generate({
@@ -501,13 +501,13 @@ describe("generate", () => {
 
         it("finds missing and extra files", async () => {
             const { root, options } = await setup();
-            const glue = join(root, ".pureform");
-            writeTree(glue, {
-                "web/old.ts": readFileSync(join(glue, "web/chip.ts"), "utf8"),
+            const outDir = join(root, ".pureform");
+            writeTree(outDir, {
+                "web/old.ts": readFileSync(join(outDir, "web/chip.ts"), "utf8"),
             });
-            writeFileSync(join(glue, "fake.css"), "");
+            writeFileSync(join(outDir, "fake.css"), "");
             const { rmSync } = await import("node:fs");
-            rmSync(join(glue, "registry.d.ts"));
+            rmSync(join(outDir, "registry.d.ts"));
             const result = await generate({ ...options, check: true });
             expect(statuses(result)).toMatchObject({
                 "fake.css": "stale",
