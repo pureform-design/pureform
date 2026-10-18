@@ -495,8 +495,8 @@ it sees has no layer.
 **Keep it current:** a new component needs an entry, and a new group a component computes must
 stay off its list. `usage.spec.ts` checks the subpaths against both bindings' exports, the listed
 groups against the selection functions, the entries against the anatomies each component folder
-uses (and `as={Button}`), and that no Solid or React source sets a listed group from anything
-but its own prop.
+uses (with `as={Button}`, and the anatomies of the components it renders, such as the list's list
+items), and that no Solid or React source sets a listed group from anything but its own prop.
 
 ## Building and testing
 

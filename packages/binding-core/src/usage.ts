@@ -54,8 +54,9 @@ export const COMPONENT_USAGE = {
         },
     },
     "linear-progress": { entries: { linearProgress: same("color") } },
-    // An unstyled `ul` around list items.
-    list: { entries: {} },
+    // An unstyled `ul` around list items; the ready-made renders a list item per entry, in the
+    // list's density and color.
+    list: { entries: { listItem: same("density", "color"), ripple: {} } },
     // `lines` follows the content, `interactive` the element.
     "list-item": {
         entries: { listItem: same("density", "color"), ripple: {} },
