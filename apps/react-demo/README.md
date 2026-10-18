@@ -8,7 +8,6 @@ check the two bindings against each other.)
 
 ```sh
 bun x pureform generate          # writes .pureform/ from pureform.config.ts (needs the packages built)
-bun x pureform generate --check  # exits 1 when the committed .pureform/ is out of date
 bun x panda codegen              # writes styled-system/, which .pureform/ imports
 bun run dev                      # the bundler plugin regenerates .pureform/ on start and on config changes
 ```
@@ -32,11 +31,10 @@ codegen`.
   `teal`, `sharp`, and `dense` themes, and the named densities (`solid-demo`'s has since gained a
   named theme per shape and density its settings offer); `panda.pureform.ts` compiles it with
   `prefix: "pf"`.
-- `.pureform/` is generated and committed (unlike `solid-demo`'s, to keep the committed path of
-  design doc §6 in use): the bundler plugin (`@pureform/bundler/vite` in `vite.config.ts`) writes
-  it when `vite dev` or `vite build` starts, and `bun x pureform generate` (`@pureform/cli`, the
-  omni `generate` task, before Panda's codegen) writes it without Vite; `--check` compares it, for
-  CI. Both take `pureform.glue.ts`'s options: the Panda adapter's codegen for `button` and
+- `.pureform/` is generated and ignored, as in the other demos: the bundler plugin
+  (`@pureform/bundler/vite` in `vite.config.ts`) writes it when `vite dev` or `vite build` starts
+  (builds prune it to what the page uses), and `bun x pureform generate` (`@pureform/cli`, the
+  omni `generate` task, before Panda's codegen) writes it without Vite. Both take `pureform.glue.ts`'s options: the Panda adapter's codegen for `button` and
   `checkbox` only (the allow-list: the components the React binding has). The command runs under
   Node, as Vite does (`bun x` follows the bin's shebang): the preset computes a shape morph
   differently under Bun, which changes the glue's hash. It holds `index.ts` (the registry, both

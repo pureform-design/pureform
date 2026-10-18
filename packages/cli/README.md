@@ -105,7 +105,7 @@ tools and tests can run the command in-process:
 ```ts
 import { main } from "@pureform/cli";
 
-const code = await main(["generate", "--check"], { cwd: "apps/react-demo" });
+const code = await main(["generate", "--check"], { cwd: "apps/my-app" });
 ```
 
 ## Build and test

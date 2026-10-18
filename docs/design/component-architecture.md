@@ -928,8 +928,8 @@ imports, resolves `virtual:pureform/registry` to `<outDir>/index.ts` (types from
 into a missing folder. Metro gets `withPureformGlue(config, options)` from `/metro` instead of
 a plugin: it generates before Metro starts, keeps a watcher, and adds the id to
 `resolveRequest`. The regeneration loop (`createGlueRunner`, `watchGlue`) lives in
-`@pureform/generate`, for the CLI's `--watch` too. `solid-demo` no longer commits
-`.pureform/`; `react-demo` still does. The hash covers the evaluated config, which the preset
+`@pureform/generate`, for the CLI's `--watch` too. No app in the repo commits `.pureform/`
+now; the committed path and `--check` stay supported for apps that want them. The hash covers the evaluated config, which the preset
 computes slightly differently under Bun and Node (a shape morph), so one app should generate
 under one runtime.
 
