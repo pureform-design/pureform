@@ -150,7 +150,7 @@ describe("createRegistry", () => {
         expect(registry.entry("card").kind).toBe("lazy");
     });
 
-    it("records the train version the glue was made with", () => {
+    it("records the train version the registry was made with", () => {
         expect(createRegistry({ chip }).version).toBeUndefined();
         expect(createRegistry({ chip }, { version: "0.4.0" }).version).toBe(
             "0.4.0",

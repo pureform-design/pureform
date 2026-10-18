@@ -162,7 +162,7 @@ afterAll(() => {
     for (const root of roots) rmSync(root, { recursive: true, force: true });
 });
 
-interface Glue {
+interface Generated {
     registry: {
         names: readonly string[];
         entry(name: string): {
@@ -173,8 +173,8 @@ interface Glue {
     };
 }
 
-const factoryOf = (glue: Glue, name: string): NativeFactory =>
-    glue.registry.entry(name).factory!;
+const factoryOf = (generated: Generated, name: string): NativeFactory =>
+    generated.registry.entry(name).factory!;
 
 const json = (value: unknown) => JSON.stringify(value);
 
@@ -195,10 +195,10 @@ const generateInto = async (
         trainCheck: false,
     });
 
-const importGlue = async (root: string): Promise<Glue> =>
+const importGenerated = async (root: string): Promise<Generated> =>
     (await import(
         /* @vite-ignore */ join(root, ".pureform", "index.ts")
-    )) as Glue;
+    )) as Generated;
 
 // The JSON a module parses, read back.
 const parsed = (source: string): unknown =>
@@ -345,8 +345,8 @@ describe("generate with the native target", () => {
     it("loads a lazy entry's factory", async () => {
         const root = appRoot();
         await generateInto(root, config(), {}, { lazy: ["icon"] });
-        const glue = await importGlue(root);
-        const entry = glue.registry.entry("icon");
+        const generated = await importGenerated(root);
+        const entry = generated.registry.entry("icon");
         expect(entry.kind).toBe("lazy");
         const icon = await entry.load();
         expect(icon({ pressed: true }).root!.style).toEqual({ width: 20 });
@@ -356,11 +356,11 @@ describe("generate with the native target", () => {
         const preset = pureform();
         const whole = precompute(preset);
         let root: string;
-        let glue: Glue;
+        let generated: Generated;
         beforeAll(async () => {
             root = appRoot();
             await generateInto(root, preset);
-            glue = await importGlue(root);
+            generated = await importGenerated(root);
         }, 60_000);
 
         // Every combination of every group's values.
@@ -379,7 +379,9 @@ describe("generate with the native target", () => {
             );
 
         it("registers every component", { timeout: 60_000 }, () => {
-            expect(glue.registry.names).toEqual(Object.keys(preset.components));
+            expect(generated.registry.names).toEqual(
+                Object.keys(preset.components),
+            );
         });
 
         it(
@@ -415,7 +417,7 @@ describe("generate with the native target", () => {
                     usage: { components: names, variants },
                     trainCheck: false,
                 });
-                const pruned = await importGlue(prunedRoot);
+                const pruned = await importGenerated(prunedRoot);
                 let count = 0;
                 let smaller = 0;
                 for (const name of names) {
@@ -455,7 +457,7 @@ describe("generate with the native target", () => {
             () => {
                 let count = 0;
                 for (const name of Object.keys(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     const over = nativeFactory(name, whole);
                     for (const selection of combinations(
                         whole.templates[name]!.variants,
@@ -476,7 +478,7 @@ describe("generate with the native target", () => {
             { timeout: 60_000 },
             () => {
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     const over = nativeFactory(
                         name,
                         whole,

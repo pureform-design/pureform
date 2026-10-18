@@ -26,7 +26,7 @@ where React Native allows.
   or DOM code), and, as
   peers, `@pureform/styling` (the registry) and `@pureform/rn-adapter` (the factories' runtime,
   the hooks that select and animate, and the engines' drawing). Both peers are core-train
-  packages the app's generated glue imports too, so the app and the binding share one copy.
+  packages the app's generated registry imports too, so the app and the binding share one copy.
 - **Depended on by:** `apps/rn-web-demo`.
 - No Zag: React Native has no DOM for its machines. `Pressable`'s callbacks emit each
   component's press, hover, and focus to its interaction source, as a machine does on the web,

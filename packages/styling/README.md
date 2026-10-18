@@ -92,10 +92,11 @@ registry.preload("card"); // start early; never rejects
 An entry's kind is fixed at creation, so the server and the client take the same path (§5.7).
 `entry` returns the same object on every call and throws for an unknown name.
 
-Generated glue passes the core train's version as a second argument,
+The generated registry passes the core train's version as a second argument,
 `createRegistry({ button }, { version: "0.4.0" })`, and `registry.version` returns it. In
 development the bindings compare it with `VERSION`, this package's own version, and warn
-once when they differ (the glue is stale, or two copies of `@pureform/styling` are installed).
+once when they differ (the registry is stale, or two copies of `@pureform/styling` are
+installed).
 
 It also passes the attribute the target scopes named themes with, and
 `registry.themeAttributes(name)` gives the attributes that put an element and everything under
@@ -107,13 +108,13 @@ registry.themeAttributes("teal"); // { "data-theme": "teal" }, frozen
 registry.themeAttributes(undefined); // {}: the base theme
 ```
 
-Panda's glue passes `data-panda-theme`, the CSS and Tailwind targets their `themeAttribute`
-option (default `data-theme`), and React Native nothing, so its `themeAttributes` is always
-empty.
+Panda's generated registry passes `data-panda-theme`, the CSS and Tailwind targets their
+`themeAttribute` option (default `data-theme`), and React Native nothing, so its `themeAttributes`
+is always empty.
 
-The glue also records how the target names its CSS vars, `vars: { prefix, tokenPrefix }` (from
-the adapter's options), as `registry.vars` (`{}` when it recorded none). Providers name token
-overrides and runtime theme vars with it.
+The generated registry also records how the target names its CSS vars,
+`vars: { prefix, tokenPrefix }` (from the adapter's options), as `registry.vars` (`{}` when it
+recorded none). Providers name token overrides and runtime theme vars with it.
 
 ### Runtime themes
 

@@ -168,7 +168,7 @@ Through the omni MCP (or `omni run`):
 - `build`: Vite library build into `dist/`, one bundle per entry.
 - `test:unit`: Vitest over `src/**/*.spec.ts`, with type checks. `factory.spec.ts` checks the
   factory against selection for every preset component; `codegen.spec.ts` generates the preset's
-  glue into a temp app, compares every combination of every group's values, and type-checks it.
+  registry into a temp app, compares every combination of every group's values, and type-checks it.
 - `test:integration`: the Metro transformer, under `test/`.
 
 `tests/browser-e2e-tests` renders it through React Native Web: `rn-parity` compares it with the

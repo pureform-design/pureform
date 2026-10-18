@@ -180,12 +180,12 @@ type Factory = (
     selection: object,
 ) => Record<string, { class: string; style?: Record<string, string> }>;
 
-interface Glue {
+interface Generated {
     registry: { names: readonly string[]; entry(name: string): unknown };
 }
 
-const factoryOf = (glue: Glue, name: string): Factory =>
-    (glue.registry.entry(name) as { factory: Factory }).factory;
+const factoryOf = (generated: Generated, name: string): Factory =>
+    (generated.registry.entry(name) as { factory: Factory }).factory;
 
 // Every combination of every group's values.
 const selections = (
@@ -351,12 +351,12 @@ describe("generate with the CSS target", () => {
         const root = appRoot();
         const loaded = config();
         await generateInto(root, loaded, { classPrefix: "pf" });
-        const glue = (await import(
+        const generated = (await import(
             /* @vite-ignore */ join(root, ".pureform", "index.ts")
-        )) as Glue;
+        )) as Generated;
         for (const name of ["iconButton", "icon", "divider"]) {
             const spec = loaded.components[name]!;
-            const factory = factoryOf(glue, name);
+            const factory = factoryOf(generated, name);
             const old = runtimeSlots(spec, { classPrefix: "pf" });
             const groups = componentShape(spec).variants;
             for (const selection of [{}, ...selections(groups)]) {
@@ -364,31 +364,33 @@ describe("generate with the CSS target", () => {
             }
         }
         // A group with no default is left out until it's chosen.
-        expect(factoryOf(glue, "iconButton")({}).root!.class).not.toContain(
-            "size_",
-        );
-        expect(factoryOf(glue, "icon")({ filled: "a`${b}" }).root!.class).toBe(
-            "pf-icon pf-icon--filled_a`${b}",
-        );
+        expect(
+            factoryOf(generated, "iconButton")({}).root!.class,
+        ).not.toContain("size_");
+        expect(
+            factoryOf(generated, "icon")({ filled: "a`${b}" }).root!.class,
+        ).toBe("pf-icon pf-icon--filled_a`${b}");
     });
 
     describe("over the preset", () => {
         const options = { classPrefix: "pf", prefix: "pf" } as const;
         const preset = pureform();
         let root: string;
-        let glue: Glue;
+        let generated: Generated;
         beforeAll(async () => {
             root = appRoot();
             await generateInto(root, preset, options);
-            glue = (await import(
+            generated = (await import(
                 /* @vite-ignore */ join(root, ".pureform", "index.ts")
-            )) as Glue;
+            )) as Generated;
         }, 60_000);
         const stylesheet = () =>
             readFileSync(join(root, ".pureform", STYLESHEET_FILE), "utf8");
 
         it("registers every component", { timeout: 60_000 }, async () => {
-            expect(glue.registry.names).toEqual(Object.keys(preset.components));
+            expect(generated.registry.names).toEqual(
+                Object.keys(preset.components),
+            );
         });
 
         it(
@@ -397,7 +399,7 @@ describe("generate with the CSS target", () => {
             async () => {
                 let count = 0;
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     const old = runtimeSlots(spec, options);
                     const groups = componentShape(spec).variants;
                     // Booleans share the cached result of their strings.
@@ -535,7 +537,7 @@ describe("generate with the CSS target", () => {
                     ),
                 ]);
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     expect(factory({ tokens: {} })).toBe(factory({}));
                     for (const [token, cssVar] of Object.entries(
                         tokenVars(name, spec, options.prefix),
@@ -563,7 +565,7 @@ describe("generate with the CSS target", () => {
                 );
                 const returned = new Set<string>();
                 for (const [name, spec] of Object.entries(preset.components)) {
-                    const factory = factoryOf(glue, name);
+                    const factory = factoryOf(generated, name);
                     for (const selection of selections(
                         componentShape(spec).variants,
                     )) {

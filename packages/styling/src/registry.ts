@@ -87,8 +87,8 @@ export interface VarOptions {
 
 /** What `createRegistry` takes besides the entries. */
 export interface RegistryOptions {
-    /** The core train's version the generated glue was made with. Bindings compare it with the
-     *  running `@pureform/styling`'s `VERSION` in development. */
+    /** The core train's version the generated registry was made with. Bindings compare it with
+     *  the running `@pureform/styling`'s `VERSION` in development. */
     version?: string;
     /** The attribute the target scopes named themes with, as its stylesheet matches it:
      *  `data-panda-theme` for Panda, the `themeAttribute` option (default `data-theme`) for the
@@ -100,7 +100,7 @@ export interface RegistryOptions {
 }
 
 export interface Registry<E extends RegistryInput = RegistryInput> {
-    /** The core train's version the glue was made with, when it recorded one. */
+    /** The core train's version the registry was made with, when it recorded one. */
     readonly version: string | undefined;
     /** The attribute the target scopes named themes with, when it has one. */
     readonly themeAttribute: string | undefined;
@@ -109,7 +109,7 @@ export interface Registry<E extends RegistryInput = RegistryInput> {
      *  no name (the base theme) and on targets without one. Providers write them on their
      *  element; an app can spread them on any element. */
     themeAttributes(name: string | undefined): ThemeAttributes;
-    /** How the target names its CSS vars. Empty when the glue recorded none. */
+    /** How the target names its CSS vars. Empty when the registry recorded none. */
     readonly vars: VarOptions;
     /** Every entry's name, in the order given. */
     readonly names: readonly (keyof E & string)[];
@@ -163,7 +163,7 @@ const lazyEntry = (name: string, input: LazyInput): LazyEntry => {
 
 /** A registry of factories by name: `createRegistry({ button, card: { lazy: () =>
  *  import("./web/card") } })`. A lazy loader's module gives its factory as the module itself,
- *  its default export, or its export named after the entry. Generated glue also passes the
+ *  its default export, or its export named after the entry. A generated registry also passes the
  *  train's version, the target's theme attribute, and its var prefixes: `createRegistry({ button },
  *  { version, themeAttribute: "data-theme", vars: { prefix: "pf" } })`. */
 export const createRegistry = <const E extends RegistryInput>(
