@@ -12,6 +12,7 @@ import {
     menuMachineProps,
     menuSelection,
     overlayPositionerProps,
+    presentProps,
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
@@ -39,6 +40,8 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -49,6 +52,7 @@ interface MenuContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: Accessor<menu.Api<PropTypes>>;
     readonly sources: ItemInteractionSources;
+    readonly presence: Presence;
 }
 
 /** What an item shares with its parts. */
@@ -115,6 +119,7 @@ function Root(props: MenuRootProps): JSX.Element {
         ...open.machineProps(),
     }));
     const api = createMemo(() => menu.connect(service, normalizeProps));
+    const presence = usePresence(() => api().open);
     const scope = useComponent(menuOverlayAnatomy, {
         selection: () => menuSelection(props),
         testId: () => props.testId,
@@ -122,7 +127,7 @@ function Root(props: MenuRootProps): JSX.Element {
         indication: () => props.indication,
     });
     return (
-        <context.Provider value={{ scope, api, sources }}>
+        <context.Provider value={{ scope, api, sources, presence }}>
             {scope.render("root", {
                 element: "div",
                 as: () => props.as,
@@ -144,25 +149,31 @@ function Trigger(props: MenuTriggerProps): JSX.Element {
     });
 }
 
-/** Places the menu under the trigger; hidden while it's closed. The registry doesn't style it. */
+/** Places the menu under the trigger; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
 function Positioner(props: MenuPartProps): JSX.Element {
-    const { scope, api } = context.use("Positioner");
+    const { scope, api, presence } = context.use("Positioner");
     return scope.render("positioner", {
         element: "div",
         machine: () =>
-            overlayPositionerProps(api().getPositionerProps(), api().open),
+            overlayPositionerProps(
+                api().getPositionerProps(),
+                presence.present(),
+            ),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
 }
 
 /** The menu's surface, which holds focus while it's open and moves through the items with the
- *  arrow keys. */
+ *  arrow keys. It stays while its exit animation runs. */
 function Content(props: MenuPartProps): JSX.Element {
-    const { scope, api } = context.use("Content");
+    const { scope, api, presence } = context.use("Content");
     return scope.render("content", {
         element: "div",
-        machine: () => api().getContentProps(),
+        ref: presence.ref,
+        machine: () =>
+            presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });

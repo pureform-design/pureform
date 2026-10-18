@@ -161,7 +161,11 @@ export type {
     InteractionSourceProps,
     InteractiveProps,
 } from "./components/indication";
-export { overlayPositionerProps } from "./components/overlay";
+export {
+    overlayPositionerProps,
+    overlayPresent,
+    presentProps,
+} from "./components/overlay";
 export type {
     OverlayPlacement,
     OverlayPositioning,

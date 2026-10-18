@@ -15,6 +15,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { ChangeDetails, Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
+import { presentProps } from "./overlay";
 import type { VariantProp } from "./variants";
 
 /** The select's parts: the field's, and `"hiddenSelect"`. */
@@ -321,12 +322,9 @@ export const selectInputProps = <P extends object>(
     };
 };
 
-/** Zag's positioner props, hidden while the list is closed, so the closed list takes no room in
- *  the layout or the page's measurements. */
-export const selectPositionerProps = <P extends object>(
-    props: P,
-    open: boolean,
-): P & { readonly hidden: boolean } => ({ ...props, hidden: !open });
+/** Zag's positioner props, hidden once the list is gone (closed, and its exit animation over), so
+ *  the closed list takes no room in the layout or the page's measurements. */
+export const selectPositionerProps = presentProps;
 
 /** Zag's hidden-select props, without `aria-labelledby` (it's hidden from assistive technology
  *  anyway) and with the visually hidden style kept. */

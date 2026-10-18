@@ -6,6 +6,7 @@ import {
     radioInputs,
     readIconStyle,
     setRadioDefaults,
+    stackPositioner,
     subscribeReducedMotion,
     syncCheckedInput,
     syncRadioInputs,
@@ -123,6 +124,35 @@ describe("syncTextInput", () => {
         expect(input.selectionStart).toBe(1);
         syncTextInput(input, "Ada");
         expect(input.value).toBe("Ada");
+    });
+});
+
+describe("stackPositioner", () => {
+    const overlay = (surfaceStyle: string) => {
+        const positioner = document.createElement("div");
+        const surface = document.createElement("div");
+        surface.setAttribute("style", surfaceStyle);
+        positioner.append(surface);
+        document.body.append(positioner);
+        return { positioner, surface };
+    };
+
+    it("stacks the positioner at its surface's z-index", () => {
+        const { positioner, surface } = overlay("z-index: 400");
+        stackPositioner(positioner, surface);
+        expect(positioner.style.getPropertyValue("--z-index")).toBe("400");
+        expect(getComputedStyle(positioner).zIndex).toBe("400");
+        surface.style.zIndex = "auto";
+        stackPositioner(positioner, surface);
+        expect(positioner.getAttribute("style") ?? "").toBe("");
+    });
+
+    it("leaves an inline z-index of the app's own", () => {
+        const { positioner, surface } = overlay("z-index: 400");
+        positioner.style.zIndex = "7";
+        stackPositioner(positioner, surface);
+        expect(positioner.style.zIndex).toBe("7");
+        expect(positioner.style.getPropertyValue("--z-index")).toBe("");
     });
 });
 

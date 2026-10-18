@@ -8,6 +8,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
     DIALOG_ROOT_PROPS,
+    dialogBackdropLayout,
     dialogMachineProps,
     dialogPositionerLayout,
     dialogSelection,
@@ -20,7 +21,11 @@ import {
     menuSelection,
 } from "./menu";
 import type { MenuPart } from "./menu";
-import { overlayPositionerProps } from "./overlay";
+import {
+    overlayPositionerProps,
+    overlayPresent,
+    presentProps,
+} from "./overlay";
 import {
     SNACKBAR_ROOT_PROPS,
     snackbarMachineProps,
@@ -72,12 +77,23 @@ describe("parts", () => {
 });
 
 describe("overlays", () => {
-    it("hide the positioner while closed", () => {
+    it("hide the positioner once gone", () => {
         expect(overlayPositionerProps({ id: "p" }, false)).toEqual({
             id: "p",
             hidden: true,
         });
         expect(overlayPositionerProps({ id: "p" }, true).hidden).toBe(false);
+    });
+
+    it("show while open, and stay while presence holds them after", () => {
+        expect(overlayPresent(true, false)).toBe(true);
+        expect(overlayPresent(false, true)).toBe(true);
+        expect(overlayPresent(false, false)).toBe(false);
+        // Zag hides the surface the moment it closes; presence's word wins.
+        expect(presentProps({ hidden: true, id: "c" }, true)).toEqual({
+            id: "c",
+            hidden: false,
+        });
     });
 
     it("open the menu under the trigger's start, unless told otherwise", () => {
@@ -133,6 +149,11 @@ describe("overlays", () => {
         });
         expect(dialogPositionerLayout(false).hidden).toBe(true);
         expect(dialogPositionerLayout(true).style.position).toBe("fixed");
+        expect(dialogBackdropLayout(false).hidden).toBe(true);
+        expect(dialogBackdropLayout(true)).toEqual({
+            hidden: false,
+            style: { position: "fixed" },
+        });
     });
 
     it("give the snackbar's root its id", () => {

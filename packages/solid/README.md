@@ -34,6 +34,7 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 | `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                                                                                                |
 | `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                                                                                         |
 | `motion.ts`                                                                                        | `useReducedMotion`                                                                                                                                                                                                            |
+| `presence.ts`                                                                                      | `usePresence`: an overlay shown while open and while its exit animation runs                                                                                                                                                  |
 | `icon-style.ts`                                                                                    | `useIconStyle`, and the context icon parts provide                                                                                                                                                                            |
 | `part-context.ts`                                                                                  | `createPartContext`: the context Root shares with its parts, and the error outside Root                                                                                                                                       |
 | `button/`                                                                                          | `@pureform/solid/button`: `button.tsx` (the component), `index.ts`, `button.spec.tsx`                                                                                                                                         |
@@ -230,8 +231,10 @@ import { Tooltip } from "@pureform/solid/tooltip";
   as `Content` (`data-pf-part="content"`, `pf-<name>-content`; the registry's `root` slot styles
   it). Nothing is portaled: the provider's theme, `dir`, and registry reach the overlay as any part,
   and server rendering and hydration see one tree. A clipping or stacking ancestor can cut a menu or
-  tooltip off; `positioning={{ strategy: "fixed" }}` escapes most. The positioner is `hidden` while
-  closed. `Trigger` is a `<button>`, or any component with `as` (`as={Button}`,
+  tooltip off; `positioning={{ strategy: "fixed" }}` escapes most. Each surface stacks at its
+  layer of the theme's stacking scale (the positioner takes the surface's `z-index`) and animates
+  on `data-state`; `usePresence` (Zag's presence machine on the surface) keeps the positioner and
+  surface showing while the exit animation runs, then `hidden`, at once when none runs. `Trigger` is a `<button>`, or any component with `as` (`as={Button}`,
   `as={IconButton}`), which takes the rest of its props; the ready-mades draw it as a `Button`
   labeled with `trigger`, and render none without it (open them with `open`). `open`,
   `defaultOpen`, and `onOpenChange` are controllable on all three.
@@ -252,8 +255,8 @@ import { Tooltip } from "@pureform/solid/tooltip";
   `Headline` (an `<h2>`) names it and the `Body` describes it. The ready-made takes `icon` (turning
   on the `icon` variant), `mirrorIcon`, `headline`, `body`, and `actions`; `Dialog.CloseTrigger`
   closes it (`as={Button}`).
-- **The snackbar** is its `Root`: a `role="status"` region, hidden while closed, that closes itself
-  after `duration` (5000 ms; `null` to stay) unless the pointer or focus is in it. `onOpenChange`
+- **The snackbar** is its `Root`: a `role="status"` region, hidden once closed and its exit
+  animation over, that closes itself after `duration` (5000 ms; `null` to stay) unless the pointer or focus is in it. `onOpenChange`
   gets `{ open, reason }` (`timeout`, `action`, `close`, `escape`, `open`); `onAction` runs before
   the action asks to close. The ready-made takes `supportingText`, `action` (the button renders
   only when given), `closeLabel` (the close button's name; it renders only when given), and
@@ -550,6 +553,10 @@ const fieldsetDisabled = useFieldsetDisabled(inputElement); // OR it into the ma
 
 - `useReducedMotion(): Accessor<boolean>`: the nearest `"reduce"` (true) or `"full"` (false),
   else the system's `prefers-reduced-motion`, `false` until mounted.
+- `usePresence(open, onShow?): { present: Accessor<boolean>; ref }`: an overlay's presence on
+  Zag's presence machine: `present` while open and while the surface given to `ref` runs its exit
+  animation, `false` once it ends (at once when none runs). `onShow` gets the surface each time it
+  shows (the dialog stacks its positioner there).
 - `useIconStyle(): Accessor<IconStyle>`: inside an icon part, its measured `{ size, color,
 filled }`, following the component's state; elsewhere `{ size: undefined, color:
 "currentColor", filled: false }`.

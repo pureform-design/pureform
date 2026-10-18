@@ -16,6 +16,7 @@ import {
     selectMachineProps,
     selectMenuSelection,
     selectPositionerProps,
+    presentProps,
     selectSelection,
     selectSupportingTextId,
     selectValueProps,
@@ -49,6 +50,8 @@ import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -69,6 +72,7 @@ interface SelectContextValue {
     readonly resetsTo: Accessor<string | null>;
     readonly setHiddenSelect: (element: HTMLSelectElement) => void;
     readonly sources: ItemInteractionSources;
+    readonly presence: Presence;
 }
 
 /** What an option shares with its parts. */
@@ -136,6 +140,7 @@ function Root(props: SelectRootProps): JSX.Element {
         ...open.machineProps(),
     }));
     const api = createMemo(() => select.connect(service, normalizeProps));
+    const presence = usePresence(() => api().open);
     const resetsTo = () => value.resetsTo() ?? null;
     useFormReset(hidden, {
         resetsTo,
@@ -177,6 +182,7 @@ function Root(props: SelectRootProps): JSX.Element {
                 resetsTo,
                 setHiddenSelect: setHidden,
                 sources,
+                presence,
             }}
         >
             {scope.render("root", {
@@ -302,24 +308,30 @@ function HiddenSelect(props: SelectPartProps): JSX.Element {
     });
 }
 
-/** Places the list under the field. The registry doesn't style it. */
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
 function Positioner(props: SelectPartProps): JSX.Element {
-    const { menu, api } = context.use("Positioner");
+    const { menu, api, presence } = context.use("Positioner");
     return menu.render("positioner", {
         element: "div",
         machine: () =>
-            selectPositionerProps(api().getPositionerProps(), api().open),
+            selectPositionerProps(
+                api().getPositionerProps(),
+                presence.present(),
+            ),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
 }
 
-/** The list of options, drawn as a menu. */
+/** The list of options, drawn as a menu. It stays while its exit animation runs. */
 function Content(props: SelectPartProps): JSX.Element {
-    const { menu, api } = context.use("Content");
+    const { menu, api, presence } = context.use("Content");
     return menu.render("root", {
         element: "div",
-        machine: () => api().getContentProps(),
+        ref: presence.ref,
+        machine: () =>
+            presentProps(api().getContentProps(), presence.present()),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });

@@ -1,5 +1,6 @@
 // The web half: the system's reduced-motion preference, an icon slot's measured style, a native
-// checkbox kept in step with its machine, and runtime themes and overrides as CSS. Only call the
+// checkbox kept in step with its machine, an overlay's positioner stacked at its surface's layer,
+// and runtime themes and overrides as CSS. Only call the
 // DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
 // lowering for React Native.
 
@@ -140,6 +141,27 @@ export const syncTextInput = (
     value: string,
 ): void => {
     if (input.value !== value) input.value = value;
+};
+
+/** Stacks an overlay's positioner at its surface's layer, as Zag's popper does for a floating
+ *  one: the surface's computed `z-index` (the preset's, from the theme's stacking scale) becomes
+ *  the positioner's `--z-index`, which its inline `z-index` reads. A positioner fixed over the
+ *  viewport, as the dialog's, makes a stacking context of its own, so the surface's `z-index`
+ *  alone would stack it nowhere. An inline `z-index` of the app's own stays. */
+export const stackPositioner = (
+    positioner: HTMLElement,
+    surface: HTMLElement,
+): void => {
+    const own = positioner.style.getPropertyValue("z-index");
+    if (own && own !== "var(--z-index)") return;
+    const zIndex = getComputedStyle(surface).zIndex;
+    if (zIndex === "auto") {
+        positioner.style.removeProperty("--z-index");
+        positioner.style.removeProperty("z-index");
+        return;
+    }
+    positioner.style.setProperty("--z-index", zIndex);
+    positioner.style.setProperty("z-index", "var(--z-index)");
 };
 
 export {

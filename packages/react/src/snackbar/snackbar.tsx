@@ -1,11 +1,12 @@
 // The snackbar: Root on pureform's snackbar machine, the snackbar itself (a `role="status"` region
-// hidden while closed, which closes itself after `duration` unless the pointer or focus is in
+// hidden once closed and its exit animation over, which closes itself after `duration` unless the pointer or focus is in
 // it); its supporting text, action, and close button; and the ready-made Snackbar over them.
 // Placing it, fixed to the bottom of the screen, is the app's.
 
 import { snackbarAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    presentProps,
     SNACKBAR_ROOT_PROPS,
     snackbarMachineProps,
     snackbarSelection,
@@ -30,6 +31,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { slotPartProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -57,7 +59,7 @@ export interface SnackbarPartProps extends PartProps {
     readonly unstyled?: boolean | undefined;
 }
 
-/** The snackbar: a `role="status"` region, hidden while closed. */
+/** The snackbar: a `role="status"` region, hidden once closed and its exit animation over. */
 function Root(props: SnackbarRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
@@ -73,6 +75,7 @@ function Root(props: SnackbarRootProps): ReactNode {
         ...open.machineProps,
     });
     const api = snackbar.connect(service, normalizeProps);
+    const presence = usePresence(api.open);
     const scope = useComponent(snackbarAnatomy, {
         selection: snackbarSelection(props),
         testId: props.testId,
@@ -85,7 +88,8 @@ function Root(props: SnackbarRootProps): ReactNode {
             {scope.render("root", {
                 element: "div",
                 as,
-                machine: api.getRootProps(),
+                ref: presence.ref,
+                machine: presentProps(api.getRootProps(), presence.present),
                 props: rest,
             })}
         </context.Provider>
