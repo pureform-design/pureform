@@ -11,7 +11,7 @@ import type { ComponentCase, KeyCase } from "./types";
 import { itemSources } from "./types";
 
 const ids = compositeTestIds.menu;
-const { content, trigger, read, click, shown } = overlayParts(ids);
+const { content, trigger, read, click, shown, overlay } = overlayParts(ids);
 
 const ITEMS = [
     { value: "cut", label: "Cut" },
@@ -82,6 +82,7 @@ export const menu: ComponentCase = {
     },
     // Open; the menu has no disabled state of its own, and the keyboard highlights an item, which
     // shows as hovered.
+    overlay: overlay(),
     indication: itemSources(menuOverlayAnatomy, ITEMS, {
         props: { defaultOpen: true },
         disabled: undefined,

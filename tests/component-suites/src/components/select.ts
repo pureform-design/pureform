@@ -29,7 +29,9 @@ const hiddenSelect = (host: HTMLElement) =>
 
 const content = (host: HTMLElement) => byTestId(host, menu.root);
 
-const isOpen = (host: HTMLElement) => !content(host).hidden;
+// Open: the list shows, and isn't on its way out.
+const isOpen = (host: HTMLElement) =>
+    !content(host).hidden && content(host).dataset.state !== "closed";
 
 /** The chosen option's value, or `null`: the label the field shows, checked against the hidden
  *  select. */
@@ -94,6 +96,11 @@ export const select: ComponentCase = {
         required: { required: true, name: "size" },
     },
     state: { prop: "value", from: "m", to: "l", act: choose("l"), read },
+    // The list of options comes and goes with `open`.
+    overlay: {
+        surface: content,
+        parts: (host) => [content(host).parentElement!],
+    },
     form: {
         control: hiddenSelect,
         aria: input,

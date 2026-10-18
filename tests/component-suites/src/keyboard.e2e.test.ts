@@ -9,6 +9,7 @@ import { harness } from "#binding";
 
 import { COMPONENTS } from "./components";
 import type { ComponentCase, KeyboardCase, KeyCase } from "./components";
+import { motionDone } from "./harness/animations";
 import { hostIn, mountCase, stateNames } from "./harness/page";
 
 /** Mounts the component after a plain button, and tabs from it onto the component. */
@@ -65,6 +66,9 @@ const pressAndCheck = async (
     await harness.settle();
     onChange.mockClear();
     await userEvent.keyboard(key);
+    await harness.settle();
+    // An overlay that closes keeps focus until its exit animation ends and it hides.
+    await motionDone();
     await harness.settle();
     if (does === "click") expect(onClick).toHaveBeenCalledTimes(1);
     if (does === "nothing") expect(onClick).not.toHaveBeenCalled();
