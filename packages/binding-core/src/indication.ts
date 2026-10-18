@@ -43,7 +43,9 @@ export interface IndicationTarget {
     readonly trigger: HTMLElement;
     /** The element the state layer tints and the ripple fills; it clips the ripple. */
     readonly surface: HTMLElement;
-    /** The layer element inside the surface, when the indication asks for one (`layer`). */
+    /** The layer element inside the surface, when the indication asks for one (`layer`). It's
+     *  found in the surface as it's read, so read it when drawing (at a press), not once when
+     *  the effect starts. */
     readonly layer?: HTMLElement | undefined;
 }
 
@@ -147,6 +149,7 @@ export {
     indicationRoles,
     NOT_FORWARDED,
     stateIndicationPart,
+    surfaceLayer,
 } from "./indication-host";
 export type {
     ForwardedStates,

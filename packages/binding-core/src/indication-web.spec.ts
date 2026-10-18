@@ -13,6 +13,7 @@ import {
     noIndication,
     providerIndicationOverrides,
     rippleClasses,
+    surfaceLayer,
 } from "./indication";
 import type { ForwardedStates, Indication } from "./indication";
 import { createInteractionSource } from "./interaction";
@@ -245,7 +246,7 @@ describe("IndicationHost", () => {
         },
     });
 
-    it("runs the effect once the trigger, surface, and layer are attached", () => {
+    it("runs the effect once the trigger and surface are attached", () => {
         const calls: string[] = [];
         const host = new IndicationHost(ENTRIES, {
             reducedMotion: () => false,
@@ -253,17 +254,50 @@ describe("IndicationHost", () => {
         });
         host.configure(recording(calls), registry);
         const source = createInteractionSource();
-        const { element, layer } = surface();
+        const { element } = surface();
         const input = document.createElement("input");
         const detachRoot = host.instance(0, source).attach("surface", element);
-        const detachInput = host.instance(0, source).attach("trigger", input);
         expect(calls).toEqual([]);
-        const detachLayer = host.instance(0, source).attach("layer", layer);
+        const detachInput = host.instance(0, source).attach("trigger", input);
         expect(calls).toEqual(["start INPUT true"]);
         host.configure(recording(calls), registry);
         expect(calls).toEqual(["start INPUT true", "stop", "start INPUT true"]);
-        detachLayer();
+        detachInput();
         expect(calls.at(-1)).toBe("stop");
+        detachRoot();
+    });
+
+    it("finds the layer in the surface when the effect reads it", () => {
+        const layers: (HTMLElement | undefined)[] = [];
+        let read: () => void = () => {};
+        const host = new IndicationHost(ENTRIES, {
+            reducedMotion: () => false,
+            dir: () => "ltr",
+        });
+        host.configure(
+            {
+                name: "reading",
+                layer: true,
+                web(target) {
+                    read = () => layers.push(target.layer);
+                    return () => {};
+                },
+            },
+            registry,
+        );
+        const source = createInteractionSource();
+        const element = document.createElement("button");
+        document.body.append(element);
+        const detachRoot = host.instance(0, source).attach("surface", element);
+        const detachInput = host.instance(0, source).attach("trigger", element);
+        read();
+        // Mounted after the effect started, as a binding's layer may be.
+        const layer = document.createElement("span");
+        layer.setAttribute("data-ripple-layer", "");
+        element.append(layer);
+        read();
+        expect(layers).toEqual([undefined, layer]);
+        expect(surfaceLayer(element)).toBe(layer);
         detachInput();
         detachRoot();
     });

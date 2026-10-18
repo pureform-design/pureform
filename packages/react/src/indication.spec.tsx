@@ -1,6 +1,7 @@
 import { testIds } from "@pureform/anatomy";
 import { createRegistry, withTokenStyle } from "@pureform/styling";
 import { act } from "@testing-library/react";
+import { Profiler } from "react";
 import type { ReactNode } from "react";
 import { describe, expect, it, vi } from "vitest";
 
@@ -14,8 +15,10 @@ import {
     useInteractionState,
 } from ".";
 import type { Indication, IndicationTarget, MutableInteractionSource } from ".";
+import { navigationRegistry } from "./__fixtures__/registry";
 import { Button } from "./button";
-import { mount, settle } from "./testing/render";
+import { ListItem } from "./list-item";
+import { mount, outside, settle } from "./testing/render";
 
 const ids = testIds.button;
 
@@ -111,6 +114,50 @@ describe("indication", () => {
         expect(layer?.querySelector("[data-ripple]")?.className).toBe(
             "ripple__ink",
         );
+        await dispatch(window, pointer("pointerup"));
+    });
+
+    it("renders a surface once as it mounts: its element and layer aren't kept in state", async () => {
+        const commits: string[] = [];
+        mount(
+            <PureformProvider registry={navigationRegistry()}>
+                <Profiler
+                    id="items"
+                    onRender={(_, phase) => commits.push(phase)}
+                >
+                    <ListItem headline="Inbox" href="#inbox" />
+                    <ListItem headline="Sent" href="#sent" />
+                </Profiler>
+            </PureformProvider>,
+        );
+        await settle();
+        expect(document.querySelectorAll("[data-ripple-layer]")).toHaveLength(
+            2,
+        );
+        expect(commits).toEqual(["mount"]);
+    });
+
+    it("finds the layer at a press, after the indication turns it on", async () => {
+        const indication = outside<Indication>(
+            materialIndication({ ripple: false }),
+        );
+        mount(
+            <PureformProvider registry={registry()}>
+                <indication.Holder>
+                    {(value) => <Button label="Save" indication={value} />}
+                </indication.Holder>
+            </PureformProvider>,
+        );
+        await settle();
+        const root = byTestId(ids.root);
+        expect(layerOf(root)).toBe(null);
+        await indication.set(materialIndication());
+        await settle();
+        const layer = layerOf(root);
+        expect(layer).not.toBe(null);
+        await dispatch(root, pointer("pointerdown"));
+        await settle();
+        expect(layer?.querySelectorAll("[data-ripple]")).toHaveLength(1);
         await dispatch(window, pointer("pointerup"));
     });
 

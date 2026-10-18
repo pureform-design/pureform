@@ -428,6 +428,7 @@ interface Indication {
     readonly native?: NativeIndicationComponent; // (props: NativeIndicationProps) => …, React-free
 }
 interface IndicationTarget { trigger: HTMLElement; surface: HTMLElement; layer?: HTMLElement }
+//   `layer` is found in the surface as it's read (`surfaceLayer`): read it when drawing
 interface IndicationContext { centered; reducedMotion(); dir(); registry }
 interface NativeIndicationProps { source; surface: { style; drawing? }; centered; reducedMotion; dir; registry }
 defineIndication(indication): Indication;
@@ -451,12 +452,13 @@ dropsFocusIndicator(indication); droppedFocusIndicatorMessage(indication);
 
 // What the web bindings share
 indicationRoles(entries, part); // [{ entry, role: "trigger" | "surface" | "state" }], cached
+surfaceLayer(surface): HTMLElement | undefined; // the surface's `:scope > [data-ripple-layer]`
 class IndicationHost {          // one per component
     configure(indication, registry): void;
     instance(entry, source): IndicationInstance; // one per surface and source
 }
 class IndicationInstance {
-    attach(role: "trigger" | "surface" | "layer" | "state", element): () => void;
+    attach(role: "trigger" | "surface" | "state", element): () => void;
     subscribeForwarded(listener: (states: { hover; pressed }) => void): () => void;
 }
 ```
@@ -469,8 +471,13 @@ interactive component's contract takes `indication` and `interactionSource`
 `INTERACTIVE_PROPS`); a composite takes `indication` on Root and `interactionSource` per item.
 
 A forwarded hover or press is one whose emit's origin isn't one of the surface's own elements
-(its trigger, surface, layer, or the element it marks states on): another component sharing the
+(its trigger, surface, or the element it marks states on): another component sharing the
 source, or the app emitting with no element. Focus is never forwarded.
+
+The bindings attach only the trigger, the surface, and the state element. The layer stays in the
+markup (server HTML and hydration unchanged), but nothing tracks it as it mounts: the effect starts
+once the trigger and surface are there, and the target's `layer` finds it in the surface when the
+ripple draws, at a press. So a surface doesn't render again once its layer mounts.
 
 ### `@pureform/binding-core/usage`
 

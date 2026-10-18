@@ -2060,7 +2060,10 @@ the layer adds about 20% to Solid's mount and 50% to React's, mostly the binding
 surface once its layer element is known, with about 3 ms of style recalculation and 7 ms of layout;
 sources made beforehand save nothing measurable. So sources stay eager, and the layer's wiring is the
 thing to make lazy (find the layer at the first press instead of tracking it from mount), keeping the
-element in the markup.
+element in the markup. **Done since:** the bindings attach only the trigger, the surface, and the state element; the
+indication's target finds the layer in the surface when it's read (`surfaceLayer`, at a press), and
+React attaches a part's element through its ref instead of state, so a surface renders once as it
+mounts (React's 1,000-item mount re-rendered every surface once before).
 
 #### Where it lives
 
@@ -2217,4 +2220,5 @@ Decided:
   elevation and shape stay in the preset. Interaction kinds are open, with pureform's typed
   and apps' added by augmentation. Sources are created eagerly behind a contract that
   promises neither eager nor lazy; the ripple reads the source and builds its controller on
-  the first press; the layer element stays eager until measured.
+  the first press; the layer element stays in the markup, found at the first press rather than
+  tracked from mount.

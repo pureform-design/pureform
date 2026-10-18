@@ -11,9 +11,10 @@ import type { Interaction, InteractionSource } from "./interaction";
 import type { AnyRegistry, Direction } from "./provider";
 
 /** What an element is to a surface's indication: the `trigger` whose interactions feed the
- *  source, the `surface` it draws on, the `layer` inside the surface, and the `state` element
- *  the preset matches hover and press on (the trigger, or the root around a native input). */
-export type IndicationRole = "trigger" | "surface" | "layer" | "state";
+ *  source, the `surface` it draws on, and the `state` element the preset matches hover and press
+ *  on (the trigger, or the root around a native input). The layer inside the surface isn't
+ *  attached: the effect finds it when it draws (`surfaceLayer`). */
+export type IndicationRole = "trigger" | "surface" | "state";
 
 /** A hover or press that came from elsewhere: another element sharing the source, or the app
  *  emitting with no element. Focus is never forwarded. */
@@ -49,12 +50,21 @@ export const indicationRoles = (
     return roles;
 };
 
-type Roles = readonly { readonly entry: number; readonly role: IndicationRole }[];
+type Roles = readonly {
+    readonly entry: number;
+    readonly role: IndicationRole;
+}[];
 
 // The same list for the same anatomy and part, so frameworks can compare it by identity.
-const rolesCache = new WeakMap<readonly IndicationAnatomy[], Map<string, Roles>>();
+const rolesCache = new WeakMap<
+    readonly IndicationAnatomy[],
+    Map<string, Roles>
+>();
 
-const partRoles = (entries: readonly IndicationAnatomy[], part: string): Roles => {
+const partRoles = (
+    entries: readonly IndicationAnatomy[],
+    part: string,
+): Roles => {
     const roles: { entry: number; role: IndicationRole }[] = [];
     entries.forEach((entry, index) => {
         if (entry.trigger === part)
@@ -74,6 +84,12 @@ const NO_ROLES: readonly never[] = Object.freeze([]);
  *  native input inside a label. */
 export const stateIndicationPart = (entry: IndicationAnatomy): string =>
     entry.trigger === "input" ? "root" : entry.trigger;
+
+/** The layer element a surface holds for its indication to draw in: its child marked
+ *  `data-ripple-layer`, which the bindings render first inside it. */
+export const surfaceLayer = (surface: HTMLElement): HTMLElement | undefined =>
+    surface.querySelector<HTMLElement>(":scope > [data-ripple-layer]") ??
+    undefined;
 
 /** What a component's indication reads besides its elements. */
 export interface IndicationEnvironment {
@@ -138,19 +154,18 @@ export class IndicationInstance {
         };
     }
 
-    /** Starts the indication's effect once its elements are there, and restarts it when the
-     *  indication changes; stops it when an element goes. */
+    /** Starts the indication's effect once its trigger and surface are there, and restarts it
+     *  when the indication changes; stops it when one goes. The layer is found in the surface
+     *  each time the effect reads it, so the bindings needn't track it as it mounts. */
     update(): void {
         const { indication, registry } = this.#host;
         const trigger = this.#elements.get("trigger");
         const surface = this.#elements.get("surface");
-        const layer = this.#elements.get("layer");
         const ready =
             indication?.web !== undefined &&
             registry !== undefined &&
             trigger !== undefined &&
-            surface !== undefined &&
-            (!indication.layer || layer !== undefined);
+            surface !== undefined;
         if (this.#effect?.indication === indication && ready) return;
         this.#effect?.cleanup();
         this.#effect = undefined;
@@ -163,11 +178,14 @@ export class IndicationInstance {
             dir: () => this.#host.environment.dir(),
             registry,
         };
-        const cleanup = indication.web(
-            { trigger, surface, layer },
-            this.source,
-            context,
-        );
+        const target = {
+            trigger,
+            surface,
+            get layer() {
+                return indication.layer ? surfaceLayer(surface) : undefined;
+            },
+        };
+        const cleanup = indication.web(target, this.source, context);
         this.#effect = { indication, cleanup };
     }
 
