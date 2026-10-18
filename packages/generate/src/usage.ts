@@ -16,8 +16,8 @@ export type VariantUsage = Readonly<
 
 /** What an app uses, as the bundler plugin's scan found it. */
 export interface Usage {
-    /** The components the app draws. The others are left out of the glue; names the config
-     *  doesn't have are ignored. */
+    /** The components the app draws. The others are left out of the generated registry; names the
+     *  config doesn't have are ignored. */
     readonly components: readonly string[];
     /** The variant values it selects. A component or group left out keeps every value. */
     readonly variants?: VariantUsage;

@@ -26,8 +26,8 @@ export {
     moduleSpecifier,
     registryDeclarations,
     registryIndex,
-} from "./glue";
-export type { GlueEntry } from "./glue";
+} from "./registry-index";
+export type { GeneratedEntry } from "./registry-index";
 export {
     GENERATED_MARK,
     hashOf,
@@ -47,10 +47,10 @@ export type {
     ImportViolation,
 } from "./imports";
 export { loadAdapter } from "./load-adapter";
-export { assertGlue, missingGlueMessage } from "./missing";
+export { assertGenerated, missingOutputMessage } from "./missing";
 export { VERSION } from "./package-version";
-export { CONFIG_FILES, createGlueRunner, findConfigFile } from "./runner";
-export type { GlueRunner } from "./runner";
+export { CONFIG_FILES, createGenerateRunner, findConfigFile } from "./runner";
+export type { GenerateRunner } from "./runner";
 export { compareVersions, satisfies } from "./semver";
 export { componentShape } from "./shape";
 export {
@@ -62,6 +62,6 @@ export {
 export type { InstalledPackage, TrainCheck, TrainProblem } from "./train";
 export { keepsValue, narrowConfig, normalizeVariants } from "./usage";
 export type { Usage, VariantUsage } from "./usage";
-export { watchGlue } from "./watch";
-export type { GlueWatcher, WatchGlueOptions } from "./watch";
+export { watchGenerate } from "./watch";
+export type { GenerateWatcher, WatchGenerateOptions } from "./watch";
 export type { FileResult, FileStatus } from "./write";

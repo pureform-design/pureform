@@ -9,7 +9,7 @@ export const INDEX_FILE = "index.ts";
 export const DECLARATIONS_FILE = "registry.d.ts";
 
 /** A component as the index and the declarations see it. */
-export interface GlueEntry {
+export interface GeneratedEntry {
     readonly name: string;
     /** The module, relative to `outDir`. */
     readonly path: string;
@@ -50,7 +50,7 @@ const registryOptions = (
 /** The registry index: every entry, static by default, the train's version and the target's
  *  theme attribute, the theme names, and the component names as a type. */
 export const registryIndex = (
-    entries: readonly GlueEntry[],
+    entries: readonly GeneratedEntry[],
     themes: readonly string[],
     version: string,
     themeAttribute?: string,
@@ -74,7 +74,7 @@ export const registryIndex = (
         'import { createRegistry } from "@pureform/styling";',
         ...(imports.length > 0 ? ["", ...imports] : []),
         "",
-        "/** The core train's version this glue was made with. */",
+        "/** The core train's version this registry was made with. */",
         `export const version = ${JSON.stringify(version)};`,
         "",
         "export const registry = createRegistry(",
@@ -98,7 +98,9 @@ const union = (values: readonly string[]): string =>
 
 /** The declarations augmenting `@pureform/styling`'s `ComponentRegistry` with each entry's
  *  shape. */
-export const registryDeclarations = (entries: readonly GlueEntry[]): string => {
+export const registryDeclarations = (
+    entries: readonly GeneratedEntry[],
+): string => {
     const components = entries.flatMap((entry) => {
         const { shape } = entry;
         const groups = Object.entries(shape.variants);

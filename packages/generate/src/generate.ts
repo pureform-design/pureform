@@ -1,6 +1,6 @@
 // `generate`: load the config, ask the target's adapter for its factory modules, and write them to
 // `.pureform/` with the registry index and its declarations, every file headed by one hash of the
-// inputs. The bundler plugin and the CLI both call it, so they can't produce different glue.
+// inputs. The bundler plugin and the CLI both call it, so they can't produce different output.
 
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
@@ -16,18 +16,18 @@ import type {
 } from "./adapter";
 import { loadConfig } from "./config";
 import { GenerateError } from "./errors";
+import { hashOf, withHeader } from "./hash";
+import type { ImportRuleOptions } from "./imports";
+import { isAdapter, loadAdapter } from "./load-adapter";
+import { VERSION } from "./package-version";
 import {
     DECLARATIONS_FILE,
     INDEX_FILE,
     isIdentifier,
     registryDeclarations,
     registryIndex,
-} from "./glue";
-import type { GlueEntry } from "./glue";
-import { hashOf, withHeader } from "./hash";
-import type { ImportRuleOptions } from "./imports";
-import { isAdapter, loadAdapter } from "./load-adapter";
-import { VERSION } from "./package-version";
+} from "./registry-index";
+import type { GeneratedEntry } from "./registry-index";
 import { componentShape } from "./shape";
 import { checkTrain, findInstalled } from "./train";
 import { normalizeVariants } from "./usage";
@@ -35,8 +35,8 @@ import type { Usage } from "./usage";
 import { compareFiles, readGenerated, writeFiles } from "./write";
 import type { FileResult, PlannedFile } from "./write";
 
-/** Bumped when what `generate` itself writes changes, so older glue reads as stale. */
-const GLUE_FORMAT = 1;
+/** Bumped when what `generate` itself writes changes, so older output reads as stale. */
+const OUTPUT_FORMAT = 2;
 
 /** The default folder, relative to the root. */
 export const DEFAULT_OUT_DIR = ".pureform";
@@ -53,8 +53,8 @@ export interface GenerateOptions<Options = Record<string, unknown>> {
     /** Components whose registry entries load on demand rather than statically. Names that
      *  `usage` leaves out are dropped. */
     readonly lazy?: readonly string[];
-    /** What the app uses (the bundler plugin's pruning): the glue keeps only the components it
-     *  names, within the allow-list, and adapters narrow styles to its variants. */
+    /** What the app uses (the bundler plugin's pruning): the generated registry keeps only the
+     *  components it names, within the allow-list, and adapters narrow styles to its variants. */
     readonly usage?: Usage;
     /** The app's root. Default: the working directory. */
     readonly root?: string;
@@ -77,7 +77,7 @@ export interface GenerateResult {
     readonly outDir: string;
     /** The hash in every generated file's header. */
     readonly hash: string;
-    /** The core train's version recorded in the glue. */
+    /** The core train's version recorded in the generated registry. */
     readonly trainVersion: string;
     /** Every file's status. In check mode without a matching hash, only the stale files: the
      *  adapter isn't run. */
@@ -154,13 +154,13 @@ const selectComponents = (
 };
 
 // The entries the adapter's modules give, checked against what was asked for.
-const glueEntries = (
+const generatedEntries = (
     adapter: CodegenAdapter,
     output: CodegenOutput,
     components: readonly string[],
     lazy: ReadonlySet<string>,
     shape: (name: string) => ComponentShape,
-): GlueEntry[] => {
+): GeneratedEntry[] => {
     const byName = new Map(
         output.components.map((module) => [module.name, module]),
     );
@@ -328,13 +328,13 @@ export const generate = async <Options = Record<string, unknown>>(
     const variants = normalizeVariants(usage?.variants, components, shape);
 
     const hash = hashOf({
-        format: GLUE_FORMAT,
+        format: OUTPUT_FORMAT,
         config,
         adapter: { name: adapter.name, platform: adapter.platform },
         options: adapterOptions,
         components,
         lazy: [...lazy],
-        // Only when it narrows anything, so unpruned glue keeps its hash.
+        // Only when it narrows anything, so an unpruned registry keeps its hash.
         ...(Object.keys(variants).length > 0 && { variants }),
         versions: Object.fromEntries(
             installed.map((entry) => [entry.name, entry.version]),
@@ -393,7 +393,7 @@ export const generate = async <Options = Record<string, unknown>>(
         importPath: (from, to) => importPath(root, outDir, from, to),
     };
     const output = await adapter.codegen(context);
-    const entries = glueEntries(adapter, output, components, lazy, shape);
+    const entries = generatedEntries(adapter, output, components, lazy, shape);
     checkThemeAttribute(adapter, output.themeAttribute);
 
     const planned: PlannedFile[] = [];

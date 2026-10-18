@@ -4,7 +4,7 @@ The build step that the bundler plugin (`@pureform/bundler`) and the `pureform` 
 (`@pureform/cli`) share. It loads `pureform.config.ts`, asks the target's adapter for its
 factory modules, and writes the `.pureform/` folder an app hands to `PureformProvider`. It has
 no bundler or CLI dependency of its own, so the plugin and the command can't produce
-different glue.
+different output.
 
 - **Depends on:** `@pureform/core` (config types), `jiti` (loads the config), `oxc-parser`
   (checks the config's imports). At run time it loads the target's adapter
@@ -15,7 +15,7 @@ different glue.
   adapters.
 
 Design: [§4 config](../../docs/design/component-architecture.md#4-pureformconfigts),
-[§6 generated glue](../../docs/design/component-architecture.md#6-generated-glue),
+[§6 the generated registry](../../docs/design/component-architecture.md#6-the-generated-registry),
 [§10 CLI](../../docs/design/component-architecture.md#10-cli),
 [§11 versioning](../../docs/design/component-architecture.md#11-versioning).
 
@@ -23,34 +23,34 @@ Design: [§4 config](../../docs/design/component-architecture.md#4-pureformconfi
 
 ```
 generate(options)
-  ├─ train.ts         installed core-train packages share one version? bindings' peers agree?
-  ├─ config.ts        loadConfig: jiti, fresh each call
-  │    └─ imports.ts  import rules: only pureform packages and relative data files
-  ├─ load-adapter.ts  "panda" → @pureform/panda-adapter/codegen (or an adapter object)
-  ├─ hash.ts          one hash of config + options + versions, in every file's header
+  ├─ train.ts           installed core-train packages share one version? bindings' peers agree?
+  ├─ config.ts          loadConfig: jiti, fresh each call
+  │    └─ imports.ts    import rules: only pureform packages and relative data files
+  ├─ load-adapter.ts    "panda" → @pureform/panda-adapter/codegen (or an adapter object)
+  ├─ hash.ts            one hash of config + options + versions, in every file's header
   ├─ adapter.codegen(context)        ← the adapter writes its modules' source
-  ├─ glue.ts          index.ts (registry, version, themes) and registry.d.ts
-  └─ write.ts         write what changed, remove what's no longer wanted, or compare (check)
+  ├─ registry-index.ts  index.ts (registry, version, themes) and registry.d.ts
+  └─ write.ts           write what changed, remove what's no longer wanted, or compare (check)
 ```
 
-| Module            | What it does                                                                     |
-| ----------------- | -------------------------------------------------------------------------------- |
-| `adapter.ts`      | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …    |
-| `shape.ts`        | `componentShape(spec)`: a component's groups, defaults, slots, and tokens        |
-| `generate.ts`     | `generate(options)`: the whole step                                              |
-| `config.ts`       | `loadConfig(path, options)`                                                      |
-| `imports.ts`      | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative` |
-| `usage.ts`        | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`    |
-| `train.ts`        | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`            |
-| `semver.ts`       | `compareVersions`, `satisfies`: just enough semver for the train check           |
-| `hash.ts`         | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)         |
-| `glue.ts`         | `registryIndex`, `registryDeclarations`                                          |
-| `write.ts`        | `writeFiles`, `compareFiles`                                                     |
-| `missing.ts`      | `missingGlueMessage`, `assertGlue`                                               |
-| `errors.ts`       | `GenerateError` with a `code`, `isGenerateError`                                 |
-| `load-adapter.ts` | `loadAdapter(target, root)`                                                      |
-| `runner.ts`       | `createGlueRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`              |
-| `watch.ts`        | `watchGlue(options, watching)`: generate on every change, without a bundler      |
+| Module              | What it does                                                                     |
+| ------------------- | -------------------------------------------------------------------------------- |
+| `adapter.ts`        | The codegen interface: `CodegenAdapter`, `CodegenContext`, `CodegenOutput`, …    |
+| `shape.ts`          | `componentShape(spec)`: a component's groups, defaults, slots, and tokens        |
+| `generate.ts`       | `generate(options)`: the whole step                                              |
+| `config.ts`         | `loadConfig(path, options)`                                                      |
+| `imports.ts`        | `scanConfigImports(entry, options)`, `formatImportViolations`, `resolveRelative` |
+| `usage.ts`          | Pruning's input: `Usage`, `VariantUsage`, `normalizeVariants`, `narrowConfig`    |
+| `train.ts`          | `CORE_TRAIN_PACKAGES`, `findInstalled(root)`, `checkTrain(installed)`            |
+| `semver.ts`         | `compareVersions`, `satisfies`: just enough semver for the train check           |
+| `hash.ts`           | `stableStringify`, `hashOf`, the header (`GENERATED_MARK`, `headerHash`)         |
+| `registry-index.ts` | `registryIndex`, `registryDeclarations`                                          |
+| `write.ts`          | `writeFiles`, `compareFiles`                                                     |
+| `missing.ts`        | `missingOutputMessage`, `assertGenerated`                                        |
+| `errors.ts`         | `GenerateError` with a `code`, `isGenerateError`                                 |
+| `load-adapter.ts`   | `loadAdapter(target, root)`                                                      |
+| `runner.ts`         | `createGenerateRunner(options)`, `findConfigFile(root)`, `CONFIG_FILES`          |
+| `watch.ts`          | `watchGenerate(options, watching)`: generate on every change, without a bundler  |
 
 ## Public API
 
@@ -83,7 +83,7 @@ result.hints; // e.g. add ".pureform/**/*" to the tsconfig's include
 
 Errors are `GenerateError`s with a `code`: `config-not-found`, `config-load`,
 `config-export`, `config-imports`, `adapter-not-found`, `adapter-invalid`,
-`adapter-output`, `components`, `train-mismatch`, `missing-glue`.
+`adapter-output`, `components`, `train-mismatch`, `missing-output`.
 
 ### Pruning: `usage`
 
@@ -110,8 +110,8 @@ type VariantUsage = Readonly<
 variants)` gives the config with only those components and the values in use (their compound
   variants too), for adapters that compile styles from the config. `keepsValue` answers for one
   value.
-- The hash covers `variants` only when they narrow something, so glue made with a usage that
-  narrows nothing equals unpruned glue.
+- The hash covers `variants` only when they narrow something, so a registry made with a usage that
+  narrows nothing equals an unpruned one.
 
 ### What it writes
 
@@ -137,7 +137,7 @@ import { createRegistry } from "@pureform/styling";
 
 import { button } from "./web/button";
 
-/** The core train's version this glue was made with. */
+/** The core train's version this registry was made with. */
 export const version = "0.4.1";
 
 export const registry = createRegistry(
@@ -221,17 +221,17 @@ nearest `node_modules/<name>` from the root up). It fails when train packages di
 version, naming the ones behind the newest and the command line to install, or when a
 binding's peer range on a train package excludes the train's version. Ranges that aren't
 semver (`workspace:^`, `catalog:`) pass. `trainCheck: false` turns it off. The train's
-version goes into the glue (`createRegistry(…, { version })`), and the bindings warn in
-development when the running `@pureform/styling` differs (`trainVersionMismatch` in
+version goes into the generated registry (`createRegistry(…, { version })`), and the bindings warn
+in development when the running `@pureform/styling` differs (`trainVersionMismatch` in
 `@pureform/binding-core`).
 
-### Missing glue
+### Missing output
 
-`assertGlue(".pureform", { root, importer })` throws a `missing-glue` error naming both ways
+`assertGenerated(".pureform", { root, importer })` throws a `missing-output` error naming both ways
 to generate the folder (`pureform generate`, or the bundler plugin) when the index is
-missing; `missingGlueMessage(outDir, importer)` gives the text. Nothing raises it on its own:
+missing; `missingOutputMessage(outDir, importer)` gives the text. Nothing raises it on its own:
 the bundler plugin raises it when an import resolves into a missing folder, and test setups
-can call `assertGlue`. (`pureform generate --check` reports a missing folder as out of date.)
+can call `assertGenerated`. (`pureform generate --check` reports a missing folder as out of date.)
 
 ### Generating again: the runner and the watcher
 
@@ -239,14 +239,14 @@ What the bundler plugin, its Metro wrapper, and `pureform generate --watch` shar
 
 ```ts
 import {
-    createGlueRunner,
+    createGenerateRunner,
     findConfigFile,
-    watchGlue,
+    watchGenerate,
 } from "@pureform/generate";
 
 findConfigFile(root); // the first pureform.config.{ts,mts,cts,js,mjs,cjs}, else "pureform.config.ts"
 
-const runner = createGlueRunner({
+const runner = createGenerateRunner({
     root,
     config: "pureform.config.ts",
     target: "panda",
@@ -255,7 +255,7 @@ await runner.run(); // calls during a run share one more run after it
 runner.dependencies; // the config and its relative imports (the config alone until a run reads them)
 runner.affects(file); // whether a changed file is one of them
 
-const watcher = watchGlue(options, {
+const watcher = watchGenerate(options, {
     onResult,
     onError,
     delay: 50,
@@ -265,7 +265,7 @@ await watcher.ready; // the first run's result, or undefined when it failed (onE
 watcher.close();
 ```
 
-`watchGlue` watches the folders of `runner.dependencies` with `fs.watch` (editors often save by
+`watchGenerate` watches the folders of `runner.dependencies` with `fs.watch` (editors often save by
 replacing a file, which ends a watch on the file itself), runs again after a change to one of
 them, follows the dependencies each run finds, and keeps watching after a failed run.
 

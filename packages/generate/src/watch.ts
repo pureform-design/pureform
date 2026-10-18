@@ -7,10 +7,10 @@ import type { FSWatcher } from "node:fs";
 import { basename, dirname, join } from "node:path";
 
 import type { GenerateOptions, GenerateResult } from "./generate";
-import { createGlueRunner } from "./runner";
-import type { GlueRunner } from "./runner";
+import { createGenerateRunner } from "./runner";
+import type { GenerateRunner } from "./runner";
 
-export interface WatchGlueOptions {
+export interface WatchGenerateOptions {
     /** Called after every successful run, the first included. */
     readonly onResult?: (result: GenerateResult) => void;
     /** Called when a run fails. Watching goes on: fixing the file runs it again. */
@@ -22,9 +22,9 @@ export interface WatchGlueOptions {
     readonly unref?: boolean;
 }
 
-export interface GlueWatcher {
+export interface GenerateWatcher {
     /** The runner behind the watcher. */
-    readonly runner: GlueRunner;
+    readonly runner: GenerateRunner;
     /** Settles after the first run: its result, or `undefined` when it failed. */
     readonly ready: Promise<GenerateResult | undefined>;
     /** Stops watching. */
@@ -32,11 +32,11 @@ export interface GlueWatcher {
 }
 
 /** Generates now and again on every change to the config or a file it imports. */
-export const watchGlue = <Options = Record<string, unknown>>(
+export const watchGenerate = <Options = Record<string, unknown>>(
     options: GenerateOptions<Options>,
-    watching: WatchGlueOptions = {},
-): GlueWatcher => {
-    const runner = createGlueRunner(options);
+    watching: WatchGenerateOptions = {},
+): GenerateWatcher => {
+    const runner = createGenerateRunner(options);
     const watchers = new Map<string, FSWatcher>();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let closed = false;
