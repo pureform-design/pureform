@@ -143,10 +143,15 @@ function Transactions() {
         });
     });
 
-    // Grouped by month, newest first, as the store keeps them.
+    const shownIds = createMemo(() => new Set(shown().map((t) => t.id)));
+    const isShown = (t: Transaction) => shownIds().has(t.id);
+
+    // Every transaction grouped by month, newest first, as the store keeps them. The filters
+    // don't regroup them: each row stays mounted and hides when it's filtered out, so a filter
+    // only toggles rows, and a month with none shown hides too.
     const months = createMemo(() => {
         const groups: { month: string; transactions: Transaction[] }[] = [];
-        for (const t of shown()) {
+        for (const t of transactions.data) {
             const key = t.date.slice(0, 7);
             if (groups.at(-1)?.month !== key)
                 groups.push({ month: key, transactions: [] });
@@ -223,40 +228,39 @@ function Transactions() {
                 {count(shown().length, "transaction", "transactions")},{" "}
                 {formatMoney(net(shown()), { sign: true })} net
             </Text>
-            <Show
-                when={months().length > 0}
-                fallback={
-                    <div class={empty}>
-                        <Text textStyle="titleMedium">
-                            No transactions match
-                        </Text>
-                        <Show when={filtered()}>
-                            <Button
-                                variant="tonal"
-                                label="Clear the filters"
-                                onClick={() =>
-                                    setFilters({
-                                        q: "",
-                                        kind: "",
-                                        category: "",
-                                    })
-                                }
-                            />
-                        </Show>
-                    </div>
-                }
-            >
-                {/* Keyed by month: the groups are new on every change of the filters, and a
-                    month that stays keeps its section and rows. */}
-                <For each={months()} keyed={(group) => group.month}>
-                    {(group) => (
-                        <section class={month}>
+            <Show when={shown().length === 0}>
+                <div class={empty}>
+                    <Text textStyle="titleMedium">No transactions match</Text>
+                    <Show when={filtered()}>
+                        <Button
+                            variant="tonal"
+                            label="Clear the filters"
+                            onClick={() =>
+                                setFilters({
+                                    q: "",
+                                    kind: "",
+                                    category: "",
+                                })
+                            }
+                        />
+                    </Show>
+                </div>
+            </Show>
+            {/* Keyed by month: the groups are new when the transactions change, and a month
+                that stays keeps its section and rows. */}
+            <For each={months()} keyed={(group) => group.month}>
+                {(group) => {
+                    const visible = createMemo(() =>
+                        group().transactions.filter(isShown),
+                    );
+                    return (
+                        <section class={month} hidden={visible().length === 0}>
                             <div class={monthHeading}>
                                 <Text as="h2" textStyle="titleSmall">
                                     {formatMonth(group().month)}
                                 </Text>
                                 <Text textStyle="labelMedium" class={muted}>
-                                    {formatMoney(net(group().transactions), {
+                                    {formatMoney(net(visible()), {
                                         sign: true,
                                     })}
                                 </Text>
@@ -265,12 +269,13 @@ function Transactions() {
                                 <TransactionList
                                     transactions={group().transactions}
                                     categories={categories.data}
+                                    shown={isShown}
                                 />
                             </div>
                         </section>
-                    )}
-                </For>
-            </Show>
+                    );
+                }}
+            </For>
         </div>
     );
 }
