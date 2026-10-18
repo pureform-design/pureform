@@ -88,8 +88,9 @@ export interface PureformProviderProps {
     readonly registry?: AnyRegistry | undefined;
     /** The color scheme. Inherited; the system's (`useColorScheme`) at the root, else light. */
     readonly scheme?: Scheme | undefined;
-    /** A named theme from the config. Inherited; the base theme at the root. Runtime themes are
-     *  web only. */
+    /** A named theme from the config. Inherited; the base theme at the root. Nested, it combines
+     *  with the outer providers' themes, as on the web: it sets what it changes from the base
+     *  theme, over what they and their overrides change. Runtime themes are web only. */
     readonly theme?: string | undefined;
     /** Token or component token values by key (`colors.primary`,
      *  `components.button.container`), for both schemes or as `{ light, dark }`, over the outer
@@ -158,6 +159,62 @@ const registrySource = (registry: AnyRegistry | undefined): StyleSource => {
     return source;
 };
 
+// What a named theme changes from the base theme in a scheme: each token whose value differs, as
+// the web writes a theme's block. Kept per registry's theme values.
+const changes = new WeakMap<object, Map<string, ThemeValues>>();
+
+const NO_VALUES: ThemeValues = Object.freeze({});
+
+const themeChanges = (
+    themes: Readonly<Record<string, ThemeValues>>,
+    theme: string | undefined,
+    scheme: Scheme,
+): ThemeValues => {
+    if (theme === undefined) return NO_VALUES;
+    let byKey = changes.get(themes);
+    if (!byKey) changes.set(themes, (byKey = new Map()));
+    // Theme keys as rn-adapter names them: the theme and the scheme.
+    const key = `${theme}:${scheme}`;
+    let changed = byKey.get(key);
+    if (changed) return changed;
+    const own = themes[key];
+    const base = themes[`base:${scheme}`];
+    changed = {};
+    if (own && base) {
+        for (const [token, value] of Object.entries(own)) {
+            if (base[token] !== value) changed[token] = value;
+        }
+    }
+    byKey.set(key, changed);
+    return changed;
+};
+
+// What a provider with its own theme inherits as overrides, over that theme: everything the outer
+// themes and overrides changed from the base theme, except what its theme sets, which wins, as a
+// nested theme's block does on the web. So nested themes for shape, density, and color combine.
+const underTheme = (
+    themes: Readonly<Record<string, ThemeValues>>,
+    outer: Pick<PureformState, "theme" | "overrides">,
+    theme: string,
+): SchemeOverrides => {
+    const scheme = (name: Scheme): ThemeValues => {
+        const own = themeChanges(themes, theme, name);
+        const inherited: ThemeValues = {};
+        for (const [token, value] of Object.entries({
+            ...themeChanges(themes, outer.theme, name),
+            ...outer.overrides[name],
+        })) {
+            if (!(token in own)) inherited[token] = value;
+        }
+        return inherited;
+    };
+    const light = scheme("light");
+    const dark = scheme("dark");
+    return Object.keys(light).length === 0 && Object.keys(dark).length === 0
+        ? NO_OVERRIDES
+        : { light, dark };
+};
+
 // The system's reduce motion setting, read only while a provider follows it.
 const useSystemReducedMotion = (follow: boolean): boolean => {
     const [reduced, setReduced] = useState(false);
@@ -204,6 +261,12 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         );
     }
     const overrideKey = JSON.stringify(props.overrides ?? null);
+    // Each theme's values, to combine a theme of its own with the outer provider's.
+    const themes =
+        props.theme === undefined
+            ? undefined
+            : registrySource(props.registry ?? parent?.registry).themeValues()
+                  .themes;
     // The root's own defaults, which only a provider without a parent reads.
     const rootScheme: Scheme | null = parent
         ? null
@@ -252,7 +315,9 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
             // The indication's theme-level tokens, under the provider's own overrides.
             overrides: mergeOverrides(
                 mergeOverrides(
-                    base.overrides,
+                    themes && props.theme !== undefined
+                        ? underTheme(themes, base, props.theme)
+                        : base.overrides,
                     providerIndicationValues(props.indication),
                 ),
                 props.overrides,
@@ -272,6 +337,7 @@ export function PureformProvider(props: PureformProviderProps): ReactNode {
         props.scheme,
         props.theme,
         overrideKey,
+        themes,
         props.engine,
         props.width,
         props.timeScale,

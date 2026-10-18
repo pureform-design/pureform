@@ -7,16 +7,20 @@ import { createRegistry } from "@pureform/styling";
 import type { Registry } from "@pureform/styling";
 import { commands } from "vitest/browser";
 
+import type { TestConfig } from "./commands";
+
 export type TestRegistry = Registry<Record<string, NativeFactory>>;
 
-/** A registry of the preset's components, the ones in `lazy` loaded on demand. */
+/** A registry of the preset's components, the ones in `lazy` loaded on demand, from the default
+ *  config or the one with named themes. */
 export const presetRegistry = async (
     components: readonly string[],
     lazy: readonly string[] = [],
+    config: TestConfig = "default",
 ): Promise<TestRegistry> => {
     const names = [...components, ...lazy];
-    const styles = await commands.nativeStyles(names);
-    const keys = await commands.tokenKeys(names);
+    const styles = await commands.nativeStyles(names, config);
+    const keys = await commands.tokenKeys(names, config);
     const factory = (name: string) => nativeFactory(name, styles, keys[name]);
     return createRegistry({
         ...Object.fromEntries(components.map((name) => [name, factory(name)])),

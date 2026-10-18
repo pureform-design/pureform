@@ -565,6 +565,16 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
     passes it to `createRegistry`, and `PureformProvider`'s `theme` writes the attributes on its
     element (an inherited theme writes nothing, its ancestor's attribute already scopes it).
 
+    Nested themes combine: a theme's block holds only the tokens that differ from the base (the
+    preset's `themes`), so a theme for shape inside one for color draws both. React Native's
+    precomputed styles hold each theme resolved whole, so its provider combines them itself: a
+    nested provider with a `theme` selects with that theme and inherits, as overrides, everything
+    the outer themes and overrides changed from the base except what its theme changes (each
+    theme's changes are the tokens whose resolved values differ from the base's). The outer
+    provider's result is unchanged, and the precomputed path recomputes only the values those
+    tokens reach. As on the web, the inner theme wins over the outer `overrides` of the same
+    tokens.
+
 - **Runtime:** `<PureformProvider theme overrides>` sets theme scope and may override any
   `dynamic` token, writing CSS vars on web or a context value on native. Nested providers
   scope. Both halves exist today: `rn-adapter`'s `PureformProvider` takes `overrides`, and
