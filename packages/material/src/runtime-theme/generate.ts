@@ -2,7 +2,11 @@
 // CSS vars the stylesheet's color tokens use, per scheme.
 
 import type { CoreConfig } from "@pureform/core/types";
-import type { CssVars, ThemeGenerator } from "@pureform/styling";
+import type {
+    CssVars,
+    ThemeGenerator,
+    ThemeSchemeVars,
+} from "@pureform/styling";
 import { themeVars } from "@pureform/styling/theme-vars";
 import { resolveTheme } from "@pureform/theme";
 
@@ -40,13 +44,55 @@ const darkOnly = (light: CssVars, dark: CssVars): CssVars =>
         ),
     );
 
+// Keys sorted and `undefined` left out, so equal inputs give equal keys.
+const stable = (value: unknown): string => {
+    if (value === null || typeof value !== "object") {
+        return JSON.stringify(value) ?? "null";
+    }
+    if (Array.isArray(value)) return `[${value.map(stable).join(",")}]`;
+    const record = value as Readonly<Record<string, unknown>>;
+    return `{${Object.keys(record)
+        .filter((key) => record[key] !== undefined)
+        .sort()
+        .map((key) => `${JSON.stringify(key)}:${stable(record[key])}`)
+        .join(",")}}`;
+};
+
+/** How many themes `generateSeedTheme` keeps: a page's swatches and the theme in use, with room. */
+export const SEED_THEME_CACHE_SIZE = 16;
+
+// The themes generated last, by input and var options, least recently used first. A theme is
+// frozen, so every caller can share it.
+const cache = new Map<string, ThemeSchemeVars>();
+
+const remember = (key: string, theme: ThemeSchemeVars): ThemeSchemeVars => {
+    cache.set(key, theme);
+    if (cache.size > SEED_THEME_CACHE_SIZE) {
+        cache.delete(cache.keys().next().value!);
+    }
+    return theme;
+};
+
 /** Material's palette for a seed: every color token, and every color role (elevation tints
  *  too, which read the roles), so the roles declared at the root are declared again inside the
- *  theme and follow it. */
+ *  theme and follow it. Equal inputs give the same frozen object: the last
+ *  `SEED_THEME_CACHE_SIZE` themes are kept, since generating one takes milliseconds and a page
+ *  asks for the same theme from several providers (and a server on every request). */
 export const generateSeedTheme: ThemeGenerator<SeedThemeInput> = (
     input,
     vars,
 ) => {
+    const key = `${stable(input)}\u0000${stable(vars)}`;
+    const cached = cache.get(key);
+    if (cached) {
+        // Most recently used: to the end.
+        cache.delete(key);
+        return remember(key, cached);
+    }
+    return remember(key, generate(input, vars));
+};
+
+const generate: ThemeGenerator<SeedThemeInput> = (input, vars) => {
     const theme = resolveTheme({
         color: materialColor({ ...input, space: "oklch" }),
         typography: materialTypescale(),
@@ -67,7 +113,13 @@ export const generateSeedTheme: ThemeGenerator<SeedThemeInput> = (
     const dark = rounded(
         themeVars(config, { ...vars, scheme: "dark" }) as CssVars,
     );
-    return { light, dark: darkOnly(light, dark) };
+    return Object.freeze({
+        light: Object.freeze(light),
+        dark: Object.freeze(darkOnly(light, dark)),
+    });
 };
+
+/** Forgets every theme `generateSeedTheme` kept. For tests. */
+export const clearSeedThemeCache = (): void => cache.clear();
 
 export default generateSeedTheme;

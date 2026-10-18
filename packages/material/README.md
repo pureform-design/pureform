@@ -73,6 +73,12 @@ as a named theme with `color: materialColor({ seed })` does. Its numbers are rou
 significant digits, since Node and Chromium differ in the last digits and the server's block and
 the client's must match.
 
+Generating a theme takes a few milliseconds (most of it the color math), and a page asks for the
+same one from several providers, a server on every request. So the generator keeps the last 16
+themes it made, by input and var options, least recently used going first: equal inputs, in any
+key order, give the same frozen `{ light, dark }`. It resolves the whole theme to get the colors;
+the other domains cost about a tenth of the color math, so it doesn't resolve the colors alone.
+
 ## Build and test
 
 Through the omni MCP's `task_run`: `build` (two entries, `index` and `runtime-theme`, plus the
