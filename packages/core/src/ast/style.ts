@@ -169,6 +169,9 @@ export interface StyleMap {
     backgroundImage?: Gradient;
     boxShadow?: Shadow;
     transform?: Transform;
+    /** The point a transform scales and turns around: `center`, `top left`, or a reference to
+     *  one set at runtime, such as a positioner's `--transform-origin`. */
+    transformOrigin?: Keyword;
     filter?: Filter;
     backdropFilter?: Filter;
     /** Clip the element to a shape. It clips everything the element draws, its border,
