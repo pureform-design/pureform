@@ -139,7 +139,7 @@ describe("trainVersionMismatch", () => {
         ).toBeUndefined();
     });
 
-    it("warns when the glue's recorded train version differs from the runtime's", () => {
+    it("warns when the generated registry's recorded train version differs from the runtime's", () => {
         const message = trainVersionMismatch(
             createRegistry({}, { version: "0.3.0" }),
             "0.4.1",
