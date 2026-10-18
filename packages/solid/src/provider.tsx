@@ -88,7 +88,7 @@ const OPTIONS = [
 export function PureformProvider(props: PureformProviderProps): JSX.Element {
     const parent = useContext(PureformContext);
     const parentVars = useContext(ThemeVarsContext);
-    const state = createMemo(() =>
+    const resolved = createMemo(() =>
         resolveProvider(
             parent(),
             {
@@ -105,6 +105,8 @@ export function PureformProvider(props: PureformProviderProps): JSX.Element {
             mergePartProps,
         ),
     );
+    const view = fieldsOf(resolved);
+    const state = () => view;
     if (isDev) {
         createEffect(
             () => props.registry,
@@ -158,6 +160,46 @@ const withIndicationOverrides = (
     return tokens ? { ...tokens, ...overrides } : overrides;
 };
 
+// The fields whose values are records, rebuilt when the provider resolves again: equal when their
+// entries are.
+const RECORD_FIELDS: ReadonlySet<keyof PureformState> = new Set([
+    "defaults",
+    "slotProps",
+    "overrides",
+]);
+
+const sameEntries = (a: object, b: object): boolean => {
+    if (a === b) return true;
+    const keys = Object.keys(a);
+    if (keys.length !== Object.keys(b).length) return false;
+    return keys.every(
+        (key) =>
+            Object.hasOwn(b, key) &&
+            Object.is(
+                (a as Record<string, unknown>)[key],
+                (b as Record<string, unknown>)[key],
+            ),
+    );
+};
+
+// The state as one object with a memo behind each field, so a component depends on the fields it
+// reads, and only a field that changed updates its readers: every component reads the provider,
+// and most of a page's would otherwise run again when any setting changes.
+const fieldsOf = (state: Accessor<PureformState>): PureformState => {
+    const view = {};
+    for (const key of Object.keys(ROOT_PROVIDER) as (keyof PureformState)[]) {
+        const field = createMemo(() => state()[key], {
+            name: `provider.${key}`,
+            ...(RECORD_FIELDS.has(key) && {
+                equals: (a: unknown, b: unknown) =>
+                    sameEntries(a as object, b as object),
+            }),
+        });
+        Object.defineProperty(view, key, { get: field, enumerable: true });
+    }
+    return view as PureformState;
+};
+
 // A runtime theme's block: generated on the server, kept or generated again while hydrating, and
 // generated after its generator loads when the theme changes. Written to the head with `useHead`,
 // keyed by its scope, so providers with the same theme share one block.
@@ -188,7 +230,10 @@ const useThemeBlock = (
         () => ({ current: block(), theme: props.theme }),
         ({ current, theme }) => {
             if (isServer || !current || !isRuntimeTheme(theme)) return;
-            const { registry, hydrate } = untrack(state);
+            const { registry, hydrate } = untrack(() => ({
+                registry: state().registry,
+                hydrate: state().hydrate,
+            }));
             if (!needsThemeLoad(current, hydrate)) return;
             let active = true;
             loadThemeVars(theme, registry).then(

@@ -376,6 +376,14 @@ and no `</head>` hands the head tags to its `onHead` option.
 | `useThemeVars()` | the nearest runtime theme's generated vars, `undefined` while reusing the server's |
 | `useMotion()`    | `Accessor<MotionSetting>`: the nearest `"reduce"` or `"full"`, else `"system"`     |
 
+The state `usePureform()` gives is one object for the provider's life, with a memo behind each
+field: a component depends on the fields it reads (`state().dir`), and only a field whose value
+changed updates its readers (`defaults`, `slotProps`, and `overrides` compare their entries).
+Every component reads the provider, so with the whole state as one value, a change to any
+setting ran most of a page again (Solid's diagnostics reported `HUGE_FAN_OUT`). Read a field
+untracked as `untrack(() => state().dir)`; `untrack(state).dir` reads the field's memo outside
+`untrack`.
+
 ### Indication
 
 How interactive components show hover, focus, and press (design doc §9.8): the state layer and
