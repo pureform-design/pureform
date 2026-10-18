@@ -107,6 +107,38 @@ describe("Tabs, ready-made", () => {
         expect(tabs()[1]!.hasAttribute("aria-controls")).toBe(false);
         expect(panels()).toHaveLength(0);
     });
+
+    it("makes each panel's content once when the items are written in place", async () => {
+        const made: string[] = [];
+        const Panel = (props: { name: string }) => {
+            made.push(props.name);
+            return <p>{props.name}</p>;
+        };
+        withRegistry(() => (
+            <Tabs
+                aria-label="Trips"
+                items={[
+                    {
+                        value: "flights",
+                        label: "Flights",
+                        icon: "✈",
+                        content: <Panel name="flights" />,
+                    },
+                    {
+                        value: "hotels",
+                        label: "Hotels",
+                        content: <Panel name="hotels" />,
+                    },
+                ]}
+            />
+        ));
+        await settle();
+        expect(made).toEqual(["flights", "hotels"]);
+        expect(panels().map((panel) => panel.textContent)).toEqual([
+            "flights",
+            "hotels",
+        ]);
+    });
 });
 
 describe("Tabs, composed", () => {

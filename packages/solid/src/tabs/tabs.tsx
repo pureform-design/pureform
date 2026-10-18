@@ -243,7 +243,9 @@ const READY_MADE_PROPS = [
 function ReadyMade(props: TabsProps): JSX.Element {
     const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
         slotPartProps(props, part) as object;
-    const items = () => props.items ?? [];
+    // Read once per change: items written in place make their content (`content`, `icon`) each
+    // time they're read.
+    const items = createMemo(() => props.items ?? []);
     const panels = createMemo(() => tabsHavePanels(items()));
     const defaultValue = untrack(() => tabsDefaultValue(props, items()));
     return (
