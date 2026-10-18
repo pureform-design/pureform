@@ -149,8 +149,8 @@ regenerations keep that usage, so don't prune a config a dev server runs.
   reload anything. Changes to installed packages need a restart.
 - **Pruning writes in place.** A pruned build writes the pruned glue to `.pureform/`, as Panda
   writes `styled-system/`; the next dev server or `pureform generate` writes the full glue back
-  (the hash covers what pruning narrowed). An app that commits `.pureform/` sets `prune: false`
-  (`react-demo`), and so does one that styles components the scan can't see, such as through
+  (the hash covers what pruning narrowed). An app that commits `.pureform/` sets `prune: false`,
+  and so does one that styles components the scan can't see, such as through
   Panda's recipe functions.
 
 ## Pruning
