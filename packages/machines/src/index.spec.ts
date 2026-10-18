@@ -11,8 +11,8 @@ import { describe, expect, it } from "vitest";
 import * as machines from ".";
 
 describe("@pureform/machines", () => {
-    it("re-exports Zag's dialog and tooltip unchanged", () => {
-        expect(machines.dialog.machine).toBe(zagDialog.machine);
+    it("re-exports Zag's tooltip unchanged, and its dialog with its states and transitions", () => {
+        expect(machines.dialog.machine.states).toBe(zagDialog.machine.states);
         expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);

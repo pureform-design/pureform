@@ -47,7 +47,8 @@ callback reports user actions only, with a details object.
 | `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.                                                  |
 | `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.                                                  |
 | `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                               |
-| `dialog.ts`, `tooltip.ts`                                 | Zag's machines, re-exported unchanged.                                                                                                      |
+| `dialog.ts`                                               | Zag's dialog, re-exported; its dismissable layer doesn't mirror the dialog's layer onto the backdrop and positioner (no forced style read). |
+| `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                       |
 | `presence.ts`                                             | Zag's presence, re-exported unchanged: keeps an overlay mounted until its exit animation ends, and lets it go at once when none runs.       |
 | `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.                                                 |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                          |
@@ -67,7 +68,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                                                                                                              |
 | `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules and derived selected items                                                                                                     |
 | `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
-| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root)                                                                                                                                                                                                 |
+| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root), its `machine` without the layer mirrored onto the backdrop and positioner                                                                                                                      |
 | `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
 | `@pureform/machines/presence`    | `@zag-js/presence` (`presence` at the root)                                                                                                                                                                                             |
 | `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
@@ -318,8 +319,12 @@ trackFormReset(input, {
 ## Good to know
 
 - The checkbox, switch, radio group, select, menu, dialog, tooltip, and tabs are Zag's. The
-  dialog and tooltip are unchanged; the others keep Zag's states and transitions and gain the
-  interaction emitters. The checkbox's form tracking is still Zag's own (its reset and
+  tooltip is unchanged; the dialog keeps Zag's states, transitions, and effects, except that its
+  dismissable layer finds no backdrop or positioner to mirror its layer onto: mirroring reads the
+  surface's computed `z-index` as the dialog opens, a style recalculation of the whole page that
+  the layer's next write (the body's `pointer-events`) makes the frame repeat. The bindings stack
+  the positioner themselves in the next frame (`stackPositioner`). The others keep Zag's states
+  and transitions and gain the interaction emitters. The checkbox's form tracking is still Zag's own (its reset and
   closest-fieldset tracking don't show through the bindings; see the shared suites); give it
   `withFieldsetRule` if that changes.
 - A per-item `disabled` (a tab, a destination, a radio) stops new interactions but doesn't end
