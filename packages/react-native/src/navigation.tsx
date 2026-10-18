@@ -23,11 +23,21 @@ import type {
     TabsItem,
     TabsVariantProps,
 } from "@pureform/binding-core";
+import type { Indication } from "@pureform/binding-core/indication";
+import type { Selection } from "@pureform/styling";
+import { memo } from "react";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
-import { testIdOf, unselectable, useControllable, withEngine } from "./parts";
+import {
+    testIdOf,
+    unselectable,
+    useControllable,
+    useStableCallback,
+    useStableSelection,
+    withEngine,
+} from "./parts";
 import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
@@ -49,37 +59,42 @@ export interface TabsProps
     readonly testId?: TestIdOverride<TabsPart> | undefined;
 }
 
-function TabImpl(props: {
-    readonly tabs: TabsProps;
+// A row gets only what it reads, each stable while the tabs render with the same props, so a row
+// renders again when its item or selection changes, not with every render of the tabs.
+interface TabProps {
     readonly item: TabsItem<ReactNode>;
-    readonly icon: boolean;
+    readonly selection: Selection<"tabs">;
+    readonly indication: Indication | undefined;
+    readonly testId: TestIdOverride<TabsPart> | undefined;
     readonly selected: boolean;
-    readonly onPress: () => void;
-}): ReactNode {
-    const { tabs, item } = props;
+    readonly onPick: (value: string) => void;
+}
+
+function TabImpl(props: TabProps): ReactNode {
+    const { item } = props;
     const engine = useEngine();
     const indication = useSurfaceIndication(TAB_INDICATION!, {
-        indication: tabs.indication,
+        indication: props.indication,
         interactionSource: item.interactionSource,
         disabled: item.disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         "tabs",
-        indication.select(tabsSelection({ ...tabs, icon: props.icon })),
+        indication.select(props.selection),
         indication.states({
             selected: props.selected,
             ...(item.disabled ? { disabled: true } : {}),
             ...(item.mirrorIcon ? { mirrored: true } : {}),
         }),
     );
-    const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, tabs.testId);
+    const id = (part: TabsPart) => testIdOf(tabsAnatomy, part, props.testId);
     return (
         <engine.Pressable
             {...indication.handlers}
             role="tab"
             aria-selected={props.selected}
             disabled={item.disabled}
-            onPress={props.onPress}
+            onPress={() => props.onPick(item.value)}
             style={{ ...s.tab, ...unselectable }}
             testID={id("tab")}
         >
@@ -107,7 +122,7 @@ function TabImpl(props: {
     );
 }
 
-const Tab = withEngine(TabImpl, "Tab");
+const Tab = memo(withEngine(TabImpl, "Tab"));
 
 function TabsImpl(props: TabsProps): ReactNode {
     const engine = useEngine();
@@ -120,10 +135,11 @@ function TabsImpl(props: TabsProps): ReactNode {
         props.onValueChange,
         props.items[0]?.value ?? "",
     );
-    const { styles: s } = useComponentSlots(
-        "tabs",
-        tabsSelection({ ...props, icon }),
-    );
+    const selection = useStableSelection(tabsSelection({ ...props, icon }));
+    const pick = useStableCallback((next: string) => {
+        if (next !== value) setValue(next);
+    });
+    const { styles: s } = useComponentSlots("tabs", selection);
     return (
         <engine.View
             role="tablist"
@@ -136,13 +152,12 @@ function TabsImpl(props: TabsProps): ReactNode {
             {props.items.map((item) => (
                 <Tab
                     key={item.value}
-                    tabs={props}
                     item={item}
-                    icon={icon}
+                    selection={selection}
+                    indication={props.indication}
+                    testId={props.testId}
                     selected={value === item.value}
-                    onPress={() => {
-                        if (item.value !== value) setValue(item.value);
-                    }}
+                    onPick={pick}
                 />
             ))}
         </engine.View>
@@ -173,28 +188,31 @@ const ANATOMIES = {
     navigationRail: navigationRailAnatomy,
 };
 
-function DestinationImpl<C extends NavigationComponent>(props: {
-    readonly name: C;
-    readonly navigation: NavigationProps<C>;
+// A destination gets only what it reads, as a tab does.
+interface DestinationProps {
+    readonly name: NavigationComponent;
     readonly item: NavigationItem<ReactNode>;
+    readonly selection: Record<string, unknown>;
+    readonly indication: Indication | undefined;
+    readonly testId: TestIdOverride<NavigationPart> | undefined;
+    /** Every destination is disabled. */
+    readonly disabled: boolean;
     readonly selected: boolean;
-    readonly onPress: () => void;
-}): ReactNode {
-    const { name, navigation, item } = props;
+    readonly onPick: (value: string) => void;
+}
+
+function DestinationImpl(props: DestinationProps): ReactNode {
+    const { name, item } = props;
     const engine = useEngine();
-    const disabled = item.disabled === true || navigation.disabled === true;
+    const disabled = item.disabled === true || props.disabled;
     const indication = useSurfaceIndication(ANATOMIES[name].indication![0]!, {
-        indication: navigation.indication,
+        indication: props.indication,
         interactionSource: item.interactionSource,
         disabled,
     });
     const { styles: s, selected } = useComponentSlots(
         name,
-        indication.select(
-            navigationSelection(
-                navigation as unknown as NavigationProps<NavigationComponent>,
-            ) as Record<string, unknown>,
-        ),
+        indication.select(props.selection),
         indication.states({
             selected: props.selected,
             ...(disabled ? { disabled: true } : {}),
@@ -205,7 +223,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
         testIdOf(
             ANATOMIES[name] as typeof navigationBarAnatomy,
             part as NavigationPart,
-            navigation.testId as TestIdOverride<NavigationPart>,
+            props.testId,
         );
     return (
         <engine.Pressable
@@ -213,7 +231,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
             role="link"
             aria-current={props.selected ? "page" : undefined}
             disabled={disabled}
-            onPress={props.onPress}
+            onPress={() => props.onPick(item.value)}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
         >
@@ -241,7 +259,7 @@ function DestinationImpl<C extends NavigationComponent>(props: {
     );
 }
 
-const Destination = withEngine(DestinationImpl, "NavigationDestination");
+const Destination = memo(withEngine(DestinationImpl, "NavigationDestination"));
 
 function NavigationImpl<C extends NavigationComponent>(
     props: NavigationProps<C> & { readonly name: C },
@@ -255,12 +273,15 @@ function NavigationImpl<C extends NavigationComponent>(
         props.onValueChange,
         props.items[0]?.value ?? "",
     );
-    const { styles: s } = useComponentSlots(
-        props.name,
+    const selection = useStableSelection(
         navigationSelection(
             props as unknown as NavigationProps<NavigationComponent>,
         ) as Record<string, unknown>,
     );
+    const pick = useStableCallback((next: string) => {
+        if (next !== value) setValue(next);
+    });
+    const { styles: s } = useComponentSlots(props.name, selection);
     return (
         <engine.View
             role="navigation"
@@ -278,12 +299,13 @@ function NavigationImpl<C extends NavigationComponent>(
                 <Destination
                     key={item.value}
                     name={props.name}
-                    navigation={props as NavigationProps<NavigationComponent>}
                     item={item}
+                    selection={selection}
+                    indication={props.indication}
+                    testId={props.testId as TestIdOverride<NavigationPart>}
+                    disabled={props.disabled === true}
                     selected={value === item.value}
-                    onPress={() => {
-                        if (item.value !== value) setValue(item.value);
-                    }}
+                    onPick={pick}
                 />
             ))}
         </engine.View>

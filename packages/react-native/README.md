@@ -148,10 +148,11 @@ import { registry } from "./.pureform";
   suspending on a lazy entry, instance tokens by name), the components (test ids,
   controlled and uncontrolled state, the select's menu, icon fills, engines), and indication
   (`indication.spec.tsx`: the source from `Pressable`, the provider's default and tokens, the
-  prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), and layers
+  prop, a shared source, keyboard-only `focusVisible`, the ripple on every surface), rows
+  (`rows.spec.tsx`: a `Profiler` on each row's surface shows which render again), and layers
   (`layer.spec.tsx`: the theme's z-index, and a wrapper lifting a menu over a later sibling where
-  the menu's own z-index can't). Node-side
-  commands (`src/testing/commands.ts`) precompute the preset's styles for a test registry.
+  the menu's own z-index can't). Node-side commands (`src/testing/commands.ts`) precompute the
+  preset's styles for a test registry.
 - `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package.
 
 ## Worth knowing
@@ -221,6 +222,11 @@ import { registry } from "./.pureform";
     }
     ```
 
+- **Rows render with what changed:** the tabs', navigation's, menu's, and radio group's rows get
+  only what they read, kept while the component renders with equal props (variants and tokens by
+  value, callbacks through a stable function that calls the latest one). So a parent's render
+  renders no row again unless `items` or a row's own props change, and a new value renders the
+  rows it selects or unselects (every radio, which reads the group's value).
 - **Keep the provider's props stable:** `registry`, `defaults`, `engine`, and `indication` are
   compared by identity, so define them once (at module level, or with `useMemo`;
   `materialIndication(options)` already gives the same object for the same options). An inline
