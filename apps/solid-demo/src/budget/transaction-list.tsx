@@ -4,8 +4,9 @@
 import { css } from "$css";
 import { Avatar } from "@pureform/solid/avatar";
 import { List } from "@pureform/solid/list";
+import { ListItem } from "@pureform/solid/list-item";
 import type { JSX } from "@solidjs/web";
-import { createMemo, mapArray } from "solid-js";
+import { createMemo, For } from "solid-js";
 
 import { formatDay, formatMoney, signedAmount } from "../lib/budget";
 import type { Category, Transaction } from "../lib/budget";
@@ -18,50 +19,65 @@ const row = css({ width: "100%", textAlign: "start" });
 export function TransactionList(props: {
     transactions: readonly Transaction[];
     categories: readonly Category[];
+    /** Which rows show: the rest stay mounted, hidden (and so left out of the list's items for
+     *  assistive technology), so a filter only toggles them. Every row, by default. */
+    shown?: (transaction: Transaction) => boolean;
+}): JSX.Element {
+    return (
+        <List.Root tokens={{ container: "transparent" }}>
+            {/* By reference: the query's data is a store that keeps a transaction's object when
+                it changes, so a row is made once and reads its fields as they're drawn. */}
+            <For each={props.transactions}>
+                {(transaction) => (
+                    <List.Item hidden={props.shown?.(transaction) === false}>
+                        <TransactionRow
+                            transaction={transaction}
+                            categories={props.categories}
+                        />
+                    </List.Item>
+                )}
+            </For>
+        </List.Root>
+    );
+}
+
+function TransactionRow(props: {
+    transaction: Transaction;
+    categories: readonly Category[];
 }): JSX.Element {
     const { editTransaction } = useBudgetActions();
-    // An item per transaction, made once while the transaction is in the list, so the list only
-    // adds and removes rows when the transactions change (a filter, a month's group). The
-    // query's data is a store that keeps a transaction's object when it changes, so the item
-    // reads its fields as they're drawn.
-    const items = mapArray(
-        () => props.transactions,
-        (transaction) => {
-            const category = createMemo(() =>
-                props.categories.find((c) => c.id === transaction.categoryId),
-            );
-            const amount = () => signedAmount(transaction, props.categories);
-            return {
-                value: transaction.id,
-                as: "button" as const,
-                get headline() {
-                    return transaction.description;
-                },
-                get supportingText() {
-                    return `${category()?.name ?? "Uncategorized"} · ${formatDay(transaction.date)}`;
-                },
-                leading: (
-                    <Avatar color={category()?.color ?? "secondary"}>
-                        <Glyph name={category()?.icon ?? "category"} />
-                    </Avatar>
-                ),
-                get trailingText() {
-                    return formatMoney(amount(), { sign: true });
-                },
-                get tokens() {
-                    return amount() > 0
-                        ? { trailingColor: "var(--colors-success)" }
-                        : undefined;
-                },
-                onClick: () => editTransaction(transaction),
-            };
-        },
+    const category = createMemo(() =>
+        props.categories.find((c) => c.id === props.transaction.categoryId),
+    );
+    const amount = createMemo(() =>
+        signedAmount(props.transaction, props.categories),
+    );
+    // Memos, since the list item reads its text more than once (whether it's there, the lines).
+    const supportingText = createMemo(
+        () =>
+            `${category()?.name ?? "Uncategorized"} · ${formatDay(props.transaction.date)}`,
+    );
+    const trailingText = createMemo(() =>
+        formatMoney(amount(), { sign: true }),
     );
     return (
-        <List
-            items={items()}
-            tokens={{ container: "transparent" }}
-            slotProps={{ root: { class: row } }}
+        <ListItem
+            as="button"
+            class={{ root: row }}
+            headline={props.transaction.description}
+            supportingText={supportingText()}
+            leading={
+                <Avatar color={category()?.color ?? "secondary"}>
+                    <Glyph name={category()?.icon ?? "category"} />
+                </Avatar>
+            }
+            trailingText={trailingText()}
+            tokens={
+                amount() > 0
+                    ? { trailingColor: "var(--colors-success)" }
+                    : undefined
+            }
+            onClick={() => editTransaction(props.transaction)}
         />
     );
 }

@@ -52,6 +52,15 @@ Amounts are integer cents and dates `YYYY-MM-DD`, formatted in UTC, so the serve
 render the same text. Amounts and counts are isolated from the text around them, so they read
 correctly right to left.
 
+**Filtering hides rows rather than removing them.** The transactions page renders every
+transaction, by month, once; a filter (search, kind, category) sets `hidden` on the rows it leaves
+out, and on a month with none left. A hidden `<li>` is out of the list for assistive technology
+too, so the list announces the shown rows' count. Mounting a row costs about half a millisecond
+(two at 4x CPU throttling), so bringing back every row used to take a long task of 100 ms or
+more; now a filter only toggles attributes. A list this size (six months, about 150 rows) doesn't
+need virtualizing, which would cost find-in-page, server rendering of every row, and the list's
+semantics.
+
 ## The settings panel
 
 The floating button (bottom of the inline end) opens a modal side sheet: Zag's dialog through
