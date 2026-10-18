@@ -222,7 +222,9 @@ import { Tooltip } from "@pureform/solid/tooltip";
   field, as wide as it) holding `Content`, drawn with the menu's registry entry
   (`selectMenuAnatomy`: test ids `pf-select-content`, `pf-select-item`, …; the highlighted option
   shows the hover state). A hidden native `<select>` with an option per item submits, resets, and
-  validates. `value` is one string or `null`; `open` is controllable too. Enter, Space, and the
+  validates. The combobox's own default (its `defaultValue`) follows the label it shows, so a form
+  reset doesn't blank it when the value stays (a controlled select whose owner ignores the reset).
+  `value` is one string or `null`; `open` is controllable too. Enter, Space, and the
   arrow keys up and down open the list; the sideways arrow keys choose the option before or after,
   by direction. Root takes `items` (`{ value, label, disabled? }`); the ready-made renders every
   part. One value only: no `multiple` yet.
