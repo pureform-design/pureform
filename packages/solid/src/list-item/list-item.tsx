@@ -5,7 +5,6 @@
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import {
-    isPresent,
     LIST_ITEM_CONTENT_PROPS,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
@@ -26,7 +25,6 @@ import {
     createContext,
     createMemo,
     omit,
-    Show,
     useContext,
 } from "solid-js";
 
@@ -35,7 +33,12 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import {
+    createSlotProps,
+    optionalPart,
+    useComponent,
+    whenPresent,
+} from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -82,8 +85,10 @@ function Root(props: ListItemRootProps): JSX.Element {
     const element = createMemo(() =>
         listItemElement<ValidComponent>({ href: props.href, as: props.as }),
     );
-    const interactive = () =>
-        isInteractiveListItem(listItemVariants(list?.(), props), element());
+    // A memo: the handlers, the classes, and the indication each read it.
+    const interactive = createMemo(() =>
+        isInteractiveListItem(listItemVariants(list?.(), props), element()),
+    );
     const source = useOwnInteractionSource(() => props.interactionSource);
     const handlers = useInteractionHandlers(
         source,
@@ -116,7 +121,11 @@ function Root(props: ListItemRootProps): JSX.Element {
     );
 }
 
-const iconPart = (part: "leading" | "trailing", name: string) =>
+const iconPart = (
+    part: "leading" | "trailing",
+    name: string,
+    optional = false,
+) =>
     function IconPart(props: ListItemIconProps): JSX.Element {
         const { scope } = context.use(name);
         return scope.render(part, {
@@ -125,6 +134,7 @@ const iconPart = (part: "leading" | "trailing", name: string) =>
             states: () => ({ mirrored: props.mirror }),
             unstyled: () => props.unstyled,
             props: omit(props, "unstyled", "mirror"),
+            optional,
         });
     };
 
@@ -162,6 +172,13 @@ const SupportingText = textPart("supportingText", "SupportingText", "span");
 const Trailing = iconPart("trailing", "Trailing");
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
+// The ready-made's parts for content that can come and go: the leading and trailing parts build
+// theirs once.
+const OptionalLeading = iconPart("leading", "Leading", true);
+const OptionalTrailing = iconPart("trailing", "Trailing", true);
+const OptionalOverline = whenPresent(Overline);
+const OptionalSupportingText = whenPresent(SupportingText);
+const OptionalTrailingText = whenPresent(TrailingText);
 
 /** The ready-made list item's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
  *  and its content. `lines` follows the content unless given. */
@@ -180,40 +197,64 @@ const READY_MADE_PROPS = [
 
 /** The ready-made list item: every part in the preset's structure that has content. */
 function ReadyMade(props: ListItemProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as ListItemRootProps;
+    const root = slots("root") as object;
+    const leading = slots("leading");
+    const content = slots("content");
+    const overline = slots("overline");
+    const headline = slots("headline");
+    const supportingText = slots("supportingText");
+    const trailing = slots("trailing");
+    const trailingText = slots("trailingText");
+    const LeadingPart = optionalPart(
+        props,
+        "leading",
+        Leading,
+        OptionalLeading,
+    );
+    const OverlinePart = optionalPart(
+        props,
+        "overline",
+        Overline,
+        OptionalOverline,
+    );
+    const SupportingTextPart = optionalPart(
+        props,
+        "supportingText",
+        SupportingText,
+        OptionalSupportingText,
+    );
+    const TrailingPart = optionalPart(
+        props,
+        "trailing",
+        Trailing,
+        OptionalTrailing,
+    );
+    const TrailingTextPart = optionalPart(
+        props,
+        "trailingText",
+        TrailingText,
+        OptionalTrailingText,
+    );
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as ListItemRootProps)}
-            lines={props.lines ?? listItemLines(props)}
-            {...slot("root")}
-        >
-            <Show when={isPresent(props.leading)}>
-                <Leading mirror={props.mirrorLeading} {...slot("leading")}>
-                    {props.leading}
-                </Leading>
-            </Show>
-            <Content {...slot("content")}>
-                <Show when={isPresent(props.overline)}>
-                    <Overline {...slot("overline")}>{props.overline}</Overline>
-                </Show>
-                <Headline {...slot("headline")}>{props.headline}</Headline>
-                <Show when={isPresent(props.supportingText)}>
-                    <SupportingText {...slot("supportingText")}>
-                        {props.supportingText}
-                    </SupportingText>
-                </Show>
+        <Root {...own} lines={props.lines ?? listItemLines(props)} {...root}>
+            <LeadingPart mirror={props.mirrorLeading} {...leading}>
+                {props.leading}
+            </LeadingPart>
+            <Content {...content}>
+                <OverlinePart {...overline}>{props.overline}</OverlinePart>
+                <Headline {...headline}>{props.headline}</Headline>
+                <SupportingTextPart {...supportingText}>
+                    {props.supportingText}
+                </SupportingTextPart>
             </Content>
-            <Show when={isPresent(props.trailing)}>
-                <Trailing mirror={props.mirrorTrailing} {...slot("trailing")}>
-                    {props.trailing}
-                </Trailing>
-            </Show>
-            <Show when={isPresent(props.trailingText)}>
-                <TrailingText {...slot("trailingText")}>
-                    {props.trailingText}
-                </TrailingText>
-            </Show>
+            <TrailingPart mirror={props.mirrorTrailing} {...trailing}>
+                {props.trailing}
+            </TrailingPart>
+            <TrailingTextPart {...trailingText}>
+                {props.trailingText}
+            </TrailingTextPart>
         </Root>
     );
 }
