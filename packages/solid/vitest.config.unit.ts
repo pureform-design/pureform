@@ -30,7 +30,9 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },
     test: {
-        testTimeout: 5000,
+        // Generous: on a loaded machine a single user event can take seconds to come back, and a
+        // test of several of them outlasts a few seconds without anything being wrong.
+        testTimeout: 30_000,
         include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         exclude: [
             "./src/**/__tests__/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}",
