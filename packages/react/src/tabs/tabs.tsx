@@ -1,7 +1,7 @@
 // The tabs: Root on Zag's tabs machine, an unstyled element around the tab list and the panels; the
-// tab list and its tabs (each a button with an icon, a label, and the active indicator), as the
-// preset draws them; a panel per tab; and the ready-made Tabs over them. When the selected tab
-// changes, its indicator slides in from the one selected before.
+// tab list and its tabs (each a button around its content: an icon, a label, and the active
+// indicator), as the preset draws them; a panel per tab; and the ready-made Tabs over them. When
+// the selected tab changes, its indicator slides in from the one selected before.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
 import {
@@ -87,6 +87,8 @@ export interface TabsIconProps extends TabsPartProps {
 export interface TabsTabProps extends TabsPartProps, InteractionSourceProps {
     readonly value: string;
     readonly disabled?: boolean | undefined;
+    /** The props of the tab's content, the element the tab wraps its children in. */
+    readonly tabContentProps?: TabsPartProps | undefined;
     /** Whether the tab names its panel (`Tabs.Content` with its value) in `aria-controls`. Turn
      *  it off for tabs that switch something else. @default true */
     readonly controls?: boolean | undefined;
@@ -169,14 +171,22 @@ function List({ unstyled, ...props }: TabsPartProps): ReactNode {
     });
 }
 
+/** A tab's content, around its icon, label, and indicator: a primary tab's indicator spans it. */
+function TabContent({ unstyled, ...props }: TabsPartProps): ReactNode {
+    const { scope } = context.use("Tab");
+    return scope.render("tabContent", { element: "span", unstyled, props });
+}
+
 /** A tab: a button, selected with a click or the arrow keys. Only the selected tab takes focus
- *  from Tab. */
+ *  from Tab. Its children go in its content, which it renders. */
 function Tab({
     unstyled,
     value,
     disabled,
     controls = true,
     interactionSource,
+    tabContentProps,
+    children,
     ...props
 }: TabsTabProps): ReactNode {
     const { scope, api, disabled: tabsDisabled, sources } = context.use("Tab");
@@ -191,7 +201,12 @@ function Tab({
                     controls,
                 }),
                 unstyled,
-                props,
+                props: {
+                    ...props,
+                    children: (
+                        <TabContent {...tabContentProps}>{children}</TabContent>
+                    ),
+                },
             })}
         </tabContext.Provider>
     );
@@ -298,6 +313,7 @@ function ReadyMade(props: TabsProps): ReactNode {
                         disabled={item.disabled}
                         interactionSource={item.interactionSource}
                         controls={panels}
+                        tabContentProps={slot("tabContent")}
                         {...slot("tab")}
                     >
                         {isPresent(item.icon) ? (
@@ -327,8 +343,8 @@ function ReadyMade(props: TabsProps): ReactNode {
 
 /** Material's tabs. Use them ready-made, `<Tabs aria-label="Trips" items={[{ value: "flights",
  *  label: "Flights", content: … }, …]} />`, or compose their parts under `Tabs.Root`: `List`
- *  holding a `Tab` per tab, each with `Icon`, `Label`, and `Indicator`, then a `Content` per
- *  panel. */
+ *  holding a `Tab` per tab, each with `Icon`, `Label`, and `Indicator` (which the tab wraps in its
+ *  content), then a `Content` per panel. */
 export const Tabs = Object.assign(ReadyMade, {
     Root,
     List,
