@@ -33,6 +33,8 @@ export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), {
         ],
     },
     test: {
+        // Compiles the page before the test opens it.
+        globalSetup: ["@pureform/vitest-config/browser-warmup"],
         browser: {
             enabled: true,
             headless: true,

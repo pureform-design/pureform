@@ -20,6 +20,8 @@ export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), {
         include: ["react", "react-dom", "react-dom/client", "react-native-web"],
     },
     test: {
+        // Compiles the page before the test opens it.
+        globalSetup: ["@pureform/vitest-config/browser-warmup"],
         testTimeout: 60_000,
         browser: {
             enabled: true,
