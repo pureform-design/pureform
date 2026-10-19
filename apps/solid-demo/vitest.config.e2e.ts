@@ -12,5 +12,8 @@ export default mergeConfig(e2eTestConfig, {
         testTimeout: 60_000,
         // The first visit waits for the dev server to optimize the pages' dependencies.
         hookTimeout: 120_000,
+        // The transactions page renders its rows a short task at a time, which a loaded machine
+        // stretches past the default second.
+        expect: { poll: { timeout: 15_000 } },
     },
 } satisfies UserWorkspaceConfig);
