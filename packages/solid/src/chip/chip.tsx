@@ -7,7 +7,6 @@ import {
     buttonMachineProps,
     CHIP_ROOT_PROPS,
     chipSelection,
-    isPresent,
 } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
@@ -15,11 +14,11 @@ import type {
 } from "@pureform/binding-core";
 import type * as button from "@pureform/machines/button";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, createMemo, omit, Show } from "solid-js";
+import { type Accessor, omit } from "solid-js";
 
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, optionalPart, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import type { PartProps } from "../props";
@@ -92,6 +91,14 @@ function TouchTarget(props: ChipPartProps): JSX.Element {
 /** The leading icon's box, hidden from assistive technology. Render it only when there's an
  *  icon. */
 function Icon(props: ChipIconProps): JSX.Element {
+    return renderIcon(props, false);
+}
+
+// The ready-made's icon, only while it has one, which it builds once.
+const OptionalIcon = (props: ChipIconProps): JSX.Element =>
+    renderIcon(props, true);
+
+function renderIcon(props: ChipIconProps, optional: boolean): JSX.Element {
     const { scope, api } = context.use("Icon");
     return scope.render("icon", {
         element: "span",
@@ -99,6 +106,7 @@ function Icon(props: ChipIconProps): JSX.Element {
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "mirror"),
+        optional,
     });
 }
 
@@ -130,23 +138,22 @@ const READY_MADE_PROPS = [
 
 /** The ready-made chip: Root, its touch target, the icon when given, and the label. */
 function ReadyMade(props: ChipProps): JSX.Element {
-    const hasIcon = createMemo(() => isPresent(props.icon));
+    // The icon part builds the icon once, inside its own context, so `useIconStyle()` works in it.
+    const IconPart = optionalPart(props, "icon", Icon, OptionalIcon);
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as ChipRootProps;
+    // The root's slot props are an element's, whose `id` also takes `false`.
+    const root = slots("root") as object;
+    const touchTarget = slots("touchTarget");
+    const icon = slots("icon");
+    const label = slots("label");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as ChipRootProps)}
-            // The root's slot props are an element's, whose `id` also takes `false`.
-            {...(slotPartProps(props, "root") as object)}
-        >
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
-            <Show when={hasIcon()}>
-                <Icon
-                    mirror={props.mirrorIcon}
-                    {...slotPartProps(props, "icon")}
-                >
-                    {props.icon}
-                </Icon>
-            </Show>
-            <Label {...slotPartProps(props, "label")}>{props.label}</Label>
+        <Root {...own} {...root}>
+            <TouchTarget {...touchTarget} />
+            <IconPart mirror={props.mirrorIcon} {...icon}>
+                {props.icon}
+            </IconPart>
+            <Label {...label}>{props.label}</Label>
         </Root>
     );
 }
