@@ -1,8 +1,8 @@
 // The tabs' contract, shared by every binding: the props Root takes for itself, how they map onto
 // the selection and Zag's tabs machine, the tabs the ready-made component takes as data, and the
 // adjustments to Zag's tab props. The bindings render Root (an unstyled element around the tab list
-// and the panels), the tab list (the preset's `root` slot), each tab with its icon, label, and
-// indicator, and a panel per tab.
+// and the panels), the tab list (the preset's `root` slot), each tab with its content (its icon,
+// label, and indicator), and a panel per tab.
 
 import type {
     PartName,
@@ -17,15 +17,18 @@ import { isPresent } from "./content";
 import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { VariantProp } from "./variants";
 
-/** The tabs' parts: `"root" | "list"` (the tab list) `| "tab" | "icon" | "label" | "indicator" |
- *  "content"` (a panel). */
+/** The tabs' parts: `"root" | "list"` (the tab list) `| "tab" | "tabContent"` (around a tab's
+ *  icon, label, and indicator) `| "icon" | "label" | "indicator" | "content"` (a panel). */
 export type TabsPart = PartName<typeof tabsCompositeAnatomy>;
 
 /** The tabs' variant groups and instance tokens. `icon` says the tabs have icons, which primary
- *  tabs stack over their labels. */
+ *  tabs stack over their labels unless `inlineIcon` sets them beside. */
 export interface TabsVariantProps {
     readonly variant?: VariantProp<"tabs", "variant">;
     readonly icon?: boolean | undefined;
+    /** Set a primary tab's icon beside its label rather than over it, in a 48px tab. Secondary
+     *  tabs always do. @default false */
+    readonly inlineIcon?: boolean | undefined;
     readonly color?: VariantProp<"tabs", "color">;
     readonly tokens?: InstanceTokens<"tabs"> | undefined;
 }
@@ -70,6 +73,7 @@ export interface TabsRootOwnProps
 export const TABS_ROOT_PROPS = [
     "variant",
     "icon",
+    "inlineIcon",
     "color",
     "tokens",
     "activationMode",
@@ -119,6 +123,7 @@ export const TABS_CONTENT_PROPS = [
 export const tabsSelection = (props: TabsVariantProps): Selection<"tabs"> => ({
     variant: props.variant,
     icon: props.icon,
+    inlineIcon: props.inlineIcon,
     color: props.color,
     tokens: props.tokens,
 });
