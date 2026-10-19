@@ -225,6 +225,9 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   `value` moves from 40 to 50 with a click in the middle of its range input (`read` checks the
   root's `value` token against the input), Home and End go to 0 and 100, and the arrows step by
   direction (the browser's own). The search bar is a text input (`""` to `"a"`, `required`). The
-  card renders `as: "button"`. The progress indicators, avatar, media, separator, scrim,
+  card renders `as: "button"` (Root's indication entry); a second card case, `cardActionArea`, lays
+  it out in sections with actions beside its action, so the action area acts (Enter and Space
+  click it) and the container shows its indication (the action area's entry, whose layer sits in
+  the action area: the indication suite looks for a layer in the part an entry names). The progress indicators, avatar, media, separator, scrim,
   supporting text, text, icon, touch target, and ripple have no state or keyboard case; pictures
   are an inline SVG data URL, so nothing loads.
