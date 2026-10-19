@@ -372,6 +372,12 @@ attributes. Other props (`className`, `style`, `data-*`, `ref`) go on that eleme
 providers inherit what they leave out. Its state is memoized on the options' identity, so keep `defaults`, `slotProps`,
 `overrides`, and a runtime `theme` stable (module constants or `useMemo`).
 
+It provides two contexts: the whole state, which `usePureform()` reads, and the part components
+read (the registry, `dir`, `motion`, `defaults`, `slotProps`, and the indication), which
+`useDirection`, `useMotion`, `useRegistry`, `useClasses`, and `useComponent` read. The theme,
+`overrides`, and `hydrate` reach components as CSS only, so changing them renders the provider and
+what calls `usePureform()`, not the components under it (200 buttons: 9 ms to 0.3 ms per switch).
+
 **Themes at run time.** `overrides` (token paths, as React Native takes them) become CSS vars in
 the element's `style`, named by the registry's `vars`, on the server too. A runtime theme (a
 `RuntimeTheme` such as `seedTheme` from `@pureform/material/runtime-theme`) puts the theme
