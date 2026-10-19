@@ -130,6 +130,11 @@ const partsOf = (
     );
     if (!trigger) throw new Error(`no ${entry.trigger} in ${anatomy.scope}`);
     const surface = near(trigger, byPart(anatomy, entry.surface));
+    // The layer sits in the surface, or in the part the entry names to hold it (a card's action
+    // area, whose layer spans the card).
+    const holder = entry.layer
+        ? near(trigger, byPart(anatomy, entry.layer))
+        : surface;
     return {
         trigger,
         surface,
@@ -139,7 +144,7 @@ const partsOf = (
                 : trigger,
         focus: near(trigger, byPart(anatomy, entry.focus)),
         layer: () =>
-            surface.querySelector<HTMLElement>(":scope > [data-ripple-layer]"),
+            holder.querySelector<HTMLElement>(":scope > [data-ripple-layer]"),
     };
 };
 
@@ -590,9 +595,10 @@ describe.each(INDICATED)("$component", (component) => {
         });
         expect(logged).toEqual([]);
         expect(changes).toEqual([]);
-        // The layer rendered on the server, where the surface shows closed.
+        // The layer rendered on the server, where the surface shows closed: in the surface, or
+        // in the part the entry names to hold it.
         const surface = host.querySelector(
-            byPart(indication.anatomy, entry.surface),
+            byPart(indication.anatomy, entry.layer ?? entry.surface),
         );
         if (!indication.props && !indication.open) {
             expect(surface).not.toBeNull();
