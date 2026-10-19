@@ -57,9 +57,19 @@ transaction, by month, once; a filter (search, kind, category) sets `hidden` on 
 out, and on a month with none left. A hidden `<li>` is out of the list for assistive technology
 too, so the list announces the shown rows' count. Mounting a row costs about half a millisecond
 (two at 4x CPU throttling), so bringing back every row used to take a long task of 100 ms or
-more; now a filter only toggles attributes. A list this size (six months, about 150 rows) doesn't
-need virtualizing, which would cost find-in-page, server rendering of every row, and the list's
-semantics.
+more; now a filter only toggles attributes.
+
+**The rows render a screenful at a time.** Mounting all of them with the page made opening the
+tab one long task (110 ms in a production build, 450 at 4x CPU throttling, more in development),
+so the page renders the first 16 rows the filters show with it, on the server too, and the rest
+after it paints, in short tasks sized to take about 8 ms each (`createProgress` in
+`src/lib/progressive.ts`). A row stays once rendered, so the filters keep hiding rather than
+remounting. While rows are still to come the months' list is `aria-busy`, and a shown row in a
+month still filling in carries `aria-setsize` and `aria-posinset`, so it's counted among the
+month's shown rows. Find-in-page reaches every row once they're all there (about a quarter of a
+second after the page, a second at 4x); the server's HTML holds only the first screenful. A list
+this size (six months, about 150 rows) doesn't need virtualizing, which would cost find-in-page
+and the list's semantics for good.
 
 ## The settings panel
 
@@ -180,6 +190,8 @@ through Playwright, checks that
   app;
 - the budget app opens from it in its own layout (title, balance, navigation, FAB), and its pages
   navigate on the client;
+- the transactions page's server HTML holds its first rows, every row follows once the list is no
+  longer busy, and a kind chip hides rows rather than removing them;
 - the floating button opens the panel; the dark scheme and no indication take effect, survive a
   reload (the server renders them), reset, and the app selector goes back to the launcher.
 
