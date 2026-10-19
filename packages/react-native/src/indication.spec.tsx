@@ -596,6 +596,13 @@ describe("a shared source", () => {
     });
 
     it("reaches every subscriber with an app's own kind, and leaves the state alone", async () => {
+        // The pointer away from where the button renders: an earlier test's click leaves it
+        // there, and the button showing under it would hear it hover.
+        const corner = document.body.appendChild(document.createElement("div"));
+        corner.style.cssText =
+            "position: fixed; right: 0; bottom: 0; width: 4px; height: 4px";
+        await userEvent.hover(corner);
+        corner.remove();
         const source = createInteractionSource();
         const heard: unknown[] = [];
         source.subscribe((interaction) => heard.push(interaction));
