@@ -1,6 +1,6 @@
 // The web half: the system's reduced-motion preference, an icon slot's measured style, a native
 // checkbox kept in step with its machine, an overlay's positioner stacked at its surface's layer,
-// and runtime themes and overrides as CSS. Only call the
+// an active indicator sliding between tabs, and runtime themes and overrides as CSS. Only call the
 // DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
 // lowering for React Native.
 
@@ -178,6 +178,8 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
     stacked.set(positioner, positioner.style.zIndex);
 };
 
+export { slideIndicator, slideTransform, transformTiming } from "./slide";
+export type { SlideTiming } from "./slide";
 export {
     THEME_BLOCK_ATTRIBUTE,
     THEME_PRECEDENCE,
