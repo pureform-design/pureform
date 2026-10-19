@@ -63,6 +63,8 @@ describe("Snackbar, ready-made", () => {
         withRegistry(
             <Snackbar
                 open
+                // No countdown: a loaded machine's click can land after the default 5 seconds.
+                duration={null}
                 supportingText="Message archived"
                 action="Undo"
                 onAction={onAction}
