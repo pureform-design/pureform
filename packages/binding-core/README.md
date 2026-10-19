@@ -352,6 +352,10 @@ setRadioDefaults(group, value);                // each radio's default, written 
 syncTextInput(input, value);                   // a text input or text area back to its value
 stackPositioner(positioner, surface): () => void; // the surface's z-index as the positioner's (the
                                                // dialog's), in the next frame; returns its cancel
+slideIndicator(from, to): Animation | undefined; // the tabs' new indicator, in from the old one's
+                                               // box (a Web Animation of transform, FLIP), timed
+                                               // by its transform transition (design doc §9.10)
+transformTiming(style); slideTransform(fromRect, toRect); // its timing and starting transform
 
 // Runtime themes and overrides
 themeCss(selector, { light, dark }): string;   // light vars, then dark ones under the scheme conditions

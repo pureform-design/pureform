@@ -544,6 +544,10 @@ pill with a group's container, and an icon font draws its icon filled.
 
 Mark the current tab with `aria-selected="true"`. `variant` is `primary` or `secondary`; turn
 on `icon` when the tabs have icons. `color` sets the indicator and a primary tab's active label.
+The indicator declares a `transform` transition over `indicatorDuration` (`medium1`) and
+`indicatorEasing` (`emphasized`), none under reduced motion; the bindings slide the new tab's
+indicator in from the old one's box over it (design doc §9.10). It draws over every tab
+(`z-index: 1`) inside the tab list, which is its own stacking context.
 
 ```html
 <div class="{root}" role="tablist">
