@@ -1,8 +1,9 @@
 import { testIds } from "@pureform/anatomy";
-import { describe, expect, it } from "vitest";
+import { createSignal, flush } from "solid-js";
+import { describe, expect, it, vi } from "vitest";
 
 import { Card } from ".";
-import { PureformProvider } from "..";
+import { createInteractionSource, PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
 
@@ -60,5 +61,40 @@ describe("Card", () => {
         const root = byTestId(ids.root);
         expect(root.tagName).toBe("A");
         expect(root.getAttribute("href")).toBe("#plan");
+    });
+
+    it("ends a press when it becomes disabled, emitting to the source it has then", async () => {
+        const warn = vi.spyOn(console, "warn");
+        try {
+            const source = createInteractionSource();
+            const [disabled, setDisabled] = createSignal(false, {
+                ownedWrite: true,
+            });
+            withRegistry(() => (
+                <Card
+                    as="button"
+                    interactionSource={source}
+                    disabled={disabled()}
+                >
+                    Plan
+                </Card>
+            ));
+            await settle();
+            byTestId(ids.root).dispatchEvent(
+                new PointerEvent("pointerdown", {
+                    bubbles: true,
+                    button: 0,
+                    pointerType: "mouse",
+                }),
+            );
+            await settle();
+            expect(source.state.pressed).toBe(true);
+            setDisabled(true);
+            flush();
+            expect(source.state.pressed).toBe(false);
+            expect(warn).not.toHaveBeenCalled();
+        } finally {
+            warn.mockRestore();
+        }
     });
 });

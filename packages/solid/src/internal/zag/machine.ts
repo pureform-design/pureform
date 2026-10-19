@@ -146,8 +146,13 @@ export function useMachine<T extends MachineSchema>(
             Object.getOwnPropertyDescriptors(state),
         ) as Params<T>["state"];
 
+    // A machine's refs hold what it reads imperatively, when an event fires (pureform's interaction
+    // emitters read their source then), which may be during Solid's own updates: the props they
+    // read are the current ones, not dependencies.
+    const untrackedProp: any = (key: string) => untrack(() => prop(key));
     const refs = createRefs(
-        untrack(() => machine.refs?.({ prop, context: ctx })) ?? {},
+        untrack(() => machine.refs?.({ prop: untrackedProp, context: ctx })) ??
+            {},
     );
 
     const getParams = (): Params<T> => ({

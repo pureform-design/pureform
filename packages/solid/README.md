@@ -593,7 +593,10 @@ design doc's §8. Beyond Zag's adapter, `normalizeProps` writes ARIA booleans as
 `"false"` (Solid 2 writes `true` as an empty attribute), and a machine's watches run untracked,
 since they read props and context on purpose (otherwise Solid's development diagnostics warn
 `STRICT_READ_UNTRACKED` on every watched change). A machine's context and refs are set up
-untracked too: Zag's select reads its props there once (the items of its initial value). And a
+untracked too: Zag's select reads its props there once (the items of its initial value). The props
+a machine's refs read later are untracked as well: refs hold what it reads when an event fires
+(the interaction emitters read their source then), which can be during Solid's own updates, as a
+focused element removed from the page blurs inside the effect that removes it. And a
 machine checks its watches right after its own writes (a sent event, a context write, its start),
 in the same batch, with each bindable reading its last write rather than the value Solid shows
 before the next flush (`readingLatest` in `bindable.ts`). So what a watch derives (the select's
