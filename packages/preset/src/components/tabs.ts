@@ -1,16 +1,22 @@
 // The pureform tabs: Material's primary and secondary tabs.
 //
-// Markup: a tab list holding the tabs, each with an optional icon, its label, and the active
-// indicator. Mark the current tab with `aria-selected="true"`. Turn on `icon` when the tabs
-// have icons; primary tabs then stack the icon over the label.
+// Markup: a tab list holding the tabs, each wrapping its content (an optional icon, its label,
+// and the active indicator), as Material's tabs do. Mark the current tab with
+// `aria-selected="true"`. Turn on `icon` when the tabs have icons; primary tabs then stack the
+// icon over the label, unless `inlineIcon` sets it beside.
 //
 //   <div class={root} role="tablist">
 //     <button class={tab} role="tab" aria-selected="true">
-//       <span class={icon}>★</span>
-//       <span class={label}>Flights</span>
-//       <span class={indicator} />
+//       <span class={tabContent}>
+//         <span class={icon}>★</span>
+//         <span class={label}>Flights</span>
+//         <span class={indicator} />
+//       </span>
 //     </button>
 //   </div>
+//
+// A primary tab's indicator spans its content (at least 24px, centered under it); a secondary
+// tab's content spans the tab and pads itself, so its indicator spans the whole tab.
 //
 // The indicator slides from the tab selected before to the new one: the bindings start a
 // transform from the old indicator's box (FLIP), timed by the `transform` transition the
@@ -19,6 +25,7 @@
 import { typed } from "@pureform/core";
 import {
     absolute,
+    center,
     column,
     flex,
     px,
@@ -26,6 +33,7 @@ import {
     row,
     shadow,
     slot,
+    stretch,
     tween,
     unitless,
     when,
@@ -72,6 +80,8 @@ const { tokens, ref } = componentTokens("tabs", {
     iconFill: unitless(0),
     indicatorHeight: px(3),
     secondaryIndicatorHeight: px(2),
+    // A primary indicator is as wide as the tab's content, and never narrower than this.
+    indicatorMinWidth: px(24),
     // How the indicator slides to a newly selected tab, as Material's web tabs time it.
     indicatorDuration: duration("medium1"),
     indicatorEasing: easing("emphasized"),
@@ -110,13 +120,14 @@ export const createTabs = <const G extends string = ColorGroup>(
             name: "tabs",
             $meta: {
                 description:
-                    "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons.",
+                    "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons, and inlineIcon to set a primary tab's icon beside its label.",
             },
             tokens,
-            slots: ["root", "tab", "icon", "label", "indicator"],
+            slots: ["root", "tab", "tabContent", "icon", "label", "indicator"],
             structure: {
                 root: ["tab"],
-                tab: ["icon", "label", "indicator"],
+                tab: ["tabContent"],
+                tabContent: ["icon", "label", "indicator"],
             },
             indication: [
                 {
@@ -129,6 +140,7 @@ export const createTabs = <const G extends string = ColorGroup>(
             variants: {
                 variant: ["primary", "secondary"],
                 icon: ["true", "false"],
+                inlineIcon: ["true", "false"],
                 color: groups as ColorGroups,
             },
             recipe: () => ({
@@ -150,6 +162,8 @@ export const createTabs = <const G extends string = ColorGroup>(
                             ...pressable.states,
                             ...tabColors(ref("activeColor")).states,
                         },
+                        // The content fills the tab's height, so the indicator sits on its edge.
+                        alignItems: stretch,
                         flexBasis: px(0),
                         flexGrow: unitless(1),
                         minWidth: px(0),
@@ -164,9 +178,19 @@ export const createTabs = <const G extends string = ColorGroup>(
                             color: ref("dividerColor"),
                             inset: true,
                         }),
-                        paddingInlineStart: ref("paddingInline"),
-                        paddingInlineEnd: ref("paddingInline"),
+                    },
+                    // The icon and label, centered in the tab and kept clear of its edges; the
+                    // indicator spans it.
+                    tabContent: {
+                        position: relative,
+                        display: flex,
+                        flexDirection: row,
+                        alignItems: center,
+                        justifyContent: center,
                         gap: spacing("2"),
+                        minWidth: ref("indicatorMinWidth"),
+                        marginInlineStart: ref("paddingInline"),
+                        marginInlineEnd: ref("paddingInline"),
                     },
                     icon: iconBox(ref("iconSize"), {
                         fill: iconFill(ref("iconFill")),
@@ -175,8 +199,8 @@ export const createTabs = <const G extends string = ColorGroup>(
                     indicator: {
                         position: absolute,
                         bottom: px(0),
-                        insetInlineStart: ref("paddingInline"),
-                        insetInlineEnd: ref("paddingInline"),
+                        insetInlineStart: px(0),
+                        insetInlineEnd: px(0),
                         height: ref("indicatorHeight"),
                         borderStartStartRadius: radius("extraSmall"),
                         borderStartEndRadius: radius("extraSmall"),
@@ -198,14 +222,20 @@ export const createTabs = <const G extends string = ColorGroup>(
                 variants: {
                     variant: {
                         primary: {},
-                        // A secondary tab's indicator spans the tab, square, and its label stays neutral.
+                        // A secondary tab's content spans the tab, padded rather than inset, so its
+                        // indicator spans the tab, square; its label stays neutral.
                         secondary: {
                             tab: {
                                 ...tabColors(ref("secondaryActiveColor")),
                             },
+                            tabContent: {
+                                flexGrow: unitless(1),
+                                marginInlineStart: px(0),
+                                marginInlineEnd: px(0),
+                                paddingInlineStart: ref("paddingInline"),
+                                paddingInlineEnd: ref("paddingInline"),
+                            },
                             indicator: {
-                                insetInlineStart: px(0),
-                                insetInlineEnd: px(0),
                                 height: ref("secondaryIndicatorHeight"),
                                 borderStartStartRadius: px(0),
                                 borderStartEndRadius: px(0),
@@ -213,6 +243,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                         },
                     },
                     icon: { true: {}, false: {} },
+                    inlineIcon: { true: {}, false: {} },
                     // A group points the active and indicator colors at its main color.
                     // Secondary tabs read their own active color, so they keep it.
                     color: colorVariant(groups, (g) => ({
@@ -224,23 +255,25 @@ export const createTabs = <const G extends string = ColorGroup>(
                         },
                     })),
                 },
-                // Primary tabs stack the icon over the label and grow taller; secondary tabs keep the
-                // icon beside it.
+                // Primary tabs stack the icon over the label and grow taller, unless the icon is
+                // inline; secondary tabs keep the icon beside it.
                 compoundVariants: [
                     {
-                        match: { variant: "primary", icon: "true" },
+                        match: {
+                            variant: "primary",
+                            icon: "true",
+                            inlineIcon: "false",
+                        },
                         style: {
-                            tab: {
-                                flexDirection: column,
-                                gap: px(2),
-                                height: ref("heightWithIcon"),
-                            },
+                            tab: { height: ref("heightWithIcon") },
+                            tabContent: { flexDirection: column, gap: px(2) },
                         },
                     },
                 ],
                 defaultVariants: {
                     variant: "primary",
                     icon: "false",
+                    inlineIcon: "false",
                     color: DEFAULT_GROUP,
                 },
             }),

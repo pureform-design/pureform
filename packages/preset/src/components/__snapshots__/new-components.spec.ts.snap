@@ -2364,8 +2364,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "borderStartStartRadius": "token(radii.extraSmall)",
       "bottom": "0px",
       "height": "var(--components-tabs-indicatorHeight, 3px)",
-      "insetInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
-      "insetInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
+      "insetInlineEnd": "0px",
+      "insetInlineStart": "0px",
       "opacity": {
         ".tabs__tab:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "1",
         "base": "0",
@@ -2408,7 +2408,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
         },
         "color": "var(--components-tabs-activeColor, token(colors.primary))",
       },
-      "alignItems": "center",
+      "alignItems": "stretch",
       "backgroundColor": {
         "&:focus-visible": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) var(--components-tabs-stateFocusOpacity, token(opacity.stateFocus)))",
         "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-tabs-container, token(colors.surface)), var(--components-tabs-content, token(colors.onSurfaceVariant)) var(--components-tabs-statePressedOpacity, token(opacity.statePressed)))",
@@ -2424,7 +2424,6 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "flexBasis": "0px",
       "flexDirection": "row",
       "flexGrow": "1",
-      "gap": "token(spacing.2)",
       "height": "var(--components-tabs-height, 48px)",
       "justifyContent": "center",
       "minWidth": "0px",
@@ -2435,10 +2434,19 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
         "base": "none",
       },
       "outlineWidth": "var(--components-tabs-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
-      "paddingInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
-      "paddingInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "tabContent": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "token(spacing.2)",
+      "justifyContent": "center",
+      "marginInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
+      "marginInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
+      "minWidth": "var(--components-tabs-indicatorMinWidth, 24px)",
+      "position": "relative",
     },
   },
   "className": "tabs",
@@ -2446,18 +2454,22 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     {
       "css": {
         "tab": {
+          "height": "var(--components-tabs-heightWithIcon, 64px)",
+        },
+        "tabContent": {
           "flexDirection": "column",
           "gap": "2px",
-          "height": "var(--components-tabs-heightWithIcon, 64px)",
         },
       },
       "icon": true,
+      "inlineIcon": false,
       "variant": "primary",
     },
   ],
   "defaultVariants": {
     "color": "primary",
     "icon": false,
+    "inlineIcon": false,
     "variant": "primary",
   },
   "jsx": [
@@ -2466,6 +2478,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
   "slots": [
     "root",
     "tab",
+    "tabContent",
     "icon",
     "label",
     "indicator",
@@ -2514,6 +2527,10 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {},
     },
+    "inlineIcon": {
+      "false": {},
+      "true": {},
+    },
     "variant": {
       "primary": {},
       "secondary": {
@@ -2521,8 +2538,6 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
           "borderStartEndRadius": "0px",
           "borderStartStartRadius": "0px",
           "height": "var(--components-tabs-secondaryIndicatorHeight, 2px)",
-          "insetInlineEnd": "0px",
-          "insetInlineStart": "0px",
         },
         "tab": {
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
@@ -2543,6 +2558,13 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-tabs-container, token(colors.surface))",
           },
           "color": "var(--components-tabs-content, token(colors.onSurfaceVariant))",
+        },
+        "tabContent": {
+          "flexGrow": "1",
+          "marginInlineEnd": "0px",
+          "marginInlineStart": "0px",
+          "paddingInlineEnd": "var(--components-tabs-paddingInline, token(spacing.4))",
+          "paddingInlineStart": "var(--components-tabs-paddingInline, token(spacing.4))",
         },
       },
     },
