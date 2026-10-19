@@ -58,6 +58,10 @@ export interface IndicationDeclaration<S extends string = string> {
     centered: boolean;
     /** The slot that draws the focus indicator. */
     focus: S;
+    /** The slot that holds the ripple's layer element, when it isn't the surface: an
+     *  unpositioned trigger inside the surface, whose layer then spans the surface (a card's
+     *  action area, which ripples over the whole card). */
+    layer?: S;
 }
 
 interface BaseComponentSpec {
