@@ -1,9 +1,11 @@
+import { testIds } from "@pureform/anatomy";
 import {
     createRegistry,
     defineRuntimeTheme,
     themeScope,
 } from "@pureform/styling";
 import type { ThemeGenerator } from "@pureform/styling";
+import type { JSX } from "@solidjs/web";
 import { createMemo, createSignal, Errored, flush, Loading } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 
@@ -17,7 +19,9 @@ import {
     usePureform,
     useThemeVars,
 } from ".";
+import type { PureformProviderProps } from ".";
 import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
+import { Button } from "./button";
 import { byTestId, mount, settle } from "./testing/mount";
 
 const neverLoads = () => new Promise<never>(() => {});
@@ -303,6 +307,156 @@ describe("PureformProvider", () => {
             ).toEqual([]);
             warn.mockRestore();
         });
+    });
+});
+
+describe("PureformProvider runs", () => {
+    type Options = Omit<PureformProviderProps, "registry" | "children">;
+    const seedTheme = defineRuntimeTheme<{ seed: string }>(
+        "seed-runs",
+        () => (input) => ({
+            light: { "--colors-primary": input.seed },
+            dark: { "--colors-primary": "black" },
+        }),
+    );
+    const OUTER: Options = {
+        defaults: { button: { size: "large" } },
+        slotProps: { button: { label: { class: "outer" } } },
+    };
+    const INNER: Options = {
+        defaults: { button: { variant: "text" } },
+        slotProps: { button: { label: { class: "inner" } } },
+    };
+
+    // Two providers whose options each come from one signal, so every option is read again when
+    // any changes, around buttons whose class factory counts its calls, a probe reading the slot
+    // props, and a `usePureform()` probe.
+    const setup = (outer: Options, inner: Options) => {
+        const runs = { classes: 0, slotProps: 0 };
+        const counted: typeof button = (selection) => {
+            runs.classes++;
+            return button(selection);
+        };
+        const registry = createRegistry(
+            { button: counted },
+            { themeAttribute: "data-theme", vars: { prefix: "pf" } },
+        );
+        const [outerOptions, setOuter] = createSignal(outer);
+        const [innerOptions, setInner] = createSignal(inner);
+        const seen: [unknown, unknown][] = [];
+        function Probe() {
+            const state = usePureform();
+            createMemo(() => {
+                runs.slotProps++;
+                return state().slotProps;
+            });
+            createMemo(() => {
+                seen.push([state().theme, state().overrides]);
+            });
+            return null;
+        }
+        const provider = (
+            options: () => Options,
+            children: () => JSX.Element,
+        ) => (
+            <PureformProvider
+                defaults={options().defaults}
+                slotProps={options().slotProps}
+                theme={options().theme}
+                overrides={options().overrides}
+                hydrate={options().hydrate}
+            >
+                {children()}
+            </PureformProvider>
+        );
+        mount(() => (
+            <PureformProvider registry={registry}>
+                {provider(outerOptions, () =>
+                    provider(innerOptions, () => (
+                        <>
+                            <Button label="Save" />
+                            <Button label="Send" />
+                            <Probe />
+                        </>
+                    )),
+                )}
+            </PureformProvider>
+        ));
+        const change = async (
+            set: (options: Options) => void,
+            base: Options,
+            options: Options,
+        ) => {
+            set({ ...base, ...options });
+            await settle();
+        };
+        return {
+            runs,
+            seen,
+            outer: (options: Options) => change(setOuter, outer, options),
+            inner: (options: Options) => change(setInner, inner, options),
+        };
+    };
+
+    it("doesn't run components again for a theme, seed theme, overrides, or hydrate change, with defaults and slot props merged over a parent's", async () => {
+        const { runs, seen, outer, inner } = setup(OUTER, INNER);
+        await settle();
+        const mounted = { ...runs };
+        expect(mounted.classes).toBeGreaterThan(0);
+        const overrides = { "colors.primary": "red" };
+        for (const change of [inner, outer]) {
+            await change({ theme: "teal" });
+            await change({ theme: seedTheme({ seed: "rgb(1, 2, 3)" }) });
+            await settle();
+            await change({ theme: seedTheme({ seed: "rgb(4, 5, 6)" }) });
+            await settle();
+            await change({ overrides });
+            await change({ overrides, hydrate: "regenerate" });
+        }
+        expect(runs).toEqual(mounted);
+        // `usePureform()` still sees every change.
+        expect(seen.map(([theme]) => theme)).toContain("teal");
+        expect(seen.at(-1)).toEqual([undefined, overrides]);
+        expect(byTestId(testIds.button.root).className).toBe(
+            "button button--text button--large",
+        );
+        expect(byTestId(testIds.button.label).className).toBe(
+            "button__label outer inner",
+        );
+    });
+
+    it("runs components again for the defaults and slot props they read", async () => {
+        const { runs, outer, inner } = setup(OUTER, INNER);
+        await settle();
+        let before = { ...runs };
+        await outer({ defaults: { button: { size: "small" } } });
+        expect(runs.classes).toBeGreaterThan(before.classes);
+        expect(byTestId(testIds.button.root).className).toBe(
+            "button button--text button--small",
+        );
+        before = { ...runs };
+        await inner({ slotProps: { button: { label: { class: "caps" } } } });
+        expect(runs.slotProps).toBeGreaterThan(before.slotProps);
+        expect(byTestId(testIds.button.label).className).toBe(
+            "button__label outer caps",
+        );
+    });
+
+    it("combines nested themes and overrides as before: the inner theme wins, the outer overrides reach it", async () => {
+        const { runs, seen, outer } = setup(OUTER, {
+            ...INNER,
+            theme: "sharp",
+        });
+        await settle();
+        const mounted = { ...runs };
+        await outer({ theme: "teal", overrides: { "colors.primary": "red" } });
+        expect(runs).toEqual(mounted);
+        expect(seen.at(-1)).toEqual(["sharp", { "colors.primary": "red" }]);
+        expect(
+            getComputedStyle(byTestId(testIds.button.root)).getPropertyValue(
+                "--colors-primary",
+            ),
+        ).toBe("red");
     });
 });
 
