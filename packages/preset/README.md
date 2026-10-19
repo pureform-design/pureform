@@ -543,7 +543,14 @@ pill with a group's container, and an icon font draws its icon filled.
 ## Tabs
 
 Mark the current tab with `aria-selected="true"`. `variant` is `primary` or `secondary`; turn
-on `icon` when the tabs have icons. `color` sets the indicator and a primary tab's active label.
+on `icon` when the tabs have icons, which primary tabs stack over their labels in a 64px tab, or
+set beside them in a 48px one with `inlineIcon`. `color` sets the indicator and a primary tab's
+active label. Each tab wraps its icon, label, and indicator in `tabContent`, as Material's tabs
+do: a primary tab's content is centered and kept `paddingInline` from the tab's edges, at least
+`indicatorMinWidth` (24px) wide, and its indicator (3px, with 3px top corners, `indicatorRadius`)
+spans it; a secondary tab's content spans the tab and pads itself, so its indicator (2px, square)
+spans the tab. The divider under the tabs is an inset shadow on each tab (`dividerColor`), so it
+takes no markup.
 The indicator declares a `transform` transition over `indicatorDuration` (`medium1`) and
 `indicatorEasing` (`emphasized`), none under reduced motion; the bindings slide the new tab's
 indicator in from the old one's box over it (design doc §9.10). It draws over every tab
@@ -552,9 +559,11 @@ indicator in from the old one's box over it (design doc §9.10). It draws over e
 ```html
 <div class="{root}" role="tablist">
     <button class="{tab}" role="tab" aria-selected="true">
-        <span class="{icon}">★</span>
-        <span class="{label}">Flights</span>
-        <span class="{indicator}"></span>
+        <span class="{tabContent}">
+            <span class="{icon}">★</span>
+            <span class="{label}">Flights</span>
+            <span class="{indicator}"></span>
+        </span>
     </button>
 </div>
 ```

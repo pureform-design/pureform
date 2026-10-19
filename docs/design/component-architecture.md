@@ -1315,9 +1315,9 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
 - **Built (p6d):** `tabs`, `navigation-bar`, `navigation-rail`, `list`, and `list-item` subpaths in
   both bindings. The tabs render through `tabsCompositeAnatomy`: an unstyled `Root` (Zag's root)
   around `List`, the preset's `root` slot (`slot: "root"`, `data-pf-part="list"`), whose `Tab`s
-  hold `Icon`, `Label`, and `Indicator`, then an unstyled `Content` panel per tab. Each tab draws
-  its own indicator (the preset's), not Zag's single measured one; it slides between tabs
-  (§9.10). The bar and rail share one
+  hold `Icon`, `Label`, and `Indicator` (in the tab's content since, §9.10), then an unstyled
+  `Content` panel per tab. Each tab draws its own indicator (the preset's), not Zag's single
+  measured one; it slides between tabs (§9.10). The bar and rail share one
   factory per binding (`createNavigation`) over their identical generated anatomies; an `Item` is
   an `<a>` with an `href`, else a `<button>`. The preset has no list, only the list item, so the
   list is a composite (`listAnatomy`): an unstyled `<ul>` with an unstyled `<li>` (`List.Item`)
@@ -2375,9 +2375,103 @@ do; React Native does the same through its motion engines.
   `transform` transition from the selection (none under reduced motion). The sliding tab takes
   `zIndex: 1`, since React Native Web makes every view a stacking context. Its gaps are in its
   README.
-- **Not done:** the preset's primary indicator spans the tab inside its padding, not the content's
-  width as the spec and both implementations draw it; that needs the indicator inside a wrapper
-  around the icon and label, a change of anatomy. pureform has no scrollable tabs.
+- **Not done:** pureform has no scrollable tabs (material-web's overflow scrolling, Angular's
+  header pagination, Compose's `ScrollableTabRow`).
+
+#### The anatomy: the tab's content
+
+Until this, the preset's tab held its icon, label, and indicator directly, and the primary
+indicator spanned the tab inside its padding: 168px under a 42px label in a 200px tab, where M3
+draws it as wide as the content. What the implementations do:
+
+- **M3 spec** (m3.material.io/components/tabs, specs; the anatomy in
+  [Material Components Android's Tabs.md](https://github.com/material-components/material-components-android/blob/master/docs/components/Tabs.md)):
+  container, icon (optional), label, divider, active indicator. 48dp tall with text or an icon
+  alone, 64dp with an icon and text stacked (Android's non-inline layout is 72dp); the icon can sit
+  beside the label instead (Android's `tabInlineLabel`, Compose's `LeadingIconTab`). Primary
+  indicators 3dp, 3dp top corners, as wide as the content and at least 24dp; secondary 2dp across
+  the tab. Android also offers `tabIndicatorFullWidth` (default off).
+- **material-web**
+  ([`tabs/internal/tab.ts`](https://github.com/material-components/material-web/blob/main/tabs/internal/tab.ts),
+  [`primary-tab.ts`](https://github.com/material-components/material-web/blob/main/tabs/internal/primary-tab.ts),
+  [`secondary-tab.ts`](https://github.com/material-components/material-web/blob/main/tabs/internal/secondary-tab.ts),
+  [`_tab.scss`](https://github.com/material-components/material-web/blob/main/tabs/internal/_tab.scss)):
+  the host (`role="tab"`, `padding: 0 16px`, `inline-flex`, centered) renders a `.button` holding
+  the focus ring (`inward`), the elevation, the ripple, and a `.content` wrapper (`position:
+relative`, inline flex, centered, the container's height, `gap: 8px`) around the icon slot and
+  the label slot. The `.indicator` (`position: absolute; inset: auto 0 0 0`) goes inside
+  `.content` unless `fullWidthIndicator`, a protected field only `md-secondary-tab` sets, which puts
+  it in `.button` instead. `md-primary-tab` adds `inline-icon`; without it `.content.stacked` is a
+  column with a 2px gap, 64px tall only with `has-icon` and `has-label` (an icon-only tab stays
+  48px). No minimum width: an icon is 24px anyway. `md-tabs` draws an `md-divider` under the row.
+- **MDC web** ([mdc-tab README](https://github.com/material-components/material-components-web/tree/master/packages/mdc-tab)):
+  `mdc-tab` around `__content` (`__icon`, `__text-label`), an `mdc-tab-indicator` (with
+  `__content--underline`), `__ripple`, and `__focus-ring`; "Tab with Indicator Spanning Only
+  Content" moves the indicator into `__content`. `--stacked` and `--min-width` modifiers.
+- **Angular Material**
+  ([`tab-group.html`](https://github.com/angular/components/blob/main/src/material/tabs/tab-group.html),
+  [`ink-bar.ts`](https://github.com/angular/components/blob/main/src/material/tabs/ink-bar.ts),
+  [`_tabs-common.scss`](https://github.com/angular/components/blob/main/src/material/tabs/_tabs-common.scss)):
+  each `mdc-tab` (the `matTabLabelWrapper`, `role="tab"`, `padding: 0 24px`) holds `__ripple`, a
+  `mat-mdc-tab-ripple`, and `__content` around `__text-label` (icons go in the label template).
+  `InkBarItem` creates `mdc-tab-indicator` > `__content--underline` (a top border) and appends it to
+  `__content` when `fitInkBarToContent` (default off) or to the tab otherwise; it slides FLIP-style
+  from the previous item's rect. `stretchTabs` (default on) and `alignTabs` lay the row out; the
+  header pages when it overflows; the divider is the header's bottom border (1px).
+- **Compose** (`Tab.kt`, `TabRow.kt` in androidx `compose/material3`): `Tab` and `LeadingIconTab`
+  draw no indicator; the row measures each tab's content (its intrinsic width less 16dp of padding
+  a side, at least 24dp: "Enforce minimum touch target of 24.dp") for `tabIndicatorOffset(…,
+matchContentSize = true)`, which `PrimaryTabRow` uses and `SecondaryTabRow` doesn't, and draws a
+  `HorizontalDivider` under the row.
+
+**The design.** Every implementation puts a content wrapper between the tab and its icon and label,
+and a content-width indicator inside it; so does pureform, keeping the per-tab indicator of the
+slide above.
+
+| Part         | What it is                                                                 | Material's name                                     |
+| ------------ | -------------------------------------------------------------------------- | --------------------------------------------------- |
+| `tab`        | The button: the state layer, ripple, and focus indicator; the divider line | container; `md-primary-tab`; `mdc-tab`              |
+| `tabContent` | Around the icon, label, and indicator: centered, and kept from the edges   | `.content`; `mdc-tab__content`                      |
+| `icon`       | As before                                                                  | icon; `mdc-tab__icon`                               |
+| `label`      | As before                                                                  | label; `mdc-tab__text-label`                        |
+| `indicator`  | As before, now in the content                                              | active indicator; `.indicator`; `mdc-tab-indicator` |
+
+- **Name.** `tabContent`, not material-web's and MDC's `content`: the tabs' composite already calls
+  a panel `content` (Zag's name), and its kebab case (`tab-content`, `pf-tabs-tab-content`) reads
+  plainly in test ids and selectors.
+- **One place for the indicator.** The indicator is always in the content, so the anatomy has one
+  parent per part and a compound `Tab` can render the wrapper itself. The variant decides the
+  width: a primary tab's content is centered in the tab, its `paddingInline` (16px) a margin, at
+  least `indicatorMinWidth` (24px, Compose's minimum) wide, and the indicator spans it; a secondary
+  tab's content grows to fill the tab and pads itself, so the indicator spans the tab, as
+  `fullWidthIndicator` does. That works on React Native too, where an absolute view is always
+  placed against its parent (no `position: static` trick). The tab stretches the content to its
+  height, so the indicator sits on its bottom edge. The tab keeps `role="tab"`, the indication, the
+  focus indicator (still the whole tab, as M3 shows it), and the height.
+- **M3's values.** The indicator is 3px with 3px top corners (`indicatorRadius`; it read the theme's
+  4px `extraSmall` corner before), 2px and square on secondary tabs; the content's gap is 8px
+  beside and 2px stacked, as material-web's.
+- **Inline icons** are cheap, so they're in: an `inlineIcon` variant (`"false"` by default) keeps a
+  primary tab's icon beside its label in a 48px tab instead of stacking it in a 64px one, as
+  material-web's `inline-icon`. Secondary tabs always set it beside.
+- **Icon-only tabs.** The ready-made tabs' `label` is optional: a tab without one renders no label
+  part, so its indicator spans the 24px icon, and takes the item's `aria-label` as its name. It
+  stays 64px with the `icon` variant unless `inlineIcon`; material-web's 48px icon-only tab needs
+  to know there's no label, which the preset's variants don't.
+- **Dropped:** a `divider` part (it stays the tab's inset shadow in `dividerColor`, which takes no
+  space and no markup; material-web's `md-divider` and Angular's border are what their shadow DOM
+  and header need, not part of a tab), a `fullWidthIndicator` option (material-web keeps it
+  internal and ties it to the tab's kind, as M3 does; an app can still widen a primary indicator by
+  styling `tabContent`), material-web's `.button` (pureform's tab is the button) and its elevation
+  (flagged for removal there), and MDC's `--min-width`.
+- **Compatible.** The compound `Tab` renders the content around its children, so markup written as
+  `<Tabs.Tab><Tabs.Icon /><Tabs.Label /><Tabs.Indicator /></Tabs.Tab>` keeps working and gets the
+  new layout; the ready-made tabs address it by slot (`class.tabContent`, `slotProps.tabContent`,
+  `testId.tabContent`), and `Tab` takes its props as `tabContentProps`. Every other part keeps its
+  test id and attributes. An app drawing the preset's classes by hand adds the `tabContent` span.
+- **The slide** needs no new code on the web: `slideIndicator` already scales about the center from
+  the old box's width to the new one's. On React Native the tabs record the content's place in the
+  tab too, so an indicator's box in the row is the tab's, the content's, and its own offsets.
 
 ## 10. CLI
 
