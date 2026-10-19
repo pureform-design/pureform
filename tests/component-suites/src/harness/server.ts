@@ -13,6 +13,14 @@ export interface ServerRender {
     readonly head: string;
 }
 
+/** How long the server build may take to start: Vite compiles the binding's sources for it, which
+ *  can take over half a minute on a busy machine. */
+export const SERVER_START_TIMEOUT = 180_000;
+
+/** Starts the server build, so a suite that renders on the server can wait for it in
+ *  `beforeAll` (with `SERVER_START_TIMEOUT`) rather than in its first test's time. */
+export const startServer = (): Promise<void> => commands.startServer();
+
 /** Renders `scene` on the server with the binding this project runs. */
 export const renderOnServer = (scene: Scene): Promise<ServerRender> =>
     commands.renderOnServer(scene);

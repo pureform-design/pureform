@@ -13,7 +13,7 @@
 
 import type { IndicationAnatomy } from "@pureform/anatomy";
 import type { MutableInteractionSource } from "@pureform/solid";
-import { afterEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { commands, userEvent } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -31,6 +31,7 @@ import type {
     SceneProvider,
     SceneWrapper,
 } from "./harness/scene";
+import { SERVER_START_TIMEOUT, startServer } from "./harness/server";
 
 type Indicated = ComponentCase & { readonly indication: IndicationCase };
 
@@ -85,6 +86,9 @@ afterEach(async () => {
     if (mouseDown) await release();
     await away();
 });
+
+// A custom indication hydrates, rendered on the server.
+beforeAll(startServer, SERVER_START_TIMEOUT);
 
 /** The elements one indication entry names, on the first element its trigger matches: the
  *  trigger, the surface it tints, the element its states are matched on (the root around a

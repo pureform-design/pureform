@@ -5,7 +5,7 @@
 // component must respond. Controlled and default state render on the server.
 
 import { themeScope } from "@pureform/styling";
-import { afterAll, describe, expect, it, vi } from "vitest";
+import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -16,7 +16,11 @@ import type { ComponentCase } from "./components";
 import { hydrate, serverRendered } from "./harness/hydration";
 import { stateNames, watchConsole } from "./harness/page";
 import type { Scene, SceneProps } from "./harness/scene";
-import { renderOnServer } from "./harness/server";
+import {
+    renderOnServer,
+    SERVER_START_TIMEOUT,
+    startServer,
+} from "./harness/server";
 import {
     countedSeedTheme,
     generated,
@@ -26,6 +30,8 @@ import {
 // The emulated scheme belongs to the page, which later test files reuse: put it back, or a file
 // that reads the page's colors (axe's contrast) runs in the dark scheme.
 afterAll(() => commands.emulateColorScheme("light"));
+
+beforeAll(startServer, SERVER_START_TIMEOUT);
 
 const sceneOf = (component: ComponentCase, props: SceneProps): Scene => ({
     component: component.component,

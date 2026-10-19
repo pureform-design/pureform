@@ -72,16 +72,24 @@ const projectOf = (project: string): [Binding, TargetName] => {
     );
 };
 
-const renderOnServer: BrowserCommand<[scene: Scene]> = async (
-    context,
-    scene,
-) => {
-    const [binding, target] = projectOf(context.project.name);
+type ServerModule = {
+    render(scene: Scene): ServerRender | Promise<ServerRender>;
+};
+
+const serverModule = async (project: string): Promise<ServerModule> => {
+    const [binding, target] = projectOf(project);
     const server = await serverFor(binding, target);
-    const module = (await server.ssrLoadModule(
+    return (await server.ssrLoadModule(
         `/src/bindings/${binding}/server.tsx`,
-    )) as { render(scene: Scene): ServerRender | Promise<ServerRender> };
-    return module.render(scene);
+    )) as ServerModule;
+};
+
+const renderOnServer: BrowserCommand<[scene: Scene]> = async (context, scene) =>
+    (await serverModule(context.project.name)).render(scene);
+
+// The first load compiles the binding's sources, which takes a while.
+const startServer: BrowserCommand<[]> = async (context) => {
+    await serverModule(context.project.name);
 };
 
 // Emulated on the whole page; nothing in the bindings reads it, which the suite checks.
@@ -131,6 +139,7 @@ const performanceMetrics: BrowserCommand<[]> = async (context) => {
 
 export const commands = {
     renderOnServer,
+    startServer,
     emulateColorScheme,
     mouse,
     performanceMetrics,
@@ -150,6 +159,8 @@ declare module "vitest/browser" {
     interface BrowserCommands {
         /** Renders a scene on the server with the running binding. */
         renderOnServer: (scene: Scene) => Promise<ServerRender>;
+        /** Starts the running binding's server build, ready to render. */
+        startServer: () => Promise<void>;
         /** Emulate `prefers-color-scheme` on the page. */
         emulateColorScheme: (scheme: "light" | "dark") => Promise<void>;
         /** The real mouse at a point in the test's viewport: it moves there, then goes down or

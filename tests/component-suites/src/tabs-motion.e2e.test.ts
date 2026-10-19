@@ -8,7 +8,7 @@
 // `motion` to `"full"` unless they test reducing it.
 
 import { MATERIAL_DURATIONS } from "@pureform/material";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -17,8 +17,12 @@ import { tabsCase } from "./components/tabs";
 import { hydrate } from "./harness/hydration";
 import { mountCase, settlePlaced } from "./harness/page";
 import type { SceneProps, SceneProvider } from "./harness/scene";
+import { SERVER_START_TIMEOUT, startServer } from "./harness/server";
 
 const FULL: SceneProvider = { motion: "full" };
+
+// The hydration scene renders on the server.
+beforeAll(startServer, SERVER_START_TIMEOUT);
 
 interface Box {
     readonly left: number;
