@@ -251,8 +251,11 @@ import { Tooltip } from "@pureform/react/tooltip";
 - **The tooltip** opens on hover after `openDelay` (400 ms) and on keyboard focus, and points the
   trigger's `aria-describedby` at itself. The ready-made renders a plain tooltip's
   `supportingText` straight in the surface, and a rich one's (`variant="rich"`) `subhead`,
-  `supportingText`, and `actions` in their parts; a rich tooltip is `interactive`. `disabled`
-  stops the tooltip, not the trigger.
+  `supportingText`, and `actions` in their parts; a rich tooltip is `interactive`. Unless it's
+  `interactive`, the whole tooltip, positioner and all, lets the pointer through: Zag lays the
+  positioner out at the corner of its containing block as it opens, before placing it, where it
+  would otherwise take the pointer from a trigger there and close the tooltip. `disabled` stops
+  the tooltip, not the trigger.
 - **The dialog** is fixed over the viewport and centered (inline layout styles on the
   positioner), with the scrim's registry entry drawing the `Backdrop` (`pf-dialog-backdrop`; Root's
   `testId` and `unstyled` take a `backdrop` key). While a modal dialog is open, Zag keeps focus in
