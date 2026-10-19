@@ -34,4 +34,6 @@ bun run dev
 `test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) is a smoke test: the page
 renders in Chromium from the registry the bundler plugin writes, its buttons styled by the Tailwind
 stylesheet, without an error. `build` runs it first. Set `CHROMIUM_PATH` (`.env.local`) to use a
-system Chromium.
+system Chromium. Its global setup, `@pureform/vitest-config/browser-warmup`, compiles the page's
+modules before the test opens it, so a cold server on a loaded machine neither runs out the test's
+time nor reloads it.

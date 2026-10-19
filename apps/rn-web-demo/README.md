@@ -33,12 +33,14 @@ bun run dev
 
 ## Test
 
-`test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) renders the page in
-Chromium: every component's parts by test id, each drawing its generated factory's styles, the
-runtime registry drawing the same, the scheme switch, the controls, the select's menu, tabs and
-navigation, shapes drawn with SVG under each engine without losing the page's state, and a ripple
-in each surface the anatomy names (the controls' and the snackbar's buttons too), a press shown
-on every component sharing a source, and the indication switch removing the ripple layers; and the overlays opening over the page and
-closing (the menu by an item and Escape, the tooltip as the pointer leaves, the snackbar by its
-action, the dialog by Escape and its Cancel). Set
-`CHROMIUM_PATH` (`.env.local`) to use a system Chromium.
+`test:e2e` (`vitest.config.e2e.ts`, over the demo's own Vite config) renders the page in Chromium:
+every component's parts by test id, each drawing its generated factory's styles, the runtime
+registry drawing the same, the scheme switch, the controls, the select's menu, tabs and navigation,
+shapes drawn with SVG under each engine without losing the page's state, and a ripple in each
+surface the anatomy names (the controls' and the snackbar's buttons too), a press shown on every
+component sharing a source, and the indication switch removing the ripple layers; and the overlays
+opening over the page and closing (the menu by an item and Escape, the tooltip as the pointer
+leaves, the snackbar by its action, the dialog by Escape and its Cancel). Set `CHROMIUM_PATH`
+(`.env.local`) to use a system Chromium. Its global setup, `@pureform/vitest-config/browser-warmup`,
+compiles the page's modules before the test opens it, so a cold server on a loaded machine neither
+runs out the test's time nor reloads it.

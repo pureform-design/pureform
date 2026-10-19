@@ -25,6 +25,8 @@ const machines = [
 export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), {
     optimizeDeps: { include: machines },
     test: {
+        // Compiles the page before the test opens it.
+        globalSetup: ["@pureform/vitest-config/browser-warmup"],
         browser: {
             enabled: true,
             headless: true,
