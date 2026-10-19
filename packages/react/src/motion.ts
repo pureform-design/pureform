@@ -10,7 +10,7 @@ import {
 } from "@pureform/binding-core/dom";
 import { useSyncExternalStore } from "react";
 
-import { usePureform } from "./provider";
+import { useComponentState } from "./provider";
 
 const subscribe = (onChange: () => void) =>
     subscribeReducedMotion(() => onChange());
@@ -19,7 +19,7 @@ const onServer = () => false;
 
 /** Whether to reduce motion: pass it to ripples, tweens, and machines that animate. */
 export function useReducedMotion(): boolean {
-    const { motion } = usePureform();
+    const { motion } = useComponentState();
     const system = useSyncExternalStore(
         subscribe,
         systemReducedMotion,

@@ -22,7 +22,7 @@ import type {
 import { use, useMemo } from "react";
 
 import { isDev, isServer } from "./env";
-import { usePureform } from "./provider";
+import { useComponentState } from "./provider";
 
 /** Each slot's classes for `selection`, over the provider's `defaults` for the component. The
  *  selection can be a new object every render: the call is memoized on its value. A lazy entry
@@ -31,7 +31,7 @@ export function useClasses<N extends ComponentName>(
     name: N,
     selection: Selection<N>,
 ): ClassSlots<N> {
-    const state = usePureform();
+    const state = useComponentState();
     const entry = classEntry(state, name);
     const factory = entry.kind === "static" ? entry.factory : use(entry.load());
     const selected = withDefaults<N>(
@@ -48,7 +48,7 @@ export function useClasses<N extends ComponentName>(
 export function useClassFactory<N extends StaticComponentName>(
     name: N,
 ): ClassFactory<N> {
-    const entry = classEntry(usePureform(), name);
+    const entry = classEntry(useComponentState(), name);
     if (entry.kind === "lazy") throw lazyFactoryError(name);
     return entry.factory;
 }
@@ -60,7 +60,7 @@ export function useClassFactory<N extends StaticComponentName>(
 export function useLazyClassFactory<N extends LazyComponentName>(
     name: N,
 ): ClassFactory<N> {
-    const entry = classEntry(usePureform(), name);
+    const entry = classEntry(useComponentState(), name);
     if (isDev && isServer) warnOnce(serverLazyFactoryMessage(name));
     if (entry.kind === "static") return entry.factory;
     if (isServer) {

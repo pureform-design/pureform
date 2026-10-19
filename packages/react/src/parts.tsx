@@ -57,7 +57,7 @@ import {
 import type { IndicationScope, PartIndication } from "./indication";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
-import { usePureform } from "./provider";
+import { useComponentState } from "./provider";
 
 /** The registry name an anatomy's component is registered under. */
 export type ComponentOf<A extends ComponentAnatomy> = A["name"] & ComponentName;
@@ -317,7 +317,7 @@ export function useComponent<A extends ComponentAnatomy>(
     anatomy: A,
     options: ComponentOptions<A>,
 ): ComponentScope<A> {
-    const state = usePureform();
+    const state = useComponentState();
     const entries = anatomy.indication;
     // Hooks run in the same order every render: an anatomy's entries never change.
     const indication = entries?.length
@@ -364,7 +364,7 @@ export function useUnstyledComponent<A extends ComponentAnatomy>(
     anatomy: A,
     options: UnstyledComponentOptions<A> = {},
 ): PartScope<A> {
-    const state = usePureform();
+    const state = useComponentState();
     return createPartScope(anatomy, options, undefined, state.slotProps);
 }
 
