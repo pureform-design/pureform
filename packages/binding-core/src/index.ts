@@ -398,13 +398,18 @@ export type {
     AvatarVariantProps,
 } from "./components/avatar";
 export {
+    CARD_CONTENT_PROPS,
     CARD_ROOT_PROPS,
     cardElement,
+    cardEntryActive,
+    cardLayout,
     cardRootProps,
     cardSelection,
     isInteractiveCard,
 } from "./components/card";
 export type {
+    CardContentProps,
+    CardLayout,
     CardPart,
     CardRootOwnProps,
     CardVariantProps,

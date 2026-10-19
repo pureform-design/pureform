@@ -11,10 +11,11 @@ import type { Interaction, InteractionSource } from "./interaction";
 import type { AnyRegistry, Direction } from "./provider";
 
 /** What an element is to a surface's indication: the `trigger` whose interactions feed the
- *  source, the `surface` it draws on, and the `state` element the preset matches hover and press
- *  on (the trigger, or the root around a native input). The layer inside the surface isn't
- *  attached: the effect finds it when it draws (`surfaceLayer`). */
-export type IndicationRole = "trigger" | "surface" | "state";
+ *  source, the `surface` it draws on, the `state` element the preset matches hover and press
+ *  on (the trigger, or the root around a native input), and the part holding the layer when
+ *  the anatomy names one besides the surface (`layer`, a card's action area). The layer element
+ *  itself isn't attached: the effect finds it when it draws (`surfaceLayer`). */
+export type IndicationRole = "trigger" | "surface" | "state" | "layer";
 
 /** A hover or press that came from elsewhere: another element sharing the source, or the app
  *  emitting with no element. Focus is never forwarded. */
@@ -74,6 +75,9 @@ const partRoles = (
         if (stateIndicationPart(entry) === part) {
             roles.push({ entry: index, role: "state" });
         }
+        if (entry.layer !== undefined && entry.layer === part) {
+            roles.push({ entry: index, role: "layer" });
+        }
     });
     return roles.length ? roles : NO_ROLES;
 };
@@ -84,6 +88,14 @@ const NO_ROLES: readonly never[] = Object.freeze([]);
  *  native input inside a label. */
 export const stateIndicationPart = (entry: IndicationAnatomy): string =>
     entry.trigger === "input" ? "root" : entry.trigger;
+
+/** Whether a part renders the layer element for an entry it has `role` in: the surface, unless
+ *  the entry names another part to hold it, or that part. */
+export const holdsLayer = (
+    entry: IndicationAnatomy | undefined,
+    role: IndicationRole,
+): boolean =>
+    entry?.layer === undefined ? role === "surface" : role === "layer";
 
 /** The layer element a surface holds for its indication to draw in: its child marked
  *  `data-ripple-layer`, which the bindings render first inside it. */
@@ -178,11 +190,15 @@ export class IndicationInstance {
             dir: () => this.#host.environment.dir(),
             registry,
         };
+        // The part holding the layer, read at each press: it may attach after the effect starts.
+        const elements = this.#elements;
         const target = {
             trigger,
             surface,
             get layer() {
-                return indication.layer ? surfaceLayer(surface) : undefined;
+                return indication.layer
+                    ? surfaceLayer(elements.get("layer") ?? surface)
+                    : undefined;
             },
         };
         const cleanup = indication.web(target, this.source, context);

@@ -1,3 +1,4 @@
+import { anatomy } from "@pureform/anatomy";
 import type {
     cardAnatomy,
     circularProgressAnatomy,
@@ -11,6 +12,8 @@ import { avatarElement, avatarRootProps } from "./avatar";
 import {
     CARD_ROOT_PROPS,
     cardElement,
+    cardEntryActive,
+    cardLayout,
     cardRootProps,
     cardSelection,
 } from "./card";
@@ -174,6 +177,51 @@ describe("card", () => {
             disabled: undefined,
             "aria-disabled": "true",
         });
+    });
+
+    it("selects the sections' variants", () => {
+        expect(
+            cardSelection({ padded: false, actionsAlign: "start" }, "div"),
+        ).toMatchObject({ padded: false, actionsAlign: "start" });
+    });
+
+    it("moves its action to the action area only beside other controls", () => {
+        expect(cardLayout({}, "div")).toEqual({
+            sections: false,
+            actionArea: false,
+            headerOutside: false,
+            header: false,
+            supportingText: false,
+        });
+        // One action: the whole card is the link, its text its name.
+        expect(
+            cardLayout({ headline: "Pro", supportingText: "…" }, "a"),
+        ).toEqual({
+            sections: true,
+            actionArea: false,
+            headerOutside: false,
+            header: true,
+            supportingText: true,
+        });
+        expect(
+            cardLayout({ headline: "Pro", actions: "Buy" }, "a"),
+        ).toMatchObject({ actionArea: true, headerOutside: false });
+        expect(
+            cardLayout({ headline: "Pro", headerAction: "⋮" }, "button"),
+        ).toMatchObject({ actionArea: true, headerOutside: true });
+        // A card that doesn't act has nothing to move.
+        expect(cardLayout({ actions: "Buy" }, "div").actionArea).toBe(false);
+        expect(
+            cardLayout({ actions: "Buy", interactive: false }, "a").actionArea,
+        ).toBe(false);
+    });
+
+    it("shows the root's indication while Root acts, the action area's otherwise", () => {
+        const [root, area] = anatomy.card.indication;
+        expect(cardEntryActive(true)(root)).toBe(true);
+        expect(cardEntryActive(true)(area)).toBe(false);
+        expect(cardEntryActive(false)(root)).toBe(false);
+        expect(cardEntryActive(false)(area)).toBe(true);
     });
 });
 

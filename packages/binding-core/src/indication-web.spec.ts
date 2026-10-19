@@ -7,6 +7,7 @@ import {
     defineIndication,
     dropsFocusIndicator,
     IndicationHost,
+    holdsLayer,
     indicationRoles,
     indicationTokenValues,
     materialIndication,
@@ -300,6 +301,63 @@ describe("IndicationHost", () => {
         expect(surfaceLayer(element)).toBe(layer);
         detachInput();
         detachRoot();
+    });
+
+    it("finds the layer in a part the entry names besides the surface", () => {
+        const LAYERED = [
+            {
+                trigger: "actionArea",
+                surface: "root",
+                centered: false,
+                focus: "root",
+                layer: "actionArea",
+            },
+        ];
+        expect(indicationRoles(LAYERED, "actionArea")).toEqual([
+            { entry: 0, role: "trigger" },
+            { entry: 0, role: "state" },
+            { entry: 0, role: "layer" },
+        ]);
+        expect(indicationRoles(LAYERED, "root")).toEqual([
+            { entry: 0, role: "surface" },
+        ]);
+        expect(holdsLayer(LAYERED[0], "surface")).toBe(false);
+        expect(holdsLayer(LAYERED[0], "layer")).toBe(true);
+        expect(holdsLayer(ENTRIES[0], "surface")).toBe(true);
+        const layers: (HTMLElement | undefined)[] = [];
+        let read: () => void = () => {};
+        const host = new IndicationHost(LAYERED, {
+            reducedMotion: () => false,
+            dir: () => "ltr",
+        });
+        host.configure(
+            {
+                name: "reading",
+                layer: true,
+                web(target) {
+                    read = () => layers.push(target.layer);
+                    return () => {};
+                },
+            },
+            registry,
+        );
+        const source = createInteractionSource();
+        const root = document.body.appendChild(document.createElement("div"));
+        const area = root.appendChild(document.createElement("button"));
+        const layer = area.appendChild(document.createElement("span"));
+        layer.setAttribute("data-ripple-layer", "");
+        const instance = host.instance(0, source);
+        const detach = [
+            instance.attach("surface", root),
+            instance.attach("trigger", area),
+        ];
+        read();
+        // Attached after the effect started.
+        detach.push(instance.attach("layer", area));
+        read();
+        expect(layers).toEqual([undefined, layer]);
+        for (const undo of detach) undo();
+        root.remove();
     });
 
     it("forwards hover and press from other origins, never its own", () => {
