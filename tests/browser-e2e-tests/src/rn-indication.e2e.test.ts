@@ -57,6 +57,7 @@ import { Slider } from "@pureform/react-native/slider";
 import { Snackbar } from "@pureform/react-native/snackbar";
 import { Switch } from "@pureform/react-native/switch";
 import { Tabs } from "@pureform/react-native/tabs";
+import { Text } from "@pureform/react-native/text";
 import { nativeFactory } from "@pureform/rn-adapter/factory";
 import { createRegistry } from "@pureform/styling";
 import type { Registry } from "@pureform/styling";
@@ -150,7 +151,7 @@ const CASES: RnCase[] = [
     }),
     own("Card", Card as never, cardAnatomy, {
         onPress: () => {},
-        children: "Basic plan",
+        children: createElement(Text, null, "Basic plan"),
     }),
     own("ListItem", ListItem as never, listItemAnatomy, {
         headline: "Inbox",
