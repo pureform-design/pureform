@@ -92,6 +92,8 @@ interface RnCase {
     readonly drags?: boolean;
 }
 
+const [CARD_ROOT_ENTRY, CARD_ACTION_AREA_ENTRY] = cardAnatomy.indication;
+
 const ITEMS = [
     { value: "a", label: "Alpha", icon: "★" },
     { value: "b", label: "Beta", icon: "♥" },
@@ -149,10 +151,29 @@ const CASES: RnCase[] = [
         "aria-label": "Compose",
         icon: "✎",
     }),
-    own("Card", Card as never, cardAnatomy, {
-        onPress: () => {},
-        children: createElement(Text, null, "Basic plan"),
-    }),
+    // The whole card acts: Root's entry.
+    own(
+        "Card",
+        Card as never,
+        { ...cardAnatomy, indication: [CARD_ROOT_ENTRY] },
+        {
+            onPress: () => {},
+            children: createElement(Text, null, "Basic plan"),
+        },
+    ),
+    // Its action beside its actions: the action area's entry, the container its surface.
+    own(
+        "Card with actions",
+        Card as never,
+        { ...cardAnatomy, indication: [CARD_ACTION_AREA_ENTRY] },
+        {
+            onPress: () => {},
+            headline: "Basic plan",
+            supportingText:
+                "Everything in the free plan, with more storage and support.",
+            actions: createElement(Button, { label: "Details" }),
+        },
+    ),
     own("ListItem", ListItem as never, listItemAnatomy, {
         headline: "Inbox",
         onPress: () => {},
@@ -371,7 +392,8 @@ interface Mount {
         indication?: Indication;
     };
     readonly props?: Record<string, unknown>;
-    /** A card with this indication around the component. */
+    /** A card with this indication beside the component: the card acts, and the component is
+     *  one of its actions, outside its action area. */
     readonly inCard?: Indication;
 }
 
@@ -457,15 +479,13 @@ const mountCase = async (
             ),
         );
         return options.inCard
-            ? createElement(
-                  Card as ComponentType<Record<string, unknown>>,
-                  {
-                      onPress: () => {},
-                      indication: options.inCard,
-                      testId: "outer",
-                  },
-                  own,
-              )
+            ? createElement(Card as ComponentType<Record<string, unknown>>, {
+                  onPress: () => {},
+                  indication: options.inCard,
+                  testId: "outer",
+                  headline: "Outer",
+                  actions: own,
+              })
             : own;
     };
     const mounted = render(view(), options.provider);
@@ -487,7 +507,7 @@ const focusByKeyboard = async (surface: () => HTMLElement) => {
         await wait(FOCUS_AFTER_PRESS_MS + 50 - since);
     }
     (document.activeElement as HTMLElement | null)?.blur();
-    // The focusable around the surface (or in it), not one around that (a card around it).
+    // The focusable around the surface (or in it).
     const FOCUSABLE = "[tabindex]:not([tabindex='-1']), input, button";
     const on = () => {
         const target =
@@ -616,6 +636,11 @@ describe.each(CASES)("$name", (rnCase) => {
             inCard: CUSTOM,
         });
         expect(host.querySelector('[data-testid="outer-root"]')).not.toBeNull();
+        // Beside the card's action area, not inside it: no control inside another.
+        const area = host.querySelector('[data-testid="outer-action-area"]');
+        expect(area).not.toBeNull();
+        expect(area!.contains(parts().surface)).toBe(false);
+        expect(area!.querySelector("button, [role=button]")).toBeNull();
         const inside = await drawn(parts);
         for (const state of [
             "rest",
