@@ -61,6 +61,9 @@ describe("tabs", () => {
             insetInlineStart: "0px",
             insetInlineEnd: "0px",
             height: "var(--components-tabs-indicatorHeight, 3px)",
+            borderStartStartRadius:
+                "var(--components-tabs-indicatorRadius, 3px)",
+            borderStartEndRadius: "var(--components-tabs-indicatorRadius, 3px)",
         });
         // A secondary tab's content spans the tab, padded rather than inset.
         expect(css?.variants?.variant?.secondary?.tabContent).toEqual({

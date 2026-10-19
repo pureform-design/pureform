@@ -2360,8 +2360,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     },
     "indicator": {
       "backgroundColor": "var(--components-tabs-indicatorColor, token(colors.primary))",
-      "borderStartEndRadius": "token(radii.extraSmall)",
-      "borderStartStartRadius": "token(radii.extraSmall)",
+      "borderStartEndRadius": "var(--components-tabs-indicatorRadius, 3px)",
+      "borderStartStartRadius": "var(--components-tabs-indicatorRadius, 3px)",
       "bottom": "0px",
       "height": "var(--components-tabs-indicatorHeight, 3px)",
       "insetInlineEnd": "0px",
