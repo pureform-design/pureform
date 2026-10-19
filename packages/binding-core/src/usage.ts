@@ -92,7 +92,9 @@ export const COMPONENT_USAGE = {
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.
-    tabs: { entries: { tabs: same("variant", "color"), ripple: {} } },
+    tabs: {
+        entries: { tabs: same("variant", "inlineIcon", "color"), ripple: {} },
+    },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons follow their content.
     "text-area": {

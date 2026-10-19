@@ -71,10 +71,16 @@ describe("parts", () => {
 describe("tabs", () => {
     it("select the variants, the icon one included", () => {
         expect(
-            tabsSelection({ variant: "secondary", icon: true, color: "x" }),
+            tabsSelection({
+                variant: "secondary",
+                icon: true,
+                inlineIcon: true,
+                color: "x",
+            }),
         ).toEqual({
             variant: "secondary",
             icon: true,
+            inlineIcon: true,
             color: "x",
             tokens: undefined,
         });
