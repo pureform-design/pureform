@@ -29,6 +29,17 @@ export const settle = (): Promise<void> =>
         await new Promise((resolve) => setTimeout(resolve, 0));
     });
 
+/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes, where a
+ *  user event alone can take seconds to come back. */
+export const until = (check: () => void, timeout = 10_000): Promise<void> =>
+    vi.waitFor(
+        async () => {
+            await settle();
+            check();
+        },
+        { timeout, interval: 10 },
+    );
+
 /** Runs a user interaction (`userEvent` from `vitest/browser`) inside `act`, then settles. */
 export const interact = async (
     action: () => Promise<unknown>,
