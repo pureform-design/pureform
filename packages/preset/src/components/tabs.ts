@@ -11,6 +11,10 @@
 //       <span class={indicator} />
 //     </button>
 //   </div>
+//
+// The indicator slides from the tab selected before to the new one: the bindings start a
+// transform from the old indicator's box (FLIP), timed by the `transform` transition the
+// indicator declares here, so the motion tokens retime it and reduced motion turns it off.
 
 import { typed } from "@pureform/core";
 import {
@@ -18,14 +22,23 @@ import {
     column,
     flex,
     px,
+    relative,
     row,
     shadow,
     slot,
+    tween,
     unitless,
     when,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
-import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
+import {
+    duration,
+    easing,
+    radius,
+    size as sizeToken,
+    spacing,
+    textStyle,
+} from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
@@ -36,6 +49,7 @@ import {
     iconBox,
     iconFill,
     INDICATION_ROOT,
+    motionTransition,
     pressableRoot,
     sys,
     variantsOf,
@@ -58,6 +72,9 @@ const { tokens, ref } = componentTokens("tabs", {
     iconFill: unitless(0),
     indicatorHeight: px(3),
     secondaryIndicatorHeight: px(2),
+    // How the indicator slides to a newly selected tab, as Material's web tabs time it.
+    indicatorDuration: duration("medium1"),
+    indicatorEasing: easing("emphasized"),
     ...INDICATION_TOKENS,
 });
 
@@ -118,6 +135,9 @@ export const createTabs = <const G extends string = ColorGroup>(
                 base: {
                     root: {
                         ...INDICATION_ROOT,
+                        // A stacking context of its own, so the indicator's layer stays in it.
+                        position: relative,
+                        zIndex: unitless(0),
                         display: flex,
                         flexDirection: row,
                         backgroundColor: ref("container"),
@@ -164,6 +184,15 @@ export const createTabs = <const G extends string = ColorGroup>(
                         opacity: when()
                             .on(SELECTED, unitless(1))
                             .else(unitless(0)),
+                        // Over every tab, so it draws over the tabs it slides across.
+                        zIndex: unitless(1),
+                        transition: motionTransition(
+                            tween(
+                                "transform",
+                                ref("indicatorDuration"),
+                                ref("indicatorEasing"),
+                            ),
+                        ),
                     },
                 },
                 variants: {

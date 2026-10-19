@@ -2371,6 +2371,11 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
         "base": "0",
       },
       "position": "absolute",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "transform var(--components-tabs-indicatorDuration, token(durations.medium1)) var(--components-tabs-indicatorEasing, token(easings.emphasized))",
+      },
+      "zIndex": "1",
     },
     "label": {
       "textStyle": "titleSmall",
@@ -2386,6 +2391,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "backgroundColor": "var(--components-tabs-container, token(colors.surface))",
       "display": "flex",
       "flexDirection": "row",
+      "position": "relative",
+      "zIndex": "0",
     },
     "tab": {
       "&:is(:disabled, [aria-disabled=true])": {
