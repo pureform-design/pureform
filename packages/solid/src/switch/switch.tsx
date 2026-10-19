@@ -38,7 +38,7 @@ import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -234,26 +234,30 @@ const READY_MADE_PROPS = [
 /** The ready-made switch: every part, in the preset's structure; the icon only when given. */
 function ReadyMade(props: SwitchProps): JSX.Element {
     const hasIcon = createMemo(() => isPresent(props.icon));
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SwitchRootProps;
+    // The root's slot props are an element's, whose `id` also takes `false`.
+    const root = slots("root") as object;
+    const touchTarget = slots("touchTarget");
+    const input = slots("input");
+    const track = slots("track");
+    const stateLayer = slots("stateLayer");
+    const handle = slots("handle");
+    const icon = slots("icon");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as SwitchRootProps)}
-            // The root's slot props are an element's, whose `id` also takes `false`.
-            {...(slotPartProps(props, "root") as object)}
-        >
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
+        <Root {...own} {...root}>
+            <TouchTarget {...touchTarget} />
             <Input
                 aria-label={props["aria-label"]}
                 aria-labelledby={props["aria-labelledby"]}
                 aria-describedby={props["aria-describedby"]}
-                {...slotPartProps(props, "input")}
+                {...input}
             />
-            <Track {...slotPartProps(props, "track")}>
-                <StateLayer {...slotPartProps(props, "stateLayer")} />
-                <Handle {...slotPartProps(props, "handle")}>
+            <Track {...track}>
+                <StateLayer {...stateLayer} />
+                <Handle {...handle}>
                     <Show when={hasIcon()}>
-                        <Icon {...slotPartProps(props, "icon")}>
-                            {props.icon}
-                        </Icon>
+                        <Icon {...icon}>{props.icon}</Icon>
                     </Show>
                 </Handle>
             </Track>

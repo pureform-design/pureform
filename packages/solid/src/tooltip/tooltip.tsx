@@ -34,7 +34,7 @@ import { useControllable } from "../controllable";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -194,40 +194,36 @@ const READY_MADE_PROPS = [
  *  A plain tooltip holds its text; a rich one, the subhead, supporting text, and actions, each
  *  only when given. */
 function ReadyMade(props: TooltipProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as TooltipRootProps;
+    const root = slots("root") as object;
+    const trigger = slots("trigger") as object;
+    const positioner = slots("positioner");
+    const content = slots("content");
+    const subhead = slots("subhead");
+    const supportingText = slots("supportingText");
+    const actions = slots("actions");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as TooltipRootProps)}
-            {...slot("root")}
-        >
+        <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger
-                    as={Button}
-                    label={props.trigger}
-                    {...slot("trigger")}
-                />
+                <Trigger as={Button} label={props.trigger} {...trigger} />
             </Show>
-            <Positioner {...slot("positioner")}>
-                <Content {...slot("content")}>
+            <Positioner {...positioner}>
+                <Content {...content}>
                     <Show
                         when={isRichTooltip(props)}
                         fallback={props.supportingText}
                     >
                         <Show when={isPresent(props.subhead)}>
-                            <Subhead {...slot("subhead")}>
-                                {props.subhead}
-                            </Subhead>
+                            <Subhead {...subhead}>{props.subhead}</Subhead>
                         </Show>
                         <Show when={isPresent(props.supportingText)}>
-                            <SupportingText {...slot("supportingText")}>
+                            <SupportingText {...supportingText}>
                                 {props.supportingText}
                             </SupportingText>
                         </Show>
                         <Show when={isPresent(props.actions)}>
-                            <Actions {...slot("actions")}>
-                                {props.actions}
-                            </Actions>
+                            <Actions {...actions}>{props.actions}</Actions>
                         </Show>
                     </Show>
                 </Content>

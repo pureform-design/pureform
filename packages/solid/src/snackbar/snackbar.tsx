@@ -36,7 +36,7 @@ import {
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import { combinePartProps } from "../props";
@@ -178,21 +178,22 @@ const READY_MADE_PROPS = [
 /** The ready-made snackbar: the message, the action when given a label, and the close button when
  *  given a name. */
 function ReadyMade(props: SnackbarProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SnackbarRootProps;
+    const root = slots("root") as object;
+    const supportingText = slots("supportingText");
+    const action = slots("action");
+    const close = slots("close");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as SnackbarRootProps)}
-            {...slot("root")}
-        >
-            <SupportingText {...slot("supportingText")}>
+        <Root {...own} {...root}>
+            <SupportingText {...supportingText}>
                 {props.supportingText}
             </SupportingText>
             <Show when={isPresent(props.action)}>
-                <Action {...slot("action")}>{props.action}</Action>
+                <Action {...action}>{props.action}</Action>
             </Show>
             <Show when={props.closeLabel}>
-                <Close aria-label={props.closeLabel} {...slot("close")}>
+                <Close aria-label={props.closeLabel} {...close}>
                     {isPresent(props.closeIcon) ? (
                         props.closeIcon
                     ) : (

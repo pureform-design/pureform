@@ -44,7 +44,7 @@ import type { ItemInteractionSources } from "./interaction";
 import { normalizeProps, useMachine } from "./internal/zag";
 import type { PropTypes } from "./internal/zag";
 import { createPartContext } from "./part-context";
-import { slotPartProps, useComponent } from "./parts";
+import { createSlotProps, useComponent } from "./parts";
 import type { ComponentScope, SlotKeyedProps } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
@@ -244,16 +244,17 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
     function ReadyMade(props: NavigationProps<C>): JSX.Element {
-        const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-            slotPartProps(props, part) as object;
+        const slots = createSlotProps(props);
+        const own = omit(props, ...READY_MADE_PROPS) as NavigationRootProps<C>;
+        const root = slots("root") as object;
+        // Views, so every destination reads the same ones.
+        const itemSlot = slots("item") as object;
+        const indicator = slots("indicator");
+        const activeIndicator = slots("activeIndicator");
+        const icon = slots("icon");
+        const label = slots("label");
         return (
-            <Root
-                {...(omit(
-                    props,
-                    ...READY_MADE_PROPS,
-                ) as NavigationRootProps<C>)}
-                {...slot("root")}
-            >
+            <Root {...own} {...root}>
                 <For
                     each={props.items ?? []}
                     keyed={(item: NavigationItem<JSX.Element>) => item.value}
@@ -264,20 +265,17 @@ export function createNavigation<C extends NavigationComponent>(config: {
                             href={item().href}
                             disabled={item().disabled}
                             interactionSource={item().interactionSource}
-                            {...slot("item")}
+                            {...itemSlot}
                         >
-                            <Indicator {...slot("indicator")}>
-                                <ActiveIndicator {...slot("activeIndicator")} />
+                            <Indicator {...indicator}>
+                                <ActiveIndicator {...activeIndicator} />
                                 <Show when={isPresent(item().icon)}>
-                                    <Icon
-                                        mirror={item().mirrorIcon}
-                                        {...slot("icon")}
-                                    >
+                                    <Icon mirror={item().mirrorIcon} {...icon}>
                                         {item().icon}
                                     </Icon>
                                 </Show>
                             </Indicator>
-                            <Label {...slot("label")}>{item().label}</Label>
+                            <Label {...label}>{item().label}</Label>
                         </Item>
                     )}
                 </For>

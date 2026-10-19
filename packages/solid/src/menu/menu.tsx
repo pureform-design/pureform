@@ -38,7 +38,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -274,52 +274,53 @@ const READY_MADE_PROPS = [
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
  *  item per entry of `items`. */
 function ReadyMade(props: MenuProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
     const items = () => props.items ?? [];
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
+    const root = slots("root") as object;
+    const trigger = slots("trigger") as object;
+    const positioner = slots("positioner");
+    const content = slots("content");
+    // Views, so every item reads the same ones.
+    const itemSlot = slots("item");
+    const itemLeading = slots("itemLeading");
+    const itemLabel = slots("itemLabel");
+    const itemTrailing = slots("itemTrailing");
+    const itemTrailingText = slots("itemTrailingText");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as MenuRootProps)}
-            {...slot("root")}
-        >
+        <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger
-                    as={Button}
-                    label={props.trigger}
-                    {...slot("trigger")}
-                />
+                <Trigger as={Button} label={props.trigger} {...trigger} />
             </Show>
-            <Positioner {...slot("positioner")}>
-                <Content {...slot("content")}>
+            <Positioner {...positioner}>
+                <Content {...content}>
                     <For
                         each={items()}
                         keyed={(item: MenuItem<JSX.Element>) => item.value}
                     >
                         {(item) => (
-                            <Item {...menuItemProps(item())} {...slot("item")}>
+                            <Item {...menuItemProps(item())} {...itemSlot}>
                                 <Show when={isPresent(item().leadingIcon)}>
                                     <ItemLeading
                                         mirror={item().mirrorLeadingIcon}
-                                        {...slot("itemLeading")}
+                                        {...itemLeading}
                                     >
                                         {item().leadingIcon}
                                     </ItemLeading>
                                 </Show>
-                                <ItemLabel {...slot("itemLabel")}>
+                                <ItemLabel {...itemLabel}>
                                     {item().label}
                                 </ItemLabel>
                                 <Show when={isPresent(item().trailingIcon)}>
                                     <ItemTrailing
                                         mirror={item().mirrorTrailingIcon}
-                                        {...slot("itemTrailing")}
+                                        {...itemTrailing}
                                     >
                                         {item().trailingIcon}
                                     </ItemTrailing>
                                 </Show>
                                 <Show when={isPresent(item().trailingText)}>
-                                    <ItemTrailingText
-                                        {...slot("itemTrailingText")}
-                                    >
+                                    <ItemTrailingText {...itemTrailingText}>
                                         {item().trailingText}
                                     </ItemTrailingText>
                                 </Show>

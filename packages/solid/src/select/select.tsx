@@ -5,6 +5,7 @@
 // Zag.
 
 import { selectAnatomy, selectMenuAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     SELECT_COLLECTION,
@@ -48,7 +49,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -421,19 +422,27 @@ const READY_MADE_PROPS = [
 ] as const;
 
 // Inside Root, so it can read whether an error shows and the options.
-function ReadyMadeContent(props: { readonly own: SelectProps }): JSX.Element {
+function ReadyMadeContent(props: {
+    readonly own: SelectProps;
+    readonly slots: (part: PartName<Anatomy>) => PartProps;
+}): JSX.Element {
     const { items, supportingTextId, errorText } = context.use("Root");
     const own = props.own;
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(own, part) as object;
+    const container = props.slots("container");
+    const leadingIcon = props.slots("leadingIcon");
+    const input = props.slots("input");
+    const label = props.slots("label");
+    const trailingIcon = props.slots("trailingIcon");
+    const supportingText = props.slots("supportingText");
+    const hiddenSelect = props.slots("hiddenSelect") as object;
     const showsSupporting = createMemo(
         () => isPresent(own.supportingText) || errorText() !== undefined,
     );
     return (
         <>
-            <Container {...slot("container")}>
+            <Container {...container}>
                 <Show when={isPresent(own.leadingIcon)}>
-                    <LeadingIcon {...slot("leadingIcon")}>
+                    <LeadingIcon {...leadingIcon}>
                         {own.leadingIcon}
                     </LeadingIcon>
                 </Show>
@@ -444,10 +453,10 @@ function ReadyMadeContent(props: { readonly own: SelectProps }): JSX.Element {
                         own["aria-describedby"] ??
                         (showsSupporting() ? supportingTextId() : undefined)
                     }
-                    {...slot("input")}
+                    {...input}
                 />
-                <Label {...slot("label")}>{own.label}</Label>
-                <TrailingIcon {...slot("trailingIcon")}>
+                <Label {...label}>{own.label}</Label>
+                <TrailingIcon {...trailingIcon}>
                     {isPresent(own.trailingIcon) ? (
                         own.trailingIcon
                     ) : (
@@ -456,11 +465,11 @@ function ReadyMadeContent(props: { readonly own: SelectProps }): JSX.Element {
                 </TrailingIcon>
             </Container>
             <Show when={showsSupporting()}>
-                <SupportingText {...slot("supportingText")}>
+                <SupportingText {...supportingText}>
                     {own.supportingText}
                 </SupportingText>
             </Show>
-            <HiddenSelect {...slot("hiddenSelect")} />
+            <HiddenSelect {...hiddenSelect} />
             <Positioner>
                 <Content>
                     <For
@@ -482,14 +491,17 @@ function ReadyMadeContent(props: { readonly own: SelectProps }): JSX.Element {
 /** The ready-made select: the field in the preset's structure (the leading icon and supporting
  *  text only when given, or while an error shows), the hidden select, and the list. */
 function ReadyMade(props: SelectProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SelectRootProps;
+    // The root's slot props are an element's, whose `id` also takes `false`.
+    const root = slots("root") as object;
     return (
         <Root
-            {...(omit(props, ...READY_MADE_PROPS) as SelectRootProps)}
+            {...own}
             leadingIcon={isPresent(props.leadingIcon) || undefined}
-            // The root's slot props are an element's, whose `id` also takes `false`.
-            {...(slotPartProps(props, "root") as object)}
+            {...root}
         >
-            <ReadyMadeContent own={props} />
+            <ReadyMadeContent own={props} slots={slots} />
         </Root>
     );
 }

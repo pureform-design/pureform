@@ -40,7 +40,7 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -241,24 +241,32 @@ const READY_MADE_PROPS = [
 /** The ready-made tabs: the tab list with a tab per item, and a panel per item with `content`.
  *  Without a value, the first enabled tab starts selected. */
 function ReadyMade(props: TabsProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
     // Read once per change: items written in place make their content (`content`, `icon`) each
     // time they're read.
     const items = createMemo(() => props.items ?? []);
     const panels = createMemo(() => tabsHavePanels(items()));
     const defaultValue = untrack(() => tabsDefaultValue(props, items()));
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as TabsRootProps;
+    const root = slots("root") as object;
+    const list = slots("list");
+    // Views, so every tab reads the same ones.
+    const tab = slots("tab") as object;
+    const icon = slots("icon");
+    const label = slots("label");
+    const indicator = slots("indicator");
+    const content = slots("content") as object;
     return (
         <Root
-            {...(omit(props, ...READY_MADE_PROPS) as TabsRootProps)}
+            {...own}
             defaultValue={defaultValue}
             icon={props.icon ?? tabsHaveIcons(items())}
-            {...slot("root")}
+            {...root}
         >
             <List
                 aria-label={props["aria-label"]}
                 aria-labelledby={props["aria-labelledby"]}
-                {...slot("list")}
+                {...list}
             >
                 <For
                     each={items()}
@@ -270,18 +278,15 @@ function ReadyMade(props: TabsProps): JSX.Element {
                             disabled={item().disabled}
                             interactionSource={item().interactionSource}
                             controls={panels()}
-                            {...slot("tab")}
+                            {...tab}
                         >
                             <Show when={isPresent(item().icon)}>
-                                <Icon
-                                    mirror={item().mirrorIcon}
-                                    {...slot("icon")}
-                                >
+                                <Icon mirror={item().mirrorIcon} {...icon}>
                                     {item().icon}
                                 </Icon>
                             </Show>
-                            <Label {...slot("label")}>{item().label}</Label>
-                            <Indicator {...slot("indicator")} />
+                            <Label {...label}>{item().label}</Label>
+                            <Indicator {...indicator} />
                         </Tab>
                     )}
                 </For>
@@ -291,7 +296,7 @@ function ReadyMade(props: TabsProps): JSX.Element {
                 keyed={(item: TabsItem<JSX.Element>) => item.value}
             >
                 {(item) => (
-                    <Content value={item().value} {...slot("content")}>
+                    <Content value={item().value} {...content}>
                         {item().content}
                     </Content>
                 )}

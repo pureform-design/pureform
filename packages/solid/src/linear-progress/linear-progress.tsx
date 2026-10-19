@@ -14,7 +14,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -84,17 +84,18 @@ export interface LinearProgressProps
 
 /** The ready-made linear progress indicator: Root and its indicator. */
 function ReadyMade(props: LinearProgressProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(
+        props,
+        "class",
+        "style",
+        "slotProps",
+    ) as LinearProgressRootProps;
+    const root = slots("root") as object;
+    const indicator = slots("indicator");
     return (
-        <Root
-            {...(omit(
-                props,
-                "class",
-                "style",
-                "slotProps",
-            ) as LinearProgressRootProps)}
-            {...(slotPartProps(props, "root") as object)}
-        >
-            <Indicator {...slotPartProps(props, "indicator")} />
+        <Root {...own} {...root}>
+            <Indicator {...indicator} />
         </Root>
     );
 }

@@ -36,7 +36,7 @@ import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -216,24 +216,27 @@ const READY_MADE_PROPS = [
 
 /** The ready-made checkbox: every part, in the preset's structure. */
 function ReadyMade(props: CheckboxProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as CheckboxRootProps;
+    // The root's slot props are an element's, whose `id` also takes `false`.
+    const root = slots("root") as object;
+    const touchTarget = slots("touchTarget");
+    const input = slots("input");
+    const box = slots("box");
+    const checkIcon = slots("checkIcon");
+    const indeterminateIcon = slots("indeterminateIcon");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as CheckboxRootProps)}
-            // The root's slot props are an element's, whose `id` also takes `false`.
-            {...(slotPartProps(props, "root") as object)}
-        >
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
+        <Root {...own} {...root}>
+            <TouchTarget {...touchTarget} />
             <Input
                 aria-label={props["aria-label"]}
                 aria-labelledby={props["aria-labelledby"]}
                 aria-describedby={props["aria-describedby"]}
-                {...slotPartProps(props, "input")}
+                {...input}
             />
-            <Box {...slotPartProps(props, "box")}>
-                <CheckIcon {...slotPartProps(props, "checkIcon")} />
-                <IndeterminateIcon
-                    {...slotPartProps(props, "indeterminateIcon")}
-                />
+            <Box {...box}>
+                <CheckIcon {...checkIcon} />
+                <IndeterminateIcon {...indeterminateIcon} />
             </Box>
         </Root>
     );
