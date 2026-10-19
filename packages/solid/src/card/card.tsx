@@ -19,7 +19,7 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -112,19 +112,20 @@ function ReadyMade(props: CardProps): JSX.Element {
             props,
             cardElement<ValidComponent>({ href: props.href, as: props.as }),
         );
+    const slots = createSlotProps(props);
+    const own = omit(
+        props,
+        "class",
+        "style",
+        "slotProps",
+        "children",
+    ) as CardRootProps;
+    const root = slots("root") as object;
+    const touchTarget = slots("touchTarget");
     return (
-        <Root
-            {...(omit(
-                props,
-                "class",
-                "style",
-                "slotProps",
-                "children",
-            ) as CardRootProps)}
-            {...(slotPartProps(props, "root") as object)}
-        >
+        <Root {...own} {...root}>
             <Show when={interactive()}>
-                <TouchTarget {...slotPartProps(props, "touchTarget")} />
+                <TouchTarget {...touchTarget} />
             </Show>
             {props.children}
         </Root>

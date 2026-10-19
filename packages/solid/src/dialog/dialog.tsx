@@ -40,7 +40,7 @@ import { useControllable } from "../controllable";
 import { mergeProps, normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -299,39 +299,37 @@ const READY_MADE_PROPS = [
 /** The ready-made dialog: the trigger, drawn as a button, when given a label, the backdrop, and the
  *  dialog with its icon, headline, body, and actions, each only when given. */
 function ReadyMade(props: DialogProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part) as object;
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as DialogRootProps;
+    const root = slots("root") as object;
+    const trigger = slots("trigger") as object;
+    const positioner = slots("positioner");
+    const content = slots("content");
+    const icon = slots("icon");
+    const headline = slots("headline");
+    const body = slots("body");
+    const actions = slots("actions");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as DialogRootProps)}
-            icon={isPresent(props.icon) || undefined}
-            {...slot("root")}
-        >
+        <Root {...own} icon={isPresent(props.icon) || undefined} {...root}>
             <Show when={isPresent(props.trigger)}>
-                <Trigger
-                    as={Button}
-                    label={props.trigger}
-                    {...slot("trigger")}
-                />
+                <Trigger as={Button} label={props.trigger} {...trigger} />
             </Show>
             <Backdrop />
-            <Positioner {...slot("positioner")}>
-                <Content {...slot("content")}>
+            <Positioner {...positioner}>
+                <Content {...content}>
                     <Show when={isPresent(props.icon)}>
-                        <Icon mirror={props.mirrorIcon} {...slot("icon")}>
+                        <Icon mirror={props.mirrorIcon} {...icon}>
                             {props.icon}
                         </Icon>
                     </Show>
                     <Show when={isPresent(props.headline)}>
-                        <Headline {...slot("headline")}>
-                            {props.headline}
-                        </Headline>
+                        <Headline {...headline}>{props.headline}</Headline>
                     </Show>
                     <Show when={isPresent(props.body)}>
-                        <Body {...slot("body")}>{props.body}</Body>
+                        <Body {...body}>{props.body}</Body>
                     </Show>
                     <Show when={isPresent(props.actions)}>
-                        <Actions {...slot("actions")}>{props.actions}</Actions>
+                        <Actions {...actions}>{props.actions}</Actions>
                     </Show>
                 </Content>
             </Positioner>

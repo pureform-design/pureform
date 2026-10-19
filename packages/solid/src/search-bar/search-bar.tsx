@@ -35,7 +35,7 @@ import { useFormReset } from "../form";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -192,27 +192,28 @@ const READY_MADE_PROPS = [
 
 /** The ready-made search bar: the input, with the leading and trailing parts only when given. */
 function ReadyMade(props: SearchBarProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part);
     const inputProps = () => {
         const picked: Record<string, unknown> = {};
         for (const key of SEARCH_BAR_INPUT_PROPS)
             picked[key] = (props as Record<string, unknown>)[key];
         return picked;
     };
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SearchBarRootProps;
+    const root = slots("root") as object;
+    const leading = slots("leading");
+    const input = slots("input");
+    const trailing = slots("trailing");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as SearchBarRootProps)}
-            {...(slot("root") as object)}
-        >
+        <Root {...own} {...root}>
             <Show when={isPresent(props.leading)}>
-                <Leading mirror={props.mirrorLeading} {...slot("leading")}>
+                <Leading mirror={props.mirrorLeading} {...leading}>
                     {props.leading}
                 </Leading>
             </Show>
-            <Input {...inputProps()} {...slot("input")} />
+            <Input {...inputProps()} {...input} />
             <Show when={isPresent(props.trailing)}>
-                <Trailing mirror={props.mirrorTrailing} {...slot("trailing")}>
+                <Trailing mirror={props.mirrorTrailing} {...trailing}>
                     {props.trailing}
                 </Trailing>
             </Show>

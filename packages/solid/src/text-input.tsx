@@ -35,7 +35,7 @@ import { useFormReset } from "./form";
 import { normalizeProps, useMachine } from "./internal/zag";
 import type { PropTypes } from "./internal/zag";
 import { createPartContext } from "./part-context";
-import { slotPartProps, useComponent } from "./parts";
+import { createSlotProps, useComponent } from "./parts";
 import type { ComponentScope, SlotKeyedProps } from "./parts";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
@@ -246,11 +246,18 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     ] as const;
 
     // Inside Root, so it can read whether an error shows.
-    function Content(props: { readonly own: ReadyMadeProps }): JSX.Element {
+    function Content(props: {
+        readonly own: ReadyMadeProps;
+        readonly slots: (part: string) => PartProps;
+    }): JSX.Element {
         const { api } = context.use("Root");
         const own = props.own;
-        const slot = (part: string) =>
-            slotPartProps(own, part as never) as object;
+        const container = props.slots("container");
+        const leadingIcon = props.slots("leadingIcon");
+        const input = props.slots("input");
+        const label = props.slots("label");
+        const trailingIcon = props.slots("trailingIcon");
+        const supportingText = props.slots("supportingText");
         const showsSupporting = createMemo(
             () =>
                 isPresent(own.supportingText) || api().errorText !== undefined,
@@ -265,28 +272,28 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
         };
         return (
             <>
-                <Container {...slot("container")}>
+                <Container {...container}>
                     <Show when={isPresent(own.leadingIcon)}>
                         <LeadingIcon
                             mirror={own.mirrorLeadingIcon}
-                            {...slot("leadingIcon")}
+                            {...leadingIcon}
                         >
                             {own.leadingIcon}
                         </LeadingIcon>
                     </Show>
-                    <Input {...inputProps()} {...slot("input")} />
-                    <Label {...slot("label")}>{own.label}</Label>
+                    <Input {...inputProps()} {...input} />
+                    <Label {...label}>{own.label}</Label>
                     <Show when={isPresent(own.trailingIcon)}>
                         <TrailingIcon
                             mirror={own.mirrorTrailingIcon}
-                            {...slot("trailingIcon")}
+                            {...trailingIcon}
                         >
                             {own.trailingIcon}
                         </TrailingIcon>
                     </Show>
                 </Container>
                 <Show when={showsSupporting()}>
-                    <SupportingText {...slot("supportingText")}>
+                    <SupportingText {...supportingText}>
                         {own.supportingText}
                     </SupportingText>
                 </Show>
@@ -297,18 +304,21 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     /** The ready-made field: every part, in the preset's structure; the icons and supporting text
      *  only when given (or while an error shows). */
     function ReadyMade(props: ReadyMadeProps): JSX.Element {
+        const slots = createSlotProps(props) as (part: string) => PartProps;
+        const own = omit(
+            props as Record<string, unknown>,
+            ...readyMadeOwn,
+        ) as RootProps;
+        // The root's slot props are an element's, whose `id` also takes `false`.
+        const root = slots("root") as object;
         return (
             <Root
-                {...(omit(
-                    props as Record<string, unknown>,
-                    ...readyMadeOwn,
-                ) as RootProps)}
+                {...own}
                 leadingIcon={isPresent(props.leadingIcon) || undefined}
                 trailingIcon={isPresent(props.trailingIcon) || undefined}
-                // The root's slot props are an element's, whose `id` also takes `false`.
-                {...(slotPartProps(props, "root") as object)}
+                {...root}
             >
-                <Content own={props} />
+                <Content own={props} slots={slots} />
             </Root>
         );
     }

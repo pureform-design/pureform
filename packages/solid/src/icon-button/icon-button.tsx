@@ -25,7 +25,7 @@ import { type Accessor, omit, untrack } from "solid-js";
 
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import type { PartProps } from "../props";
@@ -153,22 +153,23 @@ const READY_MADE_PROPS = [
 /** The ready-made icon button: Root, its touch target, the container holding the icon, and the
  *  outline. */
 function ReadyMade(props: IconButtonProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as IconButtonRootProps;
+    // The root's slot props are an element's, whose `id` also takes `false`.
+    const root = slots("root") as object;
+    const touchTarget = slots("touchTarget");
+    const container = slots("container");
+    const icon = slots("icon");
+    const outline = slots("outline");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as IconButtonRootProps)}
-            // The root's slot props are an element's, whose `id` also takes `false`.
-            {...(slotPartProps(props, "root") as object)}
-        >
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
-            <Container {...slotPartProps(props, "container")}>
-                <Icon
-                    mirror={props.mirrorIcon}
-                    {...slotPartProps(props, "icon")}
-                >
+        <Root {...own} {...root}>
+            <TouchTarget {...touchTarget} />
+            <Container {...container}>
+                <Icon mirror={props.mirrorIcon} {...icon}>
                     {props.icon}
                 </Icon>
             </Container>
-            <Outline {...slotPartProps(props, "outline")} />
+            <Outline {...outline} />
         </Root>
     );
 }

@@ -14,7 +14,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -97,23 +97,25 @@ export interface CircularProgressProps
 
 /** The ready-made circular progress indicator: Root, its halves, and their arcs. */
 function ReadyMade(props: CircularProgressProps): JSX.Element {
-    const slot = (name: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, name);
+    const slots = createSlotProps(props);
+    const own = omit(
+        props,
+        "class",
+        "style",
+        "slotProps",
+    ) as CircularProgressRootProps;
+    const root = slots("root") as object;
+    const endHalf = slots("endHalf");
+    const endArc = slots("endArc");
+    const startHalf = slots("startHalf");
+    const startArc = slots("startArc");
     return (
-        <Root
-            {...(omit(
-                props,
-                "class",
-                "style",
-                "slotProps",
-            ) as CircularProgressRootProps)}
-            {...(slot("root") as object)}
-        >
-            <EndHalf {...slot("endHalf")}>
-                <EndArc {...slot("endArc")} />
+        <Root {...own} {...root}>
+            <EndHalf {...endHalf}>
+                <EndArc {...endArc} />
             </EndHalf>
-            <StartHalf {...slot("startHalf")}>
-                <StartArc {...slot("startArc")} />
+            <StartHalf {...startHalf}>
+                <StartArc {...startArc} />
             </StartHalf>
         </Root>
     );

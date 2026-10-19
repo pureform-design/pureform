@@ -31,7 +31,7 @@ import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -177,23 +177,26 @@ const READY_MADE_PROPS = [
 
 /** The ready-made slider: every part, in the preset's structure. */
 function ReadyMade(props: SliderProps): JSX.Element {
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part);
     const label = () => {
         const picked: Record<string, unknown> = {};
         for (const key of SLIDER_INPUT_LABEL_PROPS) picked[key] = props[key];
         return picked;
     };
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SliderRootProps;
+    const root = slots("root") as object;
+    const track = slots("track");
+    const activeTrack = slots("activeTrack");
+    const stateLayer = slots("stateLayer");
+    const handle = slots("handle");
+    const input = slots("input");
     return (
-        <Root
-            {...(omit(props, ...READY_MADE_PROPS) as SliderRootProps)}
-            {...(slot("root") as object)}
-        >
-            <Track {...slot("track")} />
-            <ActiveTrack {...slot("activeTrack")} />
-            <StateLayer {...slot("stateLayer")} />
-            <Handle {...slot("handle")} />
-            <Input {...label()} {...slot("input")} />
+        <Root {...own} {...root}>
+            <Track {...track} />
+            <ActiveTrack {...activeTrack} />
+            <StateLayer {...stateLayer} />
+            <Handle {...handle} />
+            <Input {...label()} {...input} />
         </Root>
     );
 }
