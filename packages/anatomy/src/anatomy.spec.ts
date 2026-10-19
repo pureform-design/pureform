@@ -139,6 +139,16 @@ describe("the written anatomy", () => {
         expect(anatomy.select.parts.root.children).toContain("hiddenSelect");
     });
 
+    it("wraps a tab's icon, label, and indicator in its content, as Material's tabs do", () => {
+        expect(anatomy.tabs.parts.tab.children).toEqual(["tabContent"]);
+        expect(anatomy.tabs.parts.tabContent).toMatchObject({
+            attribute: "tab-content",
+            testId: "pf-tabs-tab-content",
+            parent: "tab",
+            children: ["icon", "label", "indicator"],
+        });
+    });
+
     it("lists every part's test id under testIds", () => {
         expect(
             Object.fromEntries(

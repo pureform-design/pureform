@@ -139,6 +139,13 @@ describe("composites", () => {
         expect(
             partAttributes(tabsCompositeAnatomy, "root")["data-testid"],
         ).toBe(tabsAnatomy.parts.root.testId);
+        // Each tab wraps its parts in its content, as the preset's does.
+        const preset = tabsAnatomy.parts as ComponentAnatomy["parts"];
+        expect(parts.tab!.children).toEqual(preset.tab!.children);
+        for (const name of ["tabContent", "icon", "label", "indicator"]) {
+            expect(parts[name]!.parent).toBe(preset[name]!.parent);
+            expect(parts[name]!.children).toEqual(preset[name]!.children);
+        }
     });
 
     it("the list is unstyled, around its items", () => {
