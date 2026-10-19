@@ -80,7 +80,9 @@ Conditions (`when("hover", …)`), on the styled element:
 | `mirrored`         | `&[data-pf-mirror]` (a marking, not a state: an icon that flips under `rtl`)                |
 
 Slot states (`slot("root", "checked")`) match on the slot's element, or on an ancestor slot's
-class, and also through `:has()` for a control inside the slot. Each repeats its `:is()` to
+class, and also through `:has()` for a control inside the slot. A descendant slot's state matches
+through `:has()` along the structure's path, child by child (`&:has(> .card__actionArea:is(…))`),
+without the state's own `:has()` alternatives, since `:has()` can't nest. Each repeats its `:is()` to
 its rank, so later states win: rank 1 for hover, filled, selected, checked, and expanded; 2 for
 indeterminate, focusWithin, and focusVisibleWithin; 3 for pressed; 4 for invalid; 5 for
 disabled.

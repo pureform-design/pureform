@@ -1320,7 +1320,7 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
   The avatar is an `<img>` with `src` and a `<span>` otherwise; the standalone icon is
   `aria-hidden` unless given `label`. The card follows the list item: a `<div>`, a link with
   `href`, or any element with `as`, interactive (with its touch target) when it's a link or a
-  button. The search bar's Root is the preset's `<label>`; its `Trailing` part isn't hidden, since
+  button. Since then the card has Material's anatomy and an action area (§9.9). The search bar's Root is the preset's `<label>`; its `Trailing` part isn't hidden, since
   it can hold actions. The ripple's `ripple` part isn't rendered by the binding: it's the class each
   ripple element takes.
 
@@ -1983,6 +1983,7 @@ From today's preset:
 | Components                                               | Trigger         | Surface                               | Centered |
 | -------------------------------------------------------- | --------------- | ------------------------------------- | -------- |
 | button, chip, card and list item (when interactive), tab | root (or `tab`) | the same                              | no       |
+| card with an action area (§9.9)                          | `actionArea`    | root (its layer in the action area)   | no       |
 | menu item, select option                                 | item            | item (highlight forwards as hover)    | no       |
 | snackbar action and close                                | the button      | the same                              | no       |
 | icon button                                              | root            | `container`                           | yes      |
@@ -2075,6 +2076,17 @@ and `useIndication(source, { centered })`. What differs from the web:
 - **The search bar** has no indication entry, so no ripple: its source only carries the root's hover
   and press and the input's focus.
 
+- **The layer's part (§9.9).** An entry may name a `layer` part besides its surface: the part that
+  holds the layer element. The card's action area does: it stays unpositioned inside the
+  positioned container, so its layer (absolutely placed, `inset: 0`, corners inherited) spans the
+  whole card, while only the action area is the button. The bindings render the layer in the part
+  holding it (`holdsLayer` in binding-core), attach that part with the `layer` role, and the effect
+  finds the layer there (`IndicationInstance` reads it at each press). React Native renders the
+  layer in its surface, the root, since its absolute views place against their parent.
+- **Entries that come and go.** `useComponent` takes `entryActive(entry)`: which of a component's
+  entries shows now. The card's root entry shows while Root acts, its action area's otherwise, so
+  a card renders one layer and runs one effect; a static card renders none.
+
 #### Behavior rules
 
 - **Reduced motion** (§5.8): the ripple stops; the state layer's fades and the focus
@@ -2147,6 +2159,146 @@ mounts (React's 1,000-item mount re-rendered every surface once before).
   machines emit to a source.
 - `@pureform/preset` and `@pureform/material`: the tokens, `stateLayer()`, `focusRing()`,
   and each component's indication declaration; `@pureform/anatomy` derives the entry.
+
+### 9.9 The card's anatomy
+
+A card is one subject: its media, a header, its supporting text, and its actions. It can act as a
+whole ("the entire card can be a single action"), have actions of its own beside that, or both.
+Before this, pureform's card was `root` and `touchTarget`: the whole card acted (a link or a
+button) or nothing did, so a card with its own action and a button inside nested one control in
+another. On React Native-Web that's a `<button>` in a `<button>` (React warns, and the HTML is
+invalid); on iOS and Android a `Pressable` is `accessible`, which groups its whole subtree into one
+screen-reader element, so the controls inside couldn't be reached at all.
+
+**What Material's implementations do.**
+
+- **M3 spec** ([cards](https://m3.material.io/components/cards/overview); the anatomy in
+  [Material Components Android's Card.md](https://github.com/material-components/material-components-android/blob/master/docs/components/Card.md)):
+  container, headline, subhead, supporting text, image, buttons. Elevated, filled, and outlined.
+  States on the container: hovered, focused, pressed, dragged; Android adds checked, with a checked
+  icon (`checkedIcon`, 24dp, top end) and a secondary stroke. The tokens
+  ([material-web `md.comp.elevated-card`](https://github.com/material-components/material-web/blob/main/tokens/versions/v0_192/_md-comp-elevated-card.scss))
+  carry the container's color, shape (corner medium), elevation per state (level 1, level 2 on
+  hover, level 4 dragged), state-layer opacities, and an icon color and size (primary, 24px), but
+  no padding: the layout values (16dp padding, 8dp between buttons) are guidelines.
+- **Material Components Web** ([mdc-card](https://github.com/material-components/material-components-web/tree/master/packages/mdc-card)):
+  the card has no padding; `__primary-action` is a focusable region with the ripple (`__ripple`)
+  around most of the content, and it "recommend[s] avoiding adding other actionable items within"
+  it; `__media` (`--square`, `--16-9`) with `__media-content` over it; `__actions` (`--full-bleed`)
+  holding `__action-buttons` (start) and `__action-icons` (end).
+- **Angular Material** ([card.md](https://github.com/angular/components/blob/main/src/material/card/card.md)):
+  `mat-card-header` (`-title`, `-subtitle`, `mat-card-avatar`), `mat-card-title-group` with a
+  small, medium, or large image, `mat-card-content`, `mat-card-image`, `mat-card-actions` with
+  `align="start" | "end"`, and `mat-card-footer`. The card itself has no padding; its sections pad
+  themselves. Accessibility: give the card `role="group"` or `"region"` (or a landmark) when it's a
+  meaningful whole, `tabindex` only when the card itself is a primary way to interact, and let its
+  content follow its own rules.
+- **MUI** ([Card](https://mui.com/material-ui/react-card/), and the CardHeader, CardActions,
+  CardActionArea, and CardMedia API pages): `CardHeader` (`avatar`, `title`, `subheader`,
+  `action`), `CardMedia`, `CardContent`, `CardActions` (`disableSpacing`), and `CardActionArea`, a
+  button base around the part that acts ("supplemental actions … should stand detached from the
+  main action area in order to avoid event overlap"); its ripple and focus highlight cover only the
+  action area.
+- **Jetpack Compose** ([Card](https://developer.android.com/develop/ui/compose/components/card)):
+  `Card`, `ElevatedCard`, and `OutlinedCard`, each with an `onClick` overload; the indication covers
+  the whole card, whose content is free. **Android's `MaterialCardView`** (Card.md above): checkable
+  (`android:checkable`, `setChecked`), a checked icon and gravity, and a dragged state with its
+  elevation.
+
+**The design.** MDC's and MUI's structure (an action area beside the other controls, so no
+control sits in another), with M3's and Compose's states on the whole container.
+
+| Part          | What it is                                                               | Material's name                                         |
+| ------------- | ------------------------------------------------------------------------ | ------------------------------------------------------- |
+| `root`        | The container: a `<div>`, or the link or button when the whole card acts | container; `mat-card`; `Card`                           |
+| `touchTarget` | As before, while Root acts                                               |                                                         |
+| `actionArea`  | The card's own action beside other controls: a link (`href`) or a button | `__primary-action`; `CardActionArea`                    |
+| `media`       | Full bleed, a frame for an image, a video, or a `Media`                  | image; `__media`; `mat-card-image`; `CardMedia`         |
+| `header`      | A row: `avatar`, `headerText` (`headline`, `subhead`), `headerAction`    | headline, subhead; `mat-card-header`; `CardHeader`      |
+| `content`     | The padded body, holding `supportingText` and anything else              | supporting text; `mat-card-content`; `CardContent`      |
+| `actions`     | A row of buttons, at its end or start (`actionsAlign`)                   | buttons; `__actions`; `mat-card-actions`; `CardActions` |
+| `footer`      | A last section                                                           | `mat-card-footer`                                       |
+
+- **Names.** M3's `headline` and `subhead` (Angular's title and subtitle), `supportingText` as the
+  list item and the text field call it, `avatar` and `headerAction` from MUI and Angular,
+  `actionArea` from MUI.
+- **Dropped:** MDC's `__media-content` (an overlay over the media; the app places its own),
+  `__action-buttons` and `__action-icons` (the preset styles a button and an icon button the same
+  inside the row, so one row with a gap does; an app pushes icons to the end with a margin), the
+  `--full-bleed` and `--square`/`--16-9` modifiers (`Media`'s `aspect` covers the ratios), and
+  Angular's title group and its sized images (a header with an avatar covers the common case).
+  **Not built: the checked state.** Android's checkable card is a toggle (the card's action
+  selects it) with a checked icon, a foreground, and a stroke; on the web that's `aria-pressed` on
+  the action area and controllable state (§9.4) in every binding, more than this change. The
+  preset's `selected` state is there to build it on.
+- **Layout.** The sections pad themselves (16px, the card's `padding` token, at their start and
+  sides; the container's bottom padding closes the last), the media bleeds to the edges, and the
+  container clips them to its corners. So a card laid out in sections turns off Root's own padding:
+  the `padded` variant (`"true"` by default, as before), which the ready-made card sets from its
+  content. Tokens: `headerGap` (16px), `actionsGap` (8px), `headlineColor` (`onSurface`, Title
+  Medium), `subheadColor` and `supportingTextColor` (`onSurfaceVariant`, Body Medium).
+- **Indication (§9.8).** The action area is the trigger; the container is the surface. The
+  container follows the action area's states through descendant slot conditions (below): its
+  hover, keyboard focus, and press tint the whole container, its hover lifts it a level, a disabled
+  action area dims it, and the container draws the focus indicator (M3 shows focus on the
+  container). The ripple's layer sits in the action area, which stays unpositioned so the layer
+  spans the card. A control beside the action area (in `actions`, or the `headerAction`) is outside
+  it in the markup: hovering, pressing, or focusing it shows only its own indication, and it's a
+  tab stop of its own.
+- **Descendant slot conditions.** A slot can now read a descendant's state, not only an
+  ancestor's: the web lowers `slot("actionArea", "hover")` on the root to
+  `&:has(> .card__actionArea:is(:hover, [data-pf-hover]))`, along the structure's path child by
+  child (so an outer card doesn't follow an inner one's action area), leaving out a state's own
+  `:has()` alternatives, since `:has()` can't nest. React Native passes the component's state to
+  every slot, as before. The rules sit in the `interactive: "false"` variant, beside the fill's
+  colors (each fill sets the `container` and shadow tokens they read), so their cases outrank the
+  fill on every target, cascade layers included.
+- **Accessibility.** On the web the action area is one link or button, named by its text; the
+  container is a plain `<div>` (an app adds `role="group"` or `"region"` where the card is a
+  meaningful whole, as Angular advises). On React Native the root is a plain `View`, not
+  `accessible`, so the controls inside stay reachable; the action area is the `Pressable`, which
+  groups its own content into one element with the card's action.
+- **Compatible.** A card with no action area renders as before: `interactive`, `as="button"`,
+  `href`, the variants, tokens, indication, and `interactionSource`; React Native's `onPress`
+  with plain children is still one button, its text its label, the best a card with no other
+  controls can do.
+
+**The bindings.** Every part is a compound part in Solid, React, and React Native
+(`Card.ActionArea`, `Card.Header`, …), and the ready-made `Card` takes the sections as content:
+`media`, `avatar`, `headline`, `subhead`, `headerAction`, `supportingText`, `actions`, `footer`
+(binding-core's `cardLayout`). It lays them out in that order, and with a card that acts (`href`
+or `as` on the web, `onPress` on React Native):
+
+- with no other control, Root is the link or button around everything, as before;
+- beside `actions` or a `headerAction`, the action moves to the action area around the media,
+  header, and content; Root's element props (`onClick`, `target`, `aria-*`) go with it, and
+  `slotProps.root` styles the container. A header holding a control can't sit inside the action
+  area, so it comes first, outside it.
+
+```tsx
+// Solid and React: compound
+<Card.Root variant="outlined" padded={false}>
+    <Card.ActionArea href="/plans/basic">
+        <Card.Media><img src={art} alt="" /></Card.Media>
+        <Card.Header>
+            <Card.HeaderText>
+                <Card.Headline>Basic plan</Card.Headline>
+                <Card.Subhead>$4 a month</Card.Subhead>
+            </Card.HeaderText>
+        </Card.Header>
+        <Card.Content><Card.SupportingText>…</Card.SupportingText></Card.Content>
+    </Card.ActionArea>
+    <Card.Actions><Button label="Upgrade" onClick={upgrade} /></Card.Actions>
+</Card.Root>
+
+// Ready-made, every binding (React Native: onPress)
+<Card href="/plans/basic" headline="Basic plan" supportingText="…"
+    actions={<Button label="Upgrade" onClick={upgrade} />} />
+```
+
+React Native has no links or `as`: the action area is a `Pressable` (`role="button"`, or
+`"link"`), and the root learns it has one when the action area mounts (no server rendering to
+match). Its gaps are in its README.
 
 ## 10. CLI
 
