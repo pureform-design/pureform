@@ -345,6 +345,7 @@ function ReadyMade(props: TabsProps): JSX.Element {
                             value={item().value}
                             disabled={item().disabled}
                             interactionSource={item().interactionSource}
+                            aria-label={item()["aria-label"]}
                             controls={panels()}
                             tabContentProps={tabContent}
                             {...tab}
@@ -354,7 +355,9 @@ function ReadyMade(props: TabsProps): JSX.Element {
                                     {item().icon}
                                 </Icon>
                             </Show>
-                            <Label {...label}>{item().label}</Label>
+                            <Show when={isPresent(item().label)}>
+                                <Label {...label}>{item().label}</Label>
+                            </Show>
                             <Indicator {...indicator} />
                         </Tab>
                     )}
