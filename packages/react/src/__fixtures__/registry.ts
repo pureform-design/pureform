@@ -207,7 +207,14 @@ const NAV_SLOTS = [
  *  item. */
 export const navigationRegistry = () =>
     createRegistry({
-        tabs: named("tabs", ["root", "tab", "icon", "label", "indicator"]),
+        tabs: named("tabs", [
+            "root",
+            "tab",
+            "tabContent",
+            "icon",
+            "label",
+            "indicator",
+        ]),
         navigationBar: named("navigation-bar", NAV_SLOTS),
         navigationRail: named("navigation-rail", NAV_SLOTS),
         listItem: named("list-item", [
