@@ -1,9 +1,9 @@
 import { compositeTestIds, testIds } from "@pureform/anatomy";
-import { createSignal } from "solid-js";
+import { createSignal, createStore, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
 import { ListItem } from ".";
-import { PureformProvider } from "..";
+import { PureformProvider, useIconStyle } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { List } from "../list";
 import { byTestId, mount, settle } from "../testing/mount";
@@ -64,6 +64,96 @@ describe("ListItem", () => {
         expect(root.tagName).toBe("BUTTON");
         expect(root.type).toBe("button");
         expect(root.disabled).toBe(true);
+    });
+});
+
+describe("ListItem, ready-made", () => {
+    it("follows slot-keyed class, style, and slotProps as they change", async () => {
+        const [classes, setClasses] = createSignal<
+            Partial<Record<"root" | "supportingText", string>>
+        >({});
+        const [style, setStyle] = createSignal({
+            root: { "margin-top": "1px" },
+        });
+        const [headline, setHeadline] = createStore({ title: "first" });
+        withRegistry(() => (
+            <ListItem
+                headline="Inbox"
+                supportingText="3 new"
+                class={classes()}
+                style={style()}
+                slotProps={{ headline }}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.headline).className).toBe("list-item__headline");
+        expect(byTestId(ids.headline).title).toBe("first");
+        setClasses({ root: "wide", supportingText: "muted" });
+        setStyle({ root: { "margin-top": "2px" } });
+        setHeadline((draft) => {
+            draft.title = "second";
+        });
+        flush();
+        expect(byTestId(ids.root).className).toContain(" wide");
+        expect(byTestId(ids.supportingText).className).toBe(
+            "list-item__supportingText muted",
+        );
+        expect(byTestId(ids.root).style.marginTop).toBe("2px");
+        expect(byTestId(ids.headline).title).toBe("second");
+        setClasses({});
+        flush();
+        expect(byTestId(ids.root).className).not.toContain("wide");
+        expect(byTestId(ids.supportingText).className).toBe(
+            "list-item__supportingText",
+        );
+    });
+
+    it("builds its leading content once, inside the leading part's icon context", async () => {
+        const style = document.createElement("style");
+        style.textContent = `.list-item__leading { font-size: 22px; }`;
+        document.head.append(style);
+        let builds = 0;
+        function Glyph() {
+            builds++;
+            const icon = useIconStyle();
+            return <i data-size={String(icon().size)} />;
+        }
+        const [shown, setShown] = createSignal(true);
+        withRegistry(() => (
+            <ListItem
+                headline="Inbox"
+                leading={shown() ? <Glyph /> : undefined}
+            />
+        ));
+        await settle();
+        expect(builds).toBe(1);
+        const glyph = byTestId(ids.leading).querySelector("i")!;
+        expect(glyph.dataset.size).toBe("22");
+        setShown(false);
+        await settle();
+        expect(document.querySelector(`[data-testid="${ids.leading}"]`)).toBe(
+            null,
+        );
+        setShown(true);
+        await settle();
+        expect(builds).toBe(2);
+        expect(byTestId(ids.leading).querySelector("i")!.dataset.size).toBe(
+            "22",
+        );
+        style.remove();
+    });
+
+    it("renders the parts of literal content without testing it again", async () => {
+        withRegistry(() => (
+            <ListItem headline="Inbox" overline="Mail" trailingText="3" />
+        ));
+        await settle();
+        expect(
+            [...byTestId(ids.root).children].map((part) =>
+                part.getAttribute("data-pf-part"),
+            ),
+        ).toEqual(["content", "trailing-text"]);
+        expect(byTestId(ids.overline).textContent).toBe("Mail");
     });
 });
 
