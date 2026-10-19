@@ -114,6 +114,29 @@ describe("Select, ready-made", () => {
         expect(item("l").getAttribute("aria-disabled")).toBe("true");
     });
 
+    it("opens a field as wide as the viewport onto a list that stays inside it", async () => {
+        withRegistry(
+            <div style={{ position: "absolute", left: 0, right: 0 }}>
+                <Select label="Size" items={ITEMS} />
+            </div>,
+        );
+        await settle();
+        // The list opens against the field's input: as wide as the viewport, as the preset's is in
+        // a full-width field.
+        const input = byTestId(ids.input);
+        input.style.boxSizing = "border-box";
+        input.style.width = "100%";
+        await interact(() => userEvent.click(input));
+        await frames();
+        expect(byTestId(menu.root).hidden).toBe(false);
+        const width = document.documentElement.clientWidth;
+        expect(input.getBoundingClientRect().width).toBe(width);
+        expect(
+            byTestId(menu.positioner).getBoundingClientRect().right,
+        ).toBeLessThanOrEqual(width);
+        expect(document.documentElement.scrollWidth).toBe(width);
+    });
+
     it("controlled: shows the prop's option as it changes, and empties, in one render", async () => {
         const commits: string[] = [];
         const { Controlled, set } = controlled("m");

@@ -188,6 +188,7 @@ selectSelection(props);                  // trailingIcon always on: the arrow
 selectMenuSelection(props);              // the menu's color and density
 toZagValue(value); fromZagValue(list);   // one value or null <-> Zag's list
 selectValueProps(controllableMachineProps); selectMachineProps(props, fieldsetDisabled);
+                                         // the list as wide as the field, but inside the viewport
 selectSupportingTextId(props, id);
 selectInputProps(zagTriggerProps, valueText, dir); // a read-only <input>; rtl swaps the sideways arrows
 selectPositionerProps(p, present);       // hidden once gone (closed, and its exit animation over)

@@ -58,7 +58,8 @@ export interface SelectItem extends InteractionSourceProps {
 }
 
 /** Where the list opens: Zag's positioning options that matter here. @default `{ placement:
- *  "bottom-start", sameWidth: true }` */
+ *  "bottom-start", sameWidth: true }`, and the list never wider or taller than the room the
+ *  viewport has for it */
 export interface SelectPositioning {
     readonly placement?:
         | "bottom-start"
@@ -243,6 +244,9 @@ export const selectMachineProps = (
     positioning: {
         placement: "bottom-start" as const,
         sameWidth: true,
+        // As wide as the field only while the viewport has room: a field as wide as the viewport
+        // would push the list past its edge by Zag's padding, and the page would scroll sideways.
+        fitViewport: true,
         ...props.positioning,
     },
     ids: {

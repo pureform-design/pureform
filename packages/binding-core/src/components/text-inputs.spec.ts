@@ -139,6 +139,7 @@ describe("select", () => {
             positioning: {
                 placement: "bottom-start",
                 sameWidth: true,
+                fitViewport: true,
                 gutter: 2,
             },
         });
