@@ -46,7 +46,12 @@ export { createPartContext } from "./part-context";
 export { usePresence } from "./presence";
 export type { Presence } from "./presence";
 export type { PartContext } from "./part-context";
-export { slotPartProps, useComponent, useUnstyledComponent } from "./parts";
+export {
+    createSlotProps,
+    slotPartProps,
+    useComponent,
+    useUnstyledComponent,
+} from "./parts";
 export type {
     ComponentOf,
     ComponentOptions,
