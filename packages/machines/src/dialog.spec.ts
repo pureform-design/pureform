@@ -44,6 +44,9 @@ describe("dialog", () => {
             expect(part(name).style.getPropertyValue("--z-index")).toBe("");
             expect(part(name).style.getPropertyValue("--layer-index")).toBe("");
         }
+        // Zag's layer listens for outside presses from a task it queues in the frame after the
+        // dialog opens, which can be the frame awaited above: a press before it is missed.
+        await settle();
         part("outside").dispatchEvent(
             new PointerEvent("pointerdown", { bubbles: true }),
         );
@@ -51,9 +54,8 @@ describe("dialog", () => {
             new PointerEvent("pointerup", { bubbles: true }),
         );
         part("outside").click();
-        await settle();
-        await new Promise((resolve) => setTimeout(resolve, 50));
-        expect(control.api().open).toBe(false);
+        // It dismisses in the next frame, which a busy machine can delay.
+        await expect.poll(() => control.api().open).toBe(false);
         control.stop();
     });
 });
