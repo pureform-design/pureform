@@ -6,6 +6,7 @@
 
 import type {
     ComponentAnatomy,
+    IndicationAnatomy,
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
@@ -23,6 +24,7 @@ import type {
 } from "@pureform/binding-core";
 import {
     componentIndicationTokens,
+    holdsLayer,
     indicationRoles,
 } from "@pureform/binding-core/indication";
 import type { Indication } from "@pureform/binding-core/indication";
@@ -78,6 +80,9 @@ export interface ComponentOptions<A extends ComponentAnatomy> {
     /** Whether the component shows indication now: a card or a list item only with an action.
      *  Always, by default. */
     readonly interactive?: boolean | undefined;
+    /** Whether one of its anatomy's indication entries shows now, while it's interactive: a
+     *  card's root entry while Root acts, its action area's otherwise. Every entry, by default. */
+    readonly entryActive?: ((entry: IndicationAnatomy) => boolean) | undefined;
 }
 
 /** What a part merges besides its anatomy's attributes and the registry's classes. */
@@ -221,10 +226,12 @@ function IndicatedPartElement({
         [icon, attach, ownRef, userRef],
     );
     const merged = { ...withForwarded(props, forwarded), ref };
-    // Only a surface holds the layer, in the same place while it comes and goes: a trigger may be
-    // a void element (an input).
-    const surface = indication.roles.some(({ role }) => role === "surface");
-    const node = surface
+    // Only a part holding the layer (a surface, or the part an entry names) renders it, in the
+    // same place while it comes and goes: a trigger may be a void element (an input).
+    const holds = indication.roles.some(({ entry, role }) =>
+        holdsLayer(indication.scope.entries[entry], role),
+    );
+    const node = holds
         ? createElement(tag, merged, layer, children)
         : createElement(tag, merged, children);
     if (!icon) return node;
@@ -317,6 +324,7 @@ export function useComponent<A extends ComponentAnatomy>(
         ? useIndicationScope(entries, {
               indication: options.indication,
               interactive: options.interactive,
+              entryActive: options.entryActive,
               source: options.interactionSource,
           })
         : undefined;
