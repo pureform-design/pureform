@@ -12,6 +12,7 @@ import {
     DEFAULT_INDICATION,
     droppedFocusIndicatorMessage,
     dropsFocusIndicator,
+    holdsLayer,
     IndicationHost,
     NOT_FORWARDED,
     rippleClasses,
@@ -41,6 +42,7 @@ import {
     type RefCallback,
     useCallback,
     useEffect,
+    useMemo,
     useRef,
     useState,
     useSyncExternalStore,
@@ -99,6 +101,8 @@ export interface IndicationScope {
     readonly indication: Indication;
     /** Whether the component is interactive now; a card or list item only with an action. */
     readonly interactive: boolean;
+    /** Whether an entry, by index, shows now, while the component is interactive. */
+    readonly entryActive: (entry: number) => boolean;
     /** The component's own source, for the parts that don't pass an item's. */
     readonly source: InteractionSource | undefined;
     /** The ripple's layer class, from the registry. */
@@ -111,6 +115,9 @@ export function useIndicationScope(
     options: {
         readonly indication?: Indication | undefined;
         readonly interactive?: boolean | undefined;
+        readonly entryActive?:
+            | ((entry: IndicationAnatomy) => boolean)
+            | undefined;
         readonly source?: InteractionSource | undefined;
     },
 ): IndicationScope {
@@ -138,6 +145,10 @@ export function useIndicationScope(
         entries,
         indication,
         interactive: options.interactive ?? true,
+        entryActive: (index) => {
+            const entry = entries[index];
+            return !entry || !options.entryActive || options.entryActive(entry);
+        },
         source: options.source,
         layerClass: rippleClasses(registry)?.root?.class,
     };
@@ -174,10 +185,17 @@ export function usePartIndication(part: PartIndication | undefined): {
     const [forwarded, setForwarded] = useState(NOT_FORWARDED);
     const host = part?.scope.host;
     const source = part?.scope.interactive ? part.source : undefined;
-    const roles = part?.roles;
+    // The roles of the entries that show now, the same list while they don't change.
+    const active = part?.roles.filter(({ entry }) =>
+        part.scope.entryActive(entry),
+    );
+    const activeKey = active
+        ?.map(({ entry, role }) => `${entry}:${role}`)
+        .join();
+    const roles = useMemo(() => active, [part?.roles, activeKey]);
     const ref = useCallback(
         (element: HTMLElement | null) => {
-            if (!host || !roles || !source || !element) return;
+            if (!host || !roles?.length || !source || !element) return;
             const cleanups = roles.map(({ entry, role }) =>
                 host.instance(entry, source).attach(role, element),
             );
@@ -197,14 +215,17 @@ export function usePartIndication(part: PartIndication | undefined): {
         },
         [host, roles, source],
     );
-    const surface = roles?.some(({ role }) => role === "surface") ?? false;
+    const holds =
+        roles?.some(({ entry, role }) =>
+            holdsLayer(part?.scope.entries[entry], role),
+        ) ?? false;
     return {
         ref,
         forwarded,
         // The layer isn't tracked: the indication finds it in the surface when it draws.
         layer:
             part &&
-            surface &&
+            holds &&
             part.scope.interactive &&
             part.scope.indication.layer ? (
                 <span
