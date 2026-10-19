@@ -7,7 +7,7 @@ import { PureformProvider } from ".";
 import { overlaysRegistry } from "./__fixtures__/registry";
 import { Dialog } from "./dialog";
 import { Menu } from "./menu";
-import { interact, mount, settle } from "./testing/render";
+import { interact, mount, settle, until } from "./testing/render";
 
 const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E =>
     screen.getByTestId(id) as E;
@@ -21,12 +21,14 @@ const ITEMS = [
     { value: "copy", label: "Copy" },
 ];
 
-// The surfaces' motion, as a stylesheet would draw it: in over 400ms, out over 200ms.
+// The surfaces' motion, as a stylesheet would draw it, but slow enough that no loaded machine
+// outlasts it: a test ends an animation itself, with `finish()`. A user event alone can take
+// seconds to come back, and a real 200ms exit would be over before the test looks at it.
 const MOTION = `
 @keyframes test-in { from { opacity: 0 } to { opacity: 1 } }
 @keyframes test-out { from { opacity: 1 } to { opacity: 0 } }
-.menu[data-state=open], .dialog[data-state=open] { animation: test-in 400ms }
-.menu[data-state=closed], .dialog[data-state=closed] { animation: test-out 200ms }
+.menu[data-state=open], .dialog[data-state=open] { animation: test-in 60s }
+.menu[data-state=closed], .dialog[data-state=closed] { animation: test-out 60s }
 .dialog { z-index: 400 }
 `;
 
@@ -49,7 +51,17 @@ const frames = async (count = 3) => {
     await settle();
 };
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const animations = (element: Element) =>
+    element.getAnimations().map((a) => (a as CSSAnimation).animationName);
+
+/** Ends the exit animation running on `element`, as its time would. */
+const finishExit = (element: Element) => {
+    const exit = element
+        .getAnimations()
+        .find((a) => (a as CSSAnimation).animationName === "test-out");
+    expect(exit).toBeDefined();
+    exit!.finish();
+};
 
 const menu = () =>
     mount(
@@ -64,28 +76,24 @@ describe("presence", () => {
         menu();
         await settle();
         await interact(() => userEvent.click(byTestId(menuIds.trigger)));
-        await frames();
+        await until(() =>
+            expect(byTestId(menuIds.positioner).hidden).toBe(false),
+        );
         const content = byTestId(menuIds.content);
-        expect(byTestId(menuIds.positioner).hidden).toBe(false);
-        expect(content.getAnimations().length).toBeGreaterThan(0);
-        await wait(100);
+        // Closed while it's still coming in.
+        expect(animations(content)).toEqual(["test-in"]);
         await interact(() => userEvent.keyboard("{Escape}"));
+        await until(() => expect(content.dataset.state).toBe("closed"));
         await frames();
         // Closed, and still showing while it fades out.
         expect(byTestId(menuIds.trigger).getAttribute("aria-expanded")).toBe(
             "false",
         );
-        expect(content.dataset.state).toBe("closed");
         expect(content.hidden).toBe(false);
         expect(byTestId(menuIds.positioner).hidden).toBe(false);
-        expect(
-            content
-                .getAnimations()
-                .map((a) => (a as CSSAnimation).animationName),
-        ).toEqual(["test-out"]);
-        await wait(250);
-        await frames();
-        expect(content.hidden).toBe(true);
+        expect(animations(content)).toEqual(["test-out"]);
+        finishExit(content);
+        await until(() => expect(content.hidden).toBe(true));
         expect(byTestId(menuIds.positioner).hidden).toBe(true);
     });
 
@@ -94,14 +102,18 @@ describe("presence", () => {
         menu();
         await settle();
         await interact(() => userEvent.click(byTestId(menuIds.trigger)));
-        await frames();
+        await until(() =>
+            expect(byTestId(menuIds.positioner).hidden).toBe(false),
+        );
+        const content = byTestId(menuIds.content);
         await interact(() => userEvent.keyboard("{Escape}"));
-        await frames(2);
+        await until(() => expect(animations(content)).toEqual(["test-out"]));
         await interact(() => userEvent.click(byTestId(menuIds.trigger)));
-        await wait(300);
+        await until(() => expect(content.dataset.state).toBe("open"));
         await frames();
         expect(byTestId(menuIds.positioner).hidden).toBe(false);
-        expect(byTestId(menuIds.content).dataset.state).toBe("open");
+        expect(content.hidden).toBe(false);
+        expect(animations(content)).toEqual(["test-in"]);
     });
 
     it("hides a closing menu at once when no animation runs", async () => {
@@ -127,17 +139,16 @@ describe("presence", () => {
         const positioner = byTestId(dialogIds.positioner);
         expect(positioner.style.zIndex).toBe("");
         await interact(() => userEvent.click(byTestId(dialogIds.trigger)));
-        await frames();
-        expect(positioner.hidden).toBe(false);
+        await until(() => expect(positioner.hidden).toBe(false));
         expect(getComputedStyle(positioner).zIndex).toBe("400");
-        await wait(100);
+        const content = byTestId(dialogIds.content);
         await interact(() => userEvent.keyboard("{Escape}"));
+        await until(() => expect(content.dataset.state).toBe("closed"));
         await frames();
-        expect(byTestId(dialogIds.content).hidden).toBe(false);
+        expect(content.hidden).toBe(false);
         expect(byTestId(backdropId).hidden).toBe(false);
-        await wait(250);
-        await frames();
-        expect(positioner.hidden).toBe(true);
+        finishExit(content);
+        await until(() => expect(positioner.hidden).toBe(true));
         expect(byTestId(backdropId).hidden).toBe(true);
     });
 });

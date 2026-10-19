@@ -7,7 +7,7 @@ import { userEvent } from "vitest/browser";
 import { Tooltip } from ".";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
-import { interact, mount, settle } from "../testing/render";
+import { interact, mount, settle, until } from "../testing/render";
 
 const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E =>
     screen.getByTestId(id) as E;
@@ -19,16 +19,6 @@ const withRegistry = (view: ReactNode) =>
         <PureformProvider registry={overlaysRegistry()}>
             {view}
         </PureformProvider>,
-    );
-
-/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes. */
-const until = (check: () => void) =>
-    vi.waitFor(
-        async () => {
-            await settle();
-            check();
-        },
-        { timeout: 3000, interval: 10 },
     );
 
 /** Moves the pointer off the trigger, where an earlier test or file may have left it resting
