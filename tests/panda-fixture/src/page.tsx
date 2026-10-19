@@ -968,6 +968,11 @@ export function Page() {
                     each={
                         [
                             { variant: "primary", icon: true },
+                            {
+                                variant: "primary",
+                                icon: true,
+                                inlineIcon: true,
+                            },
                             { variant: "primary", icon: false },
                             { variant: "secondary", icon: true },
                         ] as const
@@ -991,11 +996,17 @@ export function Page() {
                                             }
                                             onClick={() => setCurrent(i())}
                                         >
-                                            {options.icon && (
-                                                <span class={t.icon}>★</span>
-                                            )}
-                                            <span class={t.label}>{label}</span>
-                                            <span class={t.indicator} />
+                                            <span class={t.tabContent}>
+                                                {options.icon && (
+                                                    <span class={t.icon}>
+                                                        ★
+                                                    </span>
+                                                )}
+                                                <span class={t.label}>
+                                                    {label}
+                                                </span>
+                                                <span class={t.indicator} />
+                                            </span>
                                         </button>
                                     )}
                                 </For>
@@ -1057,8 +1068,12 @@ export function Page() {
                                                 type="button"
                                                 aria-selected="true"
                                             >
-                                                <span class={x.label}>On</span>
-                                                <span class={x.indicator} />
+                                                <span class={x.tabContent}>
+                                                    <span class={x.label}>
+                                                        On
+                                                    </span>
+                                                    <span class={x.indicator} />
+                                                </span>
                                             </button>
                                             <button
                                                 class={x.tab}
@@ -1066,8 +1081,12 @@ export function Page() {
                                                 type="button"
                                                 aria-selected="false"
                                             >
-                                                <span class={x.label}>Off</span>
-                                                <span class={x.indicator} />
+                                                <span class={x.tabContent}>
+                                                    <span class={x.label}>
+                                                        Off
+                                                    </span>
+                                                    <span class={x.indicator} />
+                                                </span>
                                             </button>
                                         </div>
                                     )}

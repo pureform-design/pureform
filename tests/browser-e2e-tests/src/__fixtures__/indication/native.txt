@@ -1396,6 +1396,8 @@ tabs.tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: bg rgba(241, 235, 246, 1) | color rgba(103, 80, 164, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs.tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(103, 80, 164, 1)
 tabs.icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(103, 80, 164, 1)
 tabs.label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1410,6 +1412,8 @@ tabs[variant=secondary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 
     hovered-selected: bg rgba(235, 230, 235, 1) | color rgba(28, 27, 30, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[variant=secondary].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(28, 27, 30, 1)
 tabs[variant=secondary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(28, 27, 30, 1)
 tabs[variant=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1424,6 +1428,8 @@ tabs[color=secondary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1)
     hovered-selected: bg rgba(241, 235, 242, 1) | color rgba(98, 91, 112, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=secondary].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(98, 91, 112, 1)
 tabs[color=secondary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(98, 91, 112, 1)
 tabs[color=secondary].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1438,6 +1444,8 @@ tabs[color=tertiary].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) 
     hovered-selected: bg rgba(243, 235, 240, 1) | color rgba(125, 82, 96, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=tertiary].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(125, 82, 96, 1)
 tabs[color=tertiary].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(125, 82, 96, 1)
 tabs[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1452,6 +1460,8 @@ tabs[color=success].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) |
     hovered-selected: bg rgba(233, 237, 235, 1) | color rgba(0, 110, 33, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=success].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 110, 33, 1)
 tabs[color=success].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 110, 33, 1)
 tabs[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1466,6 +1476,8 @@ tabs[color=warning].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) |
     hovered-selected: bg rgba(242, 235, 233, 1) | color rgba(116, 91, 0, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=warning].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(116, 91, 0, 1)
 tabs[color=warning].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(116, 91, 0, 1)
 tabs[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1480,6 +1492,8 @@ tabs[color=error].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | o
     hovered-selected: bg rgba(248, 230, 235, 1) | color rgba(186, 26, 26, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=error].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(186, 26, 26, 1)
 tabs[color=error].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(186, 26, 26, 1)
 tabs[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1494,6 +1508,8 @@ tabs[color=info].tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | ou
     hovered-selected: bg rgba(233, 236, 243, 1) | color rgba(0, 104, 124, 1)
     pressed-checked: bg rgba(235, 230, 236, 1)
     focused-checked: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tabs[color=info].tabContent: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 104, 124, 1)
 tabs[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 104, 124, 1)
 tabs[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
