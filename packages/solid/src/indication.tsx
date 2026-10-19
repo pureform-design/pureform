@@ -202,10 +202,12 @@ export function usePartIndication(
     );
     const layerClass = () =>
         unstyled() ? undefined : rippleClasses(state().registry)?.root?.class;
+    // A call in `when`, which the compiler doesn't wrap in a memo of its own.
+    const layered = () => scope.interactive() && scope.indication().layer;
     return {
         states: (own) => (shows ? withForwarded(own, forwarded()) : own),
         layer: surface ? (
-            <Show when={scope.interactive() && scope.indication().layer}>
+            <Show when={layered()}>
                 <span class={layerClass()} {...LAYER_ATTRIBUTES} />
             </Show>
         ) : undefined,

@@ -12,6 +12,7 @@ import type {
 import {
     forSlot,
     isIconPart,
+    isPresent,
     isUnstyled,
     partSources,
 } from "@pureform/binding-core";
@@ -31,10 +32,13 @@ import type {
 import { dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
+    $PROXY,
     type Accessor,
     createMemo,
     createSignal,
+    isStatic,
     merge,
+    Show,
     untrack,
 } from "solid-js";
 
@@ -94,6 +98,10 @@ export interface RenderOptions extends PartOptions {
     /** The source of the item this part belongs to, for a composite's parts that show an item's
      *  indication; others draw from the component's. */
     readonly interactionSource?: Accessor<InteractionSource | undefined>;
+    /** Render the part only while its children are there (`isPresent`): a ready-made component's
+     *  icon slot. The children are built once, inside the part's icon context, rather than once
+     *  to see whether they're there and again to render them. */
+    readonly optional?: boolean;
 }
 
 /** The means to build a component's parts. */
@@ -132,7 +140,8 @@ const createPartScope = <A extends ComponentAnatomy>(
     const scope: PartScope<A> = {
         anatomy,
         part(part, partOptions = {}) {
-            const merged = createMemo(() =>
+            // A function source: `merge` makes it the part's one memo.
+            return merge(() =>
                 combinePartProps(
                     partSources({
                         anatomy,
@@ -147,16 +156,22 @@ const createPartScope = <A extends ComponentAnatomy>(
                         props: partOptions.props,
                     }),
                 ),
-            );
-            return merge(merged) as PartProps;
+            ) as PartProps;
         },
         render(part, renderOptions) {
             const user = renderOptions.props as
                 | { children?: JSX.Element; ref?: unknown }
                 | undefined;
-            const Tag = dynamic(
-                () => renderOptions.as?.() ?? renderOptions.element,
-            );
+            const optional = renderOptions.optional === true;
+            // A part without `as` always renders its element: no computation picks it, on the
+            // server as on the client, so hydration finds the same nodes.
+            const tag = () => {
+                const as = renderOptions.as;
+                return as
+                    ? dynamic(() => as() ?? renderOptions.element)
+                    : dynamic(() => renderOptions.element, { static: true });
+            };
+            const Tag = optional ? undefined : tag();
             const roles = indication
                 ? indicationRoles(indication.entries, part)
                 : [];
@@ -169,40 +184,68 @@ const createPartScope = <A extends ComponentAnatomy>(
                           ownedWrite: true,
                       })
                     : [undefined, undefined];
-            const shown = indicated
-                ? usePartIndication(
-                      indication,
-                      roles,
-                      renderOptions.interactionSource ?? indication.source,
-                      element!,
-                      () =>
-                          isUnstyled(options.unstyled?.(), part) ||
-                          !!renderOptions.unstyled?.(),
-                  )
-                : undefined;
-            const props = scope.part(
-                part,
-                shown
-                    ? {
-                          ...renderOptions,
-                          states: () => shown.states(renderOptions.states?.()),
-                      }
-                    : renderOptions,
+            // The element's props, and a function that makes it.
+            const draw = (
+                Part: ReturnType<typeof tag>,
+                children: () => JSX.Element,
+            ) => {
+                const shown = indicated
+                    ? usePartIndication(
+                          indication,
+                          roles,
+                          renderOptions.interactionSource ?? indication.source,
+                          element!,
+                          () =>
+                              isUnstyled(options.unstyled?.(), part) ||
+                              !!renderOptions.unstyled?.(),
+                      )
+                    : undefined;
+                const props = scope.part(
+                    part,
+                    shown
+                        ? {
+                              ...renderOptions,
+                              states: () =>
+                                  shown.states(renderOptions.states?.()),
+                          }
+                        : renderOptions,
+                );
+                const refs = [
+                    setElement && ((el: Element) => setElement(el)),
+                    renderOptions.ref,
+                    untrack(() => user?.ref),
+                ];
+                // The children read where the element inserts them, with no memo of their own.
+                const layer = shown?.layer;
+                const content = layer ? () => [layer, children()] : children;
+                return () => (
+                    <Part {...props} ref={refs}>
+                        {content()}
+                    </Part>
+                );
+            };
+            if (!optional) {
+                // A function, so an icon part's children render inside its context.
+                const node = draw(Tag!, () => user?.children);
+                if (!icon) return node();
+                return (
+                    <IconPartContext value={element!}>{node()}</IconPartContext>
+                );
+            }
+            // The children built once, inside the icon's context, then the element only while
+            // they're there.
+            const gated = () => {
+                const children = createMemo(() => user?.children);
+                return (
+                    <Show when={isPresent(children())}>
+                        {draw(tag(), children)()}
+                    </Show>
+                );
+            };
+            if (!icon) return gated();
+            return (
+                <IconPartContext value={element!}>{gated()}</IconPartContext>
             );
-            const refs = [
-                setElement && ((el: Element) => setElement(el)),
-                renderOptions.ref,
-                untrack(() => user?.ref),
-            ];
-            // A function, so an icon part's children render inside its context.
-            const node = () => (
-                <Tag {...props} ref={refs}>
-                    {shown?.layer}
-                    {user?.children}
-                </Tag>
-            );
-            if (!icon) return node();
-            return <IconPartContext value={element!}>{node()}</IconPartContext>;
         },
     };
     return scope;
@@ -267,17 +310,149 @@ export interface SlotKeyedProps<A extends ComponentAnatomy> {
 }
 
 /** One part's props from a ready-made component's slot-keyed props: its `slotProps` entry with
- *  its `class` and `style` merged in. `testId` and `unstyled` go to Root whole. */
+ *  its `class` and `style` merged in. `testId` and `unstyled` go to Root whole. A component with
+ *  several parts reads them all through one `createSlotProps`. */
 export const slotPartProps = <A extends ComponentAnatomy>(
     props: SlotKeyedProps<A>,
     part: PartName<A>,
-): PartProps =>
-    merge(() =>
-        combinePartProps([
-            forSlot(props.slotProps, part) as Dict | undefined,
-            {
-                class: forSlot(props.class, part),
-                style: forSlot(props.style, part),
-            },
-        ]),
-    ) as PartProps;
+): PartProps => merge(() => onePart(props, part)) as PartProps;
+
+const onePart = (props: SlotKeyedProps<ComponentAnatomy>, part: string): Dict =>
+    combinePartProps([
+        forSlot(props.slotProps, part) as Dict | undefined,
+        {
+            class: forSlot(props.class, part),
+            style: forSlot(props.style, part),
+        },
+    ]);
+
+const NO_PROPS: Dict = Object.freeze({});
+const NO_SLOTS: Readonly<Record<string, Dict>> = Object.freeze({});
+
+// Every part the slot-keyed props name, each with its props combined.
+const everyPart = (
+    props: SlotKeyedProps<ComponentAnatomy>,
+): Readonly<Record<string, Dict>> => {
+    const { slotProps, class: classes, style } = props;
+    if (!slotProps && !classes && !style) return NO_SLOTS;
+    const parts: Record<string, Dict> = {};
+    for (const keyed of [slotProps, classes, style]) {
+        if (!keyed || typeof keyed !== "object") continue;
+        for (const part of Object.keys(keyed)) {
+            if (!Object.hasOwn(parts, part)) parts[part] = onePart(props, part);
+        }
+    }
+    return parts;
+};
+
+// A live view of one part's entry: a merge or a spread reads it as a source whose keys can change,
+// as it reads a store, since it answers for `$PROXY`. Symbols, which merges ask for as they build,
+// aren't read through, so building one in a component body reads nothing reactive.
+class SlotView {
+    constructor(
+        readonly parts: Accessor<Readonly<Record<string, Dict>>>,
+        readonly part: string,
+    ) {}
+}
+
+const entry = (view: SlotView): Dict => view.parts()[view.part] ?? NO_PROPS;
+
+const SLOT_VIEW: ProxyHandler<SlotView> = {
+    get: (view, key, receiver) => {
+        if (typeof key === "symbol")
+            return key === $PROXY ? receiver : undefined;
+        return entry(view)[key];
+    },
+    has: (view, key) =>
+        typeof key === "symbol" ? key === $PROXY : key in entry(view),
+    ownKeys: (view) => Object.keys(entry(view)),
+    getOwnPropertyDescriptor: (view, key) => {
+        if (typeof key === "symbol") return undefined;
+        const props = entry(view);
+        return Object.hasOwn(props, key)
+            ? { configurable: true, enumerable: true, value: props[key] }
+            : undefined;
+    },
+    set: () => true,
+    deleteProperty: () => true,
+};
+
+/** A ready-made component's slot-keyed props for each of its parts, computed together: `slots(
+ *  "label")` is the label's `slotProps` entry with its `class` and `style` merged in, to spread.
+ *  Spread one from a variable (`const label = slots("label")`, then `{...label}`): a call in a
+ *  spread makes a memo of its own. When `class`, `style`, and `slotProps` can't change (absent, or
+ *  plain data the compiler passed as is), each is a plain object; otherwise a live view of one
+ *  memo. `testId` and `unstyled` go to Root whole. */
+export function createSlotProps<A extends ComponentAnatomy>(
+    props: SlotKeyedProps<A>,
+): (part: PartName<A>) => PartProps {
+    const keyed = props as SlotKeyedProps<ComponentAnatomy>;
+    if (untrack(() => SLOT_KEYED.every((key) => isFixed(keyed, key)))) {
+        const parts = untrack(() => everyPart(keyed));
+        return (part) => (parts[part] ?? NO_PROPS) as PartProps;
+    }
+    const parts = createMemo(() => everyPart(keyed));
+    return (part) =>
+        new Proxy(new SlotView(parts, part), SLOT_VIEW) as PartProps;
+}
+
+const SLOT_KEYED = ["class", "style", "slotProps"] as const;
+
+// Whether a prop is a literal the compiler passed as is, or left out. Only on the props object the
+// compiler made: the server and the client build merges differently, and must pick the same parts.
+const isLiteral = (props: object, key: string): boolean =>
+    !($PROXY in props) && isStatic(props, key);
+
+// Whether a slot-keyed prop can't change: a literal holding plain data, with no getter or store
+// anywhere inside.
+const isFixed = (
+    props: SlotKeyedProps<ComponentAnatomy>,
+    key: (typeof SLOT_KEYED)[number],
+): boolean => isLiteral(props, key) && isPlainData(props[key], 0);
+
+const isPlainData = (value: unknown, depth: number): boolean => {
+    if (value === null || typeof value !== "object") return true;
+    if (depth > 4 || $PROXY in value) return false;
+    const prototype = Object.getPrototypeOf(value);
+    if (prototype !== Object.prototype && prototype !== Array.prototype) {
+        return false;
+    }
+    for (const key of Object.keys(value)) {
+        const descriptor = Object.getOwnPropertyDescriptor(value, key)!;
+        if (descriptor.get || descriptor.set) return false;
+        if (!isPlainData(descriptor.value, depth + 1)) return false;
+    }
+    return true;
+};
+
+const None = (): JSX.Element => undefined;
+
+/** The part a ready-made component renders for an optional content prop (`leading`, `icon`): none
+ *  when the prop is fixed and absent, `part` when it's fixed and there, else `whenPresent`, which
+ *  follows it. A fixed prop is a literal the compiler passed as is, or one left out, on the props
+ *  it made, so the same part is picked on the server and the client. */
+export function optionalPart<P>(
+    props: object,
+    key: string,
+    part: (props: P) => JSX.Element,
+    whenPresent: (props: P) => JSX.Element,
+): (props: P) => JSX.Element {
+    // Untracked: on a merge, finding the key reads its memo sources.
+    return untrack(() => {
+        if (!isLiteral(props, key)) return whenPresent;
+        const value = (props as Record<string, unknown>)[key];
+        return isPresent(value) ? part : None;
+    });
+}
+
+/** A part shown only while its children are there (`isPresent`), for text whose double read
+ *  costs nothing; an icon part takes `optional` instead, to build its content once. */
+export const whenPresent =
+    <P extends { readonly children?: JSX.Element }>(
+        Part: (props: P) => JSX.Element,
+    ) =>
+    (props: P): JSX.Element => (
+        <Show when={isPresent(props.children)}>
+            <Part {...props} />
+        </Show>
+    );

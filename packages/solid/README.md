@@ -29,7 +29,7 @@ is a peer, so the app's generated registry and the binding share one copy. See t
 | -------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `provider.tsx`                                                                                     | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                                                                                                 |
 | `classes.ts`                                                                                       | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                                                                                                        |
-| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps` (ready-made components)                                                                          |
+| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `createSlotProps`, `optionalPart`, `slotPartProps` (ready-made components)                                       |
 | `props.ts`                                                                                         | Solid's rules for merging a part's props: class arrays, style objects, `[handler, data]`                                                                                                                                      |
 | `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                                                                                                |
 | `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                                                                                         |
@@ -532,8 +532,26 @@ The full example, with a ready-made `Button` over `slotPartProps`, is
   `save-root`) or ids by part.
 - `unstyled` (Root's, `true` or per part, or a part's own) drops the registry's class and token
   style for that part. Parts outside the AST's slots never get registry classes.
-- Ready-made components take `class`, `style`, and `slotProps` keyed by part; `slotPartProps(props,
-part)` turns them into one part's props, and `testId` and `unstyled` go to Root whole.
+- Ready-made components take `class`, `style`, and `slotProps` keyed by part; `testId` and
+  `unstyled` go to Root whole. `createSlotProps(props)` computes every part's props from them
+  together, once: `slots("label")` is the label's, to spread from a variable (`const label =
+slots("label")`, then `{...label}`; a call inside a spread makes a memo of its own). When the
+  three are literals the compiler passed as is (or absent), each part's props are a plain object;
+  otherwise a live view of one memo, so a later change still reaches every part.
+  `slotPartProps(props, part)` gives one part's, with a memo of its own.
+- `optionalPart(props, key, Part, WhenPresent)` picks the part a ready-made renders for an optional
+  content prop: none for an absent literal, `Part` for a present one (no `Show`), else
+  `WhenPresent`. An icon slot's `WhenPresent` renders with `optional: true`, which builds the
+  content once inside the part's icon context and renders the element only while it's there;
+  text slots use `whenPresent(Part)`, a `Show` around the part.
+
+**Per-part cost.** A part is one memo (its merged props, from `merge` over the compute function),
+its element's spread and children effects, and, for a part with `as`, `dynamic`'s memos. A part
+without `as` renders its element through `dynamic(…, { static: true })`, which makes no
+computation, on the server as on the client. Its children are read where the element inserts them,
+with no memo of their own. One ready-made interactive list item row (a button with an avatar,
+supporting and trailing text) creates 68 reactive nodes, down from 144; `list-item/row-cost.spec.tsx`
+holds that budget.
 
 ### Controllable state and forms
 
@@ -643,8 +661,16 @@ check the cross-cutting rules against Solid and React together (see that package
   whose entry kind differs isn't followed.
 - `useIconStyle` doesn't see a style that changes by a pseudo-class alone (`:hover`) with no
   transition.
-- The ready-made `Button` reads its `icon` prop once to decide whether to render the icon part,
-  which builds the icon's JSX an extra time; the part builds it again inside its own context.
+- The ready-made `Button`, `Chip`, and `ListItem` build their icon content (`icon`, `leading`,
+  `trailing`) once, inside the part's icon context. The other ready-mades' optional icon slots
+  (the dialog's, search bar's, text field's, select's, switch's) still read the prop once to test it
+  and build it again inside the part.
+- A ready-made decides from the props object the compiler made whether a slot-keyed or content prop
+  is a literal (`isStatic`); props that come through a `merge` (a spread of a call, the ready-made
+  `List`'s items) always take the reactive path, since the server and the client build merges
+  differently and must render the same parts.
+- Ids from `createUniqueId` and hydration keys follow the owner tree, so they changed when the
+  parts dropped memos; the markup around them is the same.
 - A controlled checkbox's or switch's native input is put back after a click the owner ignores,
   in a microtask once the machine and the owner have handled it (`syncCheckedInput`); a radio
   group's radios likewise (`syncRadioInputs`).
