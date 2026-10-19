@@ -37,7 +37,14 @@ import { Switch } from "./switch";
 import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, interact, mount, outside, settle } from "./testing/render";
+import {
+    byTestId,
+    interact,
+    mount,
+    outside,
+    pointerAway,
+    settle,
+} from "./testing/render";
 import { Text } from "./text";
 
 let registry: TestRegistry;
@@ -81,6 +88,31 @@ const layerOf = (id: string): HTMLElement | null => {
     return last && !last.hasAttribute("data-testid") ? last : null;
 };
 const ripples = (id: string) => layerOf(id)?.childElementCount ?? 0;
+
+const watching = new Set<MutationObserver>();
+
+afterEach(() => {
+    for (const observer of watching) observer.disconnect();
+    watching.clear();
+});
+
+/** Counts the ripples drawn in `id`'s surface from now on, each though it goes once it has
+ *  faded: a loaded machine's click can come back after its ripple has gone. */
+const rippling = (id: string) => {
+    const layer = layerOf(id);
+    expect(layer, id).not.toBeNull();
+    let drawn = 0;
+    const count = (records: MutationRecord[]) => {
+        for (const record of records) drawn += record.addedNodes.length;
+    };
+    const observer = new MutationObserver(count);
+    observer.observe(layer!, { childList: true });
+    watching.add(observer);
+    return (): number => {
+        count(observer.takeRecords());
+        return drawn;
+    };
+};
 
 const background = (id: string) =>
     getComputedStyle(byTestId(id)).backgroundColor;
@@ -331,11 +363,13 @@ describe("the provider's default", () => {
         );
         expect(layerOf("pf-button-root")).not.toBeNull();
         expect(ripples("pf-button-root")).toBe(0);
+        const button = rippling("pf-button-root");
         await interact(() => userEvent.click(byTestId("pf-button-root")));
-        expect(ripples("pf-button-root")).toBe(1);
+        expect(button()).toBe(1);
         // The icon button's surface is its container.
+        const iconButton = rippling("pf-icon-button-container");
         await interact(() => userEvent.click(byTestId("pf-icon-button-root")));
-        expect(ripples("pf-icon-button-container")).toBe(1);
+        expect(iconButton()).toBe(1);
     });
 
     it("ripples on the components that gained one", async () => {
@@ -361,8 +395,9 @@ describe("the provider's default", () => {
             ["pf-card-root", "pf-card-root"],
         ] as const) {
             expect(ripples(surface), surface).toBe(0);
+            const drawn = rippling(surface);
             await interact(() => userEvent.click(byTestId(press)));
-            expect(ripples(surface), surface).toBe(1);
+            expect(drawn(), surface).toBe(1);
         }
     });
 
@@ -374,9 +409,10 @@ describe("the provider's default", () => {
             </>,
             { motion: "reduce" },
         );
+        const drawn = rippling("pf-button-root");
         await interact(() => userEvent.click(byTestId("pf-button-root")));
         expect(layerOf("pf-button-root")).not.toBeNull();
-        expect(ripples("pf-button-root")).toBe(0);
+        expect(drawn()).toBe(0);
         expect(layerOf("still-root")).toBeNull();
     });
 
@@ -565,6 +601,7 @@ describe("a shared source", () => {
                 </>
             );
         }
+        await pointerAway();
         await render(<Shared />);
         const rest = background("b-root");
         await act(async () => {
@@ -573,9 +610,11 @@ describe("a shared source", () => {
         expect(state!.hovered).toBe(true);
         await settle(FADE_MS);
         expect(background("b-root")).not.toBe(rest);
+        const a = rippling("a-root");
+        const b = rippling("b-root");
         await interact(() => userEvent.click(byTestId("a-root")));
-        expect(ripples("a-root")).toBe(1);
-        expect(ripples("b-root")).toBe(1);
+        expect(a()).toBe(1);
+        expect(b()).toBe(1);
         expect(state!.pressed).toBe(false);
     });
 
@@ -596,13 +635,7 @@ describe("a shared source", () => {
     });
 
     it("reaches every subscriber with an app's own kind, and leaves the state alone", async () => {
-        // The pointer away from where the button renders: an earlier test's click leaves it
-        // there, and the button showing under it would hear it hover.
-        const corner = document.body.appendChild(document.createElement("div"));
-        corner.style.cssText =
-            "position: fixed; right: 0; bottom: 0; width: 4px; height: 4px";
-        await userEvent.hover(corner);
-        corner.remove();
+        await pointerAway();
         const source = createInteractionSource();
         const heard: unknown[] = [];
         source.subscribe((interaction) => heard.push(interaction));
@@ -642,8 +675,9 @@ describe("materialIndication", () => {
         await render(<Button label="Save" />, {
             indication: webMaterialIndication(),
         });
+        const drawn = rippling("pf-button-root");
         await interact(() => userEvent.click(byTestId("pf-button-root")));
-        expect(ripples("pf-button-root")).toBe(1);
+        expect(drawn()).toBe(1);
     });
 });
 
@@ -669,8 +703,9 @@ describe("useIndication", () => {
             );
         }
         await render(<Surface />);
+        const drawn = rippling("surface");
         await interact(() => userEvent.click(byTestId("surface")));
-        expect(ripples("surface")).toBe(1);
+        expect(drawn()).toBe(1);
         expect(state!.focused).toBe(true);
     });
 });
