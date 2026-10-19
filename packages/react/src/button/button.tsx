@@ -20,7 +20,7 @@ import { useControllable } from "../controllable";
 import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -128,6 +128,7 @@ export interface ButtonProps
 
 /** The ready-made button: Root, its touch target, the icon when given, and the label. */
 function ReadyMade(props: ButtonProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -138,14 +139,14 @@ function ReadyMade(props: ButtonProps): ReactNode {
         ...rootProps
     } = props;
     return (
-        <Root {...rootProps} {...slotPartProps(props, "root")}>
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
+        <Root {...rootProps} {...slot("root")}>
+            <TouchTarget {...slot("touchTarget")} />
             {icon != null && icon !== false ? (
-                <Icon mirror={mirrorIcon} {...slotPartProps(props, "icon")}>
+                <Icon mirror={mirrorIcon} {...slot("icon")}>
                     {icon}
                 </Icon>
             ) : null}
-            <Label {...slotPartProps(props, "label")}>{label}</Label>
+            <Label {...slot("label")}>{label}</Label>
         </Root>
     );
 }

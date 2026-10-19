@@ -27,7 +27,7 @@ import { Button } from "../button";
 import { useControllable } from "../controllable";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -178,8 +178,7 @@ function ReadyMade(props: TooltipProps): ReactNode {
         actions,
         ...rootProps
     } = props;
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part);
+    const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             {isPresent(trigger) ? (

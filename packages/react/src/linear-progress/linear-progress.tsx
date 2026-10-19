@@ -13,7 +13,7 @@ import type { ProgressRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -81,6 +81,7 @@ export interface LinearProgressProps
 
 /** The ready-made linear progress indicator: Root and its indicator. */
 function ReadyMade(props: LinearProgressProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -88,8 +89,8 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
         ...rootProps
     } = props;
     return (
-        <Root {...rootProps} {...(slotPartProps(props, "root") as object)}>
-            <Indicator {...slotPartProps(props, "indicator")} />
+        <Root {...rootProps} {...(slot("root") as object)}>
+            <Indicator {...slot("indicator")} />
         </Root>
     );
 }

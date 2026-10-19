@@ -51,6 +51,7 @@ export type { Presence } from "./presence";
 export {
     mergeRefs,
     slotPartProps,
+    useSlotProps,
     useComponent,
     useUnstyledComponent,
 } from "./parts";

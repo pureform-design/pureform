@@ -23,7 +23,7 @@ import type { ElementType, ReactNode } from "react";
 
 import { isDev } from "../env";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import { omitProps } from "../props";
@@ -136,6 +136,7 @@ export type IconButtonProps = Omit<
 /** The ready-made icon button: Root, its touch target, the container holding the icon, and the
  *  outline. */
 function ReadyMade(props: IconButtonProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -145,14 +146,14 @@ function ReadyMade(props: IconButtonProps): ReactNode {
         ...rootProps
     } = props;
     return (
-        <Root {...rootProps} {...slotPartProps(props, "root")}>
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
-            <Container {...slotPartProps(props, "container")}>
-                <Icon mirror={mirrorIcon} {...slotPartProps(props, "icon")}>
+        <Root {...rootProps} {...slot("root")}>
+            <TouchTarget {...slot("touchTarget")} />
+            <Container {...slot("container")}>
+                <Icon mirror={mirrorIcon} {...slot("icon")}>
                     {icon}
                 </Icon>
             </Container>
-            <Outline {...slotPartProps(props, "outline")} />
+            <Outline {...slot("outline")} />
         </Root>
     );
 }

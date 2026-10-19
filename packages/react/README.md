@@ -32,7 +32,7 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 | -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `provider.tsx`                                                                                     | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`                                                                                                                  |
 | `classes.ts`                                                                                       | `useClasses`, `useClassFactory`, `useLazyClassFactory`                                                                                                                                         |
-| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `slotPartProps`, `mergeRefs`                                                      |
+| `parts.tsx`                                                                                        | `useComponent` (a component's classes and parts), `useUnstyledComponent` (parts the registry doesn't style), `useSlotProps`, `slotPartProps`, `mergeRefs`                                      |
 | `props.ts`                                                                                         | React's rules for merging a part's props: one `className` string (`cx`), style objects                                                                                                         |
 | `controllable.ts`                                                                                  | `useControllable`: controlled and uncontrolled props mapped onto a Zag machine                                                                                                                 |
 | `form.ts`                                                                                          | `useFormReset`, `useFieldsetDisabled`                                                                                                                                                          |
@@ -541,8 +541,10 @@ function Icon({ unstyled, mirror, ...props }: ButtonIconProps) {
 - `unstyled` (Root's, `true` or per part, or a part's own) drops the registry's class and token
   style for that part. Parts outside the AST's slots never get registry classes.
 - Ready-made components take `className` (any `clsx` value), `style`, and `slotProps` keyed by
-  part; `slotPartProps(props, part)` turns them into one part's props, and `testId` and
-  `unstyled` go to Root whole.
+  part; `testId` and `unstyled` go to Root whole. `useSlotProps(props)` computes every part's
+  props from them together, once per change of the three: `slot("label")` is the label's, and a
+  part none of them names gets one shared empty object. `slotPartProps(props, part)` gives one
+  part's.
 
 ### Controllable state and forms
 

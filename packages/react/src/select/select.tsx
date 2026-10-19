@@ -46,7 +46,7 @@ import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -395,8 +395,7 @@ export interface SelectProps
 // Inside Root, so it can read whether an error shows and the options.
 function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
     const { items, supportingTextId, errorText } = context.use("Root");
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(own, part);
+    const slot = useSlotProps(own);
     const showsSupporting =
         isPresent(own.supportingText) || errorText !== undefined;
     return (
@@ -447,6 +446,7 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
 /** The ready-made select: the field in the preset's structure (the leading icon and supporting
  *  text only when given, or while an error shows), the hidden select, and the list. */
 function ReadyMade(props: SelectProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -465,7 +465,7 @@ function ReadyMade(props: SelectProps): ReactNode {
             {...rootProps}
             leadingIcon={isPresent(leadingIcon) || undefined}
             // The root's slot props are an element's, whose `defaultValue` takes more types.
-            {...(slotPartProps(props, "root") as object)}
+            {...(slot("root") as object)}
         >
             <ReadyMadeContent own={props} />
         </Root>

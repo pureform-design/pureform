@@ -385,3 +385,28 @@ export const slotPartProps = <A extends ComponentAnatomy>(
             style: forSlot(props.style, part),
         },
     ]) as PartProps;
+
+const NO_PROPS: PartProps = Object.freeze({});
+
+/** A ready-made component's slot-keyed props for each of its parts, computed together, once per
+ *  change of `className`, `style`, or `slotProps`: `slot("label")` is what `slotPartProps(props,
+ *  "label")` gives, and a part none of them names gets the same empty object. */
+export function useSlotProps<A extends ComponentAnatomy>(
+    props: SlotKeyedProps<A>,
+): (part: PartName<A>) => PartProps {
+    const { slotProps, className, style } = props;
+    return useMemo(() => {
+        if (!slotProps && !className && !style) return () => NO_PROPS;
+        const keyed = { slotProps, className, style } as SlotKeyedProps<A>;
+        const parts: Record<string, PartProps> = {};
+        for (const named of [slotProps, className, style]) {
+            if (!named || typeof named !== "object") continue;
+            for (const part of Object.keys(named)) {
+                if (!Object.hasOwn(parts, part)) {
+                    parts[part] = slotPartProps(keyed, part as PartName<A>);
+                }
+            }
+        }
+        return (part: PartName<A>) => parts[part] ?? NO_PROPS;
+    }, [slotProps, className, style]);
+}

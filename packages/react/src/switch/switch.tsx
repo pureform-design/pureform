@@ -36,7 +36,7 @@ import { useFieldsetDisabled, useFormReset } from "../form";
 import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -221,6 +221,7 @@ export interface SwitchProps
 
 /** The ready-made switch: every part, in the preset's structure; the icon only when given. */
 function ReadyMade(props: SwitchProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -232,19 +233,19 @@ function ReadyMade(props: SwitchProps): ReactNode {
         ...rootProps
     } = props;
     return (
-        <Root {...rootProps} {...slotPartProps(props, "root")}>
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
+        <Root {...rootProps} {...slot("root")}>
+            <TouchTarget {...slot("touchTarget")} />
             <Input
                 aria-label={ariaLabel}
                 aria-labelledby={ariaLabelledBy}
                 aria-describedby={ariaDescribedBy}
-                {...slotPartProps(props, "input")}
+                {...slot("input")}
             />
-            <Track {...slotPartProps(props, "track")}>
-                <StateLayer {...slotPartProps(props, "stateLayer")} />
-                <Handle {...slotPartProps(props, "handle")}>
+            <Track {...slot("track")}>
+                <StateLayer {...slot("stateLayer")} />
+                <Handle {...slot("handle")}>
                     {isPresent(icon) ? (
-                        <Icon {...slotPartProps(props, "icon")}>{icon}</Icon>
+                        <Icon {...slot("icon")}>{icon}</Icon>
                     ) : null}
                 </Handle>
             </Track>

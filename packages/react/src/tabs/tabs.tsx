@@ -29,7 +29,7 @@ import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -225,8 +225,7 @@ function ReadyMade(props: TabsProps): ReactNode {
         "aria-labelledby": labelledBy,
         ...rootProps
     } = props;
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part);
+    const slot = useSlotProps(props);
     // Read once, as the default is.
     const [defaultValue] = useState(() => tabsDefaultValue(props, items));
     const panels = tabsHavePanels(items);

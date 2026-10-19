@@ -17,7 +17,7 @@ import type { PropTypes } from "@zag-js/react";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import { omitProps } from "../props";
@@ -121,6 +121,7 @@ export interface ChipProps
 
 /** The ready-made chip: Root, its touch target, the icon when given, and the label. */
 function ReadyMade(props: ChipProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -131,14 +132,14 @@ function ReadyMade(props: ChipProps): ReactNode {
         ...rootProps
     } = props;
     return (
-        <Root {...rootProps} {...slotPartProps(props, "root")}>
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
+        <Root {...rootProps} {...slot("root")}>
+            <TouchTarget {...slot("touchTarget")} />
             {isPresent(icon) ? (
-                <Icon mirror={mirrorIcon} {...slotPartProps(props, "icon")}>
+                <Icon mirror={mirrorIcon} {...slot("icon")}>
                     {icon}
                 </Icon>
             ) : null}
-            <Label {...slotPartProps(props, "label")}>{label}</Label>
+            <Label {...slot("label")}>{label}</Label>
         </Root>
     );
 }
