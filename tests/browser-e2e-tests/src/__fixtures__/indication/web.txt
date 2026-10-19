@@ -1367,6 +1367,8 @@ tabs.tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.397658 0.0157708
     hovered-selected: bg color(srgb 0.945046 0.919884 0.9642) | color oklch(0.495515 0.130434 293.718)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs.tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.495515 0.130434 293.718)
 tabs.icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.495515 0.130434 293.718)
 tabs.label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1381,6 +1383,8 @@ tabs[variant=secondary].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch
     hovered-selected: bg color(srgb 0.921517 0.903255 0.922163) | color oklch(0.224503 0.0059201 301.135)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[variant=secondary].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.224503 0.0059201 301.135)
 tabs[variant=secondary].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.224503 0.0059201 301.135)
 tabs[variant=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1395,6 +1399,8 @@ tabs[color=secondary].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0
     hovered-selected: bg color(srgb 0.943477 0.923334 0.947888) | color oklch(0.485522 0.0342097 300.379)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=secondary].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.485522 0.0342097 300.379)
 tabs[color=secondary].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.485522 0.0342097 300.379)
 tabs[color=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1409,6 +1415,8 @@ tabs[color=tertiary].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.
     hovered-selected: bg color(srgb 0.951949 0.920511 0.942868) | color oklch(0.490394 0.0605397 358.465)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=tertiary].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.490394 0.0605397 358.465)
 tabs[color=tertiary].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.490394 0.0605397 358.465)
 tabs[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1423,6 +1431,8 @@ tabs[color=success].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.3
     hovered-selected: bg color(srgb 0.912703 0.929295 0.923105) | color oklch(0.468452 0.1423 146.207)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=success].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.468452 0.1423 146.207)
 tabs[color=success].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.468452 0.1423 146.207)
 tabs[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1437,6 +1447,8 @@ tabs[color=warning].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.3
     hovered-selected: bg color(srgb 0.949125 0.923334 0.912756) | color oklch(0.482845 0.0986736 90.0339)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=warning].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.482845 0.0986736 90.0339)
 tabs[color=warning].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.482845 0.0986736 90.0339)
 tabs[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1451,6 +1463,8 @@ tabs[color=error].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.397
     hovered-selected: bg color(srgb 0.971088 0.902946 0.920912) | color oklch(0.50605 0.192665 27.7028)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=error].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.50605 0.192665 27.7028)
 tabs[color=error].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.50605 0.192665 27.7028)
 tabs[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
@@ -1465,6 +1479,8 @@ tabs[color=info].tab: bg oklch(0.984374 0.00841289 325.895) | color oklch(0.3976
     hovered-selected: bg color(srgb 0.912707 0.927413 0.951652) | color oklch(0.477056 0.0852456 217.083)
     pressed-checked: bg color(srgb 0.921517 0.902392 0.923496)
     focused-checked: bg color(srgb 0.921517 0.902392 0.923496) | outline solid 3px oklch(0.485522 0.0342097 300.379) offset 2px
+tabs[color=info].tabContent: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
+    hovered-selected: color oklch(0.477056 0.0852456 217.083)
 tabs[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
     hovered-selected: color oklch(0.477056 0.0852456 217.083)
 tabs[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.397658 0.0157708 305.735) | outline none
