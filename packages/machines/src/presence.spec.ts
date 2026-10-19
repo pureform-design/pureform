@@ -3,12 +3,13 @@ import { afterEach, describe, expect, it } from "vitest";
 import * as presence from "./presence";
 import { run, settle } from "./testing/vanilla";
 
-// A surface's motion, as a stylesheet would draw it: in over 400ms, out over 200ms.
+// A surface's motion, as a stylesheet would draw it, but slow enough that no loaded machine
+// outlasts it: a test ends the exit itself, with `finish()`.
 const MOTION = `
 @keyframes test-in { from { opacity: 0 } to { opacity: 1 } }
 @keyframes test-out { from { opacity: 1 } to { opacity: 0 } }
-.surface[data-state=open] { animation: test-in 400ms }
-.surface[data-state=closed] { animation: test-out 200ms }
+.surface[data-state=open] { animation: test-in 60s }
+.surface[data-state=closed] { animation: test-out 60s }
 `;
 
 afterEach(() => {
@@ -19,7 +20,9 @@ afterEach(() => {
 });
 
 const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const animations = (element: Element) =>
+    element.getAnimations().map((a) => (a as CSSAnimation).animationName);
 
 const mount = () => {
     const style = document.head.appendChild(document.createElement("style"));
@@ -35,6 +38,11 @@ const mount = () => {
         () => {},
     );
     control.api().setNode(surface);
+    /** Waits for the surface to be coming in, as it is when a user closes it. */
+    const entering = async () => {
+        await frame();
+        expect(animations(surface)).toEqual(["test-in"]);
+    };
     const close = async () => {
         surface.dataset.state = "closed";
         control.setProps({ present: false });
@@ -42,24 +50,24 @@ const mount = () => {
         await frame();
         await settle();
     };
-    return { surface, control, close };
+    return { surface, control, entering, close };
 };
 
 describe("presence", () => {
     it("stays while its exit animation runs, then lets the surface go", async () => {
-        const { control, close } = mount();
-        await wait(100);
+        const { surface, control, entering, close } = mount();
+        await entering();
         await close();
         expect(control.service.state.get()).toBe("unmountSuspended");
         expect(control.api().present).toBe(true);
-        await wait(250);
-        await settle();
-        expect(control.api().present).toBe(false);
+        expect(animations(surface)).toEqual(["test-out"]);
+        surface.getAnimations()[0]!.finish();
+        await expect.poll(() => control.api().present).toBe(false);
     });
 
     it("isn't let go by its enter animation's cancel once it's leaving", async () => {
-        const { surface, control, close } = mount();
-        await wait(100);
+        const { surface, control, entering, close } = mount();
+        await entering();
         await close();
         expect(control.service.state.get()).toBe("unmountSuspended");
         // The enter's cancel, as it arrives when the frame that replaced it sends it late.
