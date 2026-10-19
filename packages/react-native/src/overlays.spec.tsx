@@ -16,7 +16,7 @@ import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import { byTestId, interact, mount, outside, settle } from "./testing/render";
-import { Tooltip } from "./tooltip";
+import { LONG_PRESS_TOOLTIP_MS, Tooltip } from "./tooltip";
 
 let registry: TestRegistry;
 
@@ -346,30 +346,51 @@ const hold = async (element: HTMLElement) => {
 describe.each([animated, reanimated])("the tooltip with $name", (engine) => {
     const tooltip = () =>
         document.querySelector<HTMLElement>('[role="tooltip"]');
-    const saveButton = (onPress?: () => void) => (
-        <View style={{ padding: 80 }}>
-            <Tooltip
-                supportingText="Save to drafts"
-                trigger={(trigger) => (
-                    <IconButton
-                        {...trigger}
-                        aria-label="Save"
-                        icon="S"
-                        onPress={onPress}
-                    />
-                )}
-            />
-        </View>
-    );
+    // When it last asked to show and to hide.
+    const changed = { open: 0, closed: 0 };
+    const saveButton = (onPress?: () => void) => {
+        changed.open = changed.closed = 0;
+        return (
+            <View style={{ padding: 80 }}>
+                <Tooltip
+                    supportingText="Save to drafts"
+                    onOpenChange={({ open }) => {
+                        changed[open ? "open" : "closed"] = performance.now();
+                    }}
+                    trigger={(trigger) => (
+                        <IconButton
+                            {...trigger}
+                            aria-label="Save"
+                            icon="S"
+                            onPress={onPress}
+                        />
+                    )}
+                />
+            </View>
+        );
+    };
 
     it("shows under its trigger once the pointer rests on it, and hides when it leaves", async () => {
         await render(saveButton(), engine);
         const trigger = byTestId("pf-icon-button-root");
+        // When the pointer reaches the trigger: its first event, before the tooltip hears of it.
+        let hoveredAt = 0;
+        const hovers = new AbortController();
+        window.addEventListener(
+            "pointerover",
+            (event) => {
+                if (trigger.contains(event.target as Node))
+                    hoveredAt ||= performance.now();
+            },
+            { capture: true, signal: hovers.signal },
+        );
         await interact(() => userEvent.hover(trigger));
-        await settle(200);
-        expect(tooltip()).toBeNull();
-        await settle(300);
-        await until(() => tooltip() !== null && box(tooltip()!).top > 0);
+        hovers.abort();
+        expect(hoveredAt).toBeGreaterThan(0);
+        await until(() => tooltip() !== null && box(tooltip()!).top > 0, 3000);
+        // A timer never fires early, however loaded the machine; the margin covers the clock's
+        // coarsening.
+        expect(changed.open - hoveredAt).toBeGreaterThanOrEqual(400 - 1);
         const shown = box(tooltip()!);
         const under = box(trigger);
         expect(shown.top).toBeGreaterThanOrEqual(under.bottom);
@@ -378,8 +399,7 @@ describe.each([animated, reanimated])("the tooltip with $name", (engine) => {
             0,
         );
         await interact(() => userEvent.unhover(trigger));
-        await settle(300);
-        await until(() => tooltip() === null);
+        await until(() => tooltip() === null, 3000);
         expect(tooltip()).toBeNull();
     });
 
@@ -390,22 +410,22 @@ describe.each([animated, reanimated])("the tooltip with $name", (engine) => {
             engine,
         );
         const release = await hold(byTestId("pf-icon-button-root"));
-        await settle(100);
-        await settle(700);
+        await until(() => tooltip() !== null, 3000);
         expect(tooltip()).not.toBeNull();
+        const releasedAt = performance.now();
         await release();
         expect(pressed).toEqual([]);
-        await settle(1000);
-        expect(tooltip()).not.toBeNull();
-        await settle(500);
-        await until(() => tooltip() === null);
+        await until(() => tooltip() === null, 4000);
         expect(tooltip()).toBeNull();
+        expect(changed.closed - releasedAt).toBeGreaterThanOrEqual(
+            LONG_PRESS_TOOLTIP_MS - 1,
+        );
     });
 
     it("shows when the keyboard focuses its trigger, and Escape hides it", async () => {
         await render(saveButton(), engine);
         await interact(() => userEvent.tab());
-        await settle(300);
+        await until(() => tooltip() !== null, 3000);
         expect(tooltip()).not.toBeNull();
         await interact(() => userEvent.keyboard("{Escape}"));
         await until(() => tooltip() === null);
