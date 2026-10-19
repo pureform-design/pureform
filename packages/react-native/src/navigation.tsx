@@ -1,7 +1,7 @@
 // The tabs, and the navigation bar and rail: a row (or column) of destinations, each a pressable
-// with its icon and label, one of them selected. Tabs draw an indicator under the selected tab,
-// which slides in from the tab selected before; a navigation destination fills its active
-// indicator and its icon.
+// with its icon and label, one of them selected. Tabs wrap them in the tab's content and draw an
+// indicator under the selected tab's (across the tab, for secondary tabs), which slides in from the
+// tab selected before; a navigation destination fills its active indicator and its icon.
 
 import {
     navigationBarAnatomy,
@@ -110,6 +110,9 @@ function TabImpl(props: TabProps): ReactNode {
             {...indication.handlers}
             role="tab"
             aria-selected={props.selected}
+            {...(item["aria-label"] === undefined
+                ? {}
+                : { "aria-label": item["aria-label"] })}
             disabled={item.disabled}
             onPress={() => props.onPick(item.value)}
             onLayout={(event: LayoutChangeEvent) =>
@@ -123,28 +126,41 @@ function TabImpl(props: TabProps): ReactNode {
             }}
             testID={id("tab")}
         >
-            {isPresent(item.icon) ? (
-                <v.icon.View style={s.icon} testID={id("icon")}>
-                    <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
-                        {item.icon}
-                    </IconSlot>
-                </v.icon.View>
-            ) : null}
-            <v.label.Text
-                selectable={false}
-                style={s.label}
-                testID={id("label")}
-            >
-                {item.label}
-            </v.label.Text>
-            <v.indicator.View
-                pointerEvents="none"
+            <v.tabContent.View
                 onLayout={(event: LayoutChangeEvent) =>
-                    props.onLayout(item.value, "indicator", spanOf(event))
+                    props.onLayout(item.value, "tabContent", spanOf(event))
                 }
-                style={slid ? { ...s.indicator, ...slid } : s.indicator}
-                testID={id("indicator")}
-            />
+                style={s.tabContent}
+                testID={id("tabContent")}
+            >
+                {isPresent(item.icon) ? (
+                    <v.icon.View style={s.icon} testID={id("icon")}>
+                        <IconSlot
+                            {...iconSlot(selected, "icon")}
+                            motion={s.icon}
+                        >
+                            {item.icon}
+                        </IconSlot>
+                    </v.icon.View>
+                ) : null}
+                {isPresent(item.label) ? (
+                    <v.label.Text
+                        selectable={false}
+                        style={s.label}
+                        testID={id("label")}
+                    >
+                        {item.label}
+                    </v.label.Text>
+                ) : null}
+                <v.indicator.View
+                    pointerEvents="none"
+                    onLayout={(event: LayoutChangeEvent) =>
+                        props.onLayout(item.value, "indicator", spanOf(event))
+                    }
+                    style={slid ? { ...s.indicator, ...slid } : s.indicator}
+                    testID={id("indicator")}
+                />
+            </v.tabContent.View>
             {indication.layer(selected)}
         </v.tab.Pressable>
     );
