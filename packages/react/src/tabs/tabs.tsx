@@ -312,6 +312,7 @@ function ReadyMade(props: TabsProps): ReactNode {
                         value={item.value}
                         disabled={item.disabled}
                         interactionSource={item.interactionSource}
+                        aria-label={item["aria-label"]}
                         controls={panels}
                         tabContentProps={slot("tabContent")}
                         {...slot("tab")}
@@ -321,7 +322,9 @@ function ReadyMade(props: TabsProps): ReactNode {
                                 {item.icon}
                             </Icon>
                         ) : null}
-                        <Label {...slot("label")}>{item.label}</Label>
+                        {isPresent(item.label) ? (
+                            <Label {...slot("label")}>{item.label}</Label>
+                        ) : null}
                         <Indicator {...slot("indicator")} />
                     </Tab>
                 ))}
