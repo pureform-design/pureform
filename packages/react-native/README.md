@@ -48,6 +48,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
 | `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                           |
 | `presence.ts`                                                           | `usePresence`: an overlay's enter and exit (the preset's motions), present until the exit ends                            |
+| `tab-indicator.ts`                                                      | `useIndicatorSlides` (internal): the tabs' indicator sliding from the tab selected before, from `onLayout` boxes          |
 | `portal-host.tsx`, `portal.tsx`                                         | `PortalHost` (the root provider holds one) and `Portal`: overlays rendered over the page, sorted by layer                 |
 | `overlay.tsx`                                                           | `placeOverlay` (placement, flip, shift), the trigger's box from its source, `useDismiss` (Escape and the back button)     |
 | `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
@@ -184,7 +185,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   tweens; a factory without `moving` keeps every slot on the engine), and presence (`presence.spec.tsx`: the motions are the preset's;
   with each engine, the select's menu grows in and stays until it has faded out, reduced motion
   only fades, a reopened overlay enters again, the dialog and scrim, snackbar, and tooltip
-  `open`). Node-side commands (`src/testing/commands.ts`) precompute the
+  `open`), and the tabs' indicator (`tab-indicator.spec.tsx`, with both engines: it slides from
+  the old tab partway and rests in place, primary and secondary, for a press, a key, and a
+  controlled value; a change mid-slide starts from where it had got to; reduced motion changes at
+  once; a resize keeps it aligned). Node-side commands (`src/testing/commands.ts`) precompute the
   preset's styles for a test registry.
 - `apps/rn-web-demo`'s `test:e2e` renders the whole demo page from this package, and opens and
   dismisses each overlay.
@@ -278,6 +282,24 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   with it they enter and leave and render nothing once gone; without it they're shown and still,
   as before. The engine reports each step's end (Animated's completion, Reanimated's
   `onCSSAnimationEnd`); an engine without `presence` shows and hides at once.
+- **The tabs' indicator slides as on the web** (design doc §9.10): when the
+  selection changes, from a press, a key, or a controlled `value`, the new tab's indicator is
+  drawn over the old one's box and moves and resizes into place (a translation and a horizontal
+  scale about its center), over the indicator's `transform` transition (`indicatorDuration`,
+  medium1, and `indicatorEasing`, emphasized), times `timeScale`. The engine runs it: `useSlide`
+  on `MotionEngine` (Animated with the native driver on a device; a Reanimated CSS keyframe
+  animation). Where it differs from the web:
+    - the boxes come from `onLayout` on each tab and indicator, recorded as they lay out, so a
+      selection made before the first layout (in the same frame as mounting) changes at once;
+    - a change mid-slide starts from where the slide has got to by the clock (its curve at the
+      time elapsed), not from a measured box, since neither engine reports its position to
+      JavaScript cheaply; the two can differ by a frame;
+    - a resize mid-slide finishes the slide from the old boxes, then rests in the new place (the
+      web's does the same);
+    - the sliding tab takes `zIndex: 1` from when it's selected, so its indicator draws over the
+      tabs it crosses (React Native Web gives every view a stacking context); the web raises the
+      indicator itself;
+    - an engine without `useSlide` changes at once.
 - **The select keeps its label:** when the picked item leaves `items`, the field still shows its
   label until the value changes, as Zag's select does on the web; a value no item has had shows
   nothing, and `null` clears it.

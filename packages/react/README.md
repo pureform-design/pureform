@@ -277,7 +277,10 @@ content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on 
   variant when any tab has an icon, selects the first enabled tab unless given a value, and
   renders a panel per item with `content`. Tabs without panels switch something else and name no
   panel (`Tab`'s `controls={false}` in compound use). Each tab draws its own indicator; Zag's
-  moving indicator isn't used.
+  moving indicator isn't used. When the value changes (a click, a key, a controlled `value`), Root
+  slides the new tab's `Indicator` in from where the old one is drawn (`slideIndicator`, design doc
+  §9.10), over the `transform` transition its style declares: not on mount or hydration, not
+  under reduced motion, and from where a running slide has got to.
 - **The navigation bar and rail** share their parts and behavior: a `<nav>` (name it with
   `aria-label`) of destinations, each a link when it has an `href` and a button otherwise, reached
   in turn with Tab (arrow keys do nothing). `value` (the current destination, controllable) marks

@@ -32,21 +32,21 @@ State + variants ──► select.ts (rules by specificity) ◄─────�
 config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over its precomputed styles)
 ```
 
-| Module                           | What it does                                                                                 |
-| -------------------------------- | -------------------------------------------------------------------------------------------- |
-| `lower.ts`                       | Components to style templates: each rule with the states it holds under and its specificity. |
-| `values.ts`                      | Template values (tokens, mixes, math) and their evaluation; the `Transition` shape.          |
-| `build.ts`, `resolve.ts`         | `precompute` and `runtimeStyles`: templates resolved per theme, and runtime overrides.       |
-| `theme.ts`                       | A theme's token values for one color scheme.                                                 |
-| `select.ts`                      | Picks a component's styles, transitions, and animations for its variants and state.          |
-| `factory.ts`                     | `nativeFactory`: a component's `StyleFactory`, selecting once per selection and environment. |
-| `codegen.ts`                     | The `native` target's codegen for `@pureform/generate`: a factory module per component.      |
-| `motion.ts`                      | Pure motion helpers: easing curves, interpolation, token tweens, and overlay presence types. |
-| `react.ts`                       | `StylesProvider`, `PureformProvider`, `useComponentState`, `useComponentStyles`, …           |
-| `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, ripples, and overlay presence.   |
-| `reanimated.ts`, `css-motion.ts` | The Reanimated 4 entry: transitions, keyframes, and overlay presence as CSS animations.      |
-| `svg.ts`, `reanimated-svg.ts`    | Shapes, gradients, and ripples drawn with `react-native-svg`.                                |
-| `metro.ts`                       | Precomputing a config while Metro bundles.                                                   |
+| Module                           | What it does                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `lower.ts`                       | Components to style templates: each rule with the states it holds under and its specificity.                       |
+| `values.ts`                      | Template values (tokens, mixes, math) and their evaluation; the `Transition` shape.                                |
+| `build.ts`, `resolve.ts`         | `precompute` and `runtimeStyles`: templates resolved per theme, and runtime overrides.                             |
+| `theme.ts`                       | A theme's token values for one color scheme.                                                                       |
+| `select.ts`                      | Picks a component's styles, transitions, and animations for its variants and state.                                |
+| `factory.ts`                     | `nativeFactory`: a component's `StyleFactory`, selecting once per selection and environment.                       |
+| `codegen.ts`                     | The `native` target's codegen for `@pureform/generate`: a factory module per component.                            |
+| `motion.ts`                      | Pure motion helpers: easing curves, interpolation, token tweens, overlay presence types, and an indicator's slide. |
+| `react.ts`                       | `StylesProvider`, `PureformProvider`, `useComponentState`, `useComponentStyles`, …                                 |
+| `animate/`, `animated.ts`        | The Animated entry: state transitions, keyframe animations, ripples, overlay presence, and slides.                 |
+| `reanimated.ts`, `css-motion.ts` | The Reanimated 4 entry: transitions, keyframes, overlay presence, and slides as CSS animations.                    |
+| `svg.ts`, `reanimated-svg.ts`    | Shapes, gradients, and ripples drawn with `react-native-svg`.                                                      |
+| `metro.ts`                       | Precomputing a config while Metro bundles.                                                                         |
 
 ## Public API
 
@@ -54,8 +54,8 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                            |
 | `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState` |
-| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, and `animatedPresence`, through React Native's Animated                                                        |
-| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, and `reanimatedPresence`, through Reanimated 4                                                               |
+| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, `animatedPresence`, and `useAnimatedSlide`, through React Native's Animated                                    |
+| `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, `reanimatedPresence`, and `useReanimatedSlide`, through Reanimated 4                                         |
 | `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
 | `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
 | `@pureform/rn-adapter/factory`                | `nativeFactory`, `componentFactory`, `selectionOrder`, `movingSlots`, `overridesFor`, and the `NativeFactory` types; no React, no lowering                |
@@ -152,6 +152,19 @@ is when a binding unmounts a closed overlay:
 
 `presenceFrames(step)` gives a step's two ends as styles. `@pureform/react-native`'s
 `usePresence` takes the frames and timings from the theme and the preset's overlay keyframes.
+
+## An indicator's slide
+
+The tabs' active indicator slides from the tab selected before into its own place (design doc
+§9.10). A `SlideMotion` (`motion.ts`) is where it starts against its place (`translateX`, and
+`scaleX` about its center) and the timing; `slideOffset(from, to)` gives the start from two boxes
+along the row, `slideAt(offset, progress)` where a slide has got to, and `offsetSpan(span, offset)`
+the box it covers there, so a binding can start the next slide from a running one. Each engine
+draws one as a style for the view, for each new motion object:
+
+- `useAnimatedSlide(motion)` interpolates a progress from 0 to 1, started once the render commits
+  (the native driver on a device);
+- `useReanimatedSlide(motion)` is a CSS keyframe animation, the same object while the motion is.
 
 ## Direction
 
