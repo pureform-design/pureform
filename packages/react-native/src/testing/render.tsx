@@ -6,6 +6,7 @@ import { act, cleanup, render } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { afterEach, vi } from "vitest";
+import { userEvent } from "vitest/browser";
 
 afterEach(() => {
     cleanup();
@@ -37,6 +38,16 @@ export const until = (check: () => void, timeout = 10_000): Promise<void> =>
         },
         { timeout, interval: 10 },
     );
+
+/** Moves the pointer to the page's corner, away from where a test renders: an earlier test's
+ *  click leaves it there, and a component showing under it would hear it hover. */
+export const pointerAway = async (): Promise<void> => {
+    const corner = document.body.appendChild(document.createElement("div"));
+    corner.style.cssText =
+        "position: fixed; right: 0; bottom: 0; width: 4px; height: 4px";
+    await userEvent.hover(corner);
+    corner.remove();
+};
 
 /** Runs a user interaction inside `act`, then settles. */
 export const interact = async (
