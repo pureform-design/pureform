@@ -1,6 +1,6 @@
-// The smoke test, in Node: a global setup starts the demo's own dev server, and the test opens the
-// home page in Chromium through Playwright. Set CHROMIUM_PATH to use a system Chromium instead of
-// Playwright's download.
+// The smoke test, in Node: a global setup starts the demo's own dev server and compiles the pages
+// the test visits, and the test opens them in Chromium through Playwright. Set CHROMIUM_PATH to
+// use a system Chromium instead of Playwright's download.
 
 import e2eTestConfig from "@pureform/vitest-config/e2e";
 import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
@@ -10,8 +10,8 @@ export default mergeConfig(e2eTestConfig, {
         environment: "node",
         globalSetup: ["./vitest-e2e-server.ts"],
         testTimeout: 60_000,
-        // The first visit waits for the dev server to optimize the pages' dependencies.
-        hookTimeout: 120_000,
+        // Launching Chromium, on a loaded machine.
+        hookTimeout: 60_000,
         // The transactions page renders its rows a short task at a time, which a loaded machine
         // stretches past the default second.
         expect: { poll: { timeout: 15_000 } },

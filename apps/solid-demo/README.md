@@ -195,8 +195,13 @@ through Playwright, checks that
 - the floating button opens the panel; the dark scheme and no indication take effect, survive a
   reload (the server renders them), reset, and the app selector goes back to the launcher.
 
-`CHROMIUM_PATH` (`.env.local`) picks a system Chromium. The first visit lets Vite optimize the
-pages' dependencies (which reloads the page once) before the tests start.
+`CHROMIUM_PATH` (`.env.local`) picks a system Chromium. Before any test starts, the global setup
+compiles the pages: it opens each route the tests visit in Chromium, again and again until a round
+of visits reloads no page and leaves Vite's dependency bundle as it was, so the tests start on a
+warm server whatever the machine's load (it gives up with an error after 5 minutes). It bundles
+the Zag packages the pages import up front, which saves a round. Its limits: 60 s for each test
+and for launching Chromium, and 15 s for each `expect.poll` (the transactions' rows render a short
+task at a time, which a loaded machine stretches).
 
 ## Who owns what
 
