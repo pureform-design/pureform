@@ -7,12 +7,14 @@
 import {
     animatedPresence,
     useAnimatedComponentStyles,
+    useAnimatedSlide,
     useRipple,
 } from "@pureform/rn-adapter/animated";
 import type {
     PresenceDriver,
     RippleOptions,
     Ripples,
+    SlideMotion,
 } from "@pureform/rn-adapter/animated";
 import type { Drawing, State, ThemeValues } from "@pureform/rn-adapter/factory";
 import type { SvgDrawingProps } from "@pureform/rn-adapter/svg";
@@ -51,6 +53,11 @@ export interface MotionEngine {
     /** What runs one overlay's enter and exit, telling when each step ends. Without it,
      *  overlays show and go at once. */
     presence?(): PresenceDriver;
+    /** The style that slides an active indicator into its place from where another was drawn,
+     *  for each new `motion` (a hook). Without it, the indicator moves at once. */
+    useSlide?(
+        motion: SlideMotion | undefined,
+    ): Record<string, unknown> | undefined;
     /** The engine's views, which take its animated styles. */
     readonly View: ComponentType<any>;
     readonly Text: ComponentType<any>;
@@ -77,6 +84,7 @@ export const animated: MotionEngine = {
     useStyles: useAnimatedComponentStyles,
     useRipple,
     presence: animatedPresence,
+    useSlide: useAnimatedSlide,
     View: Animated.View,
     Text: Animated.Text,
     TextInput: Animated.createAnimatedComponent(TextInput),
