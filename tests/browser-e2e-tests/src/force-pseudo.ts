@@ -56,12 +56,16 @@ export const forcePseudoClasses = async (
         nodeId: doc.nodeId,
         selector,
     })) as { nodeIds: number[] };
-    for (const nodeId of nodeIds) {
-        await session.send("CSS.forcePseudoState", {
-            nodeId,
-            forcedPseudoClasses: pseudoClasses,
-        });
-    }
+    // All at once: each call is a round trip through the test server, and one at a time a
+    // page of elements takes longer than a test may under load.
+    await Promise.all(
+        nodeIds.map((nodeId) =>
+            session.send("CSS.forcePseudoState", {
+                nodeId,
+                forcedPseudoClasses: pseudoClasses,
+            }),
+        ),
+    );
     // The state's transitions (color fades run even under reduced motion) finish at once, so
     // computed styles show the state rather than partway to it.
     for (const animation of frame.contentDocument?.getAnimations() ?? []) {
