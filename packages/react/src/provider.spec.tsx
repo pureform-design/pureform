@@ -1,3 +1,4 @@
+import { testIds } from "@pureform/anatomy";
 import {
     createRegistry,
     defineRuntimeTheme,
@@ -5,7 +6,7 @@ import {
 } from "@pureform/styling";
 import type { ThemeGenerator } from "@pureform/styling";
 import { screen } from "@testing-library/react";
-import { Suspense, useState } from "react";
+import { type ComponentProps, type ReactNode, Suspense, useState } from "react";
 import { describe, expect, it } from "vitest";
 
 import {
@@ -18,7 +19,9 @@ import {
     usePureform,
     useThemeVars,
 } from ".";
+import type { PureformProviderProps } from ".";
 import { button, deferredLoader, fakeRegistry } from "./__fixtures__/registry";
+import { Button } from "./button";
 import {
     Errored,
     interact,
@@ -273,6 +276,123 @@ describe("PureformProvider", () => {
                 "rgb(4, 5, 6)",
             );
         });
+    });
+});
+
+describe("PureformProvider re-rendering", () => {
+    type Options = Omit<PureformProviderProps, "registry" | "children">;
+    const registry = createRegistry(
+        { button },
+        { themeAttribute: "data-theme", vars: { prefix: "pf" } },
+    );
+    const seedTheme = defineRuntimeTheme<{ seed: string }>(
+        "seed-renders",
+        () => (input) => ({
+            light: { "--colors-primary": input.seed },
+            dark: { "--colors-primary": "black" },
+        }),
+    );
+
+    // The options change from outside, and the provider's children stay the same elements, so
+    // only what reads its context renders again: the button, whose root renders its `as` again
+    // each time, and a `usePureform()` probe.
+    const setup = (inner: Options = {}) => {
+        const options = outside<Options>({});
+        const renders = { button: 0 };
+        const seen: [unknown, unknown][] = [];
+        function Counted(props: ComponentProps<"button">) {
+            renders.button++;
+            return <button {...props} />;
+        }
+        function Probe() {
+            const { theme, overrides } = usePureform();
+            seen.push([theme, overrides]);
+            return null;
+        }
+        function Switcher(props: { children: ReactNode }) {
+            return (
+                <options.Holder>
+                    {(value) => (
+                        <PureformProvider registry={registry} {...value}>
+                            {props.children}
+                        </PureformProvider>
+                    )}
+                </options.Holder>
+            );
+        }
+        const view = (
+            <>
+                <Button as={Counted} label="Save" />
+                <Probe />
+            </>
+        );
+        mount(
+            <Switcher>
+                <PureformProvider {...inner}>{view}</PureformProvider>
+            </Switcher>,
+        );
+        return { set: options.set, renders, seen };
+    };
+
+    it("doesn't render components again for a theme, seed theme, or overrides change", async () => {
+        const { set, renders, seen } = setup();
+        await settle();
+        const mounted = renders.button;
+        const overrides = { "colors.primary": "red" };
+        await set({ theme: "teal" });
+        await set({ theme: seedTheme({ seed: "rgb(1, 2, 3)" }) });
+        await settle();
+        await set({ theme: seedTheme({ seed: "rgb(4, 5, 6)" }) });
+        await settle();
+        await set({ overrides });
+        await set({ overrides, hydrate: "regenerate" });
+        expect(renders.button).toBe(mounted);
+        // `usePureform()` still sees every change.
+        expect(seen.map(([theme]) => theme)).toContain("teal");
+        expect(seen.at(-1)).toEqual([undefined, overrides]);
+        expect(
+            getComputedStyle(
+                screen.getByTestId(testIds.button.root),
+            ).getPropertyValue("--colors-primary"),
+        ).toBe("red");
+    });
+
+    it("renders components again for the defaults and slot props they read", async () => {
+        const { set, renders } = setup();
+        await settle();
+        const mounted = renders.button;
+        await set({ defaults: { button: { variant: "text" } } });
+        expect(renders.button).toBeGreaterThan(mounted);
+        expect(screen.getByTestId(testIds.button.root).className).toBe(
+            "button button--text button--small",
+        );
+        const before = renders.button;
+        await set({ slotProps: { button: { label: { className: "caps" } } } });
+        expect(renders.button).toBeGreaterThan(before);
+        expect(screen.getByTestId(testIds.button.label).className).toBe(
+            "button__label caps",
+        );
+    });
+
+    it("keeps a nested provider's components as they are when an outer theme changes", async () => {
+        const { set, renders, seen } = setup({
+            defaults: { button: { size: "large" } },
+            theme: "sharp",
+        });
+        await settle();
+        const mounted = renders.button;
+        await set({ theme: "teal", overrides: { "colors.primary": "red" } });
+        expect(renders.button).toBe(mounted);
+        // The inner theme still wins, and the outer overrides reach it.
+        expect(seen.at(-1)).toEqual(["sharp", { "colors.primary": "red" }]);
+        expect(screen.getByTestId(testIds.button.root).className).toBe(
+            "button button--filled button--large",
+        );
+        await set({ defaults: { button: { variant: "text" } } });
+        expect(renders.button).toBeGreaterThan(mounted);
+        expect(screen.getByTestId(testIds.button.root).className).toBe(
+            "button button--text button--large",
+        );
     });
 });
 
