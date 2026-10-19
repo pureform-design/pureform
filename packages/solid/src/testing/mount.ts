@@ -2,7 +2,7 @@
 
 import { render } from "@solidjs/web";
 import { flush } from "solid-js";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
 
 let disposers: (() => void)[] = [];
 
@@ -26,6 +26,17 @@ export const settle = async (): Promise<void> => {
     await new Promise((resolve) => setTimeout(resolve, 0));
     flush();
 };
+
+/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes, where a
+ *  user event alone can take seconds to come back. */
+export const until = (check: () => void, timeout = 10_000): Promise<void> =>
+    vi.waitFor(
+        async () => {
+            await settle();
+            check();
+        },
+        { timeout, interval: 10 },
+    );
 
 /** The element with this test id. */
 export const byTestId = <E extends HTMLElement = HTMLElement>(

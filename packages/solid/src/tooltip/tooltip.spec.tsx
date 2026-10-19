@@ -5,7 +5,7 @@ import { userEvent } from "vitest/browser";
 import { Tooltip } from ".";
 import { PureformProvider } from "..";
 import { overlaysRegistry } from "../__fixtures__/registry";
-import { byTestId, mount, settle } from "../testing/mount";
+import { byTestId, mount, settle, until } from "../testing/mount";
 
 const ids = compositeTestIds.tooltip;
 
@@ -15,16 +15,6 @@ const withRegistry = (view: () => unknown) =>
             {view() as never}
         </PureformProvider>
     ));
-
-/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes. */
-const until = (check: () => void) =>
-    vi.waitFor(
-        async () => {
-            await settle();
-            check();
-        },
-        { timeout: 3000, interval: 10 },
-    );
 
 /** Moves the pointer off the trigger, where an earlier test or file may have left it resting
  *  (opening the tooltip as it rendered), and waits for the tooltip to close. */
