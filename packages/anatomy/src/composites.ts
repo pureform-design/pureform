@@ -394,13 +394,23 @@ export const dialogBackdropAnatomy = {
 } as const satisfies ComponentAnatomy;
 
 /** The tabs as the bindings render them: Root, an unstyled element around the tab list and the
- *  panels; the tab list (`list`, the preset's `root` slot) with its tabs, which the tabs' registry
- *  entry styles; and a panel per tab (`content`), also unstyled. */
+ *  panels; the tab list (`list`, the preset's `root` slot) with its tabs, each wrapping its icon,
+ *  label, and indicator in `tabContent`, which the tabs' registry entry styles; and a panel per tab
+ *  (`content`), also unstyled. */
 export const tabsCompositeAnatomy = {
     name: "tabs",
     scope: "tabs",
     root: "root",
-    partNames: ["root", "list", "tab", "icon", "label", "indicator", "content"],
+    partNames: [
+        "root",
+        "list",
+        "tab",
+        "tabContent",
+        "icon",
+        "label",
+        "indicator",
+        "content",
+    ],
     parts: {
         root: {
             name: "root",
@@ -427,6 +437,15 @@ export const tabsCompositeAnatomy = {
             attribute: "tab",
             testId: "pf-tabs-tab",
             parent: "list",
+            children: ["tabContent"],
+            styled: true,
+            mirror: false,
+        },
+        tabContent: {
+            name: "tabContent",
+            attribute: "tab-content",
+            testId: "pf-tabs-tab-content",
+            parent: "tab",
             children: ["icon", "label", "indicator"],
             styled: true,
             mirror: false,
@@ -435,7 +454,7 @@ export const tabsCompositeAnatomy = {
             name: "icon",
             attribute: "icon",
             testId: "pf-tabs-icon",
-            parent: "tab",
+            parent: "tabContent",
             children: [],
             styled: true,
             mirror: true,
@@ -444,7 +463,7 @@ export const tabsCompositeAnatomy = {
             name: "label",
             attribute: "label",
             testId: "pf-tabs-label",
-            parent: "tab",
+            parent: "tabContent",
             children: [],
             styled: true,
             mirror: false,
@@ -453,7 +472,7 @@ export const tabsCompositeAnatomy = {
             name: "indicator",
             attribute: "indicator",
             testId: "pf-tabs-indicator",
-            parent: "tab",
+            parent: "tabContent",
             children: [],
             styled: true,
             mirror: false,
@@ -547,6 +566,7 @@ export const compositeTestIds = {
         root: "pf-tabs-root",
         list: "pf-tabs-list",
         tab: "pf-tabs-tab",
+        tabContent: "pf-tabs-tab-content",
         icon: "pf-tabs-icon",
         label: "pf-tabs-label",
         indicator: "pf-tabs-indicator",
