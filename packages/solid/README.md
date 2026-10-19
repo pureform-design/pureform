@@ -312,7 +312,15 @@ content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on 
 - **The card** has no machine. Root is a `<div>` surface, a link with `href`, or any element with
   `as`; a link or a button is `interactive` (state layer, hover lift, touch target) unless told
   otherwise, and `disabled` disables a button or sets `aria-disabled`. The ready-made takes its
-  content as children and renders `TouchTarget` first while interactive.
+  content as children and renders `TouchTarget` first while interactive. Material's sections are
+  parts too (`Media`, `Header`, `Avatar`, `HeaderText`, `Headline`, `Subhead`, `HeaderAction`,
+  `Content`, `SupportingText`, `Actions`, `Footer`; Root's `padded={false}` lets them pad
+  themselves), and `ActionArea` is the card's own action beside other controls: a link with
+  `href`, else a `<button>`, emitting to the card's source, `disabled` with Root unless given. The
+  ready-made takes the sections as content props (`headline`, `media`, `actions`, …) and, when it
+  acts beside `actions` or a `headerAction`, moves its action and Root's element props to the
+  action area (design doc §9.9). `useComponent` takes `entryActive`, which of the anatomy's
+  indication entries shows now, and a part an entry names as its `layer` holds the layer.
 - **The search bar** runs the text field machine: Root is a `<label>` around `Leading`
   (`aria-hidden`), the `<input type="search">`, and `Trailing` (not hidden: it can hold actions).
   `value` is controllable; `placeholder`, `name`, `form`, `required`, `disabled`, `readOnly` go to

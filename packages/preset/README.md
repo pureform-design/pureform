@@ -636,7 +636,14 @@ number from 0 to 100 (prefixed like every var, for example `--components-slider-
 ## Surfaces
 
 - `card`: `variant` is `elevated`, `filled`, or `outlined`. Set `interactive` when the whole
-  card is clickable, and render its touch target slot.
+  card is clickable, and render its touch target slot. For Material's anatomy, set `padded`
+  to `false` and lay it out with `media` (full bleed), `header` (`avatar`, `headerText` holding
+  `headline` and `subhead`, `headerAction`), `content` (`supportingText`), `actions`
+  (`actionsAlign`: `end` or `start`), and `footer`; the sections pad themselves. A card that acts
+  and has other controls wraps the part that acts in `actionArea` (a link or a button) and keeps
+  the controls outside it: the container then tints, lifts, draws the focus indicator, and dims
+  from the action area (`:has()` over its states), and the ripple's layer sits in the action
+  area, spanning the card (design doc §9.9).
 - `scrim`: dims what sits behind a modal surface. Place it inside a positioned container.
 - `separator`: Material's divider. Use an `<hr>`; `inset` is `none`, `start`, or `middle`.
 

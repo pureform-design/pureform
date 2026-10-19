@@ -302,6 +302,26 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
     A `Modal` (as the select's menu uses) draws over everything already, and on Android a sibling
     with a higher `elevation` can still draw over it.
 
+- **The card's action area** (design doc §9.9): `Card` with `onPress` and plain children is one
+  button, its text its label, as before. Beside `actions` or a `headerAction`, the ready-made card
+  moves `onPress` to `Card.ActionArea`, a `Pressable` around the media, header, and content; the
+  root is then a plain `View`, not `accessible`, so VoiceOver and TalkBack reach each control
+  inside on its own, and the action area groups its own content into the card's one action. The
+  root shows the action area's hover, press, and focus, and draws the ripple's layer last inside
+  itself, over the whole card. Compose it yourself with `Card.Root` (`padded={false}`) around
+  `Card.ActionArea`, `Card.Media`, `Card.Header` (`Avatar`, `HeaderText` with `Headline` and
+  `Subhead`, `HeaderAction`), `Card.Content` (`SupportingText`), `Card.Actions`, and
+  `Card.Footer`. Where it differs from the web:
+    - no `href` or `as`: the action area is a button, or `role="link"` for one that leads
+      somewhere, and Root acts only through `onPress`;
+    - the root learns it has an action area when one mounts (one more render), since there's no
+      server rendering to match;
+    - a string in a view part (`Content`, `Footer`, `Actions`, …) is drawn as text, in the
+      supporting text's style for the content and footer;
+    - a card laid out in sections clips its content to its corners (`overflow: hidden`); that the
+      `boxShadow` of an elevated card survives the clip on iOS and Android hasn't been checked on a
+      device;
+    - no `class`, `style`, or `slotProps` per part (React Native's components take none).
 - **Long lists:** each interactive `ListItem` takes about 0.4 to 0.5 ms to mount in development
   (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
   the rows near the screen. Key rows by their value, not their index, memoize the row, and keep

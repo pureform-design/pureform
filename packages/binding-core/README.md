@@ -295,10 +295,17 @@ sliderSelection(props, percent);         // the value token from the machine's p
 sliderMachineProps(props); sliderNativeDefault(resetsTo, min); // a reset shows the default, else min
 
 // Card (no machine)
-type CardPart; interface CardRootOwnProps // variant, interactive, tokens, disabled, testId, unstyled
+type CardPart; interface CardRootOwnProps // variant, interactive, padded, actionsAlign, tokens,
+                                         // disabled, testId, unstyled
 CARD_ROOT_PROPS; cardElement({ href, as }); // "a" with an href, else as, else "div"
 isInteractiveCard(props, element);       // interactive, else a link or a button
 cardSelection(props, element); cardRootProps(props, element); // a button's type; disabled
+CardContentProps<Node>; CARD_CONTENT_PROPS; // media, avatar, headline, subhead, headerAction,
+                                         // supportingText, actions, footer
+cardLayout(props, element);              // { sections, actionArea, headerOutside, header,
+                                         //   supportingText }: the action moves to the action
+                                         //   area only beside actions or a header action
+cardEntryActive(rootInteractive)(entry); // the root's entry while Root acts, the action area's else
 
 // Search bar: the text field machine
 type SearchBarPart; interface SearchBarRootOwnProps // tokens, disabled, required, readOnly,

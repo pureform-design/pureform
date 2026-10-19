@@ -53,6 +53,7 @@ interface IndicationAnatomy<P extends string = string> {
     readonly surface: P; // the part the state layer tints and the ripple fills (and clips to)
     readonly centered: boolean; // the ripple starts at the surface's center
     readonly focus: P; // the part that draws the focus indicator
+    readonly layer?: P; // the part holding the ripple's layer, when not the surface (a card's action area)
 }
 
 interface PartAnatomy<P extends string = string> {
@@ -79,23 +80,25 @@ interface PartAnatomy<P extends string = string> {
 - `indication` comes from the component spec's `indication`, which the preset declares beside
   each component's state layer (design doc §9.8, "Where indication draws"). Only interactive
   components have it; the card and the list item have it for when they're interactive (the
-  binding knows when), and the snackbar has two, its action and its close button. The select's
+  binding knows when), the card a second for its action area (the container its surface, the
+  action area holding the layer), and the snackbar has two, its action and its close button. The select's
   options are the menu's items, so `menuAnatomy`, `selectMenuAnatomy`, and `menuOverlayAnatomy`
   carry the menu's entry; `tabsCompositeAnatomy` carries the tabs'.
 
-| Component                     | Trigger  | Surface      | Centered | Focus    |
-| ----------------------------- | -------- | ------------ | -------- | -------- |
-| button, chip, card, list item | `root`   | `root`       | no       | `root`   |
-| tabs                          | `tab`    | `tab`        | no       | `tab`    |
-| menu (items, select options)  | `item`   | `item`       | no       | `item`   |
-| snackbar                      | `action` | `action`     | no       | `action` |
-|                               | `close`  | `close`      | no       | `close`  |
-| icon button                   | `root`   | `container`  | yes      | `root`   |
-| FAB                           | `root`   | `container`  | no       | `root`   |
-| navigation bar and rail       | `item`   | `indicator`  | yes      | `item`   |
-| checkbox, radio               | `input`  | `root`       | yes      | `root`   |
-| switch                        | `input`  | `stateLayer` | yes      | `root`   |
-| slider                        | `input`  | `stateLayer` | yes      | `handle` |
+| Component                     | Trigger      | Surface                        | Centered | Focus    |
+| ----------------------------- | ------------ | ------------------------------ | -------- | -------- |
+| button, chip, card, list item | `root`       | `root`                         | no       | `root`   |
+| card, with an action area     | `actionArea` | `root` (layer in `actionArea`) | no       | `root`   |
+| tabs                          | `tab`        | `tab`                          | no       | `tab`    |
+| menu (items, select options)  | `item`       | `item`                         | no       | `item`   |
+| snackbar                      | `action`     | `action`                       | no       | `action` |
+|                               | `close`      | `close`                        | no       | `close`  |
+| icon button                   | `root`       | `container`                    | yes      | `root`   |
+| FAB                           | `root`       | `container`                    | no       | `root`   |
+| navigation bar and rail       | `item`       | `indicator`                    | yes      | `item`   |
+| checkbox, radio               | `input`      | `root`                         | yes      | `root`   |
+| switch                        | `input`      | `stateLayer`                   | yes      | `root`   |
+| slider                        | `input`      | `stateLayer`                   | yes      | `handle` |
 
 ## Public API
 
