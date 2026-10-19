@@ -15,7 +15,14 @@ import { useSnackbar } from "./snackbar";
 import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, interact, mount, outside, settle } from "./testing/render";
+import {
+    byTestId,
+    interact,
+    mount,
+    outside,
+    pointerAway,
+    settle,
+} from "./testing/render";
 import { LONG_PRESS_TOOLTIP_MS, Tooltip } from "./tooltip";
 
 let registry: TestRegistry;
@@ -255,27 +262,36 @@ describe.each([animated, reanimated])(
         });
 
         it("holds while the pointer is over it, and closes by its action", async () => {
+            // The real pointer away: an earlier test's click on the action leaves it where this
+            // snackbar shows, and its leaving as the snackbar grows would let it go.
+            await pointerAway();
             await render(<Grab />, engine);
             const done: string[] = [];
             await interact(() => {
                 snackbars.show({
                     supportingText: "Archived",
                     action: "Undo",
-                    duration: 400,
+                    duration: 1000,
                     onAction: () => done.push("undo"),
                     onOpenChange: (details) => done.push(details.reason),
                 });
             });
-            await settle(100);
             const text = document.querySelector<HTMLElement>(
                 '[data-testid="pf-snackbar-supporting-text"]',
             )!;
-            await interact(() => userEvent.hover(text));
-            await settle(700);
-            expect(roots().length).toBe(1);
-            await interact(() => userEvent.unhover(text));
-            // A press on it holds it too, as a touch does.
             const holder = roots()[0]!.parentElement!;
+            // The pointer arrives from the page, at once: a hover command can come back after
+            // the countdown has run out on a loaded machine.
+            const pointer = { pointerType: "mouse", pointerId: 1 };
+            await interact(() => {
+                holder.dispatchEvent(new PointerEvent("pointerenter", pointer));
+            });
+            await settle(1500);
+            expect(roots().length).toBe(1);
+            await interact(() => {
+                holder.dispatchEvent(new PointerEvent("pointerleave", pointer));
+            });
+            // A press on it holds it too, as a touch does.
             const at = box(text);
             const point = {
                 bubbles: true,
@@ -289,7 +305,7 @@ describe.each([animated, reanimated])(
             });
             // React Native Web starts a press 50ms after the pointer goes down.
             await settle(100);
-            await settle(700);
+            await settle(1500);
             expect(roots().length).toBe(1);
             await interact(() => {
                 document.dispatchEvent(new MouseEvent("mouseup", point));
