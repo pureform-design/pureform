@@ -24,6 +24,13 @@ export const countedSeedTheme = defineRuntimeTheme<SeedThemeInput>(
     },
 );
 
+/** Imports Material's seed generator, the module `countedSeedTheme` wraps, and leaves
+ *  `countedSeedTheme`'s source unloaded: a provider still loads it after hydrating, without
+ *  waiting on the import. */
+export const importSeedGenerator = async (): Promise<void> => {
+    await seedTheme({ seed: "#000000" }).source.load();
+};
+
 /** The provider's `theme` for a scene: its runtime theme when it has a seed, else its named
  *  theme. */
 export const sceneTheme = (
