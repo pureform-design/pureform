@@ -17,6 +17,7 @@ const machines = [
     "checkbox",
     "core",
     "dom-query",
+    "presence",
     "types",
     "utils",
 ].map((name) => `@pureform/solid > @pureform/machines > @zag-js/${name}`);
