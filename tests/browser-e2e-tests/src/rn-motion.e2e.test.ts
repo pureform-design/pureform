@@ -2,6 +2,9 @@
 // moves from its rest color to its hover color over the transition's duration, rather than at
 // once, with or without reduced motion, since a color fade doesn't move anything. A progress
 // value, which does, moves over its transition and jumps under reduced motion.
+//
+// Animated times each frame by `Date.now()`, so the tests hold the clock and move it themselves:
+// what a frame draws then depends on the time they set, not on how late the frame runs.
 
 import type { PrecomputedStyles } from "@pureform/rn-adapter";
 import { useAnimatedComponentStyles } from "@pureform/rn-adapter/animated";
@@ -11,7 +14,7 @@ import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
 import { Animated } from "react-native";
-import { afterEach, beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 import { commands } from "vitest/browser";
 
 let styles: PrecomputedStyles;
@@ -25,7 +28,34 @@ beforeAll(async () => {
 afterEach(() => {
     root?.unmount();
     host?.remove();
+    vi.useRealTimers();
 });
+
+/** Holds the clock Animated reads; `at` moves it to `ms` past the moment it was held. */
+const holdClock = () => {
+    vi.useFakeTimers({ toFake: ["Date"] });
+    const start = Date.now();
+    return { at: (ms: number) => vi.setSystemTime(start + ms) };
+};
+
+/** Waits for the page to draw something other than `from`: Animated draws a step a frame, and
+ *  a render, after the clock moves. */
+const drawnOtherThan = async <T>(read: () => T, from: T): Promise<T> => {
+    await vi.waitFor(() => expect(read()).not.toEqual(from), {
+        timeout: 20_000,
+    });
+    return read();
+};
+
+const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+/** Waits a few frames, and renders, for what the clock's time draws. */
+const frames = async (count = 5) => {
+    for (let i = 0; i < count; i++) {
+        await frame();
+        await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+};
 
 const Button = (props: { hover: boolean }) => {
     const slots = useAnimatedComponentStyles(
@@ -57,8 +87,6 @@ const background = () =>
 const channels = (color: string) =>
     (color.match(/[\d.]+/g) ?? []).map(Number).slice(0, 3);
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 describe("useAnimatedComponentStyles", () => {
     const mount = () => {
         host = document.createElement("div");
@@ -71,13 +99,14 @@ describe("useAnimatedComponentStyles", () => {
         [" under reduced motion too", true],
     ])("moves to the hover color over the transition%s", async (_, reduced) => {
         mount();
+        const clock = holdClock();
         render(false, reduced);
         const rest = background();
         render(true, reduced);
-        await wait(40);
-        const midway = background();
-        await wait(400);
-        const hovered = background();
+        clock.at(40);
+        const midway = await drawnOtherThan(background, rest);
+        clock.at(1000);
+        const hovered = await drawnOtherThan(background, midway);
         expect(hovered).not.toBe(rest);
         // Partway, each channel lies between the two ends, and isn't either.
         expect(midway).not.toBe(rest);
@@ -133,14 +162,16 @@ describe("a progress value", () => {
         host = document.createElement("div");
         document.body.append(host);
         root = createRoot(host);
+        const clock = holdClock();
         show(10, reduced);
-        await wait(40);
+        await frames();
         const rest = arc();
         show(40, reduced);
-        await wait(40);
-        const soon = arc();
-        await wait(400);
-        const done = arc();
+        clock.at(40);
+        const soon = await drawnOtherThan(arc, rest);
+        clock.at(1000);
+        await frames();
+        const done = reduced ? arc() : await drawnOtherThan(arc, soon);
         expect(done).not.toBe(rest);
         if (reduced) expect(soon).toBe(done);
         else expect(soon).not.toBe(done);
@@ -187,10 +218,13 @@ describe("transitioned shadows", () => {
         const shadow = () =>
             getComputedStyle(document.querySelector('[data-testid="root"]')!)
                 .boxShadow;
+        const clock = holdClock();
         show(false);
         const rest = shadow();
         show(true);
-        await wait(400);
+        clock.at(1000);
+        await drawnOtherThan(shadow, rest);
+        await frames();
         expect(rest).toMatch(/px/);
         expect(shadow()).toMatch(/px/);
         expect(shadow()).not.toBe(rest);
@@ -202,6 +236,7 @@ describe("keyframe animations", () => {
         host = document.createElement("div");
         document.body.append(host);
         root = createRoot(host);
+        const clock = holdClock();
         flushSync(() =>
             root!.render(
                 createElement(
@@ -215,9 +250,11 @@ describe("keyframe animations", () => {
             getComputedStyle(document.querySelector('[data-testid="root"]')!)
                 .transform;
         const seen = new Set<string>();
-        for (let i = 0; i < 6; i++) {
-            seen.add(transform());
-            await wait(70);
+        let last = "";
+        for (let i = 1; i <= 6; i++) {
+            clock.at(i * 70);
+            last = await drawnOtherThan(transform, last);
+            seen.add(last);
         }
         expect(seen.size).toBeGreaterThan(3);
     });
