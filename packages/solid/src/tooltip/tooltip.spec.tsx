@@ -16,10 +16,21 @@ const withRegistry = (view: () => unknown) =>
         </PureformProvider>
     ));
 
-const frames = async (count = 3) => {
-    for (let i = 0; i < count; i++)
-        await new Promise((resolve) => requestAnimationFrame(resolve));
-    await settle();
+/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes. */
+const until = (check: () => void) =>
+    vi.waitFor(
+        async () => {
+            await settle();
+            check();
+        },
+        { timeout: 3000, interval: 10 },
+    );
+
+/** Moves the pointer off the trigger, where an earlier test or file may have left it resting
+ *  (opening the tooltip as it rendered), and waits for the tooltip to close. */
+const pointerOff = async (trigger: HTMLElement) => {
+    await userEvent.unhover(trigger);
+    await until(() => expect(byTestId(ids.positioner).hidden).toBe(true));
 };
 
 describe("Tooltip, ready-made", () => {
@@ -61,29 +72,48 @@ describe("Tooltip, ready-made", () => {
     });
 
     it("opens on hover after its delay and describes the trigger", async () => {
-        const onOpenChange = vi.fn();
+        const openDelay = 100;
+        let openedAt = 0;
+        const onOpenChange = vi.fn(({ open }: { open: boolean }) => {
+            if (open) openedAt = performance.now();
+        });
         withRegistry(() => (
             <Tooltip
                 trigger="Save"
                 supportingText="Save to drafts"
-                openDelay={0}
+                openDelay={openDelay}
                 closeDelay={0}
                 onOpenChange={onOpenChange}
             />
         ));
         await settle();
         const trigger = byTestId(ids.trigger);
-        // The pointer may already rest on it, where the last test left it.
-        await userEvent.unhover(trigger);
+        await pointerOff(trigger);
+        onOpenChange.mockClear();
+        // When the pointer reaches the trigger: its first event, before the tooltip hears of it.
+        let hoveredAt = 0;
+        const hovers = new AbortController();
+        window.addEventListener(
+            "pointerover",
+            (event) => {
+                if (trigger.contains(event.target as Node))
+                    hoveredAt ||= performance.now();
+            },
+            { capture: true, signal: hovers.signal },
+        );
         await userEvent.hover(trigger);
-        await frames();
+        hovers.abort();
+        expect(hoveredAt).toBeGreaterThan(0);
+        await until(() => expect(byTestId(ids.positioner).hidden).toBe(false));
         expect(onOpenChange).toHaveBeenCalledExactlyOnceWith({ open: true });
-        expect(byTestId(ids.positioner).hidden).toBe(false);
+        // A timer never fires early, however loaded the machine; the margin covers the clock's
+        // coarsening.
+        expect(openedAt - hoveredAt).toBeGreaterThanOrEqual(openDelay - 1);
         expect(trigger.getAttribute("aria-describedby")).toBe(
             byTestId(ids.content).id,
         );
         await userEvent.unhover(trigger);
-        await frames();
-        expect(byTestId(ids.positioner).hidden).toBe(true);
+        await until(() => expect(byTestId(ids.positioner).hidden).toBe(true));
+        expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 });
