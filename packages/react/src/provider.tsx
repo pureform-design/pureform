@@ -2,6 +2,8 @@
 // everything under it. It writes `dir`, `data-pf-motion`, the theme's attribute, and token
 // overrides on its own element (`display: contents`), so the CSS and the browser agree with what
 // components read from it, and a runtime theme's `<style>` block, which React hoists to the head.
+// Components read a second context without the theme, overrides, and hydration, which only the
+// provider's element and `usePureform()` use, so switching a theme doesn't render them again.
 
 import {
     providerAttributes,
@@ -55,6 +57,15 @@ export type PureformState = ProviderState<PartProps>;
 
 const PureformContext = createContext<PureformState>(ROOT_PROVIDER);
 
+/** The part of the state components read: everything but the theme, the overrides, and the
+ *  hydration, which reach them as CSS. */
+export type ComponentState = Omit<
+    PureformState,
+    "theme" | "overrides" | "hydrate"
+>;
+
+const ComponentContext = createContext<ComponentState>(ROOT_PROVIDER);
+
 const ThemeVarsContext = createContext<ThemeSchemeVars | undefined>(undefined);
 
 export interface PureformProviderProps
@@ -71,7 +82,8 @@ export interface PureformProviderProps
  *  which React hoists to the head and dedupes by the theme's scope, and `overrides` in the
  *  element's `style`, with the theme-level tokens of its `indication` under them. Object options (`defaults`, `slotProps`, `overrides`, a runtime `theme`) are
  *  compared by identity: keep them stable (module constants or `useMemo`) so components under it
- *  don't re-render needlessly. */
+ *  don't re-render needlessly. A change to the theme, the overrides, or `hydrate` renders the
+ *  provider and what calls `usePureform()`, not the components under it. */
 export function PureformProvider({
     registry,
     dir,
@@ -87,37 +99,42 @@ export function PureformProvider({
     ...rest
 }: PureformProviderProps): ReactNode {
     const parent = useContext(PureformContext);
+    const parentComponents = useContext(ComponentContext);
     const parentVars = useContext(ThemeVarsContext);
-    const state = useMemo(
-        () =>
-            resolveProvider(
-                parent,
-                {
-                    registry,
-                    dir,
-                    motion,
-                    defaults,
-                    slotProps,
-                    theme,
-                    overrides,
-                    hydrate,
-                    indication,
-                },
-                mergePartProps,
-            ),
-        [
-            parent,
-            registry,
-            dir,
-            motion,
-            defaults,
-            slotProps,
-            theme,
-            overrides,
-            hydrate,
-            indication,
-        ],
-    );
+    // Resolved over the parent's component state alone, which a theme change above leaves as is.
+    const components = useMemo((): ComponentState => {
+        const resolved = resolveProvider(
+            { ...ROOT_PROVIDER, ...parentComponents },
+            { registry, dir, motion, defaults, slotProps, indication },
+            mergePartProps,
+        );
+        return {
+            registry: resolved.registry,
+            dir: resolved.dir,
+            motion: resolved.motion,
+            defaults: resolved.defaults,
+            slotProps: resolved.slotProps,
+            indication: resolved.indication,
+            focusIndicatorColor: resolved.focusIndicatorColor,
+        };
+    }, [
+        parentComponents,
+        registry,
+        dir,
+        motion,
+        defaults,
+        slotProps,
+        indication,
+    ]);
+    const state = useMemo((): PureformState => {
+        const resolved = resolveProvider(parent, { theme, overrides, hydrate });
+        return {
+            ...components,
+            theme: resolved.theme,
+            overrides: resolved.overrides,
+            hydrate: resolved.hydrate,
+        };
+    }, [parent, components, theme, overrides, hydrate]);
     useEffect(() => {
         if (!isDev || !registry) return;
         const message = trainVersionMismatch(registry);
@@ -134,26 +151,28 @@ export function PureformProvider({
     }, [indication, overrides, state.registry]);
     return (
         <PureformContext value={state}>
-            <ThemeVarsContext
-                value={theme === undefined ? parentVars : block?.vars}
-            >
-                {block?.css === undefined ? null : (
-                    <style href={block.scope} precedence={THEME_PRECEDENCE}>
-                        {block.css}
-                    </style>
-                )}
-                <div
-                    {...rest}
-                    {...providerAttributes({ motion, theme }, state)}
-                    style={{
-                        display: "contents",
-                        ...(vars as CSSProperties | undefined),
-                        ...style,
-                    }}
+            <ComponentContext value={components}>
+                <ThemeVarsContext
+                    value={theme === undefined ? parentVars : block?.vars}
                 >
-                    {children}
-                </div>
-            </ThemeVarsContext>
+                    {block?.css === undefined ? null : (
+                        <style href={block.scope} precedence={THEME_PRECEDENCE}>
+                            {block.css}
+                        </style>
+                    )}
+                    <div
+                        {...rest}
+                        {...providerAttributes({ motion, theme }, state)}
+                        style={{
+                            display: "contents",
+                            ...(vars as CSSProperties | undefined),
+                            ...style,
+                        }}
+                    >
+                        {children}
+                    </div>
+                </ThemeVarsContext>
+            </ComponentContext>
         </PureformContext>
     );
 }
@@ -211,12 +230,18 @@ export const useThemeVars = (): ThemeSchemeVars | undefined =>
 /** The nearest provider's state, or the root's defaults with none. */
 export const usePureform = (): PureformState => useContext(PureformContext);
 
+/** The nearest provider's state without the theme, overrides, and hydration: what components
+ *  read, so a theme change doesn't render them again. */
+export const useComponentState = (): ComponentState =>
+    useContext(ComponentContext);
+
 /** The nearest provider's registry. Throws when no provider has one. */
-export const useRegistry = (): AnyRegistry => requireRegistry(usePureform());
+export const useRegistry = (): AnyRegistry =>
+    requireRegistry(useComponentState());
 
 /** The direction in effect: pass it to every machine as `dir`. */
-export const useDirection = (): Direction => usePureform().dir;
+export const useDirection = (): Direction => useComponentState().dir;
 
 /** The motion setting in effect: the nearest `"reduce"` or `"full"`, else `"system"`. Most
  *  components want `useReducedMotion()` instead. */
-export const useMotion = (): MotionSetting => usePureform().motion;
+export const useMotion = (): MotionSetting => useComponentState().motion;

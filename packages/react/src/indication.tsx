@@ -49,8 +49,8 @@ import {
 } from "react";
 
 import { isDev } from "./env";
-import { usePureform } from "./provider";
-import type { PureformState } from "./provider";
+import { useComponentState } from "./provider";
+import type { ComponentState } from "./provider";
 
 /** A stable interaction source, the same on every render: share it between components
  *  (`interactionSource={source}`), observe it with `useInteractionState`, or emit to it. */
@@ -90,7 +90,7 @@ const check = (indication: Indication): Indication => {
 /** The indication in effect: the component's own, else the nearest provider's, else Material's. */
 export const resolveIndication = (
     own: Indication | undefined,
-    state: PureformState,
+    state: ComponentState,
 ): Indication => check(own ?? state.indication ?? DEFAULT_INDICATION);
 
 /** What a component's parts share to show its indication. */
@@ -121,7 +121,7 @@ export function useIndicationScope(
         readonly source?: InteractionSource | undefined;
     },
 ): IndicationScope {
-    const state = usePureform();
+    const state = useComponentState();
     const indication = resolveIndication(options.indication, state);
     const latest = useRef(state);
     latest.current = state;
