@@ -1,6 +1,7 @@
+import { act } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider } from ".";
@@ -10,7 +11,7 @@ import { reanimated } from "./engines/reanimated";
 import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { interact, mount, outside, settle } from "./testing/render";
+import { interact, mount, outside, settle, until } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -68,6 +69,48 @@ const boxOf = (element: Element): Box => {
 const isBetween = (value: number, a: number, b: number) =>
     value > Math.min(a, b) + 1 && value < Math.max(a, b) - 1;
 
+const recording = new Set<() => void>();
+
+afterEach(() => {
+    for (const stop of recording) stop();
+});
+
+/** Clicks the tab at `index` from the page. A click command wraps the whole round trip in
+ *  `act`, which holds React's renders, so Animated's slide shows only once the command comes
+ *  back: on a loaded machine, after the slide has ended. */
+const select = (index: number) =>
+    act(async () => {
+        tabOf(index).click();
+    });
+
+/** Records the box of the indicator of the tab at `index` at every frame, from now until
+ *  `stop()`: the slide as it runs, however long the user event that started it takes to come
+ *  back. */
+const recordSlide = (index: number) => {
+    const boxes: Box[] = [];
+    let id = 0;
+    const sample = () => {
+        boxes.push(boxOf(indicatorOf(index)));
+        id = requestAnimationFrame(sample);
+    };
+    const stop = () => {
+        cancelAnimationFrame(id);
+        recording.delete(stop);
+    };
+    recording.add(stop);
+    sample();
+    return {
+        stop,
+        /** The frame nearest halfway from `from` to `to`. */
+        halfway: (from: Box, to: Box): Box => {
+            const middle = (from.left + to.left) / 2;
+            return [...boxes].sort(
+                (a, b) => Math.abs(a.left - middle) - Math.abs(b.left - middle),
+            )[0]!;
+        },
+    };
+};
+
 /** The indicator of the tab at `index` rests in its place: across its tab's content (at least
  *  24px), centered in the tab (primary), or across the tab (secondary). */
 const expectAligned = (index: number, variant = "primary") => {
@@ -109,9 +152,11 @@ describe.each([animated, reanimated])("with $name", (engine) => {
             expectAligned(0, variant);
             const from = boxOf(indicatorOf(0));
             const to = boxOf(indicatorOf(2));
-            await interact(() => userEvent.click(tabOf(2)));
-            await settle(SLIDE / 4);
-            const middle = boxOf(indicatorOf(2));
+            const slide = recordSlide(2);
+            await select(2);
+            await until(() => expect(boxOf(indicatorOf(2))).toEqual(to));
+            slide.stop();
+            const middle = slide.halfway(from, to);
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
             if (variant === "primary") {
@@ -121,8 +166,6 @@ describe.each([animated, reanimated])("with $name", (engine) => {
                     true,
                 );
             }
-            await settle(SLIDE);
-            expect(boxOf(indicatorOf(2))).toEqual(to);
             expectAligned(2, variant);
         },
     );
@@ -183,29 +226,52 @@ describe.each([animated, reanimated])("with $name", (engine) => {
         const from = boxOf(indicatorOf(0));
         const to = boxOf(indicatorOf(1));
         tabOf(1).focus();
+        const slide = recordSlide(1);
         await interact(() => userEvent.keyboard("{Enter}"));
         expect(tabOf(1).getAttribute("aria-selected")).toBe("true");
-        await settle(SLIDE / 4);
-        expect(isBetween(boxOf(indicatorOf(1)).left, from.left, to.left)).toBe(
-            true,
-        );
+        await until(() => expect(boxOf(indicatorOf(1))).toEqual(to));
+        slide.stop();
+        expect(
+            isBetween(slide.halfway(from, to).left, from.left, to.left),
+        ).toBe(true);
     });
 
     it("retargets from where it has got to when the selection changes mid-slide", async () => {
         await render(<Tabs items={ITEMS} />, engine);
         await settle(50);
+        const from = boxOf(indicatorOf(0));
+        const to = boxOf(indicatorOf(2));
         const rest = boxOf(indicatorOf(1));
-        await interact(() => userEvent.click(tabOf(2)));
-        await settle(SLIDE / 3);
-        const midway = boxOf(indicatorOf(2));
-        await interact(() => userEvent.click(tabOf(1)));
-        const restarted = boxOf(indicatorOf(1));
-        // It starts near where the last slide had got to, not at its own place.
-        expect(Math.abs(restarted.left - midway.left)).toBeLessThan(
-            Math.abs(rest.left - midway.left) / 2,
+        // Selected from the page, so the second comes mid-slide.
+        await select(2);
+        expect(tabOf(2).getAttribute("aria-selected")).toBe("true");
+        // Three quarters of the way, and not there yet: well past the tab it turns back to, and
+        // where the slide has slowed, since under load what it draws can trail where it has got
+        // to by some frames.
+        await until(() => {
+            const left = boxOf(indicatorOf(2)).left;
+            expect(isBetween(left, from.left, to.left)).toBe(true);
+            expect(Math.abs(left - from.left)).toBeGreaterThan(
+                (Math.abs(to.left - from.left) * 3) / 4,
+            );
+        });
+        // Where the slide has got to as the click arrives, and where the next one starts.
+        let gotTo!: Box;
+        tabOf(1).addEventListener(
+            "click",
+            () => {
+                gotTo = boxOf(indicatorOf(2));
+            },
+            { capture: true, once: true },
         );
-        await settle(SLIDE + 100);
-        expect(boxOf(indicatorOf(1))).toEqual(rest);
+        act(() => tabOf(1).click());
+        const restarted = boxOf(indicatorOf(1));
+        expect(tabOf(1).getAttribute("aria-selected")).toBe("true");
+        // It starts near where the last slide had got to, not at its own place.
+        expect(Math.abs(restarted.left - gotTo.left)).toBeLessThan(
+            Math.abs(rest.left - gotTo.left) / 2,
+        );
+        await until(() => expect(boxOf(indicatorOf(1))).toEqual(rest));
     });
 
     it("changes at once under reduced motion", async () => {
@@ -247,10 +313,12 @@ describe.each([animated, reanimated])("with $name", (engine) => {
         // A slide after the resize starts from the old indicator's new place.
         const from = boxOf(indicatorOf(1));
         const to = boxOf(indicatorOf(0));
-        await interact(() => userEvent.click(tabOf(0)));
-        await settle(SLIDE / 4);
-        expect(isBetween(boxOf(indicatorOf(0)).left, from.left, to.left)).toBe(
-            true,
-        );
+        const slide = recordSlide(0);
+        await select(0);
+        await until(() => expect(boxOf(indicatorOf(0))).toEqual(to));
+        slide.stop();
+        expect(
+            isBetween(slide.halfway(from, to).left, from.left, to.left),
+        ).toBe(true);
     });
 });
