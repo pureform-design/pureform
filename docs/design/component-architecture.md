@@ -440,6 +440,14 @@ function useClasses(name, selection) {
   an inline object is fine. A lazy entry goes through `use(entry.load())` (the registry's
   promise is shared and stable). `useLazyClassFactory` throws on the server, React's way of
   rendering a `<Suspense>` boundary's fallback there and the content on the client.
+- **Components don't read the theme.** The theme, `overrides`, and `hydrate` reach components
+  as CSS on the provider's element, so a switch mustn't run them again. Solid gets this from a
+  memo behind each field of the provider's state. React's `PureformProvider` provides a second,
+  internal context with only the fields components read (registry, `dir`, `motion`, `defaults`,
+  `slotProps`, the indication and its focus indicator color), resolved over the parent's same
+  context, so a theme change above leaves it alone; `usePureform()` still reads the whole
+  state. With 200 buttons in a production build, a switch went from 9 ms to 0.3 ms (41 ms to
+  1 ms at 4x CPU throttling), and mounting cost the same.
 - **Built (p8), React Native:** `useStyleFactory(name)` returns the entry's factory in the
   provider's environment (`factory.for(environment)`: theme, scheme, overrides, the engine's SVG
   drawing, the widths around the caller), not the bare factory, which is the base theme's light
