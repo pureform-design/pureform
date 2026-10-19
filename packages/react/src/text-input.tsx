@@ -34,7 +34,7 @@ import { useControllable } from "./controllable";
 import { useFormReset } from "./form";
 import { useMachine } from "./machine";
 import { createPartContext } from "./part-context";
-import { slotPartProps, useComponent } from "./parts";
+import { useComponent, useSlotProps } from "./parts";
 import type { ComponentScope, SlotKeyedProps } from "./parts";
 import { combinePartProps, omitProps } from "./props";
 import type { PartProps } from "./props";
@@ -245,7 +245,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     // Inside Root, so it can read whether an error shows.
     function Content({ own }: { readonly own: ReadyMadeProps }): ReactNode {
         const { api } = context.use("Root");
-        const slot = (part: string) => slotPartProps(own, part as never);
+        const slot = useSlotProps(own);
         const showsSupporting =
             isPresent(own.supportingText) || api.errorText !== undefined;
         const inputProps: Record<string, unknown> = {};
@@ -295,6 +295,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     /** The ready-made field: every part, in the preset's structure; the icons and supporting text
      *  only when given (or while an error shows). */
     function ReadyMade(props: ReadyMadeProps): ReactNode {
+        const slot = useSlotProps(props);
         const rootProps = omitProps(
             props as ReadyMadeProps & Record<string, unknown>,
             readyMadeOwn as never,
@@ -305,7 +306,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                 leadingIcon={isPresent(props.leadingIcon) || undefined}
                 trailingIcon={isPresent(props.trailingIcon) || undefined}
                 // The root's slot props are an element's, whose `defaultValue` takes more types.
-                {...(slotPartProps(props, "root") as object)}
+                {...(slot("root") as object)}
             >
                 <Content own={props} />
             </Root>

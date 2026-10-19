@@ -13,7 +13,7 @@ import type { ProgressRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -103,8 +103,7 @@ function ReadyMade(props: CircularProgressProps): ReactNode {
         slotProps: _slotProps,
         ...rootProps
     } = props;
-    const slot = (name: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, name);
+    const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <EndHalf {...slot("endHalf")}>

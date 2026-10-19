@@ -32,7 +32,7 @@ import { useFormReset } from "../form";
 import { useOwnInteractionSource } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -185,8 +185,7 @@ function ReadyMade(props: SliderProps): ReactNode {
     const rootProps = omitProps(rest, SLIDER_INPUT_LABEL_PROPS);
     const label: Record<string, unknown> = {};
     for (const key of SLIDER_INPUT_LABEL_PROPS) label[key] = props[key];
-    const slot = (part: Parameters<typeof slotPartProps<Anatomy>>[1]) =>
-        slotPartProps(props, part);
+    const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
             <Track {...slot("track")} />

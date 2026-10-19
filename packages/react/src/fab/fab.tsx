@@ -23,7 +23,7 @@ import type { ElementType, ReactNode } from "react";
 
 import { isDev } from "../env";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import { omitProps } from "../props";
@@ -134,6 +134,7 @@ export type FabProps = Omit<
 /** The ready-made FAB: Root, its touch target, and the container holding the icon and, when
  *  given, the label, which makes it extended. */
 function ReadyMade(props: FabProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -149,19 +150,13 @@ function ReadyMade(props: FabProps): ReactNode {
         warnOnce(missingNameMessage("Fab"));
     }
     return (
-        <Root
-            {...rootProps}
-            {...slotPartProps(props, "root")}
-            extended={extended ?? hasLabel}
-        >
-            <TouchTarget {...slotPartProps(props, "touchTarget")} />
-            <Container {...slotPartProps(props, "container")}>
-                <Icon mirror={mirrorIcon} {...slotPartProps(props, "icon")}>
+        <Root {...rootProps} {...slot("root")} extended={extended ?? hasLabel}>
+            <TouchTarget {...slot("touchTarget")} />
+            <Container {...slot("container")}>
+                <Icon mirror={mirrorIcon} {...slot("icon")}>
                     {icon}
                 </Icon>
-                {hasLabel ? (
-                    <Label {...slotPartProps(props, "label")}>{label}</Label>
-                ) : null}
+                {hasLabel ? <Label {...slot("label")}>{label}</Label> : null}
             </Container>
         </Root>
     );

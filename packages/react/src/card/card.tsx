@@ -18,7 +18,7 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { createPartContext } from "../part-context";
-import { slotPartProps, useComponent } from "../parts";
+import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -106,6 +106,7 @@ export interface CardProps
 
 /** The ready-made card: Root, its touch target while interactive, then the children. */
 function ReadyMade(props: CardProps): ReactNode {
+    const slot = useSlotProps(props);
     const {
         className: _className,
         style: _style,
@@ -118,10 +119,8 @@ function ReadyMade(props: CardProps): ReactNode {
         cardElement<ElementType>({ href: props.href, as: props.as }),
     );
     return (
-        <Root {...rootProps} {...(slotPartProps(props, "root") as object)}>
-            {interactive ? (
-                <TouchTarget {...slotPartProps(props, "touchTarget")} />
-            ) : null}
+        <Root {...rootProps} {...(slot("root") as object)}>
+            {interactive ? <TouchTarget {...slot("touchTarget")} /> : null}
             {children}
         </Root>
     );
