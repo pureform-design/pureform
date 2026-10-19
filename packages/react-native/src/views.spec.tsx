@@ -1,3 +1,5 @@
+import { createInteractionSource } from "@pureform/binding-core/interaction";
+import { act } from "@testing-library/react";
 import { createElement, forwardRef } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -11,7 +13,14 @@ import { reanimated } from "./engines/reanimated";
 import { ListItem } from "./list-item";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { byTestId, interact, mount, settle } from "./testing/render";
+import {
+    byTestId,
+    interact,
+    mount,
+    pointerAway,
+    settle,
+    until,
+} from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -86,23 +95,42 @@ describe.each([animated, reanimated])("with $name", (engine) => {
     });
 
     it("still tweens a slot that moves", async () => {
-        // Slowed down, so the tween is still running when the test looks.
-        await render(
-            <Button label="Save" variant="text" testId="save" />,
-            engine,
-            registry,
-            10,
+        // Hovered from a source in the page, since under load a hover command can come back
+        // after the tween has ended; beside a copy with no time to take, which shows at once the
+        // color the tween ends at.
+        const source = createInteractionSource();
+        const copy = (timeScale: number, testId: string) => (
+            <PureformProvider
+                registry={registry}
+                engine={engine}
+                motion="full"
+                timeScale={timeScale}
+            >
+                <Button
+                    label="Save"
+                    variant="text"
+                    testId={testId}
+                    interactionSource={source}
+                />
+            </PureformProvider>
         );
-        const background = () =>
-            getComputedStyle(byTestId("save-root")).backgroundColor;
-        const rest = background();
-        await interact(() => userEvent.hover(byTestId("save-root")));
-        await settle(100);
-        const partway = background();
-        await settle(2000);
-        const hovered = background();
+        await pointerAway();
+        await mount(
+            <>
+                {copy(10, "slow")}
+                {copy(0, "quick")}
+            </>,
+        );
+        const background = (id: string) =>
+            getComputedStyle(byTestId(`${id}-root`)).backgroundColor;
+        const rest = background("slow");
+        expect(background("quick")).toBe(rest);
+        await act(async () => source.emit({ type: "hoverEnter" }));
+        const hovered = background("quick");
         expect(hovered).not.toBe(rest);
-        expect(partway).not.toBe(hovered);
+        // Slowed down tenfold, it's still on its way.
+        expect(background("slow")).not.toBe(hovered);
+        await until(() => expect(background("slow")).toBe(hovered));
     });
 });
 
