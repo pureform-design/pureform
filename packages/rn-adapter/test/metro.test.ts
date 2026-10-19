@@ -1,7 +1,13 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import {
+    mkdtempSync,
+    readFileSync,
+    realpathSync,
+    rmSync,
+    writeFileSync,
+} from "node:fs";
 import { createRequire } from "node:module";
 import { tmpdir } from "node:os";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { runInNewContext } from "node:vm";
 
 import { afterAll, describe, expect, it } from "vitest";
@@ -10,22 +16,44 @@ import { withPureform } from "../src/metro";
 import { OPTIONS_ENV } from "../src/metro-options";
 
 const fixture = resolve(__dirname, "metro");
-const repository = resolve(__dirname, "../../..");
 const require = createRequire(join(fixture, "index.js"));
 const Metro = require("metro") as typeof import("metro");
 const { getDefaultConfig } = require("@react-native/metro-config") as {
-    getDefaultConfig: (root: string) => object;
+    getDefaultConfig: (root: string) => {
+        serializer: {
+            getPolyfills: (options: { platform: string }) => string[];
+        };
+    };
 };
 
 const out = mkdtempSync(join(tmpdir(), "pureform-metro-"));
 afterAll(() => rmSync(out, { recursive: true, force: true }));
 
+const folderOf = (file: string) => dirname(realpathSync(file));
+
+// Metro crawls every file it watches and hashes its contents, so the test watches only what
+// the bundle reads: this package (the fixture, and its links into node_modules), the Babel
+// helpers the fixture imports, Metro's runtime, and the polyfills React Native puts before
+// the app. Watching the repository hashed every installed package and omni's cache,
+// gigabytes that took minutes on a busy machine or a slow disk.
+const watchFolders = (defaults: ReturnType<typeof getDefaultConfig>) => [
+    resolve(__dirname, ".."),
+    folderOf(require.resolve("@babel/runtime/package.json")),
+    folderOf(
+        createRequire(require.resolve("metro")).resolve(
+            "metro-runtime/package.json",
+        ),
+    ),
+    ...defaults.serializer.getPolyfills({ platform: "ios" }).map(folderOf),
+];
+
 // The fixture's Metro config, with pureform's transformer loaded from source.
 const metroConfig = () => {
+    const defaults = getDefaultConfig(fixture);
     const config = withPureform(
-        Metro.mergeConfig(getDefaultConfig(fixture), {
+        Metro.mergeConfig(defaults, {
             projectRoot: fixture,
-            watchFolders: [repository],
+            watchFolders: watchFolders(defaults),
             resetCache: true,
             cacheStores: [],
         }) as Parameters<typeof withPureform>[0],
