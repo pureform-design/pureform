@@ -1,6 +1,6 @@
 import { render } from "@solidjs/web";
 import { createMachine } from "@zag-js/core";
-import { createMemo, createSignal, flush } from "solid-js";
+import { createEffect, createMemo, createSignal, flush } from "solid-js";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { useMachine } from ".";
@@ -170,5 +170,49 @@ describe("a bindable", () => {
         await settle();
         expect(onCountChange.mock.calls).toEqual([[2, 1]]);
         expect(host.textContent).toBe("1 2");
+    });
+});
+
+// A machine whose refs read a prop later, as the interaction emitters read their source when an
+// event fires.
+interface ReaderSchema {
+    props: { step?: number | undefined };
+    context: Record<string, never>;
+    refs: { step: () => number | undefined };
+    state: "idle";
+    event: { type: "NONE" };
+}
+
+const reader = createMachine<ReaderSchema>({
+    initialState: () => "idle",
+    refs: ({ prop }) => ({ step: () => prop("step") }),
+    states: { idle: {} },
+});
+
+describe("a machine's refs", () => {
+    it("read the current props, untracked, even from an effect callback", async () => {
+        const warn = vi.spyOn(console, "warn");
+        try {
+            const [step, setStep] = createSignal(1, { ownedWrite: true });
+            const read: (number | undefined)[] = [];
+            const host = document.body.appendChild(
+                document.createElement("div"),
+            );
+            dispose = render(() => {
+                const service = useMachine(reader, () => ({ step: step() }));
+                createEffect(step, () => {
+                    read.push(service.refs.get("step")());
+                });
+                return null;
+            }, host);
+            flush();
+            await settle();
+            setStep(2);
+            flush();
+            expect(read).toEqual([1, 2]);
+            expect(warn).not.toHaveBeenCalled();
+        } finally {
+            warn.mockRestore();
+        }
     });
 });

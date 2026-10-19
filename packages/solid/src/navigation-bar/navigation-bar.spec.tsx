@@ -1,8 +1,10 @@
 import { testIds } from "@pureform/anatomy";
+import { createSignal, flush } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { NavigationBar } from ".";
+import type { NavigationBarProps } from ".";
 import { PureformProvider } from "..";
 import { navigationRegistry } from "../__fixtures__/registry";
 import { NavigationRail } from "../navigation-rail";
@@ -10,7 +12,7 @@ import { byTestId, mount, settle } from "../testing/mount";
 
 const ids = testIds.navigationBar;
 
-const ITEMS = [
+const ITEMS: NavigationBarProps["items"] = [
     { value: "home", label: "Home", icon: "⌂" },
     { value: "search", label: "Search", icon: "⌕" },
     { value: "settings", label: "Settings", disabled: true },
@@ -96,6 +98,50 @@ describe("NavigationBar, ready-made", () => {
         await settle();
         expect(asked).toHaveBeenCalledExactlyOnceWith({ value: "search" });
         expect(items()[0]!.getAttribute("aria-current")).toBe("true");
+    });
+
+    it("keeps its destinations, and the focus, when the owner takes a change through a spread", async () => {
+        const warn = vi.spyOn(console, "warn");
+        try {
+            const [props, setProps] = createSignal(
+                { value: "home" },
+                { ownedWrite: true },
+            );
+            withRegistry(() => (
+                <NavigationBar
+                    aria-label="Main"
+                    items={ITEMS}
+                    {...props()}
+                    onValueChange={({ value }) => {
+                        setProps({ value: value! });
+                        flush();
+                    }}
+                />
+            ));
+            await settle();
+            const before = items();
+            await userEvent.click(before[1]!);
+            await settle();
+            expect(items()).toEqual(before);
+            expect(before[1]!.getAttribute("aria-current")).toBe("true");
+            expect(document.activeElement).toBe(before[1]);
+            expect(warn).not.toHaveBeenCalled();
+        } finally {
+            warn.mockRestore();
+        }
+    });
+
+    it("turns a destination into a link when it's given an href", async () => {
+        const [entries, setEntries] = createSignal(ITEMS, { ownedWrite: true });
+        withRegistry(() => (
+            <NavigationBar aria-label="Main" items={entries()} />
+        ));
+        await settle();
+        expect(items()[0]!.tagName).toBe("BUTTON");
+        setEntries([{ ...ITEMS[0]!, href: "#home" }, ...ITEMS.slice(1)]);
+        await settle();
+        expect(items()[0]!.tagName).toBe("A");
+        expect(items()[0]!.getAttribute("href")).toBe("#home");
     });
 
     it("renders a destination with an href as a link to the current page", async () => {

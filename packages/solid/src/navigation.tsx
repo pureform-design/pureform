@@ -154,6 +154,10 @@ export function createNavigation<C extends NavigationComponent>(config: {
     function Item(props: NavigationItemProps): JSX.Element {
         const { scope, api, sources } = context.use("Item");
         const item = () => navigationItemMachineProps(props);
+        // A memo, since the render below is read in a tracking scope: reading the props there would
+        // make the destination again, dropping its focus, whenever a spread on the component
+        // changes.
+        const element = createMemo(() => navigationItemElement(props));
         const source = sources.item(
             () => props.value,
             () => props.interactionSource,
@@ -161,7 +165,8 @@ export function createNavigation<C extends NavigationComponent>(config: {
         return (
             <itemContext.Provider value={{ value: () => props.value, source }}>
                 {scope.render("item", {
-                    element: navigationItemElement(props),
+                    element: "button",
+                    as: element,
                     interactionSource: source,
                     machine: () =>
                         combinePartProps([

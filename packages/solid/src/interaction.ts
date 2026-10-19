@@ -12,7 +12,7 @@ import {
     pressableItemProps,
 } from "@pureform/machines/interaction";
 import { isServer } from "@solidjs/web";
-import { type Accessor, createEffect, onCleanup } from "solid-js";
+import { type Accessor, createEffect, onCleanup, untrack } from "solid-js";
 
 import { normalizeProps } from "./internal/zag";
 
@@ -71,7 +71,8 @@ export const useInteractionHandlers = (
     source: Accessor<MutableInteractionSource | undefined>,
     disabled: Accessor<boolean>,
 ): Accessor<Readonly<Record<string, unknown>>> => {
-    const emitter = new InteractionEmitter(source);
+    // The source when it emits, which may be in the effect below: a read, not a dependency.
+    const emitter = new InteractionEmitter(() => untrack(source));
     onCleanup(() => emitter.end());
     createEffect(disabled, (now) => {
         if (now) emitter.end();
