@@ -115,6 +115,12 @@ export const tooltipSelection = (
 export const isRichTooltip = (props: TooltipVariantProps): boolean =>
     props.variant === "rich";
 
+/** Whether the pointer can move onto the tooltip and use it: `interactive` when given, else
+ *  whether it's rich. Otherwise it lets the pointer through, positioner and all. */
+export const isInteractiveTooltip = (
+    props: Pick<TooltipBehaviorProps, "interactive"> & TooltipVariantProps,
+): boolean => props.interactive ?? isRichTooltip(props);
+
 /** Zag's tooltip props from Root's, besides `id`, `dir`, and the controllable `open`. */
 export const tooltipMachineProps = (
     props: TooltipBehaviorProps & TooltipVariantProps,
@@ -122,7 +128,7 @@ export const tooltipMachineProps = (
     openDelay: props.openDelay,
     closeDelay: props.closeDelay,
     disabled: props.disabled,
-    interactive: props.interactive ?? isRichTooltip(props),
+    interactive: isInteractiveTooltip(props),
     closeOnEscape: props.closeOnEscape,
     closeOnClick: props.closeOnClick,
     positioning: { placement: "bottom" as const, ...props.positioning },

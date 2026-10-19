@@ -298,6 +298,7 @@ export type {
     TextFieldVariantProps,
 } from "./components/text-field";
 export {
+    isInteractiveTooltip,
     isRichTooltip,
     TOOLTIP_CONTENT_PROPS,
     TOOLTIP_ROOT_PROPS,
