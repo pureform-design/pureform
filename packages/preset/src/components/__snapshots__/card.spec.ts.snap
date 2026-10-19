@@ -4,6 +4,86 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
 {
   "card": {
     "base": {
+      "actionArea": {
+        "&:is(:disabled, [aria-disabled=true])": {
+          "pointerEvents": "none",
+        },
+        "alignItems": "stretch",
+        "backgroundColor": "transparent",
+        "borderRadius": "var(--components-card-radius, token(radii.medium))",
+        "borderWidth": "0px",
+        "color": "var(--components-card-content, token(colors.onSurface))",
+        "cursor": "pointer",
+        "display": "flex",
+        "flexDirection": "column",
+        "marginBlockEnd": "0px",
+        "marginBlockStart": "0px",
+        "marginInlineEnd": "0px",
+        "marginInlineStart": "0px",
+        "outlineStyle": "none",
+        "paddingBlockEnd": "0px",
+        "paddingBlockStart": "0px",
+        "paddingInlineEnd": "0px",
+        "paddingInlineStart": "0px",
+        "position": "static",
+        "textAlign": "start",
+        "textStyle": "bodyMedium",
+        "width": "100%",
+      },
+      "actions": {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "var(--components-card-actionsGap, token(spacing.2))",
+        "paddingBlockStart": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineEnd": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
+      },
+      "avatar": {
+        "display": "flex",
+        "flexShrink": "0",
+      },
+      "content": {
+        "display": "flex",
+        "flexDirection": "column",
+        "paddingBlockStart": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineEnd": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
+      },
+      "footer": {
+        "paddingBlockStart": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineEnd": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
+      },
+      "header": {
+        "alignItems": "center",
+        "display": "flex",
+        "flexDirection": "row",
+        "gap": "var(--components-card-headerGap, token(spacing.4))",
+        "paddingBlockStart": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineEnd": "var(--components-card-padding, token(spacing.4))",
+        "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
+      },
+      "headerAction": {
+        "display": "flex",
+        "flexShrink": "0",
+        "marginInlineEnd": "-8px",
+      },
+      "headerText": {
+        "display": "flex",
+        "flexDirection": "column",
+        "flexGrow": "1",
+        "minWidth": "0px",
+      },
+      "headline": {
+        "color": "var(--components-card-headlineColor, token(colors.onSurface))",
+        "textStyle": "titleMedium",
+      },
+      "media": {
+        "display": "flex",
+        "flexDirection": "column",
+        "overflow": "hidden",
+      },
       "root": {
         "--components-card-focusIndicatorColor": "token(colors.secondary)",
         "--components-card-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
@@ -27,6 +107,14 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         "paddingInlineStart": "var(--components-card-padding, token(spacing.4))",
         "position": "relative",
         "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      },
+      "subhead": {
+        "color": "var(--components-card-subheadColor, token(colors.onSurfaceVariant))",
+        "textStyle": "bodyMedium",
+      },
+      "supportingText": {
+        "color": "var(--components-card-supportingTextColor, token(colors.onSurfaceVariant))",
+        "textStyle": "bodyMedium",
       },
       "touchTarget": {
         "height": "100%",
@@ -113,7 +201,9 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
       },
     ],
     "defaultVariants": {
+      "actionsAlign": "end",
       "interactive": false,
+      "padded": true,
       "variant": "elevated",
     },
     "jsx": [
@@ -122,11 +212,60 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
     "slots": [
       "root",
       "touchTarget",
+      "actionArea",
+      "media",
+      "header",
+      "avatar",
+      "headerText",
+      "headline",
+      "subhead",
+      "headerAction",
+      "content",
+      "supportingText",
+      "actions",
+      "footer",
     ],
     "variants": {
+      "actionsAlign": {
+        "end": {
+          "actions": {
+            "justifyContent": "end",
+          },
+        },
+        "start": {
+          "actions": {
+            "justifyContent": "start",
+          },
+        },
+      },
       "interactive": {
         "false": {
-          "root": {},
+          "root": {
+            "backgroundColor": {
+              "&:has(> .card__actionArea:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]))": "color-mix(in srgb, var(--components-card-container, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) var(--components-card-statePressedOpacity, token(opacity.statePressed)))",
+              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "color-mix(in srgb, var(--components-card-container, token(colors.surfaceContainerLow)), token(colors.onSurface) token(opacity.disabledContainer))",
+              "&:has(> .card__actionArea:is(:focus-visible):is(:focus-visible))": "color-mix(in srgb, var(--components-card-container, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) var(--components-card-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:has(> .card__actionArea:is(:hover, [data-pf-hover]))": "color-mix(in srgb, var(--components-card-container, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) var(--components-card-stateHoverOpacity, token(opacity.stateHover)))",
+              "base": "var(--components-card-container, token(colors.surfaceContainerLow))",
+            },
+            "borderColor": {
+              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-card-outlineColor, token(colors.outlineVariant))",
+            },
+            "boxShadow": {
+              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "token(shadows.level0)",
+              "&:has(> .card__actionArea:is(:hover, [data-pf-hover]))": "var(--components-card-hoveredShadow, token(shadows.level2))",
+              "base": "var(--components-card-restingShadow, token(shadows.level1))",
+            },
+            "color": {
+              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "base": "var(--components-card-content, token(colors.onSurface))",
+            },
+            "outlineStyle": {
+              "&:has(> .card__actionArea:is(:focus-visible):is(:focus-visible))": "solid",
+              "base": "none",
+            },
+          },
         },
         "true": {
           "root": {
@@ -137,9 +276,25 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "padded": {
+        "false": {
+          "root": {
+            "overflow": "hidden",
+            "paddingBlockStart": "0px",
+            "paddingInlineEnd": "0px",
+            "paddingInlineStart": "0px",
+          },
+        },
+        "true": {
+          "root": {},
+        },
+      },
       "variant": {
         "elevated": {
           "root": {
+            "--components-card-container": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
+            "--components-card-hoveredShadow": "token(shadows.level2)",
+            "--components-card-restingShadow": "token(shadows.level1)",
             "backgroundColor": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
             "color": "var(--components-card-content, token(colors.onSurface))",
             "shadowElevation": "level1",
@@ -147,6 +302,9 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         },
         "filled": {
           "root": {
+            "--components-card-container": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
+            "--components-card-hoveredShadow": "token(shadows.level1)",
+            "--components-card-restingShadow": "token(shadows.level0)",
             "backgroundColor": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
             "color": "var(--components-card-content, token(colors.onSurface))",
             "shadowElevation": "level0",
@@ -154,6 +312,9 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
         },
         "outlined": {
           "root": {
+            "--components-card-container": "var(--components-card-outlinedContainer, token(colors.surface))",
+            "--components-card-hoveredShadow": "token(shadows.level1)",
+            "--components-card-restingShadow": "token(shadows.level0)",
             "backgroundColor": "var(--components-card-outlinedContainer, token(colors.surface))",
             "borderColor": "var(--components-card-outlineColor, token(colors.outlineVariant))",
             "borderStyle": "solid",

@@ -77,6 +77,19 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("iconColor"), SURFACE, UI_CONTRAST),
     ],
     avatar: [pair(token("content"), token("container"), TEXT_CONTRAST)],
+    // The card's text on each fill's container.
+    card: (
+        ["elevatedContainer", "filledContainer", "outlinedContainer"] as const
+    ).flatMap((container) =>
+        (
+            [
+                "content",
+                "headlineColor",
+                "subheadColor",
+                "supportingTextColor",
+            ] as const
+        ).map((text) => pair(token(text), token(container), TEXT_CONTRAST)),
+    ),
     listItem: ROW_PAIRS,
     menu: ROW_PAIRS,
     tabs: [

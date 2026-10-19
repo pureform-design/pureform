@@ -113,11 +113,19 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
 };
 
 // The selector for a slot state: on the styled slot itself, or on an ancestor slot's class.
-const stateSelector = (conditions: SlotCondition[]): string =>
+// Inside a descendant's `:has()`, a state's own `:has()` alternatives are left out, since `:has()`
+// can't nest: the descendant then matches on its own element alone.
+const stateSelector = (conditions: SlotCondition[], nested = false): string =>
     conditions
         .map(({ state }) => {
             const { match, rank } = SLOT_STATE[state];
-            return `:is(${match})`.repeat(rank);
+            const own = nested
+                ? match
+                      .split(/,\s*(?![^(]*\))/)
+                      .filter((alternative) => !alternative.startsWith(":has("))
+                      .join(", ")
+                : match;
+            return `:is(${own})`.repeat(rank);
         })
         .join("");
 
@@ -171,7 +179,7 @@ const slotSelector = (conditions: SlotCondition[], ctx: LowerCtx): string => {
                 `:has(> ${path
                     .map(
                         (step) =>
-                            `${classOf(step)}${step === slot ? stateSelector(bySlot.get(slot) ?? []) : ""}`,
+                            `${classOf(step)}${step === slot ? stateSelector(bySlot.get(slot) ?? [], true) : ""}`,
                     )
                     .join(" > ")})`,
         )
