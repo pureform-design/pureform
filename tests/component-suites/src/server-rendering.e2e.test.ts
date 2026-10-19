@@ -14,10 +14,14 @@ import { registry } from "#registry";
 import { COMPONENTS } from "./components";
 import type { ComponentCase } from "./components";
 import { hydrate, serverRendered } from "./harness/hydration";
-import { stateNames } from "./harness/page";
+import { stateNames, watchConsole } from "./harness/page";
 import type { Scene, SceneProps } from "./harness/scene";
 import { renderOnServer } from "./harness/server";
-import { countedSeedTheme, generated } from "./harness/themes";
+import {
+    countedSeedTheme,
+    generated,
+    importSeedGenerator,
+} from "./harness/themes";
 
 // The emulated scheme belongs to the page, which later test files reuse: put it back, or a file
 // that reads the page's colors (axe's contrast) runs in the dark scheme.
@@ -176,6 +180,11 @@ describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
     );
 
     it("hydrates with regenerate, generating the same block", async () => {
+        // The first time in this page, the provider loads the generator after hydrating. The
+        // first import of Material's generator has the dev server transform its sources, which a
+        // busy machine can stretch past any wait, so it happens here first; the provider still
+        // loads the counted source itself, after hydrating.
+        await importSeedGenerator();
         const server = await serverRendered(
             scene({ seed: SEED, hydrate: "regenerate" }),
         );
@@ -185,12 +194,20 @@ describe.each(COMPONENTS)("$component, a runtime theme", (component) => {
         const { logged, changes } = await hydrate(
             scene({ seed: SEED, hydrate: "regenerate" }),
         );
-        // The generator loads after hydrating, the first time in this page: a cold import of the
-        // seed theme's generator, which can take longer than `waitFor`'s default second.
-        await vi.waitFor(
-            () => expect(generated.count).toBeGreaterThan(before),
-            { timeout: 10_000 },
-        );
+        // A load that fails warns rather than generating. The effect that loads can run late on a
+        // busy machine.
+        const loading = watchConsole();
+        try {
+            await vi.waitFor(
+                () => {
+                    expect(loading.logged).toEqual([]);
+                    expect(generated.count).toBeGreaterThan(before);
+                },
+                { timeout: 5_000 },
+            );
+        } finally {
+            loading.stop();
+        }
         await harness.settle();
         expect(logged).toEqual([]);
         expect(changes).toEqual([]);

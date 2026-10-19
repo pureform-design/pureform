@@ -197,8 +197,11 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 - **The pointer rests where the last test left it.** A snackbar under it is held open, and a
   hover onto a trigger it already rests on fires nothing: unhover first, or keep state off hover
   (the tooltip case opens on keyboard focus, since leaving the trigger also asks to close).
-- The runtime theme's `regenerate` case waits up to 10 s for the generator: its first load in a
-  page is a cold import, which outran `waitFor`'s default second (the p6b flake).
+- The runtime theme's `regenerate` case imports Material's generator before it hydrates
+  (`importSeedGenerator`), leaving the counted source unloaded, so the provider still loads it
+  after hydrating without waiting on the import. The first import in a page has the dev server
+  transform the generator's sources: it outran `waitFor`'s default second (the p6b flake), then
+  10 s on a machine busy with other test runs and builds.
 - **The emulated color scheme belongs to the page**, which later test files reuse: the suites that
   emulate one put `light` back in `afterAll`, or a later file reads colors (axe's contrast) in
   the dark scheme against a light page.
