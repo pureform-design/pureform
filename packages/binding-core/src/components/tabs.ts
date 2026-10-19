@@ -97,7 +97,11 @@ export const TABS_LIST_LABEL_PROPS = ["aria-label", "aria-labelledby"] as const;
  *  type. */
 export interface TabsItem<Node = unknown> extends InteractionSourceProps {
     readonly value: string;
-    readonly label: Node;
+    /** The tab's label. A tab without one shows only its icon, and its indicator spans the icon:
+     *  name it with `aria-label`. */
+    readonly label?: Node;
+    /** The tab's accessible name, for a tab that shows only its icon. */
+    readonly "aria-label"?: string | undefined;
     /** An icon with the label; any tab having one turns on the tabs' `icon` variant. */
     readonly icon?: Node;
     /** Flip the icon under `rtl`, for an icon that points. */
