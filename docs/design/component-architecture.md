@@ -842,7 +842,10 @@ The design makes one setting, followed by everything that moves, on every target
       part shows while `overlayPresent(open, present)` and hides after (`presentProps`, over Zag's
       `hidden: !open`), so the exit animation runs to its end. With no animation (unstyled) it
       hides on the next frame. Closed overlays still render hidden on the server, as before; focus
-      stays in a closing overlay until it hides.
+      stays in a closing overlay until it hides. One change to Zag's machine: only the exit's own
+      animations end it. Zag's takes any `animationcancel` on the surface as the exit's end, and
+      the enter's cancel, when an overlay closes as it enters, can arrive a frame after the exit
+      started, so the overlay would vanish without its exit.
     - Built (React Native overlay motion and presence): React Native drops the raw rules, so
       `@pureform/react-native` holds the same motions (`OVERLAY_MOTIONS`, `OVERLAY_KEYFRAMES` in
       `presence.ts`, a spec checks them against the preset's), resolves their durations, curves,
