@@ -216,6 +216,8 @@ interface TooltipRootOwnProps            // variant, tokens, openDelay, closeDel
                                          // ids, open, defaultOpen, onOpenChange, testId, unstyled
 TOOLTIP_ROOT_PROPS; TOOLTIP_CONTENT_PROPS; // trigger, supportingText, subhead, actions
 tooltipSelection(props); isRichTooltip(props);
+isInteractiveTooltip(props);             // `interactive`, else rich; otherwise it lets the
+                                         // pointer through, positioner and all
 tooltipMachineProps(props);              // a rich tooltip is interactive; placement "bottom"
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)

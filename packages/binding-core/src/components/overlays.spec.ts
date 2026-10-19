@@ -33,6 +33,7 @@ import {
 } from "./snackbar";
 import type { SnackbarPart } from "./snackbar";
 import {
+    isInteractiveTooltip,
     isRichTooltip,
     TOOLTIP_ROOT_PROPS,
     tooltipMachineProps,
@@ -122,6 +123,9 @@ describe("overlays", () => {
 
     it("make a rich tooltip interactive, unless told otherwise", () => {
         expect(isRichTooltip({ variant: "rich" })).toBe(true);
+        expect(isInteractiveTooltip({ variant: "rich" })).toBe(true);
+        expect(isInteractiveTooltip({})).toBe(false);
+        expect(isInteractiveTooltip({ interactive: true })).toBe(true);
         expect(tooltipMachineProps({ variant: "rich" }).interactive).toBe(true);
         expect(tooltipMachineProps({}).interactive).toBe(false);
         expect(
