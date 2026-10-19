@@ -71,6 +71,36 @@ describe("slot condition validation", () => {
         ).not.toThrow();
     });
 
+    it("lets a slot read a descendant's state", () => {
+        expect(() =>
+            defineConfig({
+                tokens: {},
+                semanticTokens: {},
+                components: {
+                    field: defineSlotComponent({
+                        name: "field",
+                        slots: ["root", "container", "label", "helper"],
+                        structure: {
+                            root: ["container", "helper"],
+                            container: ["label"],
+                        },
+                        recipe: {
+                            base: {
+                                root: {
+                                    color: when(
+                                        slot("label", "hover"),
+                                        hex("#f00"),
+                                        hex("#000"),
+                                    ),
+                                },
+                            },
+                        },
+                    }),
+                },
+            }),
+        ).not.toThrow();
+    });
+
     it("needs structure to read another slot", () => {
         expect(() =>
             field(when(slot("container", "invalid"), hex("#f00"), hex("#000"))),

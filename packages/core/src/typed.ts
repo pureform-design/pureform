@@ -282,7 +282,7 @@ export interface SlotRecipeHelpers<
     T extends string,
     S extends string,
 > extends RecipeHelpers<C, T> {
-    /** A state of a slot, which must be an ancestor in `structure`. */
+    /** A state of a slot, which must be an ancestor or a descendant in `structure`. */
     slot: (name: S, state: SlotState) => SlotCondition;
 }
 

@@ -36,7 +36,7 @@ export class UtilityRefError extends Error {
 }
 
 /** Thrown when a slot condition names an unknown slot, or a slot it cannot read: one that is
- *  not its ancestor in the component's `structure`. */
+ *  neither its ancestor nor its descendant in the component's `structure`. */
 export class SlotConditionError extends Error {
     constructor(message: string) {
         super(message);
@@ -198,7 +198,7 @@ const ancestorsOf = (
 };
 
 // Check every slot condition: in a slotted component, naming a declared slot that is the
-// styled slot itself or one of its ancestors.
+// styled slot itself, one of its ancestors, or one of its descendants.
 const validateSlotConditions = (config: CoreConfig): void => {
     const checked = new Set<unknown>();
     for (const [name, spec] of Object.entries(config.components)) {
@@ -233,9 +233,12 @@ const validateSlotConditions = (config: CoreConfig): void => {
                             `${name} slot "${styled}" reads slot "${target}"; declare structure to read another slot's state`,
                         );
                     }
-                    if (!ancestors.get(styled)?.includes(target)) {
+                    if (
+                        !ancestors.get(styled)?.includes(target) &&
+                        !ancestors.get(target)?.includes(styled)
+                    ) {
                         throw new SlotConditionError(
-                            `${name} slot "${styled}" reads slot("${target}", …), which is not its ancestor in structure`,
+                            `${name} slot "${styled}" reads slot("${target}", …), which is neither its ancestor nor its descendant in structure`,
                         );
                     }
                 },

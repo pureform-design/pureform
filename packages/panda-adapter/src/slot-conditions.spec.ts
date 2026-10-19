@@ -129,6 +129,72 @@ describe("slot conditions", () => {
             `.pf-field__container${FOCUS}${FOCUS} &`,
         ]);
     });
+
+    it("lowers a descendant's state through :has(), child by child along the structure", () => {
+        const surface = defineConfig({
+            tokens: {},
+            semanticTokens: {},
+            components: {
+                tile: defineSlotComponent({
+                    name: "tile",
+                    slots: ["root", "action", "label"],
+                    structure: { root: ["action"], action: ["label"] },
+                    recipe: {
+                        base: {
+                            root: {
+                                color: when()
+                                    .on(slot("action", "hover"), hex("#111"))
+                                    .on(
+                                        [
+                                            slot("root", "invalid"),
+                                            slot("label", "focusWithin"),
+                                        ],
+                                        hex("#222"),
+                                    )
+                                    .else(hex("#000")),
+                            },
+                        },
+                    },
+                }),
+            },
+        });
+        const recipes = compilePreset(surface).theme?.slotRecipes as Slots;
+        const hover = ":is(:hover, [data-pf-hover])";
+        const invalid = `${INVALID}${INVALID}${INVALID}${INVALID}`;
+        expect(recipes.tile?.base.root?.color).toEqual({
+            base: "rgb(0 0 0)",
+            [`&:has(> .tile__action${hover})`]: "rgb(17 17 17)",
+            [`&${invalid}:has(> .tile__action > .tile__label${FOCUS}${FOCUS})`]:
+                "rgb(34 34 34)",
+        });
+    });
+
+    it("rejects a slot that's neither an ancestor nor a descendant", () => {
+        expect(() =>
+            defineConfig({
+                tokens: {},
+                semanticTokens: {},
+                components: {
+                    pair: defineSlotComponent({
+                        name: "pair",
+                        slots: ["root", "a", "b"],
+                        structure: { root: ["a", "b"] },
+                        recipe: {
+                            base: {
+                                a: {
+                                    color: when(
+                                        slot("b", "hover"),
+                                        hex("#111"),
+                                        hex("#000"),
+                                    ),
+                                },
+                            },
+                        },
+                    }),
+                },
+            }),
+        ).toThrow("neither its ancestor nor its descendant");
+    });
 });
 
 describe("selected and pressed slot states", () => {
