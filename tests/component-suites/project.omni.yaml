@@ -30,6 +30,10 @@ cache:
         - "../panda-fixture/pureform.codegen.ts"
         - "../panda-fixture/src/styles.css"
         - "../../tests/browser-e2e-tests/src/mirror.ts"
+        # The suites run on the bindings' and machines' sources, not their builds.
+        - "../../packages/solid/src/**/*"
+        - "../../packages/react/src/**/*"
+        - "../../packages/machines/src/**/*"
 
 tasks:
   test:e2e:
