@@ -17,7 +17,7 @@ import { Radio, RadioGroup } from "./radio-group";
 import { Tabs } from "./tabs";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
-import { interact, mount, outside } from "./testing/render";
+import { interact, mount, outside, settle } from "./testing/render";
 
 let registry: TestRegistry;
 
@@ -73,6 +73,13 @@ const mountUnder = async <T,>(initial: T, view: (value: T) => ReactNode) => {
             </parent.Holder>
         </PureformProvider>,
     );
+    // Rows can render again after mounting, once they're laid out; under load that lands late, so
+    // wait until they're quiet before counting what a change renders.
+    for (let tries = 0; tries < 20; tries++) {
+        renders = [];
+        await settle(50);
+        if (renders.length === 0) break;
+    }
     const rendering = async (change: () => Promise<void>) => {
         renders = [];
         await change();
