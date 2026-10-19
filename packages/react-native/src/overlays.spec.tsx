@@ -458,6 +458,14 @@ describe.each([animated, reanimated])(
             expect(scrim()).not.toBeNull();
             expect(dialog()!.getAttribute("aria-label")).toBe("Discard draft?");
             expect(dialog()!.closest('[aria-modal="true"]')).not.toBeNull();
+            // The scrim lets presses through, so only the stacking shows it's behind: the
+            // dialog's wrapper beside it draws over it.
+            const holder = [...scrim()!.parentElement!.children].find(
+                (sibling) => sibling.contains(dialog()),
+            )!;
+            expect(Number(getComputedStyle(holder).zIndex)).toBeGreaterThan(
+                Number(getComputedStyle(scrim()!).zIndex),
+            );
             // A press on the scrim, beside the dialog.
             const beside = document.elementFromPoint(4, 4) as HTMLElement;
             expect(dialog()!.contains(beside)).toBe(false);

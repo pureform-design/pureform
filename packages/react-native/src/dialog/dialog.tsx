@@ -15,6 +15,7 @@ import { Modal, Pressable, StyleSheet, View } from "react-native";
 
 import { Button } from "../button/button";
 import { IconSlot, iconSlot } from "../icon-style";
+import { useLayer } from "../layer";
 import { dismissTopOverlay, useDismiss } from "../overlay";
 import {
     testIdOf,
@@ -161,6 +162,9 @@ function ModalDialog(props: DialogProps): ReactNode {
         false,
     );
     const presence = usePresence(open, "dialog");
+    // The scrim takes its layer in its own style, and React Native's `zIndex` only orders
+    // siblings, so the dialog's wrapper beside it takes the dialog's layer to draw over it.
+    const layer = useLayer("dialog");
     const close = useStableCallback(() => {
         if (open) setOpen(false);
     });
@@ -206,7 +210,7 @@ function ModalDialog(props: DialogProps): ReactNode {
                         <View
                             pointerEvents="box-none"
                             aria-modal
-                            style={styles.positioner}
+                            style={[styles.positioner, { zIndex: layer }]}
                         >
                             <engine.View
                                 {...presence.props}
