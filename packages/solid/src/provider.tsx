@@ -2,6 +2,8 @@
 // everything under it. It writes `dir`, `data-pf-motion`, the theme's attribute, and token
 // overrides on its own element (`display: contents`), so the CSS and the browser agree with what
 // components read from it, and a runtime theme's `<style>` block in the head with `useHead`.
+// The fields components read resolve apart from the theme, overrides, and hydration, which only
+// the provider's element and `usePureform()` use, so switching a theme runs no component again.
 
 import {
     providerAttributes,
@@ -88,24 +90,52 @@ const OPTIONS = [
 export function PureformProvider(props: PureformProviderProps): JSX.Element {
     const parent = useContext(PureformContext);
     const parentVars = useContext(ThemeVarsContext);
-    const resolved = createMemo(() =>
-        resolveProvider(
-            parent(),
-            {
+    // The fields components read resolve over the parent's same fields alone, so a theme change,
+    // here or above, leaves them as they are. The own options compare by identity, as when they
+    // come from one object (`{...options()}`) that changes with the theme.
+    let lastBase: object = {};
+    let lastOwn: object = {};
+    let last: PureformState | undefined;
+    const components = createMemo(
+        () => {
+            const base = componentFieldsOf(parent());
+            const own: ProviderOptions<PartProps> = {
                 registry: props.registry,
                 dir: props.dir,
                 motion: props.motion,
                 defaults: props.defaults,
                 slotProps: props.slotProps,
-                theme: props.theme,
-                overrides: props.overrides,
-                hydrate: props.hydrate,
                 indication: props.indication,
-            },
-            mergePartProps,
-        ),
+            };
+            if (
+                last &&
+                sameEntries(base, lastBase) &&
+                sameEntries(own, lastOwn)
+            ) {
+                return last;
+            }
+            lastBase = base;
+            lastOwn = own;
+            last = resolveProvider(base as PureformState, own, mergePartProps);
+            return last;
+        },
+        { name: "provider.components" },
     );
-    const view = fieldsOf(resolved);
+    // The theme's fields resolve each over the parent's same field, as `resolveProvider` does.
+    const view = fieldsOf((key) => {
+        switch (key) {
+            case "theme":
+                return props.theme ?? parent().theme;
+            case "overrides":
+                return props.overrides
+                    ? { ...parent().overrides, ...props.overrides }
+                    : parent().overrides;
+            case "hydrate":
+                return props.hydrate ?? parent().hydrate;
+            default:
+                return components()[key];
+        }
+    });
     const state = () => view;
     if (isDev) {
         createEffect(
@@ -182,13 +212,28 @@ const sameEntries = (a: object, b: object): boolean => {
     );
 };
 
+// The fields components read: all but the theme, the overrides, and the hydration, which reach
+// them as CSS on the provider's element.
+const COMPONENT_FIELDS = (
+    Object.keys(ROOT_PROVIDER) as (keyof PureformState)[]
+).filter((key) => key !== "theme" && key !== "overrides" && key !== "hydrate");
+
+// The fields of a state components read, read alone.
+const componentFieldsOf = (state: PureformState): Partial<PureformState> => {
+    const fields: Record<string, unknown> = {};
+    for (const key of COMPONENT_FIELDS) fields[key] = state[key];
+    return fields;
+};
+
 // The state as one object with a memo behind each field, so a component depends on the fields it
 // reads, and only a field that changed updates its readers: every component reads the provider,
 // and most of a page's would otherwise run again when any setting changes.
-const fieldsOf = (state: Accessor<PureformState>): PureformState => {
+const fieldsOf = (
+    resolve: (key: keyof PureformState) => unknown,
+): PureformState => {
     const view = {};
     for (const key of Object.keys(ROOT_PROVIDER) as (keyof PureformState)[]) {
-        const field = createMemo(() => state()[key], {
+        const field = createMemo(() => resolve(key), {
             name: `provider.${key}`,
             ...(RECORD_FIELDS.has(key) && {
                 equals: (a: unknown, b: unknown) =>
