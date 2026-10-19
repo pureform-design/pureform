@@ -1311,7 +1311,8 @@ leaves through `usePresence` with the engine, and leaves the host only once its 
   both bindings. The tabs render through `tabsCompositeAnatomy`: an unstyled `Root` (Zag's root)
   around `List`, the preset's `root` slot (`slot: "root"`, `data-pf-part="list"`), whose `Tab`s
   hold `Icon`, `Label`, and `Indicator`, then an unstyled `Content` panel per tab. Each tab draws
-  its own indicator (the preset's), not Zag's single measured one. The bar and rail share one
+  its own indicator (the preset's), not Zag's single measured one; it slides between tabs
+  (§9.10). The bar and rail share one
   factory per binding (`createNavigation`) over their identical generated anatomies; an `Item` is
   an `<a>` with an `href`, else a `<button>`. The preset has no list, only the list item, so the
   list is a composite (`listAnatomy`): an unstyled `<ul>` with an unstyled `<li>` (`List.Item`)
@@ -2307,6 +2308,71 @@ or `as` on the web, `onPress` on React Native):
 React Native has no links or `as`: the action area is a `Pressable` (`role="button"`, or
 `"link"`), and the root learns it has one when the action area mounts (no server rendering to
 match). Its gaps are in its README.
+
+### 9.10 The tabs' indicator motion
+
+When the selected tab changes, Material's active indicator moves from the old tab to the new one
+rather than vanishing from one and appearing under the other. What the implementations do:
+
+- **The spec** (m3.material.io/components/tabs): the selected indicator "shifts into position" on a
+  tap or click (accessibility page). Primary indicators are 3dp with 3dp top corners, as wide as
+  the tab's content (at least 24dp); secondary ones are 2dp and span the tab (specs page).
+- **material-web** (`tabs/internal/tab.ts`, `tabs.ts`): each tab keeps its own indicator. When
+  `md-tabs` activates a tab it calls the new tab's `[ANIMATE_INDICATOR](previousTab)`, which reads
+  both indicators' `getBoundingClientRect()` and animates the new one with the Web Animations API
+  from `translateX(old.left - new.left) scaleX(old.width / new.width)` (origin bottom left) to
+  `none`, over 250ms on `EASING.EMPHASIZED`, cancelling its running animations first. Under
+  `prefers-reduced-motion` it fades in instead. Primary tabs put the indicator in the content
+  wrapper (content width), secondary ones in the tab (`fullWidthIndicator`).
+- **Compose** (`TabRow.kt`): one indicator for the row, placed by `Modifier.tabIndicatorOffset`,
+  which animates its offset and width with `Animatable`s toward the selected tab's position
+  (`matchContentSize = true` for primary rows: the content's width, at least 24dp), on the motion
+  scheme's `DefaultSpatial` spring (damping 0.9, stiffness 700 in the standard scheme; before
+  motion schemes, `tween(250, FastOutSlowInEasing)`). A new target retargets the running
+  animation. The scrollable row scrolls to the tab on the same spec.
+- **MDC web** (`mdc-tab-indicator`): a sliding indicator (the default) is FLIP too: the new
+  indicator gets the old one's `translateX` and `scaleX` with transitions off, then a CSS
+  transition (250ms, the standard curve) takes it to none; the fading one cross-fades opacity
+  (150ms linear).
+
+**Decided:** the web keeps the per-tab indicator and slides it FLIP-style, as material-web and MDC
+do; React Native does the same through its motion engines.
+
+- **Web (`slideIndicator` in `@pureform/binding-core/dom`).** Root keeps each Indicator part's
+  element by its tab's value and, when the machine's value changes (a click, the keyboard, a
+  controlled `value`), slides the new indicator in from where the old one is drawn: a Web
+  Animation of `transform` from `translate(dx, dy) scaleX(old / new)` (centers, origin 50%) to
+  the indicator's own transform. It runs in a Solid effect or a React layout effect, after the
+  change is in the DOM and before it's painted, and reads only the two boxes. The markup doesn't
+  change: nothing is written to the element, so the server renders as before and hydration
+  matches, and the first render doesn't slide (Root records the value it mounted with). The
+  indicator stays laid out by CSS in its tab, so a resize or a new label keeps it in place; a
+  slide that's running when the layout changes still ends in the new place. A change mid-slide
+  cancels the running slide after reading where it has got to, so the next starts from what's
+  on screen. A shared indicator placed by CSS variables (Zag's) was passed over: it measures
+  after mount, so the server can't place it without a flash, and it changes the anatomy.
+- **Timing from the style.** The preset gives the indicator a `transform` transition over two new
+  component tokens, `indicatorDuration` (`medium1`, 250ms, material-web's duration) and
+  `indicatorEasing` (`emphasized`), through `motionTransition`, so `reducedMotion` drops it. The
+  binding reads the computed `transition` (`transformTiming`), so every web target and an app's
+  own CSS time it, reduced motion (the provider's `motion` or the system's) changes at once, and
+  an unstyled indicator doesn't slide. Under reduced motion material-web fades the new indicator
+  in; pureform switches at once, since the indicator's opacity is a state style.
+- **Stacking.** The indicator takes `z-index: 1` and the tab list `position: relative` with
+  `z-index: 0`, its own stacking context, so a sliding indicator draws over the tabs it crosses
+  (each tab paints its container color) without escaping the list.
+- **React Native (`useIndicatorSlides`, `useSlide` on `MotionEngine`).** The tabs record each
+  tab's box in the row and its indicator's in the tab from `onLayout`, so nothing is measured on
+  a change. In the render that selects a tab, they compute the new indicator's start (the old
+  indicator's box, or where a running slide has got to by its clock and curve) and give it to that
+  tab, which draws its indicator through the engine: Animated interpolates a progress (native
+  driver on a device); Reanimated runs a CSS keyframe animation. The timing is the indicator's
+  `transform` transition from the selection (none under reduced motion). The sliding tab takes
+  `zIndex: 1`, since React Native Web makes every view a stacking context. Its gaps are in its
+  README.
+- **Not done:** the preset's primary indicator spans the tab inside its padding, not the content's
+  width as the spec and both implementations draw it; that needs the indicator inside a wrapper
+  around the icon and label, a change of anatomy. pureform has no scrollable tabs.
 
 ## 10. CLI
 
