@@ -3,7 +3,8 @@
 // drawn, moving and resizing over the indicator's own motion tokens, and ends in its own place.
 // Clicks, the keyboard, and a controlled `value` all slide; a quick change retargets from what's
 // on screen; mounting, hydrating, and reduced motion don't slide; a resize or a new label keeps
-// it aligned. The suites' browser asks for reduced motion, so these scenes set the provider's
+// it aligned. A primary indicator spans its tab's content (at least 24px), as Material's does, so
+// the slide resizes it between tabs whose labels differ; a secondary one spans the tab. The suites' browser asks for reduced motion, so these scenes set the provider's
 // `motion` to `"full"` unless they test reducing it.
 
 import { MATERIAL_DURATIONS } from "@pureform/material";
@@ -73,8 +74,9 @@ const mount = async (
 const isBetween = (value: number, a: number, b: number) =>
     value > Math.min(a, b) + 1 && value < Math.max(a, b) - 1;
 
-/** Checks the indicator rests in its place in its tab: under its label, inset by the tab's
- *  padding, for primary tabs; across the tab for secondary ones. */
+/** Checks the indicator rests in its place in its tab: across the tab's content (its icon and
+ *  label, at least 24px wide), centered in the tab, for primary tabs; across the tab for secondary
+ *  ones. */
 const expectAligned = (host: HTMLElement, value: string, variant: string) => {
     const indicator = boxOf(indicatorOf(host, value));
     const tab = boxOf(tabOf(host, value));
@@ -83,17 +85,31 @@ const expectAligned = (host: HTMLElement, value: string, variant: string) => {
         expect(indicator.width).toBeCloseTo(tab.width, 0);
         return;
     }
-    const label = boxOf(partOf(host, value, "label"));
-    expect(indicator.left + indicator.width / 2).toBeCloseTo(
-        label.left + label.width / 2,
-        0,
-    );
-    expect(indicator.left).toBeLessThanOrEqual(label.left);
-    expect(indicator.right).toBeGreaterThanOrEqual(label.right);
+    const content = boxOf(partOf(host, value, "tab-content"));
+    expect(indicator.left).toBeCloseTo(content.left, 0);
+    expect(indicator.width).toBeCloseTo(content.width, 0);
+    expect(indicator.width).toBeGreaterThanOrEqual(24);
+    expect(indicator.width).toBeLessThan(tab.width);
     expect(indicator.left - tab.left).toBeCloseTo(
         tab.right - indicator.right,
         0,
     );
+    // The parts the content holds sit over the indicator, the widest of them edge to edge.
+    const parts = ["icon", "label"]
+        .map((part) =>
+            tabOf(host, value).querySelector(`[data-pf-part="${part}"]`),
+        )
+        .filter((part): part is HTMLElement => part !== null)
+        .map(boxOf);
+    for (const part of parts) {
+        expect(part.left).toBeGreaterThanOrEqual(indicator.left - 0.5);
+        expect(part.right).toBeLessThanOrEqual(indicator.right + 0.5);
+    }
+    // Stacked, the wider part spans it; inline, the parts and the gap between them do.
+    const span =
+        Math.max(...parts.map((part) => part.right)) -
+        Math.min(...parts.map((part) => part.left));
+    if (span >= 24) expect(indicator.width).toBeCloseTo(span, 0);
 };
 
 describe.each(["primary", "secondary"])("%s tabs", (variant) => {
@@ -125,6 +141,13 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
             const middle = boxOf(indicator);
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
+            if (variant === "primary") {
+                // Flights is wider than Cars: the slide resizes the indicator on the way.
+                expect(from.width).toBeGreaterThan(to.width + 4);
+                expect(isBetween(middle.width, from.width, to.width)).toBe(
+                    true,
+                );
+            }
 
             slide.finish();
             expectAligned(host, "cars", variant);
@@ -162,6 +185,82 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
         });
         expectAligned(host, "hotels", variant);
         expect(slides(host)).toEqual([]);
+    });
+});
+
+const ITEMS = tabsCase.props!.items as readonly {
+    value: string;
+    label: string;
+}[];
+
+describe("a primary indicator", () => {
+    it.each([
+        ["text", ITEMS, {}, 48],
+        [
+            "an icon",
+            ITEMS.map(({ value }) => ({
+                value,
+                icon: "★",
+                "aria-label": value,
+            })),
+            {},
+            64,
+        ],
+        [
+            "an icon over text",
+            ITEMS.map((item) => ({ ...item, icon: "★" })),
+            {},
+            64,
+        ],
+        [
+            "an icon beside text",
+            ITEMS.map((item) => ({ ...item, icon: "★" })),
+            { inlineIcon: true },
+            48,
+        ],
+    ] as const)(
+        "spans its tab's content, of %s, centered in the tab",
+        async (_, items, props, height) => {
+            const { host } = await mount(
+                { ...props, items },
+                { motion: "reduce" },
+            );
+            for (const { value } of ITEMS) {
+                await userEvent.click(tabOf(host, value));
+                await harness.settle();
+                expect(slides(host)).toEqual([]);
+                expectAligned(host, value, "primary");
+            }
+            expect(tabOf(host, "flights").getBoundingClientRect().height).toBe(
+                height,
+            );
+            if (!("label" in items[0]!)) {
+                // Only the icon, 24px: the indicator's least width.
+                expect(boxOf(indicatorOf(host, "flights")).width).toBeCloseTo(
+                    24,
+                    0,
+                );
+                expect(tabOf(host, "flights").getAttribute("aria-label")).toBe(
+                    "flights",
+                );
+            }
+        },
+    );
+
+    it("is 3px with rounded top corners; a secondary one 2px and square", async () => {
+        const { host } = await mount({}, { motion: "reduce" });
+        const primary = getComputedStyle(indicatorOf(host, "flights"));
+        expect(primary.height).toBe("3px");
+        expect(primary.borderTopLeftRadius).toBe("3px");
+        expect(primary.borderTopRightRadius).toBe("3px");
+        expect(primary.borderBottomLeftRadius).toBe("0px");
+        const other = await mount(
+            { variant: "secondary" },
+            { motion: "reduce" },
+        );
+        const secondary = getComputedStyle(indicatorOf(other.host, "flights"));
+        expect(secondary.height).toBe("2px");
+        expect(secondary.borderTopLeftRadius).toBe("0px");
     });
 });
 
