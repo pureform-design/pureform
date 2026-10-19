@@ -123,7 +123,10 @@ const stateSelector = (conditions: SlotCondition[]): string =>
 
 // Slot states as one selector. States of one slot join on that slot's element, and the
 // ancestor slots chain outermost first, ending at the styled slot (`&`) with its own states.
-// Nesting them instead would demand a separate element per state, in the wrong order.
+// Nesting them instead would demand a separate element per state, in the wrong order. A
+// descendant's states follow as `:has()` along the structure's path from the styled slot, child
+// by child, so a slot only follows the descendant the structure places in it (not one in a
+// nested component of the same kind).
 const slotSelector = (conditions: SlotCondition[], ctx: LowerCtx): string => {
     const [first] = conditions;
     if (!first) return "&";
@@ -141,14 +144,41 @@ const slotSelector = (conditions: SlotCondition[], ctx: LowerCtx): string => {
         ]);
     }
     const prefix = ctx.classPrefix ? `${ctx.classPrefix}-` : "";
-    const outer = [...bySlot.keys()]
-        .filter((slot) => slot !== name)
+    const classOf = (slot: string) => `.${prefix}${className}__${slot}`;
+    // A slot's path down from the styled slot, when it's a descendant: its ancestors up to the
+    // styled slot, outermost first, then itself.
+    const pathFrom = (slot: string): string[] | undefined => {
+        const chain = ctx.slotAncestors?.get(slot) ?? [];
+        const at = chain.indexOf(name);
+        if (at < 0) return undefined;
+        return [...chain.slice(0, at).reverse(), slot];
+    };
+    const others = [...bySlot.keys()].filter((slot) => slot !== name);
+    const descendants = others.flatMap((slot) => {
+        const path = pathFrom(slot);
+        return path ? [[slot, path] as const] : [];
+    });
+    const outer = others
+        .filter((slot) => !descendants.some(([inner]) => inner === slot))
         .sort((a, b) => ancestors.indexOf(b) - ancestors.indexOf(a))
         .map(
             (slot) =>
-                `.${prefix}${className}__${slot}${stateSelector(bySlot.get(slot) ?? [])}`,
+                `${classOf(slot)}${stateSelector(bySlot.get(slot) ?? [])}`,
         );
-    return [...outer, `&${stateSelector(bySlot.get(name) ?? [])}`].join(" ");
+    const inner = descendants
+        .map(
+            ([slot, path]) =>
+                `:has(> ${path
+                    .map(
+                        (step) =>
+                            `${classOf(step)}${step === slot ? stateSelector(bySlot.get(slot) ?? []) : ""}`,
+                    )
+                    .join(" > ")})`,
+        )
+        .join("");
+    return [...outer, `&${stateSelector(bySlot.get(name) ?? [])}${inner}`].join(
+        " ",
+    );
 };
 
 // The keys for an AND-list of conditions, in nesting order: every slot condition in one key,
