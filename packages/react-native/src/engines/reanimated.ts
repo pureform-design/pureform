@@ -1,10 +1,12 @@
-// `@pureform/react-native/reanimated`: Reanimated 4 runs transitions, keyframe animations, and
-// overlays' enter and exit on the UI thread, as CSS's animation properties.
+// `@pureform/react-native/reanimated`: Reanimated 4 runs transitions, keyframe animations,
+// overlays' enter and exit, and the tabs' indicator slide on the UI thread, as CSS's animation
+// properties.
 
 import { useRipple } from "@pureform/rn-adapter/animated";
 import {
     reanimatedPresence,
     useReanimatedComponentStyles,
+    useReanimatedSlide,
 } from "@pureform/rn-adapter/reanimated";
 import { Pressable, TextInput } from "react-native";
 import Reanimated from "react-native-reanimated";
@@ -19,6 +21,7 @@ export const reanimated: MotionEngine = {
     useStyles: useReanimatedComponentStyles,
     useRipple,
     presence: reanimatedPresence,
+    useSlide: useReanimatedSlide,
     View: Reanimated.View,
     Text: Reanimated.Text,
     TextInput: Reanimated.createAnimatedComponent(TextInput),

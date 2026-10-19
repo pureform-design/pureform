@@ -1,6 +1,7 @@
 // The tabs, and the navigation bar and rail: a row (or column) of destinations, each a pressable
-// with its icon and label, one of them selected. Tabs draw an indicator under the selected tab; a
-// navigation destination fills its active indicator and its icon.
+// with its icon and label, one of them selected. Tabs draw an indicator under the selected tab,
+// which slides in from the tab selected before; a navigation destination fills its active
+// indicator and its icon.
 
 import {
     navigationBarAnatomy,
@@ -24,9 +25,11 @@ import type {
     TabsVariantProps,
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
+import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import type { Selection } from "@pureform/styling";
 import { memo } from "react";
 import type { ReactNode } from "react";
+import type { LayoutChangeEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
@@ -38,7 +41,10 @@ import {
     useStableSelection,
     withEngine,
 } from "./parts";
+import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
+import { useIndicatorSlides } from "./tab-indicator";
+import type { IndicatorSlides } from "./tab-indicator";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
 type NavigationPart = PartName<typeof navigationBarAnatomy>;
@@ -67,10 +73,19 @@ interface TabProps {
     readonly testId: TestIdOverride<TabsPart> | undefined;
     readonly selected: boolean;
     readonly onPick: (value: string) => void;
+    /** The slide its indicator is drawn with, while it's the latest. */
+    readonly slide: SlideMotion | undefined;
+    readonly onLayout: IndicatorSlides["onLayout"];
 }
+
+const spanOf = (event: LayoutChangeEvent) => ({
+    x: event.nativeEvent.layout.x,
+    width: event.nativeEvent.layout.width,
+});
 
 function TabImpl(props: TabProps): ReactNode {
     const { item } = props;
+    const slid = useEngine().useSlide?.(props.slide);
     const indication = useSurfaceIndication(TAB_INDICATION!, {
         indication: props.indication,
         interactionSource: item.interactionSource,
@@ -97,7 +112,15 @@ function TabImpl(props: TabProps): ReactNode {
             aria-selected={props.selected}
             disabled={item.disabled}
             onPress={() => props.onPick(item.value)}
-            style={{ ...s.tab, ...unselectable }}
+            onLayout={(event: LayoutChangeEvent) =>
+                props.onLayout(item.value, "tab", spanOf(event))
+            }
+            // A sliding indicator crosses the tabs after its own: its tab draws over them.
+            style={{
+                ...s.tab,
+                ...unselectable,
+                ...(props.slide ? { zIndex: 1 } : {}),
+            }}
             testID={id("tab")}
         >
             {isPresent(item.icon) ? (
@@ -116,7 +139,10 @@ function TabImpl(props: TabProps): ReactNode {
             </v.label.Text>
             <v.indicator.View
                 pointerEvents="none"
-                style={s.indicator}
+                onLayout={(event: LayoutChangeEvent) =>
+                    props.onLayout(item.value, "indicator", spanOf(event))
+                }
+                style={slid ? { ...s.indicator, ...slid } : s.indicator}
                 testID={id("indicator")}
             />
             {indication.layer(selected)}
@@ -140,9 +166,16 @@ function TabsImpl(props: TabsProps): ReactNode {
     const pick = useStableCallback((next: string) => {
         if (next !== value) setValue(next);
     });
-    const { styles: s, views: v } = useComponentSlots<TabsPart>(
-        "tabs",
-        selection,
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<TabsPart>("tabs", selection);
+    const slides = useIndicatorSlides(
+        value,
+        selected.transitions.indicator?.find(
+            (transition) => transition.property === "transform",
+        ),
     );
     return (
         <v.root.View
@@ -162,6 +195,8 @@ function TabsImpl(props: TabsProps): ReactNode {
                     testId={props.testId}
                     selected={value === item.value}
                     onPick={pick}
+                    slide={slides.motionOf(item.value)}
+                    onLayout={slides.onLayout}
                 />
             ))}
         </v.root.View>
