@@ -8,7 +8,7 @@
 // `motion` to `"full"` unless they test reducing it.
 
 import { MATERIAL_DURATIONS } from "@pureform/material";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { harness } from "#binding";
@@ -51,6 +51,22 @@ const slides = (host: HTMLElement) =>
     [
         ...host.querySelectorAll<HTMLElement>('[data-pf-part="indicator"]'),
     ].flatMap((indicator) => indicator.getAnimations());
+
+// Each slide starts paused, so the tests set its time: under load, the click or key and the
+// settling after it can outlast a slide.
+const animate = Element.prototype.animate;
+
+beforeAll(() => {
+    Element.prototype.animate = function (this: Element, ...args) {
+        const animation = animate.apply(this, args);
+        if (this.matches('[data-pf-part="indicator"]')) animation.pause();
+        return animation;
+    };
+});
+
+afterAll(() => {
+    Element.prototype.animate = animate;
+});
 
 /** The one slide running on `indicator`, paused. */
 const heldSlide = (indicator: HTMLElement): Animation => {
