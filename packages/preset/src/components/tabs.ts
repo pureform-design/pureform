@@ -42,7 +42,6 @@ import type { ColorValue } from "@pureform/core/ast";
 import {
     duration,
     easing,
-    radius,
     size as sizeToken,
     spacing,
     textStyle,
@@ -79,6 +78,8 @@ const { tokens, ref } = componentTokens("tabs", {
     iconSize: sizeToken("iconMedium"),
     iconFill: unitless(0),
     indicatorHeight: px(3),
+    // Material's 3dp top corners on a primary indicator.
+    indicatorRadius: px(3),
     secondaryIndicatorHeight: px(2),
     // A primary indicator is as wide as the tab's content, and never narrower than this.
     indicatorMinWidth: px(24),
@@ -202,8 +203,8 @@ export const createTabs = <const G extends string = ColorGroup>(
                         insetInlineStart: px(0),
                         insetInlineEnd: px(0),
                         height: ref("indicatorHeight"),
-                        borderStartStartRadius: radius("extraSmall"),
-                        borderStartEndRadius: radius("extraSmall"),
+                        borderStartStartRadius: ref("indicatorRadius"),
+                        borderStartEndRadius: ref("indicatorRadius"),
                         backgroundColor: ref("indicatorColor"),
                         opacity: when()
                             .on(SELECTED, unitless(1))
