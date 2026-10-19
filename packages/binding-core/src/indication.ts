@@ -144,6 +144,7 @@ export type {
     RippleClasses,
 } from "./indication-material";
 export {
+    holdsLayer,
     IndicationHost,
     IndicationInstance,
     indicationRoles,
