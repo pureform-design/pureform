@@ -1,10 +1,12 @@
 // The tabs' indicator sliding from the tab selected before to the new one, as the web's does: each
 // tab keeps its own indicator, laid out in its place, and the new one is drawn first over the old
 // one's box, then moves and resizes into place through the engine (`useSlide`). The boxes come
-// from `onLayout` (each tab's place in the row and its indicator's in the tab), so nothing is
-// measured when the selection changes, and the slide starts in the same render that selects the
-// tab. A change mid-slide starts from where the slide has got to. The timing is the `transform`
-// transition the indicator's style declares, so reduced motion, which drops it, switches at once.
+// from `onLayout` (each tab's place in the row, its content's in the tab, and its indicator's in
+// the content), so nothing is measured when the selection changes, and the slide starts in the
+// same render that selects the tab. A primary indicator spans its tab's content, so the two can
+// differ in width: the slide scales it from the old one's. A change mid-slide starts from where the
+// slide has got to. The timing is the `transform` transition the indicator's style declares, so
+// reduced motion, which drops it, switches at once.
 
 import {
     curve,
@@ -16,8 +18,9 @@ import type { SlideMotion, Span } from "@pureform/rn-adapter/animated";
 import type { Transition } from "@pureform/rn-adapter/factory";
 import { useCallback, useRef } from "react";
 
-/** Which box a layout is of: a tab's in the row, or its indicator's in the tab. */
-export type SlidePart = "tab" | "indicator";
+/** Which box a layout is of: a tab's in the row, its content's in the tab, or its indicator's in
+ *  the content. */
+export type SlidePart = "tab" | "tabContent" | "indicator";
 
 // The slide last started, and when.
 interface Running {
@@ -43,8 +46,8 @@ export interface IndicatorSlides {
     /** The slide the tab with `value` draws its indicator with: the latest one, while it's that
      *  tab's. */
     motionOf(value: string): SlideMotion | undefined;
-    /** Records a tab's box in the row, or its indicator's in the tab. The same function each
-     *  render. */
+    /** Records a tab's box in the row, its content's in the tab, or its indicator's in the
+     *  content. The same function each render. */
     readonly onLayout: (value: string, part: SlidePart, span: Span) => void;
 }
 
@@ -55,7 +58,7 @@ export const useIndicatorSlides = (
     timing: Transition | undefined,
 ): IndicatorSlides => {
     const spans = useRef(
-        new Map<string, { tab?: Span; indicator?: Span }>(),
+        new Map<string, Partial<Record<SlidePart, Span>>>(),
     ).current;
     const state = useRef<{ value?: string; running?: Running }>({});
     const onLayout = useCallback(
@@ -66,9 +69,9 @@ export const useIndicatorSlides = (
     );
     // An indicator's box in the row.
     const restOf = (of: string): Span | undefined => {
-        const { tab, indicator } = spans.get(of) ?? {};
-        return tab && indicator
-            ? { x: tab.x + indicator.x, width: indicator.width }
+        const { tab, tabContent, indicator } = spans.get(of) ?? {};
+        return tab && tabContent && indicator
+            ? { x: tab.x + tabContent.x + indicator.x, width: indicator.width }
             : undefined;
     };
     const current = state.current;

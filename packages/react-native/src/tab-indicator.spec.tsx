@@ -49,10 +49,10 @@ const tabs = () => [...document.querySelectorAll<HTMLElement>('[role="tab"]')];
 
 const tabOf = (index: number) => tabs()[index]!;
 
-const indicatorOf = (index: number) =>
-    tabOf(index).querySelector<HTMLElement>(
-        '[data-testid="pf-tabs-indicator"]',
-    )!;
+const partOf = (index: number, part: string) =>
+    tabOf(index).querySelector<HTMLElement>(`[data-testid="pf-tabs-${part}"]`);
+
+const indicatorOf = (index: number) => partOf(index, "indicator")!;
 
 interface Box {
     readonly left: number;
@@ -68,8 +68,8 @@ const boxOf = (element: Element): Box => {
 const isBetween = (value: number, a: number, b: number) =>
     value > Math.min(a, b) + 1 && value < Math.max(a, b) - 1;
 
-/** The indicator of the tab at `index` rests in its place: centered in its tab, inset alike on
- *  both sides (primary) or across it (secondary). */
+/** The indicator of the tab at `index` rests in its place: across its tab's content (at least
+ *  24px), centered in the tab (primary), or across the tab (secondary). */
 const expectAligned = (index: number, variant = "primary") => {
     const indicator = boxOf(indicatorOf(index));
     const tab = boxOf(tabOf(index));
@@ -78,11 +78,22 @@ const expectAligned = (index: number, variant = "primary") => {
         expect(indicator.width).toBeCloseTo(tab.width, 0);
         return;
     }
+    const content = boxOf(partOf(index, "tab-content")!);
+    expect(indicator.left).toBeCloseTo(content.left, 0);
+    expect(indicator.width).toBeCloseTo(content.width, 0);
+    expect(indicator.width).toBeGreaterThanOrEqual(24);
     expect(indicator.width).toBeLessThan(tab.width);
     expect(indicator.left - tab.left).toBeCloseTo(
         tab.right - indicator.right,
         0,
     );
+    for (const part of ["icon", "label"]) {
+        const element = partOf(index, part);
+        if (!element) continue;
+        const box = boxOf(element);
+        expect(box.left).toBeGreaterThanOrEqual(indicator.left - 0.5);
+        expect(box.right).toBeLessThanOrEqual(indicator.right + 0.5);
+    }
 };
 
 describe.each([animated, reanimated])("with $name", (engine) => {
@@ -103,9 +114,46 @@ describe.each([animated, reanimated])("with $name", (engine) => {
             const middle = boxOf(indicatorOf(2));
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
+            if (variant === "primary") {
+                // Flights is wider than Cars: the slide resizes it on the way.
+                expect(from.width).toBeGreaterThan(to.width + 4);
+                expect(isBetween(middle.width, from.width, to.width)).toBe(
+                    true,
+                );
+            }
             await settle(SLIDE);
             expect(boxOf(indicatorOf(2))).toEqual(to);
             expectAligned(2, variant);
+        },
+    );
+
+    it.each([
+        ["text", ITEMS],
+        [
+            "an icon",
+            ITEMS.map(({ value }) => ({
+                value,
+                icon: "★",
+                "aria-label": value,
+            })),
+        ],
+        ["an icon and text", ITEMS.map((item) => ({ ...item, icon: "★" }))],
+    ])(
+        "sizes a primary indicator to its tab's content, of %s",
+        async (_, items) => {
+            // Reduced motion, so each change is in place at once.
+            await render(<Tabs items={items} />, engine, "reduce");
+            await settle(50);
+            for (const index of [0, 1, 2]) {
+                await interact(() => userEvent.click(tabOf(index)));
+                await settle(50);
+                expectAligned(index);
+            }
+            if (!("label" in items[0]!)) {
+                expect(partOf(0, "label")).toBeNull();
+                expect(boxOf(indicatorOf(0)).width).toBeCloseTo(24, 0);
+                expect(tabOf(0).getAttribute("aria-label")).toBe("flights");
+            }
         },
     );
 
