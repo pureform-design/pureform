@@ -1813,6 +1813,13 @@ function createInteractionSource(): MutableInteractionSource;
   ordinary events (any replay is invisible), and an indication's `web` runs after mount, at
   the latest before the first interaction reaches it. Going lazy later, if p9e's measurement
   asks for it, is then an internal change.
+- **Measured: the indication stays eager.** On one ready-made interactive list item row in a
+  production build, the indication's internals (the resolved indication's memo and the host's
+  configure effect, the forwarded-state signal, the attach effect, and the element signal) cost
+  about 5.5 µs of a 377 µs row (1.5%) and 5 of its 144 reactive nodes; the layer's `Show` stays
+  either way, since it's markup. Creating them on the first interaction would save little and
+  add the "not created yet" paths above (a shared source's first emit, focus, reduced motion,
+  hydration), so they stay eager.
 - **Shared sources on the web.** A state that came from the element itself is matched by its
   pseudo-class, as today, and costs no JS. A hover or press that came from somewhere else
   (another element sharing the source, or the app emitting) can't match a pseudo-class, so
