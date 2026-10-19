@@ -236,11 +236,13 @@ interface SnackbarRootOwnProps           // tokens, duration, onAction, id, ids,
 SNACKBAR_ROOT_PROPS; SNACKBAR_CONTENT_PROPS; // supportingText, action, closeLabel, closeIcon
 snackbarSelection(props); snackbarMachineProps(props);
 
-// Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, icon, label, indicator, content)
-interface TabsRootOwnProps               // variant, icon (the variant), color, tokens, activationMode,
+// Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, tabContent, icon, label, indicator,
+// content)
+interface TabsRootOwnProps               // variant, icon (the variant), inlineIcon, color, tokens, activationMode,
                                          // loopFocus, disabled, id, ids, value, defaultValue,
                                          // onValueChange, testId, unstyled
-interface TabsItem<Node> { value; label; icon?; mirrorIcon?; disabled?; content? }
+interface TabsItem<Node> { value; label?; "aria-label"?; icon?; mirrorIcon?; disabled?; content? }
+                                         // no label: an icon-only tab, named by its aria-label
 TABS_ROOT_PROPS; TABS_CONTENT_PROPS;     // items
 TABS_LIST_LABEL_PROPS;                   // aria-label, aria-labelledby: on the tab list
 tabsSelection(props); tabsMachineProps(props); tabsItemProps(item, tabsDisabled);

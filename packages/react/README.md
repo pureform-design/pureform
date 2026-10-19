@@ -187,7 +187,7 @@ import { Tooltip } from "@pureform/react/tooltip";
 | `Tooltip`                         | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the tooltip's `root` slot), `Subhead`, `SupportingText` (`span`), `Actions` (`div`)                                                                                   | Zag's tooltip (`@pureform/machines/tooltip`)         |
 | `Dialog`                          | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`) | Zag's dialog (`@pureform/machines/dialog`)           |
 | `Snackbar`                        | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Action`, `Close` (`button`)                                                                                                                                                                                         | `@pureform/machines/snackbar`                        |
-| `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                                                          | Zag's tabs (`@pureform/machines/tabs`)               |
+| `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`, around its content, a `span` it renders), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                 | Zag's tabs (`@pureform/machines/tabs`)               |
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                             | `@pureform/machines/navigation`                      |
 | `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                | none                                                 |
 | `List`                            | `Root` (`ul`, unstyled), per item `Item` (`li`, unstyled) holding a `ListItem`                                                                                                                                                                                                   | none                                                 |
@@ -272,15 +272,22 @@ import { Tooltip } from "@pureform/react/tooltip";
   per tab, `hidden` while its tab isn't selected). Only the selected tab takes focus from Tab; the
   arrow keys left and right select the tab before or after, by direction, and Home and End the
   first and last (`activationMode="manual"` waits for Enter or Space). `value` is controllable
-  (`string | null`). The ready-made takes `items` (`{ value, label, icon?, mirrorIcon?, disabled?,
-content? }`), puts `aria-label` and `aria-labelledby` on the tab list, turns on the `icon`
-  variant when any tab has an icon, selects the first enabled tab unless given a value, and
-  renders a panel per item with `content`. Tabs without panels switch something else and name no
-  panel (`Tab`'s `controls={false}` in compound use). Each tab draws its own indicator; Zag's
-  moving indicator isn't used. When the value changes (a click, a key, a controlled `value`), Root
-  slides the new tab's `Indicator` in from where the old one is drawn (`slideIndicator`, design doc
-  §9.10), over the `transform` transition its style declares: not on mount or hydration, not
-  under reduced motion, and from where a running slide has got to.
+  (`string | null`). The ready-made takes `items` (`{ value, label?, "aria-label"?, icon?,
+mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, named by its
+  `aria-label`), puts `aria-label` and `aria-labelledby` on the tab list, turns on the `icon`
+  variant when any tab has an icon (`inlineIcon` sets a primary tab's icon beside its label),
+  selects the first enabled tab unless given a value, and renders a panel per item with `content`.
+  Tabs without panels switch something else and name no panel (`Tab`'s `controls={false}` in
+  compound use). Each `Tab` wraps its children in its content (`tabContent`,
+  `data-pf-part="tab-content"`), as Material's tabs do, so compound tabs written with `Icon`,
+  `Label`, and `Indicator` in a `Tab` get it too: a primary tab's indicator spans the content (at
+  least 24px), a secondary one the tab. The ready-made addresses it by slot (`className`, `style`,
+  `slotProps`, `testId`), and `Tab` takes its props as `tabContentProps`. Each tab draws its own
+  indicator; Zag's moving indicator isn't used. When the value changes (a click, a key, a
+  controlled `value`), Root slides the new tab's `Indicator` in from where the old one is drawn
+  (`slideIndicator`, design doc §9.10), over the `transform` transition its style declares, moving and resizing it between tabs
+  whose content differs in width: not on mount or hydration, not under reduced motion, and from
+  where a running slide has got to.
 - **The navigation bar and rail** share their parts and behavior: a `<nav>` (name it with
   `aria-label`) of destinations, each a link when it has an `href` and a button otherwise, reached
   in turn with Tab (arrow keys do nothing). `value` (the current destination, controllable) marks

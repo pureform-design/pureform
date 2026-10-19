@@ -282,6 +282,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   with it they enter and leave and render nothing once gone; without it they're shown and still,
   as before. The engine reports each step's end (Animated's completion, Reanimated's
   `onCSSAnimationEnd`); an engine without `presence` shows and hides at once.
+- **The tabs' content** is a view in each tab around its icon, label, and indicator
+  (`pf-tabs-tab-content`), as on the web: a primary tab's indicator spans it (at least 24px), a
+  secondary one the tab. A tab without a `label` shows only its icon, named by its `aria-label`;
+  `inlineIcon` sets a primary tab's icon beside its label.
 - **The tabs' indicator slides as on the web** (design doc §9.10): when the
   selection changes, from a press, a key, or a controlled `value`, the new tab's indicator is
   drawn over the old one's box and moves and resizes into place (a translation and a horizontal
@@ -289,8 +293,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   medium1, and `indicatorEasing`, emphasized), times `timeScale`. The engine runs it: `useSlide`
   on `MotionEngine` (Animated with the native driver on a device; a Reanimated CSS keyframe
   animation). Where it differs from the web:
-    - the boxes come from `onLayout` on each tab and indicator, recorded as they lay out, so a
-      selection made before the first layout (in the same frame as mounting) changes at once;
+    - the boxes come from `onLayout` on each tab, its content, and its indicator, recorded as they
+      lay out, so a selection made before the first layout (in the same frame as mounting) changes
+      at once;
     - a change mid-slide starts from where the slide has got to by the clock (its curve at the
       time elapsed), not from a measured box, since neither engine reports its position to
       JavaScript cheaply; the two can differ by a frame;
