@@ -5,7 +5,7 @@
 import { act, cleanup, render } from "@testing-library/react";
 import { useState } from "react";
 import type { ReactNode } from "react";
-import { afterEach } from "vitest";
+import { afterEach, vi } from "vitest";
 
 afterEach(() => {
     cleanup();
@@ -26,6 +26,17 @@ export const settle = (ms = 0): Promise<void> =>
     act(async () => {
         await new Promise((resolve) => setTimeout(resolve, ms));
     });
+
+/** Waits, a task at a time, until `check` passes: as long as a loaded machine takes, where a
+ *  user event alone can take seconds to come back. */
+export const until = (check: () => void, timeout = 10_000): Promise<void> =>
+    vi.waitFor(
+        async () => {
+            await settle();
+            check();
+        },
+        { timeout, interval: 10 },
+    );
 
 /** Runs a user interaction inside `act`, then settles. */
 export const interact = async (
