@@ -326,3 +326,63 @@ export const presenceFrames = (
     });
     return [style(step.from), style(step.to)];
 };
+
+/** A view's box along a row, in pixels: where it starts and how wide it is. */
+export interface Span {
+    readonly x: number;
+    readonly width: number;
+}
+
+/** Where a sliding view starts, against its own place: moved by `translateX` and scaled by
+ *  `scaleX` about its center. */
+export interface SlideOffset {
+    readonly translateX: number;
+    readonly scaleX: number;
+}
+
+/** An active indicator sliding into its place: from an offset to none, over milliseconds, on a
+ *  curve as transitions take it. A new object is a new slide. */
+export interface SlideMotion {
+    readonly from: SlideOffset;
+    readonly duration: number;
+    readonly delay: number;
+    readonly easing: string;
+}
+
+/** The offset that draws a view laid out at `to` over `from`: its center on `from`'s, its width
+ *  `from`'s. `undefined` when either has no width. */
+export const slideOffset = (from: Span, to: Span): SlideOffset | undefined =>
+    from.width > 0 && to.width > 0
+        ? {
+              translateX: from.x + from.width / 2 - (to.x + to.width / 2),
+              scaleX: from.width / to.width,
+          }
+        : undefined;
+
+/** Where a slide has got to, `progress` (its curve's output, 0 to 1) of the way: its offset. */
+export const slideAt = (from: SlideOffset, progress: number): SlideOffset => ({
+    translateX: from.translateX - from.translateX * progress,
+    scaleX: from.scaleX + (1 - from.scaleX) * progress,
+});
+
+/** A view drawn at `span` with `offset`: the box it covers. */
+export const offsetSpan = (span: Span, offset: SlideOffset): Span => {
+    const width = span.width * offset.scaleX;
+    return {
+        x: span.x + span.width / 2 + offset.translateX - width / 2,
+        width,
+    };
+};
+
+/** A slide's two ends as styles, a transform of the same steps at both. */
+export const slideFrames = (
+    motion: SlideMotion,
+): [from: Record<string, unknown>, to: Record<string, unknown>] => [
+    {
+        transform: [
+            { translateX: motion.from.translateX },
+            { scaleX: motion.from.scaleX },
+        ],
+    },
+    { transform: [{ translateX: 0 }, { scaleX: 1 }] },
+];

@@ -8,8 +8,12 @@ import {
     channels,
     easingPoints,
     interpolates,
+    offsetSpan,
     presenceFrames,
     sameUnits,
+    slideAt,
+    slideFrames,
+    slideOffset,
     stops,
 } from "./motion";
 
@@ -243,5 +247,41 @@ describe("presenceFrames", () => {
                 easing: "linear",
             }),
         ).toEqual([{ opacity: 1 }, { opacity: 0 }]);
+    });
+});
+
+describe("an indicator's slide", () => {
+    const from = { x: 0, width: 40 };
+    const to = { x: 200, width: 100 };
+
+    it("starts a view over another's box, scaled about its center", () => {
+        const offset = slideOffset(from, to)!;
+        expect(offset).toEqual({ translateX: -230, scaleX: 0.4 });
+        expect(offsetSpan(to, offset)).toEqual(from);
+        expect(slideOffset({ x: 0, width: 0 }, to)).toBeUndefined();
+    });
+
+    it("finds where a slide has got to, and the box it covers there", () => {
+        const offset = slideOffset(from, to)!;
+        expect(slideAt(offset, 0)).toEqual(offset);
+        expect(slideAt(offset, 1)).toEqual({ translateX: 0, scaleX: 1 });
+        expect(offsetSpan(to, slideAt(offset, 0.5))).toEqual({
+            x: 100,
+            width: 70,
+        });
+    });
+
+    it("gives both ends the same transform steps", () => {
+        expect(
+            slideFrames({
+                from: { translateX: -230, scaleX: 0.4 },
+                duration: 250,
+                delay: 0,
+                easing: "linear",
+            }),
+        ).toEqual([
+            { transform: [{ translateX: -230 }, { scaleX: 0.4 }] },
+            { transform: [{ translateX: 0 }, { scaleX: 1 }] },
+        ]);
     });
 });

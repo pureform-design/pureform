@@ -7,12 +7,13 @@ import { I18nManager, Platform } from "react-native";
 import { cubicBezier } from "react-native-reanimated";
 
 import { cssMotion } from "./css-motion";
-import { easingPoints, presenceFrames } from "./motion";
+import { easingPoints, presenceFrames, slideFrames } from "./motion";
 import type {
     PresenceDriver,
     PresencePhase,
     PresenceStep,
     PresenceView,
+    SlideMotion,
 } from "./motion";
 import { useComponentState } from "./react";
 import type { State } from "./select";
@@ -27,6 +28,7 @@ export type {
     PresencePhase,
     PresenceStep,
     PresenceView,
+    SlideMotion,
 } from "./motion";
 
 /** A CSS curve as Reanimated's: a cubic Bézier as its easing object, `linear` as is. */
@@ -157,3 +159,22 @@ export const reanimatedPresence = (): PresenceDriver => {
         run: () => undefined,
     };
 };
+
+/** The style that slides a view into its place, for each new `motion`, as a CSS keyframe
+ *  animation Reanimated runs on the UI thread; `undefined` without one. The style stays the same
+ *  object while `motion` does, since a changed animation starts again. */
+export const useReanimatedSlide = (
+    motion: SlideMotion | undefined,
+): Record<string, unknown> | undefined =>
+    useMemo(() => {
+        if (!motion) return undefined;
+        const [from, to] = slideFrames(motion);
+        return {
+            animationName: { from, to },
+            animationDuration: motion.duration,
+            animationDelay: motion.delay,
+            animationTimingFunction: cssEasing(motion.easing),
+            // The slide's start shows through its delay.
+            animationFillMode: "backwards",
+        };
+    }, [motion]);
