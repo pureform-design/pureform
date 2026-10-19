@@ -6,6 +6,7 @@
 
 import type {
     ComponentAnatomy,
+    IndicationAnatomy,
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
@@ -72,6 +73,10 @@ export interface ComponentOptions<A extends ComponentAnatomy> {
     /** Whether the component shows indication now: a card or a list item only with an action.
      *  Always, by default. */
     readonly interactive?: Accessor<boolean>;
+    /** Whether one of its anatomy's indication entries shows now, while it's interactive: a
+     *  card's root entry while Root acts, its action area's otherwise. Every entry, by default.
+     *  Read in a tracking scope. */
+    readonly entryActive?: (entry: IndicationAnatomy) => boolean;
 }
 
 /** What a part merges besides its anatomy's attributes and the registry's classes. */
@@ -267,6 +272,7 @@ export function useComponent<A extends ComponentAnatomy>(
     const indication = createIndicationScope(entries, {
         indication: options.indication,
         interactive: options.interactive,
+        entryActive: options.entryActive,
         source: options.interactionSource,
     });
     // The indication prop's tokens, and the providers' focus indicator color, go on Root under

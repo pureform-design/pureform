@@ -12,6 +12,7 @@ import {
     DEFAULT_INDICATION,
     droppedFocusIndicatorMessage,
     dropsFocusIndicator,
+    holdsLayer,
     IndicationHost,
     NOT_FORWARDED,
     rippleClasses,
@@ -102,6 +103,8 @@ export interface IndicationScope {
     readonly indication: Accessor<Indication>;
     /** Whether the component is interactive now; a card or list item only with an action. */
     readonly interactive: Accessor<boolean>;
+    /** Whether an entry, by index, shows now, while the component is interactive. */
+    readonly entryActive: (entry: number) => boolean;
     /** The component's own source, for the parts that don't pass an item's. */
     readonly source: Accessor<InteractionSource | undefined>;
 }
@@ -112,6 +115,9 @@ export function createIndicationScope(
     options: {
         readonly indication?: Accessor<Indication | undefined> | undefined;
         readonly interactive?: Accessor<boolean> | undefined;
+        readonly entryActive?:
+            | ((entry: IndicationAnatomy) => boolean)
+            | undefined;
         readonly source?: Accessor<InteractionSource | undefined> | undefined;
     },
 ): IndicationScope {
@@ -136,6 +142,10 @@ export function createIndicationScope(
         entries,
         indication,
         interactive: options.interactive ?? (() => true),
+        entryActive: (index) => {
+            const entry = entries[index];
+            return !entry || !options.entryActive || options.entryActive(entry);
+        },
         source: options.source ?? (() => undefined),
     };
 }
@@ -167,7 +177,10 @@ export function usePartIndication(
     unstyled: Accessor<boolean>,
 ): PartIndication {
     const state = usePureform();
-    const surface = roles.some(({ role }) => role === "surface");
+    // The roles holding the layer: a surface's, or the part an entry names to hold it.
+    const holding = roles.filter(({ entry, role }) =>
+        holdsLayer(scope.entries[entry], role),
+    );
     const shows = roles.some(({ role }) => role === "state");
     const [forwarded, setForwarded] = createSignal<ForwardedStates>(
         NOT_FORWARDED,
@@ -180,17 +193,18 @@ export function usePartIndication(
             [
                 scope.interactive() ? source() : undefined,
                 element() as HTMLElement | undefined,
+                roles.filter(({ entry }) => scope.entryActive(entry)),
             ] as const,
-        ([current, el]) => {
-            if (!current || !el) return;
-            const cleanups = roles.map(({ entry, role }) =>
+        ([current, el, active]) => {
+            if (!current || !el || active.length === 0) return;
+            const cleanups = active.map(({ entry, role }) =>
                 scope.host.instance(entry, current).attach(role, el),
             );
-            if (shows) {
-                const entry = roles.find(({ role }) => role === "state")!;
+            const stated = active.find(({ role }) => role === "state");
+            if (stated) {
                 cleanups.push(
                     scope.host
-                        .instance(entry.entry, current)
+                        .instance(stated.entry, current)
                         .subscribeForwarded(setForwarded),
                 );
             }
@@ -203,14 +217,18 @@ export function usePartIndication(
     const layerClass = () =>
         unstyled() ? undefined : rippleClasses(state().registry)?.root?.class;
     // A call in `when`, which the compiler doesn't wrap in a memo of its own.
-    const layered = () => scope.interactive() && scope.indication().layer;
+    const layered = () =>
+        scope.interactive() &&
+        !!scope.indication().layer &&
+        holding.some(({ entry }) => scope.entryActive(entry));
     return {
         states: (own) => (shows ? withForwarded(own, forwarded()) : own),
-        layer: surface ? (
-            <Show when={layered()}>
-                <span class={layerClass()} {...LAYER_ATTRIBUTES} />
-            </Show>
-        ) : undefined,
+        layer:
+            holding.length > 0 ? (
+                <Show when={layered()}>
+                    <span class={layerClass()} {...LAYER_ATTRIBUTES} />
+                </Show>
+            ) : undefined,
     };
 }
 
