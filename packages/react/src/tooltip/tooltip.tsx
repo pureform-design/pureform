@@ -6,6 +6,7 @@
 
 import { tooltipOverlayAnatomy } from "@pureform/anatomy";
 import {
+    isInteractiveTooltip,
     isPresent,
     isRichTooltip,
     overlayPositionerProps,
@@ -42,6 +43,7 @@ interface TooltipContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: tooltip.Api<PropTypes>;
     readonly presence: Presence;
+    readonly interactive: boolean;
 }
 
 const context = createPartContext<TooltipContextValue>("Tooltip");
@@ -87,7 +89,14 @@ function Root(props: TooltipRootProps): ReactNode {
     });
     const { as, ...rest } = omitProps(props, TOOLTIP_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, api, presence }}>
+        <context.Provider
+            value={{
+                scope,
+                api,
+                presence,
+                interactive: isInteractiveTooltip(props),
+            }}
+        >
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
@@ -107,15 +116,23 @@ function Trigger({ unstyled, as, ...props }: TooltipTriggerProps): ReactNode {
 }
 
 /** Places the tooltip against the trigger; hidden once it's closed and its exit animation is over.
- *  The registry doesn't style it. */
+ *  Unless the tooltip is interactive, it lets the pointer through, as the surface does: Zag lays it
+ *  out at the corner of its containing block as it opens, before placing it, where it would take
+ *  the pointer from a trigger there and close the tooltip. The registry doesn't style it. */
 function Positioner({ unstyled, ...props }: TooltipPartProps): ReactNode {
-    const { scope, api, presence } = context.use("Positioner");
+    const { scope, api, presence, interactive } = context.use("Positioner");
+    const machine = overlayPositionerProps(
+        api.getPositionerProps(),
+        presence.present,
+    );
     return scope.render("positioner", {
         element: "div",
-        machine: overlayPositionerProps(
-            api.getPositionerProps(),
-            presence.present,
-        ),
+        machine: interactive
+            ? machine
+            : {
+                  ...machine,
+                  style: { ...machine.style, pointerEvents: "none" },
+              },
         unstyled,
         props,
     });
