@@ -110,6 +110,30 @@ describe("deriveAnatomy", () => {
                 ],
             }),
         ).toThrow('pressable: indication names "layer", which is not a part');
+        const area = defineSlotComponent({
+            name: "area",
+            slots: ["root", "action"],
+            structure: { root: ["action"] },
+            indication: [
+                {
+                    trigger: "action",
+                    surface: "root",
+                    centered: false,
+                    focus: "root",
+                    layer: "action",
+                },
+            ],
+            recipe: { base: {} },
+        });
+        expect(deriveAnatomy(area).indication).toEqual([
+            {
+                trigger: "action",
+                surface: "root",
+                centered: false,
+                focus: "root",
+                layer: "action",
+            },
+        ]);
     });
 
     it("gives a single-slot component a root part", () => {

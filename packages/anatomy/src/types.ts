@@ -35,6 +35,10 @@ export interface IndicationAnatomy<P extends string = string> {
     readonly centered: boolean;
     /** The part that draws the focus indicator. */
     readonly focus: P;
+    /** The part that holds the ripple's layer element, when it isn't the surface: an
+     *  unpositioned trigger inside the surface, so the layer spans the surface from there. Left
+     *  out when the surface holds it. */
+    readonly layer?: P;
 }
 
 /** A component's anatomy: its parts, by name, and where they sit. */

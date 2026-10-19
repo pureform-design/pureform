@@ -42,8 +42,12 @@ const at = (
 const INDICATION: Record<string, IndicationAnatomy[]> = {
     button: [at("root", "root", false)],
     chip: [at("root", "root", false)],
-    // When interactive, as a link or a button.
-    card: [at("root", "root", false)],
+    // When interactive, as a link or a button; with an action area, the container shows its
+    // states and its layer sits in the action area.
+    card: [
+        at("root", "root", false),
+        { ...at("actionArea", "root", false, "root"), layer: "actionArea" },
+    ],
     listItem: [at("root", "root", false)],
     tabs: [at("tab", "tab", false)],
     // Its items, and the select's options, which the menu draws.

@@ -112,15 +112,21 @@ export const deriveAnatomy = (
     };
     const partNames = [...slots, ...extras.map((extra) => extra.name)];
     const indication = spec.indication?.map(
-        ({ trigger, surface, centered, focus }): IndicationAnatomy => {
-            for (const named of [trigger, surface, focus]) {
-                if (!known.has(named)) {
+        ({ trigger, surface, centered, focus, layer }): IndicationAnatomy => {
+            for (const named of [trigger, surface, focus, layer]) {
+                if (named !== undefined && !known.has(named)) {
                     throw new Error(
                         `${name}: indication names "${named}", which is not a part`,
                     );
                 }
             }
-            return { trigger, surface, centered, focus };
+            return {
+                trigger,
+                surface,
+                centered,
+                focus,
+                ...(layer === undefined || layer === surface ? {} : { layer }),
+            };
         },
     );
     return {
