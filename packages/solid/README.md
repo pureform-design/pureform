@@ -398,6 +398,14 @@ setting ran most of a page again (Solid's diagnostics reported `HUGE_FAN_OUT`). 
 untracked as `untrack(() => state().dir)`; `untrack(state).dir` reads the field's memo outside
 `untrack`.
 
+The fields components read (the registry, `dir`, `motion`, `defaults`, `slotProps`, and the
+indication) resolve over the parent's same fields alone, apart from the theme, `overrides`, and
+`hydrate`, which reach components as CSS only. So changing those runs the provider and what reads
+them through `usePureform()`, not the components under it, even where nested providers both set
+`defaults` or `slotProps` for a component, whose merged entries would otherwise be built again
+(200 buttons under two such providers: 4.7 ms to 0.1 ms per switch). The provider's own options
+compare by identity, as React's do.
+
 ### Indication
 
 How interactive components show hover, focus, and press (design doc §9.8): the state layer and

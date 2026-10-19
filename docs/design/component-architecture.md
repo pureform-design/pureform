@@ -441,13 +441,18 @@ function useClasses(name, selection) {
   promise is shared and stable). `useLazyClassFactory` throws on the server, React's way of
   rendering a `<Suspense>` boundary's fallback there and the content on the client.
 - **Components don't read the theme.** The theme, `overrides`, and `hydrate` reach components
-  as CSS on the provider's element, so a switch mustn't run them again. Solid gets this from a
-  memo behind each field of the provider's state. React's `PureformProvider` provides a second,
-  internal context with only the fields components read (registry, `dir`, `motion`, `defaults`,
-  `slotProps`, the indication and its focus indicator color), resolved over the parent's same
-  context, so a theme change above leaves it alone; `usePureform()` still reads the whole
-  state. With 200 buttons in a production build, a switch went from 9 ms to 0.3 ms (41 ms to
-  1 ms at 4x CPU throttling), and mounting cost the same.
+  as CSS on the provider's element, so a switch mustn't run them again. Both bindings resolve the
+  fields components read (registry, `dir`, `motion`, `defaults`, `slotProps`, the indication and
+  its focus indicator color) over the parent's same fields alone, apart from the theme's, so a
+  theme change here or above leaves them as they are; `usePureform()` still reads the whole
+  state. React's `PureformProvider` provides them in a second, internal context: with 200
+  buttons in a production build, a switch went from 9 ms to 0.3 ms (41 ms to 1 ms at 4x CPU
+  throttling), and mounting cost the same. Solid's state has a memo behind each field, so a
+  component depends on the fields it reads; resolving the two apart keeps a switch from building
+  the merged `defaults` and `slotProps` of nested providers that both set them again, which ran
+  every component reading them. With 200 buttons under two such providers, a switch went from
+  4.7 ms to 0.1 ms (17.6 ms to 0.1 ms at 4x), and mounting cost the same, with the same reactive
+  nodes per provider and the same server HTML.
 - **Built (p8), React Native:** `useStyleFactory(name)` returns the entry's factory in the
   provider's environment (`factory.for(environment)`: theme, scheme, overrides, the engine's SVG
   drawing, the widths around the caller), not the bare factory, which is the base theme's light
