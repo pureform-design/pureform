@@ -22,14 +22,25 @@ export function TransactionList(props: {
     /** Which rows show: the rest stay mounted, hidden (and so left out of the list's items for
      *  assistive technology), so a filter only toggles them. Every row, by default. */
     shown?: (transaction: Transaction) => boolean;
+    /** While the list renders part of its rows: a shown row's position among the shown rows,
+     *  and how many are shown, for assistive technology to count the ones still to come. */
+    position?: (transaction: Transaction) => number | undefined;
+    setSize?: number | undefined;
 }): JSX.Element {
+    // Functions rather than conditions in the props, which would make a memo at every read.
+    const setSize = (transaction: Transaction) =>
+        props.position?.(transaction) === undefined ? undefined : props.setSize;
     return (
         <List.Root tokens={{ container: "transparent" }}>
             {/* By reference: the query's data is a store that keeps a transaction's object when
                 it changes, so a row is made once and reads its fields as they're drawn. */}
             <For each={props.transactions}>
                 {(transaction) => (
-                    <List.Item hidden={props.shown?.(transaction) === false}>
+                    <List.Item
+                        hidden={props.shown?.(transaction) === false}
+                        aria-posinset={props.position?.(transaction)}
+                        aria-setsize={setSize(transaction)}
+                    >
                         <TransactionRow
                             transaction={transaction}
                             categories={props.categories}

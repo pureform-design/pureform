@@ -111,6 +111,55 @@ it("opens the budget app from the launcher, in its own layout", async () => {
     await page.close();
 });
 
+it("renders the transactions' first rows with the page and the rest after it, and filters hide them", async () => {
+    // The count the summary line gives: "126 transactions, +$1,234.56 net".
+    const counted = (text: string) =>
+        Number(/(\d+)\u2069? transactions?/.exec(text)?.[1]);
+
+    // The server renders the first screenful of rows, and says how many there are in all.
+    const html = await (await fetch(url("/budget/transactions"))).text();
+    const total = counted(html);
+    const served =
+        html.match(/data-scope="list-item" data-pf-part="root"/g)?.length ?? 0;
+    expect(total).toBeGreaterThan(served);
+    expect(served).toBeGreaterThan(0);
+
+    const { page, errors } = await open("/budget");
+    await page
+        .getByRole("navigation", { name: "Budget" })
+        .getByRole("link", { name: "Transactions" })
+        .first()
+        .click();
+    await page.waitForURL(url("/budget/transactions"));
+    const rows = page.locator("main section li");
+    // Every row, and the list no longer busy.
+    await expect.poll(() => rows.count()).toBe(total);
+    await expect.poll(() => page.locator("main [aria-busy]").count()).toBe(0);
+    expect(await page.locator("main li[aria-setsize]").count()).toBe(0);
+
+    // A filter hides the rows it leaves out rather than removing them.
+    const summary = page.getByText(/ transactions?, /);
+    await page
+        .getByRole("group", { name: "Show" })
+        .getByText("Income", { exact: true })
+        .click();
+    await expect
+        .poll(async () => counted(await summary.innerText()))
+        .toBeLessThan(total);
+    const income = counted(await summary.innerText());
+    await expect
+        .poll(() => rows.filter({ visible: true }).count())
+        .toBe(income);
+    expect(await rows.count()).toBe(total);
+    await page
+        .getByRole("group", { name: "Show" })
+        .getByText("All", { exact: true })
+        .click();
+    await expect.poll(() => rows.filter({ visible: true }).count()).toBe(total);
+    expect(errors).toEqual([]);
+    await page.close();
+});
+
 it("changes the settings from the floating button, keeps them across a reload, and switches apps", async () => {
     const { page, errors } = await open("/budget");
     const html = page.locator("html");
