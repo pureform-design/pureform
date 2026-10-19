@@ -58,6 +58,16 @@ describe("Tabs, ready-made", () => {
         expect(tabs()[2]!.disabled).toBe(true);
         expect(tabs()[0]!.getAttribute("aria-controls")).toBe(panels()[0]!.id);
         expect(byTestId(ids.icon).getAttribute("aria-hidden")).toBe("true");
+        // Each tab wraps its icon, label, and indicator in its content.
+        const content = byTestId(ids.tabContent);
+        expect(content.parentElement).toBe(tabs()[0]);
+        expect(content.className).toBe("tabs__tabContent");
+        expect(content.getAttribute("data-pf-part")).toBe("tab-content");
+        expect(
+            [...content.children].map((part) =>
+                part.getAttribute("data-pf-part"),
+            ),
+        ).toEqual(["icon", "label", "indicator"]);
         expect(panels().map((panel) => panel.hidden)).toEqual([
             false,
             true,
@@ -106,6 +116,30 @@ describe("Tabs, ready-made", () => {
         expect(tabs()[1]!.getAttribute("aria-selected")).toBe("true");
         expect(tabs()[1]!.hasAttribute("aria-controls")).toBe(false);
         expect(panels()).toHaveLength(0);
+    });
+
+    it("addresses each tab's content by its slot, and passes inlineIcon to the registry", async () => {
+        withRegistry(() => (
+            <Tabs
+                aria-label="Trips"
+                items={ITEMS}
+                inlineIcon
+                class={{ tabContent: "wide" }}
+                slotProps={{ tabContent: { title: "content" } }}
+                testId={{ tabContent: "trip" }}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.list).className).toBe(
+            "tabs tabs--icon-true tabs--inlineIcon-true",
+        );
+        const contents = [
+            ...document.querySelectorAll<HTMLElement>('[data-testid="trip"]'),
+        ];
+        expect(contents).toHaveLength(3);
+        expect(contents[0]!.className).toBe("tabs__tabContent wide");
+        expect(contents[0]!.title).toBe("content");
+        expect(byTestId(ids.list).hasAttribute("inlineIcon")).toBe(false);
     });
 
     it("makes each panel's content once when the items are written in place", async () => {
@@ -161,6 +195,24 @@ describe("Tabs, composed", () => {
             </Tabs.Root>
         ));
         await settle();
+        // Each tab wraps its children in its content, after the indication's layer.
+        expect(
+            tabs().map((tab) =>
+                [...tab.children].map(
+                    (part) =>
+                        part.getAttribute("data-pf-part") ??
+                        part.hasAttribute("data-ripple-layer"),
+                ),
+            ),
+        ).toEqual([
+            [true, "tab-content"],
+            [true, "tab-content"],
+        ]);
+        expect(
+            [...tabs()[1]!.lastElementChild!.children].map((part) =>
+                part.getAttribute("data-pf-part"),
+            ),
+        ).toEqual(["label", "indicator"]);
         await userEvent.click(tabs()[1]!);
         await frames();
         expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: "b" });
@@ -183,10 +235,12 @@ describe("Tabs, composed", () => {
 });
 
 describe("Tabs, the indicator's slide", () => {
-    // The registry's indicator has no styles here: give each a box and a transition, as the preset
-    // does.
+    // The registry's parts have no styles here: lay them out as the preset does, each indicator
+    // spanning its tab's content, with a transition.
     const style = document.createElement("style");
-    style.textContent = `[data-pf-part="indicator"] { display: block; width: 24px; height: 2px; transition: transform 200ms linear; }`;
+    style.textContent = `
+        [data-pf-part="tab-content"] { position: relative; display: inline-flex; }
+        [data-pf-part="indicator"] { position: absolute; left: 0; right: 0; bottom: 0; height: 2px; transition: transform 200ms linear; }`;
     afterEach(() => style.remove());
 
     const letters = (value: () => string, indicators = ["a", "b"]) => (
@@ -220,11 +274,16 @@ describe("Tabs, the indicator's slide", () => {
         const [slide] = b!.getAnimations();
         expect(slide).toBeDefined();
         slide!.pause();
+        // From the old indicator's box, resized to the new one's content.
+        const from = a!.getBoundingClientRect();
+        const to = b!.parentElement!.getBoundingClientRect();
+        expect(from.width).toBeLessThan(to.width);
         slide!.currentTime = 0;
-        expect(b!.getBoundingClientRect().left).toBeCloseTo(
-            a!.getBoundingClientRect().left,
-            0,
-        );
+        expect(b!.getBoundingClientRect().left).toBeCloseTo(from.left, 0);
+        expect(b!.getBoundingClientRect().width).toBeCloseTo(from.width, 0);
+        slide!.finish();
+        expect(b!.getBoundingClientRect().left).toBeCloseTo(to.left, 0);
+        expect(b!.getBoundingClientRect().width).toBeCloseTo(to.width, 0);
     });
 
     it("changes at once when the old tab has no indicator", async () => {
