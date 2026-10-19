@@ -8,7 +8,7 @@ import { afterAll, beforeAll, expect, inject, it } from "vitest";
 
 declare module "vitest" {
     interface ProvidedContext {
-        /** The demo's dev server, started by `vitest-e2e-server.ts`. */
+        /** The demo's dev server, started and warmed up by `vitest-e2e-server.ts`. */
         demoUrl: string;
         /** A system Chromium to use instead of Playwright's download, or "". */
         chromiumPath: string;
@@ -21,26 +21,8 @@ const url = (path: string) => new URL(path, inject("demoUrl")).href;
 
 beforeAll(async () => {
     const executablePath = inject("chromiumPath");
+    // The global setup has compiled the pages, so each visit starts on a warm server.
     browser = await chromium.launch(executablePath ? { executablePath } : {});
-    // A first visit lets the dev server optimize the dependencies the pages load, which reloads
-    // the page; the tests start once a visit opens the panel without one.
-    const page = await browser.newPage();
-    for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-            await page.goto(url("/budget"), { waitUntil: "networkidle" });
-            await page
-                .getByRole("button", { name: "Settings and apps" })
-                .click();
-            await page
-                .getByRole("dialog", { name: "Settings" })
-                .waitFor({ timeout: 10_000 });
-            await page.waitForLoadState("networkidle");
-            break;
-        } catch {
-            // Reloaded under us; visit again.
-        }
-    }
-    await page.close();
 });
 
 afterAll(() => browser?.close());
