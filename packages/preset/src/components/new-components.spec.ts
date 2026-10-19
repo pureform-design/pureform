@@ -3,6 +3,7 @@ import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
+import { pureform } from "../pureform";
 import { dialog } from "./dialog";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
@@ -105,8 +106,7 @@ describe("progress", () => {
         );
     });
 
-    it("adds its keyframes to the pureform config", async () => {
-        const { pureform } = await import("../pureform");
+    it("adds its keyframes to the pureform config", () => {
         expect(Object.keys(pureform().keyframes ?? {})).toEqual(
             expect.arrayContaining([
                 "linearProgressSlide",
