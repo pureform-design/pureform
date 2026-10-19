@@ -65,6 +65,7 @@ import type { ComponentType, ReactNode } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
 import type { Root } from "react-dom/client";
+import * as ReactNative from "react-native";
 import { View } from "react-native";
 import { afterEach, beforeAll, describe, expect, it } from "vitest";
 import { commands, userEvent } from "vitest/browser";
@@ -271,14 +272,37 @@ const mouse = async (
     return point;
 };
 
-/** Waits until `read` gives the same value three frames running (state colors may fade). */
+// Animated holds an interaction handle while each tween runs (React Native Web's
+// `InteractionManager`, which React Native's types no longer have), so the handles open tell
+// whether a fade is still running.
+const { InteractionManager } = ReactNative as unknown as {
+    InteractionManager: {
+        createInteractionHandle(): number;
+        clearInteractionHandle(handle: number): void;
+    };
+};
+const tweens = new Set<number>();
+const { createInteractionHandle, clearInteractionHandle } = InteractionManager;
+InteractionManager.createInteractionHandle = () => {
+    const handle = createInteractionHandle.call(InteractionManager);
+    tweens.add(handle);
+    return handle;
+};
+InteractionManager.clearInteractionHandle = (handle) => {
+    tweens.delete(handle);
+    clearInteractionHandle.call(InteractionManager, handle);
+};
+
+/** Waits until `read` gives the same value three frames running with no tween running (state
+ *  colors fade). Frames alone can't tell: a fade's color can stay on one 8-bit step for three
+ *  frames, more so under load, where React draws each step a render late. */
 const stable = async <T>(read: () => T): Promise<T> => {
     let last = read();
     let same = 0;
     for (let i = 0; i < 120 && same < 3; i++) {
         await frame();
         const now = read();
-        same = now === last ? same + 1 : 0;
+        same = now === last && tweens.size === 0 ? same + 1 : 0;
         last = now;
     }
     return last;
