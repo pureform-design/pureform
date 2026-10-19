@@ -184,7 +184,7 @@ const rnTree = (
                 : createElement(
                       View,
                       {
-                          key: slot,
+                          key: `${id}.${slot}`,
                           testID: `${id}.${slot}`,
                           style: bySlot[slot] as object,
                       },
