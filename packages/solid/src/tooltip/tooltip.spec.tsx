@@ -116,4 +116,49 @@ describe("Tooltip, ready-made", () => {
         await until(() => expect(byTestId(ids.positioner).hidden).toBe(true));
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
+
+    it("lets the pointer through as it opens, so the trigger under it keeps the pointer", async () => {
+        withRegistry(() => (
+            <Tooltip
+                trigger="Save"
+                supportingText="Save to drafts"
+                openDelay={0}
+            />
+        ));
+        await settle();
+        const trigger = byTestId(ids.trigger);
+        const positioner = byTestId(ids.positioner);
+        await pointerOff(trigger);
+        // What the pointer hits the moment the tooltip shows: Zag lays it out at the corner of its
+        // containing block, over the trigger, before it places it.
+        let hit: Element | null = null;
+        const shows = new MutationObserver(() => {
+            if (positioner.hidden || hit) return;
+            const box = trigger.getBoundingClientRect();
+            hit = document.elementFromPoint(
+                box.left + box.width / 2,
+                box.top + box.height / 2,
+            );
+        });
+        shows.observe(positioner, { attributeFilter: ["hidden"] });
+        await userEvent.hover(trigger);
+        await until(() => expect(hit).not.toBeNull());
+        shows.disconnect();
+        expect(trigger.contains(hit)).toBe(true);
+    });
+
+    it("keeps the pointer on a rich tooltip, for its actions", async () => {
+        withRegistry(() => (
+            <Tooltip
+                trigger="Drafts"
+                variant="rich"
+                supportingText="Drafts stay here."
+                defaultOpen
+            />
+        ));
+        await settle();
+        expect(getComputedStyle(byTestId(ids.positioner)).pointerEvents).toBe(
+            "auto",
+        );
+    });
 });
