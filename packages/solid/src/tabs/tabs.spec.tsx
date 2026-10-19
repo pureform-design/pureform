@@ -1,6 +1,6 @@
 import { compositeTestIds } from "@pureform/anatomy";
-import { Errored } from "solid-js";
-import { describe, expect, it, vi } from "vitest";
+import { createSignal, Errored } from "solid-js";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Tabs } from ".";
@@ -179,5 +179,61 @@ describe("Tabs, composed", () => {
         expect(byTestId("error").textContent).toMatch(
             /<Tabs.Label> must be inside <Tabs.Tab>/,
         );
+    });
+});
+
+describe("Tabs, the indicator's slide", () => {
+    // The registry's indicator has no styles here: give each a box and a transition, as the preset
+    // does.
+    const style = document.createElement("style");
+    style.textContent = `[data-pf-part="indicator"] { display: block; width: 24px; height: 2px; transition: transform 200ms linear; }`;
+    afterEach(() => style.remove());
+
+    const letters = (value: () => string, indicators = ["a", "b"]) => (
+        <Tabs.Root value={value()}>
+            <Tabs.List aria-label="Letters">
+                <Tabs.Tab value="a">
+                    <Tabs.Label>A</Tabs.Label>
+                    {indicators.includes("a") && <Tabs.Indicator />}
+                </Tabs.Tab>
+                <Tabs.Tab value="b">
+                    <Tabs.Label>Bravo</Tabs.Label>
+                    {indicators.includes("b") && <Tabs.Indicator />}
+                </Tabs.Tab>
+            </Tabs.List>
+        </Tabs.Root>
+    );
+
+    it("slides the new tab's indicator in from the old one's, not on mount", async () => {
+        document.head.append(style);
+        const [value, setValue] = createSignal("a");
+        withRegistry(() => letters(value));
+        await settle();
+        const [a, b] = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${ids.indicator}"]`,
+            ),
+        ];
+        expect(a!.getAnimations()).toEqual([]);
+        setValue("b");
+        await settle();
+        const [slide] = b!.getAnimations();
+        expect(slide).toBeDefined();
+        slide!.pause();
+        slide!.currentTime = 0;
+        expect(b!.getBoundingClientRect().left).toBeCloseTo(
+            a!.getBoundingClientRect().left,
+            0,
+        );
+    });
+
+    it("changes at once when the old tab has no indicator", async () => {
+        document.head.append(style);
+        const [value, setValue] = createSignal("a");
+        withRegistry(() => letters(value, ["b"]));
+        await settle();
+        setValue("b");
+        await settle();
+        expect(byTestId(ids.indicator).getAnimations()).toEqual([]);
     });
 });
