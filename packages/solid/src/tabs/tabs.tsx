@@ -1,6 +1,7 @@
 // The tabs: Root on Zag's tabs machine, an unstyled element around the tab list and the panels; the
 // tab list and its tabs (each a button with an icon, a label, and the active indicator), as the
-// preset draws them; a panel per tab; and the ready-made Tabs over them.
+// preset draws them; a panel per tab; and the ready-made Tabs over them. When the selected tab
+// changes, its indicator slides in from the one selected before.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
 import {
@@ -22,14 +23,17 @@ import type {
     TabsItem,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
+import { slideIndicator } from "@pureform/binding-core/dom";
 import * as tabs from "@pureform/machines/tabs";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createEffect,
     createMemo,
     createUniqueId,
     For,
     omit,
+    onCleanup,
     Show,
     untrack,
 } from "solid-js";
@@ -53,6 +57,8 @@ interface TabsContextValue {
     readonly api: Accessor<tabs.Api<PropTypes>>;
     readonly disabled: Accessor<boolean | undefined>;
     readonly sources: ItemInteractionSources;
+    /** Each tab's indicator element, with its tab's value. */
+    readonly indicators: Map<Element, Accessor<string>>;
 }
 
 /** What a tab shares with its parts. */
@@ -119,9 +125,35 @@ function Root(props: TabsRootProps): JSX.Element {
         unstyled: () => props.unstyled,
         indication: () => props.indication,
     });
+    const indicators = new Map<Element, Accessor<string>>();
+    const indicatorOf = (value: string) => {
+        for (const [element, of] of indicators) {
+            if (of() === value) return element;
+        }
+        return undefined;
+    };
+    // The value whose indicator shows: none until mounted, so the first selection doesn't slide.
+    let shown: string | null | undefined;
+    createEffect(
+        () => api().value,
+        (value) => {
+            const previous = shown;
+            shown = value;
+            if (previous == null || value == null || previous === value) return;
+            untrack(() =>
+                slideIndicator(indicatorOf(previous), indicatorOf(value)),
+            );
+        },
+    );
     return (
         <context.Provider
-            value={{ scope, api, disabled: () => props.disabled, sources }}
+            value={{
+                scope,
+                api,
+                disabled: () => props.disabled,
+                sources,
+                indicators,
+            }}
         >
             {scope.render("root", {
                 element: "div",
@@ -200,12 +232,21 @@ function Label(props: TabsPartProps): JSX.Element {
     });
 }
 
-/** The line under a tab, which the CSS shows while it's selected. Empty. */
+/** The line under a tab, which the CSS shows while it's selected, sliding in from the tab
+ *  selected before. Empty. */
 function Indicator(props: TabsPartProps): JSX.Element {
-    const { scope } = context.use("Indicator");
-    tabContext.use("Indicator");
+    const { scope, indicators } = context.use("Indicator");
+    const { value } = tabContext.use("Indicator");
+    let element: Element | undefined;
+    onCleanup(() => {
+        if (element) indicators.delete(element);
+    });
     return scope.render("indicator", {
         element: "span",
+        ref: (el) => {
+            element = el;
+            indicators.set(el, value);
+        },
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });
