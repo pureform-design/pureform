@@ -757,6 +757,31 @@ tooltip is its own component, `richTooltip` (`root`, `caret`, `subhead`, `suppor
 The `caret` takes the surface's color through its `color`; the binding draws Zag's arrow tip
 inside it in `currentColor`.
 
+## Toast
+
+Outside Material 3, skinned with its tokens: notifications that stack, several at once, with a
+status. Material's single message is the snackbar.
+
+```html
+<div class="{group}" role="region">
+    <div class="{root}" role="status" data-type="success">
+        <span class="{icon}" aria-hidden="true">✓</span>
+        <div class="{title}">Saved</div>
+        <div class="{description}">Your changes are saved.</div>
+        <button class="{actionTrigger}">Undo</button>
+        <button class="{closeTrigger}" aria-label="Dismiss">×</button>
+    </div>
+</div>
+```
+
+`group` is the outermost part (Zag places it); it holds the tokens and stacks at the `snackbar`
+layer. The root is `surfaceContainerHigh` with a level 3 shadow; the icon and close button sit in
+its inline padding. `type` (`info` by default, `success`, `warning`, `error`, `loading`) colors the
+icon from the theme's color groups (`loading` takes `primary`); every Material palette fills
+`success` and `warning`, from a static theme or a runtime seed. No compounds. The bindings move
+each toast with Zag's stacking variables, and the root transitions its transform, opacity and
+height (the movement drops out under reduced motion).
+
 ## Slider and progress
 
 The slider (on Zag's slider machine in the bindings) and the linear progress indicators read

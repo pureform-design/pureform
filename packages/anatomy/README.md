@@ -85,26 +85,28 @@ interface PartAnatomy<P extends string = string> {
   options are the menu's items, so `menuAnatomy`, `selectMenuAnatomy`, and `menuOverlayAnatomy`
   carry the menu's entry; `tabsCompositeAnatomy` carries the tabs'.
 
-| Component                     | Trigger      | Surface                        | Centered | Focus    |
-| ----------------------------- | ------------ | ------------------------------ | -------- | -------- |
-| button, chip, card, list item | `root`       | `root`                         | no       | `root`   |
-| card, with an action area     | `actionArea` | `root` (layer in `actionArea`) | no       | `root`   |
-| tabs                          | `tab`        | `tab`                          | no       | `tab`    |
-| menu (items, select options)  | `item`       | `item`                         | no       | `item`   |
-| snackbar                      | `action`     | `action`                       | no       | `action` |
-|                               | `close`      | `close`                        | no       | `close`  |
-| icon button                   | `root`       | `container`                    | yes      | `root`   |
-| FAB                           | `root`       | `container`                    | no       | `root`   |
-| FAB menu                      | `closeTrigger` | `closeTrigger`               | no       | `closeTrigger` |
-|                               | `item`       | `item`                         | no       | `item`   |
-| split button                  | `leadingButton` | `leadingButton`             | no       | `leadingButton` |
-|                               | `trailingButton` | `trailingButton`           | no       | `trailingButton` |
-| navigation bar and rail       | `item`       | `indicator`                    | yes      | `item`   |
-| checkbox, radio               | `input`      | `root`                         | yes      | `root`   |
-| switch                        | `input`      | `stateLayer`                   | yes      | `root`   |
-| slider                        | `handle`     | `stateLayer`                   | yes      | `handle` |
-| input chip                    | `root`       | `root`                         | no       | `root`   |
-|                               | `remove`     | `remove`                       | yes      | `remove` |
+| Component                     | Trigger          | Surface                        | Centered | Focus            |
+| ----------------------------- | ---------------- | ------------------------------ | -------- | ---------------- |
+| button, chip, card, list item | `root`           | `root`                         | no       | `root`           |
+| card, with an action area     | `actionArea`     | `root` (layer in `actionArea`) | no       | `root`           |
+| tabs                          | `tab`            | `tab`                          | no       | `tab`            |
+| menu (items, select options)  | `item`           | `item`                         | no       | `item`           |
+| snackbar                      | `action`         | `action`                       | no       | `action`         |
+|                               | `close`          | `close`                        | no       | `close`          |
+| toast                         | `actionTrigger`  | `actionTrigger`                | no       | `actionTrigger`  |
+|                               | `closeTrigger`   | `closeTrigger`                 | no       | `closeTrigger`   |
+| icon button                   | `root`           | `container`                    | yes      | `root`           |
+| FAB                           | `root`           | `container`                    | no       | `root`           |
+| FAB menu                      | `closeTrigger`   | `closeTrigger`                 | no       | `closeTrigger`   |
+|                               | `item`           | `item`                         | no       | `item`           |
+| split button                  | `leadingButton`  | `leadingButton`                | no       | `leadingButton`  |
+|                               | `trailingButton` | `trailingButton`               | no       | `trailingButton` |
+| navigation bar and rail       | `item`           | `indicator`                    | yes      | `item`           |
+| checkbox, radio               | `input`          | `root`                         | yes      | `root`           |
+| switch                        | `input`          | `stateLayer`                   | yes      | `root`           |
+| slider                        | `handle`         | `stateLayer`                   | yes      | `handle`         |
+| input chip                    | `root`           | `root`                         | no       | `root`           |
+|                               | `remove`         | `remove`                       | yes      | `remove`         |
 
 ## Public API
 

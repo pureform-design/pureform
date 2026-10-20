@@ -42,6 +42,7 @@ export default createConfig({
                     separator: "src/separator/index.ts",
                     slider: "src/slider/index.ts",
                     snackbar: "src/snackbar/index.ts",
+                    toast: "src/toast/index.ts",
                     "supporting-text": "src/supporting-text/index.ts",
                     switch: "src/switch/index.ts",
                     tabs: "src/tabs/index.ts",

@@ -11,6 +11,7 @@ import {
     tagsInputAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
+    toastAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
@@ -24,6 +25,7 @@ import {
     chipAnatomy as inputChip,
 } from "./tags-input/tags-input.anatomy";
 import { anatomy as textField } from "./text-field/text-field.anatomy";
+import { anatomy as toast } from "./toast";
 
 interface Pair {
     machine: { keys(): string[] };
@@ -41,6 +43,7 @@ const pairs: Record<string, Pair> = {
     inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
     textArea: { machine: textField, preset: textAreaAnatomy },
+    toast: { machine: toast, preset: toastAnatomy },
 };
 
 const missing = ({ machine, preset }: Pair) =>

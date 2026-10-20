@@ -124,6 +124,12 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("actionColor"), token("container"), TEXT_CONTRAST),
     ],
+    toast: [
+        pair(token("titleColor"), token("container"), TEXT_CONTRAST),
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("actionColor"), token("container"), TEXT_CONTRAST),
+        pair(token("accent"), token("container"), UI_CONTRAST),
+    ],
     tooltip: [pair(token("content"), token("container"), TEXT_CONTRAST)],
     richTooltip: [
         pair(token("content"), token("container"), TEXT_CONTRAST),

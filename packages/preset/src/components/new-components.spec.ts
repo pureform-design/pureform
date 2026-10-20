@@ -19,6 +19,7 @@ import { select } from "./select";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
+import { toast } from "./toast";
 import { positionCorners, POSITIONS } from "./tiles";
 import { tooltip } from "./tooltip";
 
@@ -34,6 +35,7 @@ describe.each([
     ["navigationBar", navigationBar],
     ["navigationRail", navigationRail],
     ["snackbar", snackbar],
+    ["toast", toast],
     ["tooltip", tooltip],
     ["richTooltip", richTooltip],
     ["slider", slider],

@@ -247,6 +247,17 @@
                 "default": "./dist/snackbar.jsx"
             }
         },
+        "./toast": {
+            "types": "./dist/toast/index.d.ts",
+            "solid": {
+                "development": "./src/toast/index.ts",
+                "default": "./dist/toast.jsx"
+            },
+            "import": {
+                "development": "./src/toast/index.ts",
+                "default": "./dist/toast.jsx"
+            }
+        },
         "./select": {
             "types": "./dist/select/index.d.ts",
             "solid": {

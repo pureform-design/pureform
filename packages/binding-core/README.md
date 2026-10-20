@@ -271,6 +271,22 @@ interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, 
                                          // onOpenChange ({ open, reason }), testId, unstyled
 SNACKBAR_ROOT_PROPS; SNACKBAR_CONTENT_PROPS; // supportingText, action, closeLabel, closeIcon
 snackbarSelection(props); snackbarMachineProps(props);
+interface SnackbarQueueOptions<Node>     // what a queued snackbar shows: layout, tokens, indication, the
+                                         // content props, duration, onAction, onOpenChange, testId
+interface SnackbarQueueApi<Options>      // show(options) → id; dismiss(id?)
+interface SnackbarHostPlacementProps<L>  // offset: the room to leave below the host (a nav bar's)
+// SnackbarRootOwnProps also takes onExitComplete, called once it has closed and its exit is over
+
+// Toast: Zag's toast; the generated toastAnatomy (group outermost, then root, icon, title,
+// description, actionTrigger, closeTrigger)
+type ToastType                           // "info" | "success" | "warning" | "error" | "loading"
+interface ToasterOptions                 // placement, max, duration, gap, overlap, offsets
+TOASTER_DEFAULTS; toasterOptions(options); // bottom-end, 3, 5000 ms, 8px, stacked, 16px
+interface ToasterOwnProps                // tokens, indication, label, closeLabel, testId, unstyled
+TOASTER_PROPS; isToastType(type); TOAST_GLYPHS; // text glyphs by type (React Native)
+toastSelection(type, props);             // an unknown type selects `info`
+TOAST_STACK_STYLE;                       // Zag's --x, --y, --scale, --opacity, --height applied
+toastGroupStyle(style);                  // Zag's region style, physical insets, no z-index
 
 // Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, tabContent, icon, label, indicator,
 // content)

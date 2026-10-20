@@ -250,6 +250,15 @@ export const overlaysRegistry = () =>
             "action",
             "close",
         ]),
+        toast: named("toast", [
+            "group",
+            "root",
+            "icon",
+            "title",
+            "description",
+            "actionTrigger",
+            "closeTrigger",
+        ]),
         button: named("button", ["root", "touchTarget", "icon", "label"]),
     });
 

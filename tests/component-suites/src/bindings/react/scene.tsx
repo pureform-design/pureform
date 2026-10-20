@@ -46,9 +46,16 @@ import { TagsInput } from "@pureform/react/tags-input";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
+import { createToaster, Toaster } from "@pureform/react/toast";
+import type { ToastData } from "@pureform/react/toast";
 import { Tooltip } from "@pureform/react/tooltip";
 import { TouchTarget } from "@pureform/react/touch-target";
-import { createElement, type ComponentType, type ReactNode } from "react";
+import {
+    createElement,
+    type ComponentType,
+    type ReactNode,
+    useState,
+} from "react";
 
 import { registry } from "#registry";
 
@@ -60,6 +67,24 @@ import type {
     SceneProps,
 } from "../../harness/scene";
 import { sceneTheme } from "../../harness/themes";
+
+/** The toaster with the scene's `toasts` in it, each staying until closed. */
+function ToastScene({
+    toasts,
+    ...props
+}: { readonly toasts?: readonly Partial<ToastData>[] } & Record<
+    string,
+    unknown
+>): ReactNode {
+    const [toaster] = useState(() => {
+        const store = createToaster();
+        for (const toast of toasts ?? []) {
+            store.create({ duration: Infinity, ...toast });
+        }
+        return store;
+    });
+    return <Toaster toaster={toaster} {...props} />;
+}
 
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ComponentType<never>> = {
@@ -101,6 +126,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Text,
     TextArea,
     TextField,
+    Toast: ToastScene,
     Tooltip,
     TouchTarget,
 };

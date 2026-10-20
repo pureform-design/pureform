@@ -45,11 +45,13 @@ import { TagsInput } from "@pureform/solid/tags-input";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
+import { createToaster, Toaster } from "@pureform/solid/toast";
+import type { ToastData } from "@pureform/solid/toast";
 import { Tooltip } from "@pureform/solid/tooltip";
 import { TouchTarget } from "@pureform/solid/touch-target";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import type { Accessor } from "solid-js";
+import { type Accessor, omit, untrack } from "solid-js";
 
 import { registry } from "#registry";
 
@@ -61,6 +63,20 @@ import type {
     SceneProps,
 } from "../../harness/scene";
 import { sceneTheme } from "../../harness/themes";
+
+/** The toaster with the scene's `toasts` in it, each staying until closed. */
+function ToastScene(
+    props: { readonly toasts?: readonly Partial<ToastData>[] } & Record<
+        string,
+        unknown
+    >,
+): JSX.Element {
+    const toaster = createToaster();
+    for (const toast of untrack(() => props.toasts) ?? []) {
+        toaster.create({ duration: Infinity, ...toast });
+    }
+    return <Toaster toaster={toaster} {...(omit(props, "toasts") as object)} />;
+}
 
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ValidComponent> = {
@@ -102,6 +118,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Text,
     TextArea,
     TextField,
+    Toast: ToastScene,
     Tooltip,
     TouchTarget,
 };

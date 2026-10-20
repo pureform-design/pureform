@@ -80,7 +80,9 @@ describe("themeAttributes", () => {
 describe.each(COMPONENTS)("$component", (component) => {
     describe.each(THEMES)("%s", (theme) => {
         it("is written on the provider's element", async () => {
-            const { host } = mountCase(component, {}, { provider: { theme } });
+            const { host } = mountCase(component, component.themedProps ?? {}, {
+                provider: { theme },
+            });
             await harness.settle();
             const provider = host.firstElementChild!;
             for (const [name, value] of Object.entries(
@@ -95,23 +97,18 @@ describe.each(COMPONENTS)("$component", (component) => {
         it("draws as under the attribute set by hand", async () => {
             const provided = await drawn(
                 component,
-                mountCase(
-                    component,
-                    {},
-                    { host: unhovered(), provider: { theme } },
-                ),
+                mountCase(component, component.themedProps ?? {}, {
+                    host: unhovered(),
+                    provider: { theme },
+                }),
             );
             const byHand = await drawn(
                 component,
-                mountCase(
-                    component,
-                    {},
-                    {
-                        host: hostIn(
-                            `<div style="pointer-events: none" ${markup(registry.themeAttributes(theme))}><div data-host></div></div>`,
-                        ),
-                    },
-                ),
+                mountCase(component, component.themedProps ?? {}, {
+                    host: hostIn(
+                        `<div style="pointer-events: none" ${markup(registry.themeAttributes(theme))}><div data-host></div></div>`,
+                    ),
+                }),
             );
             expect(provided).toEqual(byHand);
         });
@@ -120,10 +117,15 @@ describe.each(COMPONENTS)("$component", (component) => {
     it.skipIf(component.themed === false)(
         "draws differently in teal than in the base theme",
         async () => {
-            const base = await drawn(component, mountCase(component));
+            const base = await drawn(
+                component,
+                mountCase(component, component.themedProps ?? {}),
+            );
             const teal = await drawn(
                 component,
-                mountCase(component, {}, { provider: { theme: "teal" } }),
+                mountCase(component, component.themedProps ?? {}, {
+                    provider: { theme: "teal" },
+                }),
             );
             expect(teal).not.toEqual(base);
         },
@@ -153,7 +155,7 @@ describe.each(COMPONENTS.filter((component) => component.themed !== false))(
                 try {
                     const scene = mountCase(
                         component,
-                        {},
+                        component.themedProps ?? {},
                         { host: unhovered(), provider: { seed: "#006A60" } },
                     );
                     const scope = scene.host.firstElementChild!.getAttribute(
@@ -171,20 +173,18 @@ describe.each(COMPONENTS.filter((component) => component.themed !== false))(
                     const teal = colorsOf(
                         await drawn(
                             component,
-                            mountCase(
-                                component,
-                                {},
-                                {
-                                    host: unhovered(),
-                                    provider: { theme: "teal" },
-                                },
-                            ),
+                            mountCase(component, component.themedProps ?? {}, {
+                                host: unhovered(),
+                                provider: { theme: "teal" },
+                            }),
                         ),
                     );
                     const base = colorsOf(
                         await drawn(
                             component,
-                            mountCase(component, {}, { host: unhovered() }),
+                            mountCase(component, component.themedProps ?? {}, {
+                                host: unhovered(),
+                            }),
                         ),
                     );
                     expect(runtime).toEqual(teal);
