@@ -7,7 +7,6 @@
 import { splitButtonAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
-    menuItemProps,
     SPLIT_BUTTON_MENU_LABEL,
     SPLIT_BUTTON_ROOT_PROPS,
     splitButtonMachineProps,
@@ -15,7 +14,6 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
-    MenuItem,
     SplitButtonContentProps,
     SplitButtonRootOwnProps,
 } from "@pureform/binding-core";
@@ -202,32 +200,6 @@ export interface SplitButtonProps
         SlotKeyedProps<Anatomy>,
         SplitButtonContentProps<ReactNode> {}
 
-const renderItem = (item: MenuItem<ReactNode>) => (
-    <Menu.Item key={item.value} {...menuItemProps(item)}>
-        {isPresent(item.leadingIcon) ? (
-            <Menu.ItemLeading mirror={item.mirrorLeadingIcon}>
-                {item.leadingIcon}
-            </Menu.ItemLeading>
-        ) : null}
-        <Menu.ItemContent>
-            <Menu.ItemLabel>{item.label}</Menu.ItemLabel>
-            {isPresent(item.supportingText) ? (
-                <Menu.ItemSupportingText>
-                    {item.supportingText}
-                </Menu.ItemSupportingText>
-            ) : null}
-        </Menu.ItemContent>
-        {isPresent(item.trailingIcon) ? (
-            <Menu.ItemTrailing mirror={item.mirrorTrailingIcon}>
-                {item.trailingIcon}
-            </Menu.ItemTrailing>
-        ) : null}
-        {isPresent(item.trailingText) ? (
-            <Menu.ItemTrailingText>{item.trailingText}</Menu.ItemTrailingText>
-        ) : null}
-    </Menu.Item>
-);
-
 /** The ready-made split button: the leading button with its icon and label, the trailing button
  *  with its arrow, and the menu with an item per entry of `items`. */
 function ReadyMade(props: SplitButtonProps): ReactNode {
@@ -261,7 +233,11 @@ function ReadyMade(props: SplitButtonProps): ReactNode {
                     {isPresent(trailingIcon) ? trailingIcon : <ArrowIcon />}
                 </TrailingIcon>
             </TrailingButton>
-            <SplitButtonMenu>{items.map(renderItem)}</SplitButtonMenu>
+            <SplitButtonMenu>
+                {items.map((item) => (
+                    <Menu.ItemEntry key={item.value} item={item} />
+                ))}
+            </SplitButtonMenu>
         </Root>
     );
 }

@@ -7,7 +7,6 @@
 import { splitButtonAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
-    menuItemProps,
     SPLIT_BUTTON_CONTENT_PROPS,
     SPLIT_BUTTON_MENU_LABEL,
     SPLIT_BUTTON_ROOT_PROPS,
@@ -16,12 +15,11 @@ import {
 } from "@pureform/binding-core";
 import type {
     InteractionSourceProps,
-    MenuItem,
     SplitButtonContentProps,
     SplitButtonRootOwnProps,
 } from "@pureform/binding-core";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, For, omit, Show } from "solid-js";
+import { type Accessor, omit } from "solid-js";
 
 import {
     useInteractionHandlers,
@@ -240,42 +238,7 @@ function ReadyMade(props: SplitButtonProps): JSX.Element {
                 </TrailingIcon>
             </TrailingButton>
             <SplitButtonMenu>
-                <For
-                    each={props.items ?? []}
-                    keyed={(item: MenuItem<JSX.Element>) => item.value}
-                >
-                    {(item) => (
-                        <Menu.Item {...menuItemProps(item())}>
-                            <Show when={isPresent(item().leadingIcon)}>
-                                <Menu.ItemLeading
-                                    mirror={item().mirrorLeadingIcon}
-                                >
-                                    {item().leadingIcon}
-                                </Menu.ItemLeading>
-                            </Show>
-                            <Menu.ItemContent>
-                                <Menu.ItemLabel>{item().label}</Menu.ItemLabel>
-                                <Show when={isPresent(item().supportingText)}>
-                                    <Menu.ItemSupportingText>
-                                        {item().supportingText}
-                                    </Menu.ItemSupportingText>
-                                </Show>
-                            </Menu.ItemContent>
-                            <Show when={isPresent(item().trailingIcon)}>
-                                <Menu.ItemTrailing
-                                    mirror={item().mirrorTrailingIcon}
-                                >
-                                    {item().trailingIcon}
-                                </Menu.ItemTrailing>
-                            </Show>
-                            <Show when={isPresent(item().trailingText)}>
-                                <Menu.ItemTrailingText>
-                                    {item().trailingText}
-                                </Menu.ItemTrailingText>
-                            </Show>
-                        </Menu.Item>
-                    )}
-                </For>
+                <Menu.Items items={props.items ?? []} />
             </SplitButtonMenu>
         </Root>
     );
