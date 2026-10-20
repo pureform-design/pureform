@@ -1,16 +1,19 @@
 // What the text field and the text area share: Root on pureform's text field machine, the
-// field's parts as the preset draws them (a container holding the optional icons, the native
-// input or text area, and the floating label, then the supporting text), and the ready-made
-// component over them. Each component builds its own from `createTextInput`.
+// field's parts as the preset draws them (a container holding the optional icons and affixes,
+// the native input or text area, and the floating label, then the supporting text and the
+// counter), and the ready-made component over them. Each component builds its own from
+// `createTextInput`.
 
 import type { textAreaAnatomy, textFieldAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    TEXT_FIELD_AFFIX_PROPS,
     TEXT_FIELD_CONTENT_PROPS,
     textFieldMachineProps,
     textFieldNativeDefault,
 } from "@pureform/binding-core";
 import type {
+    TextFieldAffixProps,
     TextFieldBehaviorProps,
     TextFieldContentProps,
 } from "@pureform/binding-core";
@@ -50,6 +53,8 @@ interface TextInputContextValue {
     readonly setInput: (input: TextControl | null) => void;
     /** Puts the input back to the controlled value after typing; see `Input`. Stable. */
     readonly restoreInput: (input: TextControl) => void;
+    /** A secure field: the trailing icon is the visibility toggle. */
+    readonly secure: boolean;
 }
 
 /** A part's props: the element's own, and the part's `unstyled`. */
@@ -74,6 +79,8 @@ interface TextInputConfig<A extends Anatomy> {
     /** The ready-made component's props that go on the input. */
     readonly inputProps: readonly string[];
     readonly selection: (props: never) => Selection<A["name"]>;
+    /** Whether the ready-made component renders prefix and suffix text (the text field). */
+    readonly affixes?: boolean | undefined;
 }
 
 type RootProps = TextFieldBehaviorProps & {
@@ -82,11 +89,33 @@ type RootProps = TextFieldBehaviorProps & {
     readonly unstyled?: unknown;
     readonly leadingIcon?: boolean | undefined;
     readonly trailingIcon?: boolean | undefined;
+    readonly prefixText?: boolean | undefined;
+    readonly suffixText?: boolean | undefined;
+    readonly secure?: boolean | undefined;
 };
 
-type ReadyMadeProps = Omit<RootProps, "leadingIcon" | "trailingIcon"> &
+type ReadyMadeProps = Omit<
+    RootProps,
+    "leadingIcon" | "trailingIcon" | "prefixText" | "suffixText"
+> &
     SlotKeyedProps<Anatomy> &
-    TextFieldContentProps<ReactNode>;
+    TextFieldContentProps<ReactNode> &
+    TextFieldAffixProps<ReactNode>;
+
+/** The icon a secure field's toggle shows unless given another: Material's visibility icon,
+ *  crossed out while the text shows. */
+const VisibilityIcon = ({ off }: { readonly off: boolean }): ReactNode => (
+    <svg
+        viewBox="0 0 24 24"
+        width="1em"
+        height="1em"
+        fill="currentColor"
+        aria-hidden="true"
+    >
+        <path d="M12 5C7 5 2.7 8.1 1 12.5 2.7 16.9 7 20 12 20s9.3-3.1 11-7.5C21.3 8.1 17 5 12 5zm0 12.5a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" />
+        {off ? <path d="M3.3 2 2 3.3l18.7 18.7 1.3-1.3z" /> : null}
+    </svg>
+);
 
 /** Builds a text input's parts and ready-made component. */
 export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
@@ -148,7 +177,15 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             config.rootProps as never,
         ) as { as?: ElementType } & Record<string, unknown>;
         return (
-            <context.Provider value={{ scope, api, setInput, restoreInput }}>
+            <context.Provider
+                value={{
+                    scope,
+                    api,
+                    setInput,
+                    restoreInput,
+                    secure: !!props.secure,
+                }}
+            >
                 {scope.render("root", {
                     element: "div",
                     as,
@@ -213,10 +250,17 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             mirror,
             ...props
         }: TextInputIconProps): ReactNode {
-            const { scope } = context.use(name);
+            const { scope, api, secure } = context.use(name);
+            // A secure field's trailing icon is the button that shows or hides the text.
+            const toggles = part === "trailingIcon" && secure;
             return scope.render(part, {
-                element: "span",
-                machine: { "aria-hidden": "true" },
+                element: toggles ? "button" : "span",
+                machine: toggles
+                    ? (api.getVisibilityTriggerProps() as Record<
+                          string,
+                          unknown
+                      >)
+                    : { "aria-hidden": "true" },
                 states: { mirrored: mirror },
                 unstyled,
                 props,
@@ -225,8 +269,54 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
 
     /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
     const LeadingIcon = icon("leadingIcon", "LeadingIcon");
-    /** An icon at the end of the field. Turn on Root's `trailingIcon` with it. */
+    /** An icon at the end of the field. Turn on Root's `trailingIcon` with it. In a `secure`
+     *  field it is the button that shows or hides the text. */
     const TrailingIcon = icon("trailingIcon", "TrailingIcon");
+
+    const affix = (part: "prefixText" | "suffixText", name: string) =>
+        function Affix({ unstyled, ...props }: TextInputPartProps): ReactNode {
+            const { scope, api } = context.use(name);
+            return scope.render(part as never, {
+                element: "span",
+                machine:
+                    part === "prefixText"
+                        ? api.getPrefixTextProps()
+                        : api.getSuffixTextProps(),
+                unstyled,
+                props,
+            });
+        };
+
+    /** Text before the input, shown once the label floats. Turn on Root's `prefixText` with it. */
+    const PrefixText = affix("prefixText", "PrefixText");
+    /** Text after the input, shown once the label floats. Turn on Root's `suffixText` with it. */
+    const SuffixText = affix("suffixText", "SuffixText");
+
+    /** The row holding the supporting text and the counter. */
+    function SupportingRow({
+        unstyled,
+        ...props
+    }: TextInputPartProps): ReactNode {
+        const { scope, api } = context.use("SupportingRow");
+        return scope.render("supportingRow", {
+            element: "div",
+            machine: api.getSupportingRowProps(),
+            unstyled,
+            props,
+        });
+    }
+
+    /** The character count, `3 / 20` under Root's `counterMax`, at the end of the supporting
+     *  row. It turns to the error color once the value is longer. */
+    function Counter({ unstyled, ...props }: TextInputPartProps): ReactNode {
+        const { scope, api } = context.use("Counter");
+        return scope.render("counter", {
+            element: "span",
+            machine: api.getCounterProps(),
+            unstyled,
+            props: { ...props, children: props.children ?? api.counterText },
+        });
+    }
 
     /** Helper text under the field. While the field has an error, it shows the error instead. */
     function SupportingText({
@@ -244,7 +334,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
 
     // Inside Root, so it can read whether an error shows.
     function Content({ own }: { readonly own: ReadyMadeProps }): ReactNode {
-        const { api } = context.use("Root");
+        const { api, secure } = context.use("Root");
         const slot = useSlotProps(own);
         const showsSupporting =
             isPresent(own.supportingText) || api.errorText !== undefined;
@@ -253,6 +343,11 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             inputProps[key] = (own as Record<string, unknown>)[key];
         if (showsSupporting && inputProps["aria-describedby"] === undefined)
             inputProps["aria-describedby"] = api.supportingTextId;
+        const supporting = showsSupporting ? (
+            <SupportingText {...slot("supportingText")}>
+                {own.supportingText}
+            </SupportingText>
+        ) : null;
         return (
             <>
                 <Container {...slot("container")}>
@@ -264,22 +359,39 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                             {own.leadingIcon}
                         </LeadingIcon>
                     ) : null}
+                    {config.affixes && isPresent(own.prefixText) ? (
+                        <PrefixText {...slot("prefixText")}>
+                            {own.prefixText}
+                        </PrefixText>
+                    ) : null}
                     <Input {...inputProps} {...slot("input")} />
+                    {config.affixes && isPresent(own.suffixText) ? (
+                        <SuffixText {...slot("suffixText")}>
+                            {own.suffixText}
+                        </SuffixText>
+                    ) : null}
                     <Label {...slot("label")}>{own.label}</Label>
-                    {isPresent(own.trailingIcon) ? (
+                    {isPresent(own.trailingIcon) || secure ? (
                         <TrailingIcon
                             mirror={own.mirrorTrailingIcon}
                             {...slot("trailingIcon")}
                         >
-                            {own.trailingIcon}
+                            {isPresent(own.trailingIcon) ? (
+                                own.trailingIcon
+                            ) : (
+                                <VisibilityIcon off={api.revealed} />
+                            )}
                         </TrailingIcon>
                     ) : null}
                 </Container>
-                {showsSupporting ? (
-                    <SupportingText {...slot("supportingText")}>
-                        {own.supportingText}
-                    </SupportingText>
-                ) : null}
+                {api.counterText !== undefined ? (
+                    <SupportingRow {...slot("supportingRow")}>
+                        {supporting}
+                        <Counter {...slot("counter")} />
+                    </SupportingRow>
+                ) : (
+                    supporting
+                )}
             </>
         );
     }
@@ -289,6 +401,7 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
         "style",
         "slotProps",
         ...TEXT_FIELD_CONTENT_PROPS,
+        ...TEXT_FIELD_AFFIX_PROPS,
         ...config.inputProps,
     ];
 
@@ -304,7 +417,15 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             <Root
                 {...rootProps}
                 leadingIcon={isPresent(props.leadingIcon) || undefined}
-                trailingIcon={isPresent(props.trailingIcon) || undefined}
+                trailingIcon={
+                    isPresent(props.trailingIcon) || !!props.secure || undefined
+                }
+                prefixText={
+                    (config.affixes && isPresent(props.prefixText)) || undefined
+                }
+                suffixText={
+                    (config.affixes && isPresent(props.suffixText)) || undefined
+                }
                 // The root's slot props are an element's, whose `defaultValue` takes more types.
                 {...(slot("root") as object)}
             >
@@ -319,10 +440,14 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             Root,
             Container,
             LeadingIcon,
+            PrefixText,
             Input,
+            SuffixText,
             Label,
             TrailingIcon,
+            SupportingRow,
             SupportingText,
+            Counter,
         },
     };
 }

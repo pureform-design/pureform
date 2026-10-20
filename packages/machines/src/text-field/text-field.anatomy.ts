@@ -4,9 +4,13 @@ export const anatomy = createAnatomy("text-field").parts(
     "root",
     "container",
     "leadingIcon",
+    "prefixText",
     "label",
     "input",
+    "suffixText",
     "trailingIcon",
+    "supportingRow",
     "supportingText",
+    "counter",
 );
 export const parts = anatomy.build();

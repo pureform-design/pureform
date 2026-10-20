@@ -4,6 +4,7 @@ import { createSplitProps } from "@zag-js/utils";
 import type { TextFieldProps } from "./text-field.types";
 
 export const props = createProps<TextFieldProps>()([
+    "counterMax",
     "defaultValue",
     "dir",
     "disabled",
@@ -18,6 +19,8 @@ export const props = createProps<TextFieldProps>()([
     "placeholder",
     "readOnly",
     "required",
+    "revealLabel",
+    "secure",
     "validate",
     "value",
 ]);

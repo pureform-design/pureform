@@ -3,7 +3,9 @@
 // A select is a text field whose input picks from a menu: a read-only combobox with the
 // arrow as its trailing icon, which turns while the menu is open. Mark the input
 // `aria-expanded="true"` then, and render the menu component below it. Opening, closing, and
-// choosing are the app's job.
+// choosing are the app's job. Optional prefix and suffix text sit around the value, as in the
+// text field (`prefixText`, `suffixText`). The options are drawn with the menu's parts; option
+// groups come with the menu's group parts.
 //
 //   <div class={root}>
 //     <div class={container}>
@@ -28,7 +30,14 @@ import {
 } from "@pureform/core/ast";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
+import {
+    AFFIX_FIELD_SLOTS,
+    AFFIX_FIELD_STRUCTURE,
+    AFFIX_TOKENS,
+    affixParts,
+    fieldParts,
+    fieldTokens,
+} from "./field";
 import {
     DEFAULT_GROUP,
     defaultDensities,
@@ -39,13 +48,14 @@ import {
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
-const { tokens, ref } = fieldTokens("select");
+const { tokens, ref } = fieldTokens("select", AFFIX_TOKENS);
 
 const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
     labelRest: pct(50),
     iconRoom: "input",
     density: true,
 });
+const affixes = affixParts(ref, variant);
 
 const EXPANDED = slot("container", "expanded");
 
@@ -69,24 +79,36 @@ export const createSelect = <
             name: "select",
             $meta: {
                 description:
-                    "Material select field over a read-only combobox input. Mark it aria-expanded while its menu is open; render the menu component below.",
+                    "Material select field over a read-only combobox input. Mark it aria-expanded while its menu is open; render the menu component below. Turn on prefixText or suffixText when you render one.",
             },
             tokens,
-            slots: [...FIELD_SLOTS],
-            structure: FIELD_STRUCTURE,
+            slots: [...AFFIX_FIELD_SLOTS],
+            structure: AFFIX_FIELD_STRUCTURE,
             variants: {
                 variant: ["filled", "outlined"],
                 color: groups as ColorGroups,
                 leadingIcon: ["true", "false"],
                 trailingIcon: ["true", "false"],
+                prefixText: ["true", "false"],
+                suffixText: ["true", "false"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
                 base: {
                     ...base,
                     ...icons.base,
-                    container: { ...base.container, height: density.height },
-                    input: { ...base.input, height: pct(100), cursor: pointer },
+                    ...affixes.base,
+                    container: {
+                        ...base.container,
+                        ...affixes.base.container,
+                        height: density.height,
+                    },
+                    input: {
+                        ...base.input,
+                        ...affixes.base.input,
+                        height: pct(100),
+                        cursor: pointer,
+                    },
                     // The arrow turns over while the menu is open.
                     trailingIcon: {
                         ...icons.base.trailingIcon,
@@ -103,9 +125,19 @@ export const createSelect = <
                     },
                 },
                 variants: {
-                    variant,
+                    variant: {
+                        filled: {
+                            ...variant.filled,
+                            ...affixes.variant.filled,
+                        },
+                        outlined: {
+                            ...variant.outlined,
+                            ...affixes.variant.outlined,
+                        },
+                    },
                     color: color.color,
-                    ...icons.variants,
+                    ...affixes.icons,
+                    ...affixes.variants,
                     ...density.variants,
                 },
                 compoundVariants: [...icons.compoundVariants],
@@ -114,6 +146,7 @@ export const createSelect = <
                     color: DEFAULT_GROUP,
                     variant: "filled",
                     ...icons.defaultVariants,
+                    ...affixes.defaultVariants,
                     ...density.defaultVariants,
                     trailingIcon: "true",
                 },

@@ -278,6 +278,7 @@ export type {
 export {
     TEXT_AREA_INPUT_PROPS,
     TEXT_AREA_ROOT_PROPS,
+    TEXT_FIELD_AFFIX_PROPS,
     TEXT_FIELD_CONTENT_PROPS,
     TEXT_FIELD_INPUT_PROPS,
     TEXT_FIELD_ROOT_PROPS,
@@ -290,6 +291,7 @@ export type {
     TextAreaPart,
     TextAreaRootOwnProps,
     TextAreaVariantProps,
+    TextFieldAffixProps,
     TextFieldBehaviorProps,
     TextFieldContentProps,
     TextFieldElementIds,

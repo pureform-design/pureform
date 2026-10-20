@@ -32,6 +32,21 @@ export const textField: ComponentCase = textInputCase({
         disabled: { disabled: true, defaultValue: "Ada" },
         "read-only": { readOnly: true, defaultValue: "Ada" },
         required: { required: true, name: "name" },
+        affixes: { prefixText: "$", suffixText: ".00", defaultValue: "12" },
+        "outlined affixes with icons": {
+            variant: "outlined",
+            leadingIcon: "@",
+            prefixText: "$",
+            suffixText: "kg",
+            defaultValue: "12",
+        },
+        counter: {
+            supportingText: "Your nickname",
+            counterMax: 10,
+            defaultValue: "Ada",
+        },
+        "counter over the limit": { counterMax: 2, defaultValue: "Ada" },
+        secure: { secure: true, defaultValue: "hunter2" },
     },
     keys: [
         { key: "a", does: "change" },

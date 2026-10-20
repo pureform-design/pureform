@@ -17,6 +17,13 @@ export function connect<T extends PropTypes>(
     const focused = !disabled && state.matches("focused");
     const filled = computed("filled");
     const readOnly = !!prop("readOnly");
+    const secure = !!prop("secure");
+    const revealed = context.get("revealed");
+    const counterMax = prop("counterMax");
+    const counterText =
+        counterMax === undefined
+            ? undefined
+            : `${value.length} / ${counterMax}`;
 
     const dataAttrs = {
         "data-disabled": dataAttr(disabled),
@@ -35,6 +42,8 @@ export function connect<T extends PropTypes>(
         form: prop("form"),
         defaultValue: value,
         placeholder: prop("placeholder"),
+        // A secure field hides its text until revealed; any other keeps the binding's `type`.
+        ...(secure ? { type: revealed ? "text" : "password" } : {}),
         disabled,
         readOnly,
         required: prop("required"),
@@ -58,6 +67,13 @@ export function connect<T extends PropTypes>(
         invalid,
         errorText: computed("errorText"),
         supportingTextId: dom.getSupportingTextId(scope),
+        counterId: dom.getCounterId(scope),
+        counterText,
+        overflow: computed("overflow"),
+        revealed,
+        setRevealed(next) {
+            send({ type: "REVEALED.SET", revealed: next });
+        },
         setValue(next) {
             send({ type: "VALUE.SET", value: next });
         },
@@ -96,6 +112,52 @@ export function connect<T extends PropTypes>(
                 ...dataAttrs,
                 id: dom.getSupportingTextId(scope),
                 dir: prop("dir"),
+            });
+        },
+        getSupportingRowProps() {
+            return normalize.element({
+                ...parts.supportingRow.attrs,
+                ...dataAttrs,
+                dir: prop("dir"),
+            });
+        },
+        getCounterProps() {
+            return normalize.element({
+                ...parts.counter.attrs,
+                ...dataAttrs,
+                "data-overflow": dataAttr(computed("overflow")),
+                id: dom.getCounterId(scope),
+                dir: prop("dir"),
+            });
+        },
+        getPrefixTextProps() {
+            return normalize.element({
+                ...parts.prefixText.attrs,
+                ...dataAttrs,
+                dir: prop("dir"),
+            });
+        },
+        getSuffixTextProps() {
+            return normalize.element({
+                ...parts.suffixText.attrs,
+                ...dataAttrs,
+                dir: prop("dir"),
+            });
+        },
+        getVisibilityTriggerProps() {
+            return normalize.button({
+                ...parts.trailingIcon.attrs,
+                ...dataAttrs,
+                type: "button",
+                dir: prop("dir"),
+                disabled,
+                "aria-label": prop("revealLabel"),
+                "aria-pressed": revealed,
+                "aria-controls": dom.getInputId(scope),
+                onClick() {
+                    if (disabled) return;
+                    send({ type: "REVEALED.SET", revealed: !revealed });
+                },
             });
         },
     };

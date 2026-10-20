@@ -29,6 +29,7 @@ const SECTIONS = [
     "color-groups",
     "text-fields",
     "icon-fields-and-areas",
+    "affixes-and-counter",
     "icons",
     "fabs",
     "shapes",
