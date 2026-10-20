@@ -179,25 +179,21 @@ function Trigger(props: SideSheetTriggerProps): JSX.Element {
 }
 
 /** Dims the page behind a modal sheet, drawn by the scrim; hidden once it's closed and its exit
- *  animation is over. A standard sheet renders none. */
+ *  animation is over. A standard sheet's stays hidden. */
 function Backdrop(props: SideSheetPartProps): JSX.Element {
     const { backdrop, api, presence, modal } = context.use("Backdrop");
-    return (
-        <Show when={modal()}>
-            {backdrop.render("root", {
-                element: "div",
-                machine: () =>
-                    mergeProps(
-                        api().getBackdropProps(),
-                        normalizeProps.element(
-                            dialogBackdropLayout(presence.present()),
-                        ),
-                    ),
-                unstyled: () => props.unstyled,
-                props: omit(props, "unstyled"),
-            })}
-        </Show>
-    );
+    return backdrop.render("root", {
+        element: "div",
+        machine: () =>
+            mergeProps(
+                api().getBackdropProps(),
+                normalizeProps.element(
+                    dialogBackdropLayout(modal() && presence.present()),
+                ),
+            ),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
 }
 
 /** Holds the sheet against the end edge of the viewport (in the page's layout when coplanar),

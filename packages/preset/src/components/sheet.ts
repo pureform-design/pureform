@@ -1,5 +1,5 @@
-// What the bottom and side sheets share: how they slide in from their edge and back out, and the
-// keyframes for it. A bottom sheet rises from the bottom; a side sheet comes in from the end edge,
+// What the bottom and side sheets share: how they slide in from their edge and back out, fading as
+// the other overlays do, and the keyframes for it. A bottom sheet rises from the bottom; a side sheet comes in from the end edge,
 // so its keyframes run the other way under right to left (translation is physical). Under reduced
 // motion both fade, as the other overlays do. A target without `data-state` (React Native) draws
 // no motion.
@@ -21,28 +21,64 @@ import type { DurationRole, EasingRole } from "@pureform/theme";
 /** The keyframes the sheets slide with; `pureform()` adds them to the config. */
 export const SHEET_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     bottomSheetIn: {
-        from: { transform: transform(translateY(pct(100))) },
-        to: { transform: transform(translateY(px(0))) },
+        from: {
+            opacity: unitless(0),
+            transform: transform(translateY(pct(100))),
+        },
+        to: {
+            opacity: unitless(1),
+            transform: transform(translateY(px(0))),
+        },
     },
     bottomSheetOut: {
-        from: { transform: transform(translateY(px(0))) },
-        to: { transform: transform(translateY(pct(100))) },
+        from: {
+            opacity: unitless(1),
+            transform: transform(translateY(px(0))),
+        },
+        to: {
+            opacity: unitless(0),
+            transform: transform(translateY(pct(100))),
+        },
     },
     sideSheetIn: {
-        from: { transform: transform(translateX(pct(100))) },
-        to: { transform: transform(translateX(px(0))) },
+        from: {
+            opacity: unitless(0),
+            transform: transform(translateX(pct(100))),
+        },
+        to: {
+            opacity: unitless(1),
+            transform: transform(translateX(px(0))),
+        },
     },
     sideSheetOut: {
-        from: { transform: transform(translateX(px(0))) },
-        to: { transform: transform(translateX(pct(100))) },
+        from: {
+            opacity: unitless(1),
+            transform: transform(translateX(px(0))),
+        },
+        to: {
+            opacity: unitless(0),
+            transform: transform(translateX(pct(100))),
+        },
     },
     sideSheetInRtl: {
-        from: { transform: transform(translateX(pct(-100))) },
-        to: { transform: transform(translateX(px(0))) },
+        from: {
+            opacity: unitless(0),
+            transform: transform(translateX(pct(-100))),
+        },
+        to: {
+            opacity: unitless(1),
+            transform: transform(translateX(px(0))),
+        },
     },
     sideSheetOutRtl: {
-        from: { transform: transform(translateX(px(0))) },
-        to: { transform: transform(translateX(pct(-100))) },
+        from: {
+            opacity: unitless(1),
+            transform: transform(translateX(px(0))),
+        },
+        to: {
+            opacity: unitless(0),
+            transform: transform(translateX(pct(-100))),
+        },
     },
     sheetFadeIn: {
         from: { opacity: unitless(0) },
