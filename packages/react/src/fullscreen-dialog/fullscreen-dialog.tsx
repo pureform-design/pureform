@@ -7,14 +7,13 @@
 // Nothing shows behind it, so there is no backdrop.
 
 import { fullscreenDialogOverlayAnatomy } from "@pureform/anatomy";
-import type { PartName, TestIdOverride } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
 import {
     dialogMachineProps,
     FULLSCREEN_DIALOG_ROOT_PROPS,
     fullscreenDialogPositionerLayout,
     fullscreenDialogSelection,
     isPresent,
-    presentProps,
 } from "@pureform/binding-core";
 import type {
     FullscreenDialogContentProps,
@@ -22,44 +21,17 @@ import type {
     FullscreenDialogRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
-import * as dialog from "@pureform/machines/dialog";
-import { mergeProps, normalizeProps } from "@zag-js/react";
-import type { PropTypes } from "@zag-js/react";
-import {
-    type ElementType,
-    type ReactNode,
-    type RefObject,
-    useId,
-    useRef,
-} from "react";
+import { type ElementType, type ReactNode } from "react";
 
 import { Button } from "../button";
-import { useControllable } from "../controllable";
+import { dialogParts } from "../dialog-parts";
 import { CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { useMachine } from "../machine";
-import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { usePresence } from "../presence";
-import type { Presence } from "../presence";
-import { omitProps } from "../props";
+import { useSlotProps } from "../parts";
+import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
 
 type Anatomy = typeof fullscreenDialogOverlayAnatomy;
-
-/** What Root shares with its parts. */
-interface FullscreenDialogContextValue {
-    readonly scope: ComponentScope<Anatomy>;
-    readonly api: dialog.Api<PropTypes>;
-    readonly presence: Presence;
-    readonly positioner: RefObject<HTMLElement | null>;
-}
-
-const context =
-    createPartContext<FullscreenDialogContextValue>("FullscreenDialog");
 
 /** Root's props: the tokens, the machine's props (`open`, `modal`, `role`, …), `testId` and
  *  `unstyled` for every part, `as`, and the element's own props. */
@@ -83,154 +55,66 @@ export interface FullscreenDialogTriggerProps extends FullscreenDialogPartProps 
     readonly [prop: string]: unknown;
 }
 
+const chrome = dialogParts({
+    name: "FullscreenDialog",
+    anatomy: fullscreenDialogOverlayAnatomy,
+    rootProps: FULLSCREEN_DIALOG_ROOT_PROPS,
+    selection: (props: FullscreenDialogRootProps) =>
+        fullscreenDialogSelection(props),
+    machineProps: dialogMachineProps,
+    positionerLayout: (present) => fullscreenDialogPositionerLayout(present),
+});
+
 /** The full-screen dialog's root, a `<div>` around the trigger and the dialog. The registry
  *  doesn't style it. */
-function Root(props: FullscreenDialogRootProps): ReactNode {
-    const id = useId();
-    const dir = useDirection();
-    const open = useControllable<"open", boolean>(
-        "FullscreenDialog",
-        "open",
-        props,
-    );
-    const service = useMachine(dialog.machine, {
-        id,
-        dir,
-        ...dialogMachineProps(props),
-        ...open.machineProps,
-    });
-    const api = dialog.connect(service, normalizeProps);
-    const positioner = useRef<HTMLElement | null>(null);
-    const presence = usePresence(api.open, (surface) =>
-        positioner.current
-            ? stackPositioner(positioner.current, surface)
-            : undefined,
-    );
-    const scope = useComponent(fullscreenDialogOverlayAnatomy, {
-        selection: fullscreenDialogSelection(props),
-        testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
-        unstyled: props.unstyled as Unstyled<PartName<Anatomy>> | undefined,
-    });
-    const { as, ...rest } = omitProps(props, FULLSCREEN_DIALOG_ROOT_PROPS);
-    return (
-        <context.Provider value={{ scope, api, presence, positioner }}>
-            {scope.render("root", { element: "div", as, props: rest })}
-        </context.Provider>
-    );
-}
+const Root: (props: FullscreenDialogRootProps) => ReactNode = chrome.Root;
 
 /** The button that opens the dialog. */
-function Trigger({
-    unstyled,
-    as,
-    ...props
-}: FullscreenDialogTriggerProps): ReactNode {
-    const { scope, api } = context.use("Trigger");
-    return scope.render("trigger", {
-        element: "button",
-        as: as as ElementType | undefined,
-        machine: api.getTriggerProps(),
-        unstyled,
-        props,
-    });
-}
+const Trigger: (props: FullscreenDialogTriggerProps) => ReactNode =
+    chrome.Trigger;
 
 /** Covers the viewport, which the dialog fills, stacked at its surface's layer; hidden once it's
  *  closed and its exit animation is over. The registry doesn't style it. */
-function Positioner({
-    unstyled,
-    ...props
-}: FullscreenDialogPartProps): ReactNode {
-    const { scope, api, presence, positioner } = context.use("Positioner");
-    return scope.render("positioner", {
-        element: "div",
-        ref: positioner,
-        machine: mergeProps(
-            api.getPositionerProps(),
-            normalizeProps.element(
-                fullscreenDialogPositionerLayout(presence.present),
-            ),
-        ),
-        unstyled,
-        props,
-    });
-}
+const Positioner: (props: FullscreenDialogPartProps) => ReactNode =
+    chrome.Positioner;
 
 /** The dialog's surface. It stays while its exit animation runs. */
-function Content({ unstyled, ...props }: FullscreenDialogPartProps): ReactNode {
-    const { scope, api, presence } = context.use("Content");
-    return scope.render("content", {
-        element: "div",
-        ref: presence.ref,
-        machine: presentProps(api.getContentProps(), presence.present),
-        unstyled,
-        props,
-    });
-}
+const Content: (props: FullscreenDialogPartProps) => ReactNode = chrome.Content;
 
 /** The row at the top: the close trigger, the headline, and the confirm action. */
-function Header({ unstyled, ...props }: FullscreenDialogPartProps): ReactNode {
-    const { scope } = context.use("Header");
-    return scope.render("header", { element: "div", unstyled, props });
-}
+const Header: (props: FullscreenDialogPartProps) => ReactNode = chrome.part(
+    "header",
+    "Header",
+    "div",
+);
 
 /** A button that closes the dialog: `as={IconButton}` draws it as one. Name it with
  *  `aria-label`. */
-function CloseTrigger({
-    unstyled,
-    as,
-    ...props
-}: FullscreenDialogTriggerProps): ReactNode {
-    const { scope, api } = context.use("CloseTrigger");
-    return scope.render("closeTrigger", {
-        element: "button",
-        as: as as ElementType | undefined,
-        machine: api.getCloseTriggerProps(),
-        unstyled,
-        props,
-    });
-}
+const CloseTrigger: (props: FullscreenDialogTriggerProps) => ReactNode =
+    chrome.trigger("closeTrigger", "CloseTrigger", (api) =>
+        api.getCloseTriggerProps(),
+    );
 
 /** The title, an `<h2>`, which names the dialog. */
-function Headline({
-    unstyled,
-    ...props
-}: FullscreenDialogPartProps): ReactNode {
-    const { scope, api } = context.use("Headline");
-    return scope.render("headline", {
-        element: "h2",
-        machine: api.getTitleProps(),
-        unstyled,
-        props,
-    });
-}
+const Headline: (props: FullscreenDialogPartProps) => ReactNode = chrome.part(
+    "headline",
+    "Headline",
+    "h2",
+    (api) => api.getTitleProps(),
+);
 
 /** The confirming action at the end of the header: `as={Button}` draws it as a text button. It
  *  doesn't close the dialog by itself; close it from your handler. */
-function ConfirmAction({
-    unstyled,
-    as,
-    ...props
-}: FullscreenDialogTriggerProps): ReactNode {
-    const { scope } = context.use("ConfirmAction");
-    return scope.render("confirmAction", {
-        element: "button",
-        as: as as ElementType | undefined,
-        unstyled,
-        props,
-    });
-}
+const ConfirmAction: (props: FullscreenDialogTriggerProps) => ReactNode =
+    chrome.trigger("confirmAction", "ConfirmAction");
 
 /** The content, which describes the dialog. It scrolls when it's taller than the screen. */
-function Body({ unstyled, ...props }: FullscreenDialogPartProps): ReactNode {
-    const { scope, api } = context.use("Body");
-    return scope.render("body", {
-        element: "div",
-        machine: api.getDescriptionProps(),
-        unstyled,
-        props,
-    });
-}
+const Body: (props: FullscreenDialogPartProps) => ReactNode = chrome.part(
+    "body",
+    "Body",
+    "div",
+    (api) => api.getDescriptionProps(),
+);
 
 /** The ready-made dialog's props: Root's, with `className`, `style`, and `slotProps` keyed by
  *  part, the trigger's label, and the close trigger's name and icon, the headline, the confirm

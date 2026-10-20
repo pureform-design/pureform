@@ -11,14 +11,12 @@ import {
     bottomSheetBackdropAnatomy,
     bottomSheetOverlayAnatomy,
 } from "@pureform/anatomy";
-import type { PartName, TestIdOverride } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
 import {
     BOTTOM_SHEET_ROOT_PROPS,
     bottomSheetPositionerLayout,
     bottomSheetSelection,
-    dialogBackdropLayout,
     isPresent,
-    presentProps,
     sheetContentLayout,
     sheetDragHandleLayout,
     sheetMachineProps,
@@ -30,48 +28,18 @@ import type {
     BottomSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { dragToDismiss, stackPositioner } from "@pureform/binding-core/dom";
-import * as dialog from "@pureform/machines/dialog";
+import { dragToDismiss } from "@pureform/binding-core/dom";
 import { mergeProps, normalizeProps } from "@zag-js/react";
-import type { PropTypes } from "@zag-js/react";
-import {
-    type ElementType,
-    type ReactNode,
-    type RefObject,
-    useCallback,
-    useId,
-    useRef,
-} from "react";
+import { type ElementType, type ReactNode, useCallback } from "react";
 
 import { Button } from "../button";
-import { useControllable } from "../controllable";
+import { dialogParts } from "../dialog-parts";
 import { DragHandle as DragHandleComponent } from "../drag-handle";
-import { useMachine } from "../machine";
-import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { usePresence } from "../presence";
-import type { Presence } from "../presence";
-import { omitProps } from "../props";
+import { useSlotProps } from "../parts";
+import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
 
 type Anatomy = typeof bottomSheetOverlayAnatomy;
-type BackdropAnatomy = typeof bottomSheetBackdropAnatomy;
-
-/** What Root shares with its parts. */
-interface BottomSheetContextValue {
-    readonly scope: ComponentScope<Anatomy>;
-    readonly backdrop: ComponentScope<BackdropAnatomy>;
-    readonly api: dialog.Api<PropTypes>;
-    readonly latestApi: RefObject<dialog.Api<PropTypes>>;
-    readonly presence: Presence;
-    readonly modal: boolean;
-    readonly positioner: RefObject<HTMLElement | null>;
-    readonly surface: RefObject<HTMLElement | null>;
-}
-
-const context = createPartContext<BottomSheetContextValue>("BottomSheet");
 
 /** Root's props: `modal` and the tokens, the machine's props (`open`, `closeOnEscape`, …),
  *  `testId` and `unstyled` for every part, `as`, and the element's own props. */
@@ -95,149 +63,47 @@ export interface BottomSheetTriggerProps extends BottomSheetPartProps {
     readonly [prop: string]: unknown;
 }
 
-// The backdrop's test id and `unstyled`, from Root's, which name it `backdrop`.
-const backdropTestId = (
-    testId: TestIdOverride<BottomSheetPart> | undefined,
-): TestIdOverride<"root"> | undefined =>
-    typeof testId !== "object"
-        ? testId
-        : testId.backdrop === undefined
-          ? undefined
-          : { root: testId.backdrop };
+const chrome = dialogParts({
+    name: "BottomSheet",
+    anatomy: bottomSheetOverlayAnatomy,
+    backdropAnatomy: bottomSheetBackdropAnatomy,
+    rootProps: BOTTOM_SHEET_ROOT_PROPS,
+    selection: (props: BottomSheetRootProps) => bottomSheetSelection(props),
+    machineProps: sheetMachineProps,
+    modal: sheetModal,
+    positionerLayout: (present, props) =>
+        bottomSheetPositionerLayout(present, sheetModal(props)),
+    contentLayout: sheetContentLayout,
+});
 
-const backdropUnstyled = (
-    unstyled: Unstyled<BottomSheetPart> | undefined,
-): Unstyled<"root"> | undefined =>
-    typeof unstyled !== "object"
-        ? unstyled
-        : unstyled.backdrop === undefined
-          ? undefined
-          : { root: unstyled.backdrop };
+const { context } = chrome;
 
 /** The sheet's root, a `<div>` around the trigger and the sheet. The registry doesn't style
  *  it. */
-function Root(props: BottomSheetRootProps): ReactNode {
-    const id = useId();
-    const dir = useDirection();
-    const open = useControllable<"open", boolean>("BottomSheet", "open", props);
-    const service = useMachine(dialog.machine, {
-        id,
-        dir,
-        ...sheetMachineProps(props),
-        ...open.machineProps,
-    });
-    const api = dialog.connect(service, normalizeProps);
-    const latestApi = useRef(api);
-    latestApi.current = api;
-    const positioner = useRef<HTMLElement | null>(null);
-    const surface = useRef<HTMLElement | null>(null);
-    const presence = usePresence(api.open, (element) =>
-        positioner.current
-            ? stackPositioner(positioner.current, element)
-            : undefined,
-    );
-    const scope = useComponent(bottomSheetOverlayAnatomy, {
-        selection: bottomSheetSelection(props),
-        testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
-        unstyled: props.unstyled as Unstyled<PartName<Anatomy>> | undefined,
-    });
-    const backdrop = useComponent(bottomSheetBackdropAnatomy, {
-        selection: {},
-        testId: backdropTestId(props.testId),
-        unstyled: backdropUnstyled(props.unstyled),
-    });
-    const { as, ...rest } = omitProps(props, BOTTOM_SHEET_ROOT_PROPS);
-    return (
-        <context.Provider
-            value={{
-                scope,
-                backdrop,
-                api,
-                latestApi,
-                presence,
-                modal: sheetModal(props),
-                positioner,
-                surface,
-            }}
-        >
-            {scope.render("root", { element: "div", as, props: rest })}
-        </context.Provider>
-    );
-}
+const Root: (props: BottomSheetRootProps) => ReactNode = chrome.Root;
 
 /** The button that opens the sheet. */
-function Trigger({
-    unstyled,
-    as,
-    ...props
-}: BottomSheetTriggerProps): ReactNode {
-    const { scope, api } = context.use("Trigger");
-    return scope.render("trigger", {
-        element: "button",
-        as: as as ElementType | undefined,
-        machine: api.getTriggerProps(),
-        unstyled,
-        props,
-    });
-}
+const Trigger: (props: BottomSheetTriggerProps) => ReactNode = chrome.Trigger;
 
 /** Dims the page behind a modal sheet, drawn by the scrim; hidden once it's closed and its exit
- *  animation is over. A standard sheet renders none. */
-function Backdrop({ unstyled, ...props }: BottomSheetPartProps): ReactNode {
-    const { backdrop, api, presence, modal } = context.use("Backdrop");
-    if (!modal) return null;
-    return backdrop.render("root", {
-        element: "div",
-        machine: mergeProps(
-            api.getBackdropProps(),
-            normalizeProps.element(dialogBackdropLayout(presence.present)),
-        ),
-        unstyled,
-        props,
-    });
-}
+ *  animation is over. A standard sheet's stays hidden. */
+const Backdrop: (props: BottomSheetPartProps) => ReactNode = chrome.Backdrop;
 
 /** Holds the sheet at the bottom of the viewport, stacked at its surface's layer; hidden once
  *  it's closed and its exit animation is over. The registry doesn't style it. */
-function Positioner({ unstyled, ...props }: BottomSheetPartProps): ReactNode {
-    const { scope, api, presence, modal, positioner } =
-        context.use("Positioner");
-    return scope.render("positioner", {
-        element: "div",
-        ref: positioner,
-        machine: mergeProps(
-            api.getPositionerProps(),
-            normalizeProps.element(
-                bottomSheetPositionerLayout(presence.present, modal),
-            ),
-        ),
-        unstyled,
-        props,
-    });
-}
+const Positioner: (props: BottomSheetPartProps) => ReactNode =
+    chrome.Positioner;
 
 /** The sheet's surface. It stays while its exit animation runs. */
-function Content({ unstyled, ...props }: BottomSheetPartProps): ReactNode {
-    const { scope, api, presence, surface } = context.use("Content");
-    const { ref: presenceRef } = presence;
-    const ref = useCallback(
-        (element: HTMLElement | null) => {
-            surface.current = element;
-            presenceRef(element);
-        },
-        [surface, presenceRef],
-    );
-    return scope.render("content", {
-        element: "div",
-        ref,
-        machine: mergeProps(
-            presentProps(api.getContentProps(), presence.present),
-            normalizeProps.element(sheetContentLayout),
-        ),
-        unstyled,
-        props,
-    });
-}
+const Content: (props: BottomSheetPartProps) => ReactNode = chrome.Content;
+
+/** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
+const Body: (props: BottomSheetPartProps) => ReactNode = chrome.part(
+    "body",
+    "Body",
+    "div",
+    (api) => api.getDescriptionProps(),
+);
 
 /** The drag handle at the top edge: a press closes the sheet, and so does a drag down past a
  *  quarter of its height. Name it with `aria-label`. It renders the drag handle component; give
@@ -267,17 +133,6 @@ function DragHandle({
             api.getCloseTriggerProps(),
             normalizeProps.element(sheetDragHandleLayout),
         ),
-        unstyled,
-        props,
-    });
-}
-
-/** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
-function Body({ unstyled, ...props }: BottomSheetPartProps): ReactNode {
-    const { scope, api } = context.use("Body");
-    return scope.render("body", {
-        element: "div",
-        machine: api.getDescriptionProps(),
         unstyled,
         props,
     });
