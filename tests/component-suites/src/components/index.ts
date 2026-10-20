@@ -29,6 +29,7 @@ import {
 } from "./static";
 import { switchControl } from "./switch";
 import { tabsCase } from "./tabs";
+import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
 import { tooltip } from "./tooltip";
@@ -64,6 +65,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     supportingText,
     switchControl,
     tabsCase,
+    tagsInput,
     text,
     textArea,
     textField,

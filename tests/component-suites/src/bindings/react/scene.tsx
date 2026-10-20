@@ -36,6 +36,7 @@ import { Snackbar } from "@pureform/react/snackbar";
 import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
 import { Tabs } from "@pureform/react/tabs";
+import { TagsInput } from "@pureform/react/tags-input";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
@@ -84,6 +85,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     SupportingText,
     Switch,
     Tabs,
+    TagsInput,
     Text,
     TextArea,
     TextField,

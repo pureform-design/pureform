@@ -34,6 +34,7 @@ const SECTIONS = [
     "fabs",
     "shapes",
     "chips",
+    "input-chips",
     "lists",
     "tabs",
     "row-colors",
