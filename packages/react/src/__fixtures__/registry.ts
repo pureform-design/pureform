@@ -202,6 +202,7 @@ export const overlaysRegistry = () =>
         snackbar: named("snackbar", [
             "root",
             "supportingText",
+            "actions",
             "action",
             "close",
         ]),

@@ -163,6 +163,12 @@ describe("overlays", () => {
     it("give the snackbar's root its id", () => {
         expect(snackbarMachineProps({ id: "saved" }).ids.root).toBe("saved");
         expect(snackbarMachineProps({ duration: null }).duration).toBeNull();
-        expect(snackbarSelection({})).toEqual({ tokens: undefined });
+        expect(snackbarSelection({})).toEqual({
+            layout: undefined,
+            tokens: undefined,
+        });
+        expect(snackbarSelection({ layout: "longAction" }).layout).toBe(
+            "longAction",
+        );
     });
 });
