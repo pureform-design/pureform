@@ -13,3 +13,5 @@ export type {
     SnackbarSchema as Schema,
     SnackbarService as Service,
 } from "./snackbar.types";
+export { createQueue } from "./snackbar.queue";
+export type { Queue, QueueItem, QueueOptions } from "./snackbar.queue";

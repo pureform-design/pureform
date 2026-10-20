@@ -131,6 +131,13 @@
                 "default": "./dist/tags-input.mjs"
             }
         },
+        "./toast": {
+            "types": "./dist/toast/index.d.ts",
+            "import": {
+                "development": "./src/toast/index.ts",
+                "default": "./dist/toast.mjs"
+            }
+        },
         "./form": {
             "types": "./dist/form/index.d.ts",
             "import": {
@@ -163,6 +170,7 @@
         "@zag-js/switch": "catalog:",
         "@zag-js/tabs": "catalog:",
         "@zag-js/tags-input": "catalog:",
+        "@zag-js/toast": "catalog:",
         "@zag-js/toggle-group": "catalog:",
         "@zag-js/tooltip": "catalog:",
         "@zag-js/types": "catalog:",
