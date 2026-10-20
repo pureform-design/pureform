@@ -13,6 +13,7 @@ import type {
     FieldSizingKeyword,
     DisplayKeyword,
     FlexDirectionKeyword,
+    FlexWrapKeyword,
     KeywordNode,
     LineStyleKeyword,
     OverflowKeyword,
@@ -82,6 +83,7 @@ export interface StyleMap {
     display?: Keyword<DisplayKeyword>;
     position?: Keyword<PositionKeyword>;
     flexDirection?: Keyword<FlexDirectionKeyword>;
+    flexWrap?: Keyword<FlexWrapKeyword>;
     alignItems?: Keyword<AlignKeyword>;
     justifyContent?: Keyword<AlignKeyword>;
     overflow?: Keyword<OverflowKeyword>;

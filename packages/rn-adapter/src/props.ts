@@ -178,6 +178,7 @@ export const rnKeyword = (property: string, keyword: string): string | null => {
         case "display":
             return keyword === "inlineFlex" ? "flex" : keyword;
         case "flexDirection":
+        case "flexWrap":
             return keyword.replace("Reverse", "-reverse");
         case "textAlign":
             return keyword === "start"

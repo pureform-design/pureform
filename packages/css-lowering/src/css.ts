@@ -16,6 +16,7 @@ export const KEYWORD_CSS: Record<string, string> = {
     spaceEvenly: "space-evenly",
     rowReverse: "row-reverse",
     columnReverse: "column-reverse",
+    wrapReverse: "wrap-reverse",
     notAllowed: "not-allowed",
 };
 
