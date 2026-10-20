@@ -24,6 +24,8 @@ export const navigationCase = (
     component: ComponentName,
     ids: typeof testIds.navigationBar | typeof testIds.navigationRail,
     anatomy: typeof navigationBarAnatomy | typeof navigationRailAnatomy,
+    /** The component's own examples: the bar's item layout, the rail's expanded form. */
+    own: ComponentCase["examples"] = {},
 ): ComponentCase => {
     const items = (host: HTMLElement) => [
         ...host.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
@@ -86,6 +88,7 @@ export const navigationCase = (
                 items: [...ITEMS.slice(0, 2), { ...ITEMS[2]!, disabled: true }],
             },
             disabled: { disabled: true, defaultValue: "home" },
+            ...own,
         },
         state: {
             prop: "value",
@@ -110,9 +113,28 @@ export const navigationBar = navigationCase(
     "NavigationBar",
     testIds.navigationBar,
     navigationBarAnatomy,
+    {
+        "horizontal items": { itemLayout: "horizontal", defaultValue: "home" },
+        "horizontal items, secondary color": {
+            itemLayout: "horizontal",
+            color: "secondary",
+            defaultValue: "search",
+        },
+    },
 );
 export const navigationRail = navigationCase(
     "NavigationRail",
     testIds.navigationRail,
     navigationRailAnatomy,
+    {
+        expanded: { expanded: true, defaultValue: "home" },
+        "expanded, with a mirrored icon": {
+            expanded: true,
+            defaultValue: "next",
+            items: [
+                ...ITEMS.slice(0, 2),
+                { value: "next", label: "Next", icon: "→", mirrorIcon: true },
+            ],
+        },
+    },
 );
