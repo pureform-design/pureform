@@ -52,6 +52,10 @@ each component's base sets them back to the theme's on its root. So a provider's
 reach every component, and a component's own tokens change it but not a component of the same
 kind nested inside it.
 
+The ring sits outside by default. A theme draws it inside every component instead (Compose's
+inset focus ring) with `state: materialState({}, {}, { focusRing: "inset" })`, base or named;
+that only moves the theme's outer offset to minus the thickness, so components need nothing.
+
 A custom component takes the same tokens with the exported pieces: spread `INDICATION_TOKENS`
 into its tokens and into its root's `tokens`, and draw its state layer with
 `stateLayer(ref, { base, content })`, `ref` being its own token reader.

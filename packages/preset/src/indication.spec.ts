@@ -4,6 +4,8 @@
 // where. Each such component sets its indication tokens back to the theme's on its root.
 
 import type { SlottedComponentSpec } from "@pureform/core/types";
+import { px } from "@pureform/core/ast";
+import { materialState } from "@pureform/material";
 import { describe, expect, it } from "vitest";
 
 import { pureform } from "./pureform";
@@ -111,4 +113,52 @@ describe("indication", () => {
             }
         },
     );
+});
+
+describe("focus ring", () => {
+    const inset = materialState({}, {}, { focusRing: "inset" });
+
+    it("is outer by default, and an explicit outer changes nothing", () => {
+        const outer = pureform({
+            state: materialState({}, {}, { focusRing: "outer" }),
+        });
+        expect(JSON.stringify(outer)).toBe(JSON.stringify(pureform()));
+        expect(pureform().tokens.sizes?.focusIndicatorOuterOffset).toEqual(
+            px(2),
+        );
+    });
+
+    it("moves inside the element under an inset theme, at minus its thickness", () => {
+        expect(
+            pureform({ state: inset }).tokens.sizes?.focusIndicatorOuterOffset,
+        ).toEqual(px(-3));
+        const thick = pureform({
+            state: materialState(
+                {},
+                { focusIndicatorThickness: 4, focusIndicatorOuterOffset: 6 },
+                { focusRing: "inset" },
+            ),
+        });
+        expect(thick.tokens.sizes?.focusIndicatorOuterOffset).toEqual(px(-4));
+    });
+
+    it("changes only the theme's offset, so every component's focus part follows it", () => {
+        const config = pureform({ state: inset });
+        expect(JSON.stringify(config.components)).toBe(
+            JSON.stringify(pureform().components),
+        );
+        const { focusIndicatorOuterOffset: _, ...sizes } =
+            config.tokens.sizes ?? {};
+        const { focusIndicatorOuterOffset: __, ...defaults } =
+            pureform().tokens.sizes ?? {};
+        expect(sizes).toEqual(defaults);
+    });
+
+    it("can be a named theme's choice", () => {
+        const config = pureform({ themes: { inset: { state: inset } } });
+        expect(JSON.stringify(config.themes?.inset)).toContain(
+            "focusIndicatorOuterOffset",
+        );
+        expect(config.tokens.sizes?.focusIndicatorOuterOffset).toEqual(px(2));
+    });
 });
