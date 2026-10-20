@@ -502,12 +502,13 @@ input; the label, icons, and supporting text follow it.
 - Prefix and suffix text (`textField` and `select`): render a `prefixText` before the input or a
   `suffixText` after it, and turn on the variant of the same name. They show once the label
   floats; the input hands them its inline padding (the `prefixed`/`suffixed` flag tokens).
-- Counter (`textField` and `textArea`): put the supporting text and a `counter` in a
-  `supportingRow`; the counter sits at its end and follows the field's error colour, so mark
-  the input invalid when the count is over the limit. Supporting text alone can stay in the root.
+- Counter (`textField` and `textArea`): put a `counter` after the supporting text in the root,
+  a wrapping row; it sits at the end of the supporting text's line and follows the field's
+  error colour, so mark the input invalid when the count is over the limit.
 - `secure` (`textField`): a password field. The trailing icon is a `<button>` that shows or
   hides the text; the variant draws it without button chrome and with a focus ring.
-- Nothing deprecated: no option was removed.
+- Removed: the `supportingRow` part (breaking). It held the supporting text and the counter
+  while core had no `flexWrap`; the root now wraps, so both sit in the root directly.
 
 ## Select
 
@@ -763,7 +764,10 @@ focus ring, no state layer.
 
 ```html
 <div class="{bottomSheet.root}" role="dialog" aria-label="Share">
-    <button class="{bottomSheet.dragHandle} {dragHandle.root}" aria-label="Close sheet">
+    <button
+        class="{bottomSheet.dragHandle} {dragHandle.root}"
+        aria-label="Close sheet"
+    >
         <span class="{dragHandle.handle}"></span>
     </button>
     <div class="{bottomSheet.content}">…</div>

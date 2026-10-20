@@ -528,7 +528,9 @@ describe("text field affixes, counter and secure", () => {
         expect(byTestId("pf-text-field-prefix-text").textContent).toBe("$");
         expect(byTestId("pf-text-field-suffix-text").textContent).toBe(".00");
         expect(byTestId("pf-text-field-counter").textContent).toBe("2 / 2");
-        expect(byTestId("pf-text-field-supporting-row")).toBeTruthy();
+        expect(byTestId("pf-text-field-counter").parentElement).toBe(
+            byTestId("pf-text-field-root"),
+        );
         const input = byTestId("pf-text-field-input") as HTMLInputElement;
         expect(input.getAttribute("aria-invalid")).not.toBe("true");
     });

@@ -9,7 +9,6 @@ export const anatomy = createAnatomy("text-field").parts(
     "input",
     "suffixText",
     "trailingIcon",
-    "supportingRow",
     "supportingText",
     "counter",
 );

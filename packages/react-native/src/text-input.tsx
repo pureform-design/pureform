@@ -196,19 +196,12 @@ function FieldImpl(props: FieldOptions): ReactNode {
                 </v.label.Text>
                 {icon("trailingIcon", props.trailingIcon)}
             </v.container.View>
+            {supporting}
             {counterText !== undefined ? (
-                <v.supportingRow.View
-                    style={s.supportingRow}
-                    testID={id("supportingRow")}
-                >
-                    {supporting}
-                    <v.counter.Text style={s.counter} testID={id("counter")}>
-                        {counterText}
-                    </v.counter.Text>
-                </v.supportingRow.View>
-            ) : (
-                supporting
-            )}
+                <v.counter.Text style={s.counter} testID={id("counter")}>
+                    {counterText}
+                </v.counter.Text>
+            ) : null}
         </v.root.View>
     );
 }
