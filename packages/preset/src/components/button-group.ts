@@ -35,6 +35,7 @@ import {
     motionTransition,
     STATE_TWEENS,
 } from "./shared";
+import { positionCorners } from "./tiles";
 import type { Position } from "./tiles";
 
 /** The gap between a standard group's buttons, per size (M3 Expressive's button group
@@ -80,20 +81,17 @@ export const groupCorners = (
         )
         .on(slot("root", "pressed"), ref("pressedInnerRadius"))
         .else(ref("innerRadius"));
-    const corners = (start: NumericValue, end: NumericValue): StyleMap => ({
-        borderStartStartRadius: start,
-        borderEndStartRadius: start,
-        borderStartEndRadius: end,
-        borderEndEndRadius: end,
-    });
-    return {
-        none: {},
-        first: corners(outer, inner),
-        middle: corners(inner, inner),
-        last: corners(inner, outer),
-        single: {},
-    };
+    return { ...positionCorners(outer, inner, "inline"), single: {} };
 };
+
+/** A grouped button's own tokens: its inner corners (where a connected group's buttons meet;
+ *  each size sets them from `GROUP_INNER_RADII`), and how much wider it grows while pressed,
+ *  which the `position` variant turns on in a standard group. */
+export const GROUPED_TOKENS = {
+    innerRadius: radius("small"),
+    pressedInnerRadius: radius("extraSmall"),
+    pressedGrowth: px(0),
+} satisfies Record<string, NumericValue>;
 
 /** How much wider a button in a standard group grows while pressed (Compose widens it by
  *  about 15%; a fixed step keeps it a token). */
@@ -108,6 +106,32 @@ export const GROUP_TRANSITION = motionTransition(
     tween("paddingInlineEnd", duration("medium1"), easing("emphasized")),
     tween("width", duration("medium1"), easing("emphasized")),
 );
+
+/** A grouped button's `position` variant: `single` in a standard group (it widens while
+ *  pressed, on `root`), and the run's corners in a connected one on each slot in `corners`
+ *  that draws them. */
+export const groupPositionVariant = <S extends string>(
+    ref: (token: GroupCornerToken) => NumericValue,
+    corners: readonly S[],
+): Record<Position, Partial<Record<S | "root", StyleMap>>> => {
+    const run = groupCorners(ref);
+    const at = (position: "first" | "middle" | "last") =>
+        Object.fromEntries(
+            corners.map((part) => [part, run[position]]),
+        ) as Record<S, StyleMap>;
+    return {
+        none: {},
+        first: at("first"),
+        middle: at("middle"),
+        last: at("last"),
+        single: {
+            root: {
+                tokens: { pressedGrowth: GROUP_GROWTH },
+                transition: GROUP_TRANSITION,
+            },
+        },
+    } as Record<Position, Partial<Record<S | "root", StyleMap>>>;
+};
 
 /** A grouped button's inner corners per size, at rest and pressed, for the button's and icon
  *  button's `innerRadius` and `pressedInnerRadius` tokens. */

@@ -43,10 +43,9 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
 import {
-    GROUP_GROWTH,
     GROUP_INNER_RADII,
-    GROUP_TRANSITION,
-    groupCorners,
+    GROUPED_TOKENS,
+    groupPositionVariant,
 } from "./button-group";
 import {
     DEFAULT_GROUP,
@@ -180,11 +179,8 @@ const { tokens, ref } = componentTokens("button", {
     secondaryIconSize: px(20),
     secondaryIconSpacing: spacing("1"),
     secondaryStart: unitless(0),
-    // A grouped button's inner corners (where a connected group's buttons meet), and how much
-    // wider it grows while pressed, which the `position` variant turns on in a standard group.
-    innerRadius: radius("small"),
-    pressedInnerRadius: radius("extraSmall"),
-    pressedGrowth: px(0),
+    // A grouped button's inner corners and pressed growth.
+    ...GROUPED_TOKENS,
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     // Each size's height and padding, so a theme can retune a size.
@@ -205,8 +201,6 @@ const grownPadding = (padding: NumericValue) =>
         add(padding, mul(ref("pressedGrowth"), unitless(0.5))),
         padding,
     );
-
-const GROUP_CORNERS = groupCorners(ref);
 
 /** A toggle button's colors per fill, off and on, as M3 Expressive's toggle buttons draw them. */
 const toggleColors = (
@@ -449,18 +443,7 @@ export const createButton = <
                     },
                     // Its place in a button group: `single` in a standard group (it widens
                     // while pressed), and the run's corners in a connected one.
-                    position: {
-                        none: {},
-                        first: { root: GROUP_CORNERS.first },
-                        middle: { root: GROUP_CORNERS.middle },
-                        last: { root: GROUP_CORNERS.last },
-                        single: {
-                            root: {
-                                tokens: { pressedGrowth: GROUP_GROWTH },
-                                transition: GROUP_TRANSITION,
-                            },
-                        },
-                    },
+                    position: groupPositionVariant(ref, ["root"]),
                     density: densityTokenVariant(densities),
                 },
                 // A toggle's colors need both its fill and the toggle: one compound per fill.

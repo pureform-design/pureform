@@ -35,25 +35,21 @@ import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
+import { chipShape } from "./chip";
 import {
     DEFAULT_GROUP,
-    INDICATION_ROOT,
     colorVariant,
     componentTokens,
     cornerMorphTokens,
     cornerMorphVariants,
-    cornerRadius,
-    cornerTransition,
     defaultDensities,
     defaultGroups,
-    dense,
     densitySteps,
     densityVariant,
     disabledColor,
     focusRing,
     iconBox,
     iconFill,
-    pressableRoot,
     sys,
     touchTarget,
     variantsOf,
@@ -101,14 +97,7 @@ const pullOut = (inset: "avatarInset" | "iconInset" | "removeInset") =>
     sub(ref(inset), ref("padding"));
 
 const root: StyleMap = {
-    ...INDICATION_ROOT,
-    ...pressableRoot(ref),
-    gap: ref("gap"),
-    height: dense(ref("height")),
-    paddingInlineStart: ref("padding"),
-    paddingInlineEnd: ref("padding"),
-    transition: cornerTransition,
-    borderRadius: cornerRadius(ref),
+    ...chipShape(ref),
     backgroundColor: stateLayer(ref, {
         base: ref("container"),
         content: ref("content"),
