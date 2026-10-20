@@ -333,6 +333,21 @@ progressPercent(props);                  // the value as a clamped percentage of
 progressSelection(props);                // the value token from the percentage, unless indeterminate
 progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
 
+// Autocomplete: Zag's combobox; the select's field with an editable input. The list shows the
+// items `filter` keeps (labels containing the text by default; `false` keeps all).
+type AutocompletePart; interface AutocompleteRootOwnProps // variants, items, filter, value,
+// inputValue, open, allowCustomValue, openOnClick, error, name, …
+AUTOCOMPLETE_ROOT_PROPS; autocompleteSelection(props); autocompleteMenuSelection(props);
+autocompleteMachineProps(props, fieldsetDisabled); autocompleteMatches(items, text, filter);
+
+// Search view: Zag's dialog (modal; focus goes back to the search bar) and Zag's combobox (the
+// query and its suggestions). The search bar is its trigger: a press, Enter, ArrowDown or a
+// typed key (opensSearchView) opens it.
+type SearchViewPart; interface SearchViewRootOwnProps // variant, items, filter, open, inputValue,
+// onSelect, onSubmit, closeOnSelect, placeholder, …
+SEARCH_VIEW_ROOT_PROPS; searchViewSelection(props); searchViewDialogProps(props, input);
+searchViewComboboxProps(props, open); searchViewPositionerLayout(variant, present);
+
 // Tags input: Zag's tags input; a text field whose values are input chips (`chip` sets their
 // variants: inputChipSelection(props.chip)). Tags aren't edited in place.
 type TagsInputPart; interface TagsInputRootOwnProps // variant, color, density, icons, tokens, chip,
