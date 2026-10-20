@@ -15,6 +15,7 @@ import type {
     SelectItem,
     SelectPart,
     SelectVariantProps,
+    TextFieldAffixProps,
 } from "@pureform/binding-core";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -54,7 +55,8 @@ const useShownLabel = (
 
 export interface SelectProps
     extends
-        Omit<SelectVariantProps, "leadingIcon">,
+        Omit<SelectVariantProps, "leadingIcon" | "prefixText" | "suffixText">,
+        TextFieldAffixProps<ReactNode>,
         IndicationProps,
         Omit<
             FieldProps,
@@ -116,6 +118,8 @@ export function Select(props: SelectProps): ReactNode {
                 selection={selectSelection({
                     ...props,
                     leadingIcon: isPresent(props.leadingIcon),
+                    prefixText: isPresent(props.prefixText),
+                    suffixText: isPresent(props.suffixText),
                 })}
                 testId={(part) => partId(selectAnatomy, part, testId)}
                 trailingIcon={props.trailingIcon ?? "▾"}

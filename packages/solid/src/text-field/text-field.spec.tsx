@@ -206,3 +206,82 @@ describe("TextArea, ready-made", () => {
         );
     });
 });
+
+describe("TextField, affixes, counter and secure", () => {
+    it("renders the prefix and suffix around the input, and makes room for them", async () => {
+        withRegistry(() => (
+            <TextField label="Price" prefixText="$" suffixText=".00" />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(parts(root)).toEqual([
+            "container",
+            "prefix-text",
+            "input",
+            "suffix-text",
+            "label",
+        ]);
+        expect(root.className).toContain("text-field--prefixText-true");
+        expect(root.className).toContain("text-field--suffixText-true");
+        expect(byTestId(ids.prefixText).textContent).toBe("$");
+    });
+
+    it("counts toward counterMax beside the supporting text, and turns invalid past it", async () => {
+        withRegistry(() => (
+            <TextField
+                label="Name"
+                supportingText="Your name"
+                counterMax={3}
+                defaultValue="Ada"
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(parts(root)).toEqual([
+            "container",
+            "input",
+            "label",
+            "supporting-row",
+            "supporting-text",
+            "counter",
+        ]);
+        expect(byTestId(ids.counter).textContent).toBe("3 / 3");
+        const input = byTestId<HTMLInputElement>(ids.input);
+        expect(input.getAttribute("aria-invalid")).toBeNull();
+        await userEvent.type(input, "!");
+        await settle();
+        expect(byTestId(ids.counter).textContent).toBe("4 / 3");
+        expect(input.getAttribute("aria-invalid")).toBe("true");
+    });
+
+    it("keeps supporting text out of a row without a counter", async () => {
+        withRegistry(() => (
+            <TextField label="Name" supportingText="Your name" />
+        ));
+        await settle();
+        expect(parts(byTestId(ids.root))).toEqual([
+            "container",
+            "input",
+            "label",
+            "supporting-text",
+        ]);
+    });
+
+    it("hides a secure field's text until its trailing icon reveals it", async () => {
+        withRegistry(() => <TextField label="Password" secure />);
+        await settle();
+        const root = byTestId(ids.root);
+        expect(root.className).toContain("text-field--secure-true");
+        expect(root.className).toContain("text-field--trailingIcon-true");
+        const input = byTestId<HTMLInputElement>(ids.input);
+        expect(input.type).toBe("password");
+        const toggle = byTestId<HTMLButtonElement>(ids.trailingIcon);
+        expect(toggle.tagName).toBe("BUTTON");
+        expect(toggle.getAttribute("aria-label")).toBe("Show password");
+        expect(toggle.getAttribute("aria-pressed")).toBe("false");
+        await userEvent.click(toggle);
+        await settle();
+        expect(input.type).toBe("text");
+        expect(toggle.getAttribute("aria-pressed")).toBe("true");
+    });
+});

@@ -143,10 +143,14 @@ const FIELD_SLOTS = [
     "root",
     "container",
     "leadingIcon",
+    "prefixText",
     "input",
+    "suffixText",
     "label",
     "trailingIcon",
+    "supportingRow",
     "supportingText",
+    "counter",
 ] as const;
 
 /** The text inputs' fake factories, all static: the text field, text area, select, and the menu
