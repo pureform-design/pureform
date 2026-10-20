@@ -1,0 +1,593 @@
+// The search view: Root, an unstyled positioned element around the trigger (the search bar that
+// opens the view) and the view; Zag's dialog (the view is modal: focus stays in it, and goes back
+// to the search bar once it closes) and Zag's combobox (the query and its suggestions), with the
+// view's surface over the viewport or over the bar's place, its header (leading and trailing
+// icons around the input), divider, and content, and the suggestions drawn as menu items. The
+// ready-made SearchView sits over them.
+
+import {
+    searchViewMenuAnatomy,
+    searchViewOverlayAnatomy,
+} from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
+import {
+    isPresent,
+    opensSearchView,
+    presentProps,
+    SEARCH_VIEW_COLLECTION,
+    SEARCH_VIEW_CONTENT_PROPS,
+    SEARCH_VIEW_ROOT_PROPS,
+    SEARCH_VIEW_ROOT_STYLE,
+    searchViewComboboxProps,
+    searchViewDialogProps,
+    searchViewLabel,
+    searchViewMatches,
+    searchViewMenuSelection,
+    searchViewPositionerLayout,
+    searchViewSelection,
+} from "@pureform/binding-core";
+import type {
+    SearchViewContentProps,
+    SearchViewItem,
+    SearchViewPart,
+    SearchViewRootOwnProps,
+    Unstyled,
+} from "@pureform/binding-core";
+import { stackPositioner } from "@pureform/binding-core/dom";
+import * as combobox from "@pureform/machines/combobox";
+import * as dialog from "@pureform/machines/dialog";
+import type { JSX, ValidComponent } from "@solidjs/web";
+import {
+    type Accessor,
+    createMemo,
+    createSignal,
+    createUniqueId,
+    For,
+    omit,
+    Show,
+    untrack,
+} from "solid-js";
+
+import { useControllable } from "../controllable";
+import { CloseIcon } from "../glyphs";
+import { IconButton } from "../icon-button";
+import { itemInteractionSources } from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
+import { mergeProps, normalizeProps, useMachine } from "../internal/zag";
+import type { PropTypes } from "../internal/zag";
+import { createPartContext } from "../part-context";
+import { createSlotProps, useComponent } from "../parts";
+import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
+import type { PartProps } from "../props";
+import { useDirection } from "../provider";
+import { SearchBar } from "../search-bar";
+
+type Anatomy = typeof searchViewOverlayAnatomy;
+type MenuAnatomy = typeof searchViewMenuAnatomy;
+
+/** What Root shares with its parts. */
+interface SearchViewContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly menu: ComponentScope<MenuAnatomy>;
+    readonly view: Accessor<dialog.Api<PropTypes>>;
+    readonly query: Accessor<combobox.Api<PropTypes>>;
+    readonly matches: Accessor<readonly SearchViewItem[]>;
+    readonly variant: Accessor<string | undefined>;
+    readonly presence: Presence;
+    readonly sources: ItemInteractionSources;
+    readonly setPositioner: (element: HTMLElement) => void;
+    readonly setInput: (element: HTMLInputElement) => void;
+    readonly submit: () => void;
+}
+
+interface ItemContextValue {
+    readonly item: Accessor<SearchViewItem>;
+}
+
+const context = createPartContext<SearchViewContextValue>("SearchView");
+const itemContext = createPartContext<ItemContextValue>("SearchView", "Item");
+
+/** Root's props: the variant and tokens, the machines' props (`open`, `inputValue`, `items`,
+ *  `onSelect`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
+export interface SearchViewRootProps
+    extends
+        Omit<PartProps, keyof SearchViewRootOwnProps>,
+        SearchViewRootOwnProps {
+    /** Another element or component to render instead of `<div>`. */
+    readonly as?: ValidComponent | undefined;
+}
+
+/** A part's props: the element's own, and the part's `unstyled`. */
+export interface SearchViewPartProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
+
+/** A leading or trailing part's props: a part's, and `mirror` to flip an icon under `rtl`. */
+export interface SearchViewIconProps extends SearchViewPartProps {
+    readonly mirror?: boolean | undefined;
+}
+
+/** A suggestion's props: the suggestion, as data, and a part's. */
+export interface SearchViewItemProps extends SearchViewPartProps {
+    readonly item: SearchViewItem;
+}
+
+/** The search view's root, a positioned `<div>` around the trigger and the view, so a docked
+ *  view drops over the search bar. The registry doesn't style it. */
+function Root(props: SearchViewRootProps): JSX.Element {
+    const id = createUniqueId();
+    const dir = useDirection();
+    const open = useControllable<"open", boolean>("SearchView", "open", props);
+    const inputValue = useControllable<"inputValue", string>(
+        "SearchView",
+        "inputValue",
+        props,
+    );
+    let input: HTMLInputElement | undefined;
+    const view = useMachine(dialog.machine, () => ({
+        id,
+        dir: dir(),
+        ...searchViewDialogProps(props, () => input ?? null),
+        ...open.machineProps(),
+    }));
+    const viewApi = createMemo(() => dialog.connect(view, normalizeProps));
+    const [typed, setTyped] = createSignal(
+        props.inputValue ?? props.defaultInputValue ?? "",
+    );
+    const matches = createMemo(() =>
+        searchViewMatches(props.items ?? [], typed(), props.filter),
+    );
+    const collection = createMemo(() =>
+        combobox.collection<SearchViewItem>({
+            items: matches(),
+            ...SEARCH_VIEW_COLLECTION,
+        }),
+    );
+    const close = () => {
+        if (props.closeOnSelect !== false) viewApi().setOpen(false);
+    };
+    const sources = itemInteractionSources();
+    const service = useMachine(combobox.machine, () => {
+        const text = inputValue.machineProps();
+        return {
+            id,
+            ...sources.machineProps,
+            dir: dir(),
+            collection: collection(),
+            ...searchViewComboboxProps(props, viewApi().open),
+            ...text,
+            onInputValueChange: (details: { inputValue: string }) => {
+                setTyped(details.inputValue);
+                text.onInputValueChange({ inputValue: details.inputValue });
+            },
+            onSelect: (details: { itemValue?: string | undefined }) => {
+                const value = details.itemValue;
+                if (value === undefined) return;
+                props.onSelect?.({
+                    value,
+                    item: untrack(matches).find((item) => item.value === value),
+                });
+                close();
+            },
+        };
+    });
+    const query = createMemo(() => combobox.connect(service, normalizeProps));
+    const submit = () => {
+        props.onSubmit?.({ inputValue: query().inputValue });
+        close();
+    };
+    let positioner: HTMLElement | undefined;
+    const presence = usePresence(
+        () => viewApi().open,
+        (surface) =>
+            positioner ? stackPositioner(positioner, surface) : undefined,
+    );
+    const scope = useComponent(searchViewOverlayAnatomy, {
+        selection: () => searchViewSelection(props),
+        testId: () => props.testId as TestIdOverride<keyof Anatomy["parts"]>,
+        unstyled: () => props.unstyled as Unstyled<keyof Anatomy["parts"]>,
+    });
+    const menu = useComponent(searchViewMenuAnatomy, {
+        selection: searchViewMenuSelection,
+        testId: () =>
+            typeof props.testId === "string" ? props.testId : undefined,
+        indication: () => props.indication,
+    });
+    return (
+        <context.Provider
+            value={{
+                scope,
+                menu,
+                view: viewApi,
+                query,
+                matches,
+                variant: () => props.variant as string | undefined,
+                presence,
+                sources,
+                setPositioner: (element) => {
+                    positioner = element;
+                },
+                setInput: (element) => {
+                    input = element;
+                },
+                submit,
+            }}
+        >
+            {scope.render("root", {
+                element: "div",
+                as: () => props.as,
+                machine: () => ({ style: SEARCH_VIEW_ROOT_STYLE }),
+                props: omit(props, "as", ...SEARCH_VIEW_ROOT_PROPS),
+            })}
+        </context.Provider>
+    );
+}
+
+/** Around the search bar that opens the view: a press on it, Enter, the down arrow, or typing
+ *  opens it, and a typed character carries over to the view's query. The registry doesn't style
+ *  it. */
+function Trigger(props: SearchViewPartProps): JSX.Element {
+    const { scope, view, query } = context.use("Trigger");
+    return scope.render("trigger", {
+        element: "div",
+        machine: () => ({
+            onClick: () => view().setOpen(true),
+            onKeyDown: (event: KeyboardEvent) => {
+                if (view().open || !opensSearchView(event)) return;
+                event.preventDefault();
+                if (event.key.length === 1)
+                    query().setInputValue(
+                        query().inputValue + event.key,
+                        "input-change",
+                    );
+                view().setOpen(true);
+            },
+        }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** Places the view over the viewport (`fullScreen`) or over the search bar's place, stacked at
+ *  its surface's layer; hidden once it's closed and its exit animation is over. The registry
+ *  doesn't style it. */
+function Positioner(props: SearchViewPartProps): JSX.Element {
+    const { scope, view, variant, presence, setPositioner } =
+        context.use("Positioner");
+    return scope.render("positioner", {
+        element: "div",
+        ref: setPositioner,
+        machine: () =>
+            mergeProps(
+                view().getPositionerProps(),
+                normalizeProps.element(
+                    searchViewPositionerLayout(variant(), presence.present()),
+                ),
+            ),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The view's surface, a modal dialog. It stays while its exit animation runs. */
+function Surface(props: SearchViewPartProps): JSX.Element {
+    const { scope, view, presence } = context.use("Surface");
+    return scope.render("surface", {
+        element: "div",
+        ref: presence.ref,
+        machine: () =>
+            presentProps(view().getContentProps(), presence.present()),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The row at the top: the leading icon, the input, and the trailing icons. */
+function Header(props: SearchViewPartProps): JSX.Element {
+    const { scope } = context.use("Header");
+    return scope.render("header", {
+        element: "div",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** Before the input: an icon, or an icon button such as back (the ready-made's closes the
+ *  view). */
+function Leading(props: SearchViewIconProps): JSX.Element {
+    const { scope } = context.use("Leading");
+    return scope.render("leading", {
+        element: "span",
+        states: () => ({ mirrored: props.mirror }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "mirror"),
+    });
+}
+
+/** The query: the combobox input, which takes focus as the view opens. The arrow keys move
+ *  through the suggestions, Enter chooses the highlighted one or submits the query, and Escape
+ *  closes the view. */
+function Input(props: SearchViewPartProps): JSX.Element {
+    const { scope, query, setInput, submit } = context.use("Input");
+    return scope.render("input", {
+        element: "input",
+        machine: () =>
+            mergeProps(
+                query().getInputProps(),
+                normalizeProps.input({
+                    type: "search",
+                    onKeyDown: (event: { readonly key: string }) => {
+                        if (
+                            event.key === "Enter" &&
+                            query().highlightedValue === null
+                        )
+                            submit();
+                    },
+                }),
+            ),
+        ref: (element) => setInput(element as HTMLInputElement),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** After the input: icons or icon buttons, such as clear. */
+function Trailing(props: SearchViewIconProps): JSX.Element {
+    const { scope } = context.use("Trailing");
+    return scope.render("trailing", {
+        element: "span",
+        states: () => ({ mirrored: props.mirror }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "mirror"),
+    });
+}
+
+/** The line between the header and the content (none in the contained view). */
+function Divider(props: SearchViewPartProps): JSX.Element {
+    const { scope } = context.use("Divider");
+    return scope.render("divider", {
+        element: "div",
+        machine: () => ({ role: "presentation" }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The suggestions: the combobox's listbox, or any content (results, recent searches). */
+function Content(props: SearchViewPartProps): JSX.Element {
+    const { scope, query } = context.use("Content");
+    return scope.render("content", {
+        element: "div",
+        machine: () => query().getContentProps(),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** A suggestion, drawn as a menu item; the highlighted one shows the hover state. */
+function Item(props: SearchViewItemProps): JSX.Element {
+    const { menu, query, sources } = context.use("Item");
+    const item = () => props.item;
+    const source = sources.item(
+        () => props.item.value,
+        () => props.item.interactionSource,
+    );
+    return (
+        <itemContext.Provider value={{ item }}>
+            {menu.render("item", {
+                element: "div",
+                interactionSource: source,
+                machine: () => query().getItemProps({ item: item() }),
+                states: () => ({
+                    hover: query().getItemState({ item: item() }).highlighted,
+                }),
+                unstyled: () => props.unstyled,
+                props: omit(props, "unstyled", "item"),
+            })}
+        </itemContext.Provider>
+    );
+}
+
+const itemPart = (
+    part: "itemLeading" | "itemContent" | "itemSupportingText" | "itemTrailing",
+    name: string,
+) =>
+    function ItemPart(props: SearchViewIconProps): JSX.Element {
+        const { menu } = context.use(name);
+        return menu.render(part, {
+            element: "span",
+            states: () => ({ mirrored: props.mirror }),
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled", "mirror"),
+        });
+    };
+
+/** An icon before a suggestion's text, such as a clock for a recent search. */
+const ItemLeading = itemPart("itemLeading", "ItemLeading");
+/** A suggestion's text: its label and supporting text. */
+const ItemContent = itemPart("itemContent", "ItemContent");
+/** A second line under a suggestion's label. */
+const ItemSupportingText = itemPart("itemSupportingText", "ItemSupportingText");
+/** An icon after a suggestion's text. */
+const ItemTrailing = itemPart("itemTrailing", "ItemTrailing");
+
+/** A suggestion's label. */
+function ItemLabel(props: SearchViewPartProps): JSX.Element {
+    const { menu, query } = context.use("ItemLabel");
+    const { item } = itemContext.use("ItemLabel");
+    return menu.render("itemLabel", {
+        element: "span",
+        machine: () => query().getItemTextProps({ item: item() }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The back arrow the ready-made view's leading button shows unless given another. */
+const BackIcon = (): JSX.Element => (
+    <svg
+        viewBox="0 0 24 24"
+        width="1em"
+        height="1em"
+        fill="currentColor"
+        aria-hidden="true"
+    >
+        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
+    </svg>
+);
+
+/** The ready-made search view's props: Root's, with `class`, `style`, and `slotProps` keyed by
+ *  part, the search bar that opens it (a search bar showing the query unless given), the leading
+ *  and trailing icons, and content in place of the suggestions. */
+export interface SearchViewProps
+    extends
+        Omit<SearchViewRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        SlotKeyedProps<Anatomy>,
+        SearchViewContentProps<JSX.Element> {
+    readonly testId?: TestIdOverride<SearchViewPart>;
+    readonly unstyled?: Unstyled<SearchViewPart>;
+}
+
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    "children",
+    ...SEARCH_VIEW_CONTENT_PROPS,
+] as const;
+
+// Inside Root, so it can read the query and the suggestions.
+function ReadyMadeContent(props: {
+    readonly own: SearchViewProps;
+    readonly slots: ReturnType<typeof createSlotProps<Anatomy>>;
+}): JSX.Element {
+    const { view, query, matches } = context.use("Root");
+    const own = props.own;
+    const slots = props.slots;
+    return (
+        <>
+            <Trigger {...slots("trigger")}>
+                {isPresent(own.trigger) ? (
+                    own.trigger
+                ) : (
+                    <SearchBar
+                        aria-label={searchViewLabel(own)}
+                        placeholder={own.placeholder}
+                        value={query().inputValue}
+                        readOnly
+                    />
+                )}
+            </Trigger>
+            <Positioner {...slots("positioner")}>
+                <Surface {...slots("surface")}>
+                    <Header {...slots("header")}>
+                        <Leading mirror {...slots("leading")}>
+                            <IconButton
+                                aria-label={own.backLabel ?? "Back"}
+                                icon={
+                                    isPresent(own.leading) ? (
+                                        own.leading
+                                    ) : (
+                                        <BackIcon />
+                                    )
+                                }
+                                onClick={() => view().setOpen(false)}
+                            />
+                        </Leading>
+                        <Input {...slots("input")} />
+                        <Show
+                            when={
+                                isPresent(own.trailing) ||
+                                query().inputValue !== ""
+                            }
+                        >
+                            <Trailing {...slots("trailing")}>
+                                {isPresent(own.trailing) ? (
+                                    own.trailing
+                                ) : (
+                                    <IconButton
+                                        aria-label={own.clearLabel ?? "Clear"}
+                                        icon={<CloseIcon />}
+                                        onClick={() => {
+                                            query().setInputValue(
+                                                "",
+                                                "clear-trigger",
+                                            );
+                                            query().focus();
+                                        }}
+                                    />
+                                )}
+                            </Trailing>
+                        </Show>
+                    </Header>
+                    <Divider {...slots("divider")} />
+                    <Content {...slots("content")}>
+                        {isPresent(own.children) ? (
+                            own.children
+                        ) : (
+                            <For
+                                each={matches()}
+                                keyed={(item: SearchViewItem) => item.value}
+                            >
+                                {(item) => (
+                                    <Item item={item()}>
+                                        <ItemContent>
+                                            <ItemLabel>
+                                                {item().label}
+                                            </ItemLabel>
+                                            <Show when={item().supportingText}>
+                                                <ItemSupportingText>
+                                                    {item().supportingText}
+                                                </ItemSupportingText>
+                                            </Show>
+                                        </ItemContent>
+                                    </Item>
+                                )}
+                            </For>
+                        )}
+                    </Content>
+                </Surface>
+            </Positioner>
+        </>
+    );
+}
+
+/** The ready-made search view: the search bar that opens it, and the view with the back button,
+ *  the query, the clear button while there's a query, the divider, and the suggestions. */
+function ReadyMade(props: SearchViewProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as SearchViewRootProps;
+    const root = slots("root") as object;
+    return (
+        <Root {...own} {...root}>
+            <ReadyMadeContent own={props} slots={slots} />
+        </Root>
+    );
+}
+
+/** Material's search view. Use it ready-made, `<SearchView placeholder="Search mail" items={[{
+ *  value: "inbox", label: "Inbox" }, …]} onSelect={…} onSubmit={…} />`, or compose its parts
+ *  under `SearchView.Root`: `Trigger` (around a SearchBar), then `Positioner` holding `Surface`,
+ *  which holds `Header` (with `Leading`, `Input`, and `Trailing`), `Divider`, and `Content`, with
+ *  an `Item` per suggestion (holding `ItemLeading`, `ItemContent` with `ItemLabel` and
+ *  `ItemSupportingText`, and `ItemTrailing`). */
+export const SearchView = Object.assign(ReadyMade, {
+    Root,
+    Trigger,
+    Positioner,
+    Surface,
+    Header,
+    Leading,
+    Input,
+    Trailing,
+    Divider,
+    Content,
+    Item,
+    ItemLeading,
+    ItemContent,
+    ItemLabel,
+    ItemSupportingText,
+    ItemTrailing,
+});
