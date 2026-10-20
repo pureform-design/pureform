@@ -32,6 +32,7 @@ const SECTIONS = [
     "affixes-and-counter",
     "icons",
     "fabs",
+    "split-buttons-and-fab-menus",
     "shapes",
     "chips",
     "lists",
