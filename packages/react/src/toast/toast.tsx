@@ -26,15 +26,12 @@ import type { PropTypes } from "@zag-js/react";
 import { type CSSProperties, type ReactNode, useId } from "react";
 
 import { CloseIcon, ToastIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { combinePartProps, omitProps } from "../props";
+import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -219,28 +216,18 @@ export interface ToastButtonProps
     extends ToastPartProps, InteractionSourceProps {}
 
 const toastButton = (part: "actionTrigger" | "closeTrigger", name: string) =>
-    function ToastButton({
-        unstyled,
-        interactionSource,
-        ...props
-    }: ToastButtonProps): ReactNode {
+    function ToastButton(props: ToastButtonProps): ReactNode {
         const { scope, api } = context.use(name);
-        const source = useOwnInteractionSource(interactionSource);
-        const handlers = useInteractionHandlers(source, false);
-        return scope.render(part, {
-            element: "button",
-            interactionSource: source,
-            machine: combinePartProps([
+        return scope.render(
+            part,
+            useMachineButton(props, [
                 (part === "actionTrigger"
                     ? api.getActionTriggerProps()
                     : api.getCloseTriggerProps()) as Readonly<
                     Record<string, unknown>
                 >,
-                handlers,
             ]),
-            unstyled,
-            props,
-        });
+        );
     };
 
 /** The action, a text button: it runs the toast's `action.onClick`, then the toast closes. */

@@ -12,9 +12,16 @@ import {
     pressableItemProps,
 } from "@pureform/machines/interaction";
 import { isServer } from "@solidjs/web";
-import { type Accessor, createEffect, onCleanup, untrack } from "solid-js";
+import {
+    type Accessor,
+    createEffect,
+    omit,
+    onCleanup,
+    untrack,
+} from "solid-js";
 
 import { normalizeProps } from "./internal/zag";
+import { combinePartProps } from "./props";
 
 /** A component's source: the app's when it passes one, else its own (none on the server). Pass it
  *  to the machine as `interactionSource` and to `useComponent`. */
@@ -81,4 +88,31 @@ export const useInteractionHandlers = (
         pressableItemProps({}, emitter, disabled(), normalizeProps) as Readonly<
             Record<string, unknown>
         >;
+};
+
+type Dict = Readonly<Record<string, unknown>>;
+
+/** What a plain button part takes: the app's source, and its own `unstyled`. */
+export interface MachineButtonProps {
+    readonly interactionSource?: MutableInteractionSource | undefined;
+    readonly unstyled?: boolean | undefined;
+}
+
+/** How a plain `<button>` part renders when no machine emits its interactions (a snackbar's and a
+ *  toast's buttons, the split button's leading button, a chip's remove button): its own source,
+ *  the handlers that emit to it, and `machine`'s props before them. Spread into `scope.render`. */
+export const useMachineButton = (
+    props: MachineButtonProps,
+    machine: () => readonly (Dict | undefined)[],
+    disabled: Accessor<boolean> = () => false,
+) => {
+    const source = useOwnInteractionSource(() => props.interactionSource);
+    const handlers = useInteractionHandlers(source, disabled);
+    return {
+        element: "button",
+        interactionSource: source,
+        machine: () => combinePartProps([...machine(), handlers()]),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "interactionSource"),
+    } as const;
 };

@@ -80,6 +80,7 @@ export {
 export type { IconOnlyName } from "./components/content";
 export {
     DIALOG_CONTENT_PROPS,
+    DIALOG_BEHAVIOR_PROPS,
     DIALOG_ROOT_PROPS,
     dialogBackdropLayout,
     dialogMachineProps,
@@ -541,11 +542,13 @@ export {
     resolveReducedMotion,
 } from "./motion";
 export type { MotionSetting } from "./motion";
+export { GLYPH_PATHS, TOAST_GLYPH_PATHS } from "./glyphs";
 export {
     forSlot,
     isIconPart,
     isUnstyled,
     outsideRootMessage,
+    partAsRoot,
     partClasses,
     partSources,
     spreadableProps,

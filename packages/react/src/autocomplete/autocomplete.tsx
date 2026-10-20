@@ -18,11 +18,9 @@ import {
     autocompleteSupportingTextId,
     autocompleteTriggerProps,
     isPresent,
-    presentProps,
     SELECT_COLLECTION,
     selectGroupedItems,
     selectItemGroups,
-    selectPositionerProps,
     selectValueProps,
     toZagValue,
 } from "@pureform/binding-core";
@@ -47,10 +45,12 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { DropDownArrow } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
+import type { PartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
@@ -58,6 +58,8 @@ import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { selectFieldParts } from "../select-field-parts";
+import type { SelectFieldContext } from "../select-field-parts";
 
 type Anatomy = typeof autocompleteAnatomy;
 type MenuAnatomy = typeof autocompleteMenuAnatomy;
@@ -296,43 +298,36 @@ function Input({ unstyled, ...props }: AutocompletePartProps): ReactNode {
     });
 }
 
+const field = selectFieldParts(
+    context as unknown as PartContext<SelectFieldContext>,
+    itemContext,
+);
+
 /** The floating label. */
-function Label({ unstyled, ...props }: AutocompletePartProps): ReactNode {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: api.getLabelProps(),
-        unstyled,
-        props,
-    });
-}
+const Label: (props: AutocompletePartProps) => ReactNode = field.Label;
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-function LeadingIcon({
-    unstyled,
-    mirror,
-    ...props
-}: AutocompleteIconProps): ReactNode {
-    const { scope } = context.use("LeadingIcon");
-    return scope.render("leadingIcon", {
-        element: "span",
-        machine: { "aria-hidden": "true" },
-        states: { mirrored: mirror },
-        unstyled,
-        props,
-    });
-}
-
-const affix = (part: "prefixText" | "suffixText", name: string) =>
-    function Affix({ unstyled, ...props }: AutocompletePartProps): ReactNode {
-        const { scope } = context.use(name);
-        return scope.render(part, { element: "span", unstyled, props });
-    };
+const LeadingIcon: (props: AutocompleteIconProps) => ReactNode =
+    field.LeadingIcon;
 
 /** Text before the input's, shown once the label floats. Turn on Root's `prefixText` with it. */
-const PrefixText = affix("prefixText", "PrefixText");
+const PrefixText: (props: AutocompletePartProps) => ReactNode =
+    field.PrefixText;
 /** Text after the input's, shown once the label floats. Turn on Root's `suffixText` with it. */
-const SuffixText = affix("suffixText", "SuffixText");
+const SuffixText: (props: AutocompletePartProps) => ReactNode =
+    field.SuffixText;
+
+/** Helper text under the field. With an `error`, it shows the error instead. */
+const SupportingText: (props: AutocompletePartProps) => ReactNode =
+    field.SupportingText;
+
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
+const Positioner: (props: AutocompletePartProps) => ReactNode =
+    field.Positioner;
+
+/** The list of suggestions, drawn as a menu. It stays while its exit animation runs. */
+const Content: (props: AutocompletePartProps) => ReactNode = field.Content;
 
 /** The arrow at the end, which opens or closes the list and turns over while it's open. It
  *  isn't in the tab order: the input has the keys. */
@@ -346,48 +341,6 @@ function TrailingIcon({
         element: "span",
         machine: autocompleteTriggerProps(api.getTriggerProps()),
         states: { mirrored: mirror },
-        unstyled,
-        props,
-    });
-}
-
-/** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText({
-    unstyled,
-    ...props
-}: AutocompletePartProps): ReactNode {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        machine: { id: supportingTextId },
-        unstyled,
-        props: { ...props, children: errorText ?? props.children },
-    });
-}
-
-/** Places the list under the field; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner({ unstyled, ...props }: AutocompletePartProps): ReactNode {
-    const { menu, api, presence } = context.use("Positioner");
-    return menu.render("positioner", {
-        element: "div",
-        machine: selectPositionerProps(
-            api.getPositionerProps(),
-            presence.present,
-        ),
-        unstyled,
-        props,
-    });
-}
-
-/** The list of suggestions, drawn as a menu. It stays while its exit animation runs. */
-function Content({ unstyled, ...props }: AutocompletePartProps): ReactNode {
-    const { menu, api, presence } = context.use("Content");
-    return menu.render("root", {
-        element: "div",
-        ref: presence.ref,
-        machine: presentProps(api.getContentProps(), presence.present),
         unstyled,
         props,
     });
@@ -407,77 +360,18 @@ export interface AutocompleteItemGroupLabelProps extends Omit<
 }
 
 /** A group of suggestions, labelled by the ItemGroupLabel with its `id` as `group`. */
-function ItemGroup({
-    unstyled,
-    id,
-    ...props
-}: AutocompleteItemGroupProps): ReactNode {
-    const { menu, api } = context.use("ItemGroup");
-    return menu.render("itemGroup", {
-        element: "div",
-        machine: api.getItemGroupProps({ id }),
-        unstyled,
-        props,
-    });
-}
+const ItemGroup: (props: AutocompleteItemGroupProps) => ReactNode =
+    field.ItemGroup;
 
 /** A group's label. */
-function ItemGroupLabel({
-    unstyled,
-    group,
-    ...props
-}: AutocompleteItemGroupLabelProps): ReactNode {
-    const { menu, api } = context.use("ItemGroupLabel");
-    return menu.render("itemGroupLabel", {
-        element: "div",
-        machine: api.getItemGroupLabelProps({ htmlFor: group }),
-        unstyled,
-        props,
-    });
-}
+const ItemGroupLabel: (props: AutocompleteItemGroupLabelProps) => ReactNode =
+    field.ItemGroupLabel;
 
 /** A suggestion, drawn as a menu item; the highlighted one shows the hover state. */
-function Item({ unstyled, item, ...props }: AutocompleteItemProps): ReactNode {
-    const { menu, api, sources } = context.use("Item");
-    const source = sources.item(item.value, item.interactionSource);
-    return (
-        <itemContext.Provider value={{ item }}>
-            {menu.render("item", {
-                element: "div",
-                interactionSource: source,
-                machine: api.getItemProps({ item }),
-                states: { hover: api.getItemState({ item }).highlighted },
-                unstyled,
-                props,
-            })}
-        </itemContext.Provider>
-    );
-}
+const Item: (props: AutocompleteItemProps) => ReactNode = field.Item;
 
 /** A suggestion's label. */
-function ItemLabel({ unstyled, ...props }: AutocompletePartProps): ReactNode {
-    const { menu, api } = context.use("ItemLabel");
-    const { item } = itemContext.use("ItemLabel");
-    return menu.render("itemLabel", {
-        element: "span",
-        machine: api.getItemTextProps({ item }),
-        unstyled,
-        props,
-    });
-}
-
-/** The arrow the ready-made autocomplete shows unless given another. */
-const DropDownArrow = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
+const ItemLabel: (props: AutocompletePartProps) => ReactNode = field.ItemLabel;
 
 /** The ready-made autocomplete's props: Root's, with `className`, `style`, and `slotProps` keyed
  *  by the field's parts, and the label, supporting text, and icons as content. `aria-label`,

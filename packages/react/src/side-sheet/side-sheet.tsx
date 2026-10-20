@@ -11,11 +11,9 @@ import {
     sideSheetBackdropAnatomy,
     sideSheetOverlayAnatomy,
 } from "@pureform/anatomy";
-import type { PartName, TestIdOverride } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
 import {
-    dialogBackdropLayout,
     isPresent,
-    presentProps,
     sheetContentLayout,
     sheetMachineProps,
     sheetModal,
@@ -29,47 +27,17 @@ import type {
     SideSheetRootOwnProps,
     Unstyled,
 } from "@pureform/binding-core";
-import { stackPositioner } from "@pureform/binding-core/dom";
-import * as dialog from "@pureform/machines/dialog";
-import { mergeProps, normalizeProps } from "@zag-js/react";
-import type { PropTypes } from "@zag-js/react";
-import {
-    type ElementType,
-    type ReactNode,
-    type RefObject,
-    useId,
-    useRef,
-} from "react";
+import { type ElementType, type ReactNode } from "react";
 
 import { Button } from "../button";
-import { useControllable } from "../controllable";
+import { dialogParts } from "../dialog-parts";
 import { BackIcon, CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
-import { useMachine } from "../machine";
-import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
-import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { usePresence } from "../presence";
-import type { Presence } from "../presence";
-import { omitProps } from "../props";
+import { useSlotProps } from "../parts";
+import type { SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
 
 type Anatomy = typeof sideSheetOverlayAnatomy;
-type BackdropAnatomy = typeof sideSheetBackdropAnatomy;
-
-/** What Root shares with its parts. */
-interface SideSheetContextValue {
-    readonly scope: ComponentScope<Anatomy>;
-    readonly backdrop: ComponentScope<BackdropAnatomy>;
-    readonly api: dialog.Api<PropTypes>;
-    readonly presence: Presence;
-    readonly modal: boolean;
-    readonly coplanar: boolean;
-    readonly positioner: RefObject<HTMLElement | null>;
-}
-
-const context = createPartContext<SideSheetContextValue>("SideSheet");
 
 /** Root's props: `modal`, `coplanar` and the tokens, the machine's props (`open`,
  *  `closeOnEscape`, …), `testId` and `unstyled` for every part, `as`, and the element's own
@@ -94,202 +62,85 @@ export interface SideSheetTriggerProps extends SideSheetPartProps {
     readonly [prop: string]: unknown;
 }
 
-// The backdrop's test id and `unstyled`, from Root's, which name it `backdrop`.
-const backdropTestId = (
-    testId: TestIdOverride<SideSheetPart> | undefined,
-): TestIdOverride<"root"> | undefined =>
-    typeof testId !== "object"
-        ? testId
-        : testId.backdrop === undefined
-          ? undefined
-          : { root: testId.backdrop };
-
-const backdropUnstyled = (
-    unstyled: Unstyled<SideSheetPart> | undefined,
-): Unstyled<"root"> | undefined =>
-    typeof unstyled !== "object"
-        ? unstyled
-        : unstyled.backdrop === undefined
-          ? undefined
-          : { root: unstyled.backdrop };
+const chrome = dialogParts({
+    name: "SideSheet",
+    anatomy: sideSheetOverlayAnatomy,
+    backdropAnatomy: sideSheetBackdropAnatomy,
+    rootProps: SIDE_SHEET_ROOT_PROPS,
+    selection: (props: SideSheetRootProps) => sideSheetSelection(props),
+    machineProps: sheetMachineProps,
+    modal: sheetModal,
+    positionerLayout: (present, props) =>
+        sideSheetPositionerLayout(
+            present,
+            sheetModal(props),
+            sideSheetSelection(props).coplanar === true,
+        ),
+    contentLayout: sheetContentLayout,
+});
 
 /** The sheet's root, a `<div>` around the trigger and the sheet. The registry doesn't style
  *  it. */
-function Root(props: SideSheetRootProps): ReactNode {
-    const id = useId();
-    const dir = useDirection();
-    const open = useControllable<"open", boolean>("SideSheet", "open", props);
-    const service = useMachine(dialog.machine, {
-        id,
-        dir,
-        ...sheetMachineProps(props),
-        ...open.machineProps,
-    });
-    const api = dialog.connect(service, normalizeProps);
-    const positioner = useRef<HTMLElement | null>(null);
-    const presence = usePresence(api.open, (surface) =>
-        positioner.current
-            ? stackPositioner(positioner.current, surface)
-            : undefined,
-    );
-    const selection = sideSheetSelection(props);
-    const scope = useComponent(sideSheetOverlayAnatomy, {
-        selection,
-        testId: props.testId as TestIdOverride<PartName<Anatomy>> | undefined,
-        unstyled: props.unstyled as Unstyled<PartName<Anatomy>> | undefined,
-    });
-    const backdrop = useComponent(sideSheetBackdropAnatomy, {
-        selection: {},
-        testId: backdropTestId(props.testId),
-        unstyled: backdropUnstyled(props.unstyled),
-    });
-    const { as, ...rest } = omitProps(props, SIDE_SHEET_ROOT_PROPS);
-    return (
-        <context.Provider
-            value={{
-                scope,
-                backdrop,
-                api,
-                presence,
-                modal: sheetModal(props),
-                coplanar: selection.coplanar === true,
-                positioner,
-            }}
-        >
-            {scope.render("root", { element: "div", as, props: rest })}
-        </context.Provider>
-    );
-}
+const Root: (props: SideSheetRootProps) => ReactNode = chrome.Root;
 
 /** The button that opens the sheet. */
-function Trigger({ unstyled, as, ...props }: SideSheetTriggerProps): ReactNode {
-    const { scope, api } = context.use("Trigger");
-    return scope.render("trigger", {
-        element: "button",
-        as: as as ElementType | undefined,
-        machine: api.getTriggerProps(),
-        unstyled,
-        props,
-    });
-}
+const Trigger: (props: SideSheetTriggerProps) => ReactNode = chrome.Trigger;
 
 /** Dims the page behind a modal sheet, drawn by the scrim; hidden once it's closed and its exit
- *  animation is over. A standard sheet renders none. */
-function Backdrop({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { backdrop, api, presence, modal } = context.use("Backdrop");
-    if (!modal) return null;
-    return backdrop.render("root", {
-        element: "div",
-        machine: mergeProps(
-            api.getBackdropProps(),
-            normalizeProps.element(dialogBackdropLayout(presence.present)),
-        ),
-        unstyled,
-        props,
-    });
-}
+ *  animation is over. A standard sheet's stays hidden. */
+const Backdrop: (props: SideSheetPartProps) => ReactNode = chrome.Backdrop;
 
 /** Holds the sheet against the end edge of the viewport (in the page's layout when coplanar),
- *  stacked at its surface's layer; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope, api, presence, modal, coplanar, positioner } =
-        context.use("Positioner");
-    return scope.render("positioner", {
-        element: "div",
-        ref: positioner,
-        machine: mergeProps(
-            api.getPositionerProps(),
-            normalizeProps.element(
-                sideSheetPositionerLayout(presence.present, modal, coplanar),
-            ),
-        ),
-        unstyled,
-        props,
-    });
-}
+ *  stacked at its surface's layer; hidden once
+ *  it's closed and its exit animation is over. The registry doesn't style it. */
+const Positioner: (props: SideSheetPartProps) => ReactNode = chrome.Positioner;
 
 /** The sheet's surface. It stays while its exit animation runs. */
-function Content({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope, api, presence } = context.use("Content");
-    return scope.render("content", {
-        element: "div",
-        ref: presence.ref,
-        machine: mergeProps(
-            presentProps(api.getContentProps(), presence.present),
-            normalizeProps.element(sheetContentLayout),
-        ),
-        unstyled,
-        props,
-    });
-}
+const Content: (props: SideSheetPartProps) => ReactNode = chrome.Content;
 
 /** The row at the top: the back button, the headline, and the close trigger. */
-function Header({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope } = context.use("Header");
-    return scope.render("header", { element: "div", unstyled, props });
-}
+const Header: (props: SideSheetPartProps) => ReactNode = chrome.part(
+    "header",
+    "Header",
+    "div",
+);
 
 /** A button at the start of the header that goes back a step inside the sheet: `as={IconButton}`
  *  draws it as one. Name it with `aria-label`; what it does is yours. */
-function BackButton({
-    unstyled,
-    as,
-    ...props
-}: SideSheetTriggerProps): ReactNode {
-    const { scope } = context.use("BackButton");
-    return scope.render("backButton", {
-        element: "button",
-        as: as as ElementType | undefined,
-        unstyled,
-        props,
-    });
-}
+const BackButton: (props: SideSheetTriggerProps) => ReactNode = chrome.trigger(
+    "backButton",
+    "BackButton",
+);
 
 /** The title, an `<h2>`, which names the sheet. */
-function Headline({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope, api } = context.use("Headline");
-    return scope.render("headline", {
-        element: "h2",
-        machine: api.getTitleProps(),
-        unstyled,
-        props,
-    });
-}
+const Headline: (props: SideSheetPartProps) => ReactNode = chrome.part(
+    "headline",
+    "Headline",
+    "h2",
+    (api) => api.getTitleProps(),
+);
 
 /** A button at the end of the header that closes the sheet: `as={IconButton}` draws it as one.
  *  Name it with `aria-label`. */
-function CloseTrigger({
-    unstyled,
-    as,
-    ...props
-}: SideSheetTriggerProps): ReactNode {
-    const { scope, api } = context.use("CloseTrigger");
-    return scope.render("closeTrigger", {
-        element: "button",
-        as: as as ElementType | undefined,
-        machine: api.getCloseTriggerProps(),
-        unstyled,
-        props,
-    });
-}
+const CloseTrigger: (props: SideSheetTriggerProps) => ReactNode =
+    chrome.trigger("closeTrigger", "CloseTrigger", (api) =>
+        api.getCloseTriggerProps(),
+    );
 
 /** The content, which describes the sheet. It scrolls when it's taller than the sheet. */
-function Body({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope, api } = context.use("Body");
-    return scope.render("body", {
-        element: "div",
-        machine: api.getDescriptionProps(),
-        unstyled,
-        props,
-    });
-}
+const Body: (props: SideSheetPartProps) => ReactNode = chrome.part(
+    "body",
+    "Body",
+    "div",
+    (api) => api.getDescriptionProps(),
+);
 
 /** The buttons under the content, over a divider: the main one first. */
-function Actions({ unstyled, ...props }: SideSheetPartProps): ReactNode {
-    const { scope } = context.use("Actions");
-    return scope.render("actions", { element: "div", unstyled, props });
-}
+const Actions: (props: SideSheetPartProps) => ReactNode = chrome.part(
+    "actions",
+    "Actions",
+    "div",
+);
 
 /** The ready-made sheet's props: Root's, with `className`, `style`, and `slotProps` keyed by
  *  part, the trigger's label, the headline, the back and close buttons' names and icons, and the

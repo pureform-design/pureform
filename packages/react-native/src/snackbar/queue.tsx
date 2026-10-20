@@ -15,13 +15,13 @@ import {
     useLayoutEffect,
     useMemo,
     useRef,
-    useState,
     useSyncExternalStore,
 } from "react";
 import type { ReactNode } from "react";
 import { AccessibilityInfo, Platform, Pressable, View } from "react-native";
 
 import { useLayer } from "../layer";
+import { useHeldTimeout } from "../overlay";
 import { usePortalHost } from "../portal-host";
 import type { EdgeInsets, PortalStore } from "../portal-host";
 import { usePresence } from "../presence";
@@ -137,19 +137,9 @@ function QueuedSnackbar(props: {
     const engine = useEngine();
     const presence = usePresence(open, "popup");
     const margin = Number(useTokens()["spacing.4"] ?? 16) || 16;
-    const [hovered, setHovered] = useState(false);
-    const [pressed, setPressed] = useState(false);
-    const held = hovered || pressed;
-    useEffect(() => {
-        if (!open || held || duration === null || !Number.isFinite(duration)) {
-            return undefined;
-        }
-        const timer = setTimeout(
-            () => queue.dismiss(item.id, "timeout"),
-            duration,
-        );
-        return () => clearTimeout(timer);
-    }, [open, held, duration, queue, item.id]);
+    const { holdProps } = useHeldTimeout(open, duration, () =>
+        queue.dismiss(item.id, "timeout"),
+    );
     useLayoutEffect(() => {
         if (!presence.present) queue.gone(item.id);
     }, [presence.present, queue, item.id]);
@@ -182,14 +172,7 @@ function QueuedSnackbar(props: {
                     ...presence.style,
                 }}
             >
-                <Pressable
-                    accessible={false}
-                    focusable={false}
-                    onHoverIn={() => setHovered(true)}
-                    onHoverOut={() => setHovered(false)}
-                    onPressIn={() => setPressed(true)}
-                    onPressOut={() => setPressed(false)}
-                >
+                <Pressable {...holdProps}>
                     <Snackbar
                         {...surface}
                         onAction={() => {

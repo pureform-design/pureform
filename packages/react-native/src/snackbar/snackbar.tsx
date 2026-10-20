@@ -12,17 +12,11 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { IconSlot, iconSlot } from "../icon-style";
-import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { testIdOf, withEngine } from "../parts";
 import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
-
-// The action's and the close button's.
-const INDICATIONS = Object.fromEntries(
-    snackbarAnatomy.indication!.map((entry) => [entry.trigger, entry]),
-);
+import { SurfaceButton } from "../surface-button";
 
 export interface SnackbarProps extends SnackbarVariantProps, IndicationProps {
     /** The message. */
@@ -48,42 +42,19 @@ function SnackbarButtonImpl(props: {
     readonly onPress: (() => void) | undefined;
     readonly children: ReactNode;
 }): ReactNode {
-    const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
-        indication: props.snackbar.indication,
-    });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<SnackbarPart>(
-        "snackbar",
-        indication.select(snackbarSelection(props.snackbar)),
-        indication.states(),
-    );
-    const Surface = v[props.part];
     return (
-        <Surface.Pressable
-            {...indication.handlers}
-            role="button"
-            {...(props.label === undefined
-                ? {}
-                : { "aria-label": props.label })}
+        <SurfaceButton
+            anatomy={snackbarAnatomy}
+            component="snackbar"
+            part={props.part}
+            selection={snackbarSelection(props.snackbar)}
+            indication={props.snackbar.indication}
+            testId={props.snackbar.testId}
+            label={props.label}
             onPress={props.onPress}
-            style={{ ...s[props.part], ...unselectable }}
-            testID={testIdOf(
-                snackbarAnatomy,
-                props.part,
-                props.snackbar.testId,
-            )}
         >
-            <IconSlot
-                {...iconSlot(selected, props.part)}
-                motion={s[props.part]}
-            >
-                {props.children}
-            </IconSlot>
-            {indication.layer(selected)}
-        </Surface.Pressable>
+            {props.children}
+        </SurfaceButton>
     );
 }
 

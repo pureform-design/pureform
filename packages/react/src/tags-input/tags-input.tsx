@@ -27,17 +27,13 @@ import { type ElementType, type ReactNode, useId, useState } from "react";
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled } from "../form";
 import { CloseIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useItemInteractionSources,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useItemInteractionSources, useMachineButton } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { combinePartProps, omitProps } from "../props";
+import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -297,28 +293,19 @@ function ChipLabel({ unstyled, ...props }: TagsInputPartProps): ReactNode {
 }
 
 /** A chip's remove button: a surface with its own source. Zag names it from the value. */
-function ChipRemove({
-    unstyled,
-    interactionSource,
-    ...props
-}: TagsInputPartProps & InteractionSourceProps): ReactNode {
+function ChipRemove(
+    props: TagsInputPartProps & InteractionSourceProps,
+): ReactNode {
     const { chips, api } = context.use("ChipRemove");
     const { item } = chipContext.use("ChipRemove");
-    const source = useOwnInteractionSource(interactionSource);
-    const handlers = useInteractionHandlers(
-        source,
-        api.getItemState(item).disabled,
+    return chips.render(
+        "remove",
+        useMachineButton(
+            props,
+            [api.getChipRemoveProps(item) as Readonly<Record<string, unknown>>],
+            api.getItemState(item).disabled,
+        ),
     );
-    return chips.render("remove", {
-        element: "button",
-        interactionSource: source,
-        machine: combinePartProps([
-            api.getChipRemoveProps(item) as Readonly<Record<string, unknown>>,
-            handlers,
-        ]),
-        unstyled,
-        props,
-    });
 }
 
 /** The ready-made tags input's props: Root's, with `className`, `style`, and `slotProps` keyed by
