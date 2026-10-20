@@ -133,6 +133,28 @@ export type {
     SideSheetVariantProps,
 } from "./components/sheet";
 export {
+    CAROUSEL_CONTENT_PROPS,
+    CAROUSEL_ROOT_PROPS,
+    CAROUSEL_SIZES,
+    carouselInitialStyle,
+    carouselItemSizes,
+    carouselKeylines,
+    carouselMachineProps,
+    carouselSelection,
+} from "./components/carousel";
+export type {
+    CarouselBehaviorProps,
+    CarouselContentProps,
+    CarouselItem,
+    CarouselItemSize,
+    CarouselLayout,
+    CarouselLayoutOptions,
+    CarouselMetrics,
+    CarouselPart,
+    CarouselRootOwnProps,
+    CarouselVariantProps,
+} from "./components/carousel";
+export {
     DRAG_HANDLE_ROOT_PROPS,
     dragHandleSelection,
 } from "./components/drag-handle";

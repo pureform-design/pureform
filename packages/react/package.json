@@ -131,6 +131,13 @@
                 "default": "./dist/rich-tooltip.mjs"
             }
         },
+        "./carousel": {
+            "types": "./dist/carousel/index.d.ts",
+            "import": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.mjs"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "import": {
