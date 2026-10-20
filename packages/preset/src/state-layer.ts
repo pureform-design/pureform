@@ -8,6 +8,10 @@
 // indication tokens. Each defaults to the theme's value, so a theme strengthens or softens every
 // component at once, and a component's own tokens (an indication on one component) change only
 // that component.
+//
+// Where the focus indicator sits is a theme-level choice, not a component's: a theme's state
+// provider (`materialState(..., { focusRing: "inset" })`) moves the outer offset inside the
+// element, and every component's focus part follows through its `focusIndicatorOuterOffset`.
 
 import { colorMix, when } from "@pureform/core/ast";
 import type {
@@ -17,6 +21,8 @@ import type {
     ValueNode,
 } from "@pureform/core/ast";
 import { colorRole, focusIndicator, opacity } from "@pureform/theme";
+
+export type { FocusRing } from "@pureform/material";
 
 /** The indication tokens every interactive component has: the state layer's opacity per state,
  *  and the focus indicator's thickness, outer offset, and color. */

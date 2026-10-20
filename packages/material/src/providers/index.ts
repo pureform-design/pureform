@@ -195,13 +195,30 @@ export const MATERIAL_FOCUS_INDICATOR: Record<FocusIndicatorRole, number> = {
     focusIndicatorOuterOffset: 2,
 };
 
+/** Where the focus indicator is drawn: `outer`, Material's ring outside the focused element, or
+ *  `inset`, Compose's ring drawn inside it (its outer edge on the element's border edge). */
+export type FocusRing = "outer" | "inset";
+
+export interface MaterialStateOptions {
+    /** Where every component draws its focus indicator. Default `outer`. `inset` sets the outer
+     *  offset to minus the thickness, so the ring sits just inside the element; an explicit
+     *  `focusIndicatorOuterOffset` is ignored then. */
+    focusRing?: FocusRing;
+}
+
 /** Material's state opacities and focus indicator. `opacities` changes or adds opacities, in
- *  percent; `focusIndicator` changes the focus indicator's lengths, in px. */
+ *  percent; `focusIndicator` changes the focus indicator's lengths, in px; `focusRing` draws
+ *  every component's focus indicator outside (the default) or inside it. */
 export const materialState = (
     opacities: Partial<Record<StateRole, number>> & Record<string, number> = {},
     focusIndicator: Partial<Record<FocusIndicatorRole, number>> = {},
-): StateProvider =>
-    defineProvider({
+    { focusRing = "outer" }: MaterialStateOptions = {},
+): StateProvider => {
+    const lengths = { ...MATERIAL_FOCUS_INDICATOR, ...focusIndicator };
+    if (focusRing === "inset") {
+        lengths.focusIndicatorOuterOffset = -lengths.focusIndicatorThickness;
+    }
+    return defineProvider({
         domain: "state",
         name: "material",
         generate: () => ({
@@ -211,13 +228,14 @@ export const materialState = (
                 ),
             ) as Record<StateRole, NumericScalarNode>,
             focusIndicator: Object.fromEntries(
-                Object.entries({
-                    ...MATERIAL_FOCUS_INDICATOR,
-                    ...focusIndicator,
-                }).map(([name, value]) => [name, px(value)]),
+                Object.entries(lengths).map(([name, value]) => [
+                    name,
+                    px(value),
+                ]),
             ) as Record<FocusIndicatorRole, NumericScalarNode>,
         }),
     });
+};
 
 /** Material's duration tokens, in ms. */
 export const MATERIAL_DURATIONS: Record<DurationRole, number> = {
