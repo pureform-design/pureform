@@ -16,6 +16,7 @@ const ICON_SLOTS: Record<string, string[]> = {
     dialog: ["icon"],
     fab: ["icon"],
     iconButton: ["icon"],
+    inputChip: ["icon", "remove"],
     listItem: ["leading", "trailing"],
     menu: ["itemLeading", "itemTrailing"],
     navigationBar: ["icon"],
@@ -23,6 +24,7 @@ const ICON_SLOTS: Record<string, string[]> = {
     searchBar: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
     tabs: ["icon"],
+    tagsInput: ["leadingIcon", "trailingIcon"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
 };
