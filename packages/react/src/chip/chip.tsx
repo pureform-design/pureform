@@ -10,6 +10,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
+    ChipContentProps,
     ChipRootOwnProps,
 } from "@pureform/binding-core";
 import type * as button from "@pureform/machines/button";
@@ -100,6 +101,18 @@ function Icon({ unstyled, mirror, ...props }: ChipIconProps): ReactNode {
     });
 }
 
+/** The trailing icon's box (a filter chip's dropdown arrow), hidden from assistive technology.
+ *  Render it only when there's one. */
+function TrailingIcon({ unstyled, ...props }: ChipPartProps): ReactNode {
+    const { scope, api } = context.use("TrailingIcon");
+    return scope.render("trailingIcon", {
+        element: "span",
+        machine: api.getSecondaryIconProps(),
+        unstyled,
+        props,
+    });
+}
+
 /** The chip's text. */
 function Label({ unstyled, ...props }: ChipPartProps): ReactNode {
     const { scope, api } = context.use("Label");
@@ -117,9 +130,10 @@ export interface ChipProps
     extends
         Omit<ChipRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        ButtonContentProps<ReactNode> {}
+        ButtonContentProps<ReactNode>,
+        ChipContentProps<ReactNode> {}
 
-/** The ready-made chip: Root, its touch target, the icon when given, and the label. */
+/** The ready-made chip: Root, its touch target, the icon when given, the label, and the trailing icon when given. */
 function ReadyMade(props: ChipProps): ReactNode {
     const slot = useSlotProps(props);
     const {
@@ -128,6 +142,7 @@ function ReadyMade(props: ChipProps): ReactNode {
         slotProps: _slotProps,
         label,
         icon,
+        trailingIcon,
         mirrorIcon,
         ...rootProps
     } = props;
@@ -140,6 +155,11 @@ function ReadyMade(props: ChipProps): ReactNode {
                 </Icon>
             ) : null}
             <Label {...slot("label")}>{label}</Label>
+            {isPresent(trailingIcon) ? (
+                <TrailingIcon {...slot("trailingIcon")}>
+                    {trailingIcon}
+                </TrailingIcon>
+            ) : null}
         </Root>
     );
 }
@@ -152,4 +172,5 @@ export const Chip = Object.assign(ReadyMade, {
     TouchTarget,
     Icon,
     Label,
+    TrailingIcon,
 });

@@ -119,4 +119,6 @@ export interface ButtonApi<T extends PropTypes = PropTypes> {
     getRootProps: () => T["button"];
     getLabelProps: () => T["element"];
     getIconProps: () => T["element"];
+    /** The secondary icon: a button's dropdown arrow, or a filter chip's trailing icon. */
+    getSecondaryIconProps: () => T["element"];
 }

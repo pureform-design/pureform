@@ -1,5 +1,5 @@
 // The button: Root on the button machine (press, focus, and an optional toggle on `selected`),
-// its Label, Icon, and TouchTarget parts, and the ready-made Button over them.
+// its Label, Icon, SecondaryIcon, and TouchTarget parts, and the ready-made Button over them.
 
 import { buttonAnatomy } from "@pureform/anatomy";
 import {
@@ -14,7 +14,13 @@ import type {
 } from "@pureform/binding-core";
 import * as button from "@pureform/machines/button";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, createMemo, createUniqueId, omit } from "solid-js";
+import {
+    type Accessor,
+    createMemo,
+    createUniqueId,
+    omit,
+    Show,
+} from "solid-js";
 
 import { useControllable } from "../controllable";
 import { useOwnInteractionSource } from "../interaction";
@@ -120,6 +126,30 @@ function renderIcon(props: ButtonIconProps, optional: boolean): JSX.Element {
     });
 }
 
+/** The secondary icon's box (a dropdown arrow, say), hidden from assistive technology. Render it
+ *  only when there's one, on the side `secondaryIconPosition` names. */
+function SecondaryIcon(props: ButtonIconProps): JSX.Element {
+    return renderSecondaryIcon(props, false);
+}
+
+const OptionalSecondaryIcon = (props: ButtonIconProps): JSX.Element =>
+    renderSecondaryIcon(props, true);
+
+function renderSecondaryIcon(
+    props: ButtonIconProps,
+    optional: boolean,
+): JSX.Element {
+    const { scope, api } = context.use("SecondaryIcon");
+    return scope.render("secondaryIcon", {
+        element: "span",
+        machine: () => api().getSecondaryIconProps(),
+        states: () => ({ mirrored: props.mirror }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "mirror"),
+        optional,
+    });
+}
+
 /** The 48px touch target around a smaller button. Empty. */
 function TouchTarget(props: ButtonPartProps): JSX.Element {
     const { scope } = context.use("TouchTarget");
@@ -145,24 +175,41 @@ const READY_MADE_PROPS = [
     ...BUTTON_CONTENT_PROPS,
 ] as const;
 
-/** The ready-made button: Root, its touch target, the icon when given, and the label. */
+/** The ready-made button: Root, its touch target, the icons when given, and the label. */
 function ReadyMade(props: ButtonProps): JSX.Element {
     // The icon part builds the icon once, inside its own context, so `useIconStyle()` works in it.
     const IconPart = optionalPart(props, "icon", Icon, OptionalIcon);
+    const SecondaryPart = optionalPart(
+        props,
+        "secondaryIcon",
+        SecondaryIcon,
+        OptionalSecondaryIcon,
+    );
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as ButtonRootProps;
     // The root's slot props are an element's, whose `id` also takes `false`.
     const root = slots("root") as object;
     const touchTarget = slots("touchTarget");
     const icon = slots("icon");
+    const secondaryIcon = slots("secondaryIcon");
     const label = slots("label");
     return (
         <Root {...own} {...root}>
             <TouchTarget {...touchTarget} />
+            <Show when={props.secondaryIconPosition === "start"}>
+                <SecondaryPart mirror={props.mirrorIcon} {...secondaryIcon}>
+                    {props.secondaryIcon}
+                </SecondaryPart>
+            </Show>
             <IconPart mirror={props.mirrorIcon} {...icon}>
                 {props.icon}
             </IconPart>
             <Label {...label}>{props.label}</Label>
+            <Show when={props.secondaryIconPosition !== "start"}>
+                <SecondaryPart mirror={props.mirrorIcon} {...secondaryIcon}>
+                    {props.secondaryIcon}
+                </SecondaryPart>
+            </Show>
         </Root>
     );
 }
@@ -173,5 +220,6 @@ export const Button = Object.assign(ReadyMade, {
     Root,
     Label,
     Icon,
+    SecondaryIcon,
     TouchTarget,
 });

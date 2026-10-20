@@ -57,3 +57,30 @@ describe("chip color", () => {
         );
     });
 });
+
+describe("chip corners and trailing icon", () => {
+    it("rests in the small radius and morphs from tokens, with no compound", () => {
+        const recipe = compiled();
+        const radius = JSON.stringify(recipe?.base?.root?.borderRadius);
+        expect(radius).toContain("components-chip-square");
+        expect(radius).toContain("components-chip-toggles");
+        expect(radius).toContain(":active");
+        expect(chip.recipe.defaultVariants).toMatchObject({
+            corner: "square",
+            toggle: "false",
+        });
+        expect(recipe?.variants?.corner?.round?.root).toEqual({
+            "--components-chip-square": "0",
+        });
+        expect(recipe?.variants?.toggle?.true?.root).toEqual({
+            "--components-chip-toggles": "1",
+        });
+        expect(chip.recipe.compoundVariants ?? []).toEqual([]);
+    });
+
+    it("has a trailing icon with its own size and spacing", () => {
+        const slot = JSON.stringify(compiled()?.base?.trailingIcon);
+        expect(slot).toContain("components-chip-trailingIconSize");
+        expect(slot).toContain("components-chip-trailingIconSpacing");
+    });
+});

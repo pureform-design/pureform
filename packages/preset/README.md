@@ -241,6 +241,9 @@ target first, and render the icon slot only when there is an icon.
 </button>
 ```
 
+- `button` also has an optional `secondaryIcon` slot, such as a dropdown arrow, with its own
+  `secondaryIconSpacing` token on top of the gap. `secondaryIconPosition` is `end` (the default)
+  or `start`: render the slot on that side of the label.
 - `button`: `variant` is `filled`, `tonal`, `outlined`, `text`, or `elevated`; `size` is
   `small`, `medium`, or `large`.
 - `iconButton`: `variant` is `standard`, `filled`, `tonal`, `outlined`, or `elevated`. Give it
@@ -392,11 +395,17 @@ pureform({ shape: materialShape({}, { corner: "squircle" }) });
 A chip is `outlined` or `elevated`. Mark a filter chip with `aria-pressed="true"`, or a
 selected option with `aria-selected="true"`; `color` sets the selected colors.
 
+`corner` is `square` (the default, the small radius) or `round`. A chip tightens its corners
+while pressed, and a filter chip that sets `toggle: "true"` swaps them once selected, as the
+button's toggle does. An optional `trailingIcon` slot after the label (a dropdown arrow) has its
+own `trailingIconSize` and `trailingIconSpacing`.
+
 ```html
 <button class="{root}" type="button" aria-pressed="true">
     <span class="{touchTarget}"></span>
     <span class="{icon}">✓</span>
     <span class="{label}">Filter</span>
+    <span class="{trailingIcon}">▾</span>
 </button>
 ```
 

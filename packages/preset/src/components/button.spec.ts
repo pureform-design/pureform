@@ -59,3 +59,33 @@ describe("button", () => {
         expect(recipe()).toMatchSnapshot();
     });
 });
+
+describe("button secondary icon", () => {
+    it("sizes the secondary icon like the icon, per size, with its own spacing token", () => {
+        const r = recipe();
+        expect(r?.variants?.size?.large?.root).toMatchObject({
+            "--components-button-secondaryIconSize": "32px",
+        });
+        const slot = JSON.stringify(r?.base?.secondaryIcon);
+        expect(slot).toContain("components-button-secondaryIconSize");
+        expect(slot).toContain("components-button-secondaryIconSpacing");
+    });
+
+    it("puts the spacing on the side facing the label, by a flag and no compound", () => {
+        expect(recipe()?.variants?.secondaryIconPosition?.start?.root).toEqual({
+            "--components-button-secondaryStart": "1",
+        });
+        expect(button.recipe.defaultVariants?.secondaryIconPosition).toBe(
+            "end",
+        );
+        for (const compound of button.recipe.compoundVariants ?? []) {
+            expect(compound.match).not.toHaveProperty("secondaryIconPosition");
+        }
+    });
+
+    it("keeps the deprecated compact size, which no Expressive size replaces", () => {
+        expect(Object.keys(button.recipe.variants?.size ?? {})).toContain(
+            "compact",
+        );
+    });
+});

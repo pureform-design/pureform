@@ -1,4 +1,4 @@
-// The button: a pressable root with its touch target, an icon when given, and its label, styled
+// The button: a pressable root with its touch target, its icons when given, and its label, styled
 // by the registry's button factory, rippling when pressed.
 
 import { buttonAnatomy } from "@pureform/anatomy";
@@ -54,6 +54,21 @@ function ButtonImpl(props: ButtonProps): ReactNode {
     );
     const id = (part: ButtonPart) =>
         testIdOf(buttonAnatomy, part, props.testId);
+    const secondary =
+        props.secondaryIcon != null && props.secondaryIcon !== false ? (
+            <v.secondaryIcon.View
+                style={s.secondaryIcon}
+                testID={id("secondaryIcon")}
+            >
+                <IconSlot
+                    {...iconSlot(selected, "secondaryIcon")}
+                    motion={s.secondaryIcon}
+                >
+                    {props.secondaryIcon}
+                </IconSlot>
+            </v.secondaryIcon.View>
+        ) : null;
+    const start = props.secondaryIconPosition === "start";
     return (
         <v.root.Pressable
             {...indication.handlers}
@@ -69,6 +84,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
                 style={s.touchTarget}
                 testID={id("touchTarget")}
             />
+            {start ? secondary : null}
             {props.icon != null && props.icon !== false ? (
                 <v.icon.View style={s.icon} testID={id("icon")}>
                     <IconSlot {...iconSlot(selected, "icon")} motion={s.icon}>
@@ -83,6 +99,7 @@ function ButtonImpl(props: ButtonProps): ReactNode {
             >
                 {props.label}
             </v.label.Text>
+            {start ? null : secondary}
             {indication.layer(selected)}
         </v.root.Pressable>
     );

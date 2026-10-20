@@ -13,8 +13,8 @@ const REFRESH = "the preset changed: run @pureform/anatomy's generate task";
 
 // The icon slots, which take `mirror`; the preset's icons spec lists the same ones.
 const ICON_PARTS: Record<string, string[]> = {
-    button: ["icon"],
-    chip: ["icon"],
+    button: ["icon", "secondaryIcon"],
+    chip: ["icon", "trailingIcon"],
     dialog: ["icon"],
     fab: ["icon"],
     icon: ["root"],

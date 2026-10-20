@@ -13,7 +13,7 @@ import type { Unstyled } from "../parts";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
 
-/** The button's parts: `"root" | "label" | "icon" | "touchTarget"`. */
+/** The button's parts: `"root" | "label" | "icon" | "secondaryIcon" | "touchTarget"`. */
 export type ButtonPart = PartName<typeof buttonAnatomy>;
 
 /** The button's variant groups and instance tokens. */
@@ -23,6 +23,12 @@ export interface ButtonVariantProps {
     readonly size?: VariantProp<"button", "size">;
     /** Round or square corners, which tighten while pressed and swap once a toggle is on. */
     readonly corner?: VariantProp<"button", "corner">;
+    /** Which side of the label the secondary icon is on: `end` (the default) or `start`. The
+     *  ready-made button renders it there; with parts, render it on that side. */
+    readonly secondaryIconPosition?: VariantProp<
+        "button",
+        "secondaryIconPosition"
+    >;
     readonly density?: VariantProp<"button", "density">;
     readonly tokens?: InstanceTokens<"button"> | undefined;
 }
@@ -66,6 +72,7 @@ export const BUTTON_ROOT_PROPS = [
     "variant",
     "size",
     "corner",
+    "secondaryIconPosition",
     "density",
     "tokens",
     "disabled",
@@ -100,6 +107,7 @@ export const buttonSelection = (
     variant: props.variant,
     size: props.size,
     corner: props.corner,
+    secondaryIconPosition: props.secondaryIconPosition,
     density: props.density,
     // Only when on: off is the variant's default, and leaving it out keeps a plain button's
     // classes as they were.
@@ -125,6 +133,9 @@ export interface ButtonContentProps<Node> {
     readonly label?: Node;
     /** The icon's content; the icon part renders only when given. */
     readonly icon?: Node;
+    /** The secondary icon's content (a dropdown arrow, say); the part renders only when given,
+     *  on the side `secondaryIconPosition` names. */
+    readonly secondaryIcon?: Node;
     /** Flips the icon under right to left, for an icon that points. */
     readonly mirrorIcon?: boolean | undefined;
 }
@@ -133,5 +144,6 @@ export interface ButtonContentProps<Node> {
 export const BUTTON_CONTENT_PROPS = [
     "label",
     "icon",
+    "secondaryIcon",
     "mirrorIcon",
 ] as const satisfies readonly (keyof ButtonContentProps<unknown>)[];
