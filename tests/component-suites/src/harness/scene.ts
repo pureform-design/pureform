@@ -36,6 +36,7 @@ export const COMPONENT_NAMES = [
     "SupportingText",
     "Switch",
     "Tabs",
+    "TagsInput",
     "Text",
     "TextArea",
     "TextField",

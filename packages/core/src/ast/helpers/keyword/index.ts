@@ -6,6 +6,7 @@ export * from "./align";
 export * from "./display";
 export * from "./position";
 export * from "./flexDirection";
+export * from "./flexWrap";
 export * from "./lineStyle";
 export * from "./textAlign";
 export * from "./cursor";

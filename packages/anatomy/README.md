@@ -99,6 +99,8 @@ interface PartAnatomy<P extends string = string> {
 | checkbox, radio               | `input`      | `root`                         | yes      | `root`   |
 | switch                        | `input`      | `stateLayer`                   | yes      | `root`   |
 | slider                        | `handle`     | `stateLayer`                   | yes      | `handle` |
+| input chip                    | `root`       | `root`                         | no       | `root`   |
+|                               | `remove`     | `remove`                       | yes      | `remove` |
 
 ## Public API
 

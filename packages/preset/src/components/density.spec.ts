@@ -8,20 +8,24 @@ import { button } from "./button";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { iconButton } from "./icon-button";
+import { inputChip } from "./input-chip";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { radio } from "./radio";
 import { select } from "./select";
+import { tagsInput } from "./tags-input";
 import { textField } from "./text-field";
 
 describe.each([
     ["button", button],
     ["iconButton", iconButton],
     ["chip", chip],
+    ["inputChip", inputChip],
     ["checkbox", checkbox],
     ["radio", radio],
     ["textField", textField],
     ["select", select],
+    ["tagsInput", tagsInput],
     ["listItem", listItem],
     ["menu", menu],
 ] as const)("%s density", (_, spec) => {

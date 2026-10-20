@@ -35,6 +35,7 @@ export default createConfig({
                     "rich-tooltip": "src/rich-tooltip/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     tabs: "src/tabs/index.ts",
+                    "tags-input": "src/tags-input/index.ts",
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",
                     list: "src/list/index.ts",

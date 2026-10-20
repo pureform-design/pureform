@@ -201,6 +201,8 @@ export type FlexDirectionKeyword =
     | "column"
     | "rowReverse"
     | "columnReverse";
+/** Whether a flex container's items wrap onto more lines. */
+export type FlexWrapKeyword = "nowrap" | "wrap" | "wrapReverse";
 /** Portable only: React Native `borderStyle` has no `double`. */
 export type LineStyleKeyword = "none" | "solid" | "dashed" | "dotted";
 /** Logical; prefer `start` and `end` over `left` and `right`. */

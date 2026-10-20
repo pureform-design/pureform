@@ -19,6 +19,8 @@ import {
     viewportBreakpoint,
     viewportSize,
     when,
+    wrap,
+    wrapReverse,
 } from "@pureform/core/ast";
 import type { StyleMap, ValueNode } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
@@ -44,6 +46,15 @@ const rulesOf = (root: StyleMap, extra?: Partial<CoreConfig>) => {
 };
 
 describe("lowerRn values", () => {
+    it("writes flexWrap's keywords React Native's way", () => {
+        expect(rulesOf({ flexWrap: wrapReverse }).rules[0]?.style).toEqual({
+            flexWrap: "wrap-reverse",
+        });
+        expect(rulesOf({ flexWrap: wrap }).rules[0]?.style).toEqual({
+            flexWrap: "wrap",
+        });
+    });
+
     it("writes units, colors, keywords, and logical properties React Native's way", () => {
         const { rules } = rulesOf({
             width: px(40),

@@ -19,6 +19,7 @@ const ICON_PARTS: Record<string, string[]> = {
     fab: ["icon"],
     icon: ["root"],
     iconButton: ["icon"],
+    inputChip: ["icon", "remove"],
     listItem: ["leading", "trailing"],
     menu: ["itemLeading", "itemTrailing"],
     navigationBar: ["icon"],
@@ -26,6 +27,7 @@ const ICON_PARTS: Record<string, string[]> = {
     searchBar: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
     tabs: ["icon"],
+    tagsInput: ["leadingIcon", "trailingIcon"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
 };
@@ -42,6 +44,8 @@ const at = (
 const INDICATION: Record<string, IndicationAnatomy[]> = {
     button: [at("root", "root", false)],
     chip: [at("root", "root", false)],
+    // The chip, and its remove button as a surface of its own.
+    inputChip: [at("root", "root", false), at("remove", "remove", true)],
     // When interactive, as a link or a button; with an action area, the container shows its
     // states and its layer sits in the action area.
     card: [

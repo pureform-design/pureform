@@ -320,6 +320,14 @@ progressPercent(props);                  // the value as a clamped percentage of
 progressSelection(props);                // the value token from the percentage, unless indeterminate
 progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
 
+// Tags input: Zag's tags input; a text field whose values are input chips (`chip` sets their
+// variants: inputChipSelection(props.chip)). Tags aren't edited in place.
+type TagsInputPart; interface TagsInputRootOwnProps // variant, color, density, icons, tokens, chip,
+// value (string[]), max, maxLength, delimiter, validate, removeLabel, error, …
+TAGS_INPUT_ROOT_PROPS; TAGS_INPUT_CONTENT_PROPS; tagsInputSelection(props);
+tagsInputMachineProps(props); tagsInputFilled(count, text); tagsInputChipTestId(testId);
+type InputChipPart; interface InputChipVariantProps; inputChipSelection(props);
+
 // Slider: Zag's slider machine; a value is a number or a range's numbers (SliderValue)
 type SliderPart; interface SliderRootOwnProps<V> // color, handleShape, size, orientation, tokens,
                                          // min, max, step, largeStep, minStepsBetweenThumbs,

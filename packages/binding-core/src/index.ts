@@ -47,6 +47,11 @@ export type {
     ChipRootOwnProps,
     ChipVariantProps,
 } from "./components/chip";
+export { inputChipSelection } from "./components/input-chip";
+export type {
+    InputChipPart,
+    InputChipVariantProps,
+} from "./components/input-chip";
 export {
     hasAccessibleName,
     isPresent,
@@ -309,6 +314,21 @@ export type {
     TabsRootOwnProps,
     TabsVariantProps,
 } from "./components/tabs";
+export {
+    TAGS_INPUT_CONTENT_PROPS,
+    TAGS_INPUT_ROOT_PROPS,
+    tagsInputChipTestId,
+    tagsInputFilled,
+    tagsInputMachineProps,
+    tagsInputSelection,
+} from "./components/tags-input";
+export type {
+    TagsInputBehaviorProps,
+    TagsInputContentProps,
+    TagsInputPart,
+    TagsInputRootOwnProps,
+    TagsInputVariantProps,
+} from "./components/tags-input";
 export {
     TEXT_AREA_INPUT_PROPS,
     TEXT_AREA_ROOT_PROPS,
