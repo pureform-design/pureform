@@ -65,8 +65,10 @@ Commits: see `git log 38e43e0..c1e-navigation` (preset, machines, bindings, test
   presence. Not in the component suites' examples (it renders in an overlay).
 - A horizontal item without an icon still reserves the icon's space before the label.
 - No `densityOffset` on navigation (never had one).
-- The navigation screenshot in `tests/browser-e2e-tests` changes (new fixture rows); see
-  verification for whether it was regenerated.
+- The navigation screenshot and the indication fixtures (`web.txt`, `native.txt`) were
+  regenerated on purpose: the fixtures only gained rows for the new variants (existing rows
+  unchanged; horizontal labels compute to the icon colour on both targets); the screenshot adds
+  a horizontal bar and an expanded rail with their labels inside the pill.
 
 ## How to verify
 
