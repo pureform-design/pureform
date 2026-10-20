@@ -12,6 +12,7 @@ import {
     TOAST_STACK_STYLE,
     TOASTER_PROPS,
     toasterOptions,
+    toastGroupStyle,
     toastSelection,
 } from "@pureform/binding-core";
 import type {
@@ -104,7 +105,15 @@ function Group(props: ToastGroupProps): JSX.Element {
         <groupContext.Provider value={{ service, props }}>
             {scope.render("group", {
                 element: "div",
-                machine: () => api().getGroupProps({ label: props.label }),
+                machine: () => {
+                    const machine = api().getGroupProps({ label: props.label });
+                    return {
+                        ...machine,
+                        style: toastGroupStyle(
+                            machine.style as JSX.CSSProperties,
+                        ),
+                    };
+                },
                 props: {
                     ...omit(props, "toaster", "children", ...TOASTER_PROPS),
                     get children() {
