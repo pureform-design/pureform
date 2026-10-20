@@ -31,17 +31,13 @@ import {
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useMachineButton } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
-import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -148,23 +144,16 @@ export interface SnackbarButtonProps
 const snackbarButton = (part: "action" | "close", name: string) =>
     function SnackbarButton(props: SnackbarButtonProps): JSX.Element {
         const { scope, api } = context.use(name);
-        const source = useOwnInteractionSource(() => props.interactionSource);
-        const handlers = useInteractionHandlers(source, () => false);
-        return scope.render(part, {
-            element: "button",
-            interactionSource: source,
-            machine: () =>
-                combinePartProps([
-                    (part === "action"
-                        ? api().getActionProps()
-                        : api().getCloseProps()) as Readonly<
-                        Record<string, unknown>
-                    >,
-                    handlers(),
-                ]),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "interactionSource"),
-        });
+        return scope.render(
+            part,
+            useMachineButton(props, () => [
+                (part === "action"
+                    ? api().getActionProps()
+                    : api().getCloseProps()) as Readonly<
+                    Record<string, unknown>
+                >,
+            ]),
+        );
     };
 
 /** The action, a text button: it calls `onAction`, then the snackbar asks to close. */

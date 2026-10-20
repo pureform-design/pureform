@@ -21,6 +21,7 @@ import type { ElementType, ReactNode } from "react";
 
 import {
     useInteractionHandlers,
+    useMachineButton,
     useOwnInteractionSource,
 } from "../interaction";
 import { Menu } from "../menu";
@@ -97,24 +98,16 @@ function Root(props: SplitButtonRootProps): ReactNode {
 }
 
 /** The leading button, a `<button>` for the main action. */
-function LeadingButton({
-    unstyled,
-    interactionSource,
-    ...props
-}: SplitButtonButtonProps): ReactNode {
+function LeadingButton(props: SplitButtonButtonProps): ReactNode {
     const { scope, disabled } = context.use("LeadingButton");
-    const source = useOwnInteractionSource(interactionSource);
-    const handlers = useInteractionHandlers(source, disabled);
-    return scope.render("leadingButton", {
-        element: "button",
-        interactionSource: source,
-        machine: combinePartProps([
-            { type: "button", disabled: disabled || undefined },
-            handlers,
-        ]),
-        unstyled,
-        props,
-    });
+    return scope.render(
+        "leadingButton",
+        useMachineButton(
+            props,
+            [{ type: "button", disabled: disabled || undefined }],
+            disabled,
+        ),
+    );
 }
 
 /** The trailing button the menu's trigger renders, as its part: the trigger's props, without the

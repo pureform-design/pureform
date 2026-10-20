@@ -30,16 +30,13 @@ import {
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
-import { combinePartProps, omitProps } from "../props";
+import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -143,26 +140,16 @@ export interface SnackbarButtonProps
 
 // The action and the close button, each a surface with its own source.
 const snackbarButton = (part: "action" | "close", name: string) =>
-    function SnackbarButton({
-        unstyled,
-        interactionSource,
-        ...props
-    }: SnackbarButtonProps): ReactNode {
+    function SnackbarButton(props: SnackbarButtonProps): ReactNode {
         const { scope, api } = context.use(name);
-        const source = useOwnInteractionSource(interactionSource);
-        const handlers = useInteractionHandlers(source, false);
-        return scope.render(part, {
-            element: "button",
-            interactionSource: source,
-            machine: combinePartProps([
+        return scope.render(
+            part,
+            useMachineButton(props, [
                 (part === "action"
                     ? api.getActionProps()
                     : api.getCloseProps()) as Readonly<Record<string, unknown>>,
-                handlers,
             ]),
-            unstyled,
-            props,
-        });
+        );
     };
 
 /** The action, a text button: it calls `onAction`, then the snackbar asks to close. */

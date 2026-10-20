@@ -33,16 +33,12 @@ import {
 } from "solid-js";
 
 import { CloseIcon, ToastIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useMachineButton } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -233,23 +229,16 @@ export interface ToastButtonProps
 const toastButton = (part: "actionTrigger" | "closeTrigger", name: string) =>
     function ToastButton(props: ToastButtonProps): JSX.Element {
         const { scope, api } = context.use(name);
-        const source = useOwnInteractionSource(() => props.interactionSource);
-        const handlers = useInteractionHandlers(source, () => false);
-        return scope.render(part, {
-            element: "button",
-            interactionSource: source,
-            machine: () =>
-                combinePartProps([
-                    (part === "actionTrigger"
-                        ? api().getActionTriggerProps()
-                        : api().getCloseTriggerProps()) as Readonly<
-                        Record<string, unknown>
-                    >,
-                    handlers(),
-                ]),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "interactionSource"),
-        });
+        return scope.render(
+            part,
+            useMachineButton(props, () => [
+                (part === "actionTrigger"
+                    ? api().getActionTriggerProps()
+                    : api().getCloseTriggerProps()) as Readonly<
+                    Record<string, unknown>
+                >,
+            ]),
+        );
     };
 
 /** The action, a text button: it runs the toast's `action.onClick`, then the toast closes. */

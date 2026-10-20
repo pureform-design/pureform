@@ -23,6 +23,7 @@ import { type Accessor, omit } from "solid-js";
 
 import {
     useInteractionHandlers,
+    useMachineButton,
     useOwnInteractionSource,
 } from "../interaction";
 import { Menu } from "../menu";
@@ -107,19 +108,14 @@ function Root(props: SplitButtonRootProps): JSX.Element {
 /** The leading button, a `<button>` for the main action. */
 function LeadingButton(props: SplitButtonButtonProps): JSX.Element {
     const { scope, disabled } = context.use("LeadingButton");
-    const source = useOwnInteractionSource(() => props.interactionSource);
-    const handlers = useInteractionHandlers(source, disabled);
-    return scope.render("leadingButton", {
-        element: "button",
-        interactionSource: source,
-        machine: () =>
-            combinePartProps([
-                { type: "button", disabled: disabled() || undefined },
-                handlers(),
-            ]),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
-    });
+    return scope.render(
+        "leadingButton",
+        useMachineButton(
+            props,
+            () => [{ type: "button", disabled: disabled() || undefined }],
+            disabled,
+        ),
+    );
 }
 
 /** The trailing button the menu's trigger renders, as its part. */

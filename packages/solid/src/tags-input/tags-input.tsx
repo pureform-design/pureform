@@ -39,15 +39,13 @@ import { CloseIcon } from "../glyphs";
 import {
     itemInteractionSources,
     type ItemInteractionSources,
-    useInteractionHandlers,
-    useOwnInteractionSource,
+    useMachineButton,
 } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -322,24 +320,18 @@ function ChipRemove(
 ): JSX.Element {
     const { chips, api } = context.use("ChipRemove");
     const { item } = chipContext.use("ChipRemove");
-    const source = useOwnInteractionSource(() => props.interactionSource);
-    const handlers = useInteractionHandlers(
-        source,
-        () => api().getItemState(item()).disabled,
-    );
-    return chips.render("remove", {
-        element: "button",
-        interactionSource: source,
-        machine: () =>
-            combinePartProps([
+    return chips.render(
+        "remove",
+        useMachineButton(
+            props,
+            () => [
                 api().getChipRemoveProps(item()) as Readonly<
                     Record<string, unknown>
                 >,
-                handlers(),
-            ]),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
-    });
+            ],
+            () => api().getItemState(item()).disabled,
+        ),
+    );
 }
 
 /** The ready-made tags input's props: Root's, with `class`, `style`, and `slotProps` keyed by
