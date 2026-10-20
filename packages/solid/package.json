@@ -280,6 +280,17 @@
                 "default": "./dist/avatar.jsx"
             }
         },
+        "./badge": {
+            "types": "./dist/badge/index.d.ts",
+            "solid": {
+                "development": "./src/badge/index.ts",
+                "default": "./dist/badge.jsx"
+            },
+            "import": {
+                "development": "./src/badge/index.ts",
+                "default": "./dist/badge.jsx"
+            }
+        },
         "./card": {
             "types": "./dist/card/index.d.ts",
             "solid": {

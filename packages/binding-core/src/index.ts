@@ -457,6 +457,16 @@ export { selectionSignature, withDefaults } from "./selection";
 export { trainVersionMismatch } from "./version";
 export { warnOnce } from "./warn";
 export {
+    BADGE_ROOT_PROPS,
+    badgeRootProps,
+    badgeSelection,
+} from "./components/badge";
+export type {
+    BadgePart,
+    BadgeRootOwnProps,
+    BadgeVariantProps,
+} from "./components/badge";
+export {
     AVATAR_ROOT_PROPS,
     avatarElement,
     avatarRootProps,

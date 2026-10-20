@@ -371,6 +371,8 @@ RIPPLE_ROOT_PROPS; rippleSelection(props); rippleMachineProps(props); // effect 
 // Single-part components: Root is the component
 AVATAR_ROOT_PROPS; avatarSelection; avatarElement({ src, as }); // img with a src, else span
 avatarRootProps(props, element);         // src and alt; else role img named by label, or hidden
+BADGE_ROOT_PROPS; badgeSelection;      // size, placement
+badgeRootProps(props);                   // role img named by label; a dot without one is hidden
 MEDIA_ROOT_PROPS; mediaSelection;        // aspect, shape
 SEPARATOR_ROOT_PROPS; separatorSelection; separatorRootProps(element); // role on anything but hr
 SCRIM_ROOT_PROPS; scrimSelection;

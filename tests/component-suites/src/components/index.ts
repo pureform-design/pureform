@@ -20,6 +20,7 @@ import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import {
     avatar,
+    badge,
     icon,
     media,
     ripple,
@@ -39,6 +40,7 @@ import type { ComponentCase } from "./types";
 
 export const COMPONENTS: readonly ComponentCase[] = [
     avatar,
+    badge,
     button,
     card,
     cardActionArea,

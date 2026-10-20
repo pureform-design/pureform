@@ -378,9 +378,12 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   surface. It runs pureform's ripple machine with `useReducedMotion()` (no ripples while motion is
   reduced) and the `ripple` slot's class for each ripple. Props: `disabled`, `effect`
   (`"ink-well"` or `"ink-sparkle"`), `centered`, `allowPropagation`, `getSurfaceEl`.
-- **Single-part components** (`Avatar`, `Media`, `Separator`, `Scrim`, `SupportingText`, `Text`,
+- **Single-part components** (`Avatar`, `Badge`, `Media`, `Separator`, `Scrim`, `SupportingText`, `Text`,
   `Icon`, `TouchTarget`) are Root alone (`Avatar.Root` is the same component): their variants,
   `tokens`, `testId`, `unstyled`, `as`, and the element's own props, `class` and `style` included.
+  The badge is a `<span>` of its children (`<Badge>3</Badge>`), or a dot with `size="small"`, with
+  `placement="anchored"` on the corner of its positioned parent; `label` names it (`role="img"`),
+  and a dot without one is `aria-hidden`.
   The avatar is an `<img>` with `src` (its `label` the `alt`), else a `<span>` of its children,
   `role="img"` named by `label`, or hidden without one. Media is an `<img>` (`as="video"` for a
   video). The separator is an `<hr>` (another element gets `role="separator"`). The scrim and touch

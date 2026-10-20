@@ -6,6 +6,7 @@ import { userEvent } from "vitest/browser";
 
 import { Glyph, PureformProvider, useIconStyle } from ".";
 import { Avatar } from "./avatar";
+import { Badge } from "./badge";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Checkbox } from "./checkbox";
@@ -63,6 +64,7 @@ const COMPONENTS = [
     "card",
     "text",
     "avatar",
+    "badge",
     "icon",
     "iconButton",
     "fab",
@@ -125,6 +127,7 @@ describe("every component", () => {
                     <Text textStyle="bodyMedium">Card</Text>
                 </Card>
                 <Avatar label="Ada">AL</Avatar>
+                <Badge>3</Badge>
                 <Icon label="Star">
                     <Glyph glyph="★" />
                 </Icon>
@@ -184,6 +187,7 @@ describe("every component", () => {
             "pf-card-root",
             "pf-text-root",
             "pf-avatar-root",
+            "pf-badge-root",
             "pf-icon-root",
             "pf-icon-button-container",
             "pf-icon-button-outline",

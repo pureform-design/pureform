@@ -8,6 +8,7 @@ import {
 } from "@pureform/solid";
 import type { Indication } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
+import { Badge } from "@pureform/solid/badge";
 import { Button } from "@pureform/solid/button";
 import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
@@ -61,6 +62,7 @@ import { sceneTheme } from "../../harness/themes";
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ValidComponent> = {
     Avatar,
+    Badge,
     Button,
     Card,
     Checkbox,

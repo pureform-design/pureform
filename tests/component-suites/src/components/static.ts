@@ -27,6 +27,20 @@ export const avatar: ComponentCase = {
     },
 };
 
+export const badge: ComponentCase = {
+    component: "Badge",
+    props: { children: "3" },
+    root: testIds.badge.root,
+    examples: {
+        large: {},
+        small: { size: "small", children: undefined },
+        "long count": { children: "999+" },
+        labelled: { label: "3 unread" },
+    },
+    // The error color doesn't follow a theme's seed.
+    themed: false,
+};
+
 export const media: ComponentCase = {
     component: "Media",
     props: { src: PICTURE, alt: "A teal square" },

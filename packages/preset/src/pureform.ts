@@ -45,6 +45,7 @@ import type {
 } from "@pureform/theme";
 
 import { createAvatar } from "./components/avatar";
+import { badge } from "./components/badge";
 import { createButton } from "./components/button";
 import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
@@ -272,6 +273,7 @@ const defaultComponents = <G extends string>(
         ),
         fab: createFab(theme.color.groups, shapes),
         avatar: createAvatar(theme.color.groups, shapes),
+        badge,
         media: createMedia(shapes),
         chip: createChip<G, Step>(theme.color.groups, densities),
         inputChip: createInputChip<G, Step>(theme.color.groups, densities),

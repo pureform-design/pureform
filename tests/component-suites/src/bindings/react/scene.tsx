@@ -9,6 +9,7 @@ import {
 } from "@pureform/react";
 import type { Indication } from "@pureform/react";
 import { Avatar } from "@pureform/react/avatar";
+import { Badge } from "@pureform/react/badge";
 import { Button } from "@pureform/react/button";
 import { Card } from "@pureform/react/card";
 import { Checkbox } from "@pureform/react/checkbox";
@@ -60,6 +61,7 @@ import { sceneTheme } from "../../harness/themes";
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ComponentType<never>> = {
     Avatar,
+    Badge,
     Button,
     Card,
     Checkbox,

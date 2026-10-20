@@ -14,6 +14,7 @@ export default createConfig({
                     reanimated: "src/engines/reanimated.ts",
                     "reanimated-svg": "src/engines/reanimated-svg.ts",
                     avatar: "src/avatar/index.ts",
+                    badge: "src/badge/index.ts",
                     button: "src/button/index.ts",
                     card: "src/card/index.ts",
                     checkbox: "src/checkbox/index.ts",

@@ -7,6 +7,7 @@ import { describe, expect, it } from "vitest";
 import { Avatar } from ".";
 import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
+import { Badge } from "../badge";
 import { Icon } from "../icon";
 import { Media } from "../media";
 import { Scrim } from "../scrim";
@@ -48,6 +49,33 @@ describe("Avatar", () => {
         expect(root.getAttribute("role")).toBe("img");
         expect(root.getAttribute("aria-label")).toBe("Ada Lovelace");
         expect(root.textContent).toBe("AL");
+    });
+});
+
+describe("Badge", () => {
+    it("is its count in the registry's classes, anchored when asked", async () => {
+        withRegistry(<Badge placement="anchored">3</Badge>);
+        await settle();
+        const root = byTestId(testIds.badge.root);
+        expect(root.tagName).toBe("SPAN");
+        expect(root.textContent).toBe("3");
+        expect(root.className).toBe("badge badge--placement-anchored");
+    });
+
+    it("is a hidden dot without a label, a named image with one", async () => {
+        withRegistry(
+            <>
+                <Badge size="small" />
+                <Badge label="3 unread">3</Badge>
+            </>,
+        );
+        await settle();
+        const [dot, named] = document.querySelectorAll(
+            `[data-testid="${testIds.badge.root}"]`,
+        );
+        expect(dot?.getAttribute("aria-hidden")).toBe("true");
+        expect(named?.getAttribute("role")).toBe("img");
+        expect(named?.getAttribute("aria-label")).toBe("3 unread");
     });
 });
 

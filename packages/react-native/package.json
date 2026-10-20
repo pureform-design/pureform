@@ -40,6 +40,13 @@
                 "default": "./dist/avatar.mjs"
             }
         },
+        "./badge": {
+            "types": "./dist/badge/index.d.ts",
+            "import": {
+                "development": "./src/badge/index.ts",
+                "default": "./dist/badge.mjs"
+            }
+        },
         "./button": {
             "types": "./dist/button/index.d.ts",
             "import": {
