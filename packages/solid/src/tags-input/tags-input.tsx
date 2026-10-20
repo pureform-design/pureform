@@ -234,23 +234,26 @@ function Chip(props: TagsInputChipProps): JSX.Element {
     );
     return (
         <chipContext.Provider value={{ item }}>
-            {chips.render("root", {
-                element: "div",
-                interactionSource: source,
-                machine: () => api().getChipProps(item()),
-                states: () => ({
-                    hover: api().getItemState(item()).highlighted,
-                }),
-                unstyled: () => props.unstyled,
-                props: omit(
-                    props,
-                    "unstyled",
-                    "value",
-                    "index",
-                    "disabled",
-                    "interactionSource",
-                ),
-            })}
+            {/* Zag's item, unstyled around the chip, keeps focus in it from blurring the field. */}
+            <div {...(api().getChipItemProps(item()) as object)}>
+                {chips.render("root", {
+                    element: "div",
+                    interactionSource: source,
+                    machine: () => api().getChipProps(item()),
+                    states: () => ({
+                        hover: api().getItemState(item()).highlighted,
+                    }),
+                    unstyled: () => props.unstyled,
+                    props: omit(
+                        props,
+                        "unstyled",
+                        "value",
+                        "index",
+                        "disabled",
+                        "interactionSource",
+                    ),
+                })}
+            </div>
         </chipContext.Provider>
     );
 }
