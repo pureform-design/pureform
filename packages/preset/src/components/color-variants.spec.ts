@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
+import { createInputChip } from "./input-chip";
 import { createListItem } from "./list-item";
 import { createMenu } from "./menu";
 import { createNavigationBar } from "./navigation-bar";
@@ -14,6 +15,7 @@ import { createSlider } from "./slider";
 import { createSupportingText } from "./supporting-text";
 import { createSwitch } from "./switch";
 import { createTabs } from "./tabs";
+import { createTagsInput } from "./tags-input";
 import { createTextArea } from "./text-area";
 import { createTextField } from "./text-field";
 
@@ -24,8 +26,10 @@ describe.each([
     ["radio", createRadio],
     ["switchControl", createSwitch],
     ["chip", createChip],
+    ["inputChip", createInputChip],
     ["textField", createTextField],
     ["textArea", createTextArea],
+    ["tagsInput", createTagsInput],
     ["select", createSelect],
     ["listItem", createListItem],
     ["menu", createMenu],
