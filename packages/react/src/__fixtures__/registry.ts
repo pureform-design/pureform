@@ -248,9 +248,19 @@ const valued =
  *  their `value` token), card, search bar, ripple, and the single-part components. */
 export const displayRegistry = () =>
     createRegistry({
-        linearProgress: valued("linear-progress", ["root", "indicator"]),
+        linearProgress: valued("linear-progress", [
+            "root",
+            "track",
+            "indicator",
+            "stopIndicator",
+        ]),
         circularProgress: valued("circular-progress", [
             "root",
+            "track",
+            "trackEndHalf",
+            "trackEndArc",
+            "trackStartHalf",
+            "trackStartArc",
             "endHalf",
             "endArc",
             "startHalf",

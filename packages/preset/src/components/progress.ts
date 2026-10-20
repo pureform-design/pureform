@@ -6,13 +6,23 @@
 // indicator then slides along its track, and the circular one spins.
 //
 //   <div class={root} role="progressbar" aria-valuenow="40" style="--components-linearProgress-value: 40">
+//     <div class={track} />
 //     <div class={indicator} />
+//     <div class={stopIndicator} />
 //   </div>
 //
 //   <div class={root} role="progressbar" aria-valuenow="40" style="--components-circularProgress-value: 40">
+//     <span class={track}>
+//       <span class={trackEndHalf}><span class={trackEndArc} /></span>
+//       <span class={trackStartHalf}><span class={trackStartArc} /></span>
+//     </span>
 //     <span class={endHalf}><span class={endArc} /></span>
 //     <span class={startHalf}><span class={startArc} /></span>
 //   </div>
+//
+// A determinate indicator leaves a gap between its active part and its track (the `gap` token:
+// a length on the linear one, a share of the circle on the circular one). The track draws from
+// where the gap ends to where it begins again, so it never sits under the indicator.
 
 import { typed } from "@pureform/core";
 import {
@@ -20,6 +30,7 @@ import {
     add,
     animation,
     clamp,
+    div,
     hidden,
     max,
     min,
@@ -82,6 +93,8 @@ const linear = componentTokens("linearProgress", {
     thickHeight: px(8),
     value: unitless(0),
     indeterminateWidth: pct(40),
+    gap: px(4),
+    stopSize: px(4),
 });
 
 const slide = (name: string) =>
@@ -105,8 +118,8 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                     "Material linear progress. Set the value token (0 to 100), or turn on indeterminate.",
             },
             tokens: linear.tokens,
-            slots: ["root", "indicator"],
-            structure: { root: ["indicator"] },
+            slots: ["root", "track", "indicator", "stopIndicator"],
+            structure: { root: ["track", "indicator", "stopIndicator"] },
             variants: {
                 indeterminate: ["true", "false"],
                 thickness: ["default", "thick"],
@@ -119,8 +132,34 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         overflow: hidden,
                         width: pct(100),
                         height: ref("height"),
+                    },
+                    // The track starts after the indicator and the gap, and ends at the root's
+                    // end. At a full value its start passes its end and nothing shows.
+                    track: {
+                        position: absolute,
+                        top: px(0),
+                        height: pct(100),
+                        insetInlineStart: add(
+                            mul(ref("value"), pct(1)),
+                            ref("gap"),
+                        ),
+                        insetInlineEnd: px(0),
                         borderRadius: radius("full"),
                         backgroundColor: ref("trackColor"),
+                        transition: tweens("insetInlineStart"),
+                    },
+                    // The dot at the end of a determinate track, centred on it.
+                    stopIndicator: {
+                        position: absolute,
+                        insetInlineEnd: px(0),
+                        top: div(
+                            sub(ref("height"), ref("stopSize")),
+                            unitless(2),
+                        ),
+                        width: ref("stopSize"),
+                        height: ref("stopSize"),
+                        borderRadius: circle,
+                        backgroundColor: ref("activeColor"),
                     },
                     indicator: {
                         position: absolute,
@@ -136,6 +175,8 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                 variants: {
                     indeterminate: {
                         true: {
+                            track: { insetInlineStart: px(0) },
+                            stopIndicator: { display: none },
                             indicator: {
                                 width: ref("indeterminateWidth"),
                                 animation: when(
@@ -150,11 +191,14 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                     // M3 Expressive's thick track.
                     thickness: {
                         default: {},
-                        thick: { root: { height: ref("thickHeight") } },
+                        thick: {
+                            root: { tokens: { height: ref("thickHeight") } },
+                        },
                     },
                     color: colorVariant(groups, (g) => ({
-                        root: { backgroundColor: g.container },
+                        track: { backgroundColor: g.container },
                         indicator: { backgroundColor: g.main },
+                        stopIndicator: { backgroundColor: g.main },
                     })),
                 },
                 defaultVariants: {
@@ -176,9 +220,11 @@ const circular = componentTokens(
     "circularProgress",
     {
         activeColor: sys("primary"),
+        trackColor: sys("secondaryContainer"),
         size: px(48),
         thickness: px(4),
         value: unitless(0),
+        gap: unitless(3),
     },
     { value: "number" },
 );
@@ -205,24 +251,39 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
         side: "Start" | "End",
         start: number,
         sweep: ReturnType<typeof min>,
-    ): StyleMap => ({
-        position: absolute,
-        top: px(0),
-        [`insetInline${side}`]: px(0),
-        width: pct(200),
-        height: pct(100),
-        borderRadius: circle,
-        borderStyle: solid,
-        borderWidth: ref("thickness"),
-        borderColor: transparent,
-        borderBlockStartColor: ref("activeColor"),
-        borderInlineEndColor: ref("activeColor"),
-        transform: transform(
-            rotate(add(numeric(start, "deg"), mul(sweep, DEG_PER_PERCENT))),
-        ),
-        // Hidden until it has a share to show, so its anti-aliased edge never shows at the seam.
-        opacity: clamp(unitless(0), sweep, unitless(1)),
-    });
+        color: ReturnType<typeof ref>,
+    ): StyleMap => {
+        const turn = add(numeric(start, "deg"), mul(sweep, DEG_PER_PERCENT));
+        return {
+            position: absolute,
+            top: px(0),
+            [`insetInline${side}`]: px(0),
+            width: pct(200),
+            height: pct(100),
+            borderRadius: circle,
+            borderStyle: solid,
+            borderWidth: ref("thickness"),
+            borderColor: transparent,
+            borderBlockStartColor: color,
+            borderInlineEndColor: color,
+            // Turned the other way under right to left, where the ring is mirrored.
+            transform: when(
+                "rtl",
+                transform(rotate(mul(turn, unitless(-1)))),
+                transform(rotate(turn)),
+            ),
+            // Hidden until it has a share to show, so its anti-aliased edge never shows at the seam.
+            opacity: clamp(unitless(0), sweep, unitless(1)),
+        };
+    };
+
+    // The track is the same two-half ring, turned to where the gap after the indicator ends and
+    // drawing what is left of the circle less a gap at each end (in percent of the circle).
+    const trackTurn = add(ref("value"), ref("gap"));
+    const left = max(
+        sub(unitless(100), ref("value"), mul(ref("gap"), unitless(2))),
+        unitless(0),
+    );
 
     return pf.slotComponent({
         name: "circularProgress",
@@ -231,9 +292,23 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                 "Material circular progress. Set the value token (0 to 100), or turn on indeterminate for a spinner.",
         },
         tokens: circular.tokens,
-        slots: ["root", "endHalf", "endArc", "startHalf", "startArc"],
+        slots: [
+            "root",
+            "track",
+            "trackEndHalf",
+            "trackEndArc",
+            "trackStartHalf",
+            "trackStartArc",
+            "endHalf",
+            "endArc",
+            "startHalf",
+            "startArc",
+        ],
         structure: {
-            root: ["endHalf", "startHalf"],
+            root: ["track", "endHalf", "startHalf"],
+            track: ["trackEndHalf", "trackStartHalf"],
+            trackEndHalf: ["trackEndArc"],
+            trackStartHalf: ["trackStartArc"],
             endHalf: ["endArc"],
             startHalf: ["startArc"],
         },
@@ -252,13 +327,47 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     transition: tweens(circular.own("value")),
                 },
                 // The end half shows the first 50%, the start half the rest.
+                track: {
+                    position: absolute,
+                    top: px(0),
+                    insetInlineStart: px(0),
+                    width: pct(100),
+                    height: pct(100),
+                    // Turned the other way under right to left, which mirrors the circle.
+                    transform: when(
+                        "rtl",
+                        transform(rotate(mul(trackTurn, numeric(-3.6, "deg")))),
+                        transform(rotate(mul(trackTurn, DEG_PER_PERCENT))),
+                    ),
+                    transition: tweens(circular.own("value")),
+                },
+                trackEndHalf: half("End"),
+                trackEndArc: arc(
+                    "End",
+                    -135,
+                    min(left, unitless(50)),
+                    ref("trackColor"),
+                ),
+                trackStartHalf: half("Start"),
+                trackStartArc: arc(
+                    "Start",
+                    45,
+                    max(sub(left, unitless(50)), unitless(0)),
+                    ref("trackColor"),
+                ),
                 endHalf: half("End"),
-                endArc: arc("End", -135, min(ref("value"), unitless(50))),
+                endArc: arc(
+                    "End",
+                    -135,
+                    min(ref("value"), unitless(50)),
+                    ref("activeColor"),
+                ),
                 startHalf: half("Start"),
                 startArc: arc(
                     "Start",
                     45,
                     max(sub(ref("value"), unitless(50)), unitless(0)),
+                    ref("activeColor"),
                 ),
             },
             variants: {
@@ -278,6 +387,7 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                                 iterations: "infinite",
                             }),
                         },
+                        track: { display: none },
                         endHalf: { display: none },
                         startHalf: { display: none },
                     },
@@ -295,7 +405,17 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                         borderBlockStartColor: g.main,
                         borderInlineEndColor: g.main,
                     };
-                    return { root: sides, endArc: sides, startArc: sides };
+                    const track = {
+                        borderBlockStartColor: g.container,
+                        borderInlineEndColor: g.container,
+                    };
+                    return {
+                        root: sides,
+                        endArc: sides,
+                        startArc: sides,
+                        trackEndArc: track,
+                        trackStartArc: track,
+                    };
                 }),
             },
             defaultVariants: {

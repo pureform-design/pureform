@@ -60,7 +60,11 @@ const ROW_PAIRS = [
 const NAV_PAIRS = [
     pair(token("labelColor"), token("container"), TEXT_CONTRAST),
     pair(token("activeLabelColor"), token("container"), TEXT_CONTRAST),
-    pair(token("horizontalActiveLabelColor"), token("indicatorColor"), TEXT_CONTRAST),
+    pair(
+        token("horizontalActiveLabelColor"),
+        token("indicatorColor"),
+        TEXT_CONTRAST,
+    ),
     pair(token("iconColor"), token("container"), UI_CONTRAST),
     pair(token("activeIconColor"), token("indicatorColor"), UI_CONTRAST),
 ];

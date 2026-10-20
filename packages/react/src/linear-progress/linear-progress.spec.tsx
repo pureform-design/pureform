@@ -40,6 +40,9 @@ describe("LinearProgress", () => {
         expect(byTestId(testIds.linearProgress.indicator).parentElement).toBe(
             root,
         );
+        expect(
+            [...root.children].map((part) => part.getAttribute("data-pf-part")),
+        ).toEqual(["track", "indicator", "stop-indicator"]);
     });
 
     it("is indeterminate without a value", async () => {
@@ -61,7 +64,19 @@ describe("CircularProgress", () => {
         expect(root.getAttribute("aria-valuenow")).toBe("75");
         expect(
             [...root.children].map((part) => part.getAttribute("data-pf-part")),
-        ).toEqual(["end-half", "start-half"]);
+        ).toEqual(["track", "end-half", "start-half"]);
+        const track = byTestId(ids.track);
+        expect(
+            [...track.children].map((part) =>
+                part.getAttribute("data-pf-part"),
+            ),
+        ).toEqual(["track-end-half", "track-start-half"]);
+        expect(byTestId(ids.trackEndArc).parentElement).toBe(
+            byTestId(ids.trackEndHalf),
+        );
+        expect(byTestId(ids.trackStartArc).parentElement).toBe(
+            byTestId(ids.trackStartHalf),
+        );
         expect(byTestId(ids.endArc).parentElement).toBe(byTestId(ids.endHalf));
         expect(byTestId(ids.startArc).parentElement).toBe(
             byTestId(ids.startHalf),
