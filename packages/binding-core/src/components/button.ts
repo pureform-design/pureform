@@ -21,6 +21,8 @@ export interface ButtonVariantProps {
     readonly color?: VariantProp<"button", "color">;
     readonly variant?: VariantProp<"button", "variant">;
     readonly size?: VariantProp<"button", "size">;
+    /** Round or square corners, which tighten while pressed and swap once a toggle is on. */
+    readonly corner?: VariantProp<"button", "corner">;
     readonly density?: VariantProp<"button", "density">;
     readonly tokens?: InstanceTokens<"button"> | undefined;
 }
@@ -63,6 +65,7 @@ export const BUTTON_ROOT_PROPS = [
     "color",
     "variant",
     "size",
+    "corner",
     "density",
     "tokens",
     "disabled",
@@ -82,14 +85,25 @@ export const BUTTON_ROOT_PROPS = [
     "interactionSource",
 ] as const satisfies readonly (keyof ButtonRootOwnProps)[];
 
-/** The registry selection from Root's props. */
+/** Whether a press toggles `selected`: `toggle` when given, else whether `selected` or
+ *  `defaultSelected` is. The button machine decides the same way. */
+export const isToggle = (props: ButtonBehaviorProps): boolean =>
+    props.toggle ??
+    (props.selected !== undefined || props.defaultSelected !== undefined);
+
+/** The registry selection from Root's props, with `toggle` set for a toggle button, which draws
+ *  M3 Expressive's unselected and selected colors. */
 export const buttonSelection = (
-    props: ButtonVariantProps,
+    props: ButtonVariantProps & ButtonBehaviorProps,
 ): Selection<"button"> => ({
     color: props.color,
     variant: props.variant,
     size: props.size,
+    corner: props.corner,
     density: props.density,
+    // Only when on: off is the variant's default, and leaving it out keeps a plain button's
+    // classes as they were.
+    toggle: isToggle(props) || undefined,
     tokens: props.tokens,
 });
 

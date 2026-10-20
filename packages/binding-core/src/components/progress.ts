@@ -29,6 +29,8 @@ export type ProgressComponent = "linearProgress" | "circularProgress";
 export interface ProgressVariantProps<C extends ProgressComponent> {
     readonly indeterminate?: boolean | undefined;
     readonly color?: VariantProp<C, "color">;
+    /** M3 Expressive's thick track. */
+    readonly thickness?: VariantProp<C, "thickness">;
     readonly tokens?: InstanceTokens<C> | undefined;
 }
 
@@ -68,6 +70,7 @@ export interface ProgressRootOwnProps<C extends ProgressComponent>
 export const PROGRESS_ROOT_PROPS = [
     "indeterminate",
     "color",
+    "thickness",
     "tokens",
     "value",
     "min",
@@ -107,6 +110,7 @@ export const progressSelection = <C extends ProgressComponent>(
     return {
         indeterminate,
         color: props.color,
+        thickness: props.thickness,
         tokens: {
             ...(indeterminate ? {} : { value: progressPercent(props) }),
             ...tokens,

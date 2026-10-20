@@ -21,6 +21,8 @@ export type SwitchPart = PartName<typeof switchControlAnatomy>;
 /** The switch's variant groups and instance tokens. */
 export interface SwitchVariantProps {
     readonly color?: VariantProp<"switchControl", "color">;
+    /** When the handle's icon shows: when on (`selected`), in both states, or never. */
+    readonly icons?: VariantProp<"switchControl", "icons">;
     readonly tokens?: InstanceTokens<"switchControl"> | undefined;
 }
 
@@ -62,6 +64,7 @@ export interface SwitchRootOwnProps
 /** The keys of `SwitchRootOwnProps`, which Root keeps off its element. */
 export const SWITCH_ROOT_PROPS = [
     "color",
+    "icons",
     "tokens",
     "disabled",
     "invalid",
@@ -105,6 +108,7 @@ export const switchSelection = (
     props: SwitchVariantProps,
 ): Selection<"switchControl"> => ({
     color: props.color,
+    icons: props.icons,
     tokens: props.tokens,
 });
 

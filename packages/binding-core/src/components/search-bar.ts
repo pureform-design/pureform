@@ -11,12 +11,15 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
+import type { VariantProp } from "./variants";
 
 /** The search bar's parts: `"root" | "leading" | "input" | "trailing"`. */
 export type SearchBarPart = PartName<typeof searchBarAnatomy>;
 
 /** The search bar's instance tokens; it has no variant groups. */
 export interface SearchBarVariantProps {
+    /** Centers the query and placeholder, as an app bar's search does. */
+    readonly centered?: VariantProp<"searchBar", "centered">;
     readonly tokens?: InstanceTokens<"searchBar"> | undefined;
 }
 
@@ -53,6 +56,7 @@ export interface SearchBarRootOwnProps
 
 /** The keys of `SearchBarRootOwnProps`, which Root keeps off its element. */
 export const SEARCH_BAR_ROOT_PROPS = [
+    "centered",
     "tokens",
     "disabled",
     "required",
@@ -104,7 +108,10 @@ export const SEARCH_BAR_CONTENT_PROPS = [
 /** The registry selection from Root's props. */
 export const searchBarSelection = (
     props: SearchBarVariantProps,
-): Selection<"searchBar"> => ({ tokens: props.tokens });
+): Selection<"searchBar"> => ({
+    centered: props.centered,
+    tokens: props.tokens,
+});
 
 /** The text field machine's props from Root's, besides `id`, `dir`, and the controllable `value`
  *  (the binding's `useControllable`). The placeholder is the input's own: a search bar has no
