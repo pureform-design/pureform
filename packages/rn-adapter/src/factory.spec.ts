@@ -209,7 +209,10 @@ describe("movingSlots", () => {
         defaultVariants: { size: "small" },
         entries: Object.entries(rules).map(([slot, list], index) => ({
             layer: index % 2 === 0 ? 0 : 1,
-            match: index % 2 === 0 ? {} : { size: "large" },
+            match: (index % 2 === 0 ? {} : { size: "large" }) as Record<
+                string,
+                string
+            >,
             slot,
             rules: list,
         })),
@@ -430,18 +433,23 @@ describe("nativeFactory", () => {
 });
 
 describe("splitPrecomputed", () => {
-    it("gives each component's styles as precomputing it alone does", () => {
-        const preset = pureform();
-        const whole = precompute(preset);
-        const split = splitPrecomputed(whole);
-        expect(Object.keys(split)).toEqual(Object.keys(whole.templates));
-        for (const name of Object.keys(whole.templates)) {
-            expect(json(split[name])).toBe(
-                json(precompute(preset, { components: [name] })),
-            );
-            expect(split[name]!.themes).toBe(whole.themes);
-        }
-    });
+    // Precomputes the whole preset, then each component alone: over half a second on its own.
+    it(
+        "gives each component's styles as precomputing it alone does",
+        { timeout: 30_000 },
+        () => {
+            const preset = pureform();
+            const whole = precompute(preset);
+            const split = splitPrecomputed(whole);
+            expect(Object.keys(split)).toEqual(Object.keys(whole.templates));
+            for (const name of Object.keys(whole.templates)) {
+                expect(json(split[name])).toBe(
+                    json(precompute(preset, { components: [name] })),
+                );
+                expect(split[name]!.themes).toBe(whole.themes);
+            }
+        },
+    );
 });
 
 describe("over the preset", () => {

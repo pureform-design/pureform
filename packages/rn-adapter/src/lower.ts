@@ -457,7 +457,7 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                 args.map((n) => lowerNode(n, ctx)),
                 (values) => {
                     let i = 0;
-                    return node.ops.flatMap((op) => {
+                    return node.ops.flatMap((op): Record<string, Value>[] => {
                         const own = op.args.map(() => values[i++]!);
                         if (op.fn === "translate") {
                             return [
