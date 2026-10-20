@@ -31,6 +31,7 @@ export const RN_COMPONENTS = [
     "navigationBar",
     "navigationRail",
     "dialog",
+    "fullscreenDialog",
     "snackbar",
     "tooltip",
 ];
