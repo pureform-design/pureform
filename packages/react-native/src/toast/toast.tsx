@@ -26,13 +26,13 @@ import { useEffect, useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import { IconSlot, iconSlot } from "../icon-style";
-import { useSurfaceIndication } from "../indication";
-import { testIdOf, unselectable, withEngine } from "../parts";
+import { useHeldTimeout } from "../overlay";
+import { testIdOf, withEngine } from "../parts";
 import { usePortalHost } from "../portal-host";
 import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
+import { SurfaceButton } from "../surface-button";
 
 /** A toaster: Zag's toast store. Call `create`, `success`, `error`, `warning`, `info`, `loading`,
  *  `update` and `dismiss` on it. */
@@ -44,11 +44,6 @@ export type ToastData = toast.Props<ReactNode>;
 /** A new toaster, with pureform's defaults (bottom end, at most 3, 5 s each). Make it once. */
 export const createToaster = (options?: ToasterOptions): ToastStore =>
     toast.createStore(toasterOptions(options));
-
-// The action's and the close button's.
-const INDICATIONS = Object.fromEntries(
-    toastAnatomy.indication!.map((entry) => [entry.trigger, entry]),
-);
 
 export interface ToasterProps extends ToastVariantProps, IndicationProps {
     readonly toaster: ToastStore;
@@ -92,38 +87,19 @@ function ToastButtonImpl(props: {
     readonly onPress: () => void;
     readonly children: ReactNode;
 }): ReactNode {
-    const indication = useSurfaceIndication(INDICATIONS[props.part]!, {
-        indication: props.toaster.indication,
-    });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<ToastPart>(
-        "toast",
-        indication.select(toastSelection(props.type, props.toaster)),
-        indication.states(),
-    );
-    const Surface = v[props.part];
     return (
-        <Surface.Pressable
-            {...indication.handlers}
-            role="button"
-            {...(props.label === undefined
-                ? {}
-                : { "aria-label": props.label })}
+        <SurfaceButton
+            anatomy={toastAnatomy}
+            component="toast"
+            part={props.part}
+            selection={toastSelection(props.type, props.toaster)}
+            indication={props.toaster.indication}
+            testId={props.toaster.testId}
+            label={props.label}
             onPress={props.onPress}
-            style={{ ...s[props.part], ...unselectable }}
-            testID={testIdOf(toastAnatomy, props.part, props.toaster.testId)}
         >
-            <IconSlot
-                {...iconSlot(selected, props.part)}
-                motion={s[props.part]}
-            >
-                {props.children}
-            </IconSlot>
-            {indication.layer(selected)}
-        </Surface.Pressable>
+            {props.children}
+        </SurfaceButton>
     );
 }
 
@@ -143,18 +119,13 @@ function ToastItem(props: {
         "toast",
         toastSelection(item.type, toaster),
     );
-    const [hovered, setHovered] = useState(false);
-    const [pressed, setPressed] = useState(false);
-    const held = hovered || pressed;
     const duration =
         item.type === "loading"
             ? Infinity
             : (item.duration ?? store.attrs.duration);
-    useEffect(() => {
-        if (!open || held || !Number.isFinite(duration)) return undefined;
-        const timer = setTimeout(() => store.dismiss(item.id), duration);
-        return () => clearTimeout(timer);
-    }, [open, held, duration, store, item.id]);
+    const { holdProps } = useHeldTimeout(open, duration, () =>
+        store.dismiss(item.id),
+    );
     useLayoutEffect(() => {
         if (!presence.present) store.remove(item.id);
     }, [presence.present, store, item.id]);
@@ -171,14 +142,7 @@ function ToastItem(props: {
                 ...presence.style,
             }}
         >
-            <Pressable
-                accessible={false}
-                focusable={false}
-                onHoverIn={() => setHovered(true)}
-                onHoverOut={() => setHovered(false)}
-                onPressIn={() => setPressed(true)}
-                onPressOut={() => setPressed(false)}
-            >
+            <Pressable {...holdProps}>
                 <v.root.View
                     role="status"
                     aria-live="polite"

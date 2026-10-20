@@ -29,14 +29,12 @@ import type {
 } from "@pureform/binding-core";
 import { useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Modal, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 
 import { IconButton } from "../icon-button/icon-button";
 import { Menu } from "../menu/menu";
-import { dismissTopOverlay, useDismiss } from "../overlay";
+import { ModalWindow, useModalOverlay } from "../modal";
 import { testIdOf, useControllable, useStableCallback } from "../parts";
-import { PortalHost } from "../portal-host";
-import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { SearchBar } from "../search-bar/search-bar";
 import { useComponentSlots } from "../styles";
@@ -112,13 +110,9 @@ export interface SearchViewProps
  *  `<SearchView placeholder="Search mail" items={…} onSelect={…} onSubmit={…} />`. */
 export function SearchView(props: SearchViewProps): ReactNode {
     const engine = useEngine();
-    const [open, setOpen] = useControllable(
+    const { open, setOpen, presence, close } = useModalOverlay(
         "SearchView",
-        "open",
-        props.open,
-        props.defaultOpen,
-        props.onOpenChange,
-        false,
+        props,
     );
     const [query, setQuery] = useControllable(
         "SearchView",
@@ -128,7 +122,6 @@ export function SearchView(props: SearchViewProps): ReactNode {
         props.onInputValueChange,
         "",
     );
-    const presence = usePresence(open, "dialog");
     const variant = props.variant ?? "fullScreen";
     const anchored = variant === "docked" || variant === "contained";
     const trigger = useRef<Measurable>(null);
@@ -146,10 +139,6 @@ export function SearchView(props: SearchViewProps): ReactNode {
             });
         else setOpen(true);
     });
-    const close = useStableCallback(() => {
-        if (open) setOpen(false);
-    });
-    useDismiss(open, close);
     const { styles: s, views: v } = useComponentSlots<Part>(
         "searchView",
         searchViewSelection(props),
@@ -196,135 +185,122 @@ export function SearchView(props: SearchViewProps): ReactNode {
                     props.trigger
                 )}
             </View>
-            <Modal
-                transparent
-                visible={presence.present}
-                animationType="none"
-                statusBarTranslucent
-                navigationBarTranslucent
-                onRequestClose={() => {
-                    dismissTopOverlay();
-                }}
-            >
-                <PortalHost>
-                    <View aria-modal style={StyleSheet.absoluteFill}>
-                        {anchored ? (
-                            <Pressable
-                                aria-label="Close"
-                                style={StyleSheet.absoluteFill}
-                                onPress={close}
-                            />
-                        ) : null}
-                        <engine.View
-                            {...presence.props}
+            <ModalWindow visible={presence.present}>
+                <View aria-modal style={StyleSheet.absoluteFill}>
+                    {anchored ? (
+                        <Pressable
+                            aria-label="Close"
+                            style={StyleSheet.absoluteFill}
+                            onPress={close}
+                        />
+                    ) : null}
+                    <engine.View
+                        {...presence.props}
+                        style={{
+                            ...(anchored
+                                ? { position: "absolute", ...place }
+                                : { flex: 1 }),
+                            // A closing view takes no more presses.
+                            pointerEvents: open ? "auto" : "none",
+                            ...presence.style,
+                        }}
+                    >
+                        <v.root.View
+                            role="dialog"
+                            aria-label={label}
                             style={{
-                                ...(anchored
-                                    ? { position: "absolute", ...place }
-                                    : { flex: 1 }),
-                                // A closing view takes no more presses.
-                                pointerEvents: open ? "auto" : "none",
-                                ...presence.style,
+                                ...s.root,
+                                ...(anchored ? {} : { flex: 1 }),
                             }}
+                            testID={id("root")}
                         >
-                            <v.root.View
-                                role="dialog"
-                                aria-label={label}
-                                style={{
-                                    ...s.root,
-                                    ...(anchored ? {} : { flex: 1 }),
-                                }}
-                                testID={id("root")}
+                            <v.header.View
+                                style={s.header}
+                                testID={id("header")}
                             >
-                                <v.header.View
-                                    style={s.header}
-                                    testID={id("header")}
+                                <v.leading.View
+                                    style={s.leading}
+                                    testID={id("leading")}
                                 >
-                                    <v.leading.View
-                                        style={s.leading}
-                                        testID={id("leading")}
+                                    <IconButton
+                                        aria-label={props.backLabel ?? "Back"}
+                                        icon={props.leading ?? "←"}
+                                        onPress={close}
+                                    />
+                                </v.leading.View>
+                                <v.input.TextInput
+                                    autoFocus
+                                    value={query}
+                                    onChangeText={setQuery}
+                                    onSubmitEditing={() => {
+                                        props.onSubmit?.({
+                                            inputValue: query,
+                                        });
+                                        if (props.closeOnSelect ?? true)
+                                            close();
+                                    }}
+                                    editable={!props.disabled}
+                                    placeholder={props.placeholder ?? ""}
+                                    role="combobox"
+                                    aria-label={label}
+                                    aria-expanded
+                                    style={s.input}
+                                    testID={id("input")}
+                                />
+                                {isPresent(props.trailing) ? (
+                                    <v.trailing.View
+                                        style={s.trailing}
+                                        testID={id("trailing")}
+                                    >
+                                        {props.trailing}
+                                    </v.trailing.View>
+                                ) : query !== "" ? (
+                                    <v.trailing.View
+                                        style={s.trailing}
+                                        testID={id("trailing")}
                                     >
                                         <IconButton
                                             aria-label={
-                                                props.backLabel ?? "Back"
+                                                props.clearLabel ?? "Clear"
                                             }
-                                            icon={props.leading ?? "←"}
-                                            onPress={close}
+                                            icon="✕"
+                                            onPress={() => setQuery("")}
                                         />
-                                    </v.leading.View>
-                                    <v.input.TextInput
-                                        autoFocus
-                                        value={query}
-                                        onChangeText={setQuery}
-                                        onSubmitEditing={() => {
-                                            props.onSubmit?.({
-                                                inputValue: query,
-                                            });
-                                            if (props.closeOnSelect ?? true)
-                                                close();
-                                        }}
-                                        editable={!props.disabled}
-                                        placeholder={props.placeholder ?? ""}
-                                        role="combobox"
-                                        aria-label={label}
-                                        aria-expanded
-                                        style={s.input}
-                                        testID={id("input")}
-                                    />
-                                    {isPresent(props.trailing) ? (
-                                        <v.trailing.View
-                                            style={s.trailing}
-                                            testID={id("trailing")}
-                                        >
-                                            {props.trailing}
-                                        </v.trailing.View>
-                                    ) : query !== "" ? (
-                                        <v.trailing.View
-                                            style={s.trailing}
-                                            testID={id("trailing")}
-                                        >
-                                            <IconButton
-                                                aria-label={
-                                                    props.clearLabel ?? "Clear"
+                                    </v.trailing.View>
+                                ) : null}
+                            </v.header.View>
+                            <v.divider.View
+                                style={s.divider}
+                                testID={id("divider")}
+                            />
+                            <v.content.View
+                                style={s.content}
+                                testID={id("content")}
+                            >
+                                <ScrollView keyboardShouldPersistTaps="handled">
+                                    {props.children ??
+                                        (matches.length > 0 ? (
+                                            <Menu
+                                                {...searchViewMenuSelection()}
+                                                items={matches}
+                                                {...(props.indication ===
+                                                undefined
+                                                    ? {}
+                                                    : {
+                                                          indication:
+                                                              props.indication,
+                                                      })}
+                                                onSelect={(details) =>
+                                                    select(details.value)
                                                 }
-                                                icon="✕"
-                                                onPress={() => setQuery("")}
                                             />
-                                        </v.trailing.View>
-                                    ) : null}
-                                </v.header.View>
-                                <v.divider.View
-                                    style={s.divider}
-                                    testID={id("divider")}
-                                />
-                                <v.content.View
-                                    style={s.content}
-                                    testID={id("content")}
-                                >
-                                    <ScrollView keyboardShouldPersistTaps="handled">
-                                        {props.children ??
-                                            (matches.length > 0 ? (
-                                                <Menu
-                                                    {...searchViewMenuSelection()}
-                                                    items={matches}
-                                                    {...(props.indication ===
-                                                    undefined
-                                                        ? {}
-                                                        : {
-                                                              indication:
-                                                                  props.indication,
-                                                          })}
-                                                    onSelect={(details) =>
-                                                        select(details.value)
-                                                    }
-                                                />
-                                            ) : null)}
-                                    </ScrollView>
-                                </v.content.View>
-                            </v.root.View>
-                        </engine.View>
-                    </View>
-                </PortalHost>
-            </Modal>
+                                        ) : null)}
+                                </ScrollView>
+                            </v.content.View>
+                        </v.root.View>
+                    </engine.View>
+                </View>
+            </ModalWindow>
         </>
     );
 }
