@@ -51,7 +51,9 @@ Providers: `materialColor`, `materialTypescale`, `materialShape`, `materialLayou
 (`MATERIAL_RADII`, `MATERIAL_SIZES`, `MATERIAL_OPACITIES`, `MATERIAL_FOCUS_INDICATOR`,
 `MATERIAL_DURATIONS`, `MATERIAL_EASINGS`). `materialState(opacities, focusIndicator)` changes the
 state opacities (percent) and the focus indicator's thickness and outer offset (px; 3 and 2 by
-default). The color math and config pieces are exported too.
+default). A third argument, `{ focusRing: "inset" }`, draws every component's focus indicator
+inside it (Compose's inset ring) by setting the outer offset to minus the thickness; the default
+is `"outer"`. The color math and config pieces are exported too.
 
 ### `@pureform/material/runtime-theme`
 
