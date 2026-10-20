@@ -1,0 +1,325 @@
+// The FAB menu: Root on Zag's menu machine, the preset's root around the menu and the FAB; Zag's
+// positioner, which places the list of items above the FAB; the list (the menu's content) and its
+// items, each with an icon and a label; and the FAB (`CloseTrigger`), the menu's trigger, which
+// turns into the close button while the menu is open. Everything renders in place, inside Root.
+
+import { fabMenuOverlayAnatomy } from "@pureform/anatomy";
+import {
+    FAB_MENU_CONTENT_PROPS,
+    FAB_MENU_ROOT_PROPS,
+    fabMenuItemProps,
+    fabMenuMachineProps,
+    fabMenuSelection,
+    isPresent,
+    overlayPositionerProps,
+    presentProps,
+} from "@pureform/binding-core";
+import type {
+    FabMenuContentProps,
+    FabMenuItem,
+    FabMenuRootOwnProps,
+    InteractionSourceProps,
+} from "@pureform/binding-core";
+import * as menu from "@pureform/machines/menu";
+import type { JSX, ValidComponent } from "@solidjs/web";
+import {
+    type Accessor,
+    createMemo,
+    createUniqueId,
+    For,
+    omit,
+    Show,
+} from "solid-js";
+
+import { useControllable } from "../controllable";
+import {
+    itemInteractionSources,
+    useInteractionHandlers,
+    useOwnInteractionSource,
+} from "../interaction";
+import type { ItemInteractionSources } from "../interaction";
+import { normalizeProps, useMachine } from "../internal/zag";
+import type { PropTypes } from "../internal/zag";
+import { createPartContext } from "../part-context";
+import { createSlotProps, useComponent } from "../parts";
+import type { ComponentScope, SlotKeyedProps } from "../parts";
+import { usePresence } from "../presence";
+import type { Presence } from "../presence";
+import { combinePartProps } from "../props";
+import type { PartProps } from "../props";
+import { useDirection } from "../provider";
+
+type Anatomy = typeof fabMenuOverlayAnatomy;
+
+/** What Root shares with its parts. */
+interface FabMenuContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly api: Accessor<menu.Api<PropTypes>>;
+    readonly sources: ItemInteractionSources;
+    readonly presence: Presence;
+}
+
+const context = createPartContext<FabMenuContextValue>("FabMenu");
+
+/** Root's props: the variants and tokens, the menu machine's props (`open`, `onSelect`,
+ *  `positioning`, …), `testId` and `unstyled` for every part, `as`, and the element's own props. */
+export interface FabMenuRootProps
+    extends Omit<PartProps, keyof FabMenuRootOwnProps>, FabMenuRootOwnProps {
+    /** Another element or component to render instead of `<div>`. */
+    readonly as?: ValidComponent | undefined;
+}
+
+/** A part's props: the element's own, and the part's `unstyled`. */
+export interface FabMenuPartProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
+
+/** The FAB's props: a part's, and the interaction source its presses are emitted to. */
+export interface FabMenuCloseTriggerProps
+    extends FabMenuPartProps, InteractionSourceProps {}
+
+/** An item's props: its `value`, `valueText`, `disabled`, and source, and a part's. */
+export interface FabMenuItemProps
+    extends FabMenuPartProps, InteractionSourceProps {
+    readonly value: string;
+    readonly valueText?: string | undefined;
+    readonly disabled?: boolean | undefined;
+}
+
+/** An icon's props: a part's, and `mirror` to flip it under `rtl`. */
+export interface FabMenuIconProps extends FabMenuPartProps {
+    readonly mirror?: boolean | undefined;
+}
+
+/** The FAB menu's root, a `<div>` around the menu and the FAB, which runs the menu machine. */
+function Root(props: FabMenuRootProps): JSX.Element {
+    const id = createUniqueId();
+    const dir = useDirection();
+    const open = useControllable<"open", boolean>("FabMenu", "open", props);
+    const sources = itemInteractionSources();
+    const service = useMachine(menu.machine, () => ({
+        id,
+        ...sources.machineProps,
+        dir: dir(),
+        ...fabMenuMachineProps(props),
+        ...open.machineProps(),
+    }));
+    const api = createMemo(() => menu.connect(service, normalizeProps));
+    const presence = usePresence(() => api().open);
+    const scope = useComponent(fabMenuOverlayAnatomy, {
+        selection: () => fabMenuSelection(props),
+        testId: () => props.testId,
+        unstyled: () => props.unstyled,
+        indication: () => props.indication,
+    });
+    return (
+        <context.Provider value={{ scope, api, sources, presence }}>
+            {scope.render("root", {
+                element: "div",
+                as: () => props.as,
+                props: omit(props, "as", ...FAB_MENU_ROOT_PROPS),
+            })}
+        </context.Provider>
+    );
+}
+
+/** Places the list above the FAB; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
+function Positioner(props: FabMenuPartProps): JSX.Element {
+    const { scope, api, presence } = context.use("Positioner");
+    return scope.render("positioner", {
+        element: "div",
+        machine: () =>
+            overlayPositionerProps(
+                api().getPositionerProps(),
+                presence.present(),
+            ),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The list of items, the menu's content, which holds focus while it's open and moves through
+ *  the items with the arrow keys. It stays while its exit animation runs. */
+function List(props: FabMenuPartProps): JSX.Element {
+    const { scope, api, presence } = context.use("List");
+    return scope.render("list", {
+        element: "div",
+        ref: presence.ref,
+        machine: () =>
+            presentProps(api().getContentProps(), presence.present()),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** An item; the highlighted one shows the hover state. */
+function Item(props: FabMenuItemProps): JSX.Element {
+    const { scope, api, sources } = context.use("Item");
+    const source = sources.item(
+        () => props.value,
+        () => props.interactionSource,
+    );
+    const item = () => ({
+        value: props.value,
+        valueText: props.valueText,
+        disabled: props.disabled,
+    });
+    return scope.render("item", {
+        element: "div",
+        interactionSource: source,
+        machine: () => api().getItemProps(item()),
+        states: () => ({ hover: api().getItemState(item()).highlighted }),
+        unstyled: () => props.unstyled,
+        props: omit(
+            props,
+            "unstyled",
+            "value",
+            "valueText",
+            "disabled",
+            "interactionSource",
+        ),
+    });
+}
+
+/** An item's icon, hidden from assistive technology. */
+function ItemIcon(props: FabMenuIconProps): JSX.Element {
+    const { scope } = context.use("ItemIcon");
+    return scope.render("itemIcon", {
+        element: "span",
+        machine: () => ({ "aria-hidden": "true" }),
+        states: () => ({ mirrored: props.mirror }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "mirror"),
+    });
+}
+
+/** An item's label. */
+function ItemLabel(props: FabMenuPartProps): JSX.Element {
+    const { scope } = context.use("ItemLabel");
+    return scope.render("itemLabel", {
+        element: "span",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** The FAB, which opens the menu and, while it's open, closes it: name it with `aria-label`. */
+function CloseTrigger(props: FabMenuCloseTriggerProps): JSX.Element {
+    const { scope, api } = context.use("CloseTrigger");
+    const source = useOwnInteractionSource(() => props.interactionSource);
+    const handlers = useInteractionHandlers(source, () => false);
+    return scope.render("closeTrigger", {
+        element: "button",
+        interactionSource: source,
+        machine: () =>
+            combinePartProps([
+                api().getTriggerProps() as Readonly<Record<string, unknown>>,
+                handlers(),
+            ]),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "interactionSource"),
+    });
+}
+
+/** The cross the ready-made FAB shows while the menu is open, unless given another icon. */
+const CloseIcon = (): JSX.Element => (
+    <svg
+        viewBox="0 0 24 24"
+        width="1em"
+        height="1em"
+        fill="currentColor"
+        aria-hidden="true"
+    >
+        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+    </svg>
+);
+
+/** The ready-made FAB menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
+ *  the FAB's icons and name, and the items as data. */
+export interface FabMenuProps
+    extends
+        Omit<FabMenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        SlotKeyedProps<Anatomy>,
+        FabMenuContentProps<JSX.Element> {}
+
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    ...FAB_MENU_CONTENT_PROPS,
+] as const;
+
+/** The ready-made FAB menu: the list with an item per entry of `items`, and the FAB showing
+ *  `icon`, or `closeIcon` while the menu is open. */
+function ReadyMade(props: FabMenuProps): JSX.Element {
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as FabMenuRootProps;
+    const root = slots("root") as object;
+    const positioner = slots("positioner");
+    const list = slots("list");
+    const itemSlot = slots("item");
+    const itemIcon = slots("itemIcon");
+    const itemLabel = slots("itemLabel");
+    const closeTrigger = slots("closeTrigger");
+    return (
+        <Root {...own} {...root}>
+            <Positioner {...positioner}>
+                <List {...list}>
+                    <For
+                        each={props.items ?? []}
+                        keyed={(item: FabMenuItem<JSX.Element>) => item.value}
+                    >
+                        {(item) => (
+                            <Item {...fabMenuItemProps(item())} {...itemSlot}>
+                                <Show when={isPresent(item().icon)}>
+                                    <ItemIcon
+                                        mirror={item().mirrorIcon}
+                                        {...itemIcon}
+                                    >
+                                        {item().icon}
+                                    </ItemIcon>
+                                </Show>
+                                <ItemLabel {...itemLabel}>
+                                    {item().label}
+                                </ItemLabel>
+                            </Item>
+                        )}
+                    </For>
+                </List>
+            </Positioner>
+            <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
+                <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
+            </CloseTrigger>
+        </Root>
+    );
+}
+
+/** The FAB's icon: `icon` while the menu is closed, `closeIcon` (or a cross) while it's open. */
+function FabIcon(props: {
+    readonly icon: JSX.Element;
+    readonly closeIcon: JSX.Element;
+}): JSX.Element {
+    const { api } = context.use("CloseTrigger");
+    return (
+        <Show when={api().open} fallback={props.icon}>
+            <Show when={isPresent(props.closeIcon)} fallback={<CloseIcon />}>
+                {props.closeIcon}
+            </Show>
+        </Show>
+    );
+}
+
+/** M3 Expressive's FAB menu. Use it ready-made, `<FabMenu icon={<AddIcon />} fabLabel="Create"
+ *  items={[{ value: "message", label: "Message", icon: <MessageIcon /> }, …]} onSelect={…} />`,
+ *  or compose its parts under `FabMenu.Root`: `Positioner` holding `List`, with an `Item` per
+ *  action holding `ItemIcon` and `ItemLabel`, then `CloseTrigger`, the FAB. */
+export const FabMenu = Object.assign(ReadyMade, {
+    Root,
+    Positioner,
+    List,
+    Item,
+    ItemIcon,
+    ItemLabel,
+    CloseTrigger,
+});

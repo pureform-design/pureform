@@ -10,13 +10,6 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "&:is(:hover, [data-pf-hover])": {
         "shadowElevation": "level4",
       },
-      "--components-fabMenu-focusIndicatorColor": "token(colors.secondary)",
-      "--components-fabMenu-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
-      "--components-fabMenu-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
-      "--components-fabMenu-stateDraggedOpacity": "token(opacity.stateDragged)",
-      "--components-fabMenu-stateFocusOpacity": "token(opacity.stateFocus)",
-      "--components-fabMenu-stateHoverOpacity": "token(opacity.stateHover)",
-      "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
       "backgroundColor": {
         "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-statePressedOpacity, token(opacity.statePressed)))",
@@ -37,7 +30,7 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "cursor": "pointer",
       "display": "inline-flex",
       "flexDirection": "row",
-      "fontSize": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+      "fontSize": "var(--components-fabMenu-closeIconSize, token(sizes.iconMedium))",
       "justifyContent": "center",
       "outlineColor": "var(--components-fabMenu-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-fabMenu-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
@@ -105,7 +98,7 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
     "itemLabel": {
       "textStyle": "titleMedium",
     },
-    "root": {
+    "list": {
       "&[data-state=closed]": {
         "animation": "token(durations.short2) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
         "transformOrigin": "var(--transform-origin)",
@@ -117,6 +110,13 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "transformOrigin": "var(--transform-origin)",
       },
+      "alignItems": "end",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-fabMenu-gap, token(spacing.1))",
+      "zIndex": "token(zIndex.menu)",
+    },
+    "root": {
       "--components-fabMenu-focusIndicatorColor": "token(colors.secondary)",
       "--components-fabMenu-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
       "--components-fabMenu-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
@@ -124,11 +124,8 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "--components-fabMenu-stateFocusOpacity": "token(opacity.stateFocus)",
       "--components-fabMenu-stateHoverOpacity": "token(opacity.stateHover)",
       "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
-      "alignItems": "end",
-      "display": "flex",
-      "flexDirection": "column",
-      "gap": "var(--components-fabMenu-gap, token(spacing.1))",
-      "zIndex": "token(zIndex.menu)",
+      "display": "inline-flex",
+      "position": "relative",
     },
   },
   "className": "fabMenu",
@@ -142,10 +139,11 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
   ],
   "slots": [
     "root",
-    "closeTrigger",
+    "list",
     "item",
     "itemIcon",
     "itemLabel",
+    "closeTrigger",
   ],
   "variants": {
     "color": {
@@ -204,7 +202,6 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
     "size": {
       "default": {
         "closeTrigger": {
-          "--components-fabMenu-iconSize": "token(sizes.iconMedium)",
           "borderRadius": {
             "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
             "base": "var(--components-fabMenu-radiusDefault, token(radii.large))",
@@ -212,10 +209,12 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
           "height": "var(--components-fabMenu-sizeDefault, 56px)",
           "width": "var(--components-fabMenu-sizeDefault, 56px)",
         },
+        "root": {
+          "--components-fabMenu-closeIconSize": "token(sizes.iconMedium)",
+        },
       },
       "large": {
         "closeTrigger": {
-          "--components-fabMenu-iconSize": "36px",
           "borderRadius": {
             "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
             "base": "var(--components-fabMenu-radiusLarge, token(radii.extraLarge))",
@@ -223,16 +222,21 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
           "height": "var(--components-fabMenu-sizeLarge, 96px)",
           "width": "var(--components-fabMenu-sizeLarge, 96px)",
         },
+        "root": {
+          "--components-fabMenu-closeIconSize": "36px",
+        },
       },
       "medium": {
         "closeTrigger": {
-          "--components-fabMenu-iconSize": "28px",
           "borderRadius": {
             "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
             "base": "var(--components-fabMenu-radiusMedium, calc(token(radii.large) + token(radii.extraSmall)))",
           },
           "height": "var(--components-fabMenu-sizeMedium, 80px)",
           "width": "var(--components-fabMenu-sizeMedium, 80px)",
+        },
+        "root": {
+          "--components-fabMenu-closeIconSize": "28px",
         },
       },
     },

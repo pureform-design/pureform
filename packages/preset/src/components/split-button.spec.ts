@@ -80,7 +80,7 @@ describe("FAB menu", () => {
 
     it("stacks its items at the end, as pills in the container color", () => {
         const base = fab()?.base;
-        expect(base?.root?.alignItems).toBe("end");
+        expect(base?.list?.alignItems).toBe("end");
         expect(JSON.stringify(base?.item?.backgroundColor)).toContain(
             "fabMenu-accentContainer",
         );
