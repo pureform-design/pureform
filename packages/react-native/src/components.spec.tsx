@@ -18,6 +18,7 @@ import { Fab } from "./fab";
 import { Icon } from "./icon";
 import { IconButton } from "./icon-button";
 import { LinearProgress } from "./linear-progress";
+import { List } from "./list";
 import { ListItem } from "./list-item";
 import { Media } from "./media";
 import { Menu } from "./menu";
@@ -41,7 +42,9 @@ import {
     interact,
     mount,
     outside,
+    pointerAway,
     settle,
+    until,
 } from "./testing/render";
 import { Text } from "./text";
 import { TextArea } from "./text-area";
@@ -61,6 +64,7 @@ const COMPONENTS = [
     "iconButton",
     "fab",
     "separator",
+    "list",
     "listItem",
     "linearProgress",
     "circularProgress",
@@ -129,6 +133,7 @@ describe("every component", () => {
                     supportingText="3 new"
                     onPress={() => {}}
                 />
+                <List items={[{ headline: "Drafts" }]} />
                 <LinearProgress value={40} />
                 <CircularProgress />
                 <Scrim />
@@ -171,6 +176,8 @@ describe("every component", () => {
             "pf-fab-label",
             "pf-separator-root",
             "pf-list-item-headline",
+            "pf-list-root",
+            "pf-list-item",
             "pf-linear-progress-indicator",
             "pf-circular-progress-end-arc",
             "pf-scrim-root",
@@ -411,5 +418,190 @@ describe("motion engines", () => {
         expect(
             byTestId("pf-icon-button-container").querySelector("svg path"),
         ).not.toBeNull();
+    });
+});
+
+describe("lists, menus, and selects", () => {
+    const corners = (element: Element) => {
+        const style = getComputedStyle(element);
+        return [style.borderTopLeftRadius, style.borderBottomLeftRadius];
+    };
+
+    it("rounds a segmented list's tiles by their position", async () => {
+        await render(
+            <List
+                variant="segmented"
+                items={["Inbox", "Drafts", "Sent"].map((headline) => ({
+                    headline,
+                }))}
+            />,
+        );
+        const [first, middle, last] = document.querySelectorAll(
+            '[data-testid="pf-list-item-root"]',
+        );
+        const [firstTop, firstBottom] = corners(first!);
+        const [middleTop, middleBottom] = corners(middle!);
+        const [lastTop, lastBottom] = corners(last!);
+        expect(firstTop).not.toBe(firstBottom);
+        expect(middleTop).toBe(middleBottom);
+        expect(middleTop).toBe(firstBottom);
+        expect(lastBottom).toBe(firstTop);
+        expect(lastTop).toBe(middleTop);
+    });
+
+    it("leaves a standard list's items square", async () => {
+        await render(
+            <List items={[{ headline: "Inbox" }, { headline: "Drafts" }]} />,
+        );
+        const [first] = document.querySelectorAll(
+            '[data-testid="pf-list-item-root"]',
+        );
+        const [top, bottom] = corners(first!);
+        expect(top).toBe(bottom);
+    });
+
+    it("gives its items its leading type, which an item's own overrides", async () => {
+        const leading = <Glyph glyph="✉" />;
+        await render(
+            <>
+                <List
+                    leadingType="thumbnail"
+                    testId="thumbs"
+                    items={[
+                        { headline: "A", leading },
+                        { headline: "B", leading, leadingType: "icon" },
+                    ]}
+                />
+                <ListItem headline="C" leading={leading} testId="plain" />
+            </>,
+        );
+        const [thumbnail, icon] = document.querySelectorAll(
+            '[data-testid="pf-list-item-leading"]',
+        );
+        const width = (element: Element) => getComputedStyle(element).width;
+        expect(width(thumbnail!)).not.toBe(width(icon!));
+        expect(width(icon!)).toBe(width(byTestId("plain-leading")));
+    });
+
+    it("renders a menu's groups after its items, with labels and supporting text", async () => {
+        await render(
+            <Menu
+                items={[{ value: "new", label: "New" }]}
+                groups={[
+                    {
+                        id: "edit",
+                        label: "Edit",
+                        items: [
+                            {
+                                value: "cut",
+                                label: "Cut",
+                                supportingText: "To the clipboard",
+                            },
+                        ],
+                    },
+                ]}
+            />,
+        );
+        const group = byTestId("pf-menu-item-group");
+        expect(group.getAttribute("role")).toBe("group");
+        expect(byTestId("pf-menu-item-group-label").textContent).toBe("Edit");
+        expect(byTestId("pf-menu-item-supporting-text").textContent).toBe(
+            "To the clipboard",
+        );
+        expect(
+            group.querySelector('[data-testid="pf-menu-item-content"]')!
+                .textContent,
+        ).toBe("CutTo the clipboard");
+        expect(document.querySelectorAll('[role="menuitem"]')).toHaveLength(2);
+    });
+
+    it("toggles a checkbox item and fills it while checked", async () => {
+        const changed = vi.fn();
+        const Toggling = () => {
+            const [checked, setChecked] = useState(false);
+            return (
+                <Menu
+                    items={[
+                        { value: "plain", label: "Plain" },
+                        {
+                            value: "italic",
+                            label: "Italic",
+                            type: "checkbox",
+                            checked: true,
+                        },
+                        {
+                            value: "bold",
+                            label: "Bold",
+                            type: "checkbox",
+                            checked,
+                            onCheckedChange: (next) => {
+                                changed(next);
+                                setChecked(next);
+                            },
+                        },
+                    ]}
+                />
+            );
+        };
+        await render(<Toggling />);
+        await pointerAway();
+        const [italic, item] = document.querySelectorAll<HTMLElement>(
+            '[role="menuitemcheckbox"]',
+        );
+        const fill = (element: Element) =>
+            getComputedStyle(element).backgroundColor;
+        const [plain] = document.querySelectorAll('[role="menuitem"]');
+        expect(item!.getAttribute("aria-checked")).toBe("false");
+        await until(() => {
+            expect(fill(item!)).toBe(fill(plain!));
+            expect(fill(italic!)).not.toBe(fill(plain!));
+        });
+        await interact(() => userEvent.click(item!));
+        expect(changed).toHaveBeenCalledExactlyOnceWith(true);
+        await pointerAway();
+        await until(() => {
+            expect(item!.getAttribute("aria-checked")).toBe("true");
+            expect(fill(item!)).toBe(fill(italic!));
+        });
+    });
+
+    it("takes the vibrant colors", async () => {
+        await render(
+            <>
+                <Menu items={[{ value: "a", label: "A" }]} testId="plain" />
+                <Menu
+                    vibrant
+                    items={[{ value: "a", label: "A" }]}
+                    testId="vibrant"
+                />
+            </>,
+        );
+        expect(computed("vibrant-root").backgroundColor).not.toBe(
+            computed("plain-root").backgroundColor,
+        );
+    });
+
+    it("groups a select's options under their labels", async () => {
+        await render(
+            <Select
+                label="Fruit"
+                items={[
+                    { value: "a", label: "Apple", group: "Pome" },
+                    { value: "c", label: "Cherry", group: "Drupe" },
+                    { value: "p", label: "Pear", group: "Pome" },
+                ]}
+            />,
+        );
+        await interact(() =>
+            userEvent.click(document.querySelector('[role="combobox"]')!),
+        );
+        await settle(50);
+        const groups = [
+            ...document.querySelectorAll('[data-testid="pf-menu-item-group"]'),
+        ];
+        expect(groups.map((group) => group.textContent)).toEqual([
+            "PomeApplePear",
+            "DrupeCherry",
+        ]);
     });
 });

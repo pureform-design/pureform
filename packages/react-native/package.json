@@ -110,6 +110,13 @@
                 "default": "./dist/linear-progress.mjs"
             }
         },
+        "./list": {
+            "types": "./dist/list/index.d.ts",
+            "import": {
+                "development": "./src/list/index.ts",
+                "default": "./dist/list.mjs"
+            }
+        },
         "./list-item": {
             "types": "./dist/list-item/index.d.ts",
             "import": {
