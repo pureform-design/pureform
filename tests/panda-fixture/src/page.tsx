@@ -3,6 +3,7 @@
 
 import {
     avatar,
+    badge,
     media,
     button,
     card,
@@ -993,6 +994,28 @@ export function Page() {
                 </div>
             </section>
 
+            <section
+                data-section="badges"
+                style={{ ...row, "align-items": "center" }}
+            >
+                <span class={badge({ size: "small" })} />
+                <span class={badge()}>3</span>
+                <span class={badge()}>999+</span>
+                <span style={{ position: "relative", display: "inline-flex" }}>
+                    <span class={icon({ size: "medium" })}>M</span>
+                    <span
+                        class={badge({
+                            size: "small",
+                            placement: "anchored",
+                        })}
+                    />
+                </span>
+                <span style={{ position: "relative", display: "inline-flex" }}>
+                    <span class={icon({ size: "medium" })}>M</span>
+                    <span class={badge({ placement: "anchored" })}>3</span>
+                </span>
+            </section>
+
             <section data-section="icon-buttons" style={row}>
                 <For each={ICON_FILLS}>
                     {(variant) => {
@@ -1068,7 +1091,7 @@ export function Page() {
                         tabindex="0"
                         aria-selected="true"
                     >
-                        <span class={listItem().leading}>✉</span>
+                        <span class={listItem().leading}>M</span>
                         <div class={listItem().content}>
                             <span class={listItem().headline}>
                                 Selected, two lines

@@ -41,6 +41,7 @@ export default createConfig({
                     "text-area": "src/text-area/index.ts",
                     "text-field": "src/text-field/index.ts",
                     avatar: "src/avatar/index.ts",
+                    badge: "src/badge/index.ts",
                     card: "src/card/index.ts",
                     "circular-progress": "src/circular-progress/index.ts",
                     icon: "src/icon/index.ts",

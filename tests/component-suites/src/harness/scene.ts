@@ -7,6 +7,7 @@
  *  binding's `components` map in `src/bindings/<binding>/scene.tsx`. */
 export const COMPONENT_NAMES = [
     "Avatar",
+    "Badge",
     "Button",
     "Card",
     "Checkbox",
