@@ -59,7 +59,7 @@ type FieldPart = TextFieldPart | TextAreaPart;
 /** The field the text field, text area, and select render. */
 export interface FieldOptions
     extends FieldProps, TextFieldAffixProps<ReactNode> {
-    readonly name: "textField" | "textArea" | "select";
+    readonly name: "textField" | "textArea" | "select" | "autocomplete";
     readonly selection: Record<string, unknown>;
     readonly testId: (part: FieldPart) => string;
     readonly lines?: number | undefined;

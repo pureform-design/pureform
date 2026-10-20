@@ -38,6 +38,8 @@ export default createConfig({
                     "radio-group": "src/radio-group/index.ts",
                     scrim: "src/scrim/index.ts",
                     "search-bar": "src/search-bar/index.ts",
+                    "search-view": "src/search-view/index.ts",
+                    autocomplete: "src/autocomplete/index.ts",
                     select: "src/select/index.ts",
                     separator: "src/separator/index.ts",
                     slider: "src/slider/index.ts",
