@@ -359,6 +359,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles
   (`grouped`) unless told otherwise; `vibrant` takes the tertiary colors. A select's items with a
   `group` sit together under its label, in the order each group first appears.
+- **Split button and FAB menu:** `SplitButton` renders its two buttons as the `Menu`'s trigger
+  (`trigger` as a function), so the menu opens over the page under the trailing button, at its
+  end. `FabMenu` opens its items in the portal above the FAB, at its end; the `list` slot's
+  logical insets, which place it on the web, are dropped there, since the portal places it.
 - **Long lists:** each interactive `ListItem` takes about 0.4 to 0.5 ms to mount in development
   (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
   the rows near the screen. Key rows by their value, not their index, memoize the row, and keep
