@@ -105,9 +105,13 @@ describe("M3 Expressive", () => {
             handleShape: "bar",
             size: "xsmall",
         });
-        const bar = slotRecipe(slider, "slider")?.variants?.handleShape?.bar;
-        expect(bar?.stateLayer).toEqual({ display: "none" });
-        expect(slider.recipe.variants?.handleShape?.round).toEqual({});
+        const shapes = slotRecipe(slider, "slider")?.variants?.handleShape;
+        expect(shapes?.bar?.stateLayer).toEqual({ display: "none" });
+        // The shape is a flag the geometry blends by, so the round handle (deprecated, with no
+        // Expressive equivalent) still draws.
+        expect(shapes?.bar?.root).toEqual({ "--components-slider-bar": "1" });
+        expect(shapes?.round?.root).toEqual({ "--components-slider-bar": "0" });
+        expect(shapes?.round?.stateLayer).toBeUndefined();
     });
 
     it("thickens both progress indicators", () => {
@@ -153,9 +157,31 @@ describe("M3 Expressive", () => {
 
     it("eases the bar handle's narrowing, and drops it under reduced motion", () => {
         const handle = JSON.stringify(
-            slider.recipe.variants?.handleShape?.bar?.handle?.transition,
+            slider.recipe.base?.handle?.transition,
         );
         expect(handle).toContain("width");
         expect(handle).toContain("reducedMotion");
+    });
+
+    it("stands the slider up, every placed part moving to the block axis", () => {
+        const recipe = slotRecipe(slider, "slider");
+        const vertical = recipe?.variants?.orientation?.vertical;
+        for (const part of [
+            "startTrack",
+            "track",
+            "activeTrack",
+            "marker",
+            "handle",
+            "valueIndicator",
+        ] as const) {
+            const base = Object.keys(recipe?.base?.[part] ?? {}).filter((key) =>
+                key.startsWith("inset"),
+            );
+            // Every inset the horizontal slider sets, the vertical one sets too, so none leaks.
+            expect(Object.keys(vertical?.[part] ?? {}), part).toEqual(
+                expect.arrayContaining(base),
+            );
+        }
+        expect(recipe?.variants?.orientation?.horizontal).toEqual({});
     });
 });
