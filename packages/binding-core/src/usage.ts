@@ -25,6 +25,7 @@ const same = <const G extends readonly string[]>(
 /** Every component, by subpath. */
 export const COMPONENT_USAGE = {
     avatar: { entries: { avatar: same("size", "color", "shape") } },
+    badge: { entries: { badge: same("size", "placement") } },
     button: {
         entries: {
             button: same(

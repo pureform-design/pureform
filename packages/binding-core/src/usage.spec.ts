@@ -69,6 +69,7 @@ const SHARED: Readonly<Record<string, readonly string[]>> = {
     "text-input.tsx": ["text-field", "text-area"],
     "single-part.tsx": [
         "avatar",
+        "badge",
         "icon",
         "media",
         "scrim",
@@ -88,6 +89,7 @@ const NATIVE_SHARED: Readonly<Record<string, readonly string[]>> = {
     "progress.tsx": ["linear-progress", "circular-progress"],
     "single-part.tsx": [
         "avatar",
+        "badge",
         "icon",
         "media",
         "scrim",

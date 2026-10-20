@@ -152,6 +152,13 @@
                 "default": "./dist/avatar.mjs"
             }
         },
+        "./badge": {
+            "types": "./dist/badge/index.d.ts",
+            "import": {
+                "development": "./src/badge/index.ts",
+                "default": "./dist/badge.mjs"
+            }
+        },
         "./card": {
             "types": "./dist/card/index.d.ts",
             "import": {
