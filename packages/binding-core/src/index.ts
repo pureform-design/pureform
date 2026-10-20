@@ -542,6 +542,7 @@ export {
     resolveReducedMotion,
 } from "./motion";
 export type { MotionSetting } from "./motion";
+export { GLYPH_PATHS, TOAST_GLYPH_PATHS } from "./glyphs";
 export {
     forSlot,
     isIconPart,

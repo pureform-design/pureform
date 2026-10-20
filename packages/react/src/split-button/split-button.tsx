@@ -19,6 +19,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
+import { DropDownArrow } from "../glyphs";
 import {
     useInteractionHandlers,
     useMachineButton,
@@ -172,19 +173,6 @@ function SplitButtonMenu(props: SplitButtonPartProps): ReactNode {
     );
 }
 
-/** The arrow the ready-made trailing button shows unless given another icon. */
-const ArrowIcon = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
-
 /** The ready-made split button's props: Root's, with `className`, `style`, and `slotProps` keyed
  *  by part, and the label, icons, and items as content. */
 export interface SplitButtonProps
@@ -223,7 +211,7 @@ function ReadyMade(props: SplitButtonProps): ReactNode {
                 {...slot("trailingButton")}
             >
                 <TrailingIcon {...slot("trailingIcon")}>
-                    {isPresent(trailingIcon) ? trailingIcon : <ArrowIcon />}
+                    {isPresent(trailingIcon) ? trailingIcon : <DropDownArrow />}
                 </TrailingIcon>
             </TrailingButton>
             <SplitButtonMenu>

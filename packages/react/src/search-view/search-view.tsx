@@ -50,7 +50,7 @@ import {
 } from "react";
 
 import { useControllable } from "../controllable";
-import { CloseIcon } from "../glyphs";
+import { BackIcon, CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
@@ -430,19 +430,6 @@ function ItemLabel({ unstyled, ...props }: SearchViewPartProps): ReactNode {
         props,
     });
 }
-
-/** The back arrow the ready-made view's leading button shows unless given another. */
-const BackIcon = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z" />
-    </svg>
-);
 
 /** The ready-made search view's props: Root's, with `className`, `style`, and `slotProps` keyed
  *  by part, the search bar that opens it (a search bar showing the query unless given), the

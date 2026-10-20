@@ -45,6 +45,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { DropDownArrow } from "../glyphs";
 import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
@@ -420,19 +421,6 @@ function ItemLabel({ unstyled, ...props }: SelectPartProps): ReactNode {
         props,
     });
 }
-
-/** The arrow the ready-made select shows unless given another: Material's drop-down arrow. */
-const DropDownArrow = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
 
 /** The ready-made select's props: Root's, with `className`, `style`, and `slotProps` keyed by the
  *  field's parts, and the label, supporting text, and icons as content. `aria-label`,
