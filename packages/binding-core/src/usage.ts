@@ -71,10 +71,10 @@ export const COMPONENT_USAGE = {
         },
     },
     media: { entries: { media: same("aspect", "shape") } },
-    // The trigger is a button.
+    // The trigger is a button; `grouped` follows the groups unless given.
     menu: {
         entries: {
-            menu: same("color", "density", "vibrant", "grouped"),
+            menu: same("color", "density", "vibrant"),
             button: {},
             ripple: {},
         },

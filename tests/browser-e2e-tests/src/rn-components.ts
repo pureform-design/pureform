@@ -13,6 +13,7 @@ export const RN_COMPONENTS = [
     "iconButton",
     "fab",
     "separator",
+    "list",
     "listItem",
     "linearProgress",
     "circularProgress",

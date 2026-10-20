@@ -1054,6 +1054,62 @@ listItem[interactive=true].supportingText: bg none | color rgba(73, 69, 78, 1) |
     hovered-selected: color rgba(74, 68, 88, 1)
 listItem[interactive=true].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem[position=first].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=first].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem[position=middle].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=middle].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem[position=last].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=last].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].root: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: bg rgba(232, 222, 248, 1) | color rgba(74, 68, 88, 1)
+listItem[position=single].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].content: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].overline: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].headline: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].supportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+listItem[position=single].trailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 listItem[color=tertiary].root: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1)
 listItem[color=tertiary].leading: bg none | color rgba(73, 69, 78, 1) | outline none
@@ -1344,84 +1400,224 @@ menu.item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(216, 207, 232, 1) | color rgba(74, 68, 88, 1)
+    focused-checked: bg rgba(216, 207, 232, 1) | color rgba(74, 68, 88, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu.itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu.itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
 menu.itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu.itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
 menu.itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
 menu[color=tertiary].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(225, 219, 224, 1)
     focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(239, 201, 212, 1) | color rgba(99, 59, 72, 1)
+    focused-checked: bg rgba(239, 201, 212, 1) | color rgba(99, 59, 72, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu[color=tertiary].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
+    pressed-checked: color rgba(99, 59, 72, 1)
+    focused-checked: color rgba(99, 59, 72, 1)
+menu[color=tertiary].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+    pressed-checked: color rgba(99, 59, 72, 1)
+    focused-checked: color rgba(99, 59, 72, 1)
 menu[color=tertiary].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
+    pressed-checked: color rgba(99, 59, 72, 1)
+    focused-checked: color rgba(99, 59, 72, 1)
+menu[color=tertiary].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+    pressed-checked: color rgba(99, 59, 72, 1)
+    focused-checked: color rgba(99, 59, 72, 1)
 menu[color=tertiary].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
+    pressed-checked: color rgba(99, 59, 72, 1)
+    focused-checked: color rgba(99, 59, 72, 1)
 menu[color=success].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(225, 219, 224, 1)
     focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(107, 240, 120, 1) | color rgba(0, 83, 23, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(104, 237, 118, 1) | color rgba(0, 83, 23, 1)
+    focused-checked: bg rgba(104, 237, 118, 1) | color rgba(0, 83, 23, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu[color=success].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
+    pressed-checked: color rgba(0, 83, 23, 1)
+    focused-checked: color rgba(0, 83, 23, 1)
+menu[color=success].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+    pressed-checked: color rgba(0, 83, 23, 1)
+    focused-checked: color rgba(0, 83, 23, 1)
 menu[color=success].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
+    pressed-checked: color rgba(0, 83, 23, 1)
+    focused-checked: color rgba(0, 83, 23, 1)
+menu[color=success].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+    pressed-checked: color rgba(0, 83, 23, 1)
+    focused-checked: color rgba(0, 83, 23, 1)
 menu[color=success].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
+    pressed-checked: color rgba(0, 83, 23, 1)
+    focused-checked: color rgba(0, 83, 23, 1)
 menu[color=warning].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(225, 219, 224, 1)
     focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(242, 212, 127, 1) | color rgba(87, 68, 0, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(238, 208, 124, 1) | color rgba(87, 68, 0, 1)
+    focused-checked: bg rgba(238, 208, 124, 1) | color rgba(87, 68, 0, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu[color=warning].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
+    pressed-checked: color rgba(87, 68, 0, 1)
+    focused-checked: color rgba(87, 68, 0, 1)
+menu[color=warning].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+    pressed-checked: color rgba(87, 68, 0, 1)
+    focused-checked: color rgba(87, 68, 0, 1)
 menu[color=warning].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
+    pressed-checked: color rgba(87, 68, 0, 1)
+    focused-checked: color rgba(87, 68, 0, 1)
+menu[color=warning].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+    pressed-checked: color rgba(87, 68, 0, 1)
+    focused-checked: color rgba(87, 68, 0, 1)
 menu[color=warning].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
+    pressed-checked: color rgba(87, 68, 0, 1)
+    focused-checked: color rgba(87, 68, 0, 1)
 menu[color=error].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(225, 219, 224, 1)
     focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(246, 201, 198, 1) | color rgba(147, 0, 10, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(244, 196, 194, 1) | color rgba(147, 0, 10, 1)
+    focused-checked: bg rgba(244, 196, 194, 1) | color rgba(147, 0, 10, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu[color=error].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
+    pressed-checked: color rgba(147, 0, 10, 1)
+    focused-checked: color rgba(147, 0, 10, 1)
+menu[color=error].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+    pressed-checked: color rgba(147, 0, 10, 1)
+    focused-checked: color rgba(147, 0, 10, 1)
 menu[color=error].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
+    pressed-checked: color rgba(147, 0, 10, 1)
+    focused-checked: color rgba(147, 0, 10, 1)
+menu[color=error].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+    pressed-checked: color rgba(147, 0, 10, 1)
+    focused-checked: color rgba(147, 0, 10, 1)
 menu[color=error].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
+    pressed-checked: color rgba(147, 0, 10, 1)
+    focused-checked: color rgba(147, 0, 10, 1)
 menu[color=info].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(225, 219, 224, 1)
     focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
     pressed: bg rgba(221, 215, 220, 1)
     dragged: bg rgba(208, 203, 207, 1)
     hovered-selected: bg rgba(162, 223, 242, 1) | color rgba(0, 78, 94, 1)
-    pressed-checked: bg rgba(221, 215, 220, 1)
-    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed-checked: bg rgba(158, 220, 239, 1) | color rgba(0, 78, 94, 1)
+    focused-checked: bg rgba(158, 220, 239, 1) | color rgba(0, 78, 94, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 menu[color=info].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
+    pressed-checked: color rgba(0, 78, 94, 1)
+    focused-checked: color rgba(0, 78, 94, 1)
+menu[color=info].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+    pressed-checked: color rgba(0, 78, 94, 1)
+    focused-checked: color rgba(0, 78, 94, 1)
 menu[color=info].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
+    pressed-checked: color rgba(0, 78, 94, 1)
+    focused-checked: color rgba(0, 78, 94, 1)
+menu[color=info].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+    pressed-checked: color rgba(0, 78, 94, 1)
+    focused-checked: color rgba(0, 78, 94, 1)
 menu[color=info].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
+    pressed-checked: color rgba(0, 78, 94, 1)
+    focused-checked: color rgba(0, 78, 94, 1)
+menu[vibrant=true].item: bg rgba(255, 217, 227, 1) | color rgba(99, 59, 72, 1) | outline none
+    hovered: bg rgba(243, 204, 215, 1)
+    focused: bg rgba(239, 201, 212, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(239, 201, 212, 1)
+    dragged: bg rgba(230, 192, 202, 1)
+    hovered-selected: bg rgba(135, 96, 109, 1) | color rgba(255, 255, 255, 1)
+    pressed-checked: bg rgba(138, 99, 112, 1) | color rgba(255, 255, 255, 1)
+    focused-checked: bg rgba(138, 99, 112, 1) | color rgba(255, 255, 255, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[vibrant=true].itemLeading: bg none | color rgba(99, 59, 72, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+    pressed-checked: color rgba(255, 255, 255, 1)
+    focused-checked: color rgba(255, 255, 255, 1)
+menu[vibrant=true].itemContent: bg none | color rgba(99, 59, 72, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+    pressed-checked: color rgba(255, 255, 255, 1)
+    focused-checked: color rgba(255, 255, 255, 1)
+menu[vibrant=true].itemLabel: bg none | color rgba(99, 59, 72, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+    pressed-checked: color rgba(255, 255, 255, 1)
+    focused-checked: color rgba(255, 255, 255, 1)
+menu[vibrant=true].itemSupportingText: bg none | color rgba(99, 59, 72, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+    pressed-checked: color rgba(255, 255, 255, 1)
+    focused-checked: color rgba(255, 255, 255, 1)
+menu[vibrant=true].itemTrailing: bg none | color rgba(99, 59, 72, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+    pressed-checked: color rgba(255, 255, 255, 1)
+    focused-checked: color rgba(255, 255, 255, 1)
+menu[grouped=true].item: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(216, 207, 232, 1) | color rgba(74, 68, 88, 1)
+    focused-checked: bg rgba(216, 207, 232, 1) | color rgba(74, 68, 88, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+menu[grouped=true].itemLeading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu[grouped=true].itemContent: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu[grouped=true].itemLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu[grouped=true].itemSupportingText: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
+menu[grouped=true].itemTrailing: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+    pressed-checked: color rgba(74, 68, 88, 1)
+    focused-checked: color rgba(74, 68, 88, 1)
 tabs.tab: bg rgba(253, 248, 253, 1) | color rgba(73, 69, 78, 1) | outline none
     hovered: bg rgba(239, 234, 239, 1)
     focused: bg rgba(235, 230, 236, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
