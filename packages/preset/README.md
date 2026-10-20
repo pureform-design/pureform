@@ -638,6 +638,30 @@ The dialog doesn't trap focus or dim the page by itself. Use a native `<dialog>`
 focus), or put the `scrim` component behind it. It stacks over the scrim and slides in on
 `data-state` (see [Overlays](#overlays-stacking-and-motion)).
 
+## Full-screen dialog
+
+`fullscreenDialog` is the dialog that fills the screen, for a task with more content than a
+basic dialog holds. Its header has the close trigger (an icon button), the headline, and the
+confirm action (a text button); the body scrolls under it. It has no icon, no actions row and no
+scrim, and its corners are square. It has no variants (0 compounds); `headerHeight`,
+`headerPadding`, `headerGap` and `bodyPadding` are tokens. It stacks at the `dialog` layer and
+slides in like the dialog.
+
+```html
+<div class="{root}" role="dialog" aria-labelledby="title">
+    <div class="{header}">
+        <button class="{closeTrigger}" aria-label="Close">×</button>
+        <h2 class="{headline}" id="title">New event</h2>
+        <button class="{confirmAction}">Save</button>
+    </div>
+    <div class="{body}">…</div>
+</div>
+```
+
+The bindings place it in a positioner that covers the viewport, so `root` fills its container.
+`closeTrigger` and `confirmAction` only keep their size (`flex-shrink: 0`); the bindings draw
+them as an icon button and a text button.
+
 ## Snackbar and tooltip
 
 Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job; placed,
