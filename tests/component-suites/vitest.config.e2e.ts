@@ -62,6 +62,7 @@ const machines = (from: string): string[] =>
         "select",
         "switch",
         "tabs",
+        "toggle-group",
         "tooltip",
         "types",
         "utils",

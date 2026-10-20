@@ -23,6 +23,7 @@ export default createConfig({
                     chip: "src/chip/index.ts",
                     fab: "src/fab/index.ts",
                     "icon-button": "src/icon-button/index.ts",
+                    "button-group": "src/button-group/index.ts",
                     "radio-group": "src/radio-group/index.ts",
                     select: "src/select/index.ts",
                     menu: "src/menu/index.ts",

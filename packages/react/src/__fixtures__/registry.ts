@@ -365,3 +365,23 @@ export const displayRegistry = () =>
         icon: named("icon", ["root"]),
         touchTarget: named("touch-target", ["root"]),
     });
+
+/** The button group's fake factories: the group, and the buttons and icon buttons in it. */
+export const buttonGroupRegistry = () =>
+    createRegistry({
+        buttonGroup: named("button-group", ["root"]),
+        button: named("button", [
+            "root",
+            "label",
+            "icon",
+            "secondaryIcon",
+            "touchTarget",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+    });

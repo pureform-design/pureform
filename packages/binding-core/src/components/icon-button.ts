@@ -31,6 +31,9 @@ export interface IconButtonVariantProps {
     /** Round or square corners, which tighten while pressed and swap once a toggle is on. */
     readonly corner?: VariantProp<"iconButton", "corner">;
     readonly density?: VariantProp<"iconButton", "density">;
+    /** Its place in a button group: `single` in a standard group (it widens while pressed),
+     *  `first`, `middle` or `last` in a connected one (its inner corners square off). */
+    readonly position?: VariantProp<"iconButton", "position">;
     readonly tokens?: InstanceTokens<"iconButton"> | undefined;
 }
 
@@ -52,6 +55,7 @@ export const ICON_BUTTON_ROOT_PROPS = [
     "width",
     "corner",
     "density",
+    "position",
     "tokens",
     "disabled",
     "type",
@@ -83,6 +87,7 @@ export const iconButtonSelection = (
     width: props.width,
     corner: props.corner,
     density: props.density,
+    position: props.position,
     toggle: isToggle(props),
     tokens: props.tokens,
 });

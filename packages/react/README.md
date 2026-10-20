@@ -196,6 +196,7 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                                                                                  | `@pureform/machines/navigation`                      |
 | `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                                                                     | none                                                 |
 | `List`                            | `Root` (`ul`), per item `Item` (`li`) holding a `ListItem`                                                                                                                                                                                                                                                                            | none                                                 |
+| `ButtonGroup`                     | `Root` (`div`, `role="group"`), and per button `Button` or `IconButton` (the button and icon button, in the group's variants, `position` and selection)                                                                                                                                 | Zag's toggle group (`@pureform/machines/button-group`) when `selectable` |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -216,6 +217,10 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   toggle when given `selected` or `defaultSelected` (a toggle icon button also selects the
   `toggle` variant); the FAB is extended when its ready-made has a `label`. Icon-only components
   need `aria-label` or `aria-labelledby`, and warn in development without one.
+- **The button group** (`@pureform/react/button-group`) behaves as `@pureform/solid`'s does: a
+  `div` with `role="group"` holding `ButtonGroup.Button`s and `ButtonGroup.IconButton`s in its
+  variants, each with its `position` (the ready-made sets it from `items`), and toggle buttons on
+  Zag's toggle group with `selectable`.
 - **The text field and text area** float their label over a native `<input>` or `<textarea>`
   (its placeholder is one space by default, so the CSS sees when it holds a value; the container
   also gets `data-pf-filled`). The ready-made takes `label`, `supportingText`, `leadingIcon`,

@@ -122,6 +122,24 @@ export const iconButtonAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const buttonGroupAnatomy = {
+    name: "buttonGroup",
+    scope: "button-group",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-button-group-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const fabAnatomy = {
     name: "fab",
     scope: "fab",
@@ -2389,6 +2407,7 @@ export const textAnatomy = {
 export const anatomy = {
     button: buttonAnatomy,
     iconButton: iconButtonAnatomy,
+    buttonGroup: buttonGroupAnatomy,
     fab: fabAnatomy,
     avatar: avatarAnatomy,
     badge: badgeAnatomy,
@@ -2443,6 +2462,7 @@ export const testIds = {
         icon: "pf-icon-button-icon",
         outline: "pf-icon-button-outline",
     },
+    buttonGroup: { root: "pf-button-group-root" },
     fab: {
         root: "pf-fab-root",
         touchTarget: "pf-fab-touch-target",

@@ -2,6 +2,7 @@
 // part added to the preset fails here until the machine has it too.
 import {
     buttonAnatomy,
+    buttonGroupAnatomy,
     inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
@@ -13,6 +14,7 @@ import {
 } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
+import { anatomy as buttonGroup } from "./button-group";
 import { anatomy as button } from "./button/button.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
@@ -30,6 +32,7 @@ interface Pair {
 
 const pairs: Record<string, Pair> = {
     button: { machine: button, preset: buttonAnatomy },
+    buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
     navigationBar: { machine: navigation, preset: navigationBarAnatomy },
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
     slider: { machine: slider, preset: sliderAnatomy },

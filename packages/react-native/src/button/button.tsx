@@ -25,6 +25,9 @@ export interface ButtonProps
         ButtonContentProps<ReactNode>,
         InteractiveProps {
     readonly disabled?: boolean | undefined;
+    /** Whether a toggle is on, as a selectable button group sets it. Giving it makes the button
+     *  a toggle; its owner flips it from `onPress`. */
+    readonly selected?: boolean | undefined;
     readonly onPress?: (() => void) | undefined;
     /** A long press: given it, a long press calls it rather than pressing (a tooltip's trigger
      *  shows its tooltip so). */
@@ -49,6 +52,9 @@ function ButtonImpl(props: ButtonProps): ReactNode {
         indication.select(buttonSelection(props)),
         indication.states({
             disabled,
+            ...(props.selected === undefined
+                ? {}
+                : { selected: props.selected }),
             ...(props.mirrorIcon ? { mirrored: true } : {}),
         }),
     );
@@ -73,6 +79,9 @@ function ButtonImpl(props: ButtonProps): ReactNode {
         <v.root.Pressable
             {...indication.handlers}
             role="button"
+            {...(props.selected === undefined
+                ? {}
+                : { "aria-checked": props.selected })}
             disabled={props.disabled}
             onLongPress={props.onLongPress}
             onPress={props.onPress}

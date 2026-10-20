@@ -82,6 +82,13 @@
                 "default": "./dist/tabs.mjs"
             }
         },
+        "./button-group": {
+            "types": "./dist/button-group.d.ts",
+            "import": {
+                "development": "./src/button-group.ts",
+                "default": "./dist/button-group.mjs"
+            }
+        },
         "./navigation": {
             "types": "./dist/navigation/index.d.ts",
             "import": {
@@ -156,6 +163,7 @@
         "@zag-js/switch": "catalog:",
         "@zag-js/tabs": "catalog:",
         "@zag-js/tags-input": "catalog:",
+        "@zag-js/toggle-group": "catalog:",
         "@zag-js/tooltip": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
