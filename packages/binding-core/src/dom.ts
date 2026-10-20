@@ -178,6 +178,11 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
     stacked.set(positioner, positioner.style.zIndex);
 };
 
+export {
+    dragToDismiss,
+    SHEET_DISMISS_SHARE,
+    SHEET_FLICK_SPEED,
+} from "./sheet-drag";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
 export type { SlideTiming } from "./slide";
 export {

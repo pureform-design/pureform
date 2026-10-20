@@ -295,6 +295,18 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   and the `ConfirmAction` (a text button); the `Body` scrolls. Zag focuses the first focusable
   element, the close trigger. The ready-made takes `trigger`, `closeLabel`, `closeIcon`,
   `headline`, `confirmAction` and `body`. Import it from `@pureform/react/fullscreen-dialog`.
+- **The bottom sheet** runs on the same Zag machine, in a positioner fixed to the bottom of the
+  viewport, over a `Backdrop` when modal (`modal={false}` makes a standard sheet, no backdrop, the
+  page usable). Its `DragHandle` (the drag handle component) closes it on a press or a drag down
+  past a quarter of its height. The ready-made takes `trigger`, `dragHandle`, `dragHandleLabel`
+  and `body`. Import it from `@pureform/react/bottom-sheet`.
+- **The side sheet** sits against the end edge of the viewport (`coplanar` puts a standard sheet
+  in the page's layout). Its `Header` holds a `BackButton`, the `Headline` and the
+  `CloseTrigger`; `Body` and `Actions` follow. The ready-made takes `trigger`, `headline`,
+  `onBack`, `backLabel`, `backIcon`, `closeLabel`, `closeIcon`, `body` and `actions`. Import it
+  from `@pureform/react/side-sheet`.
+- **The drag handle** is a `<button>` holding the pill (`orientation="vertical"` for a pane
+  divider); name it with `aria-label`. Import it from `@pureform/react/drag-handle`.
 - **The snackbar** is its `Root`: a `role="status"` region, hidden once closed and its exit
   animation over, that closes itself after `duration` (5000 ms; `null` to stay) unless the pointer or focus is in it. `onOpenChange`
   gets `{ open, reason }` (`timeout`, `action`, `close`, `escape`, `open`); `onAction` runs before

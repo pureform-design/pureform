@@ -4,6 +4,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider, placeOverlay } from ".";
+import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
 import { Dialog } from "./dialog";
 import { animated } from "./engine";
@@ -13,6 +14,7 @@ import { FullscreenDialog } from "./fullscreen-dialog";
 import { IconButton } from "./icon-button";
 import { Menu } from "./menu";
 import { RichTooltip } from "./rich-tooltip";
+import { SideSheet } from "./side-sheet";
 import { useSnackbar } from "./snackbar";
 import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
@@ -41,6 +43,9 @@ beforeAll(async () => {
         "richTooltip",
         "dialog",
         "fullscreenDialog",
+        "bottomSheet",
+        "sideSheet",
+        "dragHandle",
         "scrim",
         "ripple",
     ];
@@ -768,6 +773,108 @@ describe.each([animated, reanimated])(
         });
     },
 );
+
+describe("the sheets", () => {
+    const sheet = (scope: string) =>
+        document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-root"]`);
+    const press = (name: string) =>
+        interact(() =>
+            userEvent.click(
+                [
+                    ...document.querySelectorAll<HTMLElement>(
+                        '[role="button"]',
+                    ),
+                ].find(
+                    (button) =>
+                        button.textContent === name ||
+                        button.getAttribute("aria-label") === name,
+                )!,
+            ),
+        );
+
+    it("opens a modal bottom sheet from its trigger, over a scrim, and its drag handle and Escape close it", async () => {
+        const asked: boolean[] = [];
+        await render(
+            <BottomSheet
+                trigger="Share"
+                aria-label="Share"
+                onOpenChange={(details) => asked.push(details.open)}
+            >
+                Share to
+            </BottomSheet>,
+        );
+        const open = async () => {
+            await press("Share");
+            await settle(600);
+            expect(sheet("bottom-sheet")).not.toBeNull();
+        };
+        expect(sheet("bottom-sheet")).toBeNull();
+        await open();
+        expect(
+            document.querySelector('[data-testid="pf-scrim-root"]'),
+        ).not.toBeNull();
+        expect(
+            sheet("bottom-sheet")!.closest('[aria-modal="true"]'),
+        ).not.toBeNull();
+
+        await press("Close sheet");
+        await until(() => sheet("bottom-sheet") === null);
+
+        await open();
+        await interact(() => userEvent.keyboard("{Escape}"));
+        await until(() => sheet("bottom-sheet") === null);
+        expect(asked).toEqual([true, false, true, false]);
+    });
+
+    it("renders a standard bottom sheet as its surface alone", async () => {
+        await render(<BottomSheet modal={false}>Share to</BottomSheet>);
+        expect(sheet("bottom-sheet")).not.toBeNull();
+        expect(
+            sheet("bottom-sheet")!.closest('[aria-modal="true"]'),
+        ).toBeNull();
+        expect(
+            document.querySelector('[data-testid="pf-scrim-root"]'),
+        ).toBeNull();
+    });
+
+    it("closes a modal side sheet from its close button, and its back button calls onBack", async () => {
+        const backs: number[] = [];
+        await render(
+            <SideSheet
+                trigger="Filters"
+                headline="Filters"
+                onBack={() => backs.push(1)}
+                actions={<Button label="Apply" />}
+            >
+                Narrow it down.
+            </SideSheet>,
+        );
+        await press("Filters");
+        await settle(600);
+        expect(sheet("side-sheet")).not.toBeNull();
+        expect(sheet("side-sheet")!.getAttribute("aria-label")).toBe("Filters");
+        await press("Back");
+        expect(backs).toEqual([1]);
+        await press("Close");
+        await until(() => sheet("side-sheet") === null);
+        expect(sheet("side-sheet")).toBeNull();
+    });
+
+    it("renders a coplanar side sheet as its surface alone", async () => {
+        await render(
+            <SideSheet modal={false} coplanar headline="Details">
+                Info
+            </SideSheet>,
+        );
+        expect(sheet("side-sheet")).not.toBeNull();
+        expect(sheet("side-sheet")!.closest('[aria-modal="true"]')).toBeNull();
+        expect(
+            document.querySelector(
+                '[data-testid="pf-side-sheet-close-trigger"]',
+            ),
+        ).not.toBeNull();
+    });
+});
 
 it("stacks open overlays by their layers: a menu, then a snackbar, then a tooltip", async () => {
     let snackbars!: Snackbars;

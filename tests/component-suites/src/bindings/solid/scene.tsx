@@ -9,6 +9,7 @@ import {
 import type { Indication } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
+import { BottomSheet } from "@pureform/solid/bottom-sheet";
 import { Button } from "@pureform/solid/button";
 import { ButtonGroup } from "@pureform/solid/button-group";
 import { Card } from "@pureform/solid/card";
@@ -16,6 +17,7 @@ import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { CircularProgress } from "@pureform/solid/circular-progress";
 import { Dialog } from "@pureform/solid/dialog";
+import { DragHandle } from "@pureform/solid/drag-handle";
 import { Fab } from "@pureform/solid/fab";
 import { FabMenu } from "@pureform/solid/fab-menu";
 import { FullscreenDialog } from "@pureform/solid/fullscreen-dialog";
@@ -35,6 +37,7 @@ import { Scrim } from "@pureform/solid/scrim";
 import { SearchBar } from "@pureform/solid/search-bar";
 import { Select } from "@pureform/solid/select";
 import { Separator } from "@pureform/solid/separator";
+import { SideSheet } from "@pureform/solid/side-sheet";
 import { Slider } from "@pureform/solid/slider";
 import { Snackbar } from "@pureform/solid/snackbar";
 import { SplitButton } from "@pureform/solid/split-button";
@@ -82,6 +85,7 @@ function ToastScene(
 export const components: Record<ComponentName, ValidComponent> = {
     Avatar,
     Badge,
+    BottomSheet,
     Button,
     ButtonGroup,
     Card,
@@ -89,6 +93,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Chip,
     CircularProgress,
     Dialog,
+    DragHandle,
     Fab,
     FullscreenDialog,
     FabMenu,
@@ -108,6 +113,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     SearchBar,
     Select,
     Separator,
+    SideSheet,
     Slider,
     Snackbar,
     SplitButton,

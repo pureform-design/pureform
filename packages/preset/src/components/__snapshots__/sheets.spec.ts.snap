@@ -1,0 +1,266 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "content": {
+      "color": "var(--components-bottomSheet-content, token(colors.onSurfaceVariant))",
+      "flexGrow": "1",
+      "minHeight": "0px",
+      "overflow": "auto",
+      "paddingBlockEnd": "var(--components-bottomSheet-contentPaddingEnd, token(spacing.6))",
+      "paddingInlineEnd": "var(--components-bottomSheet-contentPadding, token(spacing.4))",
+      "paddingInlineStart": "var(--components-bottomSheet-contentPadding, token(spacing.4))",
+      "textStyle": "bodyMedium",
+    },
+    "dragHandle": {
+      "marginInlineEnd": "auto",
+      "marginInlineStart": "auto",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sheetFadeOut",
+          "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards bottomSheetOut",
+        },
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) sheetFadeIn",
+          "base": "token(durations.long2) token(easings.emphasizedDecelerate) bottomSheetIn",
+        },
+      },
+      "backgroundColor": "var(--components-bottomSheet-container, token(colors.surfaceContainerLow))",
+      "borderEndEndRadius": "0px",
+      "borderEndStartRadius": "0px",
+      "borderStartEndRadius": "var(--components-bottomSheet-radius, token(radii.extraLarge))",
+      "borderStartStartRadius": "var(--components-bottomSheet-radius, token(radii.extraLarge))",
+      "borderWidth": "0px",
+      "color": "var(--components-bottomSheet-content, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "marginInlineEnd": "auto",
+      "marginInlineStart": "auto",
+      "maxHeight": "100%",
+      "maxWidth": "var(--components-bottomSheet-maxWidth, 640px)",
+      "minHeight": "0px",
+      "shadowElevation": "level1",
+      "width": "100%",
+    },
+  },
+  "className": "bottomSheet",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "modal": true,
+  },
+  "jsx": [
+    "BottomSheet",
+  ],
+  "slots": [
+    "root",
+    "dragHandle",
+    "content",
+  ],
+  "variants": {
+    "modal": {
+      "false": {
+        "root": {
+          "zIndex": "token(zIndex.raised)",
+        },
+      },
+      "true": {
+        "root": {
+          "zIndex": "token(zIndex.dialog)",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`dragHandle > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "handle": {
+      "backgroundColor": "var(--components-dragHandle-color, token(colors.onSurfaceVariant))",
+      "borderRadius": "token(radii.full)",
+      "height": "var(--components-dragHandle-thickness, 4px)",
+      "width": "var(--components-dragHandle-length, 32px)",
+    },
+    "root": {
+      "alignItems": "center",
+      "backgroundColor": "transparent",
+      "borderRadius": "token(radii.full)",
+      "borderWidth": "0px",
+      "cursor": "grab",
+      "display": "flex",
+      "flexShrink": "0",
+      "justifyContent": "center",
+      "minHeight": "var(--components-dragHandle-target, token(sizes.touchTarget))",
+      "minWidth": "var(--components-dragHandle-target, token(sizes.touchTarget))",
+      "outlineColor": "token(colors.secondary)",
+      "outlineOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "token(sizes.focusIndicatorThickness)",
+      "paddingBlockEnd": "0px",
+      "paddingBlockStart": "0px",
+      "paddingInlineEnd": "0px",
+      "paddingInlineStart": "0px",
+    },
+  },
+  "className": "dragHandle",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "orientation": "horizontal",
+  },
+  "jsx": [
+    "DragHandle",
+  ],
+  "slots": [
+    "root",
+    "handle",
+  ],
+  "variants": {
+    "orientation": {
+      "horizontal": {},
+      "vertical": {
+        "handle": {
+          "height": "var(--components-dragHandle-verticalLength, 48px)",
+          "width": "var(--components-dragHandle-thickness, 4px)",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "alignItems": "center",
+      "borderBlockStartColor": "var(--components-sideSheet-dividerColor, token(colors.outlineVariant))",
+      "borderBlockStartStyle": "solid",
+      "borderBlockStartWidth": "1px",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "gap": "var(--components-sideSheet-actionsGap, token(spacing.2))",
+      "paddingBlockEnd": "var(--components-sideSheet-padding, token(spacing.6))",
+      "paddingBlockStart": "var(--components-sideSheet-padding, token(spacing.6))",
+      "paddingInlineEnd": "var(--components-sideSheet-padding, token(spacing.6))",
+      "paddingInlineStart": "var(--components-sideSheet-padding, token(spacing.6))",
+    },
+    "backButton": {
+      "flexShrink": "0",
+      "marginInlineStart": "calc(var(--components-sideSheet-buttonInset, token(spacing.3)) - var(--components-sideSheet-padding, token(spacing.6)))",
+    },
+    "closeTrigger": {
+      "flexShrink": "0",
+      "marginInlineStart": "auto",
+    },
+    "content": {
+      "color": "var(--components-sideSheet-content, token(colors.onSurfaceVariant))",
+      "flexGrow": "1",
+      "minHeight": "0px",
+      "overflow": "auto",
+      "paddingInlineEnd": "var(--components-sideSheet-padding, token(spacing.6))",
+      "paddingInlineStart": "var(--components-sideSheet-padding, token(spacing.6))",
+      "textStyle": "bodyMedium",
+    },
+    "header": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "gap": "var(--components-sideSheet-gap, token(spacing.3))",
+      "minHeight": "var(--components-sideSheet-headerHeight, 72px)",
+      "paddingInlineEnd": "var(--components-sideSheet-buttonInset, token(spacing.3))",
+      "paddingInlineStart": "var(--components-sideSheet-padding, token(spacing.6))",
+    },
+    "headline": {
+      "color": "var(--components-sideSheet-headlineColor, token(colors.onSurfaceVariant))",
+      "flexGrow": "1",
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "minWidth": "0px",
+      "textStyle": "titleLarge",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sheetFadeOut",
+          "_rtl": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOutRtl",
+          "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOut",
+        },
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) sheetFadeIn",
+          "_rtl": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetInRtl",
+          "base": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetIn",
+        },
+      },
+      "backgroundColor": "var(--components-sideSheet-container, token(colors.surface))",
+      "borderWidth": "0px",
+      "color": "var(--components-sideSheet-content, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "height": "100%",
+      "maxWidth": "100%",
+      "minHeight": "0px",
+      "shadowElevation": "level0",
+      "width": "var(--components-sideSheet-width, 360px)",
+    },
+  },
+  "className": "sideSheet",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "coplanar": false,
+    "modal": true,
+  },
+  "jsx": [
+    "SideSheet",
+  ],
+  "slots": [
+    "root",
+    "header",
+    "backButton",
+    "headline",
+    "closeTrigger",
+    "content",
+    "actions",
+  ],
+  "variants": {
+    "coplanar": {
+      "false": {},
+      "true": {
+        "root": {
+          "zIndex": "token(zIndex.base)",
+        },
+      },
+    },
+    "modal": {
+      "false": {
+        "root": {
+          "zIndex": "token(zIndex.raised)",
+        },
+      },
+      "true": {
+        "root": {
+          "--components-sideSheet-container": "token(colors.surfaceContainerLow)",
+          "borderEndEndRadius": "0px",
+          "borderEndStartRadius": "var(--components-sideSheet-radius, token(radii.large))",
+          "borderStartEndRadius": "0px",
+          "borderStartStartRadius": "var(--components-sideSheet-radius, token(radii.large))",
+          "shadowElevation": "level1",
+          "zIndex": "token(zIndex.dialog)",
+        },
+      },
+    },
+  },
+}
+`;

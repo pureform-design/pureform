@@ -2536,6 +2536,9 @@ navigationRail[modal=true].icon: bg none | color rgba(73, 69, 78, 1) | outline n
     hovered-selected: color rgba(74, 68, 88, 1)
 navigationRail[modal=true].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(98, 91, 112, 1)
+dragHandle.root: bg transparent | color none | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
 snackbar.action: bg transparent | color rgba(207, 188, 255, 1) | outline none
     hovered: bg rgba(207, 188, 255, 0.08)
     focused: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

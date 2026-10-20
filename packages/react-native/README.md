@@ -266,6 +266,15 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,
       given a node or `({ close }) => node`) over a scrolling body (the children). Escape and
       back close it, as the dialog's do. Import it from `@pureform/react-native/fullscreen-dialog`.
+    - **The bottom and side sheets** open the same way, in a `Modal` over a scrim, against the
+      bottom edge or the end edge. A press on the scrim, Escape, or back closes them; so does
+      the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag
+      down past a quarter of its height, and the side sheet's close icon button (`closeLabel`).
+      The side sheet's header takes a back button when given `onBack`, and an `actions` row
+      under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its
+      surface, which the app places. The drag handle is a component of its own, a pressable
+      pill. Import them from `@pureform/react-native/bottom-sheet`, `/side-sheet`, and
+      `/drag-handle`.
 
     Without a trigger (or, for the dialog, `onOpenChange` and `defaultOpen`) each is its surface,
     as before: the app places it, and given `open` it enters and leaves in place. The select
