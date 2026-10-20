@@ -67,6 +67,51 @@ const controlled = (initial: string | null) => {
     };
 };
 
+describe("Select, option groups", () => {
+    it("renders grouped options under their labels, in the order the groups first appear", async () => {
+        withRegistry(
+            <Select
+                label="Food"
+                items={[
+                    { value: "none", label: "None" },
+                    { value: "apple", label: "Apple", group: "Fruit" },
+                    { value: "kale", label: "Kale", group: "Vegetables" },
+                    { value: "pear", label: "Pear", group: "Fruit" },
+                ]}
+            />,
+        );
+        await settle();
+        const options = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${menu.item}"]`,
+            ),
+        ];
+        expect(options.map((option) => option.dataset.value)).toEqual([
+            "none",
+            "apple",
+            "pear",
+            "kale",
+        ]);
+        expect(item("none").parentElement).toBe(byTestId(menu.root));
+        const groups = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${menu.itemGroup}"]`,
+            ),
+        ];
+        expect(groups).toHaveLength(2);
+        expect(groups[0]!.className).toBe("menu__itemGroup");
+        expect(groups[0]!.getAttribute("role")).toBe("group");
+        const labels = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${menu.itemGroupLabel}"]`,
+        );
+        expect(labels[0]!.textContent).toBe("Fruit");
+        expect(labels[0]!.className).toBe("menu__itemGroupLabel");
+        expect(groups[0]!.getAttribute("aria-labelledby")).toBe(labels[0]!.id);
+        expect(item("pear").parentElement).toBe(groups[0]);
+        expect(item("kale").parentElement).toBe(groups[1]);
+    });
+});
+
 describe("Select, ready-made", () => {
     it("renders the field, a hidden select, and the list drawn as a menu", async () => {
         withRegistry(

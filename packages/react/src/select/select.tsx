@@ -9,7 +9,9 @@ import {
     isPresent,
     SELECT_COLLECTION,
     SELECT_ROOT_PROPS,
+    selectGroupedItems,
     selectHiddenSelectProps,
+    selectItemGroups,
     selectInputProps,
     selectMachineProps,
     selectMenuSelection,
@@ -31,6 +33,7 @@ import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import {
     type ElementType,
+    Fragment,
     type ReactNode,
     useCallback,
     useEffect,
@@ -122,7 +125,7 @@ function Root(props: SelectRootProps): ReactNode {
     const collection = useMemo(
         () =>
             select.collection<SelectItem>({
-                items: [...items],
+                items: selectGroupedItems(items),
                 ...SELECT_COLLECTION,
             }),
         [items],
@@ -337,6 +340,46 @@ function Content({ unstyled, ...props }: SelectPartProps): ReactNode {
     });
 }
 
+/** A group's props: its `id`, which its label points at, and a part's. */
+export interface SelectItemGroupProps extends SelectPartProps {
+    readonly id: string;
+}
+
+/** A group label's props: the `id` of its group, and a part's. */
+export interface SelectItemGroupLabelProps extends Omit<SelectPartProps, "id"> {
+    readonly group: string;
+}
+
+/** A group of options, labelled by the ItemGroupLabel with its `id` as `group`. */
+function ItemGroup({
+    unstyled,
+    id,
+    ...props
+}: SelectItemGroupProps): ReactNode {
+    const { menu, api } = context.use("ItemGroup");
+    return menu.render("itemGroup", {
+        element: "div",
+        machine: api.getItemGroupProps({ id }),
+        unstyled,
+        props,
+    });
+}
+
+/** A group's label. */
+function ItemGroupLabel({
+    unstyled,
+    group,
+    ...props
+}: SelectItemGroupLabelProps): ReactNode {
+    const { menu, api } = context.use("ItemGroupLabel");
+    return menu.render("itemGroupLabel", {
+        element: "div",
+        machine: api.getItemGroupLabelProps({ htmlFor: group }),
+        unstyled,
+        props,
+    });
+}
+
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 function Item({ unstyled, item, ...props }: SelectItemProps): ReactNode {
     const { menu, api, sources } = context.use("Item");
@@ -432,11 +475,25 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
             <HiddenSelect {...slot("hiddenSelect")} />
             <Positioner>
                 <Content>
-                    {items.map((item) => (
-                        <Item key={item.value} item={item}>
-                            <ItemLabel>{item.label}</ItemLabel>
-                        </Item>
-                    ))}
+                    {selectItemGroups(items).map(({ group, items: run }) => {
+                        const options = run.map((item) => (
+                            <Item key={item.value} item={item}>
+                                <ItemLabel>{item.label}</ItemLabel>
+                            </Item>
+                        ));
+                        return group === undefined ? (
+                            <Fragment key={`-${run[0]!.value}`}>
+                                {options}
+                            </Fragment>
+                        ) : (
+                            <ItemGroup key={group} id={group}>
+                                <ItemGroupLabel group={group}>
+                                    {group}
+                                </ItemGroupLabel>
+                                {options}
+                            </ItemGroup>
+                        );
+                    })}
                 </Content>
             </Positioner>
         </>
@@ -444,7 +501,8 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
 }
 
 /** The ready-made select: the field in the preset's structure (the leading icon and supporting
- *  text only when given, or while an error shows), the hidden select, and the list. */
+ *  text only when given, or while an error shows), the hidden select, and the list, its options
+ *  under their group labels. */
 function ReadyMade(props: SelectProps): ReactNode {
     const slot = useSlotProps(props);
     const {
@@ -475,7 +533,8 @@ function ReadyMade(props: SelectProps): ReactNode {
 /** Material's select. Use it ready-made, `<Select label="Size" name="size" items={[{ value: "s",
  *  label: "Small" }, …]} />`, or compose its parts under `Select.Root`: `Container` holding
  *  `LeadingIcon`, `Input`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
- *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option. */
+ *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option; an
+ *  `ItemGroup` holds an `ItemGroupLabel` and its options. */
 export const Select = Object.assign(ReadyMade, {
     Root,
     Container,
@@ -487,6 +546,8 @@ export const Select = Object.assign(ReadyMade, {
     HiddenSelect,
     Positioner,
     Content,
+    ItemGroup,
+    ItemGroupLabel,
     Item,
     ItemLabel,
 });

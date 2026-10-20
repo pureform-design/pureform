@@ -156,7 +156,13 @@ export const textInputsRegistry = () =>
         textField: named("text-field", FIELD_SLOTS),
         textArea: named("text-area", FIELD_SLOTS),
         select: named("select", FIELD_SLOTS),
-        menu: named("menu", ["root", "item", "itemLabel"]),
+        menu: named("menu", [
+            "root",
+            "itemGroup",
+            "itemGroupLabel",
+            "item",
+            "itemLabel",
+        ]),
     });
 
 /** The overlays' fake factories, all static: the menu, tooltip, dialog, scrim, and snackbar, and
@@ -166,8 +172,12 @@ export const overlaysRegistry = () =>
         menu: named("menu", [
             "root",
             "item",
+            "itemGroup",
+            "itemGroupLabel",
             "itemLeading",
+            "itemContent",
             "itemLabel",
+            "itemSupportingText",
             "itemTrailing",
             "itemTrailingText",
         ]),
@@ -217,6 +227,7 @@ export const navigationRegistry = () =>
         ]),
         navigationBar: named("navigation-bar", NAV_SLOTS),
         navigationRail: named("navigation-rail", NAV_SLOTS),
+        list: named("list", ["root", "item"]),
         listItem: named("list-item", [
             "root",
             "leading",
