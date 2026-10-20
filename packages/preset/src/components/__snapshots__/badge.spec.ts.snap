@@ -1,0 +1,62 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`badge > compiles to a stable Panda recipe 1`] = `
+{
+  "base": {
+    "alignItems": "center",
+    "backgroundColor": "var(--components-badge-container, token(colors.error))",
+    "borderRadius": "var(--components-badge-radius, token(radii.full))",
+    "color": "var(--components-badge-content, token(colors.onError))",
+    "display": "inline-flex",
+    "flexShrink": "0",
+    "justifyContent": "center",
+  },
+  "className": "badge",
+  "compoundVariants": [
+    {
+      "css": {
+        "insetBlockStart": "var(--components-badge-smallOffsetBlock, 0px)",
+        "insetInlineEnd": "var(--components-badge-smallOffsetInline, 0px)",
+      },
+      "placement": "anchored",
+      "size": "small",
+    },
+    {
+      "css": {
+        "insetBlockStart": "var(--components-badge-largeOffsetBlock, -4px)",
+        "insetInlineEnd": "var(--components-badge-largeOffsetInline, -8px)",
+      },
+      "placement": "anchored",
+      "size": "large",
+    },
+  ],
+  "defaultVariants": {
+    "placement": "flow",
+    "size": "large",
+  },
+  "jsx": [
+    "Badge",
+  ],
+  "variants": {
+    "placement": {
+      "anchored": {
+        "position": "absolute",
+      },
+      "flow": {},
+    },
+    "size": {
+      "large": {
+        "height": "var(--components-badge-largeSize, 16px)",
+        "minWidth": "var(--components-badge-largeSize, 16px)",
+        "paddingInlineEnd": "var(--components-badge-largePadding, token(spacing.1))",
+        "paddingInlineStart": "var(--components-badge-largePadding, token(spacing.1))",
+        "textStyle": "labelSmall",
+      },
+      "small": {
+        "height": "var(--components-badge-smallSize, 6px)",
+        "width": "var(--components-badge-smallSize, 6px)",
+      },
+    },
+  },
+}
+`;

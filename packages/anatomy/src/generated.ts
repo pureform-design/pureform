@@ -202,6 +202,24 @@ export const avatarAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const badgeAnatomy = {
+    name: "badge",
+    scope: "badge",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-badge-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const mediaAnatomy = {
     name: "media",
     scope: "media",
@@ -2106,6 +2124,7 @@ export const anatomy = {
     iconButton: iconButtonAnatomy,
     fab: fabAnatomy,
     avatar: avatarAnatomy,
+    badge: badgeAnatomy,
     media: mediaAnatomy,
     chip: chipAnatomy,
     textField: textFieldAnatomy,
@@ -2161,6 +2180,7 @@ export const testIds = {
         label: "pf-fab-label",
     },
     avatar: { root: "pf-avatar-root" },
+    badge: { root: "pf-badge-root" },
     media: { root: "pf-media-root" },
     chip: {
         root: "pf-chip-root",

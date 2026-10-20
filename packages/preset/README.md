@@ -336,6 +336,20 @@ pureform({
 iconButton({ shape: "cookieToCircle" });
 ```
 
+### Badge
+
+`badge` is Material's small (a dot, 6px) and large (a short label or count, 16px high) badge in the
+error color; `size` picks one. It is styling only. It flows inline by default; `placement:
+anchored` positions it at the top end corner of its nearest positioned parent, so put it inside a
+navigation bar or rail `icon`, or a tab's `tabContent` (all three are positioning contexts). Give
+a count `role="img"` and an `aria-label`, or leave a dot `aria-hidden`.
+
+```html
+<span class="{icon()}"
+    >✉<span class="{badge({ placement: 'anchored' })}">3</span></span
+>
+```
+
 ### Avatar
 
 `avatar` shows a picture, initials, or an icon in a color group's container, `small` (24px),
