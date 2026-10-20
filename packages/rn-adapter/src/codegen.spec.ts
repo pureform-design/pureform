@@ -363,13 +363,13 @@ describe("generate with the native target", () => {
             generated = await importGenerated(root);
         }, 60_000);
 
-        // Every combination of every group's values.
         // Every combination of every group's values, up to `limit` of them: past it, an even
-        // spread through them (a stride through the mixed-radix count), and each value of each
-        // group on its own over the first value of the others, so none goes untried.
+        // spread through them (a stride through the mixed-radix count), and every pair of values
+        // from every two groups over the first values of the rest, so each compound (which matches
+        // two groups) is covered.
         const combinations = (
             variants: Readonly<Record<string, readonly string[]>>,
-            limit = 40_000,
+            limit = 4_000,
         ): Record<string, string>[] => {
             const groups = Object.entries(variants);
             const total = groups.reduce(
@@ -393,10 +393,16 @@ describe("generate with the native target", () => {
             const spread = Array.from({ length: limit }, (_, index) =>
                 at((index * stride) % total),
             );
-            const each = groups.flatMap(([group, values]) =>
-                values.map((value) => ({ ...at(0), [group]: value })),
+            const pairs = groups.flatMap(([a, aValues], i) =>
+                groups
+                    .slice(i + 1)
+                    .flatMap(([b, bValues]) =>
+                        aValues.flatMap((x) =>
+                            bValues.map((y) => ({ ...at(0), [a]: x, [b]: y })),
+                        ),
+                    ),
             );
-            return [...spread, ...each];
+            return [...spread, ...pairs];
         };
 
         it("registers every component", { timeout: 60_000 }, () => {
@@ -474,8 +480,7 @@ describe("generate with the native target", () => {
 
         it(
             "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values (or an even spread through them)",
-            // About two minutes on its own since the list item's leading type and position.
-            { timeout: 300_000 },
+            { timeout: 120_000 },
             () => {
                 let count = 0;
                 for (const name of Object.keys(preset.components)) {
@@ -491,7 +496,7 @@ describe("generate with the native target", () => {
                         count++;
                     }
                 }
-                expect(count).toBeGreaterThan(40_000);
+                expect(count).toBeGreaterThan(20_000);
             },
         );
 

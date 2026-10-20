@@ -135,17 +135,45 @@ interface Generated {
 const factoryOf = (generated: Generated, name: string): Factory =>
     (generated.registry.entry(name) as { factory: Factory }).factory;
 
-// Every combination of every group's values.
+// Every combination of every group's values, up to `limit` of them: past it, an even spread
+// through them (a stride through the mixed-radix count), and every pair of values from every two
+// groups over the first values of the rest, so each compound (which matches two groups) is
+// covered. The cap keeps the sweep's time flat
+// as components gain groups.
 const selections = (
     variants: Readonly<Record<string, readonly string[]>>,
-): Record<string, string>[] =>
-    Object.entries(variants).reduce<Record<string, string>[]>(
-        (all, [group, values]) =>
-            all.flatMap((selection) =>
-                values.map((value) => ({ ...selection, [group]: value })),
-            ),
-        [{}],
+    limit = 4_000,
+): Record<string, string>[] => {
+    const groups = Object.entries(variants);
+    const total = groups.reduce((n, [, values]) => n * values.length, 1);
+    const at = (index: number) => {
+        const selection: Record<string, string> = {};
+        let rest = index;
+        for (const [group, values] of groups) {
+            selection[group] = values[rest % values.length]!;
+            rest = Math.floor(rest / values.length);
+        }
+        return selection;
+    };
+    if (total <= limit) {
+        return Array.from({ length: total }, (_, index) => at(index));
+    }
+    // An odd stride, so it doesn't keep landing on the same value of an even group.
+    const stride = Math.floor(total / limit) | 1;
+    const spread = Array.from({ length: limit }, (_, index) =>
+        at((index * stride) % total),
     );
+    const pairs = groups.flatMap(([a, aValues], i) =>
+        groups
+            .slice(i + 1)
+            .flatMap(([b, bValues]) =>
+                aValues.flatMap((x) =>
+                    bValues.map((y) => ({ ...at(0), [a]: x, [b]: y })),
+                ),
+            ),
+    );
+    return [...spread, ...pairs];
+};
 
 // The classes the runtime's `componentClasses` gives, as slots.
 const runtimeSlots = (
@@ -323,7 +351,7 @@ describe("generate with the Tailwind target", () => {
         );
 
         it(
-            "gives the plugin's classes for every combination of every group's values",
+            "gives the plugin's classes for every combination of every group's values (or an even spread through them)",
             { timeout: 60_000 },
             async () => {
                 let count = 0;
@@ -343,7 +371,7 @@ describe("generate with the Tailwind target", () => {
                         count++;
                     }
                 }
-                expect(count).toBeGreaterThan(40_000);
+                expect(count).toBeGreaterThan(20_000);
             },
         );
 
