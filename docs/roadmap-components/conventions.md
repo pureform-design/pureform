@@ -57,7 +57,9 @@ gap analysis updated. Also:
   sampling, `tests/component-suites` (each binding on each target, including the direction
   suite), and the browser suite's screenshots.
 - A new variant group counts its compounds before and after (guidelines §4).
-- Deprecated options of anything you touch still work; a test says so.
+- Deprecated options of anything you touch: remove those the new version already has an
+  equivalent for (name the replacement in the gap analysis and READMEs, and update their tests
+  and fixtures); those without one still work, and a test says so.
 
 ## Output context
 

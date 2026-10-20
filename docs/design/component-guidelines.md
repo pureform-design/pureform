@@ -62,8 +62,11 @@ For each component or suggestion from a source, answer the three checks, in orde
 3. **Does it need its own styles?** Behaviour-only and ARIA-only parts get no slot.
 
 Then give it a verdict: **Add**, **Variant**, **Later**, **Skip**, **Remove** or **Split**.
-A **Remove** or a dropped deprecated option must say why. Deprecated variants stay
-(Expressive's values are the defaults).
+A **Remove** or a dropped deprecated option must say why. Expressive's values are the
+defaults. A deprecated option is **removed** when the new version already has an equivalent
+(the same result through a new variant, size or token); the removal names the replacement in
+the gap analysis (§7 "Removed, and why") and the package READMEs. A deprecated option with
+no equivalent stays as a variant.
 
 **Split or variant?** A separate component when it has different parts (a group of them, not
 one optional part), a different behaviour or machine, or a different layout model. A variant
@@ -177,7 +180,7 @@ Test hygiene learned the hard way:
 - [ ] Parts and variants follow §3 and §4; compound count noted.
 - [ ] Every row of the theme checklist (§5) passes, or the exception (§5.1) is recorded.
 - [ ] Static theme and runtime theme both checked (a named theme, and a seed-colour theme).
-- [ ] Deprecated options kept, or the removal explained.
+- [ ] Deprecated options with a new equivalent removed (replacement named); those without one kept.
 - [ ] Machine, preset and binding anatomies agree.
 - [ ] All targets pass; screenshots and fixtures reviewed.
 - [ ] Docs updated, output context written, commits pushed when asked.
