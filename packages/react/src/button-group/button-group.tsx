@@ -167,6 +167,7 @@ function ReadyMade({ items = [], ...props }: ButtonGroupProps): ReactNode {
         onClick: item.onClick,
         "aria-label": item["aria-label"],
         testId: item.testId,
+        interactionSource: item.interactionSource,
     });
     return (
         <Root {...props}>
