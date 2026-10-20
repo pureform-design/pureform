@@ -27,6 +27,7 @@ export default createConfig({
                     "text-field": "src/text-field/index.ts",
                     slider: "src/slider/index.ts",
                     "tags-input": "src/tags-input/index.ts",
+                    combobox: "src/combobox/index.ts",
                     form: "src/form/index.ts",
                     interaction: "src/interaction/index.ts",
                 },
