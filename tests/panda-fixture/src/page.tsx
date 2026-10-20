@@ -1586,8 +1586,11 @@ export function Page() {
                     const [current, setCurrent] = createSignal(0);
                     const destinations = ["Home", "Search", "Inbox", "Profile"];
                     const glyphs = ["⌂", "⌕", "✉", "☺"];
-                    const nav = (recipe: typeof navigationBar) => {
-                        const n = recipe();
+                    const nav = (
+                        recipe: typeof navigationBar,
+                        selection: Parameters<typeof navigationBar>[0] = {},
+                    ) => {
+                        const n = recipe(selection);
                         return (
                             <nav class={n.root}>
                                 <For each={destinations}>
@@ -1623,6 +1626,17 @@ export function Page() {
                                 {nav(navigationBar)}
                             </div>
                             {nav(navigationRail as typeof navigationBar)}
+                            <div style={{ width: "600px" }}>
+                                {nav(navigationBar, {
+                                    itemLayout: "horizontal",
+                                })}
+                            </div>
+                            {nav(
+                                navigationRail as typeof navigationBar,
+                                {
+                                    expanded: "true",
+                                } as Parameters<typeof navigationBar>[0],
+                            )}
                         </>
                     );
                 })()}

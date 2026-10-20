@@ -271,10 +271,6 @@ describe.each(NAMES)("the %s factory", (name) => {
 // factories): setting them has no effect.
 const UNREAD = [
     "--pf-components-slider-stateLayerColor",
-    // The horizontal nav item that reads them arrives in c1e.
-    ...["navigationBar", "navigationRail"].map(
-        (name) => `--pf-components-${name}-horizontalActiveLabelColor`,
-    ),
     // A state layer that follows another slot has no drag state.
     ...[
         "iconButton",

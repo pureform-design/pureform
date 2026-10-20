@@ -1546,6 +1546,7 @@ export const navigationRailAnatomy = {
         "activeIndicator",
         "icon",
         "label",
+        "header",
     ],
     parts: {
         root: {
@@ -1553,7 +1554,7 @@ export const navigationRailAnatomy = {
             attribute: "root",
             testId: "pf-navigation-rail-root",
             parent: null,
-            children: ["item"],
+            children: ["header", "item"],
             styled: true,
             mirror: false,
         },
@@ -1598,6 +1599,15 @@ export const navigationRailAnatomy = {
             attribute: "label",
             testId: "pf-navigation-rail-label",
             parent: "item",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        header: {
+            name: "header",
+            attribute: "header",
+            testId: "pf-navigation-rail-header",
+            parent: "root",
             children: [],
             styled: true,
             mirror: false,
@@ -2242,6 +2252,7 @@ export const testIds = {
         activeIndicator: "pf-navigation-rail-active-indicator",
         icon: "pf-navigation-rail-icon",
         label: "pf-navigation-rail-label",
+        header: "pf-navigation-rail-header",
     },
     dialog: {
         root: "pf-dialog-root",

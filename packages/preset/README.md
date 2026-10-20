@@ -573,6 +573,13 @@ focus ring on the whole bar.
 share their markup. Mark the current destination with `aria-current="page"`; `color` fills its
 pill with a group's container, and an icon font draws its icon filled.
 
+The bar's `itemLayout: "horizontal"` and the rail's `expanded: "true"` put each label beside
+its icon, inside the pill, with the same markup: the pill covers the item and the label paints
+over it, in `horizontalActiveLabelColor` (the icon's colour) once current. The rail also has a
+`header` part (above the items, for the menu button and FAB) and `modal: "true"`, a raised
+surface with rounded end corners that the bindings show in a dialog over the scrim. No
+deprecated options; nothing was removed.
+
 ```html
 <nav class="{root}">
     <a class="{item}" href="/" aria-current="page">

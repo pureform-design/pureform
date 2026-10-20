@@ -1586,13 +1586,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "color": "var(--components-navigationBar-labelColor, token(colors.onSurfaceVariant))",
       "cursor": "pointer",
       "display": "inline-flex",
-      "flexBasis": "0px",
       "flexDirection": "column",
-      "flexGrow": "1",
       "gap": "var(--components-navigationBar-gap, token(spacing.1))",
-      "height": "100%",
       "justifyContent": "center",
-      "minWidth": "0px",
       "outlineColor": "var(--components-navigationBar-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-navigationBar-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {
@@ -1600,8 +1596,6 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         "base": "none",
       },
       "outlineWidth": "var(--components-navigationBar-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
-      "paddingBlockEnd": "6px",
-      "paddingBlockStart": "6px",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
@@ -1629,6 +1623,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "itemLayout": "vertical",
   },
   "jsx": [
     "NavigationBar",
@@ -1659,10 +1654,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.error)",
-          },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.error)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onErrorContainer)",
         },
       },
       "info": {
@@ -1681,10 +1675,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.info)",
-          },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.info)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onInfoContainer)",
         },
       },
       "primary": {},
@@ -1704,10 +1697,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.secondary)",
-          },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.secondary)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onSecondaryContainer)",
         },
       },
       "success": {
@@ -1726,10 +1718,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.success)",
-          },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.success)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onSuccessContainer)",
         },
       },
       "tertiary": {
@@ -1748,10 +1739,9 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.tertiary)",
-          },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.tertiary)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onTertiaryContainer)",
         },
       },
       "warning": {
@@ -1770,10 +1760,61 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "root": {
+          "--components-navigationBar-activeLabelColor": "token(colors.warning)",
+          "--components-navigationBar-horizontalActiveLabelColor": "token(colors.onWarningContainer)",
+        },
+      },
+    },
+    "itemLayout": {
+      "horizontal": {
+        "icon": {
+          "marginInlineStart": "var(--components-navigationBar-horizontalPadding, token(spacing.4))",
+        },
+        "indicator": {
+          "bottom": "0px",
+          "height": "100%",
+          "insetInlineStart": "0px",
+          "justifyContent": "start",
+          "position": "absolute",
+          "top": "0px",
+          "width": "100%",
+        },
         "item": {
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.warning)",
+            "color": "var(--components-navigationBar-horizontalActiveLabelColor, token(colors.onSecondaryContainer))",
           },
+          "alignItems": "center",
+          "borderRadius": "token(radii.full)",
+          "flexDirection": "row",
+          "gap": "0px",
+          "height": "var(--components-navigationBar-horizontalIndicatorHeight, 40px)",
+          "justifyContent": "start",
+          "minHeight": "var(--components-navigationBar-horizontalIndicatorHeight, 40px)",
+          "paddingBlockEnd": "0px",
+          "paddingBlockStart": "0px",
+          "paddingInlineEnd": "var(--components-navigationBar-horizontalPadding, token(spacing.4))",
+          "paddingInlineStart": "var(--components-navigationBar-horizontalPadding, token(spacing.4))",
+          "position": "relative",
+        },
+        "label": {
+          "marginInlineStart": "calc(var(--components-navigationBar-iconSize, token(sizes.iconMedium)) + var(--components-navigationBar-horizontalGap, token(spacing.1)))",
+          "position": "relative",
+        },
+        "root": {
+          "alignItems": "center",
+          "gap": "token(spacing.2)",
+          "justifyContent": "center",
+        },
+      },
+      "vertical": {
+        "item": {
+          "flexBasis": "0px",
+          "flexGrow": "1",
+          "height": "100%",
+          "minWidth": "0px",
+          "paddingBlockEnd": "6px",
+          "paddingBlockStart": "6px",
         },
       },
     },
@@ -1813,6 +1854,13 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         "_motionReduce": "opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
         "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
       },
+    },
+    "header": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-navigationRail-headerGap, token(spacing.2))",
+      "marginBlockEnd": "var(--components-navigationRail-headerSpacing, token(spacing.4))",
     },
     "icon": {
       "_rtl": {
@@ -1881,7 +1929,6 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "outlineWidth": "var(--components-navigationRail-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      "width": "100%",
     },
     "label": {
       "maxWidth": "100%",
@@ -1910,6 +1957,8 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "expanded": false,
+    "modal": false,
   },
   "jsx": [
     "NavigationRail",
@@ -1921,6 +1970,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
     "activeIndicator",
     "icon",
     "label",
+    "header",
   ],
   "variants": {
     "color": {
@@ -1940,10 +1990,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.error)",
-          },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.error)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onErrorContainer)",
         },
       },
       "info": {
@@ -1962,10 +2011,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.info)",
-          },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.info)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onInfoContainer)",
         },
       },
       "primary": {},
@@ -1985,10 +2033,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.secondary)",
-          },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.secondary)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onSecondaryContainer)",
         },
       },
       "success": {
@@ -2007,10 +2054,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.success)",
-          },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.success)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onSuccessContainer)",
         },
       },
       "tertiary": {
@@ -2029,10 +2075,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
-        "item": {
-          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.tertiary)",
-          },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.tertiary)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onTertiaryContainer)",
         },
       },
       "warning": {
@@ -2051,10 +2096,74 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "root": {
+          "--components-navigationRail-activeLabelColor": "token(colors.warning)",
+          "--components-navigationRail-horizontalActiveLabelColor": "token(colors.onWarningContainer)",
+        },
+      },
+    },
+    "expanded": {
+      "false": {
+        "item": {
+          "width": "100%",
+        },
+      },
+      "true": {
+        "header": {
+          "alignItems": "start",
+        },
+        "icon": {
+          "marginInlineStart": "var(--components-navigationRail-horizontalPadding, token(spacing.4))",
+        },
+        "indicator": {
+          "bottom": "0px",
+          "height": "100%",
+          "insetInlineStart": "0px",
+          "justifyContent": "start",
+          "position": "absolute",
+          "top": "0px",
+          "width": "100%",
+        },
         "item": {
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-            "color": "token(colors.warning)",
+            "color": "var(--components-navigationRail-horizontalActiveLabelColor, token(colors.onSecondaryContainer))",
           },
+          "alignItems": "center",
+          "borderRadius": "token(radii.full)",
+          "flexDirection": "row",
+          "gap": "0px",
+          "height": "var(--components-navigationRail-horizontalIndicatorHeight, 56px)",
+          "justifyContent": "start",
+          "minHeight": "var(--components-navigationRail-horizontalIndicatorHeight, 56px)",
+          "paddingBlockEnd": "0px",
+          "paddingBlockStart": "0px",
+          "paddingInlineEnd": "var(--components-navigationRail-horizontalPadding, token(spacing.4))",
+          "paddingInlineStart": "var(--components-navigationRail-horizontalPadding, token(spacing.4))",
+          "position": "relative",
+        },
+        "label": {
+          "marginInlineStart": "calc(var(--components-navigationRail-iconSize, token(sizes.iconMedium)) + var(--components-navigationRail-horizontalGap, token(spacing.2)))",
+          "position": "relative",
+          "textStyle": "labelLarge",
+        },
+        "root": {
+          "alignItems": "start",
+          "paddingInlineEnd": "token(spacing.5)",
+          "paddingInlineStart": "token(spacing.5)",
+          "width": "var(--components-navigationRail-expandedWidth, 220px)",
+        },
+      },
+    },
+    "modal": {
+      "false": {},
+      "true": {
+        "root": {
+          "backgroundColor": "var(--components-navigationRail-modalContainer, token(colors.surfaceContainer))",
+          "borderEndEndRadius": "token(radii.large)",
+          "borderStartEndRadius": "token(radii.large)",
+          "color": "var(--components-navigationRail-labelColor, token(colors.onSurfaceVariant))",
+          "height": "100%",
+          "shadowElevation": "level1",
         },
       },
     },

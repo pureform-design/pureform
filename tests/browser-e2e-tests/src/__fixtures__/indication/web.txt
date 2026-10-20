@@ -1871,6 +1871,28 @@ navigationBar[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 
     hovered-selected: color oklch(0.3911 0.0701 217.604)
 navigationBar[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4771 0.0852 217.083)
+navigationBar[itemLayout=horizontal].item: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+    focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+navigationBar[itemLayout=horizontal].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+navigationBar[itemLayout=horizontal].activeIndicator: bg oklch(0.9163 0.0365 303.153) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.8458 0.8094 0.9041)
+    focused: bg color(srgb 0.8298 0.7942 0.887)
+    pressed: bg color(srgb 0.8298 0.7942 0.887)
+    hovered-selected: bg color(srgb 0.8458 0.8094 0.9041) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.8298 0.7942 0.887)
+    focused-checked: bg color(srgb 0.8298 0.7942 0.887)
+navigationBar[itemLayout=horizontal].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+navigationBar[itemLayout=horizontal].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
 navigationRail.item: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
     hovered-selected: color oklch(0.4855 0.0342 300.379)
@@ -2003,6 +2025,50 @@ navigationRail[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158
     hovered-selected: color oklch(0.3911 0.0701 217.604)
 navigationRail[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4771 0.0852 217.083)
+navigationRail[expanded=true].item: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+    focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+navigationRail[expanded=true].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+navigationRail[expanded=true].activeIndicator: bg oklch(0.9163 0.0365 303.153) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.8458 0.8094 0.9041)
+    focused: bg color(srgb 0.8298 0.7942 0.887)
+    pressed: bg color(srgb 0.8298 0.7942 0.887)
+    hovered-selected: bg color(srgb 0.8458 0.8094 0.9041) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.8298 0.7942 0.887)
+    focused-checked: bg color(srgb 0.8298 0.7942 0.887)
+navigationRail[expanded=true].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+navigationRail[expanded=true].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+navigationRail[modal=true].item: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    hovered-selected: color oklch(0.4855 0.0342 300.379)
+    focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+navigationRail[modal=true].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+navigationRail[modal=true].activeIndicator: bg oklch(0.9163 0.0365 303.153) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.8458 0.8094 0.9041)
+    focused: bg color(srgb 0.8298 0.7942 0.887)
+    pressed: bg color(srgb 0.8298 0.7942 0.887)
+    hovered-selected: bg color(srgb 0.8458 0.8094 0.9041) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.8298 0.7942 0.887)
+    focused-checked: bg color(srgb 0.8298 0.7942 0.887)
+navigationRail[modal=true].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+navigationRail[modal=true].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4855 0.0342 300.379)
 snackbar.action: bg rgba(0, 0, 0, 0) | color oklch(0.8341 0.0944 297.341) | outline none
     hovered: bg color(srgb 0.8117 0.7373 1 / 0.08)
     focused: bg color(srgb 0.8117 0.7373 1 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px

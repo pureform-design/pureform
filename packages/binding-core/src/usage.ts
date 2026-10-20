@@ -80,10 +80,15 @@ export const COMPONENT_USAGE = {
         },
     },
     "navigation-bar": {
-        entries: { navigationBar: same("color"), ripple: {} },
+        entries: { navigationBar: same("color", "itemLayout"), ripple: {} },
     },
     "navigation-rail": {
-        entries: { navigationRail: same("color"), ripple: {} },
+        // A modal rail is drawn in a dialog over the scrim.
+        entries: {
+            navigationRail: same("color", "expanded", "modal"),
+            scrim: {},
+            ripple: {},
+        },
     },
     // The group's color and density reach each radio.
     "radio-group": { entries: { radio: same("color", "density"), ripple: {} } },

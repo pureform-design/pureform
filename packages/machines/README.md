@@ -45,7 +45,7 @@ callback reports user actions only, with a details object.
 | `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                                                                     |
 | `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).                                                |
 | `snackbar/`                                               | The snackbar: `open`, closing itself after `duration` unless held by the pointer or focus.                                                  |
-| `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`.                                                  |
+| `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`; the rail's `header` part (`getHeaderProps`).     |
 | `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                               |
 | `dialog.ts`                                               | Zag's dialog, re-exported; its dismissable layer doesn't mirror the dialog's layer onto the backdrop and positioner (no forced style read). |
 | `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                       |

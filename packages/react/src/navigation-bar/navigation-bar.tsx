@@ -24,7 +24,8 @@ const { ReadyMade, parts } = createNavigation({
 /** Material's navigation bar. Use it ready-made, `<NavigationBar aria-label="Main" items={[{
  *  value: "home", label: "Home", icon: …, href: "/" }, …]} />`, or compose its parts under
  *  `NavigationBar.Root`: an `Item` per destination holding `Indicator` (with
- *  `ActiveIndicator` and `Icon`) and `Label`. */
+ *  `ActiveIndicator` and `Icon`) and `Label`. `itemLayout="horizontal"` puts each label beside
+ *  its icon, inside the pill. */
 export const NavigationBar = Object.assign(
     ReadyMade as (props: NavigationBarProps) => ReactNode,
     parts,
