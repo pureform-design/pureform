@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
 import { createButton } from "./components/button";
@@ -52,9 +53,9 @@ import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
-import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
+import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
@@ -75,6 +76,7 @@ import { richTooltip } from "./components/rich-tooltip";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
+import { SEARCH_VIEW_KEYFRAMES, searchView } from "./components/search-view";
 import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
 import { DEFAULT_SHAPES } from "./components/shaped";
@@ -287,7 +289,12 @@ const defaultComponents = <G extends string>(
         textArea: createTextArea<G, Step>(theme.color.groups, densities),
         tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
         searchBar,
+        searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),
+        autocomplete: createAutocomplete<G, Step>(
+            theme.color.groups,
+            densities,
+        ),
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox<G, Step>(theme.color.groups, densities),
         radio: createRadio<G, Step>(theme.color.groups, densities),
@@ -456,7 +463,11 @@ export const pureform = <
             theme.config,
             {
                 componentBaseStyles: { fontFamily: fontRole("plain") },
-                keyframes: { ...PROGRESS_KEYFRAMES, ...OVERLAY_KEYFRAMES },
+                keyframes: {
+                    ...PROGRESS_KEYFRAMES,
+                    ...OVERLAY_KEYFRAMES,
+                    ...SEARCH_VIEW_KEYFRAMES,
+                },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
             },
