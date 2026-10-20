@@ -2614,6 +2614,24 @@ export const toastAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const toolbarAnatomy = {
+    name: "toolbar",
+    scope: "toolbar",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-toolbar-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const tooltipAnatomy = {
     name: "tooltip",
     scope: "tooltip",
@@ -3012,6 +3030,7 @@ export const anatomy = {
     dragHandle: dragHandleAnatomy,
     snackbar: snackbarAnatomy,
     toast: toastAnatomy,
+    toolbar: toolbarAnatomy,
     tooltip: tooltipAnatomy,
     richTooltip: richTooltipAnatomy,
     card: cardAnatomy,
@@ -3302,6 +3321,7 @@ export const testIds = {
         actionTrigger: "pf-toast-action-trigger",
         closeTrigger: "pf-toast-close-trigger",
     },
+    toolbar: { root: "pf-toolbar-root" },
     tooltip: {
         root: "pf-tooltip-root",
         caret: "pf-tooltip-caret",

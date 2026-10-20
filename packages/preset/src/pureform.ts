@@ -75,7 +75,6 @@ import {
 } from "./components/progress";
 import { createRadio } from "./components/radio";
 import { richTooltip } from "./components/rich-tooltip";
-import { toast } from "./components/toast";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
@@ -97,6 +96,8 @@ import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { toast } from "./components/toast";
+import { toolbar } from "./components/toolbar";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
@@ -321,6 +322,7 @@ const defaultComponents = <G extends string>(
         dragHandle,
         snackbar,
         toast,
+        toolbar,
         tooltip,
         richTooltip,
         card,
