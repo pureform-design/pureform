@@ -51,6 +51,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { DropDownArrow } from "../glyphs";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -430,19 +431,6 @@ function ItemLabel(props: AutocompletePartProps): JSX.Element {
         props: omit(props, "unstyled"),
     });
 }
-
-/** The arrow the ready-made autocomplete shows unless given another. */
-const DropDownArrow = (): JSX.Element => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
 
 /** The ready-made autocomplete's props: Root's, with `class`, `style`, and `slotProps` keyed by
  *  the field's parts, and the label, supporting text, and icons as content. `aria-label`,
