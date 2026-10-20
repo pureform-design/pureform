@@ -412,6 +412,28 @@
                 "default": "./dist/search-bar.jsx"
             }
         },
+        "./search-view": {
+            "types": "./dist/search-view/index.d.ts",
+            "solid": {
+                "development": "./src/search-view/index.ts",
+                "default": "./dist/search-view.jsx"
+            },
+            "import": {
+                "development": "./src/search-view/index.ts",
+                "default": "./dist/search-view.jsx"
+            }
+        },
+        "./autocomplete": {
+            "types": "./dist/autocomplete/index.d.ts",
+            "solid": {
+                "development": "./src/autocomplete/index.ts",
+                "default": "./dist/autocomplete.jsx"
+            },
+            "import": {
+                "development": "./src/autocomplete/index.ts",
+                "default": "./dist/autocomplete.jsx"
+            }
+        },
         "./separator": {
             "types": "./dist/separator/index.d.ts",
             "solid": {
