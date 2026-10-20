@@ -484,32 +484,55 @@ keyboard, and screen readers work unchanged. `color` sets the checked colors.
 ## Lists and menus
 
 List items and menu items share one row: an optional leading icon, the text, and an optional
-trailing icon or text. Mark a selected row with `aria-selected="true"`.
+trailing icon or text. Mark a selected row with `aria-selected="true"` (a toggleable menu item
+with `aria-checked="true"`).
 
 ```html
-<li class="{root}" tabindex="0">
-    <span class="{leading}">★</span>
-    <div class="{content}">
-        <span class="{overline}">Overline</span>
-        <span class="{headline}">Headline</span>
-        <span class="{supportingText}">Supporting text</span>
-    </div>
-    <span class="{trailingText}">100+</span>
-</li>
+<ul class="{list.root}">
+    <li class="{list.item}">
+        <div class="{root}" tabindex="0">
+            <span class="{leading}">★</span>
+            <div class="{content}">
+                <span class="{overline}">Overline</span>
+                <span class="{headline}">Headline</span>
+                <span class="{supportingText}">Supporting text</span>
+            </div>
+            <span class="{trailingText}">100+</span>
+        </div>
+    </li>
+</ul>
 
 <div class="{root}" role="menu">
-    <button class="{item}" role="menuitem">
-        <span class="{itemLeading}">✂</span>
-        <span class="{itemLabel}">Cut</span>
-        <span class="{itemTrailingText}">⌘X</span>
-    </button>
-    <hr class="{separator()}" />
+    <div class="{itemGroup}" role="group" aria-labelledby="edit">
+        <span class="{itemGroupLabel}" id="edit">Edit</span>
+        <button class="{item}" role="menuitem">
+            <span class="{itemLeading}">✂</span>
+            <span class="{itemContent}">
+                <span class="{itemLabel}">Cut</span>
+                <span class="{itemSupportingText}">To the clipboard</span>
+            </span>
+            <span class="{itemTrailingText}">⌘X</span>
+        </button>
+    </div>
 </div>
 ```
 
+- `list`: the `ul` (`root`) and an `li` (`item`) per list item, with the list's padding and
+  container color. `variant: "segmented"` sets the items apart as tiles with a 2px gap; give
+  each item its `position`.
 - `listItem`: `lines` is `one`, `two`, or `three`. Set `interactive` when the item is
-  clickable; it then takes a state layer and the focus ring.
-- `menu`: items are always interactive. Separate groups with the `separator` component.
+  clickable; it then takes a state layer and the focus ring. `leadingType` sizes the leading
+  part for an `icon` (default), an `avatar` (40, round), a `thumbnail` (56) or a `video`
+  (114 by 64). `position` (`first`, `middle`, `last`, `single`) is its place among a segmented
+  list's tiles: the run's outside corners take the theme's `large` radius, the inside ones
+  `extraSmall`, and the tile fills with `surfaceContainer`. `positionCorners` in `list.ts`
+  builds those corners for any run of tiles.
+- `menu`: items are always interactive. Put items in `itemGroup`s with an optional
+  `itemGroupLabel` (a select's option groups use the same parts), or separate them with the
+  `separator` component. `grouped` draws each group as its own tile, 2px apart; the menu clips
+  the run's outside corners to its `large` radius, so a group needs no position. `vibrant`
+  swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The
+  label always sits in `itemContent`, with `itemSupportingText` under it when there is some.
 - `color` (both): a group's container fills the selected row. With no color, a selected row
   keeps Material's secondary container.
 

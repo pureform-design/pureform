@@ -182,7 +182,8 @@ interface SelectRootOwnProps             // variant, color, density, leadingIcon
                                          // disabled, invalid, error, required, readOnly, name, form,
                                          // autoComplete, positioning, id, ids, value, defaultValue,
                                          // onValueChange, open, defaultOpen, onOpenChange, testId, unstyled
-interface SelectItem { value; label; disabled? }
+interface SelectItem { value; label; disabled?; group? }
+selectItemGroups(items); selectGroupedItems(items); // option groups, in the order each first appears
 SELECT_ROOT_PROPS; SELECT_INPUT_LABEL_PROPS; SELECT_CONTENT_PROPS; SELECT_COLLECTION;
 selectSelection(props);                  // trailingIcon always on: the arrow
 selectMenuSelection(props);              // the menu's color and density
@@ -201,12 +202,16 @@ presentProps(p, present);                // hidden once gone, over Zag's hidden-
 overlayPositionerProps(p, present);      // the same, for a positioner
 
 // Menu: Zag's menu; menuOverlayAnatomy (root, trigger, positioner, content, item, …)
-interface MenuRootOwnProps               // color, density, tokens, onSelect, closeOnSelect, loopFocus,
+interface MenuRootOwnProps               // color, density, vibrant, grouped, tokens, onSelect, closeOnSelect, loopFocus,
                                          // typeahead, positioning, aria-label, ids, open,
                                          // defaultOpen, onOpenChange, testId, unstyled
-interface MenuItem<Node> { value; label; valueText?; disabled?; closeOnSelect?; leadingIcon?;
-                           trailingIcon?; trailingText?; mirrorLeadingIcon?; mirrorTrailingIcon? }
-MENU_ROOT_PROPS; MENU_CONTENT_PROPS;     // trigger, items
+interface MenuItem<Node> { value; label; valueText?; disabled?; closeOnSelect?; type?; checked?;
+                           onCheckedChange?; supportingText?; leadingIcon?; trailingIcon?;
+                           trailingText?; mirrorLeadingIcon?; mirrorTrailingIcon? }
+interface MenuGroup<Node> { id; label?; items }
+MENU_ROOT_PROPS; MENU_CONTENT_PROPS;     // trigger, items, groups
+MENU_ITEM_PROPS; menuItemMachineProps(api, item); // a toggleable item (type) takes Zag's option item
+menuGrouped(props);                      // grouped, else whether there are groups
 menuSelection(props); menuMachineProps(props); // placement "bottom-start" unless given
 menuItemProps(item);                     // Zag's item props from an item's data
 
@@ -264,8 +269,8 @@ navigationItemElement(item);             // "a" with an href, else "button"
 navigationItemMachineProps(item);        // aria-current "page" for a link, "true" for a button
 navigationItemElementProps(item, disabled); // a button's type and disabled
 
-// List item (no machine) and list (listAnatomy: an unstyled ul, an li per item)
-interface ListItemRootOwnProps           // lines, interactive, density, color, tokens, selected,
+// List item (no machine) and list (listAnatomy: a ul, an li per item)
+interface ListItemRootOwnProps           // lines, interactive, leadingType, position, density, color, tokens, selected,
                                          // disabled, testId, unstyled
 LIST_ITEM_ROOT_PROPS; LIST_ITEM_CONTENT_PROPS; // headline, overline, supportingText, leading,
                                          // trailing, trailingText, mirrorLeading, mirrorTrailing
@@ -273,7 +278,10 @@ listItemElement({ href, as });           // "a" with an href, else as, else "div
 listItemSelection(props, element);       // interactive defaults to a link or a button
 listItemRootProps(props, element);       // aria-current while selected; disabled or aria-disabled
 listItemLines(content);                  // one, two (overline or supporting text), three (both)
-interface ListRootOwnProps               // density, color, tokens (every item's defaults), testId
+interface ListRootOwnProps               // variant, listTokens; density, color, tokens, leadingType
+                                         // (every item's defaults), testId
+listSelection(props);                    // the list's variant (standard or segmented)
+listItemPosition(index, count, segmented); // first, middle, last, single; none unless segmented
 interface ListItemData<Node>             // a list item's content, variants, value, href,
                                          // selected, disabled, testId
 LIST_ROOT_PROPS; LIST_CONTENT_PROPS;     // items
