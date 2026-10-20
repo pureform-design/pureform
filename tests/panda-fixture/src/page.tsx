@@ -392,7 +392,7 @@ export function Page() {
                 data-section="fabs"
                 style={{ ...row, "align-items": "center" }}
             >
-                <For each={["small", "medium", "large"] as const}>
+                <For each={["small", "default", "medium", "large"] as const}>
                     {(size) => {
                         const f = fab({ size });
                         return (
@@ -640,7 +640,7 @@ export function Page() {
                         {(shape) => {
                             const b = iconButton({
                                 variant: "tonal",
-                                size: "large",
+                                size: "compact",
                                 shape,
                             });
                             return (
@@ -670,7 +670,7 @@ export function Page() {
                         {(variant) => {
                             const b = iconButton({
                                 variant,
-                                size: "large",
+                                size: "compact",
                                 shape: "cookie9Sided",
                             });
                             return (
@@ -698,7 +698,7 @@ export function Page() {
                         {(shape) => {
                             const b = iconButton({
                                 variant: "filled",
-                                size: "large",
+                                size: "compact",
                                 shape,
                             });
                             return (
@@ -721,7 +721,7 @@ export function Page() {
                             );
                         }}
                     </For>
-                    <For each={["medium", "large"] as const}>
+                    <For each={["default", "large"] as const}>
                         {(size) => {
                             const f = fab({
                                 size,
