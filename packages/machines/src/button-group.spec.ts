@@ -58,4 +58,30 @@ describe("buttonGroup", () => {
             expect(item.getAttribute("aria-pressed")).toBe("true");
         }
     });
+
+    it("moves focus by the arrows' direction", async () => {
+        const key = (element: Element, k: string) =>
+            element.dispatchEvent(
+                new KeyboardEvent("keydown", {
+                    key: k,
+                    bubbles: true,
+                    cancelable: true,
+                }),
+            );
+        for (const [dir, arrow] of [
+            ["ltr", "ArrowRight"],
+            ["rtl", "ArrowLeft"],
+        ] as const) {
+            const { items } = setUp({ dir });
+            await settle();
+            const [day, week] = items.map(({ item }) => item);
+            day?.focus();
+            await settle();
+            key(day!, arrow);
+            await new Promise((resolve) => setTimeout(resolve, 50));
+            expect(document.activeElement, dir).toBe(week);
+            for (const stop of stops.splice(0)) stop();
+            document.body.innerHTML = "";
+        }
+    });
 });
