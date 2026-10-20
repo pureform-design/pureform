@@ -73,6 +73,12 @@ export function connect<T extends PropTypes>(
                 dir: prop("dir"),
             });
         },
+        getActionsProps() {
+            return normalize.element({
+                ...parts.actions.attrs,
+                dir: prop("dir"),
+            });
+        },
         getActionProps() {
             return normalize.button({
                 ...parts.action.attrs,

@@ -115,28 +115,30 @@ function SnackbarImpl(props: SnackbarProps): ReactNode {
             >
                 {props.supportingText}
             </v.supportingText.Text>
-            {isPresent(props.action) ? (
+            <v.actions.View style={s.actions} testID={id("actions")}>
+                {isPresent(props.action) ? (
+                    <SnackbarButton
+                        snackbar={props}
+                        part="action"
+                        label={
+                            typeof props.action === "string"
+                                ? props.action
+                                : undefined
+                        }
+                        onPress={props.onAction}
+                    >
+                        {props.action}
+                    </SnackbarButton>
+                ) : null}
                 <SnackbarButton
                     snackbar={props}
-                    part="action"
-                    label={
-                        typeof props.action === "string"
-                            ? props.action
-                            : undefined
-                    }
-                    onPress={props.onAction}
+                    part="close"
+                    label={props.closeLabel ?? "Dismiss"}
+                    onPress={props.onClose}
                 >
-                    {props.action}
+                    {props.closeIcon ?? "×"}
                 </SnackbarButton>
-            ) : null}
-            <SnackbarButton
-                snackbar={props}
-                part="close"
-                label={props.closeLabel ?? "Dismiss"}
-                onPress={props.onClose}
-            >
-                {props.closeIcon ?? "×"}
-            </SnackbarButton>
+            </v.actions.View>
         </Root.View>
     );
 }

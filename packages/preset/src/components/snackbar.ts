@@ -7,16 +7,25 @@
 //
 //   <div class={root} role="status">
 //     <span class={supportingText}>Message archived</span>
-//     <button class={action}>Undo</button>
-//     <button class={close} aria-label="Dismiss">×</button>
+//     <span class={actions}>
+//       <button class={action}>Undo</button>
+//       <button class={close} aria-label="Dismiss">×</button>
+//     </span>
 //   </div>
+//
+// `layout` is `oneLine` (default), `twoLine` (taller, for two lines of text), or `longAction`
+// (the actions wrap below the text, at the end). The style AST has no `flexWrap`, so the
+// layout moves the `actions` wrapper rather than letting the row wrap.
 
 import { typed } from "@pureform/core";
 import {
     center,
+    column,
+    end,
     flex,
     px,
     row,
+    stretch,
     transparent,
     unitless,
 } from "@pureform/core/ast";
@@ -45,6 +54,7 @@ const { tokens, ref } = componentTokens("snackbar", {
     actionColor: sys("inversePrimary"),
     radius: radius("extraSmall"),
     minHeight: px(48),
+    twoLineMinHeight: px(68),
     maxWidth: px(560),
     paddingInline: spacing("4"),
     gap: spacing("2"),
@@ -64,8 +74,12 @@ export const snackbar = pf.slotComponent({
             "Material snackbar on the inverse surface, with an optional action and close button. Announce it with role=status.",
     },
     tokens,
-    slots: ["root", "supportingText", "action", "close"],
-    structure: { root: ["supportingText", "action", "close"] },
+    slots: ["root", "supportingText", "actions", "action", "close"],
+    structure: {
+        root: ["supportingText", "actions"],
+        actions: ["action", "close"],
+    },
+    variants: { layout: ["oneLine", "twoLine", "longAction"] },
     indication: [
         {
             trigger: "action",
@@ -98,6 +112,14 @@ export const snackbar = pf.slotComponent({
                 paddingBlockStart: spacing("3"),
                 paddingBlockEnd: spacing("3"),
             },
+            // The action and the close button; they move below the text in `longAction`.
+            actions: {
+                display: flex,
+                flexDirection: row,
+                alignItems: center,
+                flexShrink: unitless(0),
+                gap: ref("gap"),
+            },
             // A text button in the inverse primary color.
             action: {
                 ...pressableRoot(ref),
@@ -120,5 +142,23 @@ export const snackbar = pf.slotComponent({
                 justifyContent: center,
             },
         },
+        variants: {
+            layout: {
+                oneLine: {},
+                twoLine: { root: { minHeight: ref("twoLineMinHeight") } },
+                longAction: {
+                    root: {
+                        flexDirection: column,
+                        alignItems: stretch,
+                        gap: px(0),
+                        paddingBlockEnd: spacing("2"),
+                        paddingInlineEnd: ref("paddingInline"),
+                    },
+                    supportingText: { paddingBlockEnd: spacing("1") },
+                    actions: { justifyContent: end },
+                },
+            },
+        },
+        defaultVariants: { layout: "oneLine" },
     }),
 });

@@ -233,7 +233,7 @@ dialogPositionerLayout(present);         // hidden once gone; fixed over the vie
 dialogBackdropLayout(present);           // hidden once gone; the scrim fixed over the viewport
 
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
-interface SnackbarRootOwnProps           // tokens, duration, onAction, id, ids, open, defaultOpen,
+interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
                                          // onOpenChange ({ open, reason }), testId, unstyled
 SNACKBAR_ROOT_PROPS; SNACKBAR_CONTENT_PROPS; // supportingText, action, closeLabel, closeIcon
 snackbarSelection(props); snackbarMachineProps(props);

@@ -13,12 +13,15 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { IndicationProps } from "./indication";
+import type { VariantProp } from "./variants";
 
-/** The snackbar's parts: `"root" | "supportingText" | "action" | "close"`. */
+/** The snackbar's parts: `"root" | "supportingText" | "actions" | "action" | "close"`. */
 export type SnackbarPart = PartName<typeof snackbarAnatomy>;
 
-/** The snackbar's instance tokens; it has no variants. */
+/** The snackbar's `layout` (`oneLine`, `twoLine`, or `longAction`, which puts the actions below
+ *  the text) and instance tokens. */
 export interface SnackbarVariantProps {
+    readonly layout?: VariantProp<"snackbar", "layout">;
     readonly tokens?: InstanceTokens<"snackbar"> | undefined;
 }
 
@@ -72,6 +75,7 @@ export interface SnackbarRootOwnProps
 
 /** The keys of `SnackbarRootOwnProps`, which Root keeps off its element. */
 export const SNACKBAR_ROOT_PROPS = [
+    "layout",
     "tokens",
     "duration",
     "onAction",
@@ -108,7 +112,10 @@ export const SNACKBAR_CONTENT_PROPS = [
 /** The snackbar's registry selection from Root's props. */
 export const snackbarSelection = (
     props: SnackbarVariantProps,
-): Selection<"snackbar"> => ({ tokens: props.tokens });
+): Selection<"snackbar"> => ({
+    layout: props.layout,
+    tokens: props.tokens,
+});
 
 /** The snackbar machine's props from Root's, besides `dir` and the controllable `open`. */
 export const snackbarMachineProps = (props: SnackbarBehaviorProps) => ({
