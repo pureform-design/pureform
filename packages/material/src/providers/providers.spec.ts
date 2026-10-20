@@ -127,4 +127,16 @@ describe("Material providers", () => {
         expect(theme.motion.durations.medium2).toEqual(numeric(200, "ms"));
         expect(theme.motion.easings.bounce).toBeDefined();
     });
+
+    it("draw the focus indicator inside the element for an inset focus ring", () => {
+        const focus = (state: ReturnType<typeof materialState>) =>
+            resolveTheme({ ...material(), state }).state.focusIndicator;
+        expect(focus(materialState({}, {}, { focusRing: "outer" }))).toEqual(
+            focus(materialState()),
+        );
+        expect(focus(materialState({}, {}, { focusRing: "inset" }))).toEqual({
+            focusIndicatorThickness: px(3),
+            focusIndicatorOuterOffset: px(-3),
+        });
+    });
 });
