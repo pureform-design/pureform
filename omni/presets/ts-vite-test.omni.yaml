@@ -9,6 +9,9 @@ tasks:
   test:e2e:
     enabled: false
     exec: bun x vitest --config ./vitest.config.e2e.ts run
+    # The suites import the packages' built output, which a build in the same run rewrites.
+    dependencies:
+      - ^build
     cache:
       key:
         files:
