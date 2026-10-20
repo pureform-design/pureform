@@ -85,6 +85,9 @@ export interface KeyCase {
     readonly to?: unknown;
     /** Props for this case, over the component's. */
     readonly props?: SceneProps | undefined;
+    /** Where focus is after the key, when the key moves it (a toolbar's arrow keys). Left out:
+     *  it stays on `keyboard.focusable`. */
+    focuses?(host: HTMLElement): HTMLElement;
 }
 
 export interface KeyboardCase {
