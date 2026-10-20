@@ -60,6 +60,28 @@
                 "default": "./dist/fab.jsx"
             }
         },
+        "./fab-menu": {
+            "types": "./dist/fab-menu/index.d.ts",
+            "solid": {
+                "development": "./src/fab-menu/index.ts",
+                "default": "./dist/fab-menu.jsx"
+            },
+            "import": {
+                "development": "./src/fab-menu/index.ts",
+                "default": "./dist/fab-menu.jsx"
+            }
+        },
+        "./split-button": {
+            "types": "./dist/split-button/index.d.ts",
+            "solid": {
+                "development": "./src/split-button/index.ts",
+                "default": "./dist/split-button.jsx"
+            },
+            "import": {
+                "development": "./src/split-button/index.ts",
+                "default": "./dist/split-button.jsx"
+            }
+        },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "solid": {

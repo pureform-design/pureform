@@ -19,6 +19,7 @@ import { CircularProgress } from "@pureform/react/circular-progress";
 import { Dialog } from "@pureform/react/dialog";
 import { Fab } from "@pureform/react/fab";
 import { FullscreenDialog } from "@pureform/react/fullscreen-dialog";
+import { FabMenu } from "@pureform/react/fab-menu";
 import { Icon } from "@pureform/react/icon";
 import { IconButton } from "@pureform/react/icon-button";
 import { LinearProgress } from "@pureform/react/linear-progress";
@@ -37,6 +38,7 @@ import { Select } from "@pureform/react/select";
 import { Separator } from "@pureform/react/separator";
 import { Slider } from "@pureform/react/slider";
 import { Snackbar } from "@pureform/react/snackbar";
+import { SplitButton } from "@pureform/react/split-button";
 import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
 import { Tabs } from "@pureform/react/tabs";
@@ -72,6 +74,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Dialog,
     Fab,
     FullscreenDialog,
+    FabMenu,
     Icon,
     IconButton,
     LinearProgress,
@@ -90,6 +93,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Separator,
     Slider,
     Snackbar,
+    SplitButton,
     SupportingText,
     Switch,
     Tabs,

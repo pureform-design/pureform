@@ -14,6 +14,8 @@ export const RN_COMPONENTS = [
     "iconButton",
     "buttonGroup",
     "fab",
+    "fabMenu",
+    "splitButton",
     "separator",
     "list",
     "listItem",

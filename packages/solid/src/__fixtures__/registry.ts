@@ -198,6 +198,20 @@ export const overlaysRegistry = () =>
             "itemTrailing",
             "itemTrailingText",
         ]),
+        splitButton: named("split-button", [
+            "root",
+            "leadingButton",
+            "trailingButton",
+            "trailingIcon",
+        ]),
+        fabMenu: named("fab-menu", [
+            "root",
+            "list",
+            "item",
+            "itemIcon",
+            "itemLabel",
+            "closeTrigger",
+        ]),
         tooltip: named("tooltip", ["root", "caret", "supportingText"]),
         richTooltip: named("richTooltip", [
             "root",

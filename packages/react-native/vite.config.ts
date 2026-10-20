@@ -23,6 +23,8 @@ export default createConfig({
                     dialog: "src/dialog/index.ts",
                     "fullscreen-dialog": "src/fullscreen-dialog/index.ts",
                     fab: "src/fab/index.ts",
+                    "fab-menu": "src/fab-menu/index.ts",
+                    "split-button": "src/split-button/index.ts",
                     icon: "src/icon/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",

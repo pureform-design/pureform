@@ -29,6 +29,8 @@ import {
     separator,
     fab,
     fullscreenDialog,
+    fabMenu,
+    splitButton,
     icon,
     iconButton,
     inputChip,
@@ -511,6 +513,101 @@ export function Page() {
                         );
                     }}
                 </For>
+            </section>
+            <section
+                data-section="split-buttons-and-fab-menus"
+                style={{ ...row, "align-items": "end" }}
+            >
+                <For
+                    each={
+                        [
+                            ["filled", "small", false],
+                            ["tonal", "small", true],
+                            ["outlined", "medium", false],
+                            ["elevated", "xsmall", false],
+                        ] as const
+                    }
+                >
+                    {([variant, size, open]) => {
+                        const s = splitButton({ variant, size });
+                        return (
+                            <div class={s.root}>
+                                <button class={s.leadingButton} type="button">
+                                    <Ripple />
+                                    {`${variant} split`}
+                                </button>
+                                <button
+                                    class={s.trailingButton}
+                                    type="button"
+                                    aria-label="More"
+                                    aria-haspopup="menu"
+                                    aria-expanded={open ? "true" : "false"}
+                                >
+                                    <Ripple />
+                                    <span class={s.trailingIcon}>▾</span>
+                                </button>
+                            </div>
+                        );
+                    }}
+                </For>
+                <For each={["primary", "tertiary"] as const}>
+                    {(color) => {
+                        const f = fabMenu({ color });
+                        return (
+                            <div
+                                class={f.root}
+                                style={{
+                                    "margin-top": "136px",
+                                    "margin-inline-start": "96px",
+                                }}
+                            >
+                                <div
+                                    class={f.list}
+                                    role="menu"
+                                    data-state="open"
+                                >
+                                    <For each={["Message", "Call"]}>
+                                        {(label) => (
+                                            <button
+                                                class={f.item}
+                                                type="button"
+                                                role="menuitem"
+                                            >
+                                                <Ripple />
+                                                <span class={f.itemIcon}>
+                                                    @
+                                                </span>
+                                                <span class={f.itemLabel}>
+                                                    {label}
+                                                </span>
+                                            </button>
+                                        )}
+                                    </For>
+                                </div>
+                                <button
+                                    class={f.closeTrigger}
+                                    type="button"
+                                    aria-label="Close"
+                                    aria-haspopup="menu"
+                                    aria-expanded="true"
+                                >
+                                    <Ripple />✕
+                                </button>
+                            </div>
+                        );
+                    }}
+                </For>
+                <div class={fabMenu().root}>
+                    <button
+                        class={fabMenu().closeTrigger}
+                        type="button"
+                        aria-label="Create"
+                        aria-haspopup="menu"
+                        aria-expanded="false"
+                    >
+                        <Ripple />+
+                    </button>
+                </div>
             </section>
             <div>
                 <section data-section="chips" style={row}>
