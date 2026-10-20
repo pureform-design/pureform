@@ -57,11 +57,12 @@ export const searchBar = pf.slotComponent({
     name: "searchBar",
     $meta: {
         description:
-            "Material search bar: a pill holding a leading icon, the search input, and trailing icons.",
+            "Material search bar: a pill holding a leading icon, the search input, and trailing icons. centered centers the text, as M3 Expressive's app bar search does.",
     },
     tokens,
     slots: ["root", "leading", "input", "trailing"],
     structure: { root: ["leading", "input", "trailing"] },
+    variants: { centered: ["false", "true"] },
     recipe: () => ({
         base: {
             root: {
@@ -105,5 +106,13 @@ export const searchBar = pf.slotComponent({
                 color: ref("trailingColor"),
             },
         },
+        variants: {
+            // M3 Expressive centers the query and placeholder in an app bar's search bar.
+            centered: {
+                false: {},
+                true: { input: { textAlign: center } },
+            },
+        },
+        defaultVariants: { centered: "false" },
     }),
 });

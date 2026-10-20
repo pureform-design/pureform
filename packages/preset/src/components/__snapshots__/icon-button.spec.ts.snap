@@ -6,13 +6,20 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
     "base": {
       "container": {
         "alignItems": "center",
-        "borderRadius": "var(--components-iconButton-radius, token(radii.full))",
+        "borderRadius": {
+          ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+          ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+          "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+        },
         "display": "flex",
         "flexGrow": "1",
         "height": "100%",
         "justifyContent": "center",
         "position": "relative",
-        "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "transition": {
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+          "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+        },
       },
       "icon": {
         "_rtl": {
@@ -34,13 +41,21 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "width": "var(--components-iconButton-iconSize, token(sizes.iconMedium))",
       },
       "outline": {
-        "borderRadius": "var(--components-iconButton-radius, token(radii.full))",
+        "borderRadius": {
+          ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+          ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+          "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+        },
         "display": "none",
         "height": "100%",
         "left": "0px",
         "pointerEvents": "none",
         "position": "absolute",
         "top": "0px",
+        "transition": {
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+          "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+        },
         "width": "100%",
       },
       "root": {
@@ -55,7 +70,11 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "--components-iconButton-stateHoverOpacity": "token(opacity.stateHover)",
         "--components-iconButton-statePressedOpacity": "token(opacity.statePressed)",
         "alignItems": "center",
-        "borderRadius": "var(--components-iconButton-radius, token(radii.full))",
+        "borderRadius": {
+          "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+          "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+        },
         "borderWidth": "0px",
         "cursor": "pointer",
         "display": "inline-flex",
@@ -69,7 +88,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         },
         "outlineWidth": "var(--components-iconButton-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
         "position": "relative",
-        "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "transition": {
+          "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+          "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+        },
       },
       "touchTarget": {
         "height": "100%",
@@ -238,11 +260,13 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
     ],
     "defaultVariants": {
       "color": "primary",
+      "corner": "round",
       "density": "inherit",
       "shape": "none",
-      "size": "medium",
+      "size": "small",
       "toggle": false,
       "variant": "standard",
+      "width": "default",
     },
     "jsx": [
       "IconButton",
@@ -308,6 +332,14 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "corner": {
+        "round": {},
+        "square": {
+          "root": {
+            "--components-iconButton-square": "1",
+          },
+        },
+      },
       "density": {
         "-1": {
           "root": {
@@ -362,28 +394,74 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "none": {},
       },
       "size": {
+        "compact": {
+          "root": {
+            "--components-iconButton-iconSize": "token(sizes.iconMedium)",
+            "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedRadius": "token(radii.small)",
+            "--components-iconButton-squareRadius": "token(radii.medium)",
+            "height": "calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideCompact, token(sizes.controlLarge)) - calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+          },
+        },
         "large": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(var(--components-iconButton-sizeLarge, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "--components-iconButton-iconSize": "32px",
+            "--components-iconButton-outlineWidth": "2px",
+            "--components-iconButton-pressedRadius": "token(radii.large)",
+            "--components-iconButton-squareRadius": "token(radii.extraLarge)",
+            "height": "calc(var(--components-iconButton-sizeLarge, 96px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideLarge, 128px) - calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
         "medium": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(var(--components-iconButton-sizeMedium, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "--components-iconButton-iconSize": "24px",
+            "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedRadius": "token(radii.medium)",
+            "--components-iconButton-squareRadius": "token(radii.large)",
+            "height": "calc(var(--components-iconButton-sizeMedium, 56px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideMedium, 72px) - calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
         "small": {
           "root": {
-            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "--components-iconButton-iconSize": "24px",
+            "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedRadius": "token(radii.small)",
+            "--components-iconButton-squareRadius": "token(radii.medium)",
+            "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideSmall, 52px) - calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+          },
+        },
+        "xlarge": {
+          "root": {
+            "--components-iconButton-iconSize": "40px",
+            "--components-iconButton-outlineWidth": "3px",
+            "--components-iconButton-pressedRadius": "token(radii.large)",
+            "--components-iconButton-squareRadius": "token(radii.extraLarge)",
+            "height": "calc(var(--components-iconButton-sizeXlarge, 136px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXlarge, 184px) - calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+          },
+        },
+        "xsmall": {
+          "root": {
+            "--components-iconButton-iconSize": "20px",
+            "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedRadius": "token(radii.small)",
+            "--components-iconButton-squareRadius": "token(radii.medium)",
+            "height": "calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": "calc(calc(calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXsmall, 40px) - calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
           },
         },
       },
       "toggle": {
         "false": {},
-        "true": {},
+        "true": {
+          "root": {
+            "--components-iconButton-toggles": "1",
+          },
+        },
       },
       "variant": {
         "elevated": {
@@ -508,6 +586,19 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
             },
             "color": "var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer))",
             "filterElevation": "level0",
+          },
+        },
+      },
+      "width": {
+        "default": {},
+        "narrow": {
+          "root": {
+            "--components-iconButton-narrow": "1",
+          },
+        },
+        "wide": {
+          "root": {
+            "--components-iconButton-wide": "1",
           },
         },
       },

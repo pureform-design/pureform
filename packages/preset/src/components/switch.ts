@@ -2,7 +2,8 @@
 //
 // Markup: a native checkbox laid over the track, with `role="switch"` for screen readers, and
 // the handle inside the track. The state layer is a circle that follows the handle. Render an
-// icon in the handle if you want one; it shows when the switch is on.
+// icon in the handle if you want one; by default it shows when the switch is on, and `icons`
+// shows it in both states (with Material's off icon color) or never.
 //
 //   <span class={root}>
 //     <span class={touchTarget} />
@@ -83,6 +84,7 @@ const { tokens, ref } = componentTokens("switchControl", {
     checkedHandleColor: sys("onPrimary"),
     checkedHandleHoverColor: sys("primaryContainer"),
     iconColor: sys("onPrimaryContainer"),
+    uncheckedIconColor: sys("surfaceContainerHighest"),
     ...INDICATION_TOKENS,
 });
 
@@ -131,7 +133,12 @@ const colored = (c: SwitchColors) => ({
             .on([CONTROL_CHECKED, CONTROL_DISABLED], sys("surface"))
             .else(ref("handleColor")),
     },
-    icon: { color: c.icon },
+    // The off icon shows only with `icons: "both"`.
+    icon: {
+        color: when()
+            .on(CONTROL_CHECKED, c.icon)
+            .else(ref("uncheckedIconColor")),
+    },
 });
 
 /** Build the switch with a `color` variant per group in `groups`. */
@@ -143,7 +150,7 @@ export const createSwitch = <const G extends string = ColorGroup>(
             name: "switchControl",
             $meta: {
                 description:
-                    'Material switch over a native checkbox with role="switch". An icon in the handle shows when it is on.',
+                    'Material switch over a native checkbox with role="switch". icons sets when an icon in the handle shows: when on (selected), in both states (both), or never (none).',
             },
             tokens,
             slots: [
@@ -168,7 +175,10 @@ export const createSwitch = <const G extends string = ColorGroup>(
                     focus: "root",
                 },
             ],
-            variants: { color: groups as ColorGroups },
+            variants: {
+                color: groups as ColorGroups,
+                icons: ["selected", "both", "none"],
+            },
             recipe: () => ({
                 base: mergeSlots(
                     {
@@ -259,8 +269,31 @@ export const createSwitch = <const G extends string = ColorGroup>(
                             icon: g.onContainer,
                         }),
                     ),
+                    // Material's switch shows an icon when on (`selected`), in both states
+                    // (`both`, where the off handle takes the on handle's size), or not at all.
+                    icons: {
+                        selected: {},
+                        both: {
+                            handle: {
+                                width: when()
+                                    .on(
+                                        CONTROL_PRESSED,
+                                        ref("handleSizePressed"),
+                                    )
+                                    .else(ref("handleSizeChecked")),
+                                height: when()
+                                    .on(
+                                        CONTROL_PRESSED,
+                                        ref("handleSizePressed"),
+                                    )
+                                    .else(ref("handleSizeChecked")),
+                            },
+                            icon: { opacity: unitless(1) },
+                        },
+                        none: { icon: { display: none } },
+                    },
                 },
-                defaultVariants: { color: DEFAULT_GROUP },
+                defaultVariants: { color: DEFAULT_GROUP, icons: "selected" },
             }),
         }),
     );

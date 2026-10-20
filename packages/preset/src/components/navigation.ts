@@ -54,7 +54,8 @@ export const NAV_TOKENS = {
     indicatorColor: sys("secondaryContainer"),
     activeIconColor: sys("onSecondaryContainer"),
     iconColor: sys("onSurfaceVariant"),
-    activeLabelColor: sys("onSurface"),
+    // M3 Expressive labels the current destination in the secondary color.
+    activeLabelColor: sys("secondary"),
     labelColor: sys("onSurfaceVariant"),
     stateLayerColor: sys("onSurface"),
     iconSize: sizeToken("iconMedium"),
@@ -109,6 +110,8 @@ const CURRENT = slot("item", "selected");
 export interface NavActive {
     indicator: ColorValue;
     icon: ColorValue;
+    /** The current destination's label: M3 Expressive draws it in the group's main color. */
+    label: ColorValue;
 }
 
 /** The parts' colors, with the current destination's given. */
@@ -116,6 +119,7 @@ export const navColors = (
     ref: (token: NavToken) => AliasNode,
     active: NavActive,
 ) => ({
+    item: { states: { selected: { color: active.label } } },
     indicator: {
         color: when().on(CURRENT, active.icon).else(ref("iconColor")),
     },
@@ -148,6 +152,7 @@ export const navParts = (
     const colors = navColors(ref, {
         indicator: ref("indicatorColor"),
         icon: ref("activeIconColor"),
+        label: ref("activeLabelColor"),
     });
     const pressable = pressableRoot(ref);
     return {

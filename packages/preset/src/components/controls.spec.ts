@@ -104,6 +104,16 @@ describe("separator", () => {
             borderWidth: "0px",
             height: "var(--components-separator-thickness, 1px)",
         });
-        expect(recipe.variants.inset?.middle).toHaveProperty("marginInlineEnd");
+        // The inset sets which ends indent; the orientation indents them on its own axis.
+        expect(recipe.variants.inset?.middle).toEqual({
+            "--components-separator-insetStart": "1",
+            "--components-separator-insetEnd": "1",
+        });
+        expect(recipe.variants.orientation?.horizontal).toHaveProperty(
+            "marginInlineEnd",
+        );
+        expect(recipe.variants.orientation?.vertical).toHaveProperty(
+            "marginBlockEnd",
+        );
     });
 });

@@ -10,10 +10,10 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
         ".fab__root:is(:hover, [data-pf-hover]) &": "linear-gradient(token(colors.elevationTintLevel4), token(colors.elevationTintLevel4))",
         "base": "linear-gradient(token(colors.elevationTintLevel3), token(colors.elevationTintLevel3))",
       },
-      "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
+      "borderRadius": "var(--components-fab-radius, token(radii.large))",
       "display": "flex",
       "flexGrow": "1",
-      "gap": "var(--components-fab-gap, token(spacing.3))",
+      "gap": "var(--components-fab-gap, token(spacing.2))",
       "height": "100%",
       "justifyContent": "center",
       "position": "relative",
@@ -36,7 +36,7 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "width": "var(--components-fab-iconSize, token(sizes.iconMedium))",
     },
     "label": {
-      "textStyle": "labelLarge",
+      "textStyle": "titleMedium",
     },
     "root": {
       "&:is(:disabled, [aria-disabled=true])": {
@@ -95,7 +95,16 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     {
       "css": {
         "container": {
-          "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
+          "borderRadius": "var(--components-fab-radiusDefault, token(radii.large))",
+        },
+      },
+      "shape": "none",
+      "size": "default",
+    },
+    {
+      "css": {
+        "container": {
+          "borderRadius": "var(--components-fab-radiusMedium, calc(token(radii.large) + token(radii.extraSmall)))",
         },
       },
       "shape": "none",
@@ -110,30 +119,12 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "shape": "none",
       "size": "large",
     },
-    {
-      "css": {
-        "root": {
-          "width": "var(--components-fab-sizeSmall, 40px)",
-        },
-      },
-      "extended": false,
-      "size": "small",
-    },
-    {
-      "css": {
-        "root": {
-          "width": "var(--components-fab-sizeLarge, 96px)",
-        },
-      },
-      "extended": false,
-      "size": "large",
-    },
   ],
   "defaultVariants": {
     "color": "primary",
     "extended": false,
     "shape": "none",
-    "size": "medium",
+    "size": "default",
     "variant": "tonal",
   },
   "jsx": [
@@ -202,7 +193,9 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
     },
     "extended": {
       "false": {
-        "root": {},
+        "root": {
+          "aspectRatio": "1",
+        },
       },
       "true": {
         "container": {
@@ -216,7 +209,7 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
         "container": {
           "borderRadius": {
             "@supports (clip-path: shape(from 0 0, line to 0 0))": "0px",
-            "base": "var(--components-fab-radiusMedium, token(radii.large))",
+            "base": "var(--components-fab-radius, token(radii.large))",
           },
           "clipPath": "shape(from 97.553% 65.451%, line to 97.553% 65.451%, curve to 79.389% 90.451% with 94.29% 75.493% / 87.932% 84.244%, line to 79.389% 90.451%, curve to 50% 100% with 70.847% 96.657% / 60.559% 100%, line to 50% 100%, curve to 20.611% 90.451% with 39.441% 100% / 29.153% 96.657%, line to 20.611% 90.451%, curve to 2.447% 65.451% with 12.068% 84.244% / 5.71% 75.493%, line to 2.447% 65.451%, curve to 2.447% 34.549% with -0.816% 55.409% / -0.816% 44.591%, line to 2.447% 34.549%, curve to 20.611% 9.549% with 5.71% 24.507% / 12.068% 15.756%, line to 20.611% 9.549%, curve to 50% 0% with 29.153% 3.343% / 39.441% 0%, line to 50% 0%, curve to 79.389% 9.549% with 60.559% 0% / 70.847% 3.343%, line to 79.389% 9.549%, curve to 97.553% 34.549% with 87.932% 15.756% / 94.29% 24.507%, line to 97.553% 34.549%, curve to 97.553% 65.451% with 100.816% 44.591% / 100.816% 55.409%, close)",
         },
@@ -224,30 +217,50 @@ exports[`fab > compiles to a stable Panda slot recipe 1`] = `
       "none": {},
     },
     "size": {
-      "large": {
-        "icon": {
-          "fontSize": "var(--components-fab-iconSizeLarge, 36px)",
-          "height": "var(--components-fab-iconSizeLarge, 36px)",
-          "width": "var(--components-fab-iconSizeLarge, 36px)",
+      "default": {
+        "label": {
+          "textStyle": "titleMedium",
         },
         "root": {
-          "borderRadius": "var(--components-fab-radiusLarge, token(radii.extraLarge))",
+          "--components-fab-gap": "token(spacing.2)",
+          "--components-fab-iconSize": "token(sizes.iconMedium)",
+          "--components-fab-padding": "token(spacing.4)",
+          "height": "var(--components-fab-sizeDefault, 56px)",
+          "minWidth": "var(--components-fab-sizeDefault, 56px)",
+        },
+      },
+      "large": {
+        "label": {
+          "textStyle": "headlineSmall",
+        },
+        "root": {
+          "--components-fab-gap": "token(spacing.4)",
+          "--components-fab-iconSize": "36px",
+          "--components-fab-padding": "28px",
           "height": "var(--components-fab-sizeLarge, 96px)",
           "minWidth": "var(--components-fab-sizeLarge, 96px)",
         },
       },
       "medium": {
-        "icon": {},
+        "label": {
+          "textStyle": "titleLarge",
+        },
         "root": {
-          "borderRadius": "var(--components-fab-radiusMedium, token(radii.large))",
-          "height": "var(--components-fab-sizeMedium, 56px)",
-          "minWidth": "var(--components-fab-sizeMedium, 56px)",
+          "--components-fab-gap": "token(spacing.3)",
+          "--components-fab-iconSize": "28px",
+          "--components-fab-padding": "26px",
+          "height": "var(--components-fab-sizeMedium, 80px)",
+          "minWidth": "var(--components-fab-sizeMedium, 80px)",
         },
       },
       "small": {
-        "icon": {},
+        "label": {
+          "textStyle": "labelLarge",
+        },
         "root": {
-          "borderRadius": "var(--components-fab-radiusSmall, token(radii.medium))",
+          "--components-fab-gap": "token(spacing.3)",
+          "--components-fab-iconSize": "token(sizes.iconMedium)",
+          "--components-fab-padding": "token(spacing.4)",
           "height": "var(--components-fab-sizeSmall, 40px)",
           "minWidth": "var(--components-fab-sizeSmall, 40px)",
         },

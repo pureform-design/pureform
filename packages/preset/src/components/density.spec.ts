@@ -85,10 +85,13 @@ describe("density", () => {
                     "token(sizes.densityOffset)",
             },
         });
-        expect(recipe?.variants?.size?.medium?.root?.height).toBe(
-            "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+        expect(recipe?.variants?.size?.small?.root?.height).toBe(
+            "calc(var(--components-button-heightSmall, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
         );
-        expect(recipe?.compoundVariants ?? []).toHaveLength(0);
+        // Density lives in the size variants alone: no compound pairs it with anything.
+        for (const compound of recipe?.compoundVariants ?? []) {
+            expect(compound).not.toHaveProperty("density");
+        }
     });
 });
 

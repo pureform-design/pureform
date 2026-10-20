@@ -13,7 +13,6 @@
 
 import { typed } from "@pureform/core";
 import { flex, pct, px, row, unitless } from "@pureform/core/ast";
-import { spacing } from "@pureform/theme";
 
 import {
     NAV_SLOTS,
@@ -38,8 +37,9 @@ const pf = typed();
 
 const { tokens, ref } = navTokens("navigationBar", {
     container: sys("surfaceContainer"),
-    height: px(80),
-    indicatorWidth: px(64),
+    // M3 Expressive's shorter bar, with a narrower pill.
+    height: px(64),
+    indicatorWidth: px(56),
 });
 
 const parts = navParts(ref, ref("indicatorWidth"));
@@ -83,8 +83,8 @@ export const createNavigationBar = <const G extends string = ColorGroup>(
                         flexGrow: unitless(1),
                         minWidth: px(0),
                         height: pct(100),
-                        paddingBlockStart: spacing("3"),
-                        paddingBlockEnd: spacing("4"),
+                        paddingBlockStart: px(6),
+                        paddingBlockEnd: px(6),
                     },
                     indicator: parts.indicator,
                     activeIndicator: parts.activeIndicator,
@@ -96,6 +96,7 @@ export const createNavigationBar = <const G extends string = ColorGroup>(
                         navColors(ref, {
                             indicator: g.container,
                             icon: g.onContainer,
+                            label: g.main,
                         }),
                     ),
                 },

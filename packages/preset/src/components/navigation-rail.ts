@@ -37,7 +37,8 @@ const pf = typed();
 
 const { tokens, ref } = navTokens("navigationRail", {
     container: sys("surface"),
-    width: px(80),
+    // M3 Expressive's collapsed rail.
+    width: px(96),
     itemHeight: px(56),
     indicatorWidth: px(56),
     itemGap: spacing("3"),
@@ -93,6 +94,7 @@ export const createNavigationRail = <const G extends string = ColorGroup>(
                         navColors(ref, {
                             indicator: g.container,
                             icon: g.onContainer,
+                            label: g.main,
                         }),
                     ),
                 },
