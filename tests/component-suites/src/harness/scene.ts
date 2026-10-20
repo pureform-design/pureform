@@ -50,6 +50,7 @@ export const COMPONENT_NAMES = [
     "TextArea",
     "TextField",
     "Toast",
+    "Toolbar",
     "Tooltip",
     "TouchTarget",
 ] as const;

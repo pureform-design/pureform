@@ -44,6 +44,7 @@ import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
 import { toastCase } from "./toast";
+import { toolbar } from "./toolbar";
 import { tooltip } from "./tooltip";
 import type { ComponentCase } from "./types";
 
@@ -94,6 +95,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     textArea,
     textField,
     toastCase,
+    toolbar,
     tooltip,
     touchTarget,
 ];

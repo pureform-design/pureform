@@ -53,6 +53,7 @@ import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
 import { createToaster, Toaster } from "@pureform/react/toast";
 import type { ToastData } from "@pureform/react/toast";
+import { Toolbar } from "@pureform/react/toolbar";
 import { Tooltip } from "@pureform/react/tooltip";
 import { TouchTarget } from "@pureform/react/touch-target";
 import {
@@ -137,6 +138,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     TextArea,
     TextField,
     Toast: ToastScene,
+    Toolbar,
     Tooltip,
     TouchTarget,
 };
