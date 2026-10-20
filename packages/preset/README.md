@@ -551,6 +551,14 @@ with `aria-checked="true"`).
   the run's outside corners to its `large` radius, so a group needs no position. `vibrant`
   swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The
   label always sits in `itemContent`, with `itemSupportingText` under it when there is some.
+- `buttonGroup` (`button-group.ts`): a row of buttons or icon buttons, spaced by its `size`
+  (18, 12, then 8 from medium up), or 2px apart when `connected`. The buttons carry the shape:
+  `button` and `iconButton` take a `position` (`none` by default). `single`, for a standard group,
+  widens a button by `pressedGrowth` while pressed; `first`, `middle` and `last`, for a connected
+  group, keep the button's own morphing corners on the run's outside and give the inside ones
+  `innerRadius` (`pressedInnerRadius` while pressed, round once a toggle is on), per size from
+  `GROUP_INNER_RADII`. `groupCorners` builds those corners along the inline axis. The connected
+  group replaces the deprecated segmented button. No compound variants are added.
 - `color` (both): a group's container fills the selected row. With no color, a selected row
   keeps Material's secondary container.
 
