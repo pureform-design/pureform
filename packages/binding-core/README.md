@@ -254,12 +254,18 @@ tabsHaveIcons(items); tabsHavePanels(items);
 
 // Navigation bar and rail: pureform's navigation machine; their generated anatomies
 type NavigationComponent = "navigationBar" | "navigationRail"; type NavigationPart;
-interface NavigationRootOwnProps<C>      // color, tokens, disabled, id, ids, value, defaultValue,
-                                         // onValueChange, testId, unstyled
+interface NavigationRootOwnProps<C>      // color, itemLayout (bar), expanded and modal (rail),
+                                         // tokens, disabled, id, ids, value, defaultValue,
+                                         // onValueChange, open/defaultOpen/onOpenChange,
+                                         // closeOnEscape, closeOnInteractOutside (modal rail),
+                                         // testId, unstyled
 interface NavigationItemOwnProps { value; href?; disabled? }
 interface NavigationItem<Node> extends NavigationItemOwnProps { label; icon?; mirrorIcon? }
-NAVIGATION_ROOT_PROPS; NAVIGATION_ITEM_PROPS; NAVIGATION_CONTENT_PROPS; // items
-navigationSelection(props); navigationMachineProps(props);
+NAVIGATION_ROOT_PROPS; NAVIGATION_ITEM_PROPS; NAVIGATION_CONTENT_PROPS; // items, header (rail)
+navigationSelection(props);              // a modal rail is expanded unless `expanded` says no
+navigationMachineProps(props);
+navigationModalMachineProps(props);      // Zag dialog props for a modal rail
+navigationModalPositionerLayout(open); navigationModalContentLayout(open);
 navigationItemElement(item);             // "a" with an href, else "button"
 navigationItemMachineProps(item);        // aria-current "page" for a link, "true" for a button
 navigationItemElementProps(item, disabled); // a button's type and disabled
