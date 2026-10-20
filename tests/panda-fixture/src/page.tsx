@@ -22,10 +22,12 @@ import {
     listItem,
     menu,
     tabs,
+    tagsInput,
     separator,
     fab,
     icon,
     iconButton,
+    inputChip,
     radio,
     scrim,
     supportingText,
@@ -551,6 +553,95 @@ export function Page() {
                                 <span class={c.label}>Round filter</span>
                                 <span class={c.trailingIcon}>▾</span>
                             </button>
+                        );
+                    })()}
+                </section>
+                <section
+                    data-section="input-chips"
+                    style={{ ...row, "align-items": "flex-start" }}
+                >
+                    <For each={["filled", "outlined"] as const}>
+                        {(variant) => {
+                            const t = tagsInput({ variant });
+                            const c = inputChip();
+                            const id = `tags-${variant}`;
+                            const chips = [
+                                { label: "Ada", avatar: "A" },
+                                { label: "Starred", icon: "★" },
+                                { label: "Plain" },
+                                { label: "Selected", selected: true },
+                            ];
+                            return (
+                                <div class={t.root} style={{ width: "300px" }}>
+                                    {/* Holding chips, as the bindings mark it. */}
+                                    <div class={t.container} data-pf-filled="">
+                                        <For each={chips}>
+                                            {(item) => (
+                                                <div
+                                                    class={c.root}
+                                                    aria-selected={
+                                                        item.selected
+                                                            ? "true"
+                                                            : undefined
+                                                    }
+                                                >
+                                                    <span
+                                                        class={c.touchTarget}
+                                                    />
+                                                    {item.avatar ? (
+                                                        <span class={c.avatar}>
+                                                            {item.avatar}
+                                                        </span>
+                                                    ) : null}
+                                                    {item.icon ? (
+                                                        <span class={c.icon}>
+                                                            {item.icon}
+                                                        </span>
+                                                    ) : null}
+                                                    <span class={c.label}>
+                                                        {item.label}
+                                                    </span>
+                                                    <button
+                                                        class={c.remove}
+                                                        type="button"
+                                                        aria-label={`Remove ${item.label}`}
+                                                    >
+                                                        ×
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </For>
+                                        <input
+                                            class={t.input}
+                                            id={id}
+                                            placeholder=" "
+                                        />
+                                        <label class={t.label} for={id}>
+                                            {`${variant} tags`}
+                                        </label>
+                                    </div>
+                                    <span class={t.supportingText}>
+                                        Press Enter to add a tag
+                                    </span>
+                                </div>
+                            );
+                        }}
+                    </For>
+                    {(() => {
+                        const t = tagsInput({ variant: "outlined" });
+                        return (
+                            <div class={t.root} style={{ width: "200px" }}>
+                                <div class={t.container}>
+                                    <input
+                                        class={t.input}
+                                        id="tags-empty"
+                                        placeholder=" "
+                                    />
+                                    <label class={t.label} for="tags-empty">
+                                        Empty
+                                    </label>
+                                </div>
+                            </div>
                         );
                     })()}
                 </section>

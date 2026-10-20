@@ -35,6 +35,7 @@ import { Snackbar } from "@pureform/solid/snackbar";
 import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
 import { Tabs } from "@pureform/solid/tabs";
+import { TagsInput } from "@pureform/solid/tags-input";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
@@ -85,6 +86,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     SupportingText,
     Switch,
     Tabs,
+    TagsInput,
     Text,
     TextArea,
     TextField,
