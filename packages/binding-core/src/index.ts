@@ -491,15 +491,24 @@ export type {
 export {
     SLIDER_INPUT_LABEL_PROPS,
     SLIDER_ROOT_PROPS,
+    sliderControllableProps,
     sliderMachineProps,
+    sliderMarkerTokens,
     sliderNativeDefault,
     sliderSelection,
+    sliderStopActive,
+    sliderStops,
+    sliderThumbTokens,
+    sliderTrackTokens,
+    sliderValues,
+    sliderValueShape,
 } from "./components/slider";
 export type {
     SliderBehaviorProps,
     SliderElementIds,
     SliderPart,
     SliderRootOwnProps,
+    SliderValue,
     SliderVariantProps,
 } from "./components/slider";
 export {

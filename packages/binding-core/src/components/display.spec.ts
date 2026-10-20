@@ -6,7 +6,7 @@ import type {
     searchBarAnatomy,
     sliderAnatomy,
 } from "@pureform/anatomy";
-import { describe, expect, expectTypeOf, it } from "vitest";
+import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { avatarElement, avatarRootProps } from "./avatar";
 import {
@@ -33,9 +33,14 @@ import type { SearchBarPart } from "./search-bar";
 import { separatorRootProps } from "./separator";
 import {
     SLIDER_ROOT_PROPS,
+    sliderControllableProps,
     sliderMachineProps,
+    sliderMarkerTokens,
     sliderNativeDefault,
     sliderSelection,
+    sliderStopActive,
+    sliderStops,
+    sliderTrackTokens,
 } from "./slider";
 import type { SliderPart } from "./slider";
 import { textSelection } from "./text";
@@ -126,29 +131,107 @@ describe("progress", () => {
 });
 
 describe("slider", () => {
-    it("sets the value token from the percentage, under the instance's", () => {
+    it("sets the placing tokens from the percentages, under the instance's", () => {
         expect(sliderSelection({ color: "secondary" }, 40)).toEqual({
             color: "secondary",
-            tokens: { value: 40 },
+            handleShape: undefined,
+            size: undefined,
+            orientation: undefined,
+            tokens: {
+                value: 40,
+                activeStart: 0,
+                activeEnd: 40,
+                startGap: 0,
+                endGap: 1,
+            },
         });
-        expect(sliderSelection({ tokens: { handleSize: "24px" } }, 0)).toEqual({
-            color: undefined,
-            tokens: { value: 0, handleSize: "24px" },
+        expect(
+            sliderSelection({ tokens: { handleSize: "24px" } }, 0).tokens,
+        ).toMatchObject({ value: 0, handleSize: "24px" });
+    });
+
+    it("places a range's and a centered slider's active track", () => {
+        expect(sliderTrackTokens([20, 70])).toEqual({
+            value: 70,
+            activeStart: 20,
+            activeEnd: 70,
+            startGap: 1,
+            endGap: 1,
+        });
+        expect(sliderTrackTokens([30], true)).toEqual({
+            value: 30,
+            activeStart: 30,
+            activeEnd: 50,
+            startGap: 1,
+            endGap: 0,
+        });
+        expect(sliderTrackTokens([80], true)).toMatchObject({
+            activeStart: 50,
+            activeEnd: 80,
+            startGap: 0,
         });
     });
 
-    it("maps Root's props onto the machine's, its id to the root's", () => {
+    it("puts stops at each step or the values given, active on the active track", () => {
+        expect(sliderStops(true, { min: 0, max: 1, step: 0.25 })).toEqual([
+            0, 0.25, 0.5, 0.75, 1,
+        ]);
+        expect(sliderStops([10, 90], {})).toEqual([10, 90]);
+        expect(sliderStops(undefined, {})).toEqual([]);
+        expect(sliderStopActive(30, [40], {})).toBe(true);
+        expect(sliderStopActive(50, [40], {})).toBe(false);
+        expect(sliderStopActive(45, [40], { centered: true })).toBe(true);
+        expect(sliderStopActive(10, [20, 60], {})).toBe(false);
+        expect(sliderMarkerTokens(30, true)).toEqual({
+            value: 30,
+            stopActive: 1,
+        });
+    });
+
+    it("maps Root's props onto Zag's, its id to the root's", () => {
         expect(
-            sliderMachineProps({ id: "volume", min: 1, name: "volume" }),
+            sliderMachineProps(
+                {
+                    id: "volume",
+                    min: 1,
+                    name: "volume",
+                    centered: true,
+                    orientation: "vertical",
+                },
+                "m1",
+            ),
         ).toMatchObject({
             min: 1,
             name: "volume",
-            ids: { root: "volume", input: undefined },
+            origin: "center",
+            orientation: "vertical",
+            ids: { root: "volume", control: "volume" },
         });
+        expect(sliderMachineProps({}, "m1").ids.root).toBe("slider:m1");
     });
 
-    it("resets the native input to the default, else min", () => {
+    it("gives the owner its value in the shape it gave", () => {
+        const onValueChange = vi.fn();
+        const single = sliderControllableProps({
+            value: undefined,
+            defaultValue: 40,
+            onValueChange,
+        });
+        expect(single.defaultValue).toEqual([40]);
+        single.onValueChange({ value: [41] });
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: 41 });
+        const range = sliderControllableProps({
+            value: [20, 60],
+            defaultValue: undefined,
+            onValueChange,
+        });
+        range.onValueChange({ value: [20, 61] });
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: [20, 61] });
+    });
+
+    it("resets the native inputs to the default, else min", () => {
         expect(sliderNativeDefault(40, 0)).toBe("40");
+        expect(sliderNativeDefault([20, 60], 0)).toBe("20,60");
         expect(sliderNativeDefault(undefined, 10)).toBe("10");
         expect(sliderNativeDefault(undefined, undefined)).toBe("0");
     });
