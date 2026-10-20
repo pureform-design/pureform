@@ -100,7 +100,7 @@ describe("Button, ready-made", () => {
     it("prefixes every test id, or sets them by part", () => {
         withRegistry(
             <>
-                <Button label="a" testId="save" icon="+" />
+                <Button label="a" testId="save" icon="+" secondaryIcon="▾" />
                 <Button label="b" testId={{ label: "only-label" }} />
             </>,
         );

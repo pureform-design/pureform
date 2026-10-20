@@ -5,11 +5,13 @@ import { chipAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_CONTENT_PROPS,
     buttonMachineProps,
+    CHIP_CONTENT_PROPS,
     CHIP_ROOT_PROPS,
     chipSelection,
 } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
+    ChipContentProps,
     ChipRootOwnProps,
 } from "@pureform/binding-core";
 import type * as button from "@pureform/machines/button";
@@ -110,6 +112,29 @@ function renderIcon(props: ChipIconProps, optional: boolean): JSX.Element {
     });
 }
 
+/** The trailing icon's box (a filter chip's dropdown arrow), hidden from assistive technology.
+ *  Render it only when there's one. */
+function TrailingIcon(props: ChipPartProps): JSX.Element {
+    return renderTrailingIcon(props, false);
+}
+
+const OptionalTrailingIcon = (props: ChipPartProps): JSX.Element =>
+    renderTrailingIcon(props, true);
+
+function renderTrailingIcon(
+    props: ChipPartProps,
+    optional: boolean,
+): JSX.Element {
+    const { scope, api } = context.use("TrailingIcon");
+    return scope.render("trailingIcon", {
+        element: "span",
+        machine: () => api().getSecondaryIconProps(),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+        optional,
+    });
+}
+
 /** The chip's text. */
 function Label(props: ChipPartProps): JSX.Element {
     const { scope, api } = context.use("Label");
@@ -127,19 +152,27 @@ export interface ChipProps
     extends
         Omit<ChipRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
-        ButtonContentProps<JSX.Element> {}
+        ButtonContentProps<JSX.Element>,
+        ChipContentProps<JSX.Element> {}
 
 const READY_MADE_PROPS = [
     "class",
     "style",
     "slotProps",
     ...BUTTON_CONTENT_PROPS,
+    ...CHIP_CONTENT_PROPS,
 ] as const;
 
-/** The ready-made chip: Root, its touch target, the icon when given, and the label. */
+/** The ready-made chip: Root, its touch target, the icon when given, the label, and the trailing icon when given. */
 function ReadyMade(props: ChipProps): JSX.Element {
     // The icon part builds the icon once, inside its own context, so `useIconStyle()` works in it.
     const IconPart = optionalPart(props, "icon", Icon, OptionalIcon);
+    const TrailingPart = optionalPart(
+        props,
+        "trailingIcon",
+        TrailingIcon,
+        OptionalTrailingIcon,
+    );
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as ChipRootProps;
     // The root's slot props are an element's, whose `id` also takes `false`.
@@ -147,6 +180,7 @@ function ReadyMade(props: ChipProps): JSX.Element {
     const touchTarget = slots("touchTarget");
     const icon = slots("icon");
     const label = slots("label");
+    const trailingIcon = slots("trailingIcon");
     return (
         <Root {...own} {...root}>
             <TouchTarget {...touchTarget} />
@@ -154,6 +188,7 @@ function ReadyMade(props: ChipProps): JSX.Element {
                 {props.icon}
             </IconPart>
             <Label {...label}>{props.label}</Label>
+            <TrailingPart {...trailingIcon}>{props.trailingIcon}</TrailingPart>
         </Root>
     );
 }
@@ -166,4 +201,5 @@ export const Chip = Object.assign(ReadyMade, {
     TouchTarget,
     Icon,
     Label,
+    TrailingIcon,
 });

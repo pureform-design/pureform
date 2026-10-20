@@ -11,8 +11,8 @@ const recipes = compilePreset(pureform()).theme!;
 
 /** Every icon slot, by component. */
 const ICON_SLOTS: Record<string, string[]> = {
-    button: ["icon"],
-    chip: ["icon"],
+    button: ["icon", "secondaryIcon"],
+    chip: ["icon", "trailingIcon"],
     dialog: ["icon"],
     fab: ["icon"],
     iconButton: ["icon"],

@@ -1,11 +1,12 @@
 // The button: Root on the button machine (press, focus, and an optional toggle on `selected`),
-// its Label, Icon, and TouchTarget parts, and the ready-made Button over them.
+// its Label, Icon, SecondaryIcon, and TouchTarget parts, and the ready-made Button over them.
 
 import { buttonAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_ROOT_PROPS,
     buttonMachineProps,
     buttonSelection,
+    isPresent,
 } from "@pureform/binding-core";
 import type {
     ButtonContentProps,
@@ -112,6 +113,23 @@ function Icon({ unstyled, mirror, ...props }: ButtonIconProps): ReactNode {
     });
 }
 
+/** The secondary icon's box (a dropdown arrow, say), hidden from assistive technology. Render it
+ *  only when there's one, on the side `secondaryIconPosition` names. */
+function SecondaryIcon({
+    unstyled,
+    mirror,
+    ...props
+}: ButtonIconProps): ReactNode {
+    const { scope, api } = context.use("SecondaryIcon");
+    return scope.render("secondaryIcon", {
+        element: "span",
+        machine: api.getSecondaryIconProps(),
+        states: { mirrored: mirror },
+        unstyled,
+        props,
+    });
+}
+
 /** The 48px touch target around a smaller button. Empty. */
 function TouchTarget({ unstyled, ...props }: ButtonPartProps): ReactNode {
     const { scope } = context.use("TouchTarget");
@@ -126,7 +144,7 @@ export interface ButtonProps
         SlotKeyedProps<Anatomy>,
         ButtonContentProps<ReactNode> {}
 
-/** The ready-made button: Root, its touch target, the icon when given, and the label. */
+/** The ready-made button: Root, its touch target, the icons when given, and the label. */
 function ReadyMade(props: ButtonProps): ReactNode {
     const slot = useSlotProps(props);
     const {
@@ -135,18 +153,27 @@ function ReadyMade(props: ButtonProps): ReactNode {
         slotProps: _slotProps,
         label,
         icon,
+        secondaryIcon,
         mirrorIcon,
         ...rootProps
     } = props;
+    const secondary = isPresent(secondaryIcon) ? (
+        <SecondaryIcon mirror={mirrorIcon} {...slot("secondaryIcon")}>
+            {secondaryIcon}
+        </SecondaryIcon>
+    ) : null;
+    const start = rootProps.secondaryIconPosition === "start";
     return (
         <Root {...rootProps} {...slot("root")}>
             <TouchTarget {...slot("touchTarget")} />
+            {start ? secondary : null}
             {icon != null && icon !== false ? (
                 <Icon mirror={mirrorIcon} {...slot("icon")}>
                     {icon}
                 </Icon>
             ) : null}
             <Label {...slot("label")}>{label}</Label>
+            {start ? null : secondary}
         </Root>
     );
 }
@@ -157,5 +184,6 @@ export const Button = Object.assign(ReadyMade, {
     Root,
     Label,
     Icon,
+    SecondaryIcon,
     TouchTarget,
 });

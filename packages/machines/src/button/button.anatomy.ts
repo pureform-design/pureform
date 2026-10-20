@@ -4,6 +4,7 @@ export const anatomy = createAnatomy("button").parts(
     "root",
     "label",
     "icon",
+    "secondaryIcon",
     "touchTarget",
 );
 export const parts = anatomy.build();
