@@ -1,0 +1,716 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "closeTrigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "&:is(:hover, [data-pf-hover])": {
+        "shadowElevation": "level4",
+      },
+      "--components-fabMenu-focusIndicatorColor": "token(colors.secondary)",
+      "--components-fabMenu-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-fabMenu-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-fabMenu-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-fabMenu-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-fabMenu-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-fabMenu-accentContainer, token(colors.primaryContainer))",
+        "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-stateHoverOpacity, token(opacity.stateHover)))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-accent, token(colors.primary))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fabMenu-accent, token(colors.primary)), var(--components-fabMenu-onAccent, token(colors.onPrimary)) var(--components-fabMenu-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-fabMenu-accent, token(colors.primary)), var(--components-fabMenu-onAccent, token(colors.onPrimary)) var(--components-fabMenu-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true])):is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-fabMenu-accent, token(colors.primary)), var(--components-fabMenu-onAccent, token(colors.onPrimary)) var(--components-fabMenu-stateHoverOpacity, token(opacity.stateHover)))",
+        "base": "var(--components-fabMenu-accentContainer, token(colors.primaryContainer))",
+      },
+      "borderWidth": "0px",
+      "color": {
+        "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-onAccent, token(colors.onPrimary))",
+        "base": "var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer))",
+      },
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "fontSize": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "outlineColor": "var(--components-fabMenu-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-fabMenu-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-fabMenu-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "position": "relative",
+      "shadowElevation": "level3",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+      },
+    },
+    "item": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-fabMenu-accentContainer, token(colors.primaryContainer)), var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-fabMenu-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "var(--components-fabMenu-accentContainer, token(colors.primaryContainer))",
+      },
+      "borderRadius": "var(--components-fabMenu-itemRadius, token(radii.full))",
+      "borderWidth": "0px",
+      "color": "var(--components-fabMenu-onAccentContainer, token(colors.onPrimaryContainer))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "gap": "var(--components-fabMenu-itemGap, token(spacing.2))",
+      "justifyContent": "center",
+      "minHeight": "var(--components-fabMenu-itemHeight, 56px)",
+      "outlineColor": "var(--components-fabMenu-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-fabMenu-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-fabMenu-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingInlineEnd": "var(--components-fabMenu-itemPaddingInline, token(spacing.6))",
+      "paddingInlineStart": "var(--components-fabMenu-itemPaddingInline, token(spacing.6))",
+      "position": "relative",
+      "textStyle": "titleMedium",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "itemIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+      "width": "var(--components-fabMenu-iconSize, token(sizes.iconMedium))",
+    },
+    "itemLabel": {
+      "textStyle": "titleMedium",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": "token(durations.short2) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+        },
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "--components-fabMenu-focusIndicatorColor": "token(colors.secondary)",
+      "--components-fabMenu-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-fabMenu-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-fabMenu-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-fabMenu-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-fabMenu-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
+      "alignItems": "end",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "var(--components-fabMenu-gap, token(spacing.1))",
+      "zIndex": "token(zIndex.menu)",
+    },
+  },
+  "className": "fabMenu",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "primary",
+    "size": "default",
+  },
+  "jsx": [
+    "FabMenu",
+  ],
+  "slots": [
+    "root",
+    "closeTrigger",
+    "item",
+    "itemIcon",
+    "itemLabel",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.error)",
+          "--components-fabMenu-accentContainer": "token(colors.errorContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onError)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onErrorContainer)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.info)",
+          "--components-fabMenu-accentContainer": "token(colors.infoContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onInfo)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onInfoContainer)",
+        },
+      },
+      "primary": {
+        "root": {},
+      },
+      "secondary": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.secondary)",
+          "--components-fabMenu-accentContainer": "token(colors.secondaryContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onSecondary)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onSecondaryContainer)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.success)",
+          "--components-fabMenu-accentContainer": "token(colors.successContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onSuccess)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onSuccessContainer)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.tertiary)",
+          "--components-fabMenu-accentContainer": "token(colors.tertiaryContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onTertiary)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onTertiaryContainer)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-fabMenu-accent": "token(colors.warning)",
+          "--components-fabMenu-accentContainer": "token(colors.warningContainer)",
+          "--components-fabMenu-onAccent": "token(colors.onWarning)",
+          "--components-fabMenu-onAccentContainer": "token(colors.onWarningContainer)",
+        },
+      },
+    },
+    "size": {
+      "default": {
+        "closeTrigger": {
+          "--components-fabMenu-iconSize": "token(sizes.iconMedium)",
+          "borderRadius": {
+            "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
+            "base": "var(--components-fabMenu-radiusDefault, token(radii.large))",
+          },
+          "height": "var(--components-fabMenu-sizeDefault, 56px)",
+          "width": "var(--components-fabMenu-sizeDefault, 56px)",
+        },
+      },
+      "large": {
+        "closeTrigger": {
+          "--components-fabMenu-iconSize": "36px",
+          "borderRadius": {
+            "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
+            "base": "var(--components-fabMenu-radiusLarge, token(radii.extraLarge))",
+          },
+          "height": "var(--components-fabMenu-sizeLarge, 96px)",
+          "width": "var(--components-fabMenu-sizeLarge, 96px)",
+        },
+      },
+      "medium": {
+        "closeTrigger": {
+          "--components-fabMenu-iconSize": "28px",
+          "borderRadius": {
+            "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-fabMenu-closeRadius, token(radii.full))",
+            "base": "var(--components-fabMenu-radiusMedium, calc(token(radii.large) + token(radii.extraSmall)))",
+          },
+          "height": "var(--components-fabMenu-sizeMedium, 80px)",
+          "width": "var(--components-fabMenu-sizeMedium, 80px)",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`split button > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "leadingButton": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "borderEndEndRadius": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-splitButton-pressedInnerRadius, token(radii.small))",
+        "base": "var(--components-splitButton-innerRadius, token(radii.extraSmall))",
+      },
+      "borderEndStartRadius": "var(--components-splitButton-radius, token(radii.full))",
+      "borderStartEndRadius": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-splitButton-pressedInnerRadius, token(radii.small))",
+        "base": "var(--components-splitButton-innerRadius, token(radii.extraSmall))",
+      },
+      "borderStartStartRadius": "var(--components-splitButton-radius, token(radii.full))",
+      "borderWidth": "0px",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "gap": "var(--components-splitButton-leadingGap, token(spacing.2))",
+      "justifyContent": "center",
+      "outlineColor": "var(--components-splitButton-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-splitButton-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-splitButton-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "position": "relative",
+      "textStyle": "labelLarge",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+      },
+    },
+    "root": {
+      "--components-splitButton-focusIndicatorColor": "token(colors.secondary)",
+      "--components-splitButton-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-splitButton-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-splitButton-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-splitButton-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-splitButton-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-splitButton-statePressedOpacity": "token(opacity.statePressed)",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "gap": "var(--components-splitButton-gap, 2px)",
+    },
+    "trailingButton": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "borderEndEndRadius": "var(--components-splitButton-radius, token(radii.full))",
+      "borderEndStartRadius": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-splitButton-pressedInnerRadius, token(radii.small))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-splitButton-radius, token(radii.full))",
+        "base": "var(--components-splitButton-innerRadius, token(radii.extraSmall))",
+      },
+      "borderStartEndRadius": "var(--components-splitButton-radius, token(radii.full))",
+      "borderStartStartRadius": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-splitButton-pressedInnerRadius, token(radii.small))",
+        "&:is([aria-expanded=true], :has([aria-expanded=true]))": "var(--components-splitButton-radius, token(radii.full))",
+        "base": "var(--components-splitButton-innerRadius, token(radii.extraSmall))",
+      },
+      "borderWidth": "0px",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "outlineColor": "var(--components-splitButton-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-splitButton-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-splitButton-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingInlineEnd": "var(--components-splitButton-trailingPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-splitButton-trailingPadding, token(spacing.3))",
+      "position": "relative",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+      },
+    },
+    "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-splitButton-iconSize, 20px)",
+      "height": "var(--components-splitButton-iconSize, 20px)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-splitButton-iconSize, 20px)",
+      "transform": {
+        ".splitButton__trailingButton:is([aria-expanded=true], :has([aria-expanded=true])) &": "rotate(180deg)",
+        "base": "rotate(0deg)",
+      },
+      "transition": {
+        "_motionReduce": "none",
+        "base": "transform token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-splitButton-iconSize, 20px)",
+    },
+  },
+  "className": "splitButton",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "color": "primary",
+    "density": "inherit",
+    "size": "small",
+    "variant": "filled",
+  },
+  "jsx": [
+    "SplitButton",
+  ],
+  "slots": [
+    "root",
+    "leadingButton",
+    "trailingButton",
+    "trailingIcon",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.error)",
+          "--components-splitButton-accentContainer": "token(colors.errorContainer)",
+          "--components-splitButton-onAccent": "token(colors.onError)",
+          "--components-splitButton-onAccentContainer": "token(colors.onErrorContainer)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.info)",
+          "--components-splitButton-accentContainer": "token(colors.infoContainer)",
+          "--components-splitButton-onAccent": "token(colors.onInfo)",
+          "--components-splitButton-onAccentContainer": "token(colors.onInfoContainer)",
+        },
+      },
+      "primary": {
+        "root": {},
+      },
+      "secondary": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.secondary)",
+          "--components-splitButton-accentContainer": "token(colors.secondaryContainer)",
+          "--components-splitButton-onAccent": "token(colors.onSecondary)",
+          "--components-splitButton-onAccentContainer": "token(colors.onSecondaryContainer)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.success)",
+          "--components-splitButton-accentContainer": "token(colors.successContainer)",
+          "--components-splitButton-onAccent": "token(colors.onSuccess)",
+          "--components-splitButton-onAccentContainer": "token(colors.onSuccessContainer)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.tertiary)",
+          "--components-splitButton-accentContainer": "token(colors.tertiaryContainer)",
+          "--components-splitButton-onAccent": "token(colors.onTertiary)",
+          "--components-splitButton-onAccentContainer": "token(colors.onTertiaryContainer)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-splitButton-accent": "token(colors.warning)",
+          "--components-splitButton-accentContainer": "token(colors.warningContainer)",
+          "--components-splitButton-onAccent": "token(colors.onWarning)",
+          "--components-splitButton-onAccentContainer": "token(colors.onWarningContainer)",
+        },
+      },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "--components-splitButton-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-splitButton-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-splitButton-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-splitButton-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-splitButton-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
+    },
+    "size": {
+      "large": {
+        "leadingButton": {
+          "height": "calc(var(--components-splitButton-heightLarge, 96px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-splitButton-paddingLarge, token(spacing.12))",
+          "paddingInlineStart": "var(--components-splitButton-paddingLarge, token(spacing.12))",
+          "textStyle": "headlineSmall",
+        },
+        "root": {
+          "--components-splitButton-iconSize": "32px",
+          "--components-splitButton-innerRadius": "token(radii.small)",
+          "--components-splitButton-leadingGap": "token(spacing.3)",
+          "--components-splitButton-outlineWidth": "2px",
+          "--components-splitButton-pressedInnerRadius": "token(radii.large)",
+          "--components-splitButton-trailingPadding": "token(spacing.8)",
+          "height": "calc(var(--components-splitButton-heightLarge, 96px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+        "trailingButton": {
+          "height": "calc(var(--components-splitButton-heightLarge, 96px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+      },
+      "medium": {
+        "leadingButton": {
+          "height": "calc(var(--components-splitButton-heightMedium, 56px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-splitButton-paddingMedium, token(spacing.6))",
+          "paddingInlineStart": "var(--components-splitButton-paddingMedium, token(spacing.6))",
+          "textStyle": "titleMedium",
+        },
+        "root": {
+          "--components-splitButton-iconSize": "24px",
+          "--components-splitButton-innerRadius": "token(radii.extraSmall)",
+          "--components-splitButton-leadingGap": "token(spacing.2)",
+          "--components-splitButton-outlineWidth": "1px",
+          "--components-splitButton-pressedInnerRadius": "token(radii.medium)",
+          "--components-splitButton-trailingPadding": "token(spacing.4)",
+          "height": "calc(var(--components-splitButton-heightMedium, 56px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+        "trailingButton": {
+          "height": "calc(var(--components-splitButton-heightMedium, 56px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+      },
+      "small": {
+        "leadingButton": {
+          "height": "calc(var(--components-splitButton-heightSmall, token(sizes.controlMedium)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-splitButton-paddingSmall, token(spacing.4))",
+          "paddingInlineStart": "var(--components-splitButton-paddingSmall, token(spacing.4))",
+          "textStyle": "labelLarge",
+        },
+        "root": {
+          "--components-splitButton-iconSize": "20px",
+          "--components-splitButton-innerRadius": "token(radii.extraSmall)",
+          "--components-splitButton-leadingGap": "token(spacing.2)",
+          "--components-splitButton-outlineWidth": "1px",
+          "--components-splitButton-pressedInnerRadius": "token(radii.small)",
+          "--components-splitButton-trailingPadding": "token(spacing.3)",
+          "height": "calc(var(--components-splitButton-heightSmall, token(sizes.controlMedium)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+        "trailingButton": {
+          "height": "calc(var(--components-splitButton-heightSmall, token(sizes.controlMedium)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+      },
+      "xlarge": {
+        "leadingButton": {
+          "height": "calc(var(--components-splitButton-heightXlarge, 136px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-splitButton-paddingXlarge, token(spacing.16))",
+          "paddingInlineStart": "var(--components-splitButton-paddingXlarge, token(spacing.16))",
+          "textStyle": "headlineLarge",
+        },
+        "root": {
+          "--components-splitButton-iconSize": "40px",
+          "--components-splitButton-innerRadius": "token(radii.medium)",
+          "--components-splitButton-leadingGap": "token(spacing.4)",
+          "--components-splitButton-outlineWidth": "3px",
+          "--components-splitButton-pressedInnerRadius": "token(radii.large)",
+          "--components-splitButton-trailingPadding": "token(spacing.10)",
+          "height": "calc(var(--components-splitButton-heightXlarge, 136px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+        "trailingButton": {
+          "height": "calc(var(--components-splitButton-heightXlarge, 136px) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+      },
+      "xsmall": {
+        "leadingButton": {
+          "height": "calc(var(--components-splitButton-heightXsmall, token(sizes.controlSmall)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-splitButton-paddingXsmall, token(spacing.3))",
+          "paddingInlineStart": "var(--components-splitButton-paddingXsmall, token(spacing.3))",
+          "textStyle": "labelLarge",
+        },
+        "root": {
+          "--components-splitButton-iconSize": "20px",
+          "--components-splitButton-innerRadius": "token(radii.extraSmall)",
+          "--components-splitButton-leadingGap": "token(spacing.1)",
+          "--components-splitButton-outlineWidth": "1px",
+          "--components-splitButton-pressedInnerRadius": "token(radii.small)",
+          "--components-splitButton-trailingPadding": "token(spacing.3)",
+          "height": "calc(var(--components-splitButton-heightXsmall, token(sizes.controlSmall)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+        "trailingButton": {
+          "height": "calc(var(--components-splitButton-heightXsmall, token(sizes.controlSmall)) + var(--components-splitButton-densityOffset, token(sizes.densityOffset)))",
+        },
+      },
+    },
+    "variant": {
+      "elevated": {
+        "leadingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level2",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "token(colors.surfaceContainerLow)",
+          },
+          "color": "var(--components-splitButton-accent, token(colors.primary))",
+          "shadowElevation": "level1",
+        },
+        "trailingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level2",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "token(colors.surfaceContainerLow)",
+          },
+          "color": "var(--components-splitButton-accent, token(colors.primary))",
+          "shadowElevation": "level1",
+        },
+      },
+      "filled": {
+        "leadingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level1",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "var(--components-splitButton-accent, token(colors.primary))",
+          },
+          "color": "var(--components-splitButton-onAccent, token(colors.onPrimary))",
+          "shadowElevation": "level0",
+        },
+        "trailingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level1",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-splitButton-accent, token(colors.primary)), var(--components-splitButton-onAccent, token(colors.onPrimary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "var(--components-splitButton-accent, token(colors.primary))",
+          },
+          "color": "var(--components-splitButton-onAccent, token(colors.onPrimary))",
+          "shadowElevation": "level0",
+        },
+      },
+      "outlined": {
+        "leadingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "transparent",
+          },
+          "borderColor": "var(--components-splitButton-outlineColor, token(colors.outline))",
+          "borderStyle": "solid",
+          "borderWidth": "var(--components-splitButton-outlineWidth, 1px)",
+          "color": "var(--components-splitButton-accent, token(colors.primary))",
+        },
+        "trailingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "transparent",
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-splitButton-accent, token(colors.primary)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "transparent",
+          },
+          "borderColor": "var(--components-splitButton-outlineColor, token(colors.outline))",
+          "borderStyle": "solid",
+          "borderWidth": "var(--components-splitButton-outlineWidth, 1px)",
+          "color": "var(--components-splitButton-accent, token(colors.primary))",
+        },
+      },
+      "tonal": {
+        "leadingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level1",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "var(--components-splitButton-accentContainer, token(colors.primaryContainer))",
+          },
+          "color": "var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer))",
+          "shadowElevation": "level0",
+        },
+        "trailingButton": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "backgroundColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "shadowElevation": "level0",
+          },
+          "&:is(:hover, [data-pf-hover])": {
+            "shadowElevation": "level1",
+          },
+          "backgroundColor": {
+            "&:focus-visible": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateHoverOpacity, token(opacity.stateHover)))",
+            "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-splitButton-accentContainer, token(colors.primaryContainer)), var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-splitButton-stateDraggedOpacity, token(opacity.stateDragged)))",
+            "base": "var(--components-splitButton-accentContainer, token(colors.primaryContainer))",
+          },
+          "color": "var(--components-splitButton-onAccentContainer, token(colors.onPrimaryContainer))",
+          "shadowElevation": "level0",
+        },
+      },
+    },
+  },
+}
+`;
