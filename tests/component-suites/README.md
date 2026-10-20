@@ -128,6 +128,9 @@ VITE_PUREFORM_BENCH=1 bun x vitest --config vitest.config.e2e.ts run src/indicat
       the keyboard suite checks that Tab passes over it;
     - `themed: false` for a component the scheme doesn't color (text, a touch target, the scrim,
       the ripple), which a recoloring theme can't change;
+    - `themedProps`: props the themes suite renders it with, when its own props render nothing the
+      theme colors until the browser runs (the toaster: its toasts come in on the client, so its
+      examples are the empty region and the toasts are `opened`);
     - `unmirrored`: parts that don't point (a check mark), which must draw the same both ways;
     - `opened`: renderings with an overlay open (`defaultOpen: true`). Zag places a floating
       overlay and hides the page around a modal one only in the browser, so axe and the direction
