@@ -34,8 +34,7 @@ import {
     AFFIX_FIELD_SLOTS,
     AFFIX_FIELD_STRUCTURE,
     AFFIX_TOKENS,
-    affixParts,
-    fieldParts,
+    affixField,
     fieldTokens,
 } from "./field";
 import {
@@ -50,12 +49,7 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("select", AFFIX_TOKENS);
 
-const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
-    labelRest: pct(50),
-    iconRoom: "input",
-    density: true,
-});
-const affixes = affixParts(ref, variant);
+const field = affixField(ref);
 
 const EXPANDED = slot("container", "expanded");
 
@@ -69,8 +63,7 @@ export const createSelect = <
     groups: ColorGroups<G> = defaultGroups(),
     densities: Densities<D> = defaultDensities(),
 ) => {
-    const color = colors(groups);
-    const density = densityParts(densities);
+    const { density, ...parts } = field.parts(groups, densities);
     return variantsOf<{
         color: G | typeof DEFAULT_GROUP;
         density: "inherit" | D;
@@ -95,23 +88,11 @@ export const createSelect = <
             },
             recipe: () => ({
                 base: {
-                    ...base,
-                    ...icons.base,
-                    ...affixes.base,
-                    container: {
-                        ...base.container,
-                        ...affixes.base.container,
-                        height: density.height,
-                    },
-                    input: {
-                        ...base.input,
-                        ...affixes.base.input,
-                        height: pct(100),
-                        cursor: pointer,
-                    },
+                    ...parts.base,
+                    input: { ...parts.base.input, cursor: pointer },
                     // The arrow turns over while the menu is open.
                     trailingIcon: {
-                        ...icons.base.trailingIcon,
+                        ...field.icons.base.trailingIcon,
                         transform: when()
                             .on(
                                 EXPANDED,
@@ -125,28 +106,13 @@ export const createSelect = <
                     },
                 },
                 variants: {
-                    variant: {
-                        filled: {
-                            ...variant.filled,
-                            ...affixes.variant.filled,
-                        },
-                        outlined: {
-                            ...variant.outlined,
-                            ...affixes.variant.outlined,
-                        },
-                    },
-                    color: color.color,
-                    ...affixes.icons,
-                    ...affixes.variants,
+                    ...parts.variants,
                     ...density.variants,
                 },
-                compoundVariants: [...icons.compoundVariants],
+                compoundVariants: parts.compoundVariants,
                 // The arrow is always there.
                 defaultVariants: {
-                    color: DEFAULT_GROUP,
-                    variant: "filled",
-                    ...icons.defaultVariants,
-                    ...affixes.defaultVariants,
+                    ...parts.defaultVariants,
                     ...density.defaultVariants,
                     trailingIcon: "true",
                 },
