@@ -98,7 +98,7 @@ interface PartAnatomy<P extends string = string> {
 | navigation bar and rail       | `item`       | `indicator`                    | yes      | `item`   |
 | checkbox, radio               | `input`      | `root`                         | yes      | `root`   |
 | switch                        | `input`      | `stateLayer`                   | yes      | `root`   |
-| slider                        | `input`      | `stateLayer`                   | yes      | `handle` |
+| slider                        | `handle`     | `stateLayer`                   | yes      | `handle` |
 
 ## Public API
 
