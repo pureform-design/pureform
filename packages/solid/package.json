@@ -71,6 +71,17 @@
                 "default": "./dist/icon-button.jsx"
             }
         },
+        "./button-group": {
+            "types": "./dist/button-group/index.d.ts",
+            "solid": {
+                "development": "./src/button-group/index.ts",
+                "default": "./dist/button-group.jsx"
+            },
+            "import": {
+                "development": "./src/button-group/index.ts",
+                "default": "./dist/button-group.jsx"
+            }
+        },
         "./radio-group": {
             "types": "./dist/radio-group/index.d.ts",
             "solid": {
