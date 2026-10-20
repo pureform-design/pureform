@@ -105,6 +105,7 @@ describe("rn-web-demo", () => {
             "pf-dialog-headline",
             "pf-snackbar-action",
             "pf-tooltip-root",
+            "pf-rich-tooltip-subhead",
             "pf-card-root",
         ]) {
             expect(all(id).length, id).toBeGreaterThan(0);

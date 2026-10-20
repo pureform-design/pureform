@@ -2,6 +2,7 @@ import type {
     dialogOverlayAnatomy,
     menuOverlayAnatomy,
     snackbarAnatomy,
+    richTooltipOverlayAnatomy,
     tooltipOverlayAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, expectTypeOf, it } from "vitest";
@@ -27,6 +28,13 @@ import {
     presentProps,
 } from "./overlay";
 import {
+    isInteractiveRichTooltip,
+    RICH_TOOLTIP_ROOT_PROPS,
+    richTooltipMachineProps,
+    richTooltipSelection,
+} from "./rich-tooltip";
+import type { RichTooltipPart } from "./rich-tooltip";
+import {
     SNACKBAR_ROOT_PROPS,
     snackbarMachineProps,
     snackbarSelection,
@@ -34,7 +42,6 @@ import {
 import type { SnackbarPart } from "./snackbar";
 import {
     isInteractiveTooltip,
-    isRichTooltip,
     TOOLTIP_ROOT_PROPS,
     tooltipMachineProps,
     tooltipSelection,
@@ -49,6 +56,9 @@ describe("parts", () => {
         expectTypeOf<TooltipPart>().toEqualTypeOf<
             (typeof tooltipOverlayAnatomy.partNames)[number]
         >();
+        expectTypeOf<RichTooltipPart>().toEqualTypeOf<
+            (typeof richTooltipOverlayAnatomy.partNames)[number]
+        >();
         expectTypeOf<DialogPart>().toEqualTypeOf<
             (typeof dialogOverlayAnatomy.partNames)[number] | "backdrop"
         >();
@@ -61,6 +71,7 @@ describe("parts", () => {
         for (const list of [
             MENU_ROOT_PROPS,
             TOOLTIP_ROOT_PROPS,
+            RICH_TOOLTIP_ROOT_PROPS,
             DIALOG_ROOT_PROPS,
             SNACKBAR_ROOT_PROPS,
         ] as readonly (readonly string[])[]) {
@@ -121,24 +132,20 @@ describe("overlays", () => {
         });
     });
 
-    it("make a rich tooltip interactive, unless told otherwise", () => {
-        expect(isRichTooltip({ variant: "rich" })).toBe(true);
-        expect(isInteractiveTooltip({ variant: "rich" })).toBe(true);
+    it("keep the plain tooltip non-interactive, and the rich one interactive, unless told otherwise", () => {
         expect(isInteractiveTooltip({})).toBe(false);
         expect(isInteractiveTooltip({ interactive: true })).toBe(true);
-        expect(tooltipMachineProps({ variant: "rich" }).interactive).toBe(true);
         expect(tooltipMachineProps({}).interactive).toBe(false);
+        expect(isInteractiveRichTooltip({})).toBe(true);
+        expect(richTooltipMachineProps({}).interactive).toBe(true);
         expect(
-            tooltipMachineProps({ variant: "rich", interactive: false })
-                .interactive,
+            richTooltipMachineProps({ interactive: false }).interactive,
         ).toBe(false);
         expect(tooltipMachineProps({}).positioning).toEqual({
             placement: "bottom",
         });
-        expect(tooltipSelection({ variant: "rich" })).toEqual({
-            variant: "rich",
-            tokens: undefined,
-        });
+        expect(tooltipSelection({})).toEqual({ tokens: undefined });
+        expect(richTooltipSelection({})).toEqual({ tokens: undefined });
     });
 
     it("name the dialog's headline and body as Zag's title and description", () => {

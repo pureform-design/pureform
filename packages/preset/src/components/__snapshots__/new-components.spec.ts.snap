@@ -2171,6 +2171,70 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`richTooltip > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "token(spacing.2)",
+      "justifyContent": "end",
+    },
+    "caret": {
+      "color": "var(--components-richTooltip-container, token(colors.surfaceContainer))",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": "token(durations.short2) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+        },
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "backgroundColor": "var(--components-richTooltip-container, token(colors.surfaceContainer))",
+      "borderRadius": "var(--components-richTooltip-radius, token(radii.medium))",
+      "color": "var(--components-richTooltip-content, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "token(spacing.1)",
+      "maxWidth": "var(--components-richTooltip-maxWidth, 320px)",
+      "minHeight": "var(--components-richTooltip-minHeight, 24px)",
+      "paddingBlockEnd": "token(spacing.2)",
+      "paddingBlockStart": "token(spacing.3)",
+      "paddingInlineEnd": "token(spacing.4)",
+      "paddingInlineStart": "token(spacing.4)",
+      "shadowElevation": "level2",
+      "zIndex": "token(zIndex.tooltip)",
+    },
+    "subhead": {
+      "color": "var(--components-richTooltip-subheadColor, token(colors.onSurfaceVariant))",
+      "textStyle": "titleSmall",
+    },
+    "supportingText": {
+      "textStyle": "bodyMedium",
+    },
+  },
+  "className": "richTooltip",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "RichTooltip",
+  ],
+  "slots": [
+    "root",
+    "caret",
+    "subhead",
+    "supportingText",
+    "actions",
+  ],
+  "variants": {},
+}
+`;
+
 exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
@@ -3611,11 +3675,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
 exports[`tooltip > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
-    "actions": {
-      "display": "flex",
-      "flexDirection": "row",
-      "gap": "token(spacing.2)",
-      "justifyContent": "end",
+    "caret": {
+      "color": "var(--components-tooltip-container, token(colors.inverseSurface))",
     },
     "root": {
       "&[data-state=closed]": {
@@ -3629,64 +3690,34 @@ exports[`tooltip > compiles to a stable Panda slot recipe 1`] = `
         },
         "transformOrigin": "var(--transform-origin)",
       },
+      "backgroundColor": "var(--components-tooltip-container, token(colors.inverseSurface))",
+      "borderRadius": "var(--components-tooltip-radius, token(radii.extraSmall))",
+      "color": "var(--components-tooltip-content, token(colors.inverseOnSurface))",
       "display": "flex",
-      "flexDirection": "column",
+      "maxWidth": "var(--components-tooltip-maxWidth, 200px)",
       "minHeight": "var(--components-tooltip-minHeight, 24px)",
+      "paddingBlockEnd": "token(spacing.1)",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "token(spacing.2)",
+      "paddingInlineStart": "token(spacing.2)",
+      "shadowElevation": "level0",
       "zIndex": "token(zIndex.tooltip)",
     },
-    "subhead": {
-      "color": "var(--components-tooltip-subheadColor, token(colors.onSurfaceVariant))",
-      "textStyle": "titleSmall",
-    },
     "supportingText": {
-      "textStyle": "bodyMedium",
+      "textStyle": "bodySmall",
     },
   },
   "className": "tooltip",
   "compoundVariants": [],
-  "defaultVariants": {
-    "variant": "plain",
-  },
+  "defaultVariants": {},
   "jsx": [
     "Tooltip",
   ],
   "slots": [
     "root",
-    "subhead",
+    "caret",
     "supportingText",
-    "actions",
   ],
-  "variants": {
-    "variant": {
-      "plain": {
-        "root": {
-          "backgroundColor": "var(--components-tooltip-container, token(colors.inverseSurface))",
-          "borderRadius": "var(--components-tooltip-radius, token(radii.extraSmall))",
-          "color": "var(--components-tooltip-content, token(colors.inverseOnSurface))",
-          "maxWidth": "var(--components-tooltip-maxWidth, 200px)",
-          "paddingBlockEnd": "token(spacing.1)",
-          "paddingBlockStart": "token(spacing.1)",
-          "paddingInlineEnd": "token(spacing.2)",
-          "paddingInlineStart": "token(spacing.2)",
-          "shadowElevation": "level0",
-          "textStyle": "bodySmall",
-        },
-      },
-      "rich": {
-        "root": {
-          "backgroundColor": "var(--components-tooltip-richContainer, token(colors.surfaceContainer))",
-          "borderRadius": "var(--components-tooltip-richRadius, token(radii.medium))",
-          "color": "var(--components-tooltip-richContent, token(colors.onSurfaceVariant))",
-          "gap": "token(spacing.1)",
-          "maxWidth": "var(--components-tooltip-richMaxWidth, 320px)",
-          "paddingBlockEnd": "token(spacing.2)",
-          "paddingBlockStart": "token(spacing.3)",
-          "paddingInlineEnd": "token(spacing.4)",
-          "paddingInlineStart": "token(spacing.4)",
-          "shadowElevation": "level2",
-        },
-      },
-    },
-  },
+  "variants": {},
 }
 `;

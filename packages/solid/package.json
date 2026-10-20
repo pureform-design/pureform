@@ -115,6 +115,17 @@
                 "default": "./dist/tooltip.jsx"
             }
         },
+        "./rich-tooltip": {
+            "types": "./dist/rich-tooltip/index.d.ts",
+            "solid": {
+                "development": "./src/rich-tooltip/index.ts",
+                "default": "./dist/rich-tooltip.jsx"
+            },
+            "import": {
+                "development": "./src/rich-tooltip/index.ts",
+                "default": "./dist/rich-tooltip.jsx"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "solid": {

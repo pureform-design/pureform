@@ -12,6 +12,7 @@ import { menu } from "./menu";
 import { navigationBar, navigationRail } from "./navigation";
 import { circularProgress, linearProgress } from "./progress";
 import { radioGroup } from "./radio-group";
+import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
 import { select } from "./select";
 import { slider } from "./slider";
@@ -54,6 +55,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     navigationBar,
     navigationRail,
     radioGroup,
+    richTooltip,
     ripple,
     scrim,
     searchBar,

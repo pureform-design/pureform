@@ -25,6 +25,7 @@ import { Menu } from "./menu";
 import { NavigationBar } from "./navigation-bar";
 import { NavigationRail } from "./navigation-rail";
 import { Radio, RadioGroup } from "./radio-group";
+import { RichTooltip } from "./rich-tooltip";
 import { Scrim } from "./scrim";
 import { SearchBar } from "./search-bar";
 import { Select } from "./select";
@@ -83,6 +84,7 @@ const COMPONENTS = [
     "dialog",
     "snackbar",
     "tooltip",
+    "richTooltip",
     "ripple",
 ];
 
@@ -156,6 +158,7 @@ describe("every component", () => {
                 </Dialog>
                 <Snackbar supportingText="Archived" action="Undo" />
                 <Tooltip supportingText="Save" />
+                <RichTooltip subhead="Drafts" supportingText="Saved" />
             </>,
         );
         for (const id of [
@@ -195,6 +198,7 @@ describe("every component", () => {
             "pf-dialog-headline",
             "pf-snackbar-close",
             "pf-tooltip-root",
+            "pf-rich-tooltip-subhead",
         ]) {
             expect(
                 document.querySelectorAll(`[data-testid="${id}"]`).length,
