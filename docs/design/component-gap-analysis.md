@@ -3,7 +3,8 @@
 Snapshot taken 2026-10-20, rechecked the same day against the code and against the newest
 canonical M3 sources (§0.1). The styling-only Expressive updates are done (§7); everything
 else here is still to do. How to keep this doc current, and the rules every component
-follows, are in [`component-guidelines.md`](component-guidelines.md).
+follows are in [`component-guidelines.md`](component-guidelines.md); the order of work is the
+[components roadmap](../roadmap-components/README.md).
 
 ## Sources
 
