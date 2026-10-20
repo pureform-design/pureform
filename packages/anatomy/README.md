@@ -171,9 +171,10 @@ rules as any part (`useUnstyledComponent`), and they stay out of `anatomy` and `
 
 `selectMenuAnatomy` is the select's list of options, drawn by another component's slots: its
 `name` is `"menu"`, so a binding's `useComponent` styles its parts with the menu's registry entry,
-and its part names are the menu's slots (`root`, `item`, `itemLabel`) plus an unstyled
-`positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
-`data-pf-part="content"` and `pf-select-content`, then `pf-select-item`, `pf-select-item-label`,
+and its part names are the menu's slots (`root`, `itemGroup`, `itemGroupLabel`, `item`,
+`itemLabel`) plus an unstyled `positioner`. Its `scope` and test ids are the select's: `data-scope="select"`, the list's
+`data-pf-part="content"` and `pf-select-content`, then `pf-select-item-group`,
+`pf-select-item-group-label`, `pf-select-item`, `pf-select-item-label`,
 `pf-select-positioner` (`compositeTestIds.selectMenu`).
 
 **The overlays** (`menuOverlayAnatomy`, `tooltipOverlayAnatomy`, `dialogOverlayAnatomy`) are the
@@ -192,10 +193,10 @@ root) around the tab list and the panels. The preset's `root` slot is the tab li
 is `list` (`data-pf-part="list"`, `pf-tabs-list`, `slot: "root"`), holding `tab`, `tabContent`
 (`data-pf-part="tab-content"`, `pf-tabs-tab-content`), `icon`, `label`, and `indicator` as the
 preset has them (a tab around its content, the content around the rest); each panel is an unstyled `content`
-(`pf-tabs-content`). **The list** (`listAnatomy`) is the preset-less `<ul>` around list items:
-`root` (`pf-list-root`) and `item` (`pf-list-item`, the `<li>` around each list item), both
-unstyled. Their test ids are in `compositeTestIds.tabs` and `.list`. The navigation bar and rail
-and the list item use their generated anatomies as they are.
+(`pf-tabs-content`). Their test ids are in `compositeTestIds.tabs`. The navigation bar and rail,
+the list (`listAnatomy`, a styled `ul` and an `li` per item, `pf-list-root` and `pf-list-item`;
+it was a composite until the preset drew it), and the list item use their generated anatomies as
+they are.
 
 ## Building and testing
 
