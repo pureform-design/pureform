@@ -25,6 +25,7 @@ import {
     radioAnatomy,
     sliderAnatomy,
     snackbarAnatomy,
+    toastAnatomy,
     switchControlAnatomy,
     tabsAnatomy,
 } from "@pureform/anatomy";
@@ -58,6 +59,7 @@ import { Snackbar } from "@pureform/react-native/snackbar";
 import { Switch } from "@pureform/react-native/switch";
 import { Tabs } from "@pureform/react-native/tabs";
 import { Text } from "@pureform/react-native/text";
+import { createToaster, Toaster } from "@pureform/react-native/toast";
 import { nativeFactory } from "@pureform/rn-adapter/factory";
 import { createRegistry } from "@pureform/styling";
 import type { Registry } from "@pureform/styling";
@@ -90,6 +92,9 @@ interface RnCase {
     /** Props that give the first item `source` and disable it alone. */
     itemDisabled?(source: MutableInteractionSource): Record<string, unknown>;
     readonly drags?: boolean;
+    /** `false` for a region placed over the page (the toaster), which an app doesn't put in a
+     *  card. */
+    readonly inCard?: false;
 }
 
 const [CARD_ROOT_ENTRY, CARD_ACTION_AREA_ENTRY] = cardAnatomy.indication;
@@ -230,6 +235,23 @@ const CASES: RnCase[] = [
             supportingText: "Message archived",
             action: "Undo",
             closeLabel: "Dismiss",
+        },
+    },
+    // A toast's action and close button, as the snackbar's.
+    {
+        name: "Toast",
+        component: Toaster as never,
+        anatomy: toastAnatomy,
+        inCard: false,
+        get props() {
+            // At the top, inside the page: the case's host has no height.
+            const toaster = createToaster({ placement: "top-start" });
+            toaster.info({
+                title: "Archived",
+                duration: Infinity,
+                action: { label: "Undo", onClick: () => {} },
+            });
+            return { toaster };
         },
     },
 ];
@@ -629,31 +651,38 @@ describe.each(CASES)("$name", (rnCase) => {
 
     const [, entry] = entriesOf(rnCase)[0]!;
 
-    it("its indication prop doesn't reach it inside a card that has one", async () => {
-        const plain = await mountCase(rnCase, entry);
-        const alone = await drawn(plain.parts);
-        for (const root of roots.splice(0)) root.unmount();
-        document.body.innerHTML = "";
-        const { host, parts } = await mountCase(rnCase, entry, {
-            inCard: CUSTOM,
-        });
-        expect(host.querySelector('[data-testid="outer-root"]')).not.toBeNull();
-        // Beside the card's action area, not inside it: no control inside another.
-        const area = host.querySelector('[data-testid="outer-action-area"]');
-        expect(area).not.toBeNull();
-        expect(area!.contains(parts().surface)).toBe(false);
-        expect(area!.querySelector("button, [role=button]")).toBeNull();
-        const inside = await drawn(parts);
-        for (const state of [
-            "rest",
-            "hovered",
-            "pressed",
-            "focused",
-        ] as const) {
-            expectSame(inside[state], alone[state], state);
-        }
-        expect(inside.indicator).toBe(alone.indicator);
-    });
+    it.skipIf(rnCase.inCard === false)(
+        "its indication prop doesn't reach it inside a card that has one",
+        async () => {
+            const plain = await mountCase(rnCase, entry);
+            const alone = await drawn(plain.parts);
+            for (const root of roots.splice(0)) root.unmount();
+            document.body.innerHTML = "";
+            const { host, parts } = await mountCase(rnCase, entry, {
+                inCard: CUSTOM,
+            });
+            expect(
+                host.querySelector('[data-testid="outer-root"]'),
+            ).not.toBeNull();
+            // Beside the card's action area, not inside it: no control inside another.
+            const area = host.querySelector(
+                '[data-testid="outer-action-area"]',
+            );
+            expect(area).not.toBeNull();
+            expect(area!.contains(parts().surface)).toBe(false);
+            expect(area!.querySelector("button, [role=button]")).toBeNull();
+            const inside = await drawn(parts);
+            for (const state of [
+                "rest",
+                "hovered",
+                "pressed",
+                "focused",
+            ] as const) {
+                expectSame(inside[state], alone[state], state);
+            }
+            expect(inside.indicator).toBe(alone.indicator);
+        },
+    );
 
     describe.runIf(rnCase.source)("with a source", () => {
         it("a shared source shows a press on another component, and useInteractionState reports it", async () => {

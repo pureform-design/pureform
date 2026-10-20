@@ -18,6 +18,7 @@ import {
     select,
     slider,
     snackbar,
+    toast,
     richTooltip,
     tooltip,
     dialog,
@@ -69,6 +70,16 @@ const grouped = menu({ grouped: true, vibrant: true });
 
 // Named themes from pureform.config.ts, each applied to a subtree by `data-panda-theme`.
 const THEMES = [undefined, "teal", "sharp", "dense"] as const;
+
+const TOAST_TYPES = ["info", "success", "warning", "error", "loading"] as const;
+// Plain glyphs: the bundled Roboto draws them the same on every machine.
+const TOAST_ICONS = {
+    info: "i",
+    success: "✓",
+    warning: "!",
+    error: "×",
+    loading: "…",
+} as const;
 
 /** Every component in its variants and states, a section each (`data-section`). */
 export function Page() {
@@ -1587,6 +1598,66 @@ export function Page() {
                             </div>
                         );
                     }}
+                </For>
+            </section>
+            <section
+                data-section="toasts"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={[undefined, "teal"] as const}>
+                    {(theme) => (
+                        <div
+                            data-panda-theme={theme}
+                            style={{
+                                display: "grid",
+                                gap: "8px",
+                                "align-content": "start",
+                            }}
+                        >
+                            <For each={TOAST_TYPES}>
+                                {(type) => {
+                                    const t = toast({ type });
+                                    return (
+                                        <div class={t.group}>
+                                            <div
+                                                class={t.root}
+                                                role="status"
+                                                data-type={type}
+                                            >
+                                                <span
+                                                    class={t.icon}
+                                                    aria-hidden="true"
+                                                >
+                                                    {TOAST_ICONS[type]}
+                                                </span>
+                                                <div class={t.title}>
+                                                    {`${theme ?? "base"} ${type}`}
+                                                </div>
+                                                <div class={t.description}>
+                                                    Your changes are saved.
+                                                </div>
+                                                {type === "info" ? (
+                                                    <button
+                                                        class={t.actionTrigger}
+                                                        type="button"
+                                                    >
+                                                        Undo
+                                                    </button>
+                                                ) : null}
+                                                <button
+                                                    class={t.closeTrigger}
+                                                    type="button"
+                                                    aria-label="Dismiss"
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        </div>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    )}
                 </For>
             </section>
             <section
