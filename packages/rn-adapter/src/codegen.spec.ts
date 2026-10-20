@@ -474,7 +474,8 @@ describe("generate with the native target", () => {
 
         it(
             "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values (or an even spread through them)",
-            { timeout: 120_000 },
+            // About two minutes on its own since the list item's leading type and position.
+            { timeout: 300_000 },
             () => {
                 let count = 0;
                 for (const name of Object.keys(preset.components)) {
