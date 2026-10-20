@@ -41,8 +41,10 @@ export const toastCase: ComponentCase = {
             ],
         },
     },
-    // The empty region draws nothing; the toasts' colors are in the browser suite's screenshots.
-    themed: false,
+    // The themes suite renders a toast of each colored type.
+    themedProps: {
+        toasts: [saved, toast("warning", "Storage almost full")],
+    },
     // Its action and close button; the ready-made toaster takes no source for either, and has no
     // disabled state.
     indication: { anatomy: toastAnatomy, props: { toasts: [saved] } },
