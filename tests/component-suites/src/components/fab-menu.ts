@@ -8,7 +8,7 @@ import { userEvent } from "vitest/browser";
 
 import { overlayParts } from "./overlay";
 import type { ComponentCase, KeyCase } from "./types";
-import { itemSources } from "./types";
+import { byTestId, itemSources } from "./types";
 
 const ids = testIds.fabMenu;
 const { content, trigger, read, click, shown, overlay } = overlayParts({
@@ -23,6 +23,16 @@ const ITEMS = [
 ];
 
 const [CLOSE_TRIGGER, ITEM] = fabMenuAnatomy.indication;
+
+/** Places it as an app does, fixed at the screen's bottom end, so its list opens above it on the
+ *  page. */
+const place = (host: HTMLElement) => {
+    Object.assign(byTestId(host, ids.root).style, {
+        position: "fixed",
+        insetBlockEnd: "16px",
+        insetInlineEnd: "16px",
+    });
+};
 
 const opens: KeyCase = { key: "{ArrowDown}", does: "change" };
 
@@ -74,7 +84,7 @@ export const fabMenu: ComponentCase = {
             ],
         },
     },
-    overlay: { ...overlay(), parts: () => [] },
+    overlay: { ...overlay(), parts: () => [], place },
     // The FAB, which Tab reaches; the ready-made FAB menu takes no source for it, and it has no
     // disabled state. Its items are `fabMenuItems`.
     indication: { anatomy: { ...fabMenuAnatomy, indication: [CLOSE_TRIGGER] } },
@@ -89,6 +99,7 @@ export const fabMenuItems: ComponentCase = {
     examples: { "large, tertiary": { size: "large", color: "tertiary" } },
     indication: itemSources({ ...fabMenuAnatomy, indication: [ITEM] }, ITEMS, {
         props: { defaultOpen: true },
+        open: async (host) => place(host),
         disabled: undefined,
         focus: async (host) => {
             content(host).focus();

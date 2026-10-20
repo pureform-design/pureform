@@ -137,8 +137,10 @@ export const createFabMenu = <const G extends string = ColorGroup>(
             },
             recipe: () => ({
                 base: {
+                    // Over the page, with the list it opens.
                     root: {
                         ...INDICATION_ROOT,
+                        zIndex: zIndex("menu"),
                         position: relative,
                         display: inlineFlex,
                     },
