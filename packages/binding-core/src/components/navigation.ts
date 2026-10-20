@@ -2,7 +2,8 @@
 // props Root takes for itself, how they map onto the selection and the navigation machine, the
 // destinations the ready-made components take as data, and each destination's element props. A
 // destination is a link when it has an `href`, else a button; the current one is marked with
-// `aria-current`.
+// `aria-current`. The rail adds a header (its menu button and FAB), `expanded`, and `modal`, which
+// the bindings draw in a dialog over a scrim.
 
 import type {
     navigationBarAnatomy,
@@ -21,15 +22,37 @@ import type { VariantProp } from "./variants";
 export type NavigationComponent = "navigationBar" | "navigationRail";
 
 /** A navigation component's parts: `"root" | "item" | "indicator" | "activeIndicator" | "icon" |
- *  "label"`. The bar's and the rail's are the same. */
+ *  "label"`, and the rail's `"header"`. */
 export type NavigationPart =
     | PartName<typeof navigationBarAnatomy>
     | PartName<typeof navigationRailAnatomy>;
 
+/** A flag only the rail takes. */
+type RailFlag<C extends NavigationComponent> = C extends "navigationRail"
+    ? boolean | undefined
+    : undefined;
+
 /** A navigation component's variant groups and instance tokens. */
 export interface NavigationVariantProps<C extends NavigationComponent> {
     readonly color?: VariantProp<C, "color">;
+    /** The bar's: each label under its icon (`vertical`, the default) or beside it, inside the
+     *  pill (`horizontal`), as in medium windows. */
+    readonly itemLayout?: VariantProp<C, "itemLayout">;
+    /** The rail's: wider, each label beside its icon inside the pill. M3 Expressive's
+     *  replacement for the navigation drawer. @default modal */
+    readonly expanded?: RailFlag<C>;
+    /** The rail's: drawn over the page in a dialog, on a scrim, open while `open` is. A modal rail
+     *  is expanded unless `expanded` says otherwise. */
+    readonly modal?: RailFlag<C>;
     readonly tokens?: InstanceTokens<C> | undefined;
+}
+
+/** What a modal rail's dialog takes: whether it's open, and how it closes. */
+export interface NavigationModalProps extends Controllable<"open", boolean> {
+    /** @default true */
+    readonly closeOnEscape?: boolean | undefined;
+    /** Whether a click on the scrim closes it. @default true */
+    readonly closeOnInteractOutside?: boolean | undefined;
 }
 
 /** The ids of the elements, for composition. The machine builds each destination's id from the
@@ -57,6 +80,7 @@ export interface NavigationRootOwnProps<C extends NavigationComponent>
     extends
         NavigationVariantProps<C>,
         NavigationBehaviorProps,
+        NavigationModalProps,
         IndicationProps {
     /** A prefix for every part's test id (`main` → `main-item`), or ids by part. */
     readonly testId?: TestIdOverride<NavigationPart> | undefined;
@@ -67,6 +91,14 @@ export interface NavigationRootOwnProps<C extends NavigationComponent>
 /** The keys of `NavigationRootOwnProps`, which Root keeps off its element. */
 export const NAVIGATION_ROOT_PROPS = [
     "color",
+    "itemLayout",
+    "expanded",
+    "modal",
+    "open",
+    "defaultOpen",
+    "onOpenChange",
+    "closeOnEscape",
+    "closeOnInteractOutside",
     "tokens",
     "disabled",
     "id",
@@ -109,18 +141,66 @@ export interface NavigationItem<Node = unknown> extends NavigationItemOwnProps {
 export interface NavigationContentProps<Node> {
     /** The destinations, in order. */
     readonly items?: readonly NavigationItem<Node>[] | undefined;
+    /** The rail's header, above the destinations: a menu button and a FAB, say. The bar has
+     *  none, and ignores it. */
+    readonly header?: Node;
 }
 
 /** The keys of `NavigationContentProps`. */
 export const NAVIGATION_CONTENT_PROPS = [
     "items",
+    "header",
 ] as const satisfies readonly (keyof NavigationContentProps<unknown>)[];
 
 /** The registry selection from Root's props. */
 export const navigationSelection = <C extends NavigationComponent>(
     props: NavigationVariantProps<C>,
-): Selection<C> =>
-    ({ color: props.color, tokens: props.tokens }) as Selection<C>;
+): Selection<C> => {
+    const rail = props as unknown as NavigationVariantProps<"navigationRail">;
+    const expanded = rail.expanded ?? rail.modal;
+    return {
+        color: props.color,
+        ...(props.itemLayout === undefined
+            ? {}
+            : { itemLayout: props.itemLayout }),
+        ...(expanded === undefined ? {} : { expanded }),
+        ...(rail.modal === undefined ? {} : { modal: rail.modal }),
+        tokens: props.tokens,
+    } as unknown as Selection<C>;
+};
+
+/** Zag's dialog props for a modal rail, from Root's, besides `id`, `dir`, and the controllable
+ *  `open`. The rail's `aria-label` names the dialog too. */
+export const navigationModalMachineProps = (
+    props: NavigationModalProps & {
+        readonly "aria-label"?: string | undefined;
+    },
+) => ({
+    modal: true,
+    closeOnEscape: props.closeOnEscape,
+    closeOnInteractOutside: props.closeOnInteractOutside,
+    "aria-label": props["aria-label"],
+});
+
+/** What a modal rail's positioner adds to Zag's props: hidden while closed, and fixed along the
+ *  start edge of the viewport, the rail's full height. Normalize it with the framework's
+ *  `normalizeProps` and merge it after Zag's. */
+export const navigationModalPositionerLayout = (open: boolean) => ({
+    hidden: !open,
+    style: {
+        position: "fixed",
+        insetBlock: "0",
+        insetInlineStart: "0",
+        display: "flex",
+    } as const,
+});
+
+/** What a modal rail's dialog surface adds to Zag's props: hidden while closed, the rail's full
+ *  height. */
+export const navigationModalContentLayout = (open: boolean) => ({
+    hidden: !open,
+    style: { display: "flex", height: "100%", outline: "none" } as const,
+});
 
 /** The navigation machine's props from Root's, besides `id`, `dir`, and the controllable `value`.
  *  Root's `id` becomes the machine's root id. */
