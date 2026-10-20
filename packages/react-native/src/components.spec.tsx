@@ -413,3 +413,34 @@ describe("motion engines", () => {
         ).not.toBeNull();
     });
 });
+
+describe("text field affixes, counter and secure", () => {
+    it("renders the prefix, suffix and counter, and turns invalid past counterMax", async () => {
+        await render(
+            <TextField
+                label="Price"
+                prefixText="$"
+                suffixText=".00"
+                counterMax={2}
+                defaultValue="12"
+            />,
+        );
+        expect(byTestId("pf-text-field-prefix-text").textContent).toBe("$");
+        expect(byTestId("pf-text-field-suffix-text").textContent).toBe(".00");
+        expect(byTestId("pf-text-field-counter").textContent).toBe("2 / 2");
+        expect(byTestId("pf-text-field-supporting-row")).toBeTruthy();
+        const input = byTestId("pf-text-field-input") as HTMLInputElement;
+        expect(input.getAttribute("aria-invalid")).not.toBe("true");
+    });
+
+    it("hides a secure field's text until the trailing icon reveals it", async () => {
+        await render(<TextField label="Password" secure />);
+        const input = byTestId("pf-text-field-input") as HTMLInputElement;
+        expect(input.type).toBe("password");
+        const toggle = byTestId("pf-text-field-trailing-icon");
+        expect(toggle.getAttribute("aria-pressed")).toBe("false");
+        await interact(() => toggle.click());
+        await settle();
+        expect(input.type).toBe("text");
+    });
+});

@@ -9,6 +9,7 @@ import {
     textFieldSelection,
 } from "@pureform/binding-core";
 import type {
+    TextFieldAffixProps,
     TextFieldContentProps,
     TextFieldRootOwnProps,
 } from "@pureform/binding-core";
@@ -66,10 +67,13 @@ export interface TextFieldProps
             | "children"
             | "leadingIcon"
             | "trailingIcon"
+            | "prefixText"
+            | "suffixText"
             | keyof InputAttributes
         >,
         SlotKeyedProps<Anatomy>,
         TextFieldContentProps<JSX.Element>,
+        TextFieldAffixProps<JSX.Element>,
         InputAttributes {}
 
 const { ReadyMade, parts } = createTextInput({
@@ -79,11 +83,15 @@ const { ReadyMade, parts } = createTextInput({
     rootProps: TEXT_FIELD_ROOT_PROPS,
     inputProps: [...TEXT_FIELD_INPUT_PROPS, ...SOLID_INPUT_PROPS],
     selection: textFieldSelection,
+    affixes: true,
 });
 
 /** Material's text field. Use it ready-made, `<TextField label="Email" name="email" />`, or
- *  compose its parts under `TextField.Root`: `Container` holding `LeadingIcon`, `Input`, `Label`,
- *  and `TrailingIcon`, then `SupportingText`. */
+ *  compose its parts under `TextField.Root`: `Container` holding `LeadingIcon`, `PrefixText`,
+ *  `Input`, `SuffixText`, `Label`, and `TrailingIcon`, then `SupportingText`, or a
+ *  `SupportingRow` holding `SupportingText` and `Counter`. `prefixText`, `suffixText` and
+ *  `counterMax` add the affixes and the counter; `secure` makes it a password field whose
+ *  trailing icon shows or hides the text. */
 export const TextField = Object.assign(
     ReadyMade as (props: TextFieldProps) => JSX.Element,
     parts as Omit<typeof parts, "Root"> & {

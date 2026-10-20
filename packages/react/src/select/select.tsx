@@ -244,6 +244,17 @@ function LeadingIcon({
     });
 }
 
+const affix = (part: "prefixText" | "suffixText", name: string) =>
+    function Affix({ unstyled, ...props }: SelectPartProps): ReactNode {
+        const { scope } = context.use(name);
+        return scope.render(part, { element: "span", unstyled, props });
+    };
+
+/** Text before the value, shown once the label floats. Turn on Root's `prefixText` with it. */
+const PrefixText = affix("prefixText", "PrefixText");
+/** Text after the value, shown once the label floats. Turn on Root's `suffixText` with it. */
+const SuffixText = affix("suffixText", "SuffixText");
+
 /** The arrow at the end, which turns over while the list is open. */
 function TrailingIcon({
     unstyled,
@@ -387,7 +398,11 @@ export interface SelectProps
     extends
         Omit<
             SelectRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "leadingIcon"
+            | keyof SlotKeyedProps<Anatomy>
+            | "children"
+            | "leadingIcon"
+            | "prefixText"
+            | "suffixText"
         >,
         SlotKeyedProps<Anatomy>,
         SelectContentProps<ReactNode> {}
@@ -406,6 +421,11 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
                         {own.leadingIcon}
                     </LeadingIcon>
                 ) : null}
+                {isPresent(own.prefixText) ? (
+                    <PrefixText {...slot("prefixText")}>
+                        {own.prefixText}
+                    </PrefixText>
+                ) : null}
                 <Input
                     aria-label={own["aria-label"]}
                     aria-labelledby={own["aria-labelledby"]}
@@ -415,6 +435,11 @@ function ReadyMadeContent({ own }: { readonly own: SelectProps }): ReactNode {
                     }
                     {...slot("input")}
                 />
+                {isPresent(own.suffixText) ? (
+                    <SuffixText {...slot("suffixText")}>
+                        {own.suffixText}
+                    </SuffixText>
+                ) : null}
                 <Label {...slot("label")}>{own.label}</Label>
                 <TrailingIcon {...slot("trailingIcon")}>
                     {isPresent(own.trailingIcon) ? (
@@ -458,12 +483,16 @@ function ReadyMade(props: SelectProps): ReactNode {
         supportingText: _supportingText,
         leadingIcon,
         trailingIcon: _trailingIcon,
+        prefixText,
+        suffixText,
         ...rootProps
     } = props;
     return (
         <Root
             {...rootProps}
             leadingIcon={isPresent(leadingIcon) || undefined}
+            prefixText={isPresent(prefixText) || undefined}
+            suffixText={isPresent(suffixText) || undefined}
             // The root's slot props are an element's, whose `defaultValue` takes more types.
             {...(slot("root") as object)}
         >
@@ -474,13 +503,15 @@ function ReadyMade(props: SelectProps): ReactNode {
 
 /** Material's select. Use it ready-made, `<Select label="Size" name="size" items={[{ value: "s",
  *  label: "Small" }, …]} />`, or compose its parts under `Select.Root`: `Container` holding
- *  `LeadingIcon`, `Input`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
+ *  `LeadingIcon`, `PrefixText`, `Input`, `SuffixText`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
  *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option. */
 export const Select = Object.assign(ReadyMade, {
     Root,
     Container,
     LeadingIcon,
+    PrefixText,
     Input,
+    SuffixText,
     Label,
     TrailingIcon,
     SupportingText,
