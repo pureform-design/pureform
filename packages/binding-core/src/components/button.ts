@@ -30,6 +30,9 @@ export interface ButtonVariantProps {
         "secondaryIconPosition"
     >;
     readonly density?: VariantProp<"button", "density">;
+    /** Its place in a button group: `single` in a standard group (it widens while pressed),
+     *  `first`, `middle` or `last` in a connected one (its inner corners square off). */
+    readonly position?: VariantProp<"button", "position">;
     readonly tokens?: InstanceTokens<"button"> | undefined;
 }
 
@@ -74,6 +77,7 @@ export const BUTTON_ROOT_PROPS = [
     "corner",
     "secondaryIconPosition",
     "density",
+    "position",
     "tokens",
     "disabled",
     "type",
@@ -109,6 +113,7 @@ export const buttonSelection = (
     corner: props.corner,
     secondaryIconPosition: props.secondaryIconPosition,
     density: props.density,
+    position: props.position,
     // Only when on: off is the variant's default, and leaving it out keeps a plain button's
     // classes as they were.
     toggle: isToggle(props) || undefined,
