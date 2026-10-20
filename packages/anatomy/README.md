@@ -201,6 +201,15 @@ the preset's `root` slot) holding `header` (with `closeTrigger`, `headline` and 
 `body`. Unlike the basic dialog's, its `closeTrigger` is a styled slot. Test ids are in
 `compositeTestIds.fullscreenDialog`.
 
+**The sheets** (`bottomSheetOverlayAnatomy`, `sideSheetOverlayAnatomy`) are the same shape:
+unstyled `root`, `trigger` and `positioner`, then the surface (`content`, the preset's `root` slot).
+The preset's own `content` slot is the `body` part (`slot: "content"`), so the surface can keep the
+overlay's name. The bottom sheet's surface holds `dragHandle` and `body`; the side sheet's holds
+`header` (`backButton`, `headline`, `closeTrigger`), `body` and `actions`. A modal sheet's backdrop
+is `bottomSheetBackdropAnatomy` or `sideSheetBackdropAnatomy` (the scrim under the sheet's scope).
+Test ids are in `compositeTestIds.bottomSheet`, `.bottomSheetBackdrop`, `.sideSheet` and
+`.sideSheetBackdrop`.
+
 **The tabs** (`tabsCompositeAnatomy`) are the same idea: an unstyled `root` (`pf-tabs-root`, Zag's
 root) around the tab list and the panels. The preset's `root` slot is the tab list, so its part
 is `list` (`data-pf-part="list"`, `pf-tabs-list`, `slot: "root"`), holding `tab`, `tabContent`
