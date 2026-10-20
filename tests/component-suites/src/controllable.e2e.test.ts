@@ -3,7 +3,8 @@
 // callback fires once per user action and never for a prop change; the default is read once; and
 // switching between the two warns.
 
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { commands } from "vitest/browser";
 
 import { harness } from "#binding";
 
@@ -22,6 +23,16 @@ describe.each(stateful)("$component", (component) => {
     const names = stateNames(state.prop);
     const mount = (props: Record<string, unknown>) =>
         mountCase(component, { ...state.props, ...props });
+
+    // The pointer stays wherever an earlier test left it. Resting where a trigger renders, it
+    // would open (or keep open) a tooltip with no delay, so it waits in the viewport's far corner.
+    beforeEach(async () => {
+        await commands.mouse(
+            "move",
+            window.innerWidth - 1,
+            window.innerHeight - 1,
+        );
+    });
 
     it("uncontrolled: changes on its own and reports the change once", async () => {
         const onChange = vi.fn();
