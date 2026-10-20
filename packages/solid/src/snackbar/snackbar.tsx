@@ -29,6 +29,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { CloseIcon } from "../glyphs";
 import {
     useInteractionHandlers,
     useOwnInteractionSource,
@@ -158,19 +159,6 @@ const Action = snackbarButton("action", "Action");
 
 /** The close button, an icon button: name it with `aria-label`. */
 const Close = snackbarButton("close", "Close");
-
-/** The cross the ready-made close button shows unless given another icon. */
-const CloseIcon = (): JSX.Element => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-    </svg>
-);
 
 /** The ready-made snackbar's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
  *  and the message, action, and close button as content. */

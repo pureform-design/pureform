@@ -26,6 +26,7 @@ import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled } from "../form";
+import { CloseIcon } from "../glyphs";
 import {
     useInteractionHandlers,
     useItemInteractionSources,
@@ -320,19 +321,6 @@ function ChipRemove({
     });
 }
 
-/** The cross the ready-made chips' remove buttons show unless given another icon. */
-const RemoveIcon = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-    </svg>
-);
-
 /** The ready-made tags input's props: Root's, with `className`, `style`, and `slotProps` keyed by
  *  part, and the label, supporting text, icons, and chips' content. */
 export interface TagsInputProps
@@ -383,7 +371,7 @@ function ReadyMadeContent({
                                 {isPresent(own.removeIcon) ? (
                                     own.removeIcon
                                 ) : (
-                                    <RemoveIcon />
+                                    <CloseIcon />
                                 )}
                             </ChipRemove>
                         </Chip>
