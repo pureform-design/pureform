@@ -2433,6 +2433,13 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "labelLarge",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
+    "actions": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "gap": "var(--components-snackbar-gap, token(spacing.2))",
+    },
     "close": {
       "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
@@ -2506,17 +2513,44 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
   },
   "className": "snackbar",
   "compoundVariants": [],
-  "defaultVariants": {},
+  "defaultVariants": {
+    "layout": "oneLine",
+  },
   "jsx": [
     "Snackbar",
   ],
   "slots": [
     "root",
     "supportingText",
+    "actions",
     "action",
     "close",
   ],
-  "variants": {},
+  "variants": {
+    "layout": {
+      "longAction": {
+        "actions": {
+          "justifyContent": "end",
+        },
+        "root": {
+          "alignItems": "stretch",
+          "flexDirection": "column",
+          "gap": "0px",
+          "paddingBlockEnd": "token(spacing.2)",
+          "paddingInlineEnd": "var(--components-snackbar-paddingInline, token(spacing.4))",
+        },
+        "supportingText": {
+          "paddingBlockEnd": "token(spacing.1)",
+        },
+      },
+      "oneLine": {},
+      "twoLine": {
+        "root": {
+          "minHeight": "var(--components-snackbar-twoLineMinHeight, 68px)",
+        },
+      },
+    },
+  },
 }
 `;
 

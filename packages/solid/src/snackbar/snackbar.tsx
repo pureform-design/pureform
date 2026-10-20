@@ -114,6 +114,18 @@ function SupportingText(props: SnackbarPartProps): JSX.Element {
     });
 }
 
+/** The wrapper of the action and the close button, which `layout="longAction"` moves below the
+ *  text. */
+function Actions(props: SnackbarPartProps): JSX.Element {
+    const { scope, api } = context.use("Actions");
+    return scope.render("actions", {
+        element: "span",
+        machine: () => api().getActionsProps(),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
 /** A button's props: a part's, and the interaction source its presses are emitted to. */
 export interface SnackbarButtonProps
     extends SnackbarPartProps, InteractionSourceProps {}
@@ -182,6 +194,7 @@ function ReadyMade(props: SnackbarProps): JSX.Element {
     const own = omit(props, ...READY_MADE_PROPS) as SnackbarRootProps;
     const root = slots("root") as object;
     const supportingText = slots("supportingText");
+    const actions = slots("actions");
     const action = slots("action");
     const close = slots("close");
     return (
@@ -189,17 +202,21 @@ function ReadyMade(props: SnackbarProps): JSX.Element {
             <SupportingText {...supportingText}>
                 {props.supportingText}
             </SupportingText>
-            <Show when={isPresent(props.action)}>
-                <Action {...action}>{props.action}</Action>
-            </Show>
-            <Show when={props.closeLabel}>
-                <Close aria-label={props.closeLabel} {...close}>
-                    {isPresent(props.closeIcon) ? (
-                        props.closeIcon
-                    ) : (
-                        <CloseIcon />
-                    )}
-                </Close>
+            <Show when={isPresent(props.action) || props.closeLabel}>
+                <Actions {...actions}>
+                    <Show when={isPresent(props.action)}>
+                        <Action {...action}>{props.action}</Action>
+                    </Show>
+                    <Show when={props.closeLabel}>
+                        <Close aria-label={props.closeLabel} {...close}>
+                            {isPresent(props.closeIcon) ? (
+                                props.closeIcon
+                            ) : (
+                                <CloseIcon />
+                            )}
+                        </Close>
+                    </Show>
+                </Actions>
             </Show>
         </Root>
     );
@@ -207,10 +224,11 @@ function ReadyMade(props: SnackbarProps): JSX.Element {
 
 /** Material's snackbar. Use it ready-made, `<Snackbar open={saved()} onOpenChange={…}
  *  supportingText="Message archived" action="Undo" closeLabel="Dismiss" />`, or compose its parts
- *  under `Snackbar.Root`: `SupportingText`, `Action`, and `Close`. */
+ *  under `Snackbar.Root`: `SupportingText`, `Actions`, `Action`, and `Close`. */
 export const Snackbar = Object.assign(ReadyMade, {
     Root,
     SupportingText,
+    Actions,
     Action,
     Close,
 });
