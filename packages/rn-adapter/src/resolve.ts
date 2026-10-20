@@ -96,7 +96,11 @@ export const themeTemplates = (templates: Templates): Value[] => {
 
 const cache = new WeakMap<
     Styles,
-    { templates: Value[]; sets: Map<string, Resolved> }
+    {
+        templates: Value[];
+        paths: Record<string, ValuePath[]>;
+        sets: Map<string, Resolved>;
+    }
 >();
 
 /** Overrides for both schemes, or for each: a brand color generated for light and dark has
@@ -135,6 +139,16 @@ export const overridesFor = (
     return out ?? values;
 };
 
+// Values over a theme's, read through to it.
+const over = (theme: ThemeValues, values: ThemeValues): ThemeValues =>
+    Object.assign(Object.create(theme) as ThemeValues, values);
+
+// Each theme's formulas with the tokens they read, worked out once.
+const formulaReads = new WeakMap<
+    Record<string, Value>,
+    (readonly [string, Value, string[]])[]
+>();
+
 /** Overrides with the tokens derived from them recomputed: a token whose formula reads an
  *  overridden one, directly or through others, takes its new value. One given outright stays
  *  as given. */
@@ -145,13 +159,17 @@ export const withDerived = (
 ): ThemeValues => {
     const formulas = styles.formulas?.[key];
     if (!formulas || Object.keys(overrides).length === 0) return overrides;
-    const theme: ThemeValues = { ...styles.themes[key], ...overrides };
+    const theme = over(styles.themes[key] ?? {}, overrides);
     const out: ThemeValues = { ...overrides };
     const changed = new Set(Object.keys(overrides));
-    const reads = Object.entries(formulas).map(
-        ([token, formula]) =>
-            [token, formula, [...dependencies(formula)]] as const,
-    );
+    let reads = formulaReads.get(formulas);
+    if (!reads) {
+        reads = Object.entries(formulas).map(
+            ([token, formula]) =>
+                [token, formula, [...dependencies(formula)]] as const,
+        );
+        formulaReads.set(formulas, reads);
+    }
     // Formulas are few and shallow, so a pass until nothing changes is enough.
     for (let again = true; again;) {
         again = false;
@@ -178,31 +196,95 @@ export const stylesFor = (
     const overrides = withDerived(styles, key, given);
     const base = styles.themes[key];
     if (!base) throw new Error(`no styles for theme "${key}"`);
-    const theme = { ...base, ...overrides };
-    if (styles.mode === "runtime") return resolve(styles.templates, theme);
+    // Over the theme, not a copy of it: themes hold thousands of tokens.
+    const theme = over(base, overrides);
+    if (styles.mode === "runtime")
+        return lazily(
+            styles.templates,
+            (name) =>
+                resolve({ [name]: styles.templates[name]! }, theme)[name]!,
+        );
     let cached = cache.get(styles);
     if (!cached) {
-        cached = {
-            templates: themeTemplates(styles.templates),
-            sets: new Map(),
-        };
+        const templates: Value[] = [];
+        const paths: Record<string, ValuePath[]> = {};
+        for (const name of Object.keys(styles.templates)) {
+            const own: ValuePath[] = (paths[name] = []);
+            mapValues({ [name]: styles.templates[name]! }, (value, at) => {
+                if (readsTheme(value)) {
+                    own.push([templates.length, at[1], at[2], at[3]]);
+                    templates.push(value);
+                }
+                return value;
+            });
+        }
+        cached = { templates, paths, sets: new Map() };
         cache.set(styles, cached);
     }
+    const { templates, paths } = cached;
+    const values = styles.values[key]!;
     const affected = new Set(
         Object.keys(overrides).flatMap((k) => styles.dependents[k] ?? []),
     );
-    if (affected.size === 0 && cached.sets.has(key))
-        return cached.sets.get(key)!;
-    const values = [...styles.values[key]!];
-    for (const index of affected) {
-        values[index] = evaluate(cached.templates[index]!, theme);
+    if (affected.size === 0) {
+        let set = cached.sets.get(key);
+        if (!set) {
+            set = lazily(styles.templates, (name) => {
+                const own = paths[name]!;
+                let i = 0;
+                return mapValues(
+                    { [name]: styles.templates[name]! },
+                    (value) =>
+                        readsTheme(value) ? values[own[i++]![0]]! : value,
+                )[name]!;
+            });
+            cached.sets.set(key, set);
+        }
+        return set;
     }
-    let i = 0;
-    const set = mapValues(styles.templates, (value) =>
-        readsTheme(value) ? values[i++]! : value,
-    );
-    if (affected.size === 0) cached.sets.set(key, set);
-    return set;
+    // Over the theme's own styles, a copy of only the rules holding a value that reads an
+    // overridden token.
+    const plain = stylesFor(styles, key);
+    return lazily(styles.templates, (name) => {
+        const changed = paths[name]!.filter(([index]) => affected.has(index));
+        const component = plain[name]!;
+        if (changed.length === 0) return component;
+        const entries = [...component.entries];
+        const copied = new Set<string>();
+        for (const [index, e, r, property] of changed) {
+            if (!copied.has(`${e}`)) {
+                copied.add(`${e}`);
+                entries[e] = { ...entries[e]!, rules: [...entries[e]!.rules] };
+            }
+            const rules = entries[e]!.rules;
+            if (!copied.has(`${e}:${r}`)) {
+                copied.add(`${e}:${r}`);
+                rules[r] = { ...rules[r]!, style: { ...rules[r]!.style } };
+            }
+            rules[r]!.style[property] = evaluate(templates[index]!, theme);
+        }
+        return { ...component, entries };
+    });
+};
+
+// A value that reads the theme: its position among them, and its entry, rule, and property.
+type ValuePath = readonly [number, number, number, string];
+
+// Each component resolved when it's first read: a set of overrides is resolved for one
+// component at a time, so its cost doesn't grow with the preset.
+const lazily = (
+    templates: Templates,
+    build: (name: string) => ComponentStyles<Value>,
+): Resolved => {
+    const resolved: Resolved = {};
+    for (const name of Object.keys(templates)) {
+        let built: ComponentStyles<Value> | undefined;
+        Object.defineProperty(resolved, name, {
+            enumerable: true,
+            get: () => (built ??= build(name)),
+        });
+    }
+    return resolved;
 };
 
 const withOverrides = new WeakMap<Styles, Map<string, Resolved>>();
