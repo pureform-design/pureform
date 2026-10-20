@@ -74,8 +74,11 @@ describe("Toaster, ready-made", () => {
         await settle();
         await userEvent.click(byTestId(ids.actionTrigger));
         expect(onClick).toHaveBeenCalledOnce();
+        // Closing, or already gone once its exit is over.
         await vi.waitFor(() =>
-            expect(byTestId(ids.root).dataset.state).toBe("closed"),
+            expect(
+                all(ids.root).every((root) => root.dataset.state === "closed"),
+            ).toBe(true),
         );
     });
 
