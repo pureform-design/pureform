@@ -21,14 +21,7 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import type { Position } from "./list";
-import {
-    positionCorners,
-    POSITIONS,
-    rowParts,
-    rowTokens,
-    TILE_RADII,
-} from "./list";
+import { rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -42,6 +35,8 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
+import type { Position } from "./tiles";
+import { positionCorners, POSITIONS, TILE_RADII } from "./tiles";
 
 const pf = typed();
 

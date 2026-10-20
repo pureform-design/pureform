@@ -93,19 +93,25 @@ export const listSelection = (
     tokens: props.listTokens,
 });
 
+/** A tile's place in a run of separate tiles (a segmented list's items, a menu's groups, a
+ *  connected button group), by its `index` among `count`: the preset's `position` variant
+ *  rounds its corners by it. */
+export type TilePosition = "first" | "middle" | "last" | "single";
+
+/** Where the tile at `index` sits among `count` tiles. */
+export const tilePosition = (index: number, count: number): TilePosition =>
+    count === 1
+        ? "single"
+        : index === 0
+          ? "first"
+          : index === count - 1
+            ? "last"
+            : "middle";
+
 /** Where an item sits among `count` tiles, by its `index`: its corners follow. Outside a
  *  segmented list, `none`. */
 export const listItemPosition = (
     index: number,
     count: number,
     segmented: boolean,
-): "none" | "first" | "middle" | "last" | "single" =>
-    !segmented
-        ? "none"
-        : count === 1
-          ? "single"
-          : index === 0
-            ? "first"
-            : index === count - 1
-              ? "last"
-              : "middle";
+): "none" | TilePosition => (segmented ? tilePosition(index, count) : "none");
