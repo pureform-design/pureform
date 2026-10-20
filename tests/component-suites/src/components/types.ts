@@ -164,6 +164,9 @@ export interface ComponentCase {
     /** `false` for a component that draws no color from the scheme (text, a touch target), which
      *  a theme that only recolors can't change: the themes suite skips "draws differently". */
     readonly themed?: false | undefined;
+    /** Props the themes suite renders it with, over the component's, when its own render nothing
+     *  the theme colors until the browser runs (a toaster, whose toasts come in on the client). */
+    readonly themedProps?: SceneProps | undefined;
     /** Where it shows indication, for an interactive component (an anatomy with `indication`
      *  entries). */
     readonly indication?: IndicationCase | undefined;

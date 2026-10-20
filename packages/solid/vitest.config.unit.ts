@@ -23,6 +23,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/select",
             "@zag-js/menu",
             "@zag-js/dialog",
+            "@zag-js/toast",
             "@zag-js/tooltip",
             "@zag-js/switch",
             "@zag-js/tabs",

@@ -184,6 +184,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 | `Dialog`                          | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`)                                 | Zag's dialog (`@pureform/machines/dialog`)                               |
 | `FullscreenDialog`                | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Header`, `Body` (`div`), `CloseTrigger` (`button`, or `as`), `Headline` (`h2`), `ConfirmAction` (`button`, or `as={Button}`)                                              | Zag's dialog (`@pureform/machines/dialog`)                               |
 | `Snackbar`                        | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Actions` (`span`, wraps the buttons), `Action`, `Close` (`button`); `layout`: `oneLine`, `twoLine`, `longAction`                                                                                                                                    | `@pureform/machines/snackbar`                                            |
+| `Toast`                           | `Group` (`div`, the region; children render each toast), `Root` (`div`, `role="status"`), `Icon` (`span`), `Title`, `Description` (`div`), `ActionTrigger`, `CloseTrigger` (`button`); `Toaster` is the ready-made                                                                                               | Zag's toast (`@pureform/machines/toast`)                                 |
 | `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`, around its content, a `span` it renders), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                                                 | Zag's tabs (`@pureform/machines/tabs`)                                   |
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                                                             | `@pureform/machines/navigation`                                          |
 | `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                                                | none                                                                     |
@@ -303,6 +304,20 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   only when given), `closeLabel` (the close button's name; it renders only when given), and
   `closeIcon` (a cross unless given). Placing it is the app's. `class`, `style`, and `slotProps` are
   keyed by part on every ready-made.
+- **The snackbar queue:** `createSnackbarQueue()` gives `show(options)` (an id) and `dismiss(id?)`;
+  `<SnackbarHost queue={queue} offset="80px" />` shows its snackbars one at a time, centered at
+  the bottom above `offset` (a navigation bar's or a FAB's room). Each takes the ready-made's props
+  (`layout` too) and `duration`, `onAction`, `onOpenChange`; the next shows once the one before has
+  faded out (`Snackbar.Root`'s `onExitComplete`). Import them from `@pureform/solid/snackbar`.
+- **The toast** (outside Material 3): `const toaster = createToaster({ placement: "bottom-end" })`
+  is Zag's toast store; `<Toaster toaster={toaster} closeLabel="Dismiss" />` shows its toasts, and
+  `toaster.success({ title, description, action: { label, onClick } })` (`info`, `warning`,
+  `error`, `loading`, `create`, `promise`, `dismiss`) adds one. Each shows its type's icon in the
+  type's color (the theme's `success`, `warning`, `error` and `info` groups), its title and
+  description, an action, and a close button unless `closable: false`. Zag times, pauses (hover,
+  focus) and stacks them; the region sits at the theme's snackbar layer. Compose with
+  `Toast.Group` (children: `(toast, index) => …`) and `Toast.Root` and its parts. Import from
+  `@pureform/solid/toast`.
 - **The tabs** are an unstyled `Root` (Zag's root, `pf-tabs-root`) around the tab list (`List`,
   `data-pf-part="list"`, drawn by the tabs' `root` slot) and the panels (`Content`, unstyled, one
   per tab, `hidden` while its tab isn't selected). Only the selected tab takes focus from Tab; the

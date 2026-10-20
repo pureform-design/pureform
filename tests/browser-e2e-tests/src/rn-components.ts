@@ -38,6 +38,7 @@ export const RN_COMPONENTS = [
     "dialog",
     "fullscreenDialog",
     "snackbar",
+    "toast",
     "tooltip",
     "richTooltip",
 ];

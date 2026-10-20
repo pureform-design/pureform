@@ -94,7 +94,10 @@ describe("indication", () => {
     )(
         "%s sets its indication tokens back to the theme's on its root",
         (_, spec) => {
-            const root = spec.recipe.base.root as { tokens?: object };
+            // The outermost slot: the root, or the toast's group.
+            const root = spec.recipe.base[spec.slots[0]!] as {
+                tokens?: object;
+            };
             expect(root.tokens).toMatchObject(
                 Object.fromEntries(
                     Object.entries(INDICATION_TOKENS).map(([token, value]) => [

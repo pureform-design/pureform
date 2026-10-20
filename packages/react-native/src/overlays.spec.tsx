@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { View } from "react-native";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { PureformProvider, placeOverlay } from ".";
@@ -25,6 +25,7 @@ import {
     pointerAway,
     settle,
 } from "./testing/render";
+import { createToaster, Toaster } from "./toast";
 import { LONG_PRESS_TOOLTIP_MS, Tooltip } from "./tooltip";
 
 let registry: TestRegistry;
@@ -35,6 +36,7 @@ beforeAll(async () => {
         "button",
         "iconButton",
         "snackbar",
+        "toast",
         "tooltip",
         "richTooltip",
         "dialog",
@@ -342,8 +344,83 @@ describe.each([animated, reanimated])(
                 "rgb(18, 52, 86)",
             );
         });
+
+        it("sits above its offset, and takes its layout", async () => {
+            await render(<Grab />, engine);
+            await interact(() => {
+                snackbars.show({
+                    supportingText: "Raised",
+                    duration: null,
+                    offset: 80,
+                    layout: "longAction",
+                });
+            });
+            await settle(100);
+            expect(
+                window.innerHeight - box(roots()[0]!).bottom,
+            ).toBeGreaterThanOrEqual(96);
+            expect(getComputedStyle(roots()[0]!).flexDirection).toBe("column");
+            await interact(() => snackbars.dismiss());
+            await until(() => roots().length === 0);
+        });
     },
 );
+
+describe.each([animated, reanimated])("the toaster with $name", (engine) => {
+    const roots = () => [
+        ...document.querySelectorAll<HTMLElement>(
+            '[data-testid="pf-toast-root"]',
+        ),
+    ];
+
+    it("shows several at once, each with its type's icon, and closes each after its duration", async () => {
+        const toaster = createToaster({ placement: "bottom-end" });
+        await render(<Toaster toaster={toaster} />, engine);
+        await interact(() => {
+            toaster.success({ title: "Saved", duration: 300 });
+            toaster.error({ title: "Failed", description: "Try again." });
+        });
+        await settle(100);
+        expect(roots().map((root) => root.textContent)).toEqual([
+            expect.stringContaining("Failed"),
+            expect.stringContaining("Saved"),
+        ]);
+        expect(roots()[0]!.getAttribute("role")).toBe("status");
+        await until(() => roots().length === 1, 2000);
+        expect(roots().map((root) => root.textContent)).toEqual([
+            expect.stringContaining("Failed"),
+        ]);
+        await interact(() => toaster.dismiss());
+        await until(() => roots().length === 0, 2000);
+        expect(roots()).toEqual([]);
+    });
+
+    it("runs the action, then closes; a loading toast stays", async () => {
+        const toaster = createToaster();
+        const onClick = vi.fn();
+        await render(<Toaster toaster={toaster} closeLabel="Close" />, engine);
+        await interact(() => {
+            toaster.loading({ title: "Uploading", duration: 100 });
+            toaster.info({
+                title: "Archived",
+                duration: Infinity,
+                action: { label: "Undo", onClick },
+            });
+        });
+        await settle(100);
+        expect(document.querySelector('[aria-label="Close"]')).not.toBeNull();
+        const action = document.querySelector<HTMLElement>(
+            '[data-testid="pf-toast-action-trigger"]',
+        )!;
+        await interact(() => action.click());
+        expect(onClick).toHaveBeenCalledOnce();
+        await until(() => roots().length === 1, 2000);
+        await settle(300);
+        expect(roots().map((root) => root.textContent)).toEqual([
+            expect.stringContaining("Uploading"),
+        ]);
+    });
+});
 
 // A pointer press on an element, held until `release` is called.
 const hold = async (element: HTMLElement) => {

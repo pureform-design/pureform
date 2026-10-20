@@ -22,6 +22,7 @@ import * as snackbar from "@pureform/machines/snackbar";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createEffect,
     createMemo,
     createUniqueId,
     omit,
@@ -84,6 +85,18 @@ function Root(props: SnackbarRootProps): JSX.Element {
     }));
     const api = createMemo(() => snackbar.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
+    // Once it has shown and gone again, its exit is over.
+    let shown = false;
+    createEffect(
+        () => presence.present(),
+        (present) => {
+            if (present) shown = true;
+            else if (shown) {
+                shown = false;
+                props.onExitComplete?.();
+            }
+        },
+    );
     const scope = useComponent(snackbarAnatomy, {
         selection: () => snackbarSelection(props),
         testId: () => props.testId,

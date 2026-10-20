@@ -72,6 +72,7 @@ import {
 } from "./components/progress";
 import { createRadio } from "./components/radio";
 import { richTooltip } from "./components/rich-tooltip";
+import { toast } from "./components/toast";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
@@ -305,6 +306,7 @@ const defaultComponents = <G extends string>(
         dialog,
         fullscreenDialog,
         snackbar,
+        toast,
         tooltip,
         richTooltip,
         card,
