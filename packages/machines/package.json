@@ -152,6 +152,7 @@
         "@zag-js/utils": "catalog:"
     },
     "devDependencies": {
+        "@pureform/anatomy": "catalog:",
         "@pureform/tsconfig": "catalog:",
         "@pureform/vite-config": "catalog:",
         "@pureform/vitest-config": "catalog:",
