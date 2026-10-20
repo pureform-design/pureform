@@ -45,8 +45,11 @@ const STATE = [
 ];
 
 describe("selection under reduced motion", () => {
-    it("keeps the state colors and elevation", () => {
-        expect(properties("button", "root", false)).toEqual(STATE);
+    it("keeps the state colors and elevation, and drops the corner morph", () => {
+        expect(properties("button", "root", false)).toEqual([
+            ...STATE,
+            "borderRadius",
+        ]);
         expect(properties("button", "root", true)).toEqual(STATE);
     });
 

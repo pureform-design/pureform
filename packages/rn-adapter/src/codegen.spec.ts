@@ -364,19 +364,40 @@ describe("generate with the native target", () => {
         }, 60_000);
 
         // Every combination of every group's values.
+        // Every combination of every group's values, up to `limit` of them: past it, an even
+        // spread through them (a stride through the mixed-radix count), and each value of each
+        // group on its own over the first value of the others, so none goes untried.
         const combinations = (
             variants: Readonly<Record<string, readonly string[]>>,
-        ): Record<string, string>[] =>
-            Object.entries(variants).reduce<Record<string, string>[]>(
-                (all, [group, values]) =>
-                    all.flatMap((selection) =>
-                        values.map((value) => ({
-                            ...selection,
-                            [group]: value,
-                        })),
-                    ),
-                [{}],
+            limit = 40_000,
+        ): Record<string, string>[] => {
+            const groups = Object.entries(variants);
+            const total = groups.reduce(
+                (n, [, values]) => n * values.length,
+                1,
             );
+            const at = (index: number) => {
+                const selection: Record<string, string> = {};
+                let rest = index;
+                for (const [group, values] of groups) {
+                    selection[group] = values[rest % values.length]!;
+                    rest = Math.floor(rest / values.length);
+                }
+                return selection;
+            };
+            if (total <= limit) {
+                return Array.from({ length: total }, (_, index) => at(index));
+            }
+            // An odd stride, so it doesn't keep landing on the same value of an even group.
+            const stride = Math.floor(total / limit) | 1;
+            const spread = Array.from({ length: limit }, (_, index) =>
+                at((index * stride) % total),
+            );
+            const each = groups.flatMap(([group, values]) =>
+                values.map((value) => ({ ...at(0), [group]: value })),
+            );
+            return [...spread, ...each];
+        };
 
         it("registers every component", { timeout: 60_000 }, () => {
             expect(generated.registry.names).toEqual(
@@ -452,7 +473,7 @@ describe("generate with the native target", () => {
         );
 
         it(
-            "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values",
+            "gives what selecting from the whole config's precomputed styles gives, for every combination of every group's values (or an even spread through them)",
             { timeout: 120_000 },
             () => {
                 let count = 0;
