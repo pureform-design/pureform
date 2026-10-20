@@ -68,6 +68,13 @@
                 "default": "./dist/dialog.mjs"
             }
         },
+        "./fullscreen-dialog": {
+            "types": "./dist/fullscreen-dialog/index.d.ts",
+            "import": {
+                "development": "./src/fullscreen-dialog/index.ts",
+                "default": "./dist/fullscreen-dialog.mjs"
+            }
+        },
         "./tooltip": {
             "types": "./dist/tooltip/index.d.ts",
             "import": {
