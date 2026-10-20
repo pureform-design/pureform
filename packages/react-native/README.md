@@ -55,7 +55,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
 | `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share                                                                                     |
 | `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                     |
-| `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`               | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`)                        |
+| `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`)                        |
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                         |
 
 ```
@@ -349,6 +349,16 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       `boxShadow` of an elevated card survives the clip on iOS and Android hasn't been checked on a
       device;
     - no `class`, `style`, or `slotProps` per part (React Native's components take none).
+- **Lists:** `List` renders a `ListItem` per entry of `items`, each in an `item` view, and gives
+  them its `density`, `color`, `tokens`, and `leadingType` (`icon`, `avatar`, `thumbnail`,
+  `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each
+  item rounded by its `position` (`first`, `middle`, `last`, `single`), which a `ListItem` outside
+  a `List` can take too. An item's `href` isn't followed; give it `onPress`.
+- **Menu items** take `supportingText`, a line under the label, and a `type` (`checkbox` or
+  `radio`) with `checked` and `onCheckedChange`: a toggleable item fills while checked. `groups`
+  render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles
+  (`grouped`) unless told otherwise; `vibrant` takes the tertiary colors. A select's items with a
+  `group` sit together under its label, in the order each group first appears.
 - **Long lists:** each interactive `ListItem` takes about 0.4 to 0.5 ms to mount in development
   (its source, indication, and selection), so render long lists with `FlatList`, which mounts only
   the rows near the screen. Key rows by their value, not their index, memoize the row, and keep

@@ -6,6 +6,7 @@ import { selectAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     isPresent,
+    selectItemGroups,
     selectMenuSelection,
     selectSelection,
 } from "@pureform/binding-core";
@@ -16,7 +17,7 @@ import type {
     SelectPart,
     SelectVariantProps,
 } from "@pureform/binding-core";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 
@@ -108,6 +109,17 @@ export function Select(props: SelectProps): ReactNode {
         });
     const close = () => setExpanded(false);
     const shown = useShownLabel(items, value);
+    // The options by group: a run outside any group goes unlabelled.
+    const groups = useMemo(
+        () =>
+            selectItemGroups(items).map((run, index) => ({
+                id: run.group ?? `ungrouped-${index}`,
+                label: run.group,
+                items: run.items,
+            })),
+        [items],
+    );
+    const grouped = groups.some((run) => run.label !== undefined);
     return (
         <View>
             <Field
@@ -161,7 +173,9 @@ export function Select(props: SelectProps): ReactNode {
                                 color: props.color,
                                 density: props.density,
                             })}
-                            items={items}
+                            {...(grouped
+                                ? { groups, grouped: false }
+                                : { items })}
                             {...(indication === undefined
                                 ? {}
                                 : { indication })}
