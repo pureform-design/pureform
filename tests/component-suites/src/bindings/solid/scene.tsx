@@ -10,6 +10,7 @@ import type { Indication } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
 import { Button } from "@pureform/solid/button";
+import { ButtonGroup } from "@pureform/solid/button-group";
 import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
@@ -64,6 +65,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Avatar,
     Badge,
     Button,
+    ButtonGroup,
     Card,
     Checkbox,
     Chip,

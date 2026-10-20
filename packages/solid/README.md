@@ -186,6 +186,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                                                             | `@pureform/machines/navigation`                      |
 | `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                                                | none                                                 |
 | `List`                            | `Root` (`ul`), per item `Item` (`li`) holding a `ListItem`                                                                                                                                                                                                                                                       | none                                                 |
+| `ButtonGroup`                     | `Root` (`div`, `role="group"`), and per button `Button` or `IconButton` (the button and icon button, in the group's variants, `position` and selection)                                                                                                                                 | Zag's toggle group (`@pureform/machines/button-group`) when `selectable` |
 
 - **Root's props** are the variant groups (`color`, `variant`, …, typed from the app's registry),
   `tokens`, the machine's props (`disabled`, `type`, `name`, `value`, `form`, and the controllable
@@ -199,6 +200,17 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `Checkbox` puts `aria-label`, `aria-labelledby`, and `aria-describedby` on its input.
 - **The switch is a `<label>` too**, around a native checkbox with `role="switch"`; its ready-made
   takes `icon` (shown in the handle while on) and puts the ARIA naming props on the input.
+- **The button group** (`@pureform/solid/button-group`) is a `div` with `role="group"`
+  (`buttonGroupAnatomy`, test id `pf-button-group-root`) holding buttons and icon buttons in its
+  `size` and the buttons' `color`, `variant`, `corner` and `density`. Its ready-made takes `items`
+  (a button per item with a `label`, an icon button per icon-only one, named by `aria-label`) and
+  gives each its `position`: `single` in a standard group, where a button widens while pressed,
+  and `first`, `middle` or `last` with `connected`, which squares the inner corners. Composed,
+  give `ButtonGroup.Button` and `ButtonGroup.IconButton` their `position` (`buttonGroupPosition`).
+  `selectable="single"` or `"multiple"` makes them toggle buttons on Zag's toggle group (arrow keys
+  move between them; each reports `aria-pressed`), with `value`, `defaultValue` and
+  `onValueChange` on the group and a `value` per button. It replaces the deprecated segmented
+  button.
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
   id `pf-radio-group-root`) holding a preset `radio` per item. Name the group with `aria-label` or
   `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).

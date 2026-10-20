@@ -362,6 +362,11 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each
   item rounded by its `position` (`first`, `middle`, `last`, `single`), which a `ListItem` outside
   a `List` can take too. An item's `href` isn't followed; give it `onPress`.
+- **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
+  `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
+  `density`, each with its `position` (`single`, or its place in the run when `connected`).
+  `selectable` (`single` or `multiple`) makes them toggles, with `value`, `defaultValue` and
+  `onValueChange`; `Button` takes a controlled `selected` for it. There are no compound parts.
 - **Menu items** take `supportingText`, a line under the label, and a `type` (`checkbox` or
   `radio`) with `checked` and `onCheckedChange`: a toggleable item fills while checked. `groups`
   render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles

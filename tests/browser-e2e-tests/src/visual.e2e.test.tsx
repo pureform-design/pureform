@@ -21,6 +21,7 @@ const SECTIONS = [
     "density",
     "buttons",
     "icon-buttons",
+    "button-groups",
     "disabled-buttons",
     "cards",
     "scrim",
@@ -136,4 +137,28 @@ it("keyboard focus shows the focus ring", async () => {
     expect(document.activeElement).toBe(button);
     const style = getComputedStyle(button);
     expect([style.outlineStyle, style.outlineWidth]).toEqual(["solid", "3px"]);
+});
+
+it("a standard group's button widens while pressed, and a connected group squares inner corners", () => {
+    const [standard, connected] = [
+        ...section("button-groups").children,
+    ] as HTMLElement[];
+    const button = standard!.children[0] as HTMLElement;
+    const rest = button.getBoundingClientRect().width;
+    button.setAttribute("data-pf-active", "");
+    // The width eases; read the target from the padding rather than the box mid-tween.
+    const padding = parseFloat(getComputedStyle(button).paddingInlineStart);
+    button.removeAttribute("data-pf-active");
+    const restPadding = parseFloat(getComputedStyle(button).paddingInlineStart);
+    expect(padding - restPadding).toBe(6);
+    expect(rest).toBeGreaterThan(0);
+    expect(getComputedStyle(standard!).columnGap).toBe("12px");
+    expect(getComputedStyle(connected!).columnGap).toBe("2px");
+    const [first, , last] = [...connected!.children] as HTMLElement[];
+    const corners = (el: HTMLElement) => {
+        const cs = getComputedStyle(el);
+        return [cs.borderStartStartRadius, cs.borderStartEndRadius];
+    };
+    expect(corners(first!)).toEqual(["9999px", "8px"]);
+    expect(corners(last!)).toEqual(["8px", "9999px"]);
 });

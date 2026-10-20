@@ -38,6 +38,16 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // `connected` is set only when on; the buttons and icon buttons take the group's variants
+    // (an icon button's fill mapped from the button's) and their position from their index.
+    "button-group": {
+        entries: {
+            buttonGroup: same("size"),
+            button: {},
+            iconButton: {},
+            ripple: {},
+        },
+    },
     // `interactive` follows the element, and `padded` the sections the ready-made shows.
     card: { entries: { card: same("variant", "actionsAlign"), ripple: {} } },
     checkbox: { entries: { checkbox: same("color", "density"), ripple: {} } },

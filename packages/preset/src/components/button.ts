@@ -22,14 +22,32 @@
 // spacing on top of the gap: `secondaryIconSpacing`, on the side that faces the label. The
 // `secondaryIconPosition` variant says which side the slot is on, `end` (the default) or `start`; render
 // the element on that side of the label.
+//
+// In a button group, `position` places the button: `single` in a standard group, where it widens
+// while pressed, and `first`, `middle` or `last` in a connected one, where its inner corners
+// square off (see `button-group.ts`).
 
 import { typed } from "@pureform/core";
-import { add, px, slot, transparent, unitless, when } from "@pureform/core/ast";
+import {
+    add,
+    mul,
+    px,
+    slot,
+    transparent,
+    unitless,
+    when,
+} from "@pureform/core/ast";
 import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import {
+    GROUP_GROWTH,
+    GROUP_INNER_RADII,
+    GROUP_TRANSITION,
+    groupCorners,
+} from "./button-group";
 import {
     DEFAULT_GROUP,
     blend,
@@ -62,6 +80,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
+import { POSITIONS } from "./tiles";
 
 const FILLS = {
     filled: "filled",
@@ -161,6 +180,11 @@ const { tokens, ref } = componentTokens("button", {
     secondaryIconSize: px(20),
     secondaryIconSpacing: spacing("1"),
     secondaryStart: unitless(0),
+    // A grouped button's inner corners (where a connected group's buttons meet), and how much
+    // wider it grows while pressed, which the `position` variant turns on in a standard group.
+    innerRadius: radius("small"),
+    pressedInnerRadius: radius("extraSmall"),
+    pressedGrowth: px(0),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     // Each size's height and padding, so a theme can retune a size.
@@ -172,6 +196,17 @@ const { tokens, ref } = componentTokens("button", {
 });
 
 const SELECTED = slot("root", "selected");
+const PRESSED = slot("root", "pressed");
+
+/** A side's padding, wider by half the `pressedGrowth` while pressed. */
+const grownPadding = (padding: NumericValue) =>
+    when(
+        PRESSED,
+        add(padding, mul(ref("pressedGrowth"), unitless(0.5))),
+        padding,
+    );
+
+const GROUP_CORNERS = groupCorners(ref);
 
 /** A toggle button's colors per fill, off and on, as M3 Expressive's toggle buttons draw them. */
 const toggleColors = (
@@ -319,6 +354,7 @@ export const createButton = <
                 corner: ["round", "square"],
                 toggle: ["false", "true"],
                 secondaryIconPosition: ["end", "start"],
+                position: [...POSITIONS],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
@@ -387,16 +423,17 @@ export const createButton = <
                                         outlineWidth: s.outline,
                                         squareRadius: s.square,
                                         pressedRadius: s.pressed,
+                                        ...GROUP_INNER_RADII[name],
                                     },
                                     height: add(
                                         ref(sizeTokenName("height", name)),
                                         ref("densityOffset"),
                                     ),
-                                    paddingInlineStart: ref(
-                                        sizeTokenName("padding", name),
+                                    paddingInlineStart: grownPadding(
+                                        ref(sizeTokenName("padding", name)),
                                     ),
-                                    paddingInlineEnd: ref(
-                                        sizeTokenName("padding", name),
+                                    paddingInlineEnd: grownPadding(
+                                        ref(sizeTokenName("padding", name)),
                                     ),
                                 },
                                 label: { textStyle: textStyle(s.label) },
@@ -408,6 +445,20 @@ export const createButton = <
                         end: {},
                         start: {
                             root: { tokens: { secondaryStart: unitless(1) } },
+                        },
+                    },
+                    // Its place in a button group: `single` in a standard group (it widens
+                    // while pressed), and the run's corners in a connected one.
+                    position: {
+                        none: {},
+                        first: { root: GROUP_CORNERS.first },
+                        middle: { root: GROUP_CORNERS.middle },
+                        last: { root: GROUP_CORNERS.last },
+                        single: {
+                            root: {
+                                tokens: { pressedGrowth: GROUP_GROWTH },
+                                transition: GROUP_TRANSITION,
+                            },
                         },
                     },
                     density: densityTokenVariant(densities),
@@ -424,6 +475,7 @@ export const createButton = <
                     corner: "round",
                     toggle: "false",
                     secondaryIconPosition: "end",
+                    position: "none",
                     density: "inherit",
                 },
             }),

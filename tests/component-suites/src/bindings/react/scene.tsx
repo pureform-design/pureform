@@ -11,6 +11,7 @@ import type { Indication } from "@pureform/react";
 import { Avatar } from "@pureform/react/avatar";
 import { Badge } from "@pureform/react/badge";
 import { Button } from "@pureform/react/button";
+import { ButtonGroup } from "@pureform/react/button-group";
 import { Card } from "@pureform/react/card";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
@@ -63,6 +64,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Avatar,
     Badge,
     Button,
+    ButtonGroup,
     Card,
     Checkbox,
     Chip,

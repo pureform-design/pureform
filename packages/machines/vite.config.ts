@@ -20,6 +20,7 @@ export default createConfig({
                     tooltip: "src/tooltip.ts",
                     presence: "src/presence.ts",
                     tabs: "src/tabs.ts",
+                    "button-group": "src/button-group.ts",
                     navigation: "src/navigation/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     ripple: "src/ripple/index.ts",

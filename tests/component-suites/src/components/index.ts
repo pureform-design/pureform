@@ -1,6 +1,7 @@
 // Every component the shared suites run over. Add a component's case here.
 
 import { button } from "./button";
+import { buttonGroup } from "./button-group";
 import { card, cardActionArea } from "./card";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
@@ -42,6 +43,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     avatar,
     badge,
     button,
+    buttonGroup,
     card,
     cardActionArea,
     checkbox,

@@ -6,6 +6,7 @@ import {
     badge,
     media,
     button,
+    buttonGroup,
     card,
     checkbox,
     chip,
@@ -1053,6 +1054,100 @@ export function Page() {
                     </span>
                     <span class={iconButton().outline} />
                 </button>
+            </section>
+
+            <section data-section="button-groups" style={row}>
+                <div
+                    class={buttonGroup().root}
+                    role="group"
+                    aria-label="Standard"
+                >
+                    <For each={["Copy", "Paste", "Cut"]}>
+                        {(label) => {
+                            const b = button({
+                                variant: "tonal",
+                                position: "single",
+                            });
+                            return (
+                                <button class={b.root} type="button">
+                                    <span class={b.touchTarget} />
+                                    <Ripple />
+                                    <span class={b.label}>{label}</span>
+                                </button>
+                            );
+                        }}
+                    </For>
+                </div>
+                <div
+                    class={buttonGroup({ connected: true }).root}
+                    role="group"
+                    aria-label="Connected"
+                >
+                    <For
+                        each={
+                            [
+                                ["Day", "first", "false"],
+                                ["Week", "middle", "true"],
+                                ["Month", "last", "false"],
+                            ] as const
+                        }
+                    >
+                        {([label, position, pressed]) => {
+                            const b = button({
+                                variant: "outlined",
+                                toggle: true,
+                                position,
+                            });
+                            return (
+                                <button
+                                    class={b.root}
+                                    type="button"
+                                    aria-pressed={pressed}
+                                >
+                                    <span class={b.touchTarget} />
+                                    <Ripple />
+                                    <span class={b.label}>{label}</span>
+                                </button>
+                            );
+                        }}
+                    </For>
+                </div>
+                <div
+                    class={
+                        buttonGroup({ connected: true, size: "medium" }).root
+                    }
+                    role="group"
+                    aria-label="Connected icons"
+                >
+                    <For each={["first", "middle", "last"] as const}>
+                        {(position) => {
+                            const b = iconButton({
+                                variant: "filled",
+                                size: "medium",
+                                position,
+                            });
+                            return (
+                                <button
+                                    class={b.root}
+                                    type="button"
+                                    aria-label={position}
+                                >
+                                    <span class={b.touchTarget} />
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M12 17.27 18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"
+                                            />
+                                        </svg>
+                                    </span>
+                                    <span class={b.outline} />
+                                </button>
+                            );
+                        }}
+                    </For>
+                </div>
             </section>
 
             <section data-section="disabled-buttons" style={row}>

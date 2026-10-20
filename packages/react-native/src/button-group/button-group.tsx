@@ -1,0 +1,130 @@
+// The button group: a row the registry styles, holding a button per labelled item and an icon
+// button per icon-only one, each placed by its index (`single` in a standard group, its place in
+// the run in a connected one). A selectable group makes them toggles: a press turns one on, and
+// in a single-select group the others off.
+
+import { buttonGroupAnatomy } from "@pureform/anatomy";
+import {
+    buttonGroupPosition,
+    buttonGroupSelection,
+    groupedButtonVariants,
+} from "@pureform/binding-core";
+import type {
+    ButtonGroupContentProps,
+    ButtonGroupPart,
+    ButtonGroupRootOwnProps,
+} from "@pureform/binding-core";
+import type { ReactNode } from "react";
+
+import { Button } from "../button/button";
+import type { ButtonProps } from "../button/button";
+import { IconButton } from "../icon-button/icon-button";
+import type { IconButtonProps } from "../icon-button/icon-button";
+import { testIdOf, useControllable, withEngine } from "../parts";
+import { useComponentSlots } from "../styles";
+
+export interface ButtonGroupProps
+    extends ButtonGroupRootOwnProps, ButtonGroupContentProps<ReactNode> {
+    readonly "aria-label"?: string | undefined;
+}
+
+/** The value after pressing `value`: on or off in a multiple-select group; alone, or off when
+ *  deselectable, in a single-select one. */
+const pressed = (
+    current: readonly string[],
+    value: string,
+    multiple: boolean,
+    deselectable: boolean,
+): string[] => {
+    const on = current.includes(value);
+    if (multiple)
+        return on ? current.filter((v) => v !== value) : [...current, value];
+    return on ? (deselectable ? [] : [...current]) : [value];
+};
+
+function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
+    const { styles: s, views: v } = useComponentSlots<ButtonGroupPart>(
+        "buttonGroup",
+        buttonGroupSelection(props),
+    );
+    const [value, setValue] = useControllable(
+        "ButtonGroup",
+        "value",
+        props.value,
+        props.defaultValue,
+        props.onValueChange,
+        [] as string[],
+    );
+    const items = props.items ?? [];
+    const id = (part: ButtonGroupPart) =>
+        testIdOf(buttonGroupAnatomy, part, props.testId);
+    return (
+        <v.root.View
+            role="group"
+            {...(props["aria-label"] === undefined
+                ? {}
+                : { "aria-label": props["aria-label"] })}
+            style={s.root}
+            testID={id("root")}
+        >
+            {items.map((item, index) => {
+                const key = item.value ?? String(index);
+                const variants = groupedButtonVariants(
+                    props,
+                    {},
+                    buttonGroupPosition(index, items.length, props.connected),
+                );
+                const selectable = props.selectable !== undefined;
+                const selected = selectable ? value.includes(key) : undefined;
+                const onPress = () => {
+                    if (selectable)
+                        setValue(
+                            pressed(
+                                value,
+                                key,
+                                props.selectable === "multiple",
+                                props.deselectable ?? true,
+                            ),
+                        );
+                    item.onClick?.();
+                };
+                const disabled = item.disabled || props.disabled;
+                return item.label === undefined ? (
+                    <IconButton
+                        key={key}
+                        {...(variants as Partial<IconButtonProps>)}
+                        variant={
+                            (variants.variant === "text"
+                                ? "standard"
+                                : variants.variant) as IconButtonProps["variant"]
+                        }
+                        aria-label={item["aria-label"] ?? ""}
+                        icon={item.icon}
+                        width={item.width}
+                        disabled={disabled}
+                        selected={selected}
+                        onPress={onPress}
+                        testId={item.testId}
+                        interactionSource={item.interactionSource}
+                    />
+                ) : (
+                    <Button
+                        key={key}
+                        {...(variants as Partial<ButtonProps>)}
+                        label={item.label}
+                        icon={item.icon}
+                        disabled={disabled}
+                        selected={selected}
+                        onPress={onPress}
+                        testId={item.testId}
+                        interactionSource={item.interactionSource}
+                    />
+                );
+            })}
+        </v.root.View>
+    );
+}
+
+/** M3 Expressive's button group: `<ButtonGroup connected selectable="single" items={[{ label:
+ *  "Day" }, { label: "Week" }]} />`. */
+export const ButtonGroup = withEngine(ButtonGroupImpl, "ButtonGroup");

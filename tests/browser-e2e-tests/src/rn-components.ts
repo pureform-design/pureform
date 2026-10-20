@@ -12,6 +12,7 @@ export const RN_COMPONENTS = [
     "avatar",
     "icon",
     "iconButton",
+    "buttonGroup",
     "fab",
     "separator",
     "list",

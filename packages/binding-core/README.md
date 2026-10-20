@@ -158,6 +158,19 @@ radioGroupMachineProps(props, fieldsetDisabled); radioGroupResetValue(defaultVal
 radioGroupRootProps(p); radioItemProps(p); radioInputProps(p); radioRingProps(p);
                                          // without aria-labelledby, Zag's inline style, data-ssr
 
+// Button group: the row (buttonGroupAnatomy) on Zag's toggle group when selectable; its buttons
+// are the preset's buttons and icon buttons
+interface ButtonGroupRootOwnProps        // size, connected, groupTokens, the buttons' color,
+                                         // variant, corner, density, selectable ("single" |
+                                         // "multiple"), deselectable, disabled, id, value,
+                                         // defaultValue, onValueChange, testId
+interface ButtonGroupItem { value?; label?; icon?; "aria-label"?; disabled?; width?; onClick?; testId? }
+BUTTON_GROUP_ROOT_PROPS; BUTTON_GROUP_CONTENT_PROPS; // items
+buttonGroupSelection(props); buttonGroupMachineProps(props);
+buttonGroupPosition(index, count, connected); // "single" unless connected, then tilePosition
+groupedButtonVariants(group, button, position); // the button's own win
+buttonGroupRootProps(p); buttonGroupItemProps(p); // without Zag's style; without id, disabled, type
+
 // Chip, icon button, FAB: on the button machine (buttonMachineProps, or fabMachineProps)
 CHIP_ROOT_PROPS; chipSelection(props);
 ICON_BUTTON_ROOT_PROPS; ICON_BUTTON_CONTENT_PROPS; iconButtonSelection(props); // sets `toggle`
