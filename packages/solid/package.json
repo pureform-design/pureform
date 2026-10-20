@@ -126,6 +126,17 @@
                 "default": "./dist/tabs.jsx"
             }
         },
+        "./tags-input": {
+            "types": "./dist/tags-input/index.d.ts",
+            "solid": {
+                "development": "./src/tags-input/index.ts",
+                "default": "./dist/tags-input.jsx"
+            },
+            "import": {
+                "development": "./src/tags-input/index.ts",
+                "default": "./dist/tags-input.jsx"
+            }
+        },
         "./navigation-bar": {
             "types": "./dist/navigation-bar/index.d.ts",
             "solid": {

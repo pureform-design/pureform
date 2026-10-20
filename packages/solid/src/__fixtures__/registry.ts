@@ -2,7 +2,11 @@
 // read what the factory was given, plus a lazy chip whose loader the test controls.
 
 import { createRegistry, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ComponentShape, Selection } from "@pureform/styling";
+import type {
+    ClassFactory,
+    ComponentShape,
+    Selection,
+} from "@pureform/styling";
 
 export type ButtonShape = {
     variants: { variant: "filled" | "text"; size: "small" | "large" };
@@ -153,13 +157,22 @@ const FIELD_SLOTS = [
     "counter",
 ] as const;
 
-/** The text inputs' fake factories, all static: the text field, text area, select, and the menu
- *  the select draws its list with. */
+/** The text inputs' fake factories, all static: the text field, text area, select, tags input
+ *  with its input chips, and the menu the select draws its list with. */
 export const textInputsRegistry = () =>
     createRegistry({
         textField: named("text-field", FIELD_SLOTS),
         textArea: named("text-area", FIELD_SLOTS),
         select: named("select", FIELD_SLOTS),
+        tagsInput: named("tags-input", FIELD_SLOTS),
+        inputChip: named("input-chip", [
+            "root",
+            "avatar",
+            "icon",
+            "label",
+            "remove",
+            "touchTarget",
+        ]),
         menu: named("menu", [
             "root",
             "itemGroup",
