@@ -59,6 +59,10 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     // Its items, and the select's options, which the menu draws.
     menu: [at("item", "item", false)],
     snackbar: [at("action", "action", false), at("close", "close", false)],
+    toast: [
+        at("actionTrigger", "actionTrigger", false),
+        at("closeTrigger", "closeTrigger", false),
+    ],
     iconButton: [at("root", "container", true)],
     fab: [at("root", "container", false)],
     // The FAB that opens and closes it, and each item.
@@ -106,7 +110,8 @@ describe("the written anatomy", () => {
 
     it("nests every part inside the root", () => {
         for (const { name, root, parts } of Object.values(written)) {
-            expect(root, name).toBe("root");
+            // The toast's outermost part is the region its toasts stack in, as Zag's.
+            expect(root, name).toBe(name === "toast" ? "group" : "root");
             for (const part of Object.values(parts)) {
                 if (part.name === root) {
                     expect(part.parent, `${name}.${part.name}`).toBeNull();

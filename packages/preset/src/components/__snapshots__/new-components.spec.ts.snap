@@ -3752,6 +3752,177 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`toast > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actionTrigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, transparent, var(--components-toast-actionColor, token(colors.primary)) var(--components-toast-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-toast-actionColor, token(colors.primary)) var(--components-toast-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-toast-actionColor, token(colors.primary)) var(--components-toast-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-toast-actionColor, token(colors.primary)) var(--components-toast-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "transparent",
+      },
+      "borderRadius": "token(radii.full)",
+      "borderWidth": "0px",
+      "color": "var(--components-toast-actionColor, token(colors.primary))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "height": "var(--components-toast-actionHeight, token(sizes.controlMedium))",
+      "justifyContent": "center",
+      "outlineColor": "var(--components-toast-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-toast-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-toast-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "paddingInlineEnd": "token(spacing.3)",
+      "paddingInlineStart": "token(spacing.3)",
+      "position": "relative",
+      "textStyle": "labelLarge",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "closeTrigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "pointerEvents": "none",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, transparent, var(--components-toast-content, token(colors.onSurfaceVariant)) var(--components-toast-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-toast-content, token(colors.onSurfaceVariant)) var(--components-toast-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-toast-content, token(colors.onSurfaceVariant)) var(--components-toast-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, transparent, var(--components-toast-content, token(colors.onSurfaceVariant)) var(--components-toast-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "transparent",
+      },
+      "borderRadius": "token(radii.full)",
+      "borderWidth": "0px",
+      "color": "var(--components-toast-content, token(colors.onSurfaceVariant))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "fontSize": "var(--components-toast-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-toast-closeSize, 48px)",
+      "insetBlockStart": "4px",
+      "insetInlineEnd": "0px",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "outlineColor": "var(--components-toast-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-toast-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-toast-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "position": "absolute",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      "width": "var(--components-toast-closeSize, 48px)",
+    },
+    "description": {
+      "color": "var(--components-toast-content, token(colors.onSurfaceVariant))",
+      "textStyle": "bodyMedium",
+    },
+    "group": {
+      "--components-toast-focusIndicatorColor": "token(colors.secondary)",
+      "--components-toast-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-toast-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-toast-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-toast-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-toast-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-toast-statePressedOpacity": "token(opacity.statePressed)",
+      "width": "var(--components-toast-width, 356px)",
+      "zIndex": "token(zIndex.snackbar)",
+    },
+    "icon": {
+      "alignItems": "center",
+      "color": "var(--components-toast-accent, token(colors.info))",
+      "display": "flex",
+      "fontSize": "var(--components-toast-iconSize, token(sizes.iconMedium))",
+      "height": "var(--components-toast-iconSize, token(sizes.iconMedium))",
+      "insetBlockStart": "var(--components-toast-paddingBlock, token(spacing.3))",
+      "insetInlineStart": "var(--components-toast-paddingInline, token(spacing.4))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "position": "absolute",
+      "width": "var(--components-toast-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "alignItems": "start",
+      "backgroundColor": "var(--components-toast-container, token(colors.surfaceContainerHigh))",
+      "borderRadius": "var(--components-toast-radius, token(radii.medium))",
+      "color": "var(--components-toast-content, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "gap": "token(spacing.1)",
+      "minHeight": "var(--components-toast-minHeight, 56px)",
+      "overflow": "hidden",
+      "paddingBlockEnd": "var(--components-toast-paddingBlock, token(spacing.3))",
+      "paddingBlockStart": "var(--components-toast-paddingBlock, token(spacing.3))",
+      "paddingInlineEnd": "var(--components-toast-closeSize, 48px)",
+      "paddingInlineStart": "calc(var(--components-toast-paddingInline, token(spacing.4)) + var(--components-toast-iconSize, token(sizes.iconMedium)) + token(spacing.3))",
+      "position": "relative",
+      "shadowElevation": "level3",
+      "transition": {
+        "_motionReduce": "opacity token(durations.short3) token(easings.standard)",
+        "base": "transform token(durations.short3) token(easings.standard), opacity token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-toast-width, 356px)",
+    },
+    "title": {
+      "color": "var(--components-toast-titleColor, token(colors.onSurface))",
+      "textStyle": "titleSmall",
+    },
+  },
+  "className": "toast",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "type": "info",
+  },
+  "jsx": [
+    "Toast",
+  ],
+  "slots": [
+    "group",
+    "root",
+    "icon",
+    "title",
+    "description",
+    "actionTrigger",
+    "closeTrigger",
+  ],
+  "variants": {
+    "type": {
+      "error": {
+        "icon": {
+          "color": "token(colors.error)",
+        },
+      },
+      "info": {},
+      "loading": {
+        "icon": {
+          "color": "token(colors.primary)",
+        },
+      },
+      "success": {
+        "icon": {
+          "color": "token(colors.success)",
+        },
+      },
+      "warning": {
+        "icon": {
+          "color": "token(colors.warning)",
+        },
+      },
+    },
+  },
+}
+`;
+
 exports[`tooltip > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {

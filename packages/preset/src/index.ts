@@ -33,6 +33,7 @@ export * from "./components/slider";
 export * from "./components/split-button";
 export * from "./components/snackbar";
 export * from "./components/rich-tooltip";
+export * from "./components/toast";
 export * from "./components/tooltip";
 export * from "./components/tabs";
 export * from "./components/tags-input";
