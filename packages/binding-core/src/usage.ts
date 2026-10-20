@@ -151,6 +151,11 @@ export const COMPONENT_USAGE = {
     },
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
+    // The scroll state sets `scrolled` and `collapsed`, and `search` follows the search bar; the
+    // search bar is drawn scrolled and centered.
+    "app-bar": {
+        entries: { appBar: same("size", "centered"), searchBar: {} },
+    },
     "search-bar": { entries: { searchBar: {} } },
     // The ready-made trigger is a search bar; the suggestions are menu items in the menu's
     // default colors; the leading and clear buttons are icon buttons.
