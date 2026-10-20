@@ -24,7 +24,6 @@
 
 import { typed } from "@pureform/core";
 import {
-    animation,
     auto,
     center,
     column,
@@ -41,8 +40,6 @@ import {
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import {
-    duration,
-    easing,
     radius,
     size as sizeToken,
     spacing,
@@ -50,7 +47,7 @@ import {
     zIndex,
 } from "@pureform/theme";
 
-import { DIALOG_MOTION, overlayMotion } from "./overlay";
+import { DIALOG_MOTION, motionAnimation, overlayMotion } from "./overlay";
 import {
     componentTokens,
     iconBox,
@@ -109,11 +106,7 @@ export const SEARCH_VIEW_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
 // from the start side for the trailing one. Reduced motion keeps them still.
 const travel = (side: "leading" | "trailing"): StyleMap => {
     const run = (name: string) =>
-        animation({
-            name,
-            duration: duration("medium2"),
-            easing: easing("emphasizedDecelerate"),
-        });
+        motionAnimation(name, "medium2", "emphasizedDecelerate");
     const [ltr, rtl] =
         side === "leading"
             ? ["searchViewFromEnd", "searchViewFromStart"]
