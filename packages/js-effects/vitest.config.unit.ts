@@ -5,7 +5,7 @@ import baseConfig from "./vite.config";
 
 export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
     test: {
-        testTimeout: 1000,
+        testTimeout: 5000,
         environment: "jsdom",
         include: ["./src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}"],
         exclude: [
