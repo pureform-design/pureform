@@ -4,11 +4,15 @@
 // web.
 
 import type {
+    ChangeDetails,
     OverlayPlacement,
     OverlayPositioning,
 } from "@pureform/binding-core";
-import type { InteractionSource } from "@pureform/binding-core/interaction";
-import { useEffect, useMemo, useRef, useState } from "react";
+import type {
+    InteractionSource,
+    MutableInteractionSource,
+} from "@pureform/binding-core/interaction";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import {
     BackHandler,
@@ -19,9 +23,12 @@ import {
 } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
-import { useStableCallback } from "./parts";
+import { useInteractionSource } from "./interaction";
+import { useControllable, useStableCallback } from "./parts";
 import { useHostBounds, usePortalHost } from "./portal-host";
 import type { EdgeInsets, WindowRect } from "./portal-host";
+import { usePresence } from "./presence";
+import type { Presence } from "./presence";
 import { useDirection } from "./provider";
 
 /** Where an overlay went: its top left corner in the host's layer, the side of the trigger it
@@ -346,4 +353,66 @@ export function Anchored(props: AnchoredProps): ReactNode {
             </View>
         </>
     );
+}
+
+/** The open state a trigger's overlay takes: controlled when `open` is defined. */
+export interface AnchoredOverlayProps {
+    readonly open?: boolean | undefined;
+    readonly defaultOpen?: boolean | undefined;
+    readonly onOpenChange?:
+        | ((details: ChangeDetails<"open", boolean>) => void)
+        | undefined;
+}
+
+/** A trigger's overlay (a menu, the FAB menu's items): whether it's open, the trigger's
+ *  interaction source, its box when the overlay last opened (pending while it's measured), the
+ *  overlay's presence, and `close` (which returns focus to the trigger on the web) and `toggle`
+ *  for the trigger. The back button or Escape closes it. Render the overlay while
+ *  `presence.present && measured`. */
+export function useAnchoredOverlay(
+    component: string,
+    props: AnchoredOverlayProps,
+): {
+    readonly open: boolean;
+    readonly source: MutableInteractionSource;
+    readonly measured: { readonly rect: WindowRect | undefined } | undefined;
+    readonly presence: Presence;
+    readonly close: () => void;
+    readonly toggle: () => void;
+} {
+    const [open, setOpen] = useControllable(
+        component,
+        "open",
+        props.open,
+        props.defaultOpen,
+        props.onOpenChange,
+        false,
+    );
+    const source = useInteractionSource();
+    const anchor = useAnchor(source);
+    const [measured, setMeasured] = useState<
+        { readonly rect: WindowRect | undefined } | undefined
+    >();
+    const presence = usePresence(open, "popup");
+    useLayoutEffect(() => {
+        if (!open) return;
+        let current = true;
+        anchor.measure((rect) => current && setMeasured({ rect }));
+        return () => {
+            current = false;
+        };
+    }, [open, anchor]);
+    if (!presence.present && measured) setMeasured(undefined);
+    const close = useStableCallback(() => {
+        if (!open) return;
+        setOpen(false);
+        // Focus goes back to the trigger, as the web's menu returns it.
+        if (Platform.OS === "web") anchor.focus();
+    });
+    const toggle = useStableCallback(() => {
+        if (open) close();
+        else setOpen(true);
+    });
+    useDismiss(open, close);
+    return { open, source, measured, presence, close, toggle };
 }

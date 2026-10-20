@@ -21,24 +21,19 @@ import type {
 } from "@pureform/binding-core";
 import type { Indication } from "@pureform/binding-core/indication";
 import type { Selection } from "@pureform/styling";
-import { useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Platform } from "react-native";
 
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { useInteractionSource } from "../interaction";
-import { Anchored, useAnchor, useDismiss } from "../overlay";
+import { Anchored, useAnchoredOverlay } from "../overlay";
 import {
     testIdOf,
     unselectable,
-    useControllable,
     useStableCallback,
     withEngine,
 } from "../parts";
 import { Portal } from "../portal";
-import type { WindowRect } from "../portal-host";
-import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -179,9 +174,6 @@ function CloseTriggerImpl(props: {
 
 const CloseTrigger = withEngine(CloseTriggerImpl, "FabMenuCloseTrigger");
 
-// The FAB's box when the menu last opened: pending while it's measured, then the box.
-type Anchor = { readonly rect: WindowRect | undefined } | undefined;
-
 // The list's place above the FAB, which the web's styles give it, is the portal's here.
 const PLACING =
     /^(position|top|bottom|left|right|start|end|inset\w*|marginBottom|marginBlockEnd)$/;
@@ -198,37 +190,8 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
         "fabMenu",
         selection,
     );
-    const [open, setOpen] = useControllable(
-        "FabMenu",
-        "open",
-        props.open,
-        props.defaultOpen,
-        props.onOpenChange,
-        false,
-    );
-    const source = useInteractionSource();
-    const anchor = useAnchor(source);
-    const [measured, setMeasured] = useState<Anchor>();
-    const presence = usePresence(open, "popup");
-    useLayoutEffect(() => {
-        if (!open) return;
-        let current = true;
-        anchor.measure((rect) => current && setMeasured({ rect }));
-        return () => {
-            current = false;
-        };
-    }, [open, anchor]);
-    if (!presence.present && measured) setMeasured(undefined);
-    const close = useStableCallback(() => {
-        if (!open) return;
-        setOpen(false);
-        if (Platform.OS === "web") anchor.focus();
-    });
-    const toggle = useStableCallback(() => {
-        if (open) close();
-        else setOpen(true);
-    });
-    useDismiss(open, close);
+    const { open, source, measured, presence, close, toggle } =
+        useAnchoredOverlay("FabMenu", props);
     const select = useStableCallback((value: string) => {
         props.onSelect?.({ value });
         if (props.closeOnSelect ?? true) close();
