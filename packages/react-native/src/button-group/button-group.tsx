@@ -105,6 +105,7 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                         selected={selected}
                         onPress={onPress}
                         testId={item.testId}
+                        interactionSource={item.interactionSource}
                     />
                 ) : (
                     <Button
@@ -116,6 +117,7 @@ function ButtonGroupImpl(props: ButtonGroupProps): ReactNode {
                         selected={selected}
                         onPress={onPress}
                         testId={item.testId}
+                        interactionSource={item.interactionSource}
                     />
                 );
             })}

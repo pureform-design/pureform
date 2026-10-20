@@ -16,6 +16,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { ButtonVariantProps } from "./button";
 import type { IconButtonVariantProps } from "./icon-button";
+import type { InteractionSourceProps } from "./indication";
 import { tilePosition } from "./list";
 import type { TilePosition } from "./list";
 import type { VariantProp } from "./variants";
@@ -93,7 +94,9 @@ export const BUTTON_GROUP_ROOT_PROPS = [
 
 /** One button of the ready-made group, as data. With a label it's a button; with only an icon,
  *  an icon button (name it with `aria-label`). */
-export interface ButtonGroupItem<Node = unknown> {
+export interface ButtonGroupItem<
+    Node = unknown,
+> extends InteractionSourceProps {
     /** Its value in a selectable group, and its key. @default its index */
     readonly value?: string | undefined;
     readonly label?: Node;

@@ -28,6 +28,7 @@ import {
     For,
     merge,
     omit,
+    Show,
 } from "solid-js";
 
 import { Button } from "../button/button";
@@ -196,9 +197,16 @@ const READY_MADE_PROPS = [...BUTTON_GROUP_CONTENT_PROPS] as const;
 /** The ready-made group: a button per item with a label, an icon button per icon-only item, each
  *  placed by its index. */
 function ReadyMade(props: ButtonGroupProps): JSX.Element {
-    const items = () => props.items ?? [];
+    // An entry per item, keyed by its value (else its index), so a button follows its item's
+    // changes rather than being made again.
+    const entries = createMemo(() =>
+        (props.items ?? []).map((item, index) => ({
+            key: item.value ?? index,
+            item,
+        })),
+    );
     const position = (index: number) =>
-        buttonGroupPosition(index, items().length, props.connected);
+        buttonGroupPosition(index, entries().length, props.connected);
     const one = (item: ButtonGroupItem<JSX.Element>, index: number) => ({
         value: item.value ?? (props.selectable ? String(index) : undefined),
         position: position(index),
@@ -206,25 +214,29 @@ function ReadyMade(props: ButtonGroupProps): JSX.Element {
         onClick: item.onClick,
         "aria-label": item["aria-label"],
         testId: item.testId,
+        interactionSource: item.interactionSource,
     });
     return (
         <Root {...(omit(props, ...READY_MADE_PROPS) as ButtonGroupRootProps)}>
-            <For each={items()}>
-                {(item, index) =>
-                    item.label === undefined ? (
-                        <GroupIconButton
-                            {...(one(item, index()) as object)}
-                            icon={item.icon}
-                            width={item.width}
-                        />
-                    ) : (
+            <For each={entries()} keyed={(entry) => entry.key}>
+                {(entry, index) => (
+                    <Show
+                        when={entry().item.label !== undefined}
+                        fallback={
+                            <GroupIconButton
+                                {...(one(entry().item, index()) as object)}
+                                icon={entry().item.icon}
+                                width={entry().item.width}
+                            />
+                        }
+                    >
                         <GroupButton
-                            {...(one(item, index()) as object)}
-                            label={item.label}
-                            icon={item.icon}
+                            {...(one(entry().item, index()) as object)}
+                            label={entry().item.label}
+                            icon={entry().item.icon}
                         />
-                    )
-                }
+                    </Show>
+                )}
             </For>
         </Root>
     );
