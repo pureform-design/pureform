@@ -236,6 +236,13 @@
                 "default": "./dist/snackbar.mjs"
             }
         },
+        "./toast": {
+            "types": "./dist/toast/index.d.ts",
+            "import": {
+                "development": "./src/toast/index.ts",
+                "default": "./dist/toast.mjs"
+            }
+        },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "import": {

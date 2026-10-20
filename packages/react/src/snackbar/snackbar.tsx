@@ -20,7 +20,13 @@ import type {
 import * as snackbar from "@pureform/machines/snackbar";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import {
+    type ElementType,
+    type ReactNode,
+    useEffect,
+    useId,
+    useRef,
+} from "react";
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
@@ -77,6 +83,17 @@ function Root(props: SnackbarRootProps): ReactNode {
     });
     const api = snackbar.connect(service, normalizeProps);
     const presence = usePresence(api.open);
+    // Once it has shown and gone again, its exit is over.
+    const shown = useRef(false);
+    const onExitComplete = useRef(props.onExitComplete);
+    onExitComplete.current = props.onExitComplete;
+    useEffect(() => {
+        if (presence.present) shown.current = true;
+        else if (shown.current) {
+            shown.current = false;
+            onExitComplete.current?.();
+        }
+    }, [presence.present]);
     const scope = useComponent(snackbarAnatomy, {
         selection: snackbarSelection(props),
         testId: props.testId,

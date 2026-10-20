@@ -4,14 +4,11 @@
 // start once it's let go, as the web's machine does), by its action, its close button, or the
 // app; the next comes in once it has faded out.
 
-import type { TestIdOverride } from "@pureform/anatomy";
 import type {
-    IndicationProps,
-    SnackbarOpenChangeDetails,
-    SnackbarOpenChangeReason,
-    SnackbarPart,
-    SnackbarVariantProps,
+    SnackbarQueueApi,
+    SnackbarQueueOptions,
 } from "@pureform/binding-core";
+import * as snackbar from "@pureform/machines/snackbar";
 import { useTokens } from "@pureform/rn-adapter/react";
 import {
     useEffect,
@@ -36,128 +33,81 @@ import {
 import type { PureformScope } from "../provider";
 import { Snackbar } from "./snackbar";
 
-/** A snackbar to show: its content, how long it stays, and what to call. */
-export interface SnackbarOptions extends SnackbarVariantProps, IndicationProps {
-    /** The message. */
-    readonly supportingText: ReactNode;
-    /** The action's label; the action shows only when given. */
-    readonly action?: ReactNode;
-    /** Called when the user chooses the action, before the snackbar closes. */
-    readonly onAction?: (() => void) | undefined;
-    /** The close button's name for assistive technology. Default "Dismiss". */
-    readonly closeLabel?: string | undefined;
-    readonly closeIcon?: ReactNode;
-    /** How long it stays, in milliseconds, while it isn't held. `null` keeps it until the user or
-     *  the app closes it. Default 5000, as the web's. */
-    readonly duration?: number | null | undefined;
-    /** Called once it closes, with why: `timeout`, `action`, or `close` (its close button, or
-     *  the app's `dismiss`). */
-    readonly onOpenChange?:
-        | ((details: SnackbarOpenChangeDetails) => void)
-        | undefined;
-    readonly testId?: TestIdOverride<SnackbarPart> | undefined;
+/** A snackbar to show: its content, layout, how long it stays, and what to call; and `offset`,
+ *  the room to leave below it (a navigation bar's or a FAB's), in points. */
+export interface SnackbarOptions extends SnackbarQueueOptions<ReactNode> {
+    /** The room to leave below it, above the host's bottom inset, such as a navigation bar's
+     *  height. Default 0. */
+    readonly offset?: number | undefined;
 }
 
 /** What `useSnackbar` gives. */
-export interface Snackbars {
-    /** Adds a snackbar to the queue, shown once those before it have gone. Returns its id. */
-    show(options: SnackbarOptions): string;
-    /** Closes the snackbar with this id, or the one showing; one still waiting leaves the queue
-     *  unseen. */
-    dismiss(id?: string): void;
-}
+export type Snackbars = SnackbarQueueApi<SnackbarOptions>;
 
-interface Queued {
-    readonly id: string;
-    readonly options: SnackbarOptions;
+interface Queued extends SnackbarOptions {
     readonly scope: PureformScope | undefined;
-    /** Why it's closing, once it is. */
-    readonly closing?: SnackbarOpenChangeReason;
 }
 
-// A host's queue, in its layer while it holds a snackbar.
+type Item = snackbar.QueueItem<Queued>;
+
+// A host's queue (pureform's snackbar queue, one at a time), in its layer while it holds a
+// snackbar.
 class Queue {
-    items: readonly Queued[] = [];
-    readonly #listeners = new Set<() => void>();
+    readonly queue = snackbar.createQueue<Queued>();
     readonly #store: PortalStore;
     readonly #entry: number;
     #layer = 0;
     #order = 0;
-    #ids = 0;
+    #held = false;
 
     constructor(store: PortalStore) {
         this.#store = store;
         this.#entry = store.nextId();
+        this.queue.subscribe(() => this.#place());
     }
-
-    readonly subscribe = (listener: () => void): (() => void) => {
-        this.#listeners.add(listener);
-        return () => this.#listeners.delete(listener);
-    };
 
     show(
         options: SnackbarOptions,
         scope: PureformScope | undefined,
         layer: number,
     ): string {
-        const id = `snackbar-${++this.#ids}`;
-        if (this.items.length === 0) {
+        if (this.queue.items().length === 0) {
             this.#layer = layer;
             this.#order = this.#store.nextOrder();
         }
-        this.#set([...this.items, { id, options, scope }]);
-        return id;
+        return this.queue.show({ ...options, scope });
     }
 
-    close(id: string | undefined, reason: SnackbarOpenChangeReason): void {
-        const [shown] = this.items;
-        const target = id ?? shown?.id;
-        if (target === undefined) return;
-        if (shown?.id !== target) {
-            // Never shown: it leaves unseen.
-            this.#set(this.items.filter((item) => item.id !== target));
-            return;
-        }
-        if (shown.closing) return;
-        this.#set([{ ...shown, closing: reason }, ...this.items.slice(1)]);
-        shown.options.onOpenChange?.({ open: false, reason });
-    }
-
-    /** The shown snackbar has faded out. */
-    gone(id: string): void {
-        if (this.items[0]?.id === id) this.#set(this.items.slice(1));
-    }
-
-    #set(items: readonly Queued[]): void {
-        const was = this.items.length > 0;
-        this.items = items;
-        if (items.length > 0 && !was) {
+    // In the host while it holds a snackbar.
+    #place(): void {
+        const holds = this.queue.items().length > 0;
+        if (holds && !this.#held) {
             this.#store.set(this.#entry, {
                 key: [[this.#layer, this.#order]],
-                node: <Shown queue={this} />,
+                node: <Shown queue={this.queue} />,
             });
-        } else if (items.length === 0 && was) {
+        } else if (!holds && this.#held) {
             this.#store.remove(this.#entry);
         }
-        for (const listener of this.#listeners) listener();
+        this.#held = holds;
     }
 }
 
 const queues = new WeakMap<PortalStore, Queue>();
 
 // The snackbar at the front of the queue, in the provider `show` was called under.
-function Shown(props: { readonly queue: Queue }): ReactNode {
+function Shown(props: { readonly queue: snackbar.Queue<Queued> }): ReactNode {
     const { queue } = props;
     const items = useSyncExternalStore(
         queue.subscribe,
-        () => queue.items,
-        () => queue.items,
+        queue.items,
+        queue.items,
     );
     const host = usePortalHost();
     const shown = items[0];
     if (!shown || !host) return null;
     return (
-        <PureformScopeProvider scope={shown.scope}>
+        <PureformScopeProvider scope={shown.options.scope}>
             <QueuedSnackbar
                 key={shown.id}
                 item={shown}
@@ -169,8 +119,8 @@ function Shown(props: { readonly queue: Queue }): ReactNode {
 }
 
 function QueuedSnackbar(props: {
-    readonly item: Queued;
-    readonly queue: Queue;
+    readonly item: Item;
+    readonly queue: snackbar.Queue<Queued>;
     readonly insets: EdgeInsets;
 }): ReactNode {
     const { item, queue, insets } = props;
@@ -179,6 +129,8 @@ function QueuedSnackbar(props: {
         duration = 5000,
         onAction,
         onOpenChange: _onOpenChange,
+        scope: _scope,
+        offset = 0,
         ...surface
     } = options;
     const open = item.closing === undefined;
@@ -193,7 +145,7 @@ function QueuedSnackbar(props: {
             return undefined;
         }
         const timer = setTimeout(
-            () => queue.close(item.id, "timeout"),
+            () => queue.dismiss(item.id, "timeout"),
             duration,
         );
         return () => clearTimeout(timer);
@@ -217,7 +169,7 @@ function QueuedSnackbar(props: {
                 position: "absolute",
                 left: insets.left + margin,
                 right: insets.right + margin,
-                bottom: insets.bottom + margin,
+                bottom: insets.bottom + offset + margin,
                 alignItems: "center",
             }}
         >
@@ -242,9 +194,9 @@ function QueuedSnackbar(props: {
                         {...surface}
                         onAction={() => {
                             onAction?.();
-                            queue.close(item.id, "action");
+                            queue.dismiss(item.id, "action");
                         }}
-                        onClose={() => queue.close(item.id, "close")}
+                        onClose={() => queue.dismiss(item.id, "close")}
                     />
                 </Pressable>
             </engine.View>
@@ -281,7 +233,7 @@ export function useSnackbar(): Snackbars {
                     latest.current.scope,
                     latest.current.layer,
                 ),
-            dismiss: (id) => queue().close(id, "close"),
+            dismiss: (id) => queue().queue.dismiss(id, "close"),
         };
     }, [host.store]);
 }
