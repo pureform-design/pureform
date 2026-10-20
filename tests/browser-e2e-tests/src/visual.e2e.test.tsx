@@ -41,6 +41,7 @@ const SECTIONS = [
     "lists",
     "tabs",
     "row-colors",
+    "toasts",
     "search-and-feedback",
     "select",
     "progress",

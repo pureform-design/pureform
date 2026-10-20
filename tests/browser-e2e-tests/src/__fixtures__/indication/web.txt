@@ -2523,6 +2523,86 @@ snackbar.close: bg rgba(0, 0, 0, 0) | color oklch(0.9574 0.0085 325.889) | outli
     hovered-selected: bg color(srgb 0.9568 0.9373 0.9568 / 0.08)
     pressed-checked: bg color(srgb 0.9568 0.9373 0.9568 / 0.1)
     focused-checked: bg color(srgb 0.9568 0.9373 0.9568 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast.actionTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast.closeTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=success].actionTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=success].closeTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=warning].actionTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=warning].closeTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=error].actionTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=error].closeTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=loading].actionTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+toast[type=loading].closeTrigger: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 card.root: bg oklch(0.9664 0.0085 325.891) | color oklch(0.2245 0.0059 301.135) | outline none
     hovered: bg color(srgb 0.8999 0.8816 0.9005)
     focused: bg color(srgb 0.8827 0.8647 0.8835) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px

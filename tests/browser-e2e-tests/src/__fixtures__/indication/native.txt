@@ -2552,3 +2552,83 @@ snackbar.close: bg transparent | color rgba(244, 239, 244, 1) | outline none
     hovered-selected: bg rgba(244, 239, 244, 0.08)
     pressed-checked: bg rgba(244, 239, 244, 0.1)
     focused-checked: bg rgba(244, 239, 244, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast.actionTrigger: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast.closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=success].actionTrigger: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=success].closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=warning].actionTrigger: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=warning].closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=error].actionTrigger: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=error].closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=loading].actionTrigger: bg transparent | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+toast[type=loading].closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(73, 69, 78, 0.08)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
