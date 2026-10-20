@@ -145,6 +145,7 @@ exports[`searchView > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "root": {
+          "--components-searchView-container": "token(colors.surfaceContainer)",
           "--components-searchView-headerHeight": "56px",
           "--components-searchView-headerInset": "token(spacing.2)",
           "backgroundColor": "var(--components-searchView-container, token(colors.surfaceContainerHigh))",
