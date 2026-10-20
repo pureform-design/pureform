@@ -10,6 +10,7 @@ import {
 import type { Indication } from "@pureform/react";
 import { Avatar } from "@pureform/react/avatar";
 import { Button } from "@pureform/react/button";
+import { ButtonGroup } from "@pureform/react/button-group";
 import { Card } from "@pureform/react/card";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
@@ -58,6 +59,7 @@ import { sceneTheme } from "../../harness/themes";
 export const components: Record<ComponentName, ComponentType<never>> = {
     Avatar,
     Button,
+    ButtonGroup,
     Card,
     Checkbox,
     Chip,

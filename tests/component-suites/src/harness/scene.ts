@@ -8,6 +8,7 @@
 export const COMPONENT_NAMES = [
     "Avatar",
     "Button",
+    "ButtonGroup",
     "Card",
     "Checkbox",
     "Chip",
