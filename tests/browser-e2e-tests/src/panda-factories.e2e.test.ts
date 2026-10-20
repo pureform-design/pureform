@@ -84,18 +84,43 @@ const pandaSlots = (name: string, selection: Record<string, string>) => {
 };
 
 // The defaults, then every combination of every group's values.
+// Every combination of every group's values, past `limit` of them a sample instead: every pair
+// of values from every two groups (so each compound, which matches two groups, is covered) over
+// the first values of the rest, and an even spread through the combinations.
 const selections = (
     variantMap: Record<string, string[]>,
-): Record<string, string>[] => [
-    {},
-    ...Object.entries(variantMap).reduce<Record<string, string>[]>(
-        (combos, [group, values]) =>
-            combos.flatMap((combo) =>
-                values.map((value) => ({ ...combo, [group]: value })),
+    limit = 40_000,
+): Record<string, string>[] => {
+    const groups = Object.entries(variantMap);
+    const total = groups.reduce((n, [, values]) => n * values.length, 1);
+    const at = (index: number) => {
+        const selection: Record<string, string> = {};
+        let rest = index;
+        for (const [group, values] of groups) {
+            selection[group] = values[rest % values.length]!;
+            rest = Math.floor(rest / values.length);
+        }
+        return selection;
+    };
+    if (total <= limit) {
+        return [{}, ...Array.from({ length: total }, (_, index) => at(index))];
+    }
+    const pairs = groups.flatMap(([a, aValues], i) =>
+        groups
+            .slice(i + 1)
+            .flatMap(([b, bValues]) =>
+                aValues.flatMap((x) =>
+                    bValues.map((y) => ({ ...at(0), [a]: x, [b]: y })),
+                ),
             ),
-        [{}],
-    ),
-];
+    );
+    // An odd stride, so it doesn't keep landing on the same value of an even group.
+    const stride = Math.floor(total / limit) | 1;
+    const spread = Array.from({ length: limit }, (_, index) =>
+        at((index * stride) % total),
+    );
+    return [{}, ...pairs, ...spread];
+};
 
 const hasStyles = (style: StyleObject | undefined): boolean =>
     style !== undefined && Object.keys(style).length > 0;

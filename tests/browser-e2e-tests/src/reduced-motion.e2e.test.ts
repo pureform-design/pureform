@@ -36,7 +36,8 @@ const STATE =
 
 /** The transitioned properties with full motion, and with reduced motion. */
 const EXPECTED: Record<Fixture["name"], { full: string; reduced: string }> = {
-    button: { full: STATE, reduced: STATE },
+    // M3 Expressive's corner morph moves, so reduced motion drops it.
+    button: { full: `${STATE}, border-radius`, reduced: STATE },
     switchControl: {
         full: "inset-inline-start, width, height, background-color",
         reduced: "background-color",
