@@ -122,14 +122,14 @@ design doc §9.8). A machine with one surface takes it as `interactionSource`; a
 binding makes them and passes them in; without one, nothing is emitted (the button keeps a source of
 its own, since its API reads one).
 
-| Machine          | Surface (element the handlers are on)  | Emits                                                                                                                  |
-| ---------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| button           | root                                   | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
-| checkbox, switch | root (label) and native input          | pointer press and hover on the root; Space press and focus on the input                                                |
-| radio group      | each item (label) and its native input | the same, per radio                                                                                                    |
-| slider           | native input                           | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
-| tabs, navigation | each tab or destination                | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
-| menu, select     | each item or option                    | the highlighted one hovers (no origin element); pointer press; Enter or Space presses and releases the highlighted one |
+| Machine          | Surface (element the handlers are on)               | Emits                                                                                                                  |
+| ---------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| button           | root                                                | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
+| checkbox, switch | root (label) and native input                       | pointer press and hover on the root; Space press and focus on the input                                                |
+| radio group      | each item (label) and its native input              | the same, per radio                                                                                                    |
+| slider           | native input                                        | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
+| tabs, navigation | each tab or destination                             | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
+| menu, select     | each item or option (a menu's toggleable items too) | the highlighted one hovers (no origin element); pointer press; Enter or Space presses and releases the highlighted one |
 
 - **Touch never hovers**: a `pointerType` of `touch` emits no `hoverEnter`.
 - **The innermost claims a press**: a press handler claims its event (`claimEvent`), so a

@@ -7,10 +7,11 @@
 
 import { menuAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
-import { isPresent, menuSelection } from "@pureform/binding-core";
+import { isPresent, menuGrouped, menuSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     IndicationProps,
+    MenuGroup,
     MenuItem,
     MenuSelectDetails,
     MenuVariantProps,
@@ -60,7 +61,10 @@ export interface MenuTriggerProps {
 }
 
 export interface MenuProps extends MenuVariantProps, IndicationProps {
-    readonly items: readonly MenuItem<ReactNode>[];
+    readonly items?: readonly MenuItem<ReactNode>[] | undefined;
+    /** Groups of items, after `items`, each with an optional label. The menu is `grouped` unless
+     *  told otherwise. */
+    readonly groups?: readonly MenuGroup<ReactNode>[] | undefined;
     /** What opens it, rendered in place: a label, for a `Button`, or a function rendering your
      *  own trigger with the props it's given (`(trigger) => <IconButton {...trigger} … />`).
      *  Given it, the menu opens over the page against the trigger and closes itself; without
@@ -122,6 +126,9 @@ function MenuItemImpl(props: ItemProps): ReactNode {
         indication.select(props.selection),
         indication.states({
             selected: props.selected,
+            ...(item.type === undefined
+                ? {}
+                : { checked: item.checked ?? false }),
             disabled: item.disabled ?? false,
             ...(item.mirrorLeadingIcon || item.mirrorTrailingIcon
                 ? { mirrored: true }
@@ -142,20 +149,43 @@ function MenuItemImpl(props: ItemProps): ReactNode {
     return (
         <v.item.Pressable
             {...indication.handlers}
-            role="menuitem"
+            role={item.type === undefined ? "menuitem" : `menuitem${item.type}`}
+            {...(item.type === undefined
+                ? {}
+                : { "aria-checked": item.checked ?? false })}
             disabled={item.disabled}
-            onPress={() => props.onSelect(item.value)}
+            onPress={() => {
+                if (item.type !== undefined)
+                    item.onCheckedChange?.(
+                        item.type === "radio" || !item.checked,
+                    );
+                props.onSelect(item.value);
+            }}
             style={{ ...s.item, ...unselectable }}
             testID={id("item")}
         >
             {icon("itemLeading", item.leadingIcon)}
-            <v.itemLabel.Text
-                selectable={false}
-                style={s.itemLabel}
-                testID={id("itemLabel")}
+            <v.itemContent.View
+                style={s.itemContent}
+                testID={id("itemContent")}
             >
-                {item.label}
-            </v.itemLabel.Text>
+                <v.itemLabel.Text
+                    selectable={false}
+                    style={s.itemLabel}
+                    testID={id("itemLabel")}
+                >
+                    {item.label}
+                </v.itemLabel.Text>
+                {isPresent(item.supportingText) ? (
+                    <v.itemSupportingText.Text
+                        selectable={false}
+                        style={s.itemSupportingText}
+                        testID={id("itemSupportingText")}
+                    >
+                        {item.supportingText}
+                    </v.itemSupportingText.Text>
+                ) : null}
+            </v.itemContent.View>
             {icon("itemTrailing", item.trailingIcon)}
             {isPresent(item.trailingText) ? (
                 <v.itemTrailingText.Text
@@ -175,13 +205,27 @@ const Item = memo(withEngine(MenuItemImpl, "MenuItem"));
 
 function MenuImpl(props: MenuProps): ReactNode {
     const engine = useEngine();
-    const selection = useStableSelection(menuSelection(props));
+    const selection = useStableSelection(
+        menuSelection({ ...props, grouped: menuGrouped(props) }),
+    );
     const select = useStableCallback((value: string) =>
         props.onSelect?.({ value }),
     );
     const { styles: s, views: v } = useComponentSlots<Part>("menu", selection);
     const presence = useOverlayPresence(props.open, "popup");
     if (!presence.present) return null;
+    const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
+    const item = (entry: MenuItem<ReactNode>) => (
+        <Item
+            key={entry.value}
+            item={entry}
+            selection={selection}
+            indication={props.indication}
+            testId={props.testId}
+            selected={props.value === entry.value}
+            onSelect={select}
+        />
+    );
     // The engine's view where it enters and leaves, the slot's own while it's still.
     const Root = props.open === undefined ? v.root : engine;
     return (
@@ -192,18 +236,30 @@ function MenuImpl(props: MenuProps): ReactNode {
                 ? {}
                 : { "aria-label": props["aria-label"] })}
             style={{ ...s.root, ...presence.style }}
-            testID={testIdOf(menuAnatomy, "root", props.testId)}
+            testID={id("root")}
         >
-            {props.items.map((item) => (
-                <Item
-                    key={item.value}
-                    item={item}
-                    selection={selection}
-                    indication={props.indication}
-                    testId={props.testId}
-                    selected={props.value === item.value}
-                    onSelect={select}
-                />
+            {(props.items ?? []).map(item)}
+            {(props.groups ?? []).map((group) => (
+                <v.itemGroup.View
+                    key={group.id}
+                    role="group"
+                    {...(typeof group.label === "string"
+                        ? { "aria-label": group.label }
+                        : {})}
+                    style={s.itemGroup}
+                    testID={id("itemGroup")}
+                >
+                    {isPresent(group.label) ? (
+                        <v.itemGroupLabel.Text
+                            selectable={false}
+                            style={s.itemGroupLabel}
+                            testID={id("itemGroupLabel")}
+                        >
+                            {group.label}
+                        </v.itemGroupLabel.Text>
+                    ) : null}
+                    {group.items.map(item)}
+                </v.itemGroup.View>
             ))}
         </Root.View>
     );
@@ -218,7 +274,9 @@ interface WebElement {
     getAttribute(name: string): string | null;
 }
 
-const ITEM = '[role="menuitem"]:not([aria-disabled="true"])';
+const ITEM = ["menuitem", "menuitemcheckbox", "menuitemradio"]
+    .map((role) => `[role="${role}"]:not([aria-disabled="true"])`)
+    .join(", ");
 
 // The open menu, placed: on the web it takes focus on its first item, and the arrow keys, Home,
 // and End move it; Tab closes it.
@@ -316,10 +374,12 @@ function MenuOverlay(props: MenuProps): ReactNode {
         else setOpen(true);
     });
     useDismiss(open, close);
-    const items = props.items;
     const select = (details: MenuSelectDetails) => {
         onSelect?.(details);
-        const item = items.find((entry) => entry.value === details.value);
+        const item = [
+            ...(props.items ?? []),
+            ...(props.groups ?? []).flatMap((group) => group.items),
+        ].find((entry) => entry.value === details.value);
         if (item?.closeOnSelect ?? closeOnSelect ?? true) close();
     };
     const given: MenuTriggerProps = {

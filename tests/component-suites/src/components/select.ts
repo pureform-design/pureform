@@ -96,6 +96,16 @@ export const select: ComponentCase = {
         required: { required: true, name: "size" },
         affixes: { prefixText: "EU", suffixText: "cm", defaultValue: "m" },
     },
+    opened: {
+        "option groups": {
+            defaultOpen: true,
+            items: [
+                { value: "s", label: "Small", group: "Everyday" },
+                { value: "m", label: "Medium", group: "Everyday" },
+                { value: "xl", label: "Extra large", group: "Tall" },
+            ],
+        },
+    },
     state: { prop: "value", from: "m", to: "l", act: choose("l"), read },
     // The list of options comes and goes with `open`.
     overlay: {

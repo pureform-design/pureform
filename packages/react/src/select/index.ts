@@ -5,6 +5,8 @@
 export { Select } from "./select";
 export type {
     SelectIconProps,
+    SelectItemGroupLabelProps,
+    SelectItemGroupProps,
     SelectItemProps,
     SelectPartProps,
     SelectProps,

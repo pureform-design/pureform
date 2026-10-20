@@ -54,17 +54,30 @@ export const COMPONENT_USAGE = {
         },
     },
     "linear-progress": { entries: { linearProgress: same("color") } },
-    // An unstyled `ul` around list items; the ready-made renders a list item per entry, in the
-    // list's density and color.
-    list: { entries: { listItem: same("density", "color"), ripple: {} } },
+    // A `ul` around list items; the ready-made renders a list item per entry, in the list's
+    // density, color, and leading type. A segmented list sets each item's position.
+    list: {
+        entries: {
+            list: same("variant"),
+            listItem: same("density", "color", "leadingType"),
+            ripple: {},
+        },
+    },
     // `lines` follows the content, `interactive` the element.
     "list-item": {
-        entries: { listItem: same("density", "color"), ripple: {} },
+        entries: {
+            listItem: same("density", "color", "leadingType", "position"),
+            ripple: {},
+        },
     },
     media: { entries: { media: same("aspect", "shape") } },
-    // The trigger is a button.
+    // The trigger is a button; `grouped` follows the groups unless given.
     menu: {
-        entries: { menu: same("color", "density"), button: {}, ripple: {} },
+        entries: {
+            menu: same("color", "density", "vibrant"),
+            button: {},
+            ripple: {},
+        },
     },
     "navigation-bar": {
         entries: { navigationBar: same("color"), ripple: {} },

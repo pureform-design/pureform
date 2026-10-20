@@ -18,6 +18,7 @@ import {
     snackbar,
     tooltip,
     dialog,
+    list,
     listItem,
     menu,
     tabs,
@@ -55,6 +56,8 @@ const ICON_FILLS = [
 const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
+
+const grouped = menu({ grouped: true, vibrant: true });
 
 // Named themes from pureform.config.ts, each applied to a subtree by `data-panda-theme`.
 const THEMES = [undefined, "teal", "sharp", "dense"] as const;
@@ -1001,6 +1004,86 @@ export function Page() {
                         <span class={menu().itemLabel}>Paste</span>
                         <span class={menu().itemTrailingText}>⌘V</span>
                     </button>
+                </div>
+                <ul
+                    class={list({ variant: "segmented" }).root}
+                    style={{ width: "320px" }}
+                >
+                    {(["first", "middle", "last"] as const).map(
+                        (position, index) => (
+                            <li class={list().item}>
+                                <div
+                                    class={
+                                        listItem({
+                                            lines: "two",
+                                            leadingType: "avatar",
+                                            position,
+                                        }).root
+                                    }
+                                >
+                                    <span class={listItem().leading}>
+                                        {"ABC"[index]}
+                                    </span>
+                                    <div class={listItem().content}>
+                                        <span class={listItem().headline}>
+                                            Segmented, {position}
+                                        </span>
+                                        <span class={listItem().supportingText}>
+                                            Avatar leading
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                        ),
+                    )}
+                </ul>
+                <div
+                    class={grouped.root}
+                    role="menu"
+                    style={{ width: "240px" }}
+                >
+                    {[
+                        { id: "edit", label: "Edit", items: ["Cut", "Copy"] },
+                        { id: "view", label: "View", items: ["Grid"] },
+                    ].map((group) => (
+                        <div
+                            class={grouped.itemGroup}
+                            role="group"
+                            aria-labelledby={`menu-group-${group.id}`}
+                        >
+                            <span
+                                class={grouped.itemGroupLabel}
+                                id={`menu-group-${group.id}`}
+                            >
+                                {group.label}
+                            </span>
+                            {group.items.map((label) => (
+                                <button
+                                    class={grouped.item}
+                                    role={
+                                        label === "Grid"
+                                            ? "menuitemcheckbox"
+                                            : "menuitem"
+                                    }
+                                    aria-checked={
+                                        label === "Grid" ? "true" : undefined
+                                    }
+                                    type="button"
+                                >
+                                    <span class={grouped.itemContent}>
+                                        <span class={grouped.itemLabel}>
+                                            {label}
+                                        </span>
+                                        <span
+                                            class={grouped.itemSupportingText}
+                                        >
+                                            Supporting text
+                                        </span>
+                                    </span>
+                                </button>
+                            ))}
+                        </div>
+                    ))}
                 </div>
                 {(() => {
                     const d = dialog({ icon: true });

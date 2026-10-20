@@ -24,6 +24,7 @@ const named =
 
 const registry = () =>
     createRegistry({
+        list: named("list", ["root", "item"]),
         listItem: named("list-item", [
             "root",
             "leading",

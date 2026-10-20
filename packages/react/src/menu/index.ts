@@ -5,6 +5,8 @@
 export { Menu } from "./menu";
 export type {
     MenuIconProps,
+    MenuItemGroupLabelProps,
+    MenuItemGroupProps,
     MenuItemProps,
     MenuPartProps,
     MenuProps,

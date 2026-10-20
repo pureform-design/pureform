@@ -583,6 +583,51 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`list > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "item": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "root": {
+      "backgroundColor": "var(--components-list-container, token(colors.surface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "paddingBlockEnd": "var(--components-list-paddingBlock, token(spacing.2))",
+      "paddingBlockStart": "var(--components-list-paddingBlock, token(spacing.2))",
+      "paddingInlineEnd": "0px",
+      "paddingInlineStart": "0px",
+    },
+  },
+  "className": "list",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "variant": "standard",
+  },
+  "jsx": [
+    "List",
+  ],
+  "slots": [
+    "root",
+    "item",
+  ],
+  "variants": {
+    "variant": {
+      "segmented": {
+        "root": {
+          "backgroundColor": "transparent",
+          "gap": "var(--components-list-segmentedGap, 2px)",
+        },
+      },
+      "standard": {},
+    },
+  },
+}
+`;
+
 exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
@@ -694,7 +739,9 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "color": "primary",
     "density": "inherit",
     "interactive": false,
+    "leadingType": "icon",
     "lines": "one",
+    "position": "none",
   },
   "jsx": [
     "ListItem",
@@ -812,6 +859,34 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "leadingType": {
+      "avatar": {
+        "leading": {
+          "borderRadius": "token(radii.full)",
+          "height": "var(--components-listItem-avatarSize, 40px)",
+          "minWidth": "var(--components-listItem-avatarSize, 40px)",
+          "overflow": "hidden",
+          "width": "var(--components-listItem-avatarSize, 40px)",
+        },
+      },
+      "icon": {},
+      "thumbnail": {
+        "leading": {
+          "height": "var(--components-listItem-thumbnailSize, 56px)",
+          "minWidth": "var(--components-listItem-thumbnailSize, 56px)",
+          "overflow": "hidden",
+          "width": "var(--components-listItem-thumbnailSize, 56px)",
+        },
+      },
+      "video": {
+        "leading": {
+          "height": "var(--components-listItem-videoHeight, 64px)",
+          "minWidth": "var(--components-listItem-videoWidth, 114px)",
+          "overflow": "hidden",
+          "width": "var(--components-listItem-videoWidth, 114px)",
+        },
+      },
+    },
     "lines": {
       "one": {
         "root": {
@@ -832,6 +907,45 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "position": {
+      "first": {
+        "root": {
+          "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
+          "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderEndStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+        },
+      },
+      "last": {
+        "root": {
+          "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
+          "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderEndStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+        },
+      },
+      "middle": {
+        "root": {
+          "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
+          "borderEndEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderEndStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartEndRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-listItem-innerRadius, token(radii.extraSmall))",
+        },
+      },
+      "none": {},
+      "single": {
+        "root": {
+          "--components-listItem-container": "var(--components-listItem-segmentedContainer, token(colors.surfaceContainer))",
+          "borderEndEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderEndStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartEndRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+          "borderStartStartRadius": "var(--components-listItem-outerRadius, token(radii.large))",
+        },
+      },
+    },
   },
 }
 `;
@@ -840,6 +954,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "item": {
+      "&:is(:checked, [aria-checked=true])": {
+        "backgroundColor": {
+          "&:focus-visible": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+          "&:is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+          "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+          "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, var(--components-menu-selectedContainer, token(colors.secondaryContainer)), var(--components-menu-selectedContent, token(colors.onSecondaryContainer)) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+          "base": "var(--components-menu-selectedContainer, token(colors.secondaryContainer))",
+        },
+        "color": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+      },
       "&:is(:disabled, [aria-disabled=true])": {
         "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         "pointerEvents": "none",
@@ -868,8 +992,8 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "display": "flex",
       "flexDirection": "row",
       "gap": "var(--components-menu-gap, token(spacing.3))",
-      "height": "calc(var(--components-menu-itemHeight, 48px) + token(sizes.densityOffset))",
       "justifyContent": "start",
+      "minHeight": "calc(var(--components-menu-itemHeight, 48px) + token(sizes.densityOffset))",
       "outlineColor": "var(--components-menu-focusIndicatorColor, token(colors.secondary))",
       "outlineOffset": "var(--components-menu-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
       "outlineStyle": {
@@ -882,6 +1006,25 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
       "width": "100%",
+    },
+    "itemContent": {
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockEnd": "token(spacing.2)",
+      "paddingBlockStart": "token(spacing.2)",
+      "width": "100%",
+    },
+    "itemGroup": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "itemGroupLabel": {
+      "color": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+      "paddingBlockEnd": "token(spacing.2)",
+      "paddingBlockStart": "token(spacing.2)",
+      "paddingInlineEnd": "var(--components-menu-itemPaddingInline, token(spacing.3))",
+      "paddingInlineStart": "var(--components-menu-itemPaddingInline, token(spacing.3))",
+      "textStyle": "labelMedium",
     },
     "itemLabel": {
       "textAlign": "start",
@@ -896,6 +1039,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "alignItems": "center",
       "color": {
+        ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
@@ -909,6 +1053,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "minWidth": "var(--components-menu-iconSize, token(sizes.iconMedium))",
       "width": "var(--components-menu-iconSize, token(sizes.iconMedium))",
     },
+    "itemSupportingText": {
+      "color": {
+        ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
+        "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "textAlign": "start",
+      "textStyle": "bodyMedium",
+    },
     "itemTrailing": {
       "_rtl": {
         "&[data-pf-mirror]": {
@@ -917,6 +1071,7 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "alignItems": "center",
       "color": {
+        ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
         ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-menu-selectedContent, token(colors.onSecondaryContainer))",
         "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -974,15 +1129,21 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
   "defaultVariants": {
     "color": "primary",
     "density": "inherit",
+    "grouped": false,
+    "vibrant": false,
   },
   "jsx": [
     "Menu",
   ],
   "slots": [
     "root",
+    "itemGroup",
+    "itemGroupLabel",
     "item",
     "itemLeading",
+    "itemContent",
     "itemLabel",
+    "itemSupportingText",
     "itemTrailing",
     "itemTrailingText",
   ],
@@ -990,6 +1151,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "color": {
       "error": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.errorContainer)",
+            },
+            "color": "token(colors.onErrorContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.errorContainer), token(colors.onErrorContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1003,13 +1174,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onErrorContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onErrorContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onErrorContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onErrorContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1018,6 +1199,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "info": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.infoContainer)",
+            },
+            "color": "token(colors.onInfoContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.infoContainer), token(colors.onInfoContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1031,13 +1222,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onInfoContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onInfoContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onInfoContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1047,6 +1248,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       "primary": {},
       "secondary": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.secondaryContainer)",
+            },
+            "color": "token(colors.onSecondaryContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.secondaryContainer), token(colors.onSecondaryContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1060,13 +1271,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSecondaryContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSecondaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSecondaryContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSecondaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1075,6 +1296,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "success": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.successContainer)",
+            },
+            "color": "token(colors.onSuccessContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.successContainer), token(colors.onSuccessContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1088,13 +1319,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSuccessContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSuccessContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSuccessContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1103,6 +1344,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "tertiary": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.tertiaryContainer)",
+            },
+            "color": "token(colors.onTertiaryContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.tertiaryContainer), token(colors.onTertiaryContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1116,13 +1367,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onTertiaryContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onTertiaryContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onTertiaryContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onTertiaryContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1131,6 +1392,16 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
       },
       "warning": {
         "item": {
+          "&:is(:checked, [aria-checked=true])": {
+            "backgroundColor": {
+              "&:focus-visible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
+              "&:is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) var(--components-menu-statePressedOpacity, token(opacity.statePressed)))",
+              "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) var(--components-menu-stateHoverOpacity, token(opacity.stateHover)))",
+              "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) var(--components-menu-stateDraggedOpacity, token(opacity.stateDragged)))",
+              "base": "token(colors.warningContainer)",
+            },
+            "color": "token(colors.onWarningContainer)",
+          },
           "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
             "backgroundColor": {
               "&:focus-visible": "color-mix(in srgb, token(colors.warningContainer), token(colors.onWarningContainer) var(--components-menu-stateFocusOpacity, token(opacity.stateFocus)))",
@@ -1144,13 +1415,23 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
         },
         "itemLeading": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onWarningContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "itemSupportingText": {
+          "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onWarningContainer)",
+            ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-menu-supportingColor, token(colors.onSurfaceVariant))",
+          },
+        },
         "itemTrailing": {
           "color": {
+            ".menu__item:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onWarningContainer)",
             ".menu__item:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
             ".menu__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-menu-trailingColor, token(colors.onSurfaceVariant))",
@@ -1161,25 +1442,58 @@ exports[`menu > compiles to a stable Panda slot recipe 1`] = `
     "density": {
       "-1": {
         "item": {
-          "height": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -1))",
+          "minHeight": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -1))",
         },
       },
       "-2": {
         "item": {
-          "height": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -2))",
+          "minHeight": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -2))",
         },
       },
       "-3": {
         "item": {
-          "height": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -3))",
+          "minHeight": "calc(var(--components-menu-itemHeight, 48px) + calc(token(spacing.1) * -3))",
         },
       },
       "0": {
         "item": {
-          "height": "calc(var(--components-menu-itemHeight, 48px) + 0px)",
+          "minHeight": "calc(var(--components-menu-itemHeight, 48px) + 0px)",
         },
       },
       "inherit": {},
+    },
+    "grouped": {
+      "false": {},
+      "true": {
+        "itemGroup": {
+          "backgroundColor": "var(--components-menu-container, token(colors.surfaceContainer))",
+          "borderRadius": "var(--components-menu-innerRadius, token(radii.extraSmall))",
+          "paddingBlockEnd": "var(--components-menu-paddingBlock, token(spacing.2))",
+          "paddingBlockStart": "var(--components-menu-paddingBlock, token(spacing.2))",
+        },
+        "root": {
+          "backgroundColor": "transparent",
+          "borderRadius": "var(--components-menu-outerRadius, token(radii.large))",
+          "gap": "var(--components-menu-groupGap, 2px)",
+          "overflow": "hidden",
+          "paddingBlockEnd": "0px",
+          "paddingBlockStart": "0px",
+        },
+      },
+    },
+    "vibrant": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-menu-container": "var(--components-menu-vibrantContainer, token(colors.tertiaryContainer))",
+          "--components-menu-content": "var(--components-menu-vibrantContent, token(colors.onTertiaryContainer))",
+          "--components-menu-iconColor": "var(--components-menu-vibrantContent, token(colors.onTertiaryContainer))",
+          "--components-menu-selectedContainer": "var(--components-menu-vibrantSelectedContainer, token(colors.tertiary))",
+          "--components-menu-selectedContent": "var(--components-menu-vibrantSelectedContent, token(colors.onTertiary))",
+          "--components-menu-supportingColor": "var(--components-menu-vibrantContent, token(colors.onTertiaryContainer))",
+          "--components-menu-trailingColor": "var(--components-menu-vibrantContent, token(colors.onTertiaryContainer))",
+        },
+      },
     },
   },
 }

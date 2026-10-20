@@ -1,9 +1,13 @@
-// The list: Root, an unstyled `<ul>` that gives its list items its variants as their defaults; Item,
-// the `<li>` around each list item; and the ready-made List, which renders a ListItem per entry of
-// `items`.
+// The list: Root, a `<ul>` that gives its list items its variants as their defaults; Item, the
+// `<li>` around each list item; and the ready-made List, which renders a ListItem per entry of
+// `items`, each in its place among the tiles of a segmented list.
 
 import { listAnatomy } from "@pureform/anatomy";
-import { LIST_ROOT_PROPS } from "@pureform/binding-core";
+import {
+    LIST_ROOT_PROPS,
+    listItemPosition,
+    listSelection,
+} from "@pureform/binding-core";
 import type {
     ListContentProps,
     ListItemPart,
@@ -16,14 +20,14 @@ import { type ElementType, type ReactNode, useMemo } from "react";
 import { ListDefaults, ListItem } from "../list-item/list-item";
 import type { ListItemPartProps, ListItemProps } from "../list-item/list-item";
 import { createPartContext } from "../part-context";
-import { useUnstyledComponent } from "../parts";
-import type { PartScope } from "../parts";
+import { useComponent } from "../parts";
+import type { ComponentScope } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 
 /** What Root shares with its items. */
 interface ListContextValue {
-    readonly scope: PartScope<typeof listAnatomy>;
+    readonly scope: ComponentScope<typeof listAnatomy>;
 }
 
 const context = createPartContext<ListContextValue>("List");
@@ -39,13 +43,16 @@ export interface ListRootProps
 /** An item's props: the `<li>`'s own. */
 export type ListItemWrapperProps = PartProps;
 
-/** The list's root, a `<ul>`. The registry doesn't style it. */
+/** The list's root, a `<ul>`. */
 function Root(props: ListRootProps): ReactNode {
-    const scope = useUnstyledComponent(listAnatomy, { testId: props.testId });
-    const { density, color, tokens } = props;
+    const scope = useComponent(listAnatomy, {
+        selection: listSelection(props),
+        testId: props.testId,
+    });
+    const { density, color, tokens, leadingType } = props;
     const defaults = useMemo(
-        () => ({ density, color, tokens }),
-        [density, color, tokens],
+        () => ({ density, color, tokens, leadingType }),
+        [density, color, tokens, leadingType],
     );
     const { as, ...rest } = omitProps(props, LIST_ROOT_PROPS);
     return (
@@ -57,7 +64,7 @@ function Root(props: ListRootProps): ReactNode {
     );
 }
 
-/** The `<li>` around a list item. The registry doesn't style it. */
+/** The `<li>` around a list item. */
 function Item(props: ListItemWrapperProps): ReactNode {
     const { scope } = context.use("Item");
     return scope.render("item", { element: "li", props });
@@ -73,14 +80,21 @@ export interface ListProps
     readonly unstyled?: Unstyled<ListItemPart> | undefined;
 }
 
-/** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`. */
+/** The ready-made list: an item per entry of `items`, each a ListItem in an `<li>`. In a segmented
+ *  list, each item takes its position among the tiles unless given one. */
 function ReadyMade(props: ListProps): ReactNode {
     const { slotProps, unstyled, items = [], ...rootProps } = props;
+    const segmented = props.variant === "segmented";
     return (
         <Root {...rootProps}>
             {items.map(({ value, ...item }, index) => (
                 <Item key={value ?? index}>
                     <ListItem
+                        position={listItemPosition(
+                            index,
+                            items.length,
+                            segmented,
+                        )}
                         {...(item as ListItemProps)}
                         {...({ slotProps, unstyled } as Partial<ListItemProps>)}
                     />
