@@ -32,6 +32,9 @@ export interface SelectVariantProps {
     readonly color?: VariantProp<"select", "color">;
     readonly density?: VariantProp<"select", "density">;
     readonly leadingIcon?: boolean | undefined;
+    /** Make room for prefix or suffix text; the ready-made select sets them when it renders one. */
+    readonly prefixText?: boolean | undefined;
+    readonly suffixText?: boolean | undefined;
     readonly tokens?: InstanceTokens<"select"> | undefined;
 }
 
@@ -49,7 +52,7 @@ export interface SelectElementIds {
     readonly item?: ((value: string) => string) | undefined;
 }
 
-/** One option, as data. */
+/** One option, as data. Option groups come with the menu's group parts (c1c). */
 export interface SelectItem extends InteractionSourceProps {
     readonly value: string;
     /** What the option and the field show, and typeahead matches. */
@@ -126,6 +129,8 @@ export const SELECT_ROOT_PROPS = [
     "color",
     "density",
     "leadingIcon",
+    "prefixText",
+    "suffixText",
     "tokens",
     "items",
     "disabled",
@@ -167,6 +172,10 @@ export interface SelectContentProps<Node> {
     readonly leadingIcon?: Node;
     /** The arrow at the end; a drop-down arrow unless given. */
     readonly trailingIcon?: Node;
+    /** Text before the value; shows once the label floats. */
+    readonly prefixText?: Node;
+    /** Text after the value; shows once the label floats. */
+    readonly suffixText?: Node;
 }
 
 /** The keys of `SelectContentProps`. */
@@ -175,6 +184,8 @@ export const SELECT_CONTENT_PROPS = [
     "supportingText",
     "leadingIcon",
     "trailingIcon",
+    "prefixText",
+    "suffixText",
 ] as const satisfies readonly (keyof SelectContentProps<unknown>)[];
 
 /** The field's registry selection from Root's props. The arrow's room is always there. */
@@ -185,6 +196,8 @@ export const selectSelection = (
     color: props.color,
     density: props.density,
     leadingIcon: props.leadingIcon,
+    prefixText: props.prefixText,
+    suffixText: props.suffixText,
     trailingIcon: true,
     tokens: props.tokens,
 });
