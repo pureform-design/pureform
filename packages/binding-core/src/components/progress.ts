@@ -14,11 +14,12 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
-/** The linear progress indicator's parts: `"root" | "indicator"`. */
+/** The linear progress indicator's parts: `"root" | "track" | "indicator" | "stopIndicator"`. */
 export type LinearProgressPart = PartName<typeof linearProgressAnatomy>;
 
-/** The circular progress indicator's parts: `"root" | "endHalf" | "endArc" | "startHalf" |
- *  "startArc"`. */
+/** The circular progress indicator's parts: `"root"`, the track's `"track" | "trackEndHalf" |
+ *  "trackEndArc" | "trackStartHalf" | "trackStartArc"`, and the indicator's `"endHalf" | "endArc" |
+ *  "startHalf" | "startArc"`. */
 export type CircularProgressPart = PartName<typeof circularProgressAnatomy>;
 
 /** Which progress indicator. */

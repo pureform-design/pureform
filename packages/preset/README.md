@@ -630,13 +630,20 @@ number from 0 to 100 (prefixed like every var, for example `--components-slider-
     aria-valuenow="40"
     style="--components-linearProgress-value: 40%"
 >
+    <div class="{track}"></div>
     <div class="{indicator}"></div>
+    <div class="{stopIndicator}"></div>
 </div>
 ```
 
-- `linearProgress`: turn on `indeterminate` when the amount is unknown.
-- `circularProgress`: a ring drawn by two halves, each turning through its share of the
-  value. Turn on `indeterminate` for a spinner, which needs only the root.
+- `linearProgress`: `track` (the rest of the bar, starting after the indicator and the `gap`
+  token, 4px), `indicator`, and `stopIndicator` (a dot at the track's end, `stopSize`). Turn on
+  `indeterminate` when the amount is unknown: the track fills the bar and the dot goes.
+- `circularProgress`: a `track` (the same two-half ring in `trackColor`, turned past the
+  indicator and drawing the rest of the circle less a `gap` at each end, a percent of the
+  circle, 3 by default) under a ring drawn by two halves, each turning through its share of the
+  value. The arcs draw from their own tokens, not the radius roles, so they stay round under
+  a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner, which needs only the root.
 
 ```html
 <div
@@ -645,6 +652,10 @@ number from 0 to 100 (prefixed like every var, for example `--components-slider-
     aria-valuenow="40"
     style="--components-circularProgress-value: 40"
 >
+    <span class="{track}">
+        <span class="{trackEndHalf}"><span class="{trackEndArc}"></span></span>
+        <span class="{trackStartHalf}"><span class="{trackStartArc}"></span></span>
+    </span>
     <span class="{endHalf}"><span class="{endArc}"></span></span>
     <span class="{startHalf}"><span class="{startArc}"></span></span>
 </div>

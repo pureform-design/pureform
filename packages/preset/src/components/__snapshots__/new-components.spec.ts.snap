@@ -15,7 +15,10 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
       "opacity": "clamp(0, min(var(--components-circularProgress-value, 0), 50), 1)",
       "position": "absolute",
       "top": "0px",
-      "transform": "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
+      "transform": {
+        "_rtl": "rotate(calc(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)) * -1))",
+        "base": "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
+      },
       "width": "200%",
     },
     "endHalf": {
@@ -48,10 +51,80 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
       "opacity": "clamp(0, max(calc(var(--components-circularProgress-value, 0) - 50), 0), 1)",
       "position": "absolute",
       "top": "0px",
-      "transform": "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
+      "transform": {
+        "_rtl": "rotate(calc(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)) * -1))",
+        "base": "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
+      },
       "width": "200%",
     },
     "startHalf": {
+      "height": "100%",
+      "insetInlineStart": "0px",
+      "overflow": "hidden",
+      "position": "absolute",
+      "top": "0px",
+      "width": "50%",
+    },
+    "track": {
+      "height": "100%",
+      "insetInlineStart": "0px",
+      "position": "absolute",
+      "top": "0px",
+      "transform": {
+        "_rtl": "rotate(calc(calc(var(--components-circularProgress-value, 0) + var(--components-circularProgress-gap, 3)) * -3.6deg))",
+        "base": "rotate(calc(calc(var(--components-circularProgress-value, 0) + var(--components-circularProgress-gap, 3)) * 3.6deg))",
+      },
+      "transition": {
+        "_motionReduce": "none",
+        "base": "--components-circularProgress-value token(durations.short3) token(easings.standard)",
+      },
+      "width": "100%",
+    },
+    "trackEndArc": {
+      "borderBlockStartColor": "var(--components-circularProgress-trackColor, token(colors.secondaryContainer))",
+      "borderColor": "transparent",
+      "borderInlineEndColor": "var(--components-circularProgress-trackColor, token(colors.secondaryContainer))",
+      "borderRadius": "50%",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-circularProgress-thickness, 4px)",
+      "height": "100%",
+      "insetInlineEnd": "0px",
+      "opacity": "clamp(0, min(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0), 50), 1)",
+      "position": "absolute",
+      "top": "0px",
+      "transform": {
+        "_rtl": "rotate(calc(calc(-135deg + calc(min(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0), 50) * 3.6deg)) * -1))",
+        "base": "rotate(calc(-135deg + calc(min(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0), 50) * 3.6deg)))",
+      },
+      "width": "200%",
+    },
+    "trackEndHalf": {
+      "height": "100%",
+      "insetInlineEnd": "0px",
+      "overflow": "hidden",
+      "position": "absolute",
+      "top": "0px",
+      "width": "50%",
+    },
+    "trackStartArc": {
+      "borderBlockStartColor": "var(--components-circularProgress-trackColor, token(colors.secondaryContainer))",
+      "borderColor": "transparent",
+      "borderInlineEndColor": "var(--components-circularProgress-trackColor, token(colors.secondaryContainer))",
+      "borderRadius": "50%",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-circularProgress-thickness, 4px)",
+      "height": "100%",
+      "insetInlineStart": "0px",
+      "opacity": "clamp(0, max(calc(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0) - 50), 0), 1)",
+      "position": "absolute",
+      "top": "0px",
+      "transform": {
+        "_rtl": "rotate(calc(calc(45deg + calc(max(calc(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0) - 50), 0) * 3.6deg)) * -1))",
+        "base": "rotate(calc(45deg + calc(max(calc(max(calc(100 - var(--components-circularProgress-value, 0) - calc(var(--components-circularProgress-gap, 3) * 2)), 0) - 50), 0) * 3.6deg)))",
+      },
+      "width": "200%",
+    },
+    "trackStartHalf": {
       "height": "100%",
       "insetInlineStart": "0px",
       "overflow": "hidden",
@@ -72,6 +145,11 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
   ],
   "slots": [
     "root",
+    "track",
+    "trackEndHalf",
+    "trackEndArc",
+    "trackStartHalf",
+    "trackStartArc",
     "endHalf",
     "endArc",
     "startHalf",
@@ -92,6 +170,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
           "borderBlockStartColor": "token(colors.error)",
           "borderInlineEndColor": "token(colors.error)",
         },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.errorContainer)",
+          "borderInlineEndColor": "token(colors.errorContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.errorContainer)",
+          "borderInlineEndColor": "token(colors.errorContainer)",
+        },
       },
       "info": {
         "endArc": {
@@ -105,6 +191,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
         "startArc": {
           "borderBlockStartColor": "token(colors.info)",
           "borderInlineEndColor": "token(colors.info)",
+        },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.infoContainer)",
+          "borderInlineEndColor": "token(colors.infoContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.infoContainer)",
+          "borderInlineEndColor": "token(colors.infoContainer)",
         },
       },
       "primary": {},
@@ -121,6 +215,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
           "borderBlockStartColor": "token(colors.secondary)",
           "borderInlineEndColor": "token(colors.secondary)",
         },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.secondaryContainer)",
+          "borderInlineEndColor": "token(colors.secondaryContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.secondaryContainer)",
+          "borderInlineEndColor": "token(colors.secondaryContainer)",
+        },
       },
       "success": {
         "endArc": {
@@ -134,6 +236,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
         "startArc": {
           "borderBlockStartColor": "token(colors.success)",
           "borderInlineEndColor": "token(colors.success)",
+        },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.successContainer)",
+          "borderInlineEndColor": "token(colors.successContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.successContainer)",
+          "borderInlineEndColor": "token(colors.successContainer)",
         },
       },
       "tertiary": {
@@ -149,6 +259,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
           "borderBlockStartColor": "token(colors.tertiary)",
           "borderInlineEndColor": "token(colors.tertiary)",
         },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.tertiaryContainer)",
+          "borderInlineEndColor": "token(colors.tertiaryContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.tertiaryContainer)",
+          "borderInlineEndColor": "token(colors.tertiaryContainer)",
+        },
       },
       "warning": {
         "endArc": {
@@ -162,6 +280,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
         "startArc": {
           "borderBlockStartColor": "token(colors.warning)",
           "borderInlineEndColor": "token(colors.warning)",
+        },
+        "trackEndArc": {
+          "borderBlockStartColor": "token(colors.warningContainer)",
+          "borderInlineEndColor": "token(colors.warningContainer)",
+        },
+        "trackStartArc": {
+          "borderBlockStartColor": "token(colors.warningContainer)",
+          "borderInlineEndColor": "token(colors.warningContainer)",
         },
       },
     },
@@ -180,6 +306,9 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
           "borderWidth": "var(--components-circularProgress-thickness, 4px)",
         },
         "startHalf": {
+          "display": "none",
+        },
+        "track": {
           "display": "none",
         },
       },
@@ -310,12 +439,32 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
       "width": "calc(var(--components-linearProgress-value, 0) * 1%)",
     },
     "root": {
-      "backgroundColor": "var(--components-linearProgress-trackColor, token(colors.secondaryContainer))",
-      "borderRadius": "token(radii.full)",
       "height": "var(--components-linearProgress-height, 4px)",
       "overflow": "hidden",
       "position": "relative",
       "width": "100%",
+    },
+    "stopIndicator": {
+      "backgroundColor": "var(--components-linearProgress-activeColor, token(colors.primary))",
+      "borderRadius": "50%",
+      "height": "var(--components-linearProgress-stopSize, 4px)",
+      "insetInlineEnd": "0px",
+      "position": "absolute",
+      "top": "calc(calc(var(--components-linearProgress-height, 4px) - var(--components-linearProgress-stopSize, 4px)) / 2)",
+      "width": "var(--components-linearProgress-stopSize, 4px)",
+    },
+    "track": {
+      "backgroundColor": "var(--components-linearProgress-trackColor, token(colors.secondaryContainer))",
+      "borderRadius": "token(radii.full)",
+      "height": "100%",
+      "insetInlineEnd": "0px",
+      "insetInlineStart": "calc(calc(var(--components-linearProgress-value, 0) * 1%) + var(--components-linearProgress-gap, 4px))",
+      "position": "absolute",
+      "top": "0px",
+      "transition": {
+        "_motionReduce": "none",
+        "base": "inset-inline-start token(durations.short3) token(easings.standard)",
+      },
     },
   },
   "className": "linearProgress",
@@ -330,7 +479,9 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
   ],
   "slots": [
     "root",
+    "track",
     "indicator",
+    "stopIndicator",
   ],
   "variants": {
     "color": {
@@ -338,7 +489,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.error)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.error)",
+        },
+        "track": {
           "backgroundColor": "token(colors.errorContainer)",
         },
       },
@@ -346,7 +500,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.info)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.info)",
+        },
+        "track": {
           "backgroundColor": "token(colors.infoContainer)",
         },
       },
@@ -355,7 +512,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.secondary)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.secondary)",
+        },
+        "track": {
           "backgroundColor": "token(colors.secondaryContainer)",
         },
       },
@@ -363,7 +523,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.success)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.success)",
+        },
+        "track": {
           "backgroundColor": "token(colors.successContainer)",
         },
       },
@@ -371,7 +534,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.tertiary)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.tertiary)",
+        },
+        "track": {
           "backgroundColor": "token(colors.tertiaryContainer)",
         },
       },
@@ -379,7 +545,10 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
         "indicator": {
           "backgroundColor": "token(colors.warning)",
         },
-        "root": {
+        "stopIndicator": {
+          "backgroundColor": "token(colors.warning)",
+        },
+        "track": {
           "backgroundColor": "token(colors.warningContainer)",
         },
       },
@@ -394,13 +563,19 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
           },
           "width": "var(--components-linearProgress-indeterminateWidth, 40%)",
         },
+        "stopIndicator": {
+          "display": "none",
+        },
+        "track": {
+          "insetInlineStart": "0px",
+        },
       },
     },
     "thickness": {
       "default": {},
       "thick": {
         "root": {
-          "height": "var(--components-linearProgress-thickHeight, 8px)",
+          "--components-linearProgress-height": "var(--components-linearProgress-thickHeight, 8px)",
         },
       },
     },

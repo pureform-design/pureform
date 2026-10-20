@@ -98,12 +98,47 @@ describe("progress", () => {
     it("turns each half of the circular arc through its share of the value", () => {
         const base = compilePreset(configWith(circularProgress)).theme
             ?.slotRecipes?.circularProgress?.base;
-        expect(base?.endArc?.transform).toBe(
+        expect((base?.endArc?.transform as { base: string }).base).toBe(
             "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
         );
-        expect(base?.startArc?.transform).toBe(
+        expect((base?.startArc?.transform as { base: string }).base).toBe(
             "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
         );
+    });
+
+    it("draws the circular track as the rest of the circle, turned past the indicator and its gap", () => {
+        const base = compilePreset(configWith(circularProgress)).theme
+            ?.slotRecipes?.circularProgress?.base;
+        expect(Object.keys(base ?? {})).toEqual(
+            expect.arrayContaining([
+                "track",
+                "trackEndHalf",
+                "trackEndArc",
+                "trackStartHalf",
+                "trackStartArc",
+            ]),
+        );
+        expect(JSON.stringify(base?.track?.transform)).toContain(
+            "var(--components-circularProgress-gap",
+        );
+        expect(JSON.stringify(base?.trackEndArc?.transform)).toContain(
+            "var(--components-circularProgress-gap",
+        );
+        expect(base?.trackEndArc?.borderBlockStartColor).toContain(
+            "trackColor",
+        );
+    });
+
+    it("starts the linear track after the indicator and a gap, and hides it and the stop dot while indeterminate", () => {
+        const css = compilePreset(configWith(linearProgress)).theme?.slotRecipes
+            ?.linearProgress;
+        expect(css?.base?.track?.insetInlineStart).toContain(
+            "var(--components-linearProgress-gap",
+        );
+        expect(css?.base?.stopIndicator?.width).toContain("stopSize");
+        const indeterminate = css?.variants?.indeterminate?.true;
+        expect(indeterminate?.stopIndicator).toEqual({ display: "none" });
+        expect(indeterminate?.track).toEqual({ insetInlineStart: "0px" });
     });
 
     it("adds its keyframes to the pureform config", () => {
