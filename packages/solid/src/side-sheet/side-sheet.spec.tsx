@@ -96,7 +96,7 @@ describe("SideSheet, ready-made", () => {
         expect(onBack).toHaveBeenCalledTimes(1);
     });
 
-    it("as a coplanar sheet, stays in the page's layout without a backdrop", async () => {
+    it("as a coplanar sheet, stays in the page's layout with its backdrop hidden", async () => {
         withRegistry(() => (
             <SideSheet modal={false} coplanar defaultOpen headline="Details" />
         ));
@@ -105,11 +105,7 @@ describe("SideSheet, ready-made", () => {
             "side-sheet side-sheet--modal-false side-sheet--coplanar-true",
         );
         expect(byTestId(ids.positioner).style.position).toBe("");
-        expect(
-            document.querySelector(
-                `[data-testid="${compositeTestIds.sideSheetBackdrop.root}"]`,
-            ),
-        ).toBeNull();
+        expect(byTestId(compositeTestIds.sideSheetBackdrop.root).hidden).toBe(true);
     });
 
     it("ignores coplanar on a modal sheet", async () => {

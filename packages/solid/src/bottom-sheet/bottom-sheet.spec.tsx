@@ -112,7 +112,7 @@ describe("BottomSheet, ready-made", () => {
         expect(onOpenChange).toHaveBeenLastCalledWith({ open: false });
     });
 
-    it("as a standard sheet, has no backdrop, doesn't trap focus, and lets presses beside it through", async () => {
+    it("as a standard sheet, hides its backdrop, doesn't trap focus, and lets presses beside it through", async () => {
         withRegistry(() => (
             <BottomSheet modal={false} defaultOpen aria-label="Now playing" />
         ));
@@ -120,11 +120,7 @@ describe("BottomSheet, ready-made", () => {
         const content = byTestId(ids.content);
         expect(content.className).toContain("bottom-sheet--modal-false");
         expect(content.getAttribute("aria-modal")).not.toBe("true");
-        expect(
-            document.querySelector(
-                `[data-testid="${compositeTestIds.bottomSheetBackdrop.root}"]`,
-            ),
-        ).toBeNull();
+        expect(byTestId(compositeTestIds.bottomSheetBackdrop.root).hidden).toBe(true);
         expect(byTestId(ids.positioner).style.pointerEvents).toBe("none");
         expect(content.style.pointerEvents).toBe("auto");
     });
