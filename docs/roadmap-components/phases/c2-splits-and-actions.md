@@ -13,8 +13,11 @@ for the parts these build on.
 
 Split `tooltip` into `tooltip` (plain: `root`, optional `caret`, `supportingText`; zag
 `tooltip`) and `richTooltip` (`root`, `caret`, `subhead`, `supportingText`, `actions`; zag
-`popover` or `hover-card`). The old `rich` variant stays working, as a deprecated alias that
-renders the new component (guidelines: keep what we had). Own files: `tooltip.ts`, a new
+`popover` or `hover-card`). **Remove** the `tooltip`'s `variant` group (`plain`, `rich`) and
+its `subhead` and `actions` parts. Why: rich tooltips aren't deprecated in M3, they moved to
+their own component, so `richTooltip` replaces the variant. Keeping an alias would leave
+parts on `tooltip` that only one variant uses. Update the demos, suites and fixtures that
+use `variant: "rich"`, and note the breaking change in the commit. Own files: `tooltip.ts`, a new
 `rich-tooltip.ts`, `packages/machines/src/tooltip.ts`, bindings.
 
 ## c2b: Dialog and full-screen dialog
@@ -61,5 +64,5 @@ Registration files for each new component. Merge order: c2a, c2b, c2c, c2d, c2e,
 
 ## Done when
 
-As for c1. Plus: the old `tooltip` `rich` variant still renders, and the new components pass
+As for c1. Plus: `tooltip` has no `rich` variant or rich-only parts left, and the new components pass
 the direction and indication suites.
