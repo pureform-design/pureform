@@ -235,6 +235,17 @@ export const overlaysRegistry = () =>
             "confirmAction",
             "body",
         ]),
+        bottomSheet: named("bottom-sheet", ["root", "dragHandle", "content"]),
+        sideSheet: named("side-sheet", [
+            "root",
+            "header",
+            "backButton",
+            "headline",
+            "closeTrigger",
+            "content",
+            "actions",
+        ]),
+        dragHandle: named("drag-handle", ["root", "handle"]),
         iconButton: named("icon-button", [
             "root",
             "touchTarget",

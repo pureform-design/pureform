@@ -29,6 +29,9 @@ import {
     separator,
     fab,
     fullscreenDialog,
+    bottomSheet,
+    sideSheet,
+    dragHandle,
     fabMenu,
     splitButton,
     icon,
@@ -2182,6 +2185,159 @@ export function Page() {
                         </div>
                     );
                 })()}
+            </section>
+
+            <section
+                data-section="sheets"
+                style={{
+                    display: "flex",
+                    "align-items": "stretch",
+                    gap: "16px",
+                    height: "300px",
+                }}
+            >
+                <div
+                    style={{
+                        display: "flex",
+                        "flex-direction": "column",
+                        "justify-content": "flex-end",
+                        width: "360px",
+                        outline: "1px solid currentColor",
+                    }}
+                >
+                    {(() => {
+                        const s = bottomSheet();
+                        const h = dragHandle();
+                        return (
+                            <div
+                                class={s.root}
+                                role="dialog"
+                                aria-label="Share"
+                            >
+                                <button
+                                    class={`${s.dragHandle} ${h.root}`}
+                                    type="button"
+                                    aria-label="Close sheet"
+                                >
+                                    <span class={h.handle} />
+                                </button>
+                                <div class={s.content}>
+                                    Share this photo with people nearby, or copy
+                                    a link to it.
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        "justify-content": "flex-end",
+                        width: "420px",
+                        outline: "1px solid currentColor",
+                    }}
+                >
+                    {(() => {
+                        const s = sideSheet();
+                        const b = iconButton({ variant: "standard" });
+                        return (
+                            <div
+                                class={s.root}
+                                role="dialog"
+                                aria-labelledby="side-sheet-title"
+                                style={{ width: "300px" }}
+                            >
+                                <div class={s.header}>
+                                    <button
+                                        class={`${s.backButton} ${b.root}`}
+                                        type="button"
+                                        aria-label="Back"
+                                    >
+                                        <span class={b.touchTarget} />
+                                        <span class={b.container}>
+                                            <svg
+                                                class={b.icon}
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    fill="currentColor"
+                                                    d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+                                                />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                    <h2
+                                        class={s.headline}
+                                        id="side-sheet-title"
+                                    >
+                                        Filters
+                                    </h2>
+                                    <button
+                                        class={`${s.closeTrigger} ${b.root}`}
+                                        type="button"
+                                        aria-label="Close"
+                                    >
+                                        <span class={b.touchTarget} />
+                                        <span class={b.container}>
+                                            <svg
+                                                class={b.icon}
+                                                viewBox="0 0 24 24"
+                                            >
+                                                <path
+                                                    fill="currentColor"
+                                                    d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                                />
+                                            </svg>
+                                        </span>
+                                    </button>
+                                </div>
+                                <div class={s.content}>
+                                    Narrow the results by date, size and kind.
+                                </div>
+                                <div class={s.actions}>
+                                    <button
+                                        class={
+                                            button({ variant: "filled" }).root
+                                        }
+                                        type="button"
+                                    >
+                                        <span class={button().label}>Save</span>
+                                    </button>
+                                    <button
+                                        class={
+                                            button({ variant: "outlined" }).root
+                                        }
+                                        type="button"
+                                    >
+                                        <span class={button().label}>
+                                            Cancel
+                                        </span>
+                                    </button>
+                                </div>
+                            </div>
+                        );
+                    })()}
+                </div>
+                <div
+                    style={{
+                        display: "flex",
+                        "align-items": "center",
+                        outline: "1px solid currentColor",
+                    }}
+                >
+                    {(() => {
+                        const h = dragHandle({ orientation: "vertical" });
+                        return (
+                            <button
+                                class={h.root}
+                                type="button"
+                                aria-label="Resize panes"
+                            >
+                                <span class={h.handle} />
+                            </button>
+                        );
+                    })()}
+                </div>
             </section>
 
             <section

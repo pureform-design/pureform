@@ -1,11 +1,13 @@
 // Every component the shared suites run over. Add a component's case here.
 
+import { bottomSheet } from "./bottom-sheet";
 import { button } from "./button";
 import { buttonGroup } from "./button-group";
 import { card, cardActionArea } from "./card";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { dialog } from "./dialog";
+import { dragHandle } from "./drag-handle";
 import { fab } from "./fab";
 import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
@@ -18,6 +20,7 @@ import { radioGroup } from "./radio-group";
 import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
 import { select } from "./select";
+import { sideSheet } from "./side-sheet";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { splitButton } from "./split-button";
@@ -44,6 +47,7 @@ import type { ComponentCase } from "./types";
 export const COMPONENTS: readonly ComponentCase[] = [
     avatar,
     badge,
+    bottomSheet,
     button,
     buttonGroup,
     card,
@@ -52,6 +56,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     chip,
     circularProgress,
     dialog,
+    dragHandle,
     fab,
     fullscreenDialog,
     fabMenu,
@@ -72,6 +77,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     searchBar,
     select,
     separator,
+    sideSheet,
     slider,
     snackbar,
     splitButton,

@@ -89,6 +89,27 @@
                 "default": "./dist/dialog.mjs"
             }
         },
+        "./bottom-sheet": {
+            "types": "./dist/bottom-sheet/index.d.ts",
+            "import": {
+                "development": "./src/bottom-sheet/index.ts",
+                "default": "./dist/bottom-sheet.mjs"
+            }
+        },
+        "./side-sheet": {
+            "types": "./dist/side-sheet/index.d.ts",
+            "import": {
+                "development": "./src/side-sheet/index.ts",
+                "default": "./dist/side-sheet.mjs"
+            }
+        },
+        "./drag-handle": {
+            "types": "./dist/drag-handle/index.d.ts",
+            "import": {
+                "development": "./src/drag-handle/index.ts",
+                "default": "./dist/drag-handle.mjs"
+            }
+        },
         "./fullscreen-dialog": {
             "types": "./dist/fullscreen-dialog/index.d.ts",
             "import": {

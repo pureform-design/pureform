@@ -8,6 +8,7 @@
 export const COMPONENT_NAMES = [
     "Avatar",
     "Badge",
+    "BottomSheet",
     "Button",
     "ButtonGroup",
     "Card",
@@ -15,6 +16,7 @@ export const COMPONENT_NAMES = [
     "Chip",
     "CircularProgress",
     "Dialog",
+    "DragHandle",
     "Fab",
     "FullscreenDialog",
     "FabMenu",
@@ -34,6 +36,7 @@ export const COMPONENT_NAMES = [
     "SearchBar",
     "Select",
     "Separator",
+    "SideSheet",
     "Slider",
     "Snackbar",
     "SplitButton",
