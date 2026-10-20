@@ -124,6 +124,13 @@
                 "default": "./dist/slider.mjs"
             }
         },
+        "./combobox": {
+            "types": "./dist/combobox/index.d.ts",
+            "import": {
+                "development": "./src/combobox/index.ts",
+                "default": "./dist/combobox.mjs"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "import": {
@@ -159,6 +166,7 @@
         "@zag-js/anatomy": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",
+        "@zag-js/combobox": "catalog:",
         "@zag-js/core": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",

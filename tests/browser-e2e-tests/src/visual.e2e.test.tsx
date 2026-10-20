@@ -45,6 +45,7 @@ const SECTIONS = [
     "toasts",
     "search-and-feedback",
     "select",
+    "search-and-autocomplete",
     "progress",
     "navigation",
     "badges",

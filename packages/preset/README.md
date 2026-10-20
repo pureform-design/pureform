@@ -432,6 +432,20 @@ own `trailingIconSize` and `trailingIconSpacing`.
 </button>
 ```
 
+## Search view and autocomplete
+
+`searchView` is the surface a search bar opens into: a `header` (`leading`, `input`, `trailing`,
+which hold icon buttons) over a `divider` and the `content` (the suggestions, drawn with the
+menu's item parts). `variant`: `fullScreen` (default) fills its positioner over the viewport;
+`docked` drops over the search bar's place with the large corners; `contained` (M3 Expressive)
+is docked with the header kept as a pill, no divider, and its icons travel outward as it opens
+(keyframes `searchViewFromEnd`/`searchViewFromStart`, web only; still under reduced motion).
+The search bar's `scrolled` variant takes the app bar's scrolled container colour.
+
+`autocomplete` is the select's field (affixes, icons, colour, density) over an editable
+combobox input: no pointer cursor, the arrow turns while the suggestions are open. The
+suggestions are the `menu` component's items and groups.
+
 ## Input chip and tags input
 
 `inputChip` is Material's input chip, split from `chip` (it adds `avatar` and an interactive

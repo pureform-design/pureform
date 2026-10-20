@@ -38,6 +38,8 @@ import {
 
 const { tokens, ref } = componentTokens("searchBar", {
     container: sys("surfaceContainerHigh"),
+    // The container once the app bar it sits in is scrolled under.
+    scrolledContainer: sys("surfaceContainerHighest"),
     inputColor: sys("onSurface"),
     placeholderColor: sys("onSurfaceVariant"),
     leadingColor: sys("onSurface"),
@@ -57,12 +59,12 @@ export const searchBar = pf.slotComponent({
     name: "searchBar",
     $meta: {
         description:
-            "Material search bar: a pill holding a leading icon, the search input, and trailing icons. centered centers the text, as M3 Expressive's app bar search does.",
+            "Material search bar: a pill holding a leading icon, the search input, and trailing icons. centered centers the text, as M3 Expressive's app bar search does; scrolled takes the app bar's scrolled container color.",
     },
     tokens,
     slots: ["root", "leading", "input", "trailing"],
     structure: { root: ["leading", "input", "trailing"] },
-    variants: { centered: ["false", "true"] },
+    variants: { centered: ["false", "true"], scrolled: ["false", "true"] },
     recipe: () => ({
         base: {
             root: {
@@ -112,7 +114,16 @@ export const searchBar = pf.slotComponent({
                 false: {},
                 true: { input: { textAlign: center } },
             },
+            // In an app bar the page has scrolled under, the bar takes the scrolled container.
+            scrolled: {
+                false: {},
+                true: {
+                    root: {
+                        tokens: { container: ref("scrolledContainer") },
+                    },
+                },
+            },
         },
-        defaultVariants: { centered: "false" },
+        defaultVariants: { centered: "false", scrolled: "false" },
     }),
 });

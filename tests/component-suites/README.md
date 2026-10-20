@@ -222,7 +222,9 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   overlays (menu, tooltip, dialog, snackbar). The tags input (`tags-input.ts`) goes from `["red"]`
   to `["red", "blue"]` by typing and Enter; its indication case highlights the chip with the left
   arrow (shown as hover) and focuses the remove button by script, since Zag keeps it out of the tab
-  order.
+  order. The autocomplete (`autocomplete.ts`) chooses `value` from the suggestions opened by its
+  arrow; its input submits the typed text. The search view (`search-view.ts`) opens from the
+  search bar around it (its trigger, `data-state`), and is a modal: focus goes to its input.
 - **Navigation and lists** (`tabs.ts`, `navigation.ts`, `list.ts`): the tabs' `value` moves with
   a click, Home and End, and the sideways arrows by direction (`read` checks each panel's `hidden`
   against its tab); `keyboard.focusable` is the selected tab, the only one Tab reaches. The

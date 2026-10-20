@@ -16,6 +16,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
         include: [
             "@zag-js/checkbox",
             "@zag-js/collection",
+            "@zag-js/combobox",
             "@zag-js/dialog",
             "@zag-js/menu",
             "@zag-js/presence",

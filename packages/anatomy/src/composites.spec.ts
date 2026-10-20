@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { partAttributes, partSlot } from "./attributes";
 import {
+    autocompleteMenuAnatomy,
     bottomSheetBackdropAnatomy,
     bottomSheetOverlayAnatomy,
     compositeTestIds,
@@ -10,6 +11,8 @@ import {
     fullscreenDialogOverlayAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
+    searchViewMenuAnatomy,
+    searchViewOverlayAnatomy,
     selectMenuAnatomy,
     sideSheetBackdropAnatomy,
     sideSheetOverlayAnatomy,
@@ -24,6 +27,7 @@ import {
     fullscreenDialogAnatomy,
     menuAnatomy,
     richTooltipAnatomy,
+    searchViewAnatomy,
     sideSheetAnatomy,
     tabsAnatomy,
     tooltipAnatomy,
@@ -33,6 +37,8 @@ import type { ComponentAnatomy } from "./types";
 describe("composites", () => {
     it.each([
         ["the select's menu", selectMenuAnatomy, menuAnatomy],
+        ["the autocomplete's menu", autocompleteMenuAnatomy, menuAnatomy],
+        ["the search view's items", searchViewMenuAnatomy, menuAnatomy],
         ["the menu's overlay", menuOverlayAnatomy, menuAnatomy],
         ["the tabs", tabsCompositeAnatomy, tabsAnatomy],
     ] as const)(
@@ -129,6 +135,56 @@ describe("composites", () => {
             );
         },
     );
+
+    it("the autocomplete's menu is the select's under the autocomplete's scope and test ids", () => {
+        expect(autocompleteMenuAnatomy.partNames).toEqual(
+            selectMenuAnatomy.partNames,
+        );
+        for (const part of autocompleteMenuAnatomy.partNames) {
+            expect(autocompleteMenuAnatomy.parts[part].testId).toBe(
+                compositeTestIds.autocompleteMenu[part],
+            );
+        }
+        expect(partAttributes(autocompleteMenuAnatomy, "root")).toEqual({
+            "data-scope": "autocomplete",
+            "data-pf-part": "content",
+            "data-testid": "pf-autocomplete-content",
+        });
+    });
+
+    it("the search view draws every slot of the preset's, its surface as surface, in unstyled parts", () => {
+        const parts =
+            searchViewOverlayAnatomy.parts as ComponentAnatomy["parts"];
+        const slots = Object.values(parts)
+            .filter((part) => part.styled)
+            .map(partSlot);
+        expect(slots.sort()).toEqual([...searchViewAnatomy.partNames].sort());
+        expect(partSlot(parts.surface!)).toBe("root");
+        expect(partSlot(parts.root!)).toBeNull();
+        for (const name of ["root", "trigger", "positioner"])
+            expect(parts[name]!.styled).toBe(false);
+        for (const name of searchViewOverlayAnatomy.partNames) {
+            expect(parts[name]!.testId).toBe(compositeTestIds.searchView[name]);
+            if (parts[name]!.styled && name !== "surface")
+                expect(parts[name]!.mirror).toBe(
+                    (searchViewAnatomy.parts as ComponentAnatomy["parts"])[
+                        name
+                    ]!.mirror,
+                );
+        }
+    });
+
+    it("the search view's items take the menu's item slots under its scope", () => {
+        for (const part of searchViewMenuAnatomy.partNames) {
+            expect(menuAnatomy.partNames).toContain(part);
+            expect(searchViewMenuAnatomy.parts[part].testId).toBe(
+                compositeTestIds.searchViewMenu[part],
+            );
+            expect(searchViewMenuAnatomy.parts[part].mirror).toBe(
+                menuAnatomy.parts[part].mirror,
+            );
+        }
+    });
 
     it("the dialog's backdrop is drawn by the scrim, under the dialog's scope", () => {
         expect(dialogBackdropAnatomy.name).toBe("scrim");

@@ -2407,6 +2407,7 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "centered": false,
+    "scrolled": false,
   },
   "jsx": [
     "SearchBar",
@@ -2423,6 +2424,14 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
       "true": {
         "input": {
           "textAlign": "center",
+        },
+      },
+    },
+    "scrolled": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-searchBar-container": "var(--components-searchBar-scrolledContainer, token(colors.surfaceContainerHighest))",
         },
       },
     },

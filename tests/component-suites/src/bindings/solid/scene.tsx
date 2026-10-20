@@ -7,6 +7,7 @@ import {
     PureformProvider,
 } from "@pureform/solid";
 import type { Indication } from "@pureform/solid";
+import { Autocomplete } from "@pureform/solid/autocomplete";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
 import { BottomSheet } from "@pureform/solid/bottom-sheet";
@@ -35,6 +36,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 import { Ripple } from "@pureform/solid/ripple";
 import { Scrim } from "@pureform/solid/scrim";
 import { SearchBar } from "@pureform/solid/search-bar";
+import { SearchView } from "@pureform/solid/search-view";
 import { Select } from "@pureform/solid/select";
 import { Separator } from "@pureform/solid/separator";
 import { SideSheet } from "@pureform/solid/side-sheet";
@@ -111,7 +113,9 @@ export const components: Record<ComponentName, ValidComponent> = {
     RichTooltip,
     Scrim,
     SearchBar,
+    SearchView,
     Select,
+    Autocomplete,
     Separator,
     SideSheet,
     Slider,

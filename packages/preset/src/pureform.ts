@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
 import { bottomSheet } from "./components/bottom-sheet";
@@ -78,6 +79,7 @@ import { toast } from "./components/toast";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
+import { SEARCH_VIEW_KEYFRAMES, searchView } from "./components/search-view";
 import { createSelect } from "./components/select";
 import { separator } from "./components/separator";
 import { DEFAULT_SHAPES } from "./components/shaped";
@@ -292,7 +294,12 @@ const defaultComponents = <G extends string>(
         textArea: createTextArea<G, Step>(theme.color.groups, densities),
         tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
         searchBar,
+        searchView,
         select: createSelect<G, Step>(theme.color.groups, densities),
+        autocomplete: createAutocomplete<G, Step>(
+            theme.color.groups,
+            densities,
+        ),
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox<G, Step>(theme.color.groups, densities),
         radio: createRadio<G, Step>(theme.color.groups, densities),
@@ -469,6 +476,7 @@ export const pureform = <
                     ...PROGRESS_KEYFRAMES,
                     ...OVERLAY_KEYFRAMES,
                     ...SHEET_KEYFRAMES,
+                    ...SEARCH_VIEW_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
