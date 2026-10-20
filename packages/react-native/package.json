@@ -249,6 +249,13 @@
                 "development": "./src/tooltip/index.ts",
                 "default": "./dist/tooltip.mjs"
             }
+        },
+        "./rich-tooltip": {
+            "types": "./dist/rich-tooltip/index.d.ts",
+            "import": {
+                "development": "./src/rich-tooltip/index.ts",
+                "default": "./dist/rich-tooltip.mjs"
+            }
         }
     },
     "publishConfig": {

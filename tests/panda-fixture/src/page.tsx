@@ -16,6 +16,7 @@ import {
     select,
     slider,
     snackbar,
+    richTooltip,
     tooltip,
     dialog,
     list,
@@ -1314,14 +1315,14 @@ export function Page() {
                     </button>
                 </div>
                 <div class={tooltip().root} role="tooltip">
-                    Save to drafts
+                    <span class={tooltip().supportingText}>Save to drafts</span>
                 </div>
-                <div class={tooltip({ variant: "rich" }).root} role="tooltip">
-                    <span class={tooltip().subhead}>Drafts</span>
-                    <span class={tooltip().supportingText}>
+                <div class={richTooltip().root} role="tooltip">
+                    <span class={richTooltip().subhead}>Drafts</span>
+                    <span class={richTooltip().supportingText}>
                         Drafts stay on this device until you send them.
                     </span>
-                    <div class={tooltip().actions}>
+                    <div class={richTooltip().actions}>
                         <button
                             class={button({ variant: "text" }).root}
                             type="button"

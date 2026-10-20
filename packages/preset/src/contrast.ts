@@ -120,10 +120,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("actionColor"), token("container"), TEXT_CONTRAST),
     ],
-    tooltip: [
+    tooltip: [pair(token("content"), token("container"), TEXT_CONTRAST)],
+    richTooltip: [
         pair(token("content"), token("container"), TEXT_CONTRAST),
-        pair(token("richContent"), token("richContainer"), TEXT_CONTRAST),
-        pair(token("subheadColor"), token("richContainer"), TEXT_CONTRAST),
+        pair(token("subheadColor"), token("container"), TEXT_CONTRAST),
     ],
     slider: [
         pair(token("activeColor"), SURFACE, UI_CONTRAST),

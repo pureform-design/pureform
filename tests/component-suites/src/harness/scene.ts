@@ -25,6 +25,7 @@ export const COMPONENT_NAMES = [
     "NavigationRail",
     "RadioGroup",
     "Ripple",
+    "RichTooltip",
     "Scrim",
     "SearchBar",
     "Select",

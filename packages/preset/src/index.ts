@@ -26,6 +26,7 @@ export * from "./components/search-bar";
 export * from "./components/select";
 export * from "./components/slider";
 export * from "./components/snackbar";
+export * from "./components/rich-tooltip";
 export * from "./components/tooltip";
 export * from "./components/tabs";
 export * from "./components/touch-target";

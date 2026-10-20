@@ -25,6 +25,7 @@ import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
 import { RadioGroup } from "@pureform/solid/radio-group";
+import { RichTooltip } from "@pureform/solid/rich-tooltip";
 import { Ripple } from "@pureform/solid/ripple";
 import { Scrim } from "@pureform/solid/scrim";
 import { SearchBar } from "@pureform/solid/search-bar";
@@ -76,6 +77,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     NavigationRail,
     RadioGroup,
     Ripple,
+    RichTooltip,
     Scrim,
     SearchBar,
     Select,

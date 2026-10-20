@@ -199,6 +199,7 @@ export const COMPONENTS = [
     "dialog",
     "snackbar",
     "tooltip",
+    "richTooltip",
     "ripple",
 ];
 

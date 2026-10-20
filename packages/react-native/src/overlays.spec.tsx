@@ -11,6 +11,7 @@ import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
 import { IconButton } from "./icon-button";
 import { Menu } from "./menu";
+import { RichTooltip } from "./rich-tooltip";
 import { useSnackbar } from "./snackbar";
 import type { Snackbars } from "./snackbar";
 import { presetRegistry } from "./testing/registry";
@@ -34,6 +35,7 @@ beforeAll(async () => {
         "iconButton",
         "snackbar",
         "tooltip",
+        "richTooltip",
         "dialog",
         "scrim",
         "ripple",
@@ -587,6 +589,29 @@ describe.each([animated, reanimated])(
         });
     },
 );
+
+it("shows a rich tooltip's parts open, interactive by default", async () => {
+    await render(
+        <RichTooltip
+            defaultOpen
+            subhead="Drafts"
+            supportingText="Drafts stay here."
+            actions={<IconButton aria-label="More" icon="M" />}
+            trigger={(trigger) => (
+                <IconButton {...trigger} aria-label="Tip" icon="?" />
+            )}
+        />,
+    );
+    await settle(400);
+    const tip = document.querySelector<HTMLElement>('[role="tooltip"]')!;
+    expect(tip).not.toBeNull();
+    for (const part of ["subhead", "supporting-text", "actions"]) {
+        expect(
+            tip.querySelector(`[data-testid="pf-rich-tooltip-${part}"]`),
+        ).not.toBeNull();
+    }
+    expect(tip.parentElement!.style.pointerEvents).toBe("auto");
+});
 
 it("stacks open overlays by their layers: a menu, then a snackbar, then a tooltip", async () => {
     let snackbars!: Snackbars;

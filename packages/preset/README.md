@@ -653,11 +653,23 @@ they stack at their layers and grow in on `data-state` (see
     </span>
 </div>
 
-<div class="{root}" role="tooltip" id="tip">Save to drafts</div>
+<div class="{root}" role="tooltip" id="tip">
+    <span class="{supportingText}">Save to drafts</span>
+</div>
+
+<div class="{root}" role="tooltip">
+    <!-- richTooltip -->
+    <span class="{subhead}">Drafts</span>
+    <span class="{supportingText}">Drafts stay on this device.</span>
+    <div class="{actions}">…</div>
+</div>
 ```
 
-`tooltip`'s `variant` is `plain` or `rich`; a rich tooltip adds `subhead`, `supportingText`,
-and `actions` slots.
+`tooltip` is the plain tooltip: `root`, `supportingText`, and an optional `caret`. The rich
+tooltip is its own component, `richTooltip` (`root`, `caret`, `subhead`, `supportingText`,
+`actions`). `tooltip` no longer has a `variant` group: `richTooltip` replaces `variant: "rich"`.
+The `caret` takes the surface's color through its `color`; the binding draws Zag's arrow tip
+inside it in `currentColor`.
 
 ## Slider and progress
 
@@ -718,7 +730,9 @@ Expressive has no equivalent.
 >
     <span class="{track}">
         <span class="{trackEndHalf}"><span class="{trackEndArc}"></span></span>
-        <span class="{trackStartHalf}"><span class="{trackStartArc}"></span></span>
+        <span class="{trackStartHalf}"
+            ><span class="{trackStartArc}"></span
+        ></span>
     </span>
     <span class="{endHalf}"><span class="{endArc}"></span></span>
     <span class="{startHalf}"><span class="{startArc}"></span></span>
