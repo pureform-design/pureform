@@ -22,6 +22,11 @@ export const textArea: ComponentCase = textInputCase({
         disabled: { disabled: true, defaultValue: "Ada" },
         "read-only": { readOnly: true, defaultValue: "Ada" },
         required: { required: true, name: "bio" },
+        counter: {
+            supportingText: "A few lines about you",
+            counterMax: 200,
+            defaultValue: "Ada",
+        },
     },
     keys: [
         { key: "a", does: "change" },

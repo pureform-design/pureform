@@ -1,6 +1,7 @@
-// The text inputs' shared field: a container holding the leading icon, the input, the floating
-// label, and the trailing icon, with supporting text under it. It tracks its own focus and value,
-// which the container and label read as the web's :focus-within and a filled input.
+// The text inputs' shared field: a container holding the leading icon, the prefix, the input, the
+// suffix, the floating label, and the trailing icon, with supporting text and a counter under
+// it. It tracks its own focus and value, which the container and label read as the web's
+// :focus-within and a filled input.
 
 import {
     partTestId,
@@ -18,6 +19,7 @@ import {
     textFieldSelection,
 } from "@pureform/binding-core";
 import type {
+    TextFieldAffixProps,
     ChangeDetails,
     TextAreaPart,
     TextAreaVariantProps,
@@ -27,6 +29,7 @@ import type {
 } from "@pureform/binding-core";
 import { useState } from "react";
 import type { ReactNode, Ref } from "react";
+import { Pressable } from "react-native";
 import type { TextInputProps } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
@@ -44,14 +47,18 @@ export interface FieldProps extends TextFieldContentProps<ReactNode> {
     readonly invalid?: boolean | undefined;
     readonly disabled?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
+    /** The most characters the counter allows: it shows `count / counterMax`, and a longer
+     *  value marks the field invalid. */
+    readonly counterMax?: number | undefined;
     /** React Native's own `TextInput` props, such as `keyboardType` or `placeholder`. */
     readonly inputProps?: TextInputProps | undefined;
 }
 
-type FieldPart = TextFieldPart & TextAreaPart;
+type FieldPart = TextFieldPart | TextAreaPart;
 
 /** The field the text field, text area, and select render. */
-export interface FieldOptions extends FieldProps {
+export interface FieldOptions
+    extends FieldProps, TextFieldAffixProps<ReactNode> {
     readonly name: "textField" | "textArea" | "select";
     readonly selection: Record<string, unknown>;
     readonly testId: (part: FieldPart) => string;
@@ -61,6 +68,10 @@ export interface FieldOptions extends FieldProps {
     /** The input takes no typing (a select). */
     readonly display?: boolean | undefined;
     readonly container?: Ref<unknown> | undefined;
+    /** A secure (password) field: the trailing icon shows or hides the text. */
+    readonly secure?: boolean | undefined;
+    /** The visibility toggle's accessible name. @default "Show password" */
+    readonly revealLabel?: string | undefined;
 }
 
 function FieldImpl(props: FieldOptions): ReactNode {
@@ -73,7 +84,15 @@ function FieldImpl(props: FieldOptions): ReactNode {
         props.onValueChange,
         "",
     );
+    const [revealed, setRevealed] = useState(false);
     const focused = ownFocus || (props.expanded ?? false);
+    const counterText =
+        props.counterMax === undefined
+            ? undefined
+            : `${value.length} / ${props.counterMax}`;
+    const invalid =
+        (props.invalid ?? false) ||
+        (props.counterMax !== undefined && value.length > props.counterMax);
     const mirrored = props.mirrorLeadingIcon || props.mirrorTrailingIcon;
     const {
         styles: s,
@@ -83,7 +102,7 @@ function FieldImpl(props: FieldOptions): ReactNode {
         focus: focused,
         focusVisible: focused,
         filled: value !== "",
-        invalid: props.invalid ?? false,
+        invalid,
         disabled: props.disabled ?? false,
         expanded: props.expanded ?? false,
         ...(props.readOnly ? { readOnly: true } : {}),
@@ -92,6 +111,23 @@ function FieldImpl(props: FieldOptions): ReactNode {
     const id = props.testId;
     const icon = (part: "leadingIcon" | "trailingIcon", node: ReactNode) => {
         const Slot = v[part];
+        // A secure field's trailing icon is the button that shows or hides the text.
+        if (part === "trailingIcon" && props.secure)
+            return (
+                <Pressable
+                    role="button"
+                    aria-label={props.revealLabel ?? "Show password"}
+                    aria-pressed={revealed}
+                    disabled={props.disabled}
+                    onPress={() => setRevealed(!revealed)}
+                    style={s[part]}
+                    testID={id(part)}
+                >
+                    <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
+                        {isPresent(node) ? node : revealed ? "◡" : "◉"}
+                    </IconSlot>
+                </Pressable>
+            );
         return isPresent(node) ? (
             <Slot.View
                 {...(part === "trailingIcon" ? { pointerEvents: "none" } : {})}
@@ -104,6 +140,23 @@ function FieldImpl(props: FieldOptions): ReactNode {
             </Slot.View>
         ) : null;
     };
+    const affix = (part: "prefixText" | "suffixText", node: ReactNode) => {
+        if (props.name === "textArea" || !isPresent(node)) return null;
+        const Slot = v[part];
+        return (
+            <Slot.Text selectable={false} style={s[part]} testID={id(part)}>
+                {node}
+            </Slot.Text>
+        );
+    };
+    const supporting = isPresent(props.supportingText) ? (
+        <v.supportingText.Text
+            style={s.supportingText}
+            testID={id("supportingText")}
+        >
+            {props.supportingText}
+        </v.supportingText.Text>
+    ) : null;
     return (
         <v.root.View style={s.root} testID={id("root")}>
             <v.container.View
@@ -112,6 +165,7 @@ function FieldImpl(props: FieldOptions): ReactNode {
                 testID={id("container")}
             >
                 {icon("leadingIcon", props.leadingIcon)}
+                {affix("prefixText", props.prefixText)}
                 <v.input.TextInput
                     {...props.inputProps}
                     value={value}
@@ -124,12 +178,14 @@ function FieldImpl(props: FieldOptions): ReactNode {
                     {...(typeof props.label === "string"
                         ? { "aria-label": props.label }
                         : {})}
-                    aria-invalid={props.invalid}
+                    aria-invalid={invalid}
+                    {...(props.secure ? { secureTextEntry: !revealed } : {})}
                     multiline={props.name === "textArea"}
                     numberOfLines={props.lines}
                     style={s.input}
                     testID={id("input")}
                 />
+                {affix("suffixText", props.suffixText)}
                 <v.label.Text
                     selectable={false}
                     pointerEvents="none"
@@ -140,14 +196,19 @@ function FieldImpl(props: FieldOptions): ReactNode {
                 </v.label.Text>
                 {icon("trailingIcon", props.trailingIcon)}
             </v.container.View>
-            {isPresent(props.supportingText) ? (
-                <v.supportingText.Text
-                    style={s.supportingText}
-                    testID={id("supportingText")}
+            {counterText !== undefined ? (
+                <v.supportingRow.View
+                    style={s.supportingRow}
+                    testID={id("supportingRow")}
                 >
-                    {props.supportingText}
-                </v.supportingText.Text>
-            ) : null}
+                    {supporting}
+                    <v.counter.Text style={s.counter} testID={id("counter")}>
+                        {counterText}
+                    </v.counter.Text>
+                </v.supportingRow.View>
+            ) : (
+                supporting
+            )}
         </v.root.View>
     );
 }
@@ -164,8 +225,14 @@ export const Field = withEngine(FieldImpl, "Field");
 
 export interface TextFieldProps
     extends
-        Omit<TextFieldVariantProps, "leadingIcon" | "trailingIcon">,
-        FieldProps {
+        Omit<
+            TextFieldVariantProps,
+            "leadingIcon" | "trailingIcon" | "prefixText" | "suffixText"
+        >,
+        FieldProps,
+        TextFieldAffixProps<ReactNode> {
+    /** The visibility toggle's accessible name in a `secure` field. @default "Show password" */
+    readonly revealLabel?: string | undefined;
     readonly testId?: TestIdOverride<TextFieldPart> | undefined;
 }
 
@@ -178,7 +245,9 @@ export function TextField(props: TextFieldProps): ReactNode {
             selection={textFieldSelection({
                 ...props,
                 leadingIcon: isPresent(props.leadingIcon),
-                trailingIcon: isPresent(props.trailingIcon),
+                trailingIcon: isPresent(props.trailingIcon) || !!props.secure,
+                prefixText: isPresent(props.prefixText),
+                suffixText: isPresent(props.suffixText),
             })}
             testId={(part) => partId(textFieldAnatomy, part, props.testId)}
         />

@@ -10,8 +10,13 @@
 //       <textarea class={input} id="bio" placeholder=" " rows={3} />
 //       <label class={label} for="bio">Bio</label>
 //     </div>
-//     <span class={supportingText}>Helper or error text</span>
+//     <div class={supportingRow}>
+//       <span class={supportingText}>Helper or error text</span>
+//       <span class={counter}>12 / 200</span>
+//     </div>
 //   </div>
+//
+// The supporting row is only needed with a counter; supporting text alone can sit in the root.
 
 import { typed } from "@pureform/core";
 import {
@@ -29,8 +34,10 @@ import { spacing } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import {
+    COUNTER_SLOTS,
     FIELD_SLOTS,
     FIELD_STRUCTURE,
+    counterParts,
     fieldParts,
     fieldTokens,
     floated,
@@ -54,6 +61,7 @@ const { base, variant, colors, icons } = fieldParts(ref, {
     labelRest,
     iconRoom: "container",
 });
+const counter = counterParts(ref);
 
 // The sizes density changes, at an offset: half of it off each side of the text, and the
 // label's resting line moving with it. The text scrolls through its own padding, under the
@@ -104,11 +112,15 @@ export const createTextArea = <
             name: "textArea",
             $meta: {
                 description:
-                    "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one.",
+                    "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one. A counter sits beside the supporting text in supportingRow.",
             },
             tokens,
-            slots: [...FIELD_SLOTS],
-            structure: FIELD_STRUCTURE,
+            slots: [...FIELD_SLOTS, ...COUNTER_SLOTS],
+            structure: {
+                ...FIELD_STRUCTURE,
+                root: ["container", "supportingRow"],
+                supportingRow: ["supportingText", "counter"],
+            },
             variants: {
                 color: groups as ColorGroups,
                 leadingIcon: ["true", "false"],
@@ -121,6 +133,11 @@ export const createTextArea = <
                 base: {
                     ...base,
                     ...icons.base,
+                    ...counter,
+                    supportingText: {
+                        ...base.supportingText,
+                        ...counter.supportingText,
+                    },
                     container: {
                         ...base.container,
                         display: flex,

@@ -15,11 +15,11 @@ import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
-/** The text field's parts: `"root" | "container" | "leadingIcon" | "input" | "label" |
- *  "trailingIcon" | "supportingText"`. */
+/** The text field's parts: `"root" | "container" | "leadingIcon" | "prefixText" | "input" |
+ *  "suffixText" | "label" | "trailingIcon" | "supportingRow" | "supportingText" | "counter"`. */
 export type TextFieldPart = PartName<typeof textFieldAnatomy>;
 
-/** The text area's parts, the text field's names. */
+/** The text area's parts: the text field's, without the prefix and suffix. */
 export type TextAreaPart = PartName<typeof textAreaAnatomy>;
 
 /** The text field's variant groups and instance tokens. `leadingIcon` and `trailingIcon` make
@@ -30,6 +30,11 @@ export interface TextFieldVariantProps {
     readonly density?: VariantProp<"textField", "density">;
     readonly leadingIcon?: boolean | undefined;
     readonly trailingIcon?: boolean | undefined;
+    /** Make room for prefix or suffix text; the ready-made field sets them when it renders one. */
+    readonly prefixText?: boolean | undefined;
+    readonly suffixText?: boolean | undefined;
+    /** A secure (password) field: the trailing icon is the button that shows or hides the text. */
+    readonly secure?: boolean | undefined;
     readonly tokens?: InstanceTokens<"textField"> | undefined;
 }
 
@@ -52,6 +57,7 @@ export interface TextFieldElementIds {
     readonly input?: string | undefined;
     readonly label?: string | undefined;
     readonly supportingText?: string | undefined;
+    readonly counter?: string | undefined;
 }
 
 /** What the text field machine takes from Root's props. */
@@ -75,6 +81,11 @@ export interface TextFieldBehaviorProps extends Controllable<"value", string> {
     readonly name?: string | undefined;
     /** The id of the form the input belongs to, for a field outside it. */
     readonly form?: string | undefined;
+    /** The most characters the counter allows: it shows `count / counterMax`, and a longer
+     *  value marks the field invalid. Use the input's native `maxLength` to stop typing instead. */
+    readonly counterMax?: number | undefined;
+    /** The visibility toggle's accessible name in a secure field. @default "Show password" */
+    readonly revealLabel?: string | undefined;
     /** The root element's id; the machine builds the other ids from it. */
     readonly id?: string | undefined;
     readonly ids?: TextFieldElementIds | undefined;
@@ -106,6 +117,8 @@ const BEHAVIOR_PROPS = [
     "placeholder",
     "name",
     "form",
+    "counterMax",
+    "revealLabel",
     "id",
     "ids",
     "value",
@@ -122,13 +135,22 @@ export const TEXT_FIELD_ROOT_PROPS = [
     "density",
     "leadingIcon",
     "trailingIcon",
+    "prefixText",
+    "suffixText",
+    "secure",
     "tokens",
     ...BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof TextFieldRootOwnProps)[];
 
 /** The keys of `TextAreaRootOwnProps`. */
 export const TEXT_AREA_ROOT_PROPS = [
-    ...TEXT_FIELD_ROOT_PROPS,
+    "variant",
+    "color",
+    "density",
+    "leadingIcon",
+    "trailingIcon",
+    "tokens",
+    ...BEHAVIOR_PROPS,
     "autoGrow",
 ] as const satisfies readonly (keyof TextAreaRootOwnProps)[];
 
@@ -173,6 +195,20 @@ export interface TextFieldContentProps<Node> {
     readonly mirrorTrailingIcon?: boolean | undefined;
 }
 
+/** The prefix and suffix text the ready-made text field and select render around the input. */
+export interface TextFieldAffixProps<Node> {
+    /** Text before the input, such as a currency sign; shows once the label floats. */
+    readonly prefixText?: Node;
+    /** Text after the input, such as a unit; shows once the label floats. */
+    readonly suffixText?: Node;
+}
+
+/** The keys of `TextFieldAffixProps`. */
+export const TEXT_FIELD_AFFIX_PROPS = [
+    "prefixText",
+    "suffixText",
+] as const satisfies readonly (keyof TextFieldAffixProps<unknown>)[];
+
 /** The keys of `TextFieldContentProps`. */
 export const TEXT_FIELD_CONTENT_PROPS = [
     "label",
@@ -192,6 +228,9 @@ export const textFieldSelection = (
     density: props.density,
     leadingIcon: props.leadingIcon,
     trailingIcon: props.trailingIcon,
+    prefixText: props.prefixText,
+    suffixText: props.suffixText,
+    secure: props.secure,
     tokens: props.tokens,
 });
 
@@ -210,7 +249,9 @@ export const textAreaSelection = (
 
 /** The text field machine's props from Root's, besides `id`, `dir`, and the controllable `value`
  *  (the binding's `useControllable`). */
-export const textFieldMachineProps = (props: TextFieldBehaviorProps) => ({
+export const textFieldMachineProps = (
+    props: TextFieldBehaviorProps & { readonly secure?: boolean | undefined },
+) => ({
     disabled: props.disabled,
     invalid: props.invalid,
     error: props.error,
@@ -220,11 +261,15 @@ export const textFieldMachineProps = (props: TextFieldBehaviorProps) => ({
     placeholder: props.placeholder,
     name: props.name,
     form: props.form,
+    counterMax: props.counterMax,
+    secure: props.secure,
+    revealLabel: props.revealLabel,
     ids: {
         root: props.id ?? props.ids?.root,
         input: props.ids?.input,
         label: props.ids?.label,
         supportingText: props.ids?.supportingText,
+        counter: props.ids?.counter,
     },
 });
 

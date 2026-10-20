@@ -6,6 +6,7 @@ import {
     navigationRailAnatomy,
     sliderAnatomy,
     snackbarAnatomy,
+    textAreaAnatomy,
     textFieldAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
@@ -27,6 +28,7 @@ const pairs: Record<string, Pair> = {
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
+    textArea: { machine: textField, preset: textAreaAnatomy },
 };
 
 const missing = ({ machine, preset }: Pair) =>

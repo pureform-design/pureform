@@ -15,6 +15,7 @@ export interface ElementIds {
     input?: string | undefined;
     label?: string | undefined;
     supportingText?: string | undefined;
+    counter?: string | undefined;
 }
 
 /** How the field decides it's invalid besides `invalid` and `error`: `"native"` lets the input's
@@ -49,9 +50,18 @@ export interface TextFieldProps extends DirectionProperty, CommonProperties {
     name?: string | undefined;
     /** The id of the form the input belongs to, for a field outside it. */
     form?: string | undefined;
+    /** The most characters the counter allows. The counter shows `count / counterMax`, and a
+     *  longer value marks the field invalid. The input still takes the extra characters; use the
+     *  native `maxLength` to stop them instead. */
+    counterMax?: number | undefined;
+    /** A secure (password) field: the text is hidden until the visibility toggle reveals it. */
+    secure?: boolean | undefined;
+    /** The visibility toggle's accessible name. It is a toggle button, pressed while the text
+     *  shows, so the name stays the same. @default "Show password" */
+    revealLabel?: string | undefined;
 }
 
-type PropsWithDefault = "defaultValue" | "placeholder";
+type PropsWithDefault = "defaultValue" | "placeholder" | "revealLabel";
 
 export interface TextFieldSchema {
     state: "idle" | "focused";
@@ -63,12 +73,15 @@ export interface TextFieldSchema {
         interacted: boolean;
         /** The input's `validationMessage`, read after each change. */
         validationMessage: string;
+        /** A secure field shows its text. */
+        revealed: boolean;
     };
     computed: {
         disabled: boolean;
         filled: boolean;
         invalid: boolean;
         errorText: string | undefined;
+        overflow: boolean;
     };
     event: { type: string; [key: string]: unknown };
     action: string;
@@ -92,6 +105,15 @@ export interface TextFieldApi<T extends PropTypes = PropTypes> {
     errorText: string | undefined;
     /** The supporting text's id, for the input's `aria-describedby` while it shows. */
     supportingTextId: string;
+    /** The counter's id, for the input's `aria-describedby` while it shows. */
+    counterId: string;
+    /** What the counter shows, `"3 / 20"`, or `undefined` without `counterMax`. */
+    counterText: string | undefined;
+    /** The value is longer than `counterMax`. */
+    overflow: boolean;
+    /** A secure field shows its text. */
+    revealed: boolean;
+    setRevealed: (revealed: boolean) => void;
     setValue: (value: string) => void;
     /** Puts the value back after a form reset, and forgets the user's interaction. */
     reset: (value: string) => void;
@@ -101,4 +123,11 @@ export interface TextFieldApi<T extends PropTypes = PropTypes> {
     getInputProps: () => T["input"];
     getTextAreaProps: () => T["textarea"];
     getSupportingTextProps: () => T["element"];
+    /** The row holding the supporting text and the counter. */
+    getSupportingRowProps: () => T["element"];
+    getCounterProps: () => T["element"];
+    getPrefixTextProps: () => T["element"];
+    getSuffixTextProps: () => T["element"];
+    /** A secure field's trailing icon: a toggle button that shows or hides the text. */
+    getVisibilityTriggerProps: () => T["button"];
 }

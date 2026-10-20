@@ -78,11 +78,15 @@ const { ReadyMade, parts } = createTextInput({
     selection: textAreaSelection,
 });
 
+// The text area has no prefix or suffix.
+const { PrefixText: _prefix, SuffixText: _suffix, ...areaParts } = parts;
+
 /** Material's text area. Use it ready-made, `<TextArea label="Bio" name="bio" rows={3} />`, or
- *  compose its parts under `TextArea.Root`, as the text field's. */
+ *  compose its parts under `TextArea.Root`, as the text field's (without the prefix and suffix).
+ *  `counterMax` adds the counter. */
 export const TextArea = Object.assign(
     ReadyMade as (props: TextAreaProps) => JSX.Element,
-    parts as Omit<typeof parts, "Root"> & {
+    areaParts as Omit<typeof areaParts, "Root"> & {
         Root: (props: TextAreaRootProps) => JSX.Element;
     },
 );

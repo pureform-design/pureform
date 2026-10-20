@@ -261,6 +261,21 @@ function LeadingIcon(props: SelectIconProps): JSX.Element {
     });
 }
 
+const affix = (part: "prefixText" | "suffixText", name: string) =>
+    function Affix(props: SelectPartProps): JSX.Element {
+        const { scope } = context.use(name);
+        return scope.render(part, {
+            element: "span",
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled"),
+        });
+    };
+
+/** Text before the value, shown once the label floats. Turn on Root's `prefixText` with it. */
+const PrefixText = affix("prefixText", "PrefixText");
+/** Text after the value, shown once the label floats. Turn on Root's `suffixText` with it. */
+const SuffixText = affix("suffixText", "SuffixText");
+
 /** The arrow at the end, which turns over while the list is open. */
 function TrailingIcon(props: SelectIconProps): JSX.Element {
     const { scope, api } = context.use("TrailingIcon");
@@ -408,7 +423,11 @@ export interface SelectProps
     extends
         Omit<
             SelectRootProps,
-            keyof SlotKeyedProps<Anatomy> | "children" | "leadingIcon"
+            | keyof SlotKeyedProps<Anatomy>
+            | "children"
+            | "leadingIcon"
+            | "prefixText"
+            | "suffixText"
         >,
         SlotKeyedProps<Anatomy>,
         SelectContentProps<JSX.Element> {}
@@ -430,6 +449,8 @@ function ReadyMadeContent(props: {
     const own = props.own;
     const container = props.slots("container");
     const leadingIcon = props.slots("leadingIcon");
+    const prefixText = props.slots("prefixText");
+    const suffixText = props.slots("suffixText");
     const input = props.slots("input");
     const label = props.slots("label");
     const trailingIcon = props.slots("trailingIcon");
@@ -446,6 +467,9 @@ function ReadyMadeContent(props: {
                         {own.leadingIcon}
                     </LeadingIcon>
                 </Show>
+                <Show when={isPresent(own.prefixText)}>
+                    <PrefixText {...prefixText}>{own.prefixText}</PrefixText>
+                </Show>
                 <Input
                     aria-label={own["aria-label"]}
                     aria-labelledby={own["aria-labelledby"]}
@@ -455,6 +479,9 @@ function ReadyMadeContent(props: {
                     }
                     {...input}
                 />
+                <Show when={isPresent(own.suffixText)}>
+                    <SuffixText {...suffixText}>{own.suffixText}</SuffixText>
+                </Show>
                 <Label {...label}>{own.label}</Label>
                 <TrailingIcon {...trailingIcon}>
                     {isPresent(own.trailingIcon) ? (
@@ -499,6 +526,8 @@ function ReadyMade(props: SelectProps): JSX.Element {
         <Root
             {...own}
             leadingIcon={isPresent(props.leadingIcon) || undefined}
+            prefixText={isPresent(props.prefixText) || undefined}
+            suffixText={isPresent(props.suffixText) || undefined}
             {...root}
         >
             <ReadyMadeContent own={props} slots={slots} />
@@ -508,13 +537,15 @@ function ReadyMade(props: SelectProps): JSX.Element {
 
 /** Material's select. Use it ready-made, `<Select label="Size" name="size" items={[{ value: "s",
  *  label: "Small" }, …]} />`, or compose its parts under `Select.Root`: `Container` holding
- *  `LeadingIcon`, `Input`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
+ *  `LeadingIcon`, `PrefixText`, `Input`, `SuffixText`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
  *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option. */
 export const Select = Object.assign(ReadyMade, {
     Root,
     Container,
     LeadingIcon,
+    PrefixText,
     Input,
+    SuffixText,
     Label,
     TrailingIcon,
     SupportingText,

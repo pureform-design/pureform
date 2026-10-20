@@ -8,6 +8,20 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
+    "counter": {
+      "color": {
+        ".textArea__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".textArea__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-textArea-errorColor, token(colors.error))",
+        "base": "var(--components-textArea-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexDirection": "column",
+      "flexShrink": "0",
+      "marginInlineStart": "auto",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-textArea-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
     "input": {
       "&:is(:disabled, [aria-disabled=true])": {
         "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -81,6 +95,10 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       "display": "flex",
       "flexDirection": "column",
     },
+    "supportingRow": {
+      "display": "flex",
+      "flexDirection": "row",
+    },
     "supportingText": {
       "color": {
         ".textArea__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -89,6 +107,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
       },
       "display": "flex",
       "flexDirection": "column",
+      "flexShrink": "1",
       "paddingBlockStart": "token(spacing.1)",
       "paddingInlineEnd": "var(--components-textArea-paddingInline, token(spacing.4))",
       "paddingInlineStart": "var(--components-textArea-paddingInline, token(spacing.4))",
@@ -155,6 +174,8 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     "label",
     "trailingIcon",
     "supportingText",
+    "supportingRow",
+    "counter",
   ],
   "variants": {
     "autoGrow": {

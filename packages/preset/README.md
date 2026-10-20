@@ -422,6 +422,15 @@ input; the label, icons, and supporting text follow it.
   container's height, as in Material's own text field.
 - `textArea`: use a `<textarea>` with `rows`, or turn on `autoGrow` to grow it with the text.
   The textarea sits between its icons, so its scrollbar and resize handle stay clear of them.
+- Prefix and suffix text (`textField` and `select`): render a `prefixText` before the input or a
+  `suffixText` after it, and turn on the variant of the same name. They show once the label
+  floats; the input hands them its inline padding (the `prefixed`/`suffixed` flag tokens).
+- Counter (`textField` and `textArea`): put the supporting text and a `counter` in a
+  `supportingRow`; the counter sits at its end and follows the field's error colour, so mark
+  the input invalid when the count is over the limit. Supporting text alone can stay in the root.
+- `secure` (`textField`): a password field. The trailing icon is a `<button>` that shows or
+  hides the text; the variant draws it without button chrome and with a focus ring.
+- Nothing deprecated: no option was removed.
 
 ## Select
 
