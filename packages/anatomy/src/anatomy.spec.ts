@@ -61,7 +61,7 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     checkbox: [at("input", "root", true, "root")],
     radio: [at("input", "root", true, "root")],
     switchControl: [at("input", "stateLayer", true, "root")],
-    slider: [at("input", "stateLayer", true, "handle")],
+    slider: [at("handle", "stateLayer", true, "handle")],
 };
 
 describe("the written anatomy", () => {

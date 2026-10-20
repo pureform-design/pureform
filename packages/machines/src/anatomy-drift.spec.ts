@@ -26,6 +26,7 @@ const pairs: Record<string, Pair> = {
     button: { machine: button, preset: buttonAnatomy },
     navigationBar: { machine: navigation, preset: navigationBarAnatomy },
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
+    slider: { machine: slider, preset: sliderAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
     textArea: { machine: textField, preset: textAreaAnatomy },
@@ -41,14 +42,4 @@ describe("machine anatomies against the preset's", () => {
         });
     }
 
-    // The slider's machine is replaced in c1g, with the preset's parts.
-    it.todo("slider has every preset part");
-    it("slider's drift is known until c1g", () => {
-        expect(missing({ machine: slider, preset: sliderAnatomy })).toEqual([
-            "track",
-            "activeTrack",
-            "stateLayer",
-            "handle",
-        ]);
-    });
 });

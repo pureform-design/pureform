@@ -122,6 +122,7 @@
         "@zag-js/utils": "^1.46.0",
         "@zag-js/checkbox": "^1.46.0",
         "@zag-js/switch": "^1.46.0",
+        "@zag-js/slider": "^1.46.0",
         "@zag-js/radio-group": "^1.46.0",
         "@zag-js/select": "^1.46.0",
         "@zag-js/collection": "^1.46.0",

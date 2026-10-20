@@ -2,7 +2,7 @@
 // read what the factory was given, plus a lazy chip whose loader the test controls.
 
 import { createRegistry, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ComponentShape } from "@pureform/styling";
+import type { ClassFactory, ComponentShape, Selection } from "@pureform/styling";
 
 export type ButtonShape = {
     variants: { variant: "filled" | "text"; size: "small" | "large" };
@@ -279,14 +279,28 @@ export const displayRegistry = () =>
             "startHalf",
             "startArc",
         ]),
-        slider: valued("slider", [
-            "root",
-            "track",
-            "activeTrack",
-            "stateLayer",
-            "handle",
-            "input",
-        ]),
+        slider: ((s: Selection<ComponentShape>) =>
+            withTokenStyle(
+                named("slider", [
+                    "root",
+                    "startTrack",
+                    "track",
+                    "activeTrack",
+                    "markerGroup",
+                    "marker",
+                    "stateLayer",
+                    "handle",
+                    "valueIndicator",
+                    "input",
+                ])(s) as never,
+                s.tokens as never,
+                {
+                    value: "--value",
+                    activeStart: "--activeStart",
+                    activeEnd: "--activeEnd",
+                    stopActive: "--stopActive",
+                },
+            )) as never,
         card: named("card", [
             "root",
             "touchTarget",

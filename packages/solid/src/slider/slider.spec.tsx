@@ -17,26 +17,36 @@ const withRegistry = (view: () => unknown) =>
         </PureformProvider>
     ));
 
+const parts = (root: Element) =>
+    [...root.children].map((part) => part.getAttribute("data-pf-part"));
+
 describe("Slider", () => {
-    it("renders the preset's parts over a named range input, the value as a token", async () => {
+    it("renders the preset's parts around a named handle, the value as tokens", async () => {
         withRegistry(() => (
             <Slider aria-label="Volume" defaultValue={40} name="volume" />
         ));
         await settle();
         const root = byTestId(ids.root);
-        expect(
-            [...root.children].map((part) => part.getAttribute("data-pf-part")),
-        ).toEqual(["track", "active-track", "state-layer", "handle", "input"]);
+        expect(parts(root)).toEqual([
+            "start-track",
+            "track",
+            "active-track",
+            "handle",
+            "input",
+        ]);
         expect(root.style.getPropertyValue("--value")).toBe("40");
+        expect(root.style.getPropertyValue("--activeEnd")).toBe("40");
+        const handle = byTestId(ids.handle);
+        expect(handle.getAttribute("role")).toBe("slider");
+        expect(handle.getAttribute("aria-valuenow")).toBe("40");
+        expect(handle.getAttribute("aria-label")).toBe("Volume");
         const input = byTestId<HTMLInputElement>(ids.input);
-        expect(input.type).toBe("range");
         expect(input.value).toBe("40");
         expect(input.name).toBe("volume");
-        expect(input.getAttribute("aria-label")).toBe("Volume");
         expect(root.hasAttribute("aria-label")).toBe(false);
     });
 
-    it("moves with the keyboard and reports it, the token following", async () => {
+    it("moves with the keyboard and reports a number, the tokens following", async () => {
         const onValueChange = vi.fn();
         withRegistry(() => (
             <Slider
@@ -48,10 +58,11 @@ describe("Slider", () => {
             />
         ));
         await settle();
-        byTestId(ids.input).focus();
+        byTestId(ids.handle).focus();
+        await settle();
         await userEvent.keyboard("{ArrowRight}");
         await settle();
-        expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 6 });
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: 6 });
         expect(byTestId(ids.root).style.getPropertyValue("--value")).toBe("60");
     });
 
@@ -66,14 +77,73 @@ describe("Slider", () => {
             />
         ));
         await settle();
-        const input = byTestId<HTMLInputElement>(ids.input);
-        input.focus();
+        const handle = byTestId(ids.handle);
+        handle.focus();
+        await settle();
         await userEvent.keyboard("{ArrowRight}");
         await settle();
-        expect(onValueChange).toHaveBeenCalledExactlyOnceWith({ value: 41 });
-        expect(input.value).toBe("40");
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: 41 });
+        expect(handle.getAttribute("aria-valuenow")).toBe("40");
         setValue(70);
         await settle();
-        expect(input.value).toBe("70");
+        expect(handle.getAttribute("aria-valuenow")).toBe("70");
+    });
+
+    it("draws a range: two handles, each placed by its own token", async () => {
+        const onValueChange = vi.fn();
+        withRegistry(() => (
+            <Slider
+                aria-label={["From", "To"]}
+                defaultValue={[20, 60]}
+                onValueChange={onValueChange}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        const handles = root.querySelectorAll<HTMLElement>(
+            "[data-pf-part=handle]",
+        );
+        expect(handles).toHaveLength(2);
+        expect(handles[0]!.getAttribute("aria-label")).toBe("From");
+        expect(handles[0]!.style.getPropertyValue("--value")).toBe("20");
+        expect(handles[1]!.style.getPropertyValue("--value")).toBe("60");
+        expect(root.style.getPropertyValue("--activeStart")).toBe("20");
+        handles[1]!.focus();
+        await settle();
+        await userEvent.keyboard("{ArrowLeft}");
+        await settle();
+        expect(onValueChange).toHaveBeenLastCalledWith({ value: [20, 59] });
+    });
+
+    it("draws stops, active where the active track is, and the value indicator", async () => {
+        withRegistry(() => (
+            <Slider
+                aria-label="Volume"
+                min={0}
+                max={4}
+                defaultValue={2}
+                stops
+                valueIndicator
+            />
+        ));
+        await settle();
+        const markers = byTestId(ids.root).querySelectorAll<HTMLElement>(
+            "[data-pf-part=marker]",
+        );
+        expect(
+            [...markers].map((marker) => [
+                marker.style.getPropertyValue("--value"),
+                marker.style.getPropertyValue("--stopActive"),
+            ]),
+        ).toEqual([
+            ["0", "1"],
+            ["25", "1"],
+            ["50", "1"],
+            ["75", "0"],
+            ["100", "0"],
+        ]);
+        const indicator = byTestId(ids.valueIndicator);
+        expect(indicator.textContent).toBe("2");
+        expect(indicator.hidden).toBe(true);
     });
 });

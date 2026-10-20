@@ -306,13 +306,21 @@ progressPercent(props);                  // the value as a clamped percentage of
 progressSelection(props);                // the value token from the percentage, unless indeterminate
 progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
 
-// Slider: pureform's slider machine over a native range input
-type SliderPart; interface SliderRootOwnProps // color, tokens, min, max, step, disabled,
-                                         // readOnly, invalid, name, form, id, ids, value,
-                                         // defaultValue, onValueChange, testId, unstyled
+// Slider: Zag's slider machine; a value is a number or a range's numbers (SliderValue)
+type SliderPart; interface SliderRootOwnProps<V> // color, handleShape, size, orientation, tokens,
+                                         // min, max, step, largeStep, minStepsBetweenThumbs,
+                                         // centered, stops, valueIndicator, disabled, readOnly,
+                                         // invalid, name, form, id, ids, value, defaultValue,
+                                         // onValueChange, testId, unstyled
 SLIDER_ROOT_PROPS; SLIDER_INPUT_LABEL_PROPS; // aria-label, -labelledby, -describedby, -valuetext
-sliderSelection(props, percent);         // the value token from the machine's percent
-sliderMachineProps(props); sliderNativeDefault(resetsTo, min); // a reset shows the default, else min
+sliderSelection(props, percents);        // the placing tokens from the thumbs' percents
+sliderTrackTokens(percents, centered);   // value, activeStart, activeEnd, startGap, endGap
+sliderThumbTokens(percent); sliderMarkerTokens(percent, active); // a thumb's, a stop's own
+sliderStops(stops, range); sliderStopActive(value, values, props);
+sliderMachineProps(props, machineId);    // the root is also Zag's control
+sliderControllableProps(controllable);   // lists for Zag, the owner's shape back
+sliderValues(value); sliderValueShape(values, given);
+sliderNativeDefault(resetsTo, min);      // "20,60": a reset shows the default, else min
 
 // Card (no machine)
 type CardPart; interface CardRootOwnProps // variant, interactive, padded, actionsAlign, tokens,

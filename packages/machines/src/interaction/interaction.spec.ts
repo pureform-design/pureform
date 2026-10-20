@@ -401,8 +401,8 @@ describe("radio group", () => {
 describe("slider", () => {
     function mount(props: Partial<slider.Props>) {
         const root = document.createElement("div");
-        const input = document.createElement("input");
-        root.append(input);
+        const handle = document.createElement("div");
+        root.append(handle);
         document.body.append(root);
         const running = run(
             slider.machine,
@@ -410,11 +410,12 @@ describe("slider", () => {
             { id: "volume", ...props },
             (api, spread) => {
                 spread(root, api.getRootProps());
-                spread(input, api.getInputProps());
+                spread(handle, api.getHandleProps(0));
             },
         );
         stops.push(running.stop);
-        return { ...running, input };
+        // The root takes the pointer.
+        return { ...running, input: root };
     }
 
     it("emits a drag and its press while the pointer is down", async () => {

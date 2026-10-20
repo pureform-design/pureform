@@ -50,7 +50,7 @@ callback reports user actions only, with a details object.
 | `dialog.ts`                                               | Zag's dialog, re-exported; its dismissable layer doesn't mirror the dialog's layer onto the backdrop and positioner (no forced style read). |
 | `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                       |
 | `presence.ts`                                             | Zag's presence, re-exported; keeps an overlay mounted until its exit animation ends, and only the exit's own animations end it.             |
-| `slider/`                                                 | The slider over a native range input: value, snapping, the drag, write-back, and fieldsets.                                                 |
+| `slider/`                                                 | Zag's slider under the preset's part names: thumbs, range, stops, value indicator, fieldsets.                                               |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                          |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped.                                        |
 | `interaction/`                                            | How machines emit to an interaction source: an emitter per surface, Zag machines wrapped (`withInteraction`), handlers chained after Zag's. |
@@ -76,7 +76,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                                                                                                  |
 | `@pureform/machines/ripple`      | `ripple`'s members                                                                                                                                                                                                                      |
 | `@pureform/machines/text-field`  | `textField`'s members                                                                                                                                                                                                                   |
-| `@pureform/machines/slider`      | `slider`'s members, and `snapValue`                                                                                                                                                                                                     |
+| `@pureform/machines/slider`      | `slider`'s members (Zag's slider, wrapped)                                                                                                                                                                                              |
 | `@pureform/machines/form`        | the form helpers                                                                                                                                                                                                                        |
 | `@pureform/machines/interaction` | `InteractionEmitter`, `InteractionEmitters`, `claimEvent`, `pointerKind`, `isFocusVisible`, `withInteraction`, `chainProps`, `emittersOf`: emitting to an interaction source from a machine of your own (or React Native's `Pressable`) |
 
@@ -122,13 +122,13 @@ design doc §9.8). A machine with one surface takes it as `interactionSource`; a
 binding makes them and passes them in; without one, nothing is emitted (the button keeps a source of
 its own, since its API reads one).
 
-| Machine          | Surface (element the handlers are on)               | Emits                                                                                                                  |
-| ---------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| button           | root                                                | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
-| checkbox, switch | root (label) and native input                       | pointer press and hover on the root; Space press and focus on the input                                                |
-| radio group      | each item (label) and its native input              | the same, per radio                                                                                                    |
-| slider           | native input                                        | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
-| tabs, navigation | each tab or destination                             | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
+| Machine          | Surface (element the handlers are on)  | Emits                                                                                                                  |
+| ---------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| button           | root                                   | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
+| checkbox, switch | root (label) and native input          | pointer press and hover on the root; Space press and focus on the input                                                |
+| radio group      | each item (label) and its native input | the same, per radio                                                                                                    |
+| slider           | root and handles                       | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
+| tabs, navigation | each tab or destination                | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
 | menu, select     | each item or option (a menu's toggleable items too) | the highlighted one hovers (no origin element); pointer press; Enter or Space presses and releases the highlighted one |
 
 - **Touch never hovers**: a `pointerType` of `touch` emits no `hoverEnter`.
@@ -248,25 +248,21 @@ are links or buttons, each reached with Tab: no roving focus, and arrow keys do 
 
 ### Slider
 
-| Prop                                     | Type                                      | Notes                                                        |
-| ---------------------------------------- | ----------------------------------------- | ------------------------------------------------------------ |
-| `id`, `ids`                              | `string`, `{ root?, input? }`             | element ids: `slider:<id>`, `slider:<id>:input`              |
-| `value`, `defaultValue`, `onValueChange` | `number`, `number`, `({ value }) => void` | controllable; the default is `min`                           |
-| `min`, `max`, `step`                     | `number`                                  | 0, 100, 1                                                    |
-| `disabled`, `readOnly`, `invalid`        | `boolean`                                 | `readOnly` takes no change (a range input has no `readonly`) |
-| `name`, `form`                           | `string`                                  | forwarded to the native input                                |
-| `dir`, `getRootNode`                     |                                           | as in Zag                                                    |
+Zag's `@zag-js/slider` (all its props: `value: number[]`, `min`, `max`, `step`, `largeStep`,
+`minStepsBetweenThumbs`, `origin`, `orientation`, `thumbCollisionBehavior`, …), wrapped:
 
-The native `<input type="range">` takes the pointer, the keyboard (its arrow keys follow `dir`),
-the form, and assistive technology; the machine follows it. States: `idle` and `dragging` (the
-pointer is down on the input, until it's let go anywhere). A value from outside is written back
-to the input; one the user moves is clamped and snapped to the step from `min`
-(`snapValue(value, { min, max, step })`). The fieldsets around the input disable it by the
-browser's rule. A form reset is the binding's: it calls `reset(value)` after the browser's.
-`connect` returns `value`, `fraction` (0 to 1), `percent` (0 to 100, the preset's `value` token),
-`dragging`, `disabled`, `setValue`, `reset`, `focus`, and part props for `root` and `input`
-(`type="range"`, `min`, `max`, `step`, the value as `defaultValue`, `aria-invalid`,
-`aria-readonly`, `data-dragging`).
+- The root is also Zag's control (`ids.control` is the root's id): the pointer moves the value
+  anywhere on it. Thumbs are centred on their values (`thumbAlignment: "center"`).
+- The API has the preset's parts: `getRootProps`, `getStartTrackProps`, `getTrackProps`,
+  `getActiveTrackProps` (Zag's range), `getMarkerGroupProps`, `getMarkerProps({ value })`, and per
+  thumb `getHandleProps(i)` (role `slider`, focus and keys), `getStateLayerProps(i)`,
+  `getValueIndicatorProps(i)` (Zag's dragging indicator), `getInputProps(i)` (the hidden input,
+  `disabled` while the slider is, so it doesn't submit). Zag's inline styles are left off; the
+  preset places every part. Also `percents`, `percentOf(value)`, `disabled`, `focusedIndex`.
+- The up and down arrows step a horizontal slider too, as a range input does (Zag ignores them).
+- pureform's fieldset rule; the form reset is the bindings'.
+- A pointer down on the root or a handle presses and drags the source (`dragStop` before the
+  release); the root hovers; handles focus and blur.
 
 ### Ripple
 
@@ -335,8 +331,6 @@ trackFormReset(input, {
   `withFieldsetRule` if that changes.
 - A per-item `disabled` (a tab, a destination, a radio) stops new interactions but doesn't end
   one in progress; only the machine's own `disabled` does.
-- The slider has one thumb: a range slider with two would need its own inputs (or Zag's slider,
-  which owns the pointer and a focusable thumb instead of a native input).
 - `setNativeDefault` keeps what an unedited text control or select shows: writing a default
   alone would change it.
 - The snackbar's `paused` isn't marked on its root: the pointer resting on it would change the

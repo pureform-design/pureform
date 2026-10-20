@@ -424,7 +424,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
 - **Focus stays with its surface:** a shared source carries presses and hover to every component
   on it, but each selects focus (and the focus indicator) from its own interaction alone.
 - **The slider takes focus** and steps with the arrow keys (sideways by direction), Home, and End,
-  and the `increment` and `decrement` accessibility actions.
+  and the `increment` and `decrement` accessibility actions. A range (`defaultValue={[20, 60]}`)
+  moves the thumb nearest the press, and the keys move the last one dragged; `centered`, `stops`,
+  `valueIndicator` and `orientation: "vertical"` match the web. Each thumb and stop resolves its
+  own styles with its own `value` token.
 - **The search bar** hears its root's hover and press and its input's focus (always visible, as a
   text field's), but has no indication entry, so no ripple.
 - **A component's states are one set:** a component with two icons mirrors both when either is

@@ -2015,8 +2015,8 @@ From today's preset:
 | navigation bar and rail destination                      | item            | `activeIndicator`                     | yes      |
 | checkbox, radio                                          | native input    | root circle                           | yes      |
 | switch                                                   | native input    | `stateLayer`                          | yes      |
-| slider (`handleShape: "round"`)                          | native input    | the handle's state layer (drag emits) | yes      |
-| slider (`handleShape: "bar"`, M3 Expressive's default)   | native input    | none drawn: the handle narrows        | —        |
+| slider (`handleShape: "round"`)                          | `handle` (c1g)  | the handle's state layer (drag emits) | yes      |
+| slider (`handleShape: "bar"`, M3 Expressive's default)   | `handle` (c1g)  | none drawn: the handle narrows        | —        |
 
 - **No indication:** text fields and the search bar's field draw their own active indicator;
   dialogs, menus, tooltips, progress, and static components aren't interactive.
