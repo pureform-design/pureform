@@ -73,12 +73,9 @@ export interface DialogRootOwnProps
     readonly unstyled?: Unstyled<DialogPart> | undefined;
 }
 
-/** The keys of `DialogRootOwnProps`, which Root keeps off its element. */
-export const DIALOG_ROOT_PROPS = [
-    "icon",
-    "tokens",
-    "modal",
-    "role",
+/** The keys every dialog-machine Root (the dialogs, the sheets) keeps off its element after its
+ *  variants, `modal` and `role`: the rest of the behavior, `open`'s, `testId` and `unstyled`. */
+export const DIALOG_BEHAVIOR_PROPS = [
     "closeOnInteractOutside",
     "closeOnEscape",
     "restoreFocus",
@@ -91,6 +88,15 @@ export const DIALOG_ROOT_PROPS = [
     "onOpenChange",
     "testId",
     "unstyled",
+] as const satisfies readonly (keyof DialogRootOwnProps)[];
+
+/** The keys of `DialogRootOwnProps`, which Root keeps off its element. */
+export const DIALOG_ROOT_PROPS = [
+    "icon",
+    "tokens",
+    "modal",
+    "role",
+    ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof DialogRootOwnProps)[];
 
 /** What the ready-made dialog renders inside Root, in the framework's node type. */

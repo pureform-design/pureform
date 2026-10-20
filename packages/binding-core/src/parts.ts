@@ -53,6 +53,19 @@ export type Unstyled<P extends string = string> =
     | boolean
     | SlotKeyed<P, boolean>;
 
+/** One part's entry of a per-part override (`testId`, `unstyled`) as a separate component's
+ *  `root`: a Root that also renders another component's root (a dialog's backdrop, drawn by the
+ *  scrim) names it `part`. A value for every part passes through. */
+export const partAsRoot = <V extends string | boolean>(
+    value: V | SlotKeyed<string, V> | undefined,
+    part: string,
+): V | { readonly root: V } | undefined =>
+    typeof value !== "object"
+        ? value
+        : value[part] === undefined
+          ? undefined
+          : { root: value[part] as V };
+
 /** Whether `unstyled` opts this part out of the registry's styles. */
 export const isUnstyled = (
     unstyled: Unstyled | undefined,

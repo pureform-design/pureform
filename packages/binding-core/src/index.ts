@@ -80,6 +80,7 @@ export {
 export type { IconOnlyName } from "./components/content";
 export {
     DIALOG_CONTENT_PROPS,
+    DIALOG_BEHAVIOR_PROPS,
     DIALOG_ROOT_PROPS,
     dialogBackdropLayout,
     dialogMachineProps,
@@ -546,6 +547,7 @@ export {
     isIconPart,
     isUnstyled,
     outsideRootMessage,
+    partAsRoot,
     partClasses,
     partSources,
     spreadableProps,

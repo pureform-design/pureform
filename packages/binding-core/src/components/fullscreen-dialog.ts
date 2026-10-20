@@ -15,6 +15,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { DialogBehaviorProps } from "./dialog";
+import { DIALOG_BEHAVIOR_PROPS } from "./dialog";
 
 /** The full-screen dialog's parts: `"root" | "trigger" | "positioner" | "content"` (the surface)
  *  `| "header" | "closeTrigger" | "headline" | "confirmAction" | "body"`. */
@@ -42,18 +43,7 @@ export const FULLSCREEN_DIALOG_ROOT_PROPS = [
     "tokens",
     "modal",
     "role",
-    "closeOnInteractOutside",
-    "closeOnEscape",
-    "restoreFocus",
-    "initialFocusEl",
-    "finalFocusEl",
-    "aria-label",
-    "ids",
-    "open",
-    "defaultOpen",
-    "onOpenChange",
-    "testId",
-    "unstyled",
+    ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof FullscreenDialogRootOwnProps)[];
 
 /** What the ready-made full-screen dialog renders inside Root, in the framework's node type. */

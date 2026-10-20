@@ -17,7 +17,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
 import type { DialogBehaviorProps } from "./dialog";
-import { dialogMachineProps } from "./dialog";
+import { DIALOG_BEHAVIOR_PROPS, dialogMachineProps } from "./dialog";
 
 /** What the sheets' machine takes from Root's props: the dialog's, but for `modal`, which is the
  *  sheets' variant too, and `role`. */
@@ -77,26 +77,11 @@ export interface SideSheetRootOwnProps
     readonly unstyled?: Unstyled<SideSheetPart> | undefined;
 }
 
-const SHEET_BEHAVIOR_PROPS = [
-    "closeOnInteractOutside",
-    "closeOnEscape",
-    "restoreFocus",
-    "initialFocusEl",
-    "finalFocusEl",
-    "aria-label",
-    "ids",
-    "open",
-    "defaultOpen",
-    "onOpenChange",
-    "testId",
-    "unstyled",
-] as const;
-
 /** The keys of `BottomSheetRootOwnProps`, which Root keeps off its element. */
 export const BOTTOM_SHEET_ROOT_PROPS = [
     "modal",
     "tokens",
-    ...SHEET_BEHAVIOR_PROPS,
+    ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof BottomSheetRootOwnProps)[];
 
 /** The keys of `SideSheetRootOwnProps`, which Root keeps off its element. */
@@ -104,7 +89,7 @@ export const SIDE_SHEET_ROOT_PROPS = [
     "modal",
     "coplanar",
     "tokens",
-    ...SHEET_BEHAVIOR_PROPS,
+    ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof SideSheetRootOwnProps)[];
 
 /** What the ready-made bottom sheet renders inside Root, in the framework's node type. */
