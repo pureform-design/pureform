@@ -176,6 +176,11 @@ const outline = (
         ? "none"
         : `${style} ${width} ${color} offset ${offset}`;
 
+// Chromium's color-mix results differ in the sixth decimal between builds and machines, so
+// numbers are kept to four, well above that and still finer than an 8-bit channel.
+const rounded = (value: string): string =>
+    value.replace(/\d+\.\d{5,}/g, (n) => String(Number(Number(n).toFixed(4))));
+
 const webValues = async (
     classesOf: (item: Item) => Classes,
     scenario: Scenario,
@@ -223,13 +228,15 @@ const webValues = async (
             const id = element.dataset.id!;
             const dot = id.lastIndexOf(".");
             (out[id.slice(0, dot)] ??= {})[id.slice(dot + 1)] = {
-                bg: style.backgroundColor,
-                color: style.color,
-                outline: outline(
-                    style.outlineStyle,
-                    style.outlineWidth,
-                    style.outlineColor,
-                    style.outlineOffset,
+                bg: rounded(style.backgroundColor),
+                color: rounded(style.color),
+                outline: rounded(
+                    outline(
+                        style.outlineStyle,
+                        style.outlineWidth,
+                        style.outlineColor,
+                        style.outlineOffset,
+                    ),
                 ),
             };
         }

@@ -1,10 +1,16 @@
 // Visual checks over the Panda fixture's page of every component, with the fixture's Panda
 // styles: a screenshot per section, plus measured layout rules that screenshots alone catch late
 // (icons centered, labels that float without jumping, the focus ring on keyboard focus).
+//
+// The theme's fonts are bundled, so the screenshots don't depend on the machine's fallback fonts.
 
+import "@fontsource/jetbrains-mono/400.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 import "#/styles.css";
 import { render } from "@solidjs/web";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { page, userEvent } from "vitest/browser";
 
 import { Page } from "#/page";
@@ -37,6 +43,18 @@ const SECTIONS = [
 ];
 
 let dispose: (() => void) | undefined;
+
+// Load every face up front: `document.fonts.ready` waits only for the faces already in use.
+beforeAll(async () => {
+    await Promise.all(
+        [
+            "400 1em Roboto",
+            "500 1em Roboto",
+            "700 1em Roboto",
+            "400 1em 'JetBrains Mono'",
+        ].map((font) => document.fonts.load(font)),
+    );
+});
 
 beforeEach(async () => {
     const root = document.createElement("div");

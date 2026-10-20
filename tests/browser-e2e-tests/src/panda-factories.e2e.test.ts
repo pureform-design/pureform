@@ -6,7 +6,11 @@
 
 import * as pandaRecipes from "$recipes";
 import { varName } from "@pureform/css-lowering";
-import type { ClassFactory, ComponentShape } from "@pureform/styling";
+import type {
+    ClassFactory,
+    ComponentShape,
+    SlotClasses,
+} from "@pureform/styling";
 import { describe, expect, it } from "vitest";
 
 import { registry } from "../../panda-fixture/.pureform";
@@ -300,13 +304,15 @@ describe("instance tokens", () => {
         const style = document.createElement("style");
         style.textContent = pandaCss;
         document.head.append(style);
-        const slots = factoryOf("checkbox")({ tokens: { boxSize: "30px" } });
+        const slots: Record<string, SlotClasses> = factoryOf("checkbox")({
+            tokens: { boxSize: "30px" },
+        });
         const root = document.createElement("span");
         root.className = slots.root.class;
         for (const [property, value] of Object.entries(slots.root.style ?? {}))
             root.style.setProperty(property, value);
         const box = document.createElement("span");
-        box.className = slots.box.class;
+        box.className = slots.box!.class;
         root.append(box);
         document.body.append(root);
         try {
