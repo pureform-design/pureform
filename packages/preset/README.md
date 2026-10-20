@@ -211,8 +211,8 @@ step but can't declare different ones. A step named `inherit`, or below `-3`, wh
 stop holding up, is rejected. Each step adds CSS to every dense component, so declare only the
 ones you use.
 
-Dense components: `button`, `iconButton`, `chip`, `checkbox`, `radio`, `textField`,
-`textArea`, `select`, `listItem`, and `menu`. The text area has no fixed height, so its steps
+Dense components: `button`, `iconButton`, `chip`, `inputChip`, `checkbox`, `radio`, `textField`,
+`textArea`, `tagsInput`, `select`, `listItem`, and `menu`. The text area has no fixed height, so its steps
 move its paddings, label, and minimum height. Buttons, chips, and controls keep their full touch target; list and
 menu items shrink with no touch target, so keep dense menus for pointer layouts.
 
@@ -407,6 +407,37 @@ own `trailingIconSize` and `trailingIconSpacing`.
     <span class="{label}">Filter</span>
     <span class="{trailingIcon}">▾</span>
 </button>
+```
+
+## Input chip and tags input
+
+`inputChip` is Material's input chip, split from `chip` (it adds `avatar` and an interactive
+`remove`): outlined, filled with the secondary container when `aria-selected="true"`, with the
+chip's `corner`/`toggle` morph, `color` and `density`. The avatar, icon and remove button pull
+themselves to Material's insets (4, 8 and 8) with negative margins, so no variant says which are
+rendered. The remove button is its own indication surface. The chip has no `variant`: input chips
+are only outlined.
+
+`tagsInput` is the text field (filled or outlined, `leadingIcon`, `trailingIcon`, `color`,
+`density`) whose container is a wrapping row: an `inputChip` per value, then the input, which
+grows to fill the line. Mark the container filled (`data-pf-filled`) while it holds a chip so the
+label floats; the bindings do. Tags aren't edited in place.
+
+```html
+<div class="{tagsInput.root}">
+    <div class="{tagsInput.container}" data-pf-filled>
+        <div class="{inputChip.root}">
+            <span class="{inputChip.touchTarget}"></span>
+            <span class="{inputChip.avatar}"><img src="ada.png" alt="" /></span>
+            <span class="{inputChip.label}">Ada</span>
+            <button class="{inputChip.remove}" aria-label="Remove Ada">
+                ×
+            </button>
+        </div>
+        <input class="{tagsInput.input}" id="to" placeholder=" " />
+        <label class="{tagsInput.label}" for="to">To</label>
+    </div>
+</div>
 ```
 
 ## Text field and text area
@@ -718,7 +749,9 @@ Expressive has no equivalent.
 >
     <span class="{track}">
         <span class="{trackEndHalf}"><span class="{trackEndArc}"></span></span>
-        <span class="{trackStartHalf}"><span class="{trackStartArc}"></span></span>
+        <span class="{trackStartHalf}"
+            ><span class="{trackStartArc}"></span
+        ></span>
     </span>
     <span class="{endHalf}"><span class="{endArc}"></span></span>
     <span class="{startHalf}"><span class="{startArc}"></span></span>

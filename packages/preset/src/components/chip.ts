@@ -1,8 +1,9 @@
-// The pureform chip: Material's assist, filter, input, and suggestion chips share one shape.
+// The pureform chip: Material's assist, filter, and suggestion chips share one shape. Input chips
+// are their own component, `inputChip` (`input-chip.ts`).
 //
 // A chip is outlined by default, or `elevated` with no outline. Marking it selected
 // (`aria-selected="true"` or `aria-pressed="true"`) fills it with the secondary container, as a
-// selected filter or input chip. Render the icon slot only when there is an icon.
+// selected filter chip. Render the icon slot only when there is an icon.
 //
 // A chip's corners are `square` at rest (the small radius) and tighten while pressed. `corner`
 // picks them: `square` (the default) or `round`, and a filter chip, which sets `toggle: "true"`,
