@@ -1,0 +1,189 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`searchView > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "content": {
+      "color": "var(--components-searchView-contentColor, token(colors.onSurfaceVariant))",
+      "flexGrow": "1",
+      "minHeight": "0px",
+      "overflow": "auto",
+      "textStyle": "bodyLarge",
+    },
+    "divider": {
+      "backgroundColor": "var(--components-searchView-dividerColor, token(colors.outline))",
+      "borderWidth": "0px",
+      "flexShrink": "0",
+      "height": "var(--components-searchView-dividerThickness, 1px)",
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "width": "100%",
+    },
+    "header": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "gap": "var(--components-searchView-gap, token(spacing.1))",
+      "marginBlockStart": "var(--components-searchView-headerInset, 0px)",
+      "marginInlineEnd": "var(--components-searchView-headerInset, 0px)",
+      "marginInlineStart": "var(--components-searchView-headerInset, 0px)",
+      "minHeight": "var(--components-searchView-headerHeight, 72px)",
+      "paddingInlineEnd": "var(--components-searchView-paddingInline, token(spacing.2))",
+      "paddingInlineStart": "var(--components-searchView-paddingInline, token(spacing.2))",
+    },
+    "input": {
+      "&::placeholder": {
+        "color": "var(--components-searchView-placeholderColor, token(colors.onSurfaceVariant))",
+      },
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-searchView-inputColor, token(colors.onSurface))",
+      "flexGrow": "1",
+      "height": "100%",
+      "minWidth": "0px",
+      "outlineStyle": "none",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "leading": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-searchView-leadingColor, token(colors.onSurface))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-searchView-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "base": "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+        },
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+        },
+      },
+      "backgroundColor": "var(--components-searchView-container, token(colors.surfaceContainerHigh))",
+      "borderWidth": "0px",
+      "color": "var(--components-searchView-contentColor, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "minHeight": "0px",
+      "shadowElevation": "level0",
+      "width": "100%",
+      "zIndex": "token(zIndex.dialog)",
+    },
+    "trailing": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-searchView-trailingColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-searchView-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-searchView-iconSize, token(sizes.iconMedium))",
+    },
+  },
+  "className": "searchView",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "variant": "fullScreen",
+  },
+  "jsx": [
+    "SearchView",
+  ],
+  "slots": [
+    "root",
+    "header",
+    "leading",
+    "input",
+    "trailing",
+    "divider",
+    "content",
+  ],
+  "variants": {
+    "variant": {
+      "contained": {
+        "content": {
+          "paddingBlockStart": "token(spacing.2)",
+        },
+        "divider": {
+          "display": "none",
+        },
+        "header": {
+          "backgroundColor": "var(--components-searchView-headerContainer, token(colors.surfaceContainerHigh))",
+          "borderRadius": "var(--components-searchView-headerRadius, token(radii.full))",
+        },
+        "leading": {
+          "animation": {
+            "_motionReduce": "none",
+            "_rtl": "token(durations.medium2) token(easings.emphasizedDecelerate) searchViewFromStart",
+            "base": "token(durations.medium2) token(easings.emphasizedDecelerate) searchViewFromEnd",
+          },
+        },
+        "root": {
+          "--components-searchView-container": "token(colors.surfaceContainer)",
+          "--components-searchView-headerHeight": "56px",
+          "--components-searchView-headerInset": "token(spacing.2)",
+          "backgroundColor": "var(--components-searchView-container, token(colors.surfaceContainerHigh))",
+          "borderRadius": "var(--components-searchView-radius, token(radii.extraLarge))",
+          "color": "var(--components-searchView-contentColor, token(colors.onSurfaceVariant))",
+          "maxHeight": "var(--components-searchView-maxHeight, 560px)",
+          "minHeight": "var(--components-searchView-minHeight, 240px)",
+          "minWidth": "var(--components-searchView-minWidth, 360px)",
+          "overflow": "auto",
+          "shadowElevation": "level3",
+        },
+        "trailing": {
+          "animation": {
+            "_motionReduce": "none",
+            "_rtl": "token(durations.medium2) token(easings.emphasizedDecelerate) searchViewFromEnd",
+            "base": "token(durations.medium2) token(easings.emphasizedDecelerate) searchViewFromStart",
+          },
+        },
+      },
+      "docked": {
+        "root": {
+          "--components-searchView-headerHeight": "56px",
+          "backgroundColor": "var(--components-searchView-container, token(colors.surfaceContainerHigh))",
+          "borderRadius": "var(--components-searchView-radius, token(radii.extraLarge))",
+          "color": "var(--components-searchView-contentColor, token(colors.onSurfaceVariant))",
+          "maxHeight": "var(--components-searchView-maxHeight, 560px)",
+          "minHeight": "var(--components-searchView-minHeight, 240px)",
+          "minWidth": "var(--components-searchView-minWidth, 360px)",
+          "overflow": "auto",
+          "shadowElevation": "level3",
+        },
+      },
+      "fullScreen": {
+        "root": {
+          "flexGrow": "1",
+        },
+      },
+    },
+  },
+}
+`;

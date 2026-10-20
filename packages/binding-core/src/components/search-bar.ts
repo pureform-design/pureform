@@ -16,10 +16,12 @@ import type { VariantProp } from "./variants";
 /** The search bar's parts: `"root" | "leading" | "input" | "trailing"`. */
 export type SearchBarPart = PartName<typeof searchBarAnatomy>;
 
-/** The search bar's instance tokens; it has no variant groups. */
+/** The search bar's variants and instance tokens. */
 export interface SearchBarVariantProps {
     /** Centers the query and placeholder, as an app bar's search does. */
     readonly centered?: VariantProp<"searchBar", "centered">;
+    /** The app bar it sits in is scrolled under: the bar takes the scrolled container color. */
+    readonly scrolled?: VariantProp<"searchBar", "scrolled">;
     readonly tokens?: InstanceTokens<"searchBar"> | undefined;
 }
 
@@ -57,6 +59,7 @@ export interface SearchBarRootOwnProps
 /** The keys of `SearchBarRootOwnProps`, which Root keeps off its element. */
 export const SEARCH_BAR_ROOT_PROPS = [
     "centered",
+    "scrolled",
     "tokens",
     "disabled",
     "required",
@@ -110,6 +113,7 @@ export const searchBarSelection = (
     props: SearchBarVariantProps,
 ): Selection<"searchBar"> => ({
     centered: props.centered,
+    scrolled: props.scrolled,
     tokens: props.tokens,
 });
 

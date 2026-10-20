@@ -164,6 +164,7 @@ export const textInputsRegistry = () =>
         textField: named("text-field", FIELD_SLOTS),
         textArea: named("text-area", FIELD_SLOTS),
         select: named("select", FIELD_SLOTS),
+        autocomplete: named("autocomplete", FIELD_SLOTS),
         tagsInput: named("tags-input", FIELD_SLOTS),
         inputChip: named("input-chip", [
             "root",
@@ -254,6 +255,21 @@ export const overlaysRegistry = () =>
             "outline",
         ]),
         scrim: named("scrim", ["root"]),
+        searchView: named("search-view", [
+            "root",
+            "header",
+            "leading",
+            "input",
+            "trailing",
+            "divider",
+            "content",
+        ]),
+        searchBar: named("search-bar", [
+            "root",
+            "leading",
+            "input",
+            "trailing",
+        ]),
         snackbar: named("snackbar", [
             "root",
             "supportingText",

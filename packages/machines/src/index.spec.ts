@@ -1,4 +1,5 @@
 import * as zagCheckbox from "@zag-js/checkbox";
+import * as zagCombobox from "@zag-js/combobox";
 import * as zagDialog from "@zag-js/dialog";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
@@ -22,6 +23,7 @@ describe("@pureform/machines", () => {
     it("keeps Zag's states and transitions for the machines that emit to an interaction source", () => {
         const zag = {
             checkbox: zagCheckbox,
+            combobox: zagCombobox,
             menu: zagMenu,
             radioGroup: zagRadioGroup,
             select: zagSelect,

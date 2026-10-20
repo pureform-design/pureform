@@ -1,5 +1,6 @@
 // Every component the shared suites run over. Add a component's case here.
 
+import { autocomplete } from "./autocomplete";
 import { bottomSheet } from "./bottom-sheet";
 import { button } from "./button";
 import { buttonGroup } from "./button-group";
@@ -19,6 +20,7 @@ import { circularProgress, linearProgress } from "./progress";
 import { radioGroup } from "./radio-group";
 import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
+import { searchView } from "./search-view";
 import { select } from "./select";
 import { sideSheet } from "./side-sheet";
 import { slider } from "./slider";
@@ -76,7 +78,9 @@ export const COMPONENTS: readonly ComponentCase[] = [
     ripple,
     scrim,
     searchBar,
+    searchView,
     select,
+    autocomplete,
     separator,
     sideSheet,
     slider,

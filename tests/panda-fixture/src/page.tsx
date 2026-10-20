@@ -15,7 +15,9 @@ import {
     navigationBar,
     navigationRail,
     searchBar,
+    searchView,
     select,
+    autocomplete,
     slider,
     snackbar,
     toast,
@@ -1790,6 +1792,138 @@ export function Page() {
                                         </For>
                                     </div>
                                 )}
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
+                data-section="search-and-autocomplete"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <label
+                    class={searchBar({ scrolled: true }).root}
+                    style={{ width: "320px" }}
+                >
+                    <span class={searchBar().leading}>⌕</span>
+                    <input
+                        class={searchBar().input}
+                        type="search"
+                        placeholder="Scrolled search bar"
+                    />
+                </label>
+                <For each={["docked", "contained"] as const}>
+                    {(variant) => {
+                        const v = searchView({ variant });
+                        const m = menu();
+                        return (
+                            <div
+                                style={{
+                                    position: "relative",
+                                    width: "360px",
+                                    height: "300px",
+                                }}
+                            >
+                                <div
+                                    class={v.root}
+                                    role="dialog"
+                                    aria-label={`${variant} search view`}
+                                >
+                                    <div class={v.header}>
+                                        <span class={v.leading} data-pf-mirror>
+                                            ←
+                                        </span>
+                                        <input
+                                            class={v.input}
+                                            role="combobox"
+                                            aria-expanded="true"
+                                            aria-label={`${variant} search`}
+                                            value="In"
+                                        />
+                                        <span class={v.trailing}>×</span>
+                                    </div>
+                                    <div
+                                        class={v.divider}
+                                        role="presentation"
+                                    />
+                                    <div class={v.content} role="listbox">
+                                        <For each={["Inbox", "Invoices"]}>
+                                            {(label) => (
+                                                <div
+                                                    class={m.item}
+                                                    role="option"
+                                                    aria-selected="false"
+                                                >
+                                                    <span class={m.itemLeading}>
+                                                        ⌕
+                                                    </span>
+                                                    <span class={m.itemLabel}>
+                                                        {label}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </For>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const a = autocomplete({ variant });
+                        const m = menu();
+                        const id = `autocomplete-${variant}`;
+                        return (
+                            <div
+                                style={{
+                                    position: "relative",
+                                    width: "220px",
+                                    "min-height": "200px",
+                                }}
+                            >
+                                <div class={a.root}>
+                                    <div class={a.container}>
+                                        <input
+                                            class={a.input}
+                                            id={id}
+                                            role="combobox"
+                                            aria-expanded="true"
+                                            aria-autocomplete="list"
+                                            aria-controls={`${id}-list`}
+                                            placeholder=" "
+                                            value="Pa"
+                                        />
+                                        <label class={a.label} for={id}>
+                                            {`${variant} autocomplete`}
+                                        </label>
+                                        <span class={a.trailingIcon}>▾</span>
+                                    </div>
+                                </div>
+                                <div
+                                    class={m.root}
+                                    role="listbox"
+                                    id={`${id}-list`}
+                                    style={{
+                                        position: "absolute",
+                                        "z-index": "1",
+                                        width: "100%",
+                                    }}
+                                >
+                                    <For each={["Paris", "Panama"]}>
+                                        {(option) => (
+                                            <div
+                                                class={m.item}
+                                                role="option"
+                                                aria-selected="false"
+                                            >
+                                                <span class={m.itemLabel}>
+                                                    {option}
+                                                </span>
+                                            </div>
+                                        )}
+                                    </For>
+                                </div>
                             </div>
                         );
                     }}

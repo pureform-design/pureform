@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Glyph, PureformProvider, useIconStyle } from ".";
+import { Autocomplete } from "./autocomplete";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
 import { BottomSheet } from "./bottom-sheet";
@@ -32,6 +33,7 @@ import { Radio, RadioGroup } from "./radio-group";
 import { RichTooltip } from "./rich-tooltip";
 import { Scrim } from "./scrim";
 import { SearchBar } from "./search-bar";
+import { SearchView } from "./search-view";
 import { Select } from "./select";
 import { Separator } from "./separator";
 import { SideSheet } from "./side-sheet";
@@ -83,6 +85,8 @@ const COMPONENTS = [
     "textArea",
     "searchBar",
     "select",
+    "autocomplete",
+    "searchView",
     "tagsInput",
     "inputChip",
     "slider",
@@ -785,5 +789,111 @@ describe("lists, menus, and selects", () => {
             "PomeApplePear",
             "DrupeCherry",
         ]);
+    });
+
+    it("filters an autocomplete's suggestions as it's typed in, and picks one", async () => {
+        const change = vi.fn();
+        await render(
+            <Autocomplete
+                label="City"
+                items={[
+                    { value: "par", label: "Paris" },
+                    { value: "pra", label: "Prague" },
+                    { value: "rom", label: "Rome" },
+                ]}
+                onValueChange={change}
+            />,
+        );
+        const input = byTestId("pf-autocomplete-input") as HTMLInputElement;
+        await interact(() => userEvent.type(input, "pr"));
+        await settle(50);
+        const shown = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map(
+                (item) => item.textContent,
+            );
+        expect(shown()).toEqual(["Prague"]);
+        expect(input.getAttribute("aria-expanded")).toBe("true");
+        await interact(() =>
+            userEvent.click(document.querySelector('[role="menuitem"]')!),
+        );
+        await settle(50);
+        expect(change).toHaveBeenCalledExactlyOnceWith({ value: "pra" });
+        expect(input.value).toBe("Prague");
+        await until(() => expect(shown()).toEqual([]));
+        await interact(() =>
+            userEvent.click(
+                document.querySelector('[aria-label="Show suggestions"]')!,
+            ),
+        );
+        await settle(50);
+        expect(shown()).toEqual(["Prague"]);
+    });
+
+    it("opens a search view, filters, selects, and closes", async () => {
+        const select = vi.fn();
+        const submit = vi.fn();
+        await render(
+            <SearchView
+                placeholder="Search mail"
+                items={[
+                    { value: "a", label: "Alpha" },
+                    { value: "b", label: "Beta" },
+                ]}
+                onSelect={select}
+                onSubmit={submit}
+            />,
+        );
+        const view = () => document.querySelector('[role="dialog"]');
+        expect(view()).toBeNull();
+        await interact(() =>
+            userEvent.click(
+                document.querySelector('[aria-haspopup="dialog"]')!,
+            ),
+        );
+        await until(() => expect(view()).not.toBeNull());
+        expect(byTestId("pf-search-view-root")).toBeTruthy();
+        const input = byTestId("pf-search-view-input") as HTMLInputElement;
+        await interact(() => userEvent.type(input, "be"));
+        const shown = () =>
+            [...document.querySelectorAll('[role="menuitem"]')].map(
+                (item) => item.textContent,
+            );
+        expect(shown()).toEqual(["Beta"]);
+        await interact(() =>
+            userEvent.click(document.querySelector('[role="menuitem"]')!),
+        );
+        expect(select).toHaveBeenCalledExactlyOnceWith({
+            value: "b",
+            item: { value: "b", label: "Beta" },
+        });
+        await until(() => expect(view()).toBeNull());
+        expect(
+            (byTestId("pf-search-bar-input") as HTMLInputElement).value,
+        ).toBe("Beta");
+        // Submitting the query closes the view too.
+        await interact(() =>
+            userEvent.click(
+                document.querySelector('[aria-haspopup="dialog"]')!,
+            ),
+        );
+        await until(() => expect(view()).not.toBeNull());
+        await interact(() =>
+            userEvent.type(
+                byTestId("pf-search-view-input") as HTMLInputElement,
+                "{Enter}",
+            ),
+        );
+        expect(submit).toHaveBeenCalledWith({ inputValue: "Beta" });
+        await until(() => expect(view()).toBeNull());
+    });
+
+    it("closes a search view from its back button", async () => {
+        await render(<SearchView defaultOpen variant="docked" />);
+        const view = () => document.querySelector('[role="dialog"]');
+        await until(() => expect(view()).not.toBeNull());
+        await interact(() =>
+            userEvent.click(document.querySelector('[aria-label="Back"]')!),
+        );
+        await until(() => expect(view()).toBeNull());
     });
 });
