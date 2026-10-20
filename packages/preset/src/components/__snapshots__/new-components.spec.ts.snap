@@ -3504,16 +3504,16 @@ exports[`snackbar > compiles to a stable Panda slot recipe 1`] = `
     "layout": {
       "longAction": {
         "actions": {
-          "justifyContent": "end",
+          "marginInlineStart": "auto",
         },
         "root": {
-          "alignItems": "stretch",
-          "flexDirection": "column",
+          "flexWrap": "wrap",
           "gap": "0px",
           "paddingBlockEnd": "token(spacing.2)",
           "paddingInlineEnd": "var(--components-snackbar-paddingInline, token(spacing.4))",
         },
         "supportingText": {
+          "flexBasis": "100%",
           "paddingBlockEnd": "token(spacing.1)",
         },
       },

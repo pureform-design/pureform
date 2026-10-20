@@ -22,10 +22,11 @@ describe("snackbar", () => {
         expect(snackbar.recipe.defaultVariants).toEqual({ layout: "oneLine" });
     });
 
-    it("stacks the long layout in a column with the actions at the end", () => {
+    it("wraps the long layout's actions below the text, at the end", () => {
         const long = snackbar.recipe.variants?.layout?.longAction;
-        expect(long?.root?.flexDirection).toBeDefined();
-        expect(long?.actions?.justifyContent).toBeDefined();
+        expect(long?.root?.flexWrap).toBeDefined();
+        expect(long?.supportingText?.flexBasis).toBeDefined();
+        expect(long?.actions?.marginInlineStart).toBeDefined();
         expect(snackbar.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 });
