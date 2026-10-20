@@ -17,6 +17,10 @@
 // A toggle icon button sets `toggle: "true"` and marks its state with `aria-pressed`: it rests
 // in Material's unselected colors and takes the selected ones, with its icon filled, once
 // `aria-pressed="true"`.
+//
+// In a button group, `position` places the button: `single` in a standard group, where it widens
+// while pressed, and `first`, `middle` or `last` in a connected one, where its inner corners
+// square off (see `button-group.ts`).
 
 import { typed } from "@pureform/core";
 import {
@@ -34,6 +38,12 @@ import { radius, size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import {
+    GROUP_GROWTH,
+    GROUP_INNER_RADII,
+    GROUP_TRANSITION,
+    groupCorners,
+} from "./button-group";
 import {
     DEFAULT_SHAPES,
     shapedColors,
@@ -74,6 +84,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
+import { POSITIONS } from "./tiles";
 
 const FILLS = {
     filled: "filled",
@@ -162,6 +173,11 @@ const { tokens, ref } = componentTokens("iconButton", {
     // The `width` variant's flags: narrow, wide, or neither for the default width.
     narrow: unitless(0),
     wide: unitless(0),
+    // A grouped button's inner corners (where a connected group's buttons meet), and how much
+    // wider it grows while pressed, which the `position` variant turns on in a standard group.
+    innerRadius: radius("small"),
+    pressedInnerRadius: radius("extraSmall"),
+    pressedGrowth: px(0),
     iconSize: sizeToken("iconMedium"),
     // Material draws a selected toggle's icon filled.
     iconFill: unitless(0),
@@ -179,12 +195,28 @@ const { tokens, ref } = componentTokens("iconButton", {
 
 const dense = (value: NumericValue) => add(value, ref("densityOffset"));
 
+/** A width with the density's offset, wider by `pressedGrowth` while pressed. */
+const grown = (value: NumericValue) =>
+    when(
+        slot("root", "pressed"),
+        add(dense(value), ref("pressedGrowth")),
+        dense(value),
+    );
+
 const corners = {
     borderRadius: cornerRadius(ref),
     transition: cornerTransition,
 };
 
 const SELECTED = slot("root", "selected");
+
+// The run's corners in a connected group, on every slot that draws the corners.
+const GROUP_CORNERS = groupCorners(ref);
+const groupPosition = (position: "first" | "middle" | "last") => ({
+    root: GROUP_CORNERS[position],
+    container: GROUP_CORNERS[position],
+    outline: GROUP_CORNERS[position],
+});
 
 /** A toggle's colors per fill, off and on, as Material's toggle icon buttons draw them. */
 const toggleColors = (
@@ -286,6 +318,7 @@ export const createIconButton = <
                 width: ["narrow", "default", "wide"],
                 corner: ["round", "square"],
                 toggle: ["false", "true"],
+                position: [...POSITIONS],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
@@ -342,10 +375,12 @@ export const createIconButton = <
                                         outlineWidth: s.outline,
                                         squareRadius: s.square,
                                         pressedRadius: s.pressed,
+                                        ...GROUP_INNER_RADII[name],
                                     },
                                     // The default width, or the narrow or wide one by the
-                                    // `width` variant's flags.
-                                    width: dense(
+                                    // `width` variant's flags, wider by `pressedGrowth` while
+                                    // pressed.
+                                    width: grown(
                                         blend(
                                             blend(
                                                 ref(
@@ -376,6 +411,20 @@ export const createIconButton = <
                         wide: { root: { tokens: { wide: unitless(1) } } },
                     },
                     ...cornerMorphVariants("round"),
+                    // Its place in a button group: `single` in a standard group (it widens
+                    // while pressed), and the run's corners in a connected one.
+                    position: {
+                        none: {},
+                        first: groupPosition("first"),
+                        middle: groupPosition("middle"),
+                        last: groupPosition("last"),
+                        single: {
+                            root: {
+                                tokens: { pressedGrowth: GROUP_GROWTH },
+                                transition: GROUP_TRANSITION,
+                            },
+                        },
+                    },
                     density: densityTokenVariant(densities),
                 },
                 // A toggle rests in the unselected colors and takes the selected ones once
@@ -403,6 +452,7 @@ export const createIconButton = <
                     width: "default",
                     corner: "round",
                     toggle: "false",
+                    position: "none",
                     density: "inherit",
                     shape: "none",
                 },

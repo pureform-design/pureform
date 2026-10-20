@@ -68,7 +68,9 @@ describe("M3 Expressive", () => {
 
     it("gives icon buttons narrow and wide widths per size, by the width's flags", () => {
         const recipe = slotRecipe(iconButton, "iconButton");
-        const width = String(recipe?.variants?.size?.large?.root?.width);
+        const width = JSON.stringify(
+            recipe?.variants?.size?.large?.root?.width,
+        );
         expect(width).toContain("components-iconButton-wideLarge");
         expect(width).toContain("components-iconButton-wide,");
         expect(recipe?.variants?.width?.wide?.root).toEqual({
@@ -195,9 +197,7 @@ describe("M3 Expressive", () => {
     });
 
     it("eases the bar handle's narrowing, and drops it under reduced motion", () => {
-        const handle = JSON.stringify(
-            slider.recipe.base?.handle?.transition,
-        );
+        const handle = JSON.stringify(slider.recipe.base?.handle?.transition);
         expect(handle).toContain("width");
         expect(handle).toContain("reducedMotion");
     });
