@@ -1242,6 +1242,7 @@ export function Page() {
                                 class={s.root}
                                 style={{
                                     "--pf-components-slider-value": `${value()}`,
+                                    "--pf-components-slider-activeEnd": `${value()}`,
                                 }}
                             >
                                 <span class={s.track} />
@@ -1336,6 +1337,8 @@ export function Page() {
                                     style={{
                                         width: "200px",
                                         "--pf-components-slider-value": "70",
+                                        "--pf-components-slider-activeEnd":
+                                            "70",
                                     }}
                                 >
                                     <span
@@ -1366,6 +1369,145 @@ export function Page() {
                                         disabled
                                     />
                                 </div>
+                            </div>
+                            {/* M3 Expressive's slider configurations (c1g): a range, a
+                                centered slider, stops, the value indicator, and a vertical
+                                slider, drawn from their placing tokens. */}
+                            <div
+                                data-slider-samples
+                                style={{
+                                    display: "flex",
+                                    gap: "16px",
+                                    "align-items": "center",
+                                    "padding-block": "56px 8px",
+                                }}
+                            >
+                                {(
+                                    [
+                                        [
+                                            {},
+                                            {
+                                                value: 60,
+                                                activeStart: 20,
+                                                activeEnd: 60,
+                                                startGap: 1,
+                                                endGap: 1,
+                                            },
+                                            [20, 60],
+                                            [],
+                                        ],
+                                        [
+                                            {},
+                                            {
+                                                value: 30,
+                                                activeStart: 30,
+                                                activeEnd: 50,
+                                                startGap: 1,
+                                                endGap: 0,
+                                            },
+                                            [30],
+                                            [],
+                                        ],
+                                        [
+                                            {},
+                                            {
+                                                value: 50,
+                                                activeStart: 0,
+                                                activeEnd: 50,
+                                                startGap: 0,
+                                                endGap: 1,
+                                            },
+                                            [50],
+                                            [0, 25, 50, 75, 100],
+                                        ],
+                                        [
+                                            { orientation: "vertical" },
+                                            {
+                                                value: 40,
+                                                activeStart: 0,
+                                                activeEnd: 40,
+                                                startGap: 0,
+                                                endGap: 1,
+                                            },
+                                            [40],
+                                            [],
+                                        ],
+                                    ] as const
+                                ).map(
+                                    (
+                                        [variants, tokens, thumbs, stops],
+                                        sample,
+                                    ) => {
+                                        const s = slider(variants);
+                                        const vars = (
+                                            t: Record<string, number>,
+                                        ) =>
+                                            Object.fromEntries(
+                                                Object.entries(t).map(
+                                                    ([k, v]) => [
+                                                        `--pf-components-slider-${k}`,
+                                                        String(v),
+                                                    ],
+                                                ),
+                                            );
+                                        const vertical =
+                                            "orientation" in variants;
+                                        return (
+                                            <div
+                                                class={s.root}
+                                                style={{
+                                                    width: vertical
+                                                        ? undefined
+                                                        : "96px",
+                                                    height: vertical
+                                                        ? "120px"
+                                                        : undefined,
+                                                    ...vars(tokens),
+                                                }}
+                                            >
+                                                <span class={s.startTrack} />
+                                                <span class={s.track} />
+                                                <span class={s.activeTrack} />
+                                                <div class={s.markerGroup}>
+                                                    {stops.map((stop) => (
+                                                        <span
+                                                            class={s.marker}
+                                                            style={vars({
+                                                                value: stop,
+                                                                stopActive:
+                                                                    stop <= 50
+                                                                        ? 1
+                                                                        : 0,
+                                                            })}
+                                                        />
+                                                    ))}
+                                                </div>
+                                                {thumbs.map((thumb) => (
+                                                    <>
+                                                        <div
+                                                            class={s.handle}
+                                                            style={vars({
+                                                                value: thumb,
+                                                            })}
+                                                        />
+                                                        {sample === 2 && (
+                                                            <span
+                                                                class={
+                                                                    s.valueIndicator
+                                                                }
+                                                                style={vars({
+                                                                    value: thumb,
+                                                                })}
+                                                            >
+                                                                {thumb}
+                                                            </span>
+                                                        )}
+                                                    </>
+                                                ))}
+                                            </div>
+                                        );
+                                    },
+                                )}
                             </div>
                         </>
                     );
