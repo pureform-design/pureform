@@ -522,11 +522,6 @@ describe("generate with the CSS target", () => {
                 const unread = new Set([
                     "--pf-components-slider-stateLayerColor",
                     "--pf-components-menu-supportingColor",
-                    // The horizontal nav item that reads them arrives in c1e.
-                    ...["navigationBar", "navigationRail"].map(
-                        (name) =>
-                            `--pf-components-${name}-horizontalActiveLabelColor`,
-                    ),
                     // A state layer that follows another slot has no drag state.
                     ...[
                         "iconButton",

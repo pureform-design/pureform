@@ -144,11 +144,50 @@ describe("M3 Expressive", () => {
     });
 
     it("labels the current destination in its color group's main color", () => {
-        for (const nav of [navigationBar, navigationRail]) {
-            expect(
-                JSON.stringify(nav.recipe.variants?.color?.tertiary?.item),
-            ).toContain("tertiary");
+        for (const [nav, name] of [
+            [navigationBar, "navigationBar"],
+            [navigationRail, "navigationRail"],
+        ] as const) {
+            const root = nav.recipe.variants?.color?.tertiary?.root as
+                | { tokens: Record<string, unknown> }
+                | undefined;
+            const tokens = root?.tokens ?? {};
+            const token = (key: string) =>
+                JSON.stringify(tokens[`components.${name}.${key}`]);
+            expect(token("activeLabelColor")).toContain('"tertiary"');
+            // A horizontal destination's label sits on the pill, in the icon's color.
+            expect(token("horizontalActiveLabelColor")).toContain(
+                "onTertiaryContainer",
+            );
         }
+    });
+
+    it("labels a horizontal destination in the icon's color, inside the pill", () => {
+        const bar = navigationBar.recipe.variants?.itemLayout?.horizontal;
+        const rail = navigationRail.recipe.variants?.expanded?.true;
+        for (const layout of [bar, rail]) {
+            expect(JSON.stringify(layout?.item)).toContain(
+                "horizontalActiveLabelColor",
+            );
+            // The pill covers the destination, so the label sits on it.
+            expect(layout?.indicator?.position).toEqual(
+                expect.objectContaining({ value: "absolute" }),
+            );
+        }
+        expect(navigationBar.recipe.defaultVariants?.itemLayout).toBe(
+            "vertical",
+        );
+        expect(navigationRail.recipe.defaultVariants?.expanded).toBe("false");
+    });
+
+    it("gives the rail a header, and a raised surface when modal", () => {
+        expect(navigationRail.slots).toContain("header");
+        expect(navigationBar.slots).not.toContain("header");
+        const modal = navigationRail.recipe.variants?.modal?.true?.root;
+        expect(modal?.apply).toEqual({ shadowElevation: "level1" });
+        expect(JSON.stringify(modal?.backgroundColor)).toContain(
+            "modalContainer",
+        );
     });
 
     it("eases the bar handle's narrowing, and drops it under reduced motion", () => {

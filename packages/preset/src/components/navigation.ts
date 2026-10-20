@@ -1,5 +1,7 @@
 // The parts Material's navigation bar and navigation rail share: destinations that stack an
-// icon over a label, with the current one marked by a pill behind its icon.
+// icon over a label, with the current one marked by a pill behind its icon. A horizontal
+// destination (the bar's `itemLayout: horizontal`, the expanded rail) puts the label beside the
+// icon, both inside the pill.
 //
 // Mark the current destination with `aria-current="page"` (or `aria-selected`). The pill takes
 // the state layer while its destination is hovered, focused, or pressed; inside it, the active
@@ -9,13 +11,16 @@
 import type { IndicationDeclaration } from "@pureform/core";
 import {
     absolute,
+    add,
     center,
     column,
     flex,
+    start,
     none,
     pct,
     px,
     relative,
+    row,
     slot,
     transparent,
     tween,
@@ -67,6 +72,11 @@ export const NAV_TOKENS = {
     activeIconFill: unitless(1),
     indicatorHeight: px(32),
     gap: spacing("1"),
+    // A horizontal destination's pill: its height, the inline padding around the icon and label,
+    // and the gap between them.
+    horizontalIndicatorHeight: px(40),
+    horizontalPadding: spacing("4"),
+    horizontalGap: spacing("1"),
     ...INDICATION_TOKENS,
 } satisfies Record<string, ValueNode>;
 
@@ -113,16 +123,14 @@ const CURRENT = slot("item", "selected");
 export interface NavActive {
     indicator: ColorValue;
     icon: ColorValue;
-    /** The current destination's label: M3 Expressive draws it in the group's main color. */
-    label: ColorValue;
 }
 
-/** The parts' colors, with the current destination's given. */
+/** The parts' colors, with the current destination's given. The label's are tokens (see
+ *  `navLabelTokens`), so the layout picks between them. */
 export const navColors = (
     ref: (token: NavToken) => AliasNode,
     active: NavActive,
 ) => ({
-    item: { states: { selected: { color: active.label } } },
     indicator: {
         color: when().on(CURRENT, active.icon).else(ref("iconColor")),
     },
@@ -132,6 +140,21 @@ export const navColors = (
             base: active.indicator,
             content: ref("stateLayerColor"),
         }),
+    },
+});
+
+/** A color group's current labels, as tokens on the root: M3 Expressive draws a vertical
+ *  destination's in the group's main color, and a horizontal one's, which sits on the pill, in
+ *  the icon's color. The layout reads one or the other. */
+export const navLabelTokens = (group: {
+    main: ColorValue;
+    onContainer: ColorValue;
+}) => ({
+    root: {
+        tokens: {
+            activeLabelColor: group.main,
+            horizontalActiveLabelColor: group.onContainer,
+        },
     },
 });
 
@@ -155,7 +178,6 @@ export const navParts = (
     const colors = navColors(ref, {
         indicator: ref("indicatorColor"),
         icon: ref("activeIconColor"),
-        label: ref("activeLabelColor"),
     });
     const pressable = pressableRoot(ref);
     return {
@@ -213,3 +235,43 @@ export const navParts = (
         } satisfies StyleMap,
     };
 };
+
+/** The parts' styles for a horizontal destination, over the vertical ones: the item is the pill,
+ *  the label beside the icon. The pill (`indicator`) covers the item, holding the active
+ *  indicator and the icon at its start; the label follows in the flow, past the icon, and paints
+ *  over the pill. Every target positions an absolute child against its parent, so the pill
+ *  stays the item's. `height` is the pill's. */
+export const navHorizontalParts = (
+    ref: (token: NavToken) => AliasNode,
+    height: ValueNode & StyleMap["height"],
+) => ({
+    item: {
+        position: relative,
+        flexDirection: row,
+        alignItems: center,
+        justifyContent: start,
+        height,
+        minHeight: height,
+        paddingInlineStart: ref("horizontalPadding"),
+        paddingInlineEnd: ref("horizontalPadding"),
+        paddingBlockStart: px(0),
+        paddingBlockEnd: px(0),
+        gap: px(0),
+        borderRadius: radius("full"),
+        states: { selected: { color: ref("horizontalActiveLabelColor") } },
+    } satisfies StyleMap,
+    indicator: {
+        position: absolute,
+        top: px(0),
+        bottom: px(0),
+        insetInlineStart: px(0),
+        width: pct(100),
+        height: pct(100),
+        justifyContent: start,
+    } satisfies StyleMap,
+    icon: { marginInlineStart: ref("horizontalPadding") } satisfies StyleMap,
+    label: {
+        position: relative,
+        marginInlineStart: add(ref("iconSize"), ref("horizontalGap")),
+    } satisfies StyleMap,
+});
