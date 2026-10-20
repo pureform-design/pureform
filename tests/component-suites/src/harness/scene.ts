@@ -14,6 +14,7 @@ export const COMPONENT_NAMES = [
     "CircularProgress",
     "Dialog",
     "Fab",
+    "FullscreenDialog",
     "Icon",
     "IconButton",
     "LinearProgress",

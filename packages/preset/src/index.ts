@@ -14,6 +14,7 @@ export * from "./components/shaped";
 export * from "./components/fab";
 export * from "./components/icon";
 export * from "./components/dialog";
+export * from "./components/fullscreen-dialog";
 export * from "./components/list";
 export * from "./components/list-item";
 export * from "./components/menu";

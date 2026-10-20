@@ -422,6 +422,86 @@ exports[`dialog > compiles to a stable Panda slot recipe 1`] = `
 }
 `;
 
+exports[`fullscreenDialog > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "body": {
+      "color": "var(--components-fullscreenDialog-bodyColor, token(colors.onSurfaceVariant))",
+      "flexGrow": "1",
+      "minHeight": "0px",
+      "overflow": "auto",
+      "paddingBlockEnd": "var(--components-fullscreenDialog-bodyPadding, token(spacing.6))",
+      "paddingBlockStart": "var(--components-fullscreenDialog-bodyPadding, token(spacing.6))",
+      "paddingInlineEnd": "var(--components-fullscreenDialog-bodyPadding, token(spacing.6))",
+      "paddingInlineStart": "var(--components-fullscreenDialog-bodyPadding, token(spacing.6))",
+      "textStyle": "bodyMedium",
+    },
+    "closeTrigger": {
+      "flexShrink": "0",
+    },
+    "confirmAction": {
+      "flexShrink": "0",
+    },
+    "header": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "gap": "var(--components-fullscreenDialog-headerGap, token(spacing.4))",
+      "minHeight": "var(--components-fullscreenDialog-headerHeight, 56px)",
+      "paddingInlineEnd": "var(--components-fullscreenDialog-headerPadding, token(spacing.4))",
+      "paddingInlineStart": "var(--components-fullscreenDialog-headerPadding, token(spacing.4))",
+    },
+    "headline": {
+      "color": "var(--components-fullscreenDialog-headlineColor, token(colors.onSurface))",
+      "flexGrow": "1",
+      "minWidth": "0px",
+      "textStyle": "titleLarge",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "base": "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+        },
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+        },
+      },
+      "backgroundColor": "var(--components-fullscreenDialog-container, token(colors.surface))",
+      "borderWidth": "0px",
+      "color": "var(--components-fullscreenDialog-bodyColor, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexDirection": "column",
+      "flexGrow": "1",
+      "minHeight": "0px",
+      "minWidth": "0px",
+      "shadowElevation": "level0",
+      "width": "100%",
+      "zIndex": "token(zIndex.dialog)",
+    },
+  },
+  "className": "fullscreenDialog",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "FullscreenDialog",
+  ],
+  "slots": [
+    "root",
+    "header",
+    "closeTrigger",
+    "headline",
+    "confirmAction",
+    "body",
+  ],
+  "variants": {},
+}
+`;
+
 exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {

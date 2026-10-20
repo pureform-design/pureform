@@ -51,6 +51,15 @@ export const COMPONENT_USAGE = {
     "circular-progress": { entries: { circularProgress: same("color") } },
     // `icon` follows the icon content; the backdrop is a scrim, and the trigger a button.
     dialog: { entries: { dialog: {}, scrim: {}, button: {}, ripple: {} } },
+    // The trigger is a button, the close trigger an icon button, and the confirm action a button.
+    "fullscreen-dialog": {
+        entries: {
+            fullscreenDialog: {},
+            button: {},
+            iconButton: {},
+            ripple: {},
+        },
+    },
     // `extended` follows the label.
     fab: {
         entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },

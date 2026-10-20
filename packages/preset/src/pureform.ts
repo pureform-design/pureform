@@ -50,6 +50,7 @@ import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
+import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createFab } from "./components/fab";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
@@ -290,6 +291,7 @@ const defaultComponents = <G extends string>(
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
         dialog,
+        fullscreenDialog,
         snackbar,
         tooltip,
         richTooltip,

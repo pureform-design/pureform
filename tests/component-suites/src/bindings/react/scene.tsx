@@ -16,6 +16,7 @@ import { Chip } from "@pureform/react/chip";
 import { CircularProgress } from "@pureform/react/circular-progress";
 import { Dialog } from "@pureform/react/dialog";
 import { Fab } from "@pureform/react/fab";
+import { FullscreenDialog } from "@pureform/react/fullscreen-dialog";
 import { Icon } from "@pureform/react/icon";
 import { IconButton } from "@pureform/react/icon-button";
 import { LinearProgress } from "@pureform/react/linear-progress";
@@ -65,6 +66,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     CircularProgress,
     Dialog,
     Fab,
+    FullscreenDialog,
     Icon,
     IconButton,
     LinearProgress,

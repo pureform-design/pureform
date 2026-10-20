@@ -204,6 +204,21 @@ export const overlaysRegistry = () =>
             "body",
             "actions",
         ]),
+        fullscreenDialog: named("fullscreen-dialog", [
+            "root",
+            "header",
+            "closeTrigger",
+            "headline",
+            "confirmAction",
+            "body",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
         scrim: named("scrim", ["root"]),
         snackbar: named("snackbar", [
             "root",
