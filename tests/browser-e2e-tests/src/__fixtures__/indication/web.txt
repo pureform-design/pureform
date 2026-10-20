@@ -1300,6 +1300,14 @@ searchBar.root: bg oklch(0.933 0.0075 332.402) | color oklch(0.2245 0.0059 301.1
     hovered-selected: bg color(srgb 0.8602 0.8419 0.8572)
     pressed-checked: bg color(srgb 0.8439 0.8259 0.8411)
     focused-checked: bg color(srgb 0.8439 0.8259 0.8411) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+searchBar[scrolled=true].root: bg oklch(0.9151 0.0086 325.879) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.8385 0.8203 0.8392)
+    focused: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.8227 0.8047 0.8235)
+    dragged: bg color(srgb 0.7752 0.7582 0.7764)
+    hovered-selected: bg color(srgb 0.8385 0.8203 0.8392)
+    pressed-checked: bg color(srgb 0.8227 0.8047 0.8235)
+    focused-checked: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 select.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4955 0.1304 293.718)
     focused-checked: color oklch(0.4955 0.1304 293.718)
@@ -1327,6 +1335,35 @@ select[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.7
     focused: color oklch(0.506 0.1927 27.7028)
     focused-checked: color oklch(0.506 0.1927 27.7028)
 select[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4771 0.0852 217.083)
+    focused-checked: color oklch(0.4771 0.0852 217.083)
+autocomplete.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4955 0.1304 293.718)
+    focused-checked: color oklch(0.4955 0.1304 293.718)
+autocomplete[variant=outlined].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+autocomplete[variant=outlined].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+autocomplete[color=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4855 0.0342 300.379)
+    focused-checked: color oklch(0.4855 0.0342 300.379)
+autocomplete[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4904 0.0605 358.465)
+    focused-checked: color oklch(0.4904 0.0605 358.465)
+autocomplete[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4685 0.1423 146.207)
+    focused-checked: color oklch(0.4685 0.1423 146.207)
+autocomplete[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4828 0.0987 90.0339)
+    focused-checked: color oklch(0.4828 0.0987 90.0339)
+autocomplete[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.506 0.1927 27.7028)
+    focused-checked: color oklch(0.506 0.1927 27.7028)
+autocomplete[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4771 0.0852 217.083)
     focused-checked: color oklch(0.4771 0.0852 217.083)
 checkbox.root: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none

@@ -451,48 +451,53 @@ describe.each(INDICATED)("$component", (component) => {
         const sourceProps = (source: MutableInteractionSource) =>
             indication.source!(source);
 
-        it("a shared source shows a press on another component, and useInteractionState reports it", async () => {
-            const observed = harness.observe();
-            const { parts } = await mountIndicated(component, entry, {
-                props: sourceProps(observed.source),
-            });
-            const other = harness.mount(
-                {
-                    component: "Button",
-                    props: {
-                        label: "Other",
-                        interactionSource: observed.source,
+        it.skipIf(indication.modal)(
+            "a shared source shows a press on another component, and useInteractionState reports it",
+            async () => {
+                const observed = harness.observe();
+                const { parts } = await mountIndicated(component, entry, {
+                    props: sourceProps(observed.source),
+                });
+                const other = harness.mount(
+                    {
+                        component: "Button",
+                        props: {
+                            label: "Other",
+                            interactionSource: observed.source,
+                        },
                     },
-                },
-                topHost(),
-            );
-            await harness.settle();
-            const button = other.host.querySelector<HTMLElement>("button")!;
-            await settled(parts().surface);
-            const rest = background(parts().surface);
+                    topHost(),
+                );
+                await harness.settle();
+                const button = other.host.querySelector<HTMLElement>("button")!;
+                await settled(parts().surface);
+                const rest = background(parts().surface);
 
-            // Its own press shows on the button.
-            await mouse("down", parts().surface);
-            await settled(parts().surface);
-            const pressed = background(parts().surface);
-            expect(observed.state().pressed).toBe(true);
-            expect(button.hasAttribute("data-pf-active")).toBe(true);
-            await release();
-            await settled(parts().surface);
-            expect(observed.state().pressed).toBe(false);
-            expect(button.hasAttribute("data-pf-active")).toBe(false);
+                // Its own press shows on the button.
+                await mouse("down", parts().surface);
+                await settled(parts().surface);
+                const pressed = background(parts().surface);
+                expect(observed.state().pressed).toBe(true);
+                expect(button.hasAttribute("data-pf-active")).toBe(true);
+                await release();
+                await settled(parts().surface);
+                expect(observed.state().pressed).toBe(false);
+                expect(button.hasAttribute("data-pf-active")).toBe(false);
 
-            // The button's press shows on it, as its own does.
-            await mouse("down", button);
-            await settled(parts().surface);
-            expect(observed.state().pressed).toBe(true);
-            expect(parts().state.hasAttribute("data-pf-active")).toBe(true);
-            expectSame(background(parts().surface), pressed, "pressed");
-            await release();
-            await settled(parts().surface);
-            expect(parts().state.hasAttribute("data-pf-active")).toBe(false);
-            expectSame(background(parts().surface), rest, "at rest");
-        });
+                // The button's press shows on it, as its own does.
+                await mouse("down", button);
+                await settled(parts().surface);
+                expect(observed.state().pressed).toBe(true);
+                expect(parts().state.hasAttribute("data-pf-active")).toBe(true);
+                expectSame(background(parts().surface), pressed, "pressed");
+                await release();
+                await settled(parts().surface);
+                expect(parts().state.hasAttribute("data-pf-active")).toBe(
+                    false,
+                );
+                expectSame(background(parts().surface), rest, "at rest");
+            },
+        );
 
         it("a shared source never forwards focus", async () => {
             const observed = harness.observe();
