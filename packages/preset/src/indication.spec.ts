@@ -3,8 +3,8 @@
 // focus indicator from its own tokens, and every component that draws a state layer declares
 // where. Each such component sets its indication tokens back to the theme's on its root.
 
-import type { SlottedComponentSpec } from "@pureform/core/types";
 import { px } from "@pureform/core/ast";
+import type { SlottedComponentSpec } from "@pureform/core/types";
 import { materialState } from "@pureform/material";
 import { describe, expect, it } from "vitest";
 

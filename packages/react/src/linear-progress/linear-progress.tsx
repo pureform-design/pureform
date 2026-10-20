@@ -1,4 +1,4 @@
-// The linear progress indicator: Root, a `role="progressbar"` track, around its Indicator, and the
+// The linear progress indicator: Root, a `role="progressbar"` track, around its Track, Indicator and StopIndicator, and the
 // ready-made LinearProgress over them. It has no machine: the app sets the value, which places the
 // indicator through the preset's `value` token. Without one it's indeterminate, and the indicator
 // slides along the track.
@@ -63,11 +63,18 @@ function Root(props: LinearProgressRootProps): ReactNode {
     );
 }
 
+const part = (name: "track" | "indicator" | "stopIndicator", label: string) =>
+    function Part({ unstyled, ...props }: LinearProgressPartProps): ReactNode {
+        const { scope } = context.use(label);
+        return scope.render(name, { element: "div", unstyled, props });
+    };
+
+/** The track: the rest of the bar, after the indicator and a gap. Empty. */
+const Track = part("track", "Track");
 /** The bar that shows the amount done, or slides while indeterminate. Empty. */
-function Indicator({ unstyled, ...props }: LinearProgressPartProps): ReactNode {
-    const { scope } = context.use("Indicator");
-    return scope.render("indicator", { element: "div", unstyled, props });
-}
+const Indicator = part("indicator", "Indicator");
+/** The dot at the end of a determinate track. Empty. */
+const StopIndicator = part("stopIndicator", "StopIndicator");
 
 /** The ready-made linear progress indicator's props: Root's, with `className`, `style`, and
  *  `slotProps` keyed by part. */
@@ -79,7 +86,7 @@ export interface LinearProgressProps
         >,
         SlotKeyedProps<Anatomy> {}
 
-/** The ready-made linear progress indicator: Root and its indicator. */
+/** The ready-made linear progress indicator: Root, its track, indicator and stop indicator. */
 function ReadyMade(props: LinearProgressProps): ReactNode {
     const slot = useSlotProps(props);
     const {
@@ -90,12 +97,19 @@ function ReadyMade(props: LinearProgressProps): ReactNode {
     } = props;
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
+            <Track {...slot("track")} />
             <Indicator {...slot("indicator")} />
+            <StopIndicator {...slot("stopIndicator")} />
         </Root>
     );
 }
 
 /** Material's linear progress indicator. Use it ready-made, `<LinearProgress value={40}
  *  aria-label="Uploading" />` (leave `value` out while the amount is unknown), or compose
- *  `LinearProgress.Root` around `LinearProgress.Indicator`. */
-export const LinearProgress = Object.assign(ReadyMade, { Root, Indicator });
+ *  `LinearProgress.Root` around `Track`, `Indicator` and `StopIndicator`. */
+export const LinearProgress = Object.assign(ReadyMade, {
+    Root,
+    Track,
+    Indicator,
+    StopIndicator,
+});

@@ -1268,7 +1268,9 @@ export function Page() {
                                     "--pf-components-linearProgress-value": `${value()}`,
                                 }}
                             >
+                                <div class={p.track} />
                                 <div class={p.indicator} />
+                                <div class={p.stopIndicator} />
                             </div>
                             <div
                                 class={
@@ -1280,6 +1282,14 @@ export function Page() {
                                 role="progressbar"
                                 aria-label="Loading"
                             >
+                                <div
+                                    class={
+                                        linearProgress({
+                                            indeterminate: true,
+                                            color: "tertiary",
+                                        }).track
+                                    }
+                                />
                                 <div
                                     class={
                                         linearProgress({
@@ -1303,6 +1313,18 @@ export function Page() {
                                                 "--pf-components-circularProgress-value": `${value()}`,
                                             }}
                                         >
+                                            <span class={c.track}>
+                                                <span class={c.trackEndHalf}>
+                                                    <span
+                                                        class={c.trackEndArc}
+                                                    />
+                                                </span>
+                                                <span class={c.trackStartHalf}>
+                                                    <span
+                                                        class={c.trackStartArc}
+                                                    />
+                                                </span>
+                                            </span>
                                             <span class={c.endHalf}>
                                                 <span class={c.endArc} />
                                             </span>
