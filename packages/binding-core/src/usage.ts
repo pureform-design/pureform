@@ -151,6 +151,8 @@ export const COMPONENT_USAGE = {
     },
     slider: { entries: { slider: same("color"), ripple: {} } },
     snackbar: { entries: { snackbar: same("layout"), ripple: {} } },
+    // Each toast's `type` comes with the toast, not a prop.
+    toast: { entries: { toast: {}, ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.

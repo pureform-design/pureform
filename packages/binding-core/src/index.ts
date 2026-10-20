@@ -317,13 +317,34 @@ export {
     snackbarMachineProps,
     snackbarSelection,
 } from "./components/snackbar";
+export {
+    isToastType,
+    TOAST_GLYPHS,
+    TOAST_STACK_STYLE,
+    TOASTER_DEFAULTS,
+    TOASTER_PROPS,
+    toasterOptions,
+    toastSelection,
+} from "./components/toast";
+export type {
+    ToastAction,
+    ToasterOptions,
+    ToasterOwnProps,
+    ToastPart,
+    ToastPlacement,
+    ToastType,
+    ToastVariantProps,
+} from "./components/toast";
 export type {
     SnackbarBehaviorProps,
     SnackbarContentProps,
     SnackbarElementIds,
     SnackbarOpenChangeDetails,
     SnackbarOpenChangeReason,
+    SnackbarHostPlacementProps,
     SnackbarPart,
+    SnackbarQueueApi,
+    SnackbarQueueOptions,
     SnackbarRootOwnProps,
     SnackbarVariantProps,
 } from "./components/snackbar";
