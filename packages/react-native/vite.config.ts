@@ -40,6 +40,7 @@ export default createConfig({
                     "navigation-rail": "src/navigation-rail/index.ts",
                     "radio-group": "src/radio-group/index.ts",
                     scrim: "src/scrim/index.ts",
+                    "app-bar": "src/app-bar/index.ts",
                     "search-bar": "src/search-bar/index.ts",
                     "search-view": "src/search-view/index.ts",
                     autocomplete: "src/autocomplete/index.ts",
