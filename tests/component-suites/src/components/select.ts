@@ -94,6 +94,7 @@ export const select: ComponentCase = {
         compact: { density: "compact", defaultValue: "l" },
         disabled: { disabled: true, defaultValue: "m" },
         required: { required: true, name: "size" },
+        affixes: { prefixText: "EU", suffixText: "cm", defaultValue: "m" },
     },
     state: { prop: "value", from: "m", to: "l", act: choose("l"), read },
     // The list of options comes and goes with `open`.

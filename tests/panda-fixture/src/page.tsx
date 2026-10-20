@@ -265,6 +265,82 @@ export function Page() {
                 </For>
             </section>
             <section
+                data-section="affixes-and-counter"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = textField({
+                            variant,
+                            prefixText: true,
+                            suffixText: true,
+                        });
+                        const id = `affix-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <span class={t.prefixText}>$</span>
+                                    <input
+                                        class={t.input}
+                                        id={id}
+                                        placeholder=" "
+                                        value="12"
+                                    />
+                                    <span class={t.suffixText}>.00</span>
+                                    <label class={t.label} for={id}>
+                                        Price
+                                    </label>
+                                </div>
+                                <div class={t.supportingRow}>
+                                    <span class={t.supportingText}>
+                                        Before tax
+                                    </span>
+                                    <span class={t.counter}>2 / 8</span>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+                <For each={["filled", "outlined"] as const}>
+                    {(variant) => {
+                        const t = textField({
+                            variant,
+                            trailingIcon: true,
+                            secure: true,
+                        });
+                        const id = `secure-${variant}`;
+                        return (
+                            <div class={t.root} style={{ width: "240px" }}>
+                                <div class={t.container}>
+                                    <input
+                                        class={t.input}
+                                        id={id}
+                                        type="password"
+                                        placeholder=" "
+                                        value="hunter2"
+                                        aria-invalid="true"
+                                    />
+                                    <label class={t.label} for={id}>
+                                        Password
+                                    </label>
+                                    <button
+                                        type="button"
+                                        class={t.trailingIcon}
+                                        aria-label="Show password"
+                                        aria-pressed="false"
+                                    >
+                                        ◉
+                                    </button>
+                                </div>
+                                <div class={t.supportingRow}>
+                                    <span class={t.counter}>7 / 6</span>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
+            <section
                 data-section="icon-fields-and-areas"
                 style={{ ...row, "align-items": "flex-start" }}
             >
