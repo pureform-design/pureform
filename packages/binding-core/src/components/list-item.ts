@@ -24,6 +24,12 @@ export type ListItemPart = PartName<typeof listItemAnatomy>;
 export interface ListItemVariantProps {
     readonly lines?: VariantProp<"listItem", "lines">;
     readonly interactive?: boolean | undefined;
+    /** What the leading part holds: an icon, an avatar (40), a thumbnail (56), or a video's
+     *  frame (114 by 64). @default "icon" */
+    readonly leadingType?: VariantProp<"listItem", "leadingType">;
+    /** Its place among a segmented list's tiles, which rounds its corners. A segmented `List`
+     *  sets it. @default "none" */
+    readonly position?: VariantProp<"listItem", "position">;
     readonly density?: VariantProp<"listItem", "density">;
     readonly color?: VariantProp<"listItem", "color">;
     readonly tokens?: InstanceTokens<"listItem"> | undefined;
@@ -50,6 +56,8 @@ export interface ListItemRootOwnProps
 export const LIST_ITEM_ROOT_PROPS = [
     "lines",
     "interactive",
+    "leadingType",
+    "position",
     "density",
     "color",
     "tokens",
@@ -116,6 +124,8 @@ export const listItemSelection = (
 ): Selection<"listItem"> => ({
     lines: props.lines,
     interactive: isInteractiveListItem(props, element),
+    leadingType: props.leadingType,
+    position: props.position,
     density: props.density,
     color: props.color,
     tokens: props.tokens,
