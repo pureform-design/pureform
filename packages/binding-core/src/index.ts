@@ -70,6 +70,18 @@ export type {
     DialogVariantProps,
 } from "./components/dialog";
 export {
+    FULLSCREEN_DIALOG_CONTENT_PROPS,
+    FULLSCREEN_DIALOG_ROOT_PROPS,
+    fullscreenDialogPositionerLayout,
+    fullscreenDialogSelection,
+} from "./components/fullscreen-dialog";
+export type {
+    FullscreenDialogContentProps,
+    FullscreenDialogPart,
+    FullscreenDialogRootOwnProps,
+    FullscreenDialogVariantProps,
+} from "./components/fullscreen-dialog";
+export {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
     fabMachineProps,

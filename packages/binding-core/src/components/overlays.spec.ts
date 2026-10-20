@@ -1,5 +1,6 @@
 import type {
     dialogOverlayAnatomy,
+    fullscreenDialogOverlayAnatomy,
     menuOverlayAnatomy,
     snackbarAnatomy,
     tooltipOverlayAnatomy,
@@ -14,6 +15,12 @@ import {
     dialogSelection,
 } from "./dialog";
 import type { DialogPart } from "./dialog";
+import {
+    FULLSCREEN_DIALOG_ROOT_PROPS,
+    fullscreenDialogPositionerLayout,
+    fullscreenDialogSelection,
+} from "./fullscreen-dialog";
+import type { FullscreenDialogPart } from "./fullscreen-dialog";
 import {
     MENU_ROOT_PROPS,
     menuItemProps,
@@ -158,6 +165,22 @@ describe("overlays", () => {
             hidden: false,
             style: { position: "fixed" },
         });
+    });
+
+    it("lay the full-screen dialog over the viewport and select its tokens", () => {
+        expect(fullscreenDialogSelection({})).toEqual({ tokens: undefined });
+        expect(fullscreenDialogPositionerLayout(false).hidden).toBe(true);
+        expect(fullscreenDialogPositionerLayout(true).style).toMatchObject({
+            position: "fixed",
+            alignItems: "stretch",
+        });
+        expect(fullscreenDialogPositionerLayout(true).style).not.toHaveProperty(
+            "padding",
+        );
+        expect(FULLSCREEN_DIALOG_ROOT_PROPS).toContain("open");
+        expectTypeOf<FullscreenDialogPart>().toEqualTypeOf<
+            (typeof fullscreenDialogOverlayAnatomy.partNames)[number]
+        >();
     });
 
     it("give the snackbar's root its id", () => {

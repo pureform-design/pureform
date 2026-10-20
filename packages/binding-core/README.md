@@ -239,6 +239,15 @@ dialogSelection(props); dialogMachineProps(props);
 dialogPositionerLayout(present);         // hidden once gone; fixed over the viewport, centering
 dialogBackdropLayout(present);           // hidden once gone; the scrim fixed over the viewport
 
+// Full-screen dialog: the same Zag dialog machine (`dialogMachineProps`); fullscreenDialogOverlayAnatomy,
+// no backdrop and no variants
+type FullscreenDialogPart                // the overlay's parts
+interface FullscreenDialogRootOwnProps   // tokens, and the dialog's behavior props, testId, unstyled
+FULLSCREEN_DIALOG_ROOT_PROPS; FULLSCREEN_DIALOG_CONTENT_PROPS; // trigger, closeLabel, closeIcon,
+                                         // headline, confirmAction, body
+fullscreenDialogSelection(props);
+fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the viewport, stretching
+
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
                                          // onOpenChange ({ open, reason }), testId, unstyled
