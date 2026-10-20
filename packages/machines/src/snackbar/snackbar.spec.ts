@@ -1,9 +1,20 @@
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import * as snackbar from ".";
 import { run, settle } from "../testing/vanilla";
 import type { MachineProps } from "../testing/vanilla";
+
+// The pointer stays wherever an earlier spec left it, often on the page's top left corner where
+// the snackbar lands, which holds its time. It waits in the viewport's far corner instead.
+beforeEach(async () => {
+    const corner = document.createElement("div");
+    corner.style.cssText =
+        "position: fixed; right: 0; bottom: 0; width: 8px; height: 8px";
+    document.body.append(corner);
+    await userEvent.hover(corner);
+    corner.remove();
+});
 
 afterEach(() => {
     vi.useRealTimers();
