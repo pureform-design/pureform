@@ -140,11 +140,12 @@ export const COMPONENT_USAGE = {
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
-    // The suggestions are menu items in the menu's default colors; the leading and clear
-    // buttons are icon buttons.
+    // The ready-made trigger is a search bar; the suggestions are menu items in the menu's
+    // default colors; the leading and clear buttons are icon buttons.
     "search-view": {
         entries: {
             searchView: same("variant"),
+            searchBar: {},
             menu: {},
             iconButton: {},
             ripple: {},

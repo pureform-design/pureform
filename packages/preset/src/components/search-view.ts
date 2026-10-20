@@ -249,6 +249,8 @@ export const searchView = pf.slotComponent({
                     root: {
                         ...dropped,
                         tokens: {
+                            // A step below the header's pill, so the pill shows.
+                            container: sys("surfaceContainer"),
                             headerHeight: px(56),
                             headerInset: spacing("2"),
                         },
