@@ -301,11 +301,14 @@ export {
 } from "./components/select";
 export {
     AUTOCOMPLETE_ROOT_PROPS,
+    autocompleteFilterText,
+    autocompleteInitialText,
     autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
+    autocompleteTriggerProps,
     containsFilter,
 } from "./components/autocomplete";
 export type {

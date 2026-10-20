@@ -190,6 +190,9 @@ export const autocompleteMachineProps = (
     name: props.name,
     form: props.form,
     allowCustomValue: props.allowCustomValue ?? true,
+    // A chosen suggestion's label replaces the text once the value takes it (the combobox
+    // machine's), so a controlled value the owner turns down leaves the text alone.
+    selectionBehavior: "preserve" as const,
     openOnClick: props.openOnClick ?? false,
     // The label floats over a placeholder of one space, as the text field's does.
     placeholder: " ",
@@ -214,3 +217,28 @@ export const autocompleteSupportingTextId = (
     props: Pick<AutocompleteBehaviorProps, "ids">,
     id: string,
 ): string => props.ids?.supportingText ?? `combobox:${id}:supporting-text`;
+
+/** Zag's trigger props for the `trailingIcon` part, a `<span>` the preset draws as the field's
+ *  arrow: a button to assistive technology (Zag names it and marks it expanded). */
+export const autocompleteTriggerProps = <P extends object>(
+    props: P,
+): P & { readonly role: "button" } => ({ ...props, role: "button" });
+
+/** The text the list filters by, from Zag's input change: what the user typed, or nothing (every
+ *  suggestion) when the text changed otherwise, such as to a chosen suggestion's label. */
+export const autocompleteFilterText = (details: {
+    readonly inputValue: string;
+    readonly reason?: string | undefined;
+}): string => (details.reason === "input-change" ? details.inputValue : "");
+
+/** The input's text to start with: the given one, else the label of the chosen suggestion. */
+export const autocompleteInitialText = (
+    props: Pick<
+        AutocompleteBehaviorProps,
+        "items" | "value" | "defaultValue" | "defaultInputValue"
+    >,
+): string | undefined => {
+    if (props.defaultInputValue !== undefined) return props.defaultInputValue;
+    const value = props.value !== undefined ? props.value : props.defaultValue;
+    return props.items?.find((item) => item.value === value)?.label;
+};

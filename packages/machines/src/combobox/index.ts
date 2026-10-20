@@ -3,16 +3,16 @@
 // interaction source: the highlighted one hovers, the pointer presses one, and Enter presses the
 // highlighted one (Space types). Everything ends when the list closes or the combobox becomes disabled.
 
-import type {
-    Machine as AnyMachine,
-    Service as AnyService,
-} from "@zag-js/core";
 import {
     connect as zagConnect,
     machine as zagMachine,
     type Api,
     type Machine as ZagMachine,
 } from "@zag-js/combobox";
+import type {
+    Machine as AnyMachine,
+    Service as AnyService,
+} from "@zag-js/core";
 import type { NormalizeProps, PropTypes } from "@zag-js/types";
 
 import {
@@ -37,7 +37,49 @@ const zag = zagMachine as unknown as AnyMachine<SchemaOf<ZagMachine>>;
 
 /** Zag's combobox machine, its highlight hovering the suggestion, and everything ending when it
  *  closes or becomes disabled. */
-export const machine: Machine = withInteraction(zag, (params, emitters) => {
+// Zag scrolls the list back to the top each time it closes, mount included. Setting `scrollTop`
+// lays the page out, which on mount computes every style before a runtime theme's arrive, so the
+// theme's colors then ease in. A hidden list (closed, its exit over) has nothing to scroll.
+const zagActions = zag.implementations!.actions!;
+const quiet: AnyMachine<SchemaOf<ZagMachine>> = {
+    ...zag,
+    implementations: {
+        ...zag.implementations,
+        actions: {
+            ...zagActions,
+            // Under `preserve`, a value the combobox takes (chosen, or set by its owner) still
+            // writes its label into the input: only a choice the owner turns down leaves the
+            // text. Zag writes it once it has found the value's items, a microtask later.
+            syncSelectedItems(params) {
+                const { prop, context } = params;
+                const replace =
+                    prop("selectionBehavior") === "preserve" &&
+                    context.get("value").length > 0;
+                zagActions["syncSelectedItems"]!(
+                    replace
+                        ? {
+                              ...params,
+                              prop: ((key: string) =>
+                                  key === "selectionBehavior"
+                                      ? "replace"
+                                      : prop(key as never)) as typeof prop,
+                          }
+                        : params,
+                );
+            },
+            scrollContentToTop(params) {
+                const content = params.scope.getById(
+                    params.scope.ids?.["content"] ??
+                        `combobox:${params.scope.id}:content`,
+                );
+                if (!content || content.hidden) return;
+                zagActions["scrollContentToTop"]!(params);
+            },
+        },
+    },
+};
+
+export const machine: Machine = withInteraction(quiet, (params, emitters) => {
     const { track, prop } = params;
     trackHighlight(params, emitters, () => params.state.hasTag("open"));
     track([() => prop("disabled")], () => {
