@@ -99,6 +99,8 @@ button[toggle=true].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.73
     hovered-selected: color oklch(1 0 0)
 button[toggle=true].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(1 0 0)
+button[toggle=true].secondaryIcon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(1 0 0)
 iconButton.root: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
     focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
@@ -690,6 +692,8 @@ chip.icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline no
     hovered-selected: color oklch(0.4005 0.034 298.613)
 chip.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4005 0.034 298.613)
+chip.trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
 chip[variant=elevated].root: bg oklch(0.9664 0.0085 325.891) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.914 0.8948 0.9156)
     focused: bg color(srgb 0.9003 0.8812 0.9023) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
@@ -703,6 +707,8 @@ chip[variant=elevated].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0
 chip[variant=elevated].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.4005 0.034 298.613)
 chip[variant=elevated].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+chip[variant=elevated].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.4005 0.034 298.613)
 chip[color=tertiary].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
@@ -718,6 +724,8 @@ chip[color=tertiary].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.7
     hovered-selected: color oklch(0.4044 0.0591 359.127)
 chip[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4044 0.0591 359.127)
+chip[color=tertiary].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
 chip[color=success].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
     focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
@@ -731,6 +739,8 @@ chip[color=success].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158
 chip[color=success].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.3849 0.1167 146.268)
 chip[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+chip[color=success].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.3849 0.1167 146.268)
 chip[color=warning].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
@@ -746,6 +756,8 @@ chip[color=warning].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.71
     hovered-selected: color oklch(0.3956 0.0809 90.5623)
 chip[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.3956 0.0809 90.5623)
+chip[color=warning].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
 chip[color=error].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
     focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
@@ -760,6 +772,8 @@ chip[color=error].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718)
     hovered-selected: color oklch(0.4171 0.1702 27.3795)
 chip[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered-selected: color oklch(0.4171 0.1702 27.3795)
+chip[color=error].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
 chip[color=info].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
     focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
@@ -773,6 +787,8 @@ chip[color=info].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 30
 chip[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.3911 0.0701 217.604)
 chip[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+chip[color=info].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.3911 0.0701 217.604)
 textField.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4955 0.1304 293.718)

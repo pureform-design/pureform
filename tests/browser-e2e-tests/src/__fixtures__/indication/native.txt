@@ -97,6 +97,8 @@ button[toggle=true].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(255, 255, 255, 1)
 button[toggle=true].icon: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(255, 255, 255, 1)
+button[toggle=true].secondaryIcon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
 button[toggle=true].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(255, 255, 255, 1)
 card.root: bg rgba(247, 242, 247, 1) | color rgba(28, 27, 30, 1) | outline none
@@ -140,6 +142,8 @@ chip.icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 chip.label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
+chip.trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 chip.touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 chip[variant=elevated].root: bg rgba(247, 242, 247, 1) | color rgba(73, 69, 78, 1) | outline none
@@ -153,6 +157,8 @@ chip[variant=elevated].root: bg rgba(247, 242, 247, 1) | color rgba(73, 69, 78, 
 chip[variant=elevated].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 chip[variant=elevated].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+chip[variant=elevated].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
 chip[variant=elevated].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(74, 68, 88, 1)
@@ -168,6 +174,8 @@ chip[color=tertiary].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
 chip[color=tertiary].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
+chip[color=tertiary].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
 chip[color=tertiary].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(99, 59, 72, 1)
 chip[color=success].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
@@ -181,6 +189,8 @@ chip[color=success].root: bg transparent | color rgba(73, 69, 78, 1) | outline n
 chip[color=success].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
 chip[color=success].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+chip[color=success].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
 chip[color=success].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 83, 23, 1)
@@ -196,6 +206,8 @@ chip[color=warning].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
 chip[color=warning].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
+chip[color=warning].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
 chip[color=warning].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(87, 68, 0, 1)
 chip[color=error].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
@@ -210,6 +222,8 @@ chip[color=error].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
 chip[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
+chip[color=error].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
 chip[color=error].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(147, 0, 10, 1)
 chip[color=info].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
@@ -223,6 +237,8 @@ chip[color=info].root: bg transparent | color rgba(73, 69, 78, 1) | outline none
 chip[color=info].icon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
 chip[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+chip[color=info].trailingIcon: bg none | color rgba(103, 80, 164, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
 chip[color=info].touchTarget: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 78, 94, 1)
