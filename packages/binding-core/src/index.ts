@@ -299,6 +299,25 @@ export {
     selectValueProps,
     toZagValue,
 } from "./components/select";
+export {
+    AUTOCOMPLETE_ROOT_PROPS,
+    autocompleteMachineProps,
+    autocompleteMatches,
+    autocompleteMenuSelection,
+    autocompleteSelection,
+    autocompleteSupportingTextId,
+    containsFilter,
+} from "./components/autocomplete";
+export type {
+    AutocompleteBehaviorProps,
+    AutocompleteElementIds,
+    AutocompleteFilter,
+    AutocompleteItem,
+    AutocompleteMenuPart,
+    AutocompletePart,
+    AutocompleteRootOwnProps,
+    AutocompleteVariantProps,
+} from "./components/autocomplete";
 export type {
     SelectBehaviorProps,
     SelectContentProps,
@@ -608,6 +627,32 @@ export type {
     SearchBarRootOwnProps,
     SearchBarVariantProps,
 } from "./components/search-bar";
+export {
+    opensSearchView,
+    SEARCH_VIEW_COLLECTION,
+    SEARCH_VIEW_CONTENT_PROPS,
+    SEARCH_VIEW_ROOT_PROPS,
+    SEARCH_VIEW_ROOT_STYLE,
+    searchViewComboboxProps,
+    searchViewDialogProps,
+    searchViewLabel,
+    searchViewMatches,
+    searchViewMenuSelection,
+    searchViewPositionerLayout,
+    searchViewSelection,
+} from "./components/search-view";
+export type {
+    SearchViewBehaviorProps,
+    SearchViewContentProps,
+    SearchViewElementIds,
+    SearchViewItem,
+    SearchViewItemPart,
+    SearchViewPart,
+    SearchViewRootOwnProps,
+    SearchViewSelectDetails,
+    SearchViewSubmitDetails,
+    SearchViewVariantProps,
+} from "./components/search-view";
 export {
     SEPARATOR_ROOT_PROPS,
     separatorRootProps,

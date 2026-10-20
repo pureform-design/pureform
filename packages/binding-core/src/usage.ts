@@ -24,6 +24,15 @@ const same = <const G extends readonly string[]>(
 
 /** Every component, by subpath. */
 export const COMPONENT_USAGE = {
+    // `leadingIcon` follows the icon content and `trailingIcon` is always set; the list is a
+    // menu in the autocomplete's color and density.
+    autocomplete: {
+        entries: {
+            autocomplete: same("variant", "color", "density"),
+            menu: same("color", "density"),
+            ripple: {},
+        },
+    },
     avatar: { entries: { avatar: same("size", "color", "shape") } },
     badge: { entries: { badge: same("size", "placement") } },
     button: {
@@ -131,6 +140,16 @@ export const COMPONENT_USAGE = {
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
+    // The suggestions are menu items in the menu's default colors; the leading and clear
+    // buttons are icon buttons.
+    "search-view": {
+        entries: {
+            searchView: same("variant"),
+            menu: {},
+            iconButton: {},
+            ripple: {},
+        },
+    },
     // `leadingIcon` follows the icon content and `trailingIcon` is always set; the list is a
     // menu in the select's color and density.
     select: {
