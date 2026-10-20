@@ -19,6 +19,26 @@ export type {
     ButtonVariantProps,
 } from "./components/button";
 export {
+    BUTTON_GROUP_CONTENT_PROPS,
+    BUTTON_GROUP_ROOT_PROPS,
+    buttonGroupItemProps,
+    buttonGroupMachineProps,
+    buttonGroupPosition,
+    buttonGroupRootProps,
+    buttonGroupSelection,
+    groupedButtonVariants,
+} from "./components/button-group";
+export type {
+    ButtonGroupBehaviorProps,
+    ButtonGroupButtonVariantProps,
+    ButtonGroupContentProps,
+    ButtonGroupItem,
+    ButtonGroupPart,
+    ButtonGroupPosition,
+    ButtonGroupRootOwnProps,
+    ButtonGroupVariantProps,
+} from "./components/button-group";
+export {
     CHECKBOX_INPUT_LABEL_PROPS,
     CHECKBOX_ROOT_PROPS,
     checkboxInputProps,
