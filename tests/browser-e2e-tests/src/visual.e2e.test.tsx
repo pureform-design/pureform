@@ -26,6 +26,7 @@ const SECTIONS = [
     "cards",
     "scrim",
     "fullscreen-dialog",
+    "sheets",
     "media",
     "controls",
     "color-groups",

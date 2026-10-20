@@ -7,12 +7,14 @@ import { userEvent } from "vitest/browser";
 import { Glyph, PureformProvider, useIconStyle } from ".";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
+import { BottomSheet } from "./bottom-sheet";
 import { Button } from "./button";
 import { Card } from "./card";
 import { Checkbox } from "./checkbox";
 import { Chip } from "./chip";
 import { CircularProgress } from "./circular-progress";
 import { Dialog } from "./dialog";
+import { DragHandle } from "./drag-handle";
 import { animated } from "./engine";
 import { animatedSvg } from "./engines/svg";
 import { Fab } from "./fab";
@@ -32,6 +34,7 @@ import { Scrim } from "./scrim";
 import { SearchBar } from "./search-bar";
 import { Select } from "./select";
 import { Separator } from "./separator";
+import { SideSheet } from "./side-sheet";
 import { Slider } from "./slider";
 import { Snackbar } from "./snackbar";
 import { SupportingText } from "./supporting-text";
@@ -89,6 +92,9 @@ const COMPONENTS = [
     "navigationRail",
     "dialog",
     "fullscreenDialog",
+    "bottomSheet",
+    "sideSheet",
+    "dragHandle",
     "snackbar",
     "tooltip",
     "richTooltip",
@@ -170,6 +176,16 @@ describe("every component", () => {
                 >
                     Details.
                 </FullscreenDialog>
+                <BottomSheet modal={false}>Share to</BottomSheet>
+                <SideSheet
+                    modal={false}
+                    headline="Filters"
+                    onBack={() => {}}
+                    actions={<Button label="Apply" />}
+                >
+                    Narrow it down.
+                </SideSheet>
+                <DragHandle aria-label="Resize" orientation="vertical" />
                 <Snackbar supportingText="Archived" action="Undo" />
                 <Tooltip supportingText="Save" />
                 <RichTooltip subhead="Drafts" supportingText="Saved" />
@@ -216,6 +232,17 @@ describe("every component", () => {
             "pf-fullscreen-dialog-close-trigger",
             "pf-fullscreen-dialog-confirm-action",
             "pf-fullscreen-dialog-body",
+            "pf-bottom-sheet-root",
+            "pf-bottom-sheet-drag-handle",
+            "pf-bottom-sheet-content",
+            "pf-side-sheet-header",
+            "pf-side-sheet-back-button",
+            "pf-side-sheet-headline",
+            "pf-side-sheet-close-trigger",
+            "pf-side-sheet-content",
+            "pf-side-sheet-actions",
+            "pf-drag-handle-root",
+            "pf-drag-handle-handle",
             "pf-snackbar-close",
             "pf-tooltip-root",
             "pf-rich-tooltip-subhead",

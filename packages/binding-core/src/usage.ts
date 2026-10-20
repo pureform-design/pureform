@@ -71,11 +71,11 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
-    // A modal sheet is drawn over the scrim; the trigger is a button, and the drag handle its own
-    // component.
+    // `modal` defaults to on, so it isn't passed as given. A modal sheet is drawn over the scrim;
+    // the trigger is a button, and the drag handle its own component.
     "bottom-sheet": {
         entries: {
-            bottomSheet: same("modal"),
+            bottomSheet: {},
             dragHandle: {},
             scrim: {},
             button: {},
@@ -143,11 +143,12 @@ export const COMPONENT_USAGE = {
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
-    // `coplanar` applies to a standard sheet only. A modal sheet is drawn over the scrim; the
-    // trigger and actions are buttons, the back and close buttons icon buttons.
+    // `modal` defaults to on and `coplanar` applies to a standard sheet only, so neither is given.
+    // A modal sheet is drawn over the scrim; the trigger and actions are buttons, the back and
+    // close buttons icon buttons.
     "side-sheet": {
         entries: {
-            sideSheet: same("modal"),
+            sideSheet: {},
             scrim: {},
             button: {},
             iconButton: {},
