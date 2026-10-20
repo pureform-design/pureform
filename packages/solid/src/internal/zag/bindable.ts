@@ -45,7 +45,9 @@ export function createBindable<T>(
               : value().v;
 
     const set = (v: T | ((prev: T) => T)) => {
-        const prev = untrack(read);
+        // An update reads the last write, not the value Solid shows until the next flush, so
+        // several updates in one go (a toast store adding three toasts) each build on the last.
+        const prev = untrack(controlled) ? untrack(read) : latest;
         const next = isFunction(v) ? v(prev) : v;
         if (props().debug) {
             console.log(`[bindable > ${props().debug}] setValue`, {

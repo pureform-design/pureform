@@ -71,6 +71,9 @@ export interface SnackbarRootOwnProps
     readonly testId?: TestIdOverride<SnackbarPart> | undefined;
     /** Every part, or some, without the registry's styles. */
     readonly unstyled?: Unstyled<SnackbarPart> | undefined;
+    /** Called once it has closed and its exit animation is over (a queue shows the next one
+     *  then). */
+    readonly onExitComplete?: (() => void) | undefined;
 }
 
 /** The keys of `SnackbarRootOwnProps`, which Root keeps off its element. */
@@ -87,6 +90,7 @@ export const SNACKBAR_ROOT_PROPS = [
     "testId",
     "unstyled",
     "indication",
+    "onExitComplete",
 ] as const satisfies readonly (keyof SnackbarRootOwnProps)[];
 
 /** What the ready-made snackbar renders inside Root, in the framework's node type. */
@@ -128,3 +132,36 @@ export const snackbarMachineProps = (props: SnackbarBehaviorProps) => ({
         close: props.ids?.close,
     },
 });
+
+/** A snackbar to show through a queue (`createSnackbarQueue`, React Native's `useSnackbar`): its
+ *  content, its layout, how long it stays, and who to tell. */
+export interface SnackbarQueueOptions<Node>
+    extends SnackbarVariantProps, IndicationProps, SnackbarContentProps<Node> {
+    /** How long it stays, in milliseconds, while the pointer and focus are elsewhere. `null` keeps
+     *  it until the user or the app closes it. @default 5000 */
+    readonly duration?: number | null | undefined;
+    /** Called when the user chooses the action, before the snackbar closes. */
+    readonly onAction?: (() => void) | undefined;
+    /** Called once it asks to close, with why: `timeout`, `action`, `close` (its close button, or
+     *  the app's `dismiss`) or `escape`. */
+    readonly onOpenChange?:
+        | ((details: SnackbarOpenChangeDetails) => void)
+        | undefined;
+    readonly testId?: TestIdOverride<SnackbarPart>;
+}
+
+/** What a snackbar queue gives the app. */
+export interface SnackbarQueueApi<Options> {
+    /** Adds a snackbar to the queue, shown once those before it have gone. Returns its id. */
+    show(options: Options): string;
+    /** Closes the snackbar with this id, or the one showing; one still waiting leaves unseen. */
+    dismiss(id?: string): void;
+}
+
+/** Where a snackbar host sits: above the bottom edge by `offset` (a navigation bar's or a FAB's
+ *  room, a CSS length on the web, points on React Native), and the theme's spacing. */
+export interface SnackbarHostPlacementProps<Length> {
+    /** The room to leave below the snackbar, such as a navigation bar's height, so it shows
+     *  above it. @default 0 */
+    readonly offset?: Length | undefined;
+}
