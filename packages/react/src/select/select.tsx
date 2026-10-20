@@ -15,8 +15,6 @@ import {
     selectInputProps,
     selectMachineProps,
     selectMenuSelection,
-    selectPositionerProps,
-    presentProps,
     selectSelection,
     selectSupportingTextId,
     selectValueProps,
@@ -50,6 +48,7 @@ import { useItemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
+import type { PartContext } from "../part-context";
 import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
@@ -57,6 +56,8 @@ import type { Presence } from "../presence";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { selectFieldParts } from "../select-field-parts";
+import type { SelectFieldContext } from "../select-field-parts";
 
 type Anatomy = typeof selectAnatomy;
 type MenuAnatomy = typeof selectMenuAnatomy;
@@ -221,43 +222,32 @@ function Input({ unstyled, ...props }: SelectPartProps): ReactNode {
     });
 }
 
+const field = selectFieldParts(
+    context as unknown as PartContext<SelectFieldContext>,
+    itemContext,
+);
+
 /** The floating label. */
-function Label({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: api.getLabelProps(),
-        unstyled,
-        props,
-    });
-}
+const Label: (props: SelectPartProps) => ReactNode = field.Label;
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-function LeadingIcon({
-    unstyled,
-    mirror,
-    ...props
-}: SelectIconProps): ReactNode {
-    const { scope } = context.use("LeadingIcon");
-    return scope.render("leadingIcon", {
-        element: "span",
-        machine: { "aria-hidden": "true" },
-        states: { mirrored: mirror },
-        unstyled,
-        props,
-    });
-}
-
-const affix = (part: "prefixText" | "suffixText", name: string) =>
-    function Affix({ unstyled, ...props }: SelectPartProps): ReactNode {
-        const { scope } = context.use(name);
-        return scope.render(part, { element: "span", unstyled, props });
-    };
+const LeadingIcon: (props: SelectIconProps) => ReactNode = field.LeadingIcon;
 
 /** Text before the value, shown once the label floats. Turn on Root's `prefixText` with it. */
-const PrefixText = affix("prefixText", "PrefixText");
+const PrefixText: (props: SelectPartProps) => ReactNode = field.PrefixText;
 /** Text after the value, shown once the label floats. Turn on Root's `suffixText` with it. */
-const SuffixText = affix("suffixText", "SuffixText");
+const SuffixText: (props: SelectPartProps) => ReactNode = field.SuffixText;
+
+/** Helper text under the field. With an `error`, it shows the error instead. */
+const SupportingText: (props: SelectPartProps) => ReactNode =
+    field.SupportingText;
+
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
+const Positioner: (props: SelectPartProps) => ReactNode = field.Positioner;
+
+/** The list of options, drawn as a menu. It stays while its exit animation runs. */
+const Content: (props: SelectPartProps) => ReactNode = field.Content;
 
 /** The arrow at the end, which turns over while the list is open. */
 function TrailingIcon({
@@ -272,18 +262,6 @@ function TrailingIcon({
         states: { mirrored: mirror },
         unstyled,
         props,
-    });
-}
-
-/** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        machine: { id: supportingTextId },
-        unstyled,
-        props: { ...props, children: errorText ?? props.children },
     });
 }
 
@@ -325,33 +303,6 @@ function HiddenSelect({ unstyled, ...props }: SelectPartProps): ReactNode {
     });
 }
 
-/** Places the list under the field; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { menu, api, presence } = context.use("Positioner");
-    return menu.render("positioner", {
-        element: "div",
-        machine: selectPositionerProps(
-            api.getPositionerProps(),
-            presence.present,
-        ),
-        unstyled,
-        props,
-    });
-}
-
-/** The list of options, drawn as a menu. It stays while its exit animation runs. */
-function Content({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { menu, api, presence } = context.use("Content");
-    return menu.render("root", {
-        element: "div",
-        ref: presence.ref,
-        machine: presentProps(api.getContentProps(), presence.present),
-        unstyled,
-        props,
-    });
-}
-
 /** A group's props: its `id`, which its label points at, and a part's. */
 export interface SelectItemGroupProps extends SelectPartProps {
     readonly id: string;
@@ -363,64 +314,17 @@ export interface SelectItemGroupLabelProps extends Omit<SelectPartProps, "id"> {
 }
 
 /** A group of options, labelled by the ItemGroupLabel with its `id` as `group`. */
-function ItemGroup({
-    unstyled,
-    id,
-    ...props
-}: SelectItemGroupProps): ReactNode {
-    const { menu, api } = context.use("ItemGroup");
-    return menu.render("itemGroup", {
-        element: "div",
-        machine: api.getItemGroupProps({ id }),
-        unstyled,
-        props,
-    });
-}
+const ItemGroup: (props: SelectItemGroupProps) => ReactNode = field.ItemGroup;
 
 /** A group's label. */
-function ItemGroupLabel({
-    unstyled,
-    group,
-    ...props
-}: SelectItemGroupLabelProps): ReactNode {
-    const { menu, api } = context.use("ItemGroupLabel");
-    return menu.render("itemGroupLabel", {
-        element: "div",
-        machine: api.getItemGroupLabelProps({ htmlFor: group }),
-        unstyled,
-        props,
-    });
-}
+const ItemGroupLabel: (props: SelectItemGroupLabelProps) => ReactNode =
+    field.ItemGroupLabel;
 
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
-function Item({ unstyled, item, ...props }: SelectItemProps): ReactNode {
-    const { menu, api, sources } = context.use("Item");
-    const source = sources.item(item.value, item.interactionSource);
-    return (
-        <itemContext.Provider value={{ item }}>
-            {menu.render("item", {
-                element: "div",
-                interactionSource: source,
-                machine: api.getItemProps({ item }),
-                states: { hover: api.getItemState({ item }).highlighted },
-                unstyled,
-                props,
-            })}
-        </itemContext.Provider>
-    );
-}
+const Item: (props: SelectItemProps) => ReactNode = field.Item;
 
 /** An option's label. */
-function ItemLabel({ unstyled, ...props }: SelectPartProps): ReactNode {
-    const { menu, api } = context.use("ItemLabel");
-    const { item } = itemContext.use("ItemLabel");
-    return menu.render("itemLabel", {
-        element: "span",
-        machine: api.getItemTextProps({ item }),
-        unstyled,
-        props,
-    });
-}
+const ItemLabel: (props: SelectPartProps) => ReactNode = field.ItemLabel;
 
 /** The ready-made select's props: Root's, with `className`, `style`, and `slotProps` keyed by the
  *  field's parts, and the label, supporting text, and icons as content. `aria-label`,
