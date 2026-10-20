@@ -39,10 +39,9 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
 import {
-    GROUP_GROWTH,
     GROUP_INNER_RADII,
-    GROUP_TRANSITION,
-    groupCorners,
+    GROUPED_TOKENS,
+    groupPositionVariant,
 } from "./button-group";
 import {
     DEFAULT_SHAPES,
@@ -173,11 +172,8 @@ const { tokens, ref } = componentTokens("iconButton", {
     // The `width` variant's flags: narrow, wide, or neither for the default width.
     narrow: unitless(0),
     wide: unitless(0),
-    // A grouped button's inner corners (where a connected group's buttons meet), and how much
-    // wider it grows while pressed, which the `position` variant turns on in a standard group.
-    innerRadius: radius("small"),
-    pressedInnerRadius: radius("extraSmall"),
-    pressedGrowth: px(0),
+    // A grouped button's inner corners and pressed growth.
+    ...GROUPED_TOKENS,
     iconSize: sizeToken("iconMedium"),
     // Material draws a selected toggle's icon filled.
     iconFill: unitless(0),
@@ -209,14 +205,6 @@ const corners = {
 };
 
 const SELECTED = slot("root", "selected");
-
-// The run's corners in a connected group, on every slot that draws the corners.
-const GROUP_CORNERS = groupCorners(ref);
-const groupPosition = (position: "first" | "middle" | "last") => ({
-    root: GROUP_CORNERS[position],
-    container: GROUP_CORNERS[position],
-    outline: GROUP_CORNERS[position],
-});
 
 /** A toggle's colors per fill, off and on, as Material's toggle icon buttons draw them. */
 const toggleColors = (
@@ -413,18 +401,11 @@ export const createIconButton = <
                     ...cornerMorphVariants("round"),
                     // Its place in a button group: `single` in a standard group (it widens
                     // while pressed), and the run's corners in a connected one.
-                    position: {
-                        none: {},
-                        first: groupPosition("first"),
-                        middle: groupPosition("middle"),
-                        last: groupPosition("last"),
-                        single: {
-                            root: {
-                                tokens: { pressedGrowth: GROUP_GROWTH },
-                                transition: GROUP_TRANSITION,
-                            },
-                        },
-                    },
+                    position: groupPositionVariant(ref, [
+                        "root",
+                        "container",
+                        "outline",
+                    ]),
                     density: densityTokenVariant(densities),
                 },
                 // A toggle rests in the unselected colors and takes the selected ones once

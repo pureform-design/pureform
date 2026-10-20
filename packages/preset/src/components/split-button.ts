@@ -59,6 +59,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
+import { runCorners } from "./tiles";
 
 const FILLS = {
     filled: "filled",
@@ -206,10 +207,11 @@ export const createSplitButton = <
                         ...button,
                         gap: ref("leadingGap"),
                         textStyle: textStyle("labelLarge"),
-                        borderStartStartRadius: ref("radius"),
-                        borderEndStartRadius: ref("radius"),
-                        borderStartEndRadius: inner("leadingButton"),
-                        borderEndEndRadius: inner("leadingButton"),
+                        ...runCorners(
+                            ref("radius"),
+                            inner("leadingButton"),
+                            "inline",
+                        ),
                     },
                     trailingButton: {
                         ...button,

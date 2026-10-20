@@ -20,11 +20,12 @@ import {
     add,
     unitless,
 } from "@pureform/core/ast";
-import type { ColorValue, StyleMap } from "@pureform/core/ast";
+import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
+import type { IndicationRef } from "../state-layer";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -143,6 +144,32 @@ const iconColor = (selected: ColorValue) =>
         .on(slot("root", "disabled"), disabledColor("disabledContent"))
         .else(ref("iconColor"));
 
+/** The tokens `chipShape` reads, besides the indication's. */
+export type ChipShapeToken =
+    | "gap"
+    | "height"
+    | "padding"
+    | "radius"
+    | "squareRadius"
+    | "pressedRadius"
+    | "square"
+    | "toggles";
+
+/** A chip's root without its colors, shared by the chip and the input chip: a pressable row at
+ *  the density's height, padded inline, with the corner morph. */
+export const chipShape = (
+    ref: IndicationRef & ((token: ChipShapeToken) => NumericValue),
+): StyleMap => ({
+    ...INDICATION_ROOT,
+    ...pressableRoot(ref),
+    gap: ref("gap"),
+    height: dense(ref("height")),
+    paddingInlineStart: ref("padding"),
+    paddingInlineEnd: ref("padding"),
+    transition: cornerTransition,
+    borderRadius: cornerRadius(ref),
+});
+
 const pf = typed();
 
 /** Build the chip with a `color` variant per group in `groups`. A group colors the selected
@@ -183,16 +210,7 @@ export const createChip = <
             },
             recipe: () => ({
                 base: {
-                    root: {
-                        ...INDICATION_ROOT,
-                        ...pressableRoot(ref),
-                        gap: ref("gap"),
-                        height: dense(ref("height")),
-                        paddingInlineStart: ref("padding"),
-                        paddingInlineEnd: ref("padding"),
-                        transition: cornerTransition,
-                        borderRadius: cornerRadius(ref),
-                    },
+                    root: chipShape(ref),
                     icon: {
                         ...iconBox(ref("iconSize"), {
                             fill: iconFill(ref("iconFill")),
