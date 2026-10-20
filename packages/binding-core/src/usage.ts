@@ -40,6 +40,7 @@ export const COMPONENT_USAGE = {
     // `interactive` follows the element, and `padded` the sections the ready-made shows.
     card: { entries: { card: same("variant", "actionsAlign"), ripple: {} } },
     checkbox: { entries: { checkbox: same("color", "density"), ripple: {} } },
+    // `toggle` follows `selected`.
     chip: {
         entries: {
             chip: same("variant", "color", "density", "corner"),
