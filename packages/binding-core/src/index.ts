@@ -107,6 +107,39 @@ export type {
     FullscreenDialogVariantProps,
 } from "./components/fullscreen-dialog";
 export {
+    BOTTOM_SHEET_CONTENT_PROPS,
+    BOTTOM_SHEET_ROOT_PROPS,
+    bottomSheetPositionerLayout,
+    bottomSheetSelection,
+    SIDE_SHEET_CONTENT_PROPS,
+    SIDE_SHEET_ROOT_PROPS,
+    sheetContentLayout,
+    sheetMachineProps,
+    sheetModal,
+    sideSheetPositionerLayout,
+    sideSheetSelection,
+} from "./components/sheet";
+export type {
+    BottomSheetContentProps,
+    BottomSheetPart,
+    BottomSheetRootOwnProps,
+    BottomSheetVariantProps,
+    SheetBehaviorProps,
+    SideSheetContentProps,
+    SideSheetPart,
+    SideSheetRootOwnProps,
+    SideSheetVariantProps,
+} from "./components/sheet";
+export {
+    DRAG_HANDLE_ROOT_PROPS,
+    dragHandleSelection,
+} from "./components/drag-handle";
+export type {
+    DragHandlePart,
+    DragHandleRootOwnProps,
+    DragHandleVariantProps,
+} from "./components/drag-handle";
+export {
     FAB_CONTENT_PROPS,
     FAB_ROOT_PROPS,
     fabMachineProps,
