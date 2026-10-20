@@ -54,7 +54,7 @@ callback reports user actions only, with a details object.
 | `presence.ts`                                             | Zag's presence, re-exported; keeps an overlay mounted until its exit animation ends, and only the exit's own animations end it.                                                                                            |
 | `slider/`                                                 | Zag's slider under the preset's part names: thumbs, range, stops, value indicator, fieldsets.                                                                                                                              |
 | `tags-input/`                                             | Zag's tags input, with the field's `container` and an input chip per value (`getChipProps`, `getChipItemProps`, `getChipLabelProps`, `getChipRemoveProps`); not editable in place by default; the highlighted chip hovers. |
-| `combobox/`                                               | Zag's combobox, its highlighted suggestion hovering and Enter (not Space) pressing it; `anatomy` (the autocomplete's parts) and `searchViewAnatomy`. The autocomplete and the search view run on it. |
+| `combobox/`                                               | Zag's combobox, its highlighted suggestion hovering and Enter (not Space) pressing it; `anatomy` (the autocomplete's parts) and `searchViewAnatomy`. The autocomplete and the search view run on it.                       |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                                                                                                         |
 | `zag-form.ts`                                             | `withFieldsetRule`: a Zag machine's fieldset tracking swapped for pureform's, and its reset dropped.                                                                                                                       |
 | `interaction/`                                            | How machines emit to an interaction source: an emitter per surface, Zag machines wrapped (`withInteraction`), handlers chained after Zag's.                                                                                |
@@ -84,7 +84,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/text-field`   | `textField`'s members                                                                                                                                                                                                                   |
 | `@pureform/machines/slider`       | `slider`'s members (Zag's slider, wrapped)                                                                                                                                                                                              |
 | `@pureform/machines/tags-input`   | `tagsInput`'s members (Zag's tags input, wrapped)                                                                                                                                                                                       |
-| `@pureform/machines/combobox`     | `combobox`'s members (Zag's combobox, wrapped) |
+| `@pureform/machines/combobox`     | `combobox`'s members (Zag's combobox, wrapped)                                                                                                                                                                                          |
 | `@pureform/machines/form`         | the form helpers                                                                                                                                                                                                                        |
 | `@pureform/machines/interaction`  | `InteractionEmitter`, `InteractionEmitters`, `claimEvent`, `pointerKind`, `isFocusVisible`, `withInteraction`, `chainProps`, `emittersOf`: emitting to an interaction source from a machine of your own (or React Native's `Pressable`) |
 
@@ -207,7 +207,7 @@ The text field and the text area share it: the input part is an `<input>` (`getI
 | `secure`, `revealLabel`                  | `boolean`, `string`                                    | password field: `getVisibilityTriggerProps()` toggles `revealed` and the input's `type` |
 | `name`, `form`, `dir`, `getRootNode`     |                                                        | forwarded or as in Zag                                                                  |
 
-Parts: `getPrefixTextProps`, `getSuffixTextProps`, `getSupportingRowProps`, `getCounterProps`
+Parts: `getPrefixTextProps`, `getSuffixTextProps`, `getCounterProps`
 (`id`, `data-overflow`), and `getVisibilityTriggerProps` (a `type="button"` toggle with
 `aria-pressed` and `aria-controls`) besides the input, label, root and supporting text.
 

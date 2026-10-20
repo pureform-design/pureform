@@ -114,13 +114,6 @@ export function connect<T extends PropTypes>(
                 dir: prop("dir"),
             });
         },
-        getSupportingRowProps() {
-            return normalize.element({
-                ...parts.supportingRow.attrs,
-                ...dataAttrs,
-                dir: prop("dir"),
-            });
-        },
         getCounterProps() {
             return normalize.element({
                 ...parts.counter.attrs,

@@ -5,6 +5,7 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "container": {
       "display": "flex",
+      "flexBasis": "100%",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
@@ -93,11 +94,8 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     },
     "root": {
       "display": "flex",
-      "flexDirection": "column",
-    },
-    "supportingRow": {
-      "display": "flex",
       "flexDirection": "row",
+      "flexWrap": "wrap",
     },
     "supportingText": {
       "color": {
@@ -106,7 +104,9 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
         "base": "var(--components-textArea-supportingColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
+      "flexBasis": "0px",
       "flexDirection": "column",
+      "flexGrow": "1",
       "flexShrink": "1",
       "paddingBlockStart": "token(spacing.1)",
       "paddingInlineEnd": "var(--components-textArea-paddingInline, token(spacing.4))",
@@ -174,7 +174,6 @@ exports[`textArea > compiles to a stable Panda slot recipe 1`] = `
     "label",
     "trailingIcon",
     "supportingText",
-    "supportingRow",
     "counter",
   ],
   "variants": {

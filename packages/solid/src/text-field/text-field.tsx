@@ -88,8 +88,8 @@ const { ReadyMade, parts } = createTextInput({
 
 /** Material's text field. Use it ready-made, `<TextField label="Email" name="email" />`, or
  *  compose its parts under `TextField.Root`: `Container` holding `LeadingIcon`, `PrefixText`,
- *  `Input`, `SuffixText`, `Label`, and `TrailingIcon`, then `SupportingText`, or a
- *  `SupportingRow` holding `SupportingText` and `Counter`. `prefixText`, `suffixText` and
+ *  `Input`, `SuffixText`, `Label`, and `TrailingIcon`, then `SupportingText` and
+ *  `Counter`. `prefixText`, `suffixText` and
  *  `counterMax` add the affixes and the counter; `secure` makes it a password field whose
  *  trailing icon shows or hides the text. */
 export const TextField = Object.assign(
