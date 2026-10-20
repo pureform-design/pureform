@@ -18,8 +18,6 @@ import {
     selectItemGroups,
     selectMachineProps,
     selectMenuSelection,
-    selectPositionerProps,
-    presentProps,
     selectSelection,
     selectSupportingTextId,
     selectValueProps,
@@ -52,12 +50,15 @@ import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
+import type { PartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { selectFieldParts } from "../select-field-parts";
+import type { SelectFieldContext } from "../select-field-parts";
 
 type Anatomy = typeof selectAnatomy;
 type MenuAnatomy = typeof selectMenuAnatomy;
@@ -241,43 +242,32 @@ function Input(props: SelectPartProps): JSX.Element {
     });
 }
 
+const field = selectFieldParts(
+    context as unknown as PartContext<SelectFieldContext>,
+    itemContext,
+);
+
 /** The floating label. */
-function Label(props: SelectPartProps): JSX.Element {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: () => api().getLabelProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const Label: (props: SelectPartProps) => JSX.Element = field.Label;
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-function LeadingIcon(props: SelectIconProps): JSX.Element {
-    const { scope } = context.use("LeadingIcon");
-    return scope.render("leadingIcon", {
-        element: "span",
-        machine: () => ({ "aria-hidden": "true" }),
-        states: () => ({ mirrored: props.mirror }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
-    });
-}
-
-const affix = (part: "prefixText" | "suffixText", name: string) =>
-    function Affix(props: SelectPartProps): JSX.Element {
-        const { scope } = context.use(name);
-        return scope.render(part, {
-            element: "span",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const LeadingIcon: (props: SelectIconProps) => JSX.Element = field.LeadingIcon;
 
 /** Text before the value, shown once the label floats. Turn on Root's `prefixText` with it. */
-const PrefixText = affix("prefixText", "PrefixText");
+const PrefixText: (props: SelectPartProps) => JSX.Element = field.PrefixText;
 /** Text after the value, shown once the label floats. Turn on Root's `suffixText` with it. */
-const SuffixText = affix("suffixText", "SuffixText");
+const SuffixText: (props: SelectPartProps) => JSX.Element = field.SuffixText;
+
+/** Helper text under the field. With an `error`, it shows the error instead. */
+const SupportingText: (props: SelectPartProps) => JSX.Element =
+    field.SupportingText;
+
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
+const Positioner: (props: SelectPartProps) => JSX.Element = field.Positioner;
+
+/** The list of options, drawn as a menu. It stays while its exit animation runs. */
+const Content: (props: SelectPartProps) => JSX.Element = field.Content;
 
 /** The arrow at the end, which turns over while the list is open. */
 function TrailingIcon(props: SelectIconProps): JSX.Element {
@@ -288,23 +278,6 @@ function TrailingIcon(props: SelectIconProps): JSX.Element {
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "mirror"),
-    });
-}
-
-/** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText(props: SelectPartProps): JSX.Element {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    const children = {
-        get children() {
-            return errorText() ?? props.children;
-        },
-    };
-    return scope.render("supportingText", {
-        element: "span",
-        machine: () => ({ id: supportingTextId() }),
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), children),
     });
 }
 
@@ -341,35 +314,6 @@ function HiddenSelect(props: SelectPartProps): JSX.Element {
     });
 }
 
-/** Places the list under the field; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner(props: SelectPartProps): JSX.Element {
-    const { menu, api, presence } = context.use("Positioner");
-    return menu.render("positioner", {
-        element: "div",
-        machine: () =>
-            selectPositionerProps(
-                api().getPositionerProps(),
-                presence.present(),
-            ),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
-/** The list of options, drawn as a menu. It stays while its exit animation runs. */
-function Content(props: SelectPartProps): JSX.Element {
-    const { menu, api, presence } = context.use("Content");
-    return menu.render("root", {
-        element: "div",
-        ref: presence.ref,
-        machine: () =>
-            presentProps(api().getContentProps(), presence.present()),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
 /** A group's props: its `id`, and a part's. */
 export interface SelectItemGroupProps extends SelectPartProps {
     readonly id: string;
@@ -381,62 +325,17 @@ export interface SelectItemGroupLabelProps extends SelectPartProps {
 }
 
 /** A group of options, named by the ItemGroupLabel whose `htmlFor` is its `id`. */
-function ItemGroup(props: SelectItemGroupProps): JSX.Element {
-    const { menu, api } = context.use("ItemGroup");
-    return menu.render("itemGroup", {
-        element: "div",
-        machine: () => api().getItemGroupProps({ id: props.id }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id"),
-    });
-}
+const ItemGroup: (props: SelectItemGroupProps) => JSX.Element = field.ItemGroup;
 
 /** A group's label. */
-function ItemGroupLabel(props: SelectItemGroupLabelProps): JSX.Element {
-    const { menu, api } = context.use("ItemGroupLabel");
-    return menu.render("itemGroupLabel", {
-        element: "div",
-        machine: () => api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "htmlFor"),
-    });
-}
+const ItemGroupLabel: (props: SelectItemGroupLabelProps) => JSX.Element =
+    field.ItemGroupLabel;
 
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
-function Item(props: SelectItemProps): JSX.Element {
-    const { menu, api, sources } = context.use("Item");
-    const item = () => props.item;
-    const source = sources.item(
-        () => props.item.value,
-        () => props.item.interactionSource,
-    );
-    return (
-        <itemContext.Provider value={{ item }}>
-            {menu.render("item", {
-                element: "div",
-                interactionSource: source,
-                machine: () => api().getItemProps({ item: item() }),
-                states: () => ({
-                    hover: api().getItemState({ item: item() }).highlighted,
-                }),
-                unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "item"),
-            })}
-        </itemContext.Provider>
-    );
-}
+const Item: (props: SelectItemProps) => JSX.Element = field.Item;
 
 /** An option's label. */
-function ItemLabel(props: SelectPartProps): JSX.Element {
-    const { menu, api } = context.use("ItemLabel");
-    const { item } = itemContext.use("ItemLabel");
-    return menu.render("itemLabel", {
-        element: "span",
-        machine: () => api().getItemTextProps({ item: item() }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const ItemLabel: (props: SelectPartProps) => JSX.Element = field.ItemLabel;
 
 /** The ready-made select's props: Root's, with `class`, `style`, and `slotProps` keyed by the
  *  field's parts, and the label, supporting text, and icons as content. `aria-label`,
