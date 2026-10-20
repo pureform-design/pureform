@@ -2872,6 +2872,63 @@ export const cardAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const carouselAnatomy = {
+    name: "carousel",
+    scope: "carousel",
+    root: "root",
+    partNames: ["root", "itemGroup", "item", "mask", "content"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-carousel-root",
+            parent: null,
+            children: ["itemGroup"],
+            styled: true,
+            mirror: false,
+        },
+        itemGroup: {
+            name: "itemGroup",
+            attribute: "item-group",
+            testId: "pf-carousel-item-group",
+            parent: "root",
+            children: ["item"],
+            styled: true,
+            mirror: false,
+        },
+        item: {
+            name: "item",
+            attribute: "item",
+            testId: "pf-carousel-item",
+            parent: "itemGroup",
+            children: ["mask"],
+            styled: true,
+            mirror: false,
+        },
+        mask: {
+            name: "mask",
+            attribute: "mask",
+            testId: "pf-carousel-mask",
+            parent: "item",
+            children: ["content"],
+            styled: true,
+            mirror: false,
+        },
+        content: {
+            name: "content",
+            attribute: "content",
+            testId: "pf-carousel-content",
+            parent: "mask",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    indication: [
+        { trigger: "mask", surface: "mask", centered: false, focus: "mask" },
+    ],
+} as const satisfies ComponentAnatomy;
+
 export const scrimAnatomy = {
     name: "scrim",
     scope: "scrim",
@@ -3015,6 +3072,7 @@ export const anatomy = {
     tooltip: tooltipAnatomy,
     richTooltip: richTooltipAnatomy,
     card: cardAnatomy,
+    carousel: carouselAnatomy,
     scrim: scrimAnatomy,
     ripple: rippleAnatomy,
     icon: iconAnatomy,
@@ -3329,6 +3387,13 @@ export const testIds = {
         supportingText: "pf-card-supporting-text",
         actions: "pf-card-actions",
         footer: "pf-card-footer",
+    },
+    carousel: {
+        root: "pf-carousel-root",
+        itemGroup: "pf-carousel-item-group",
+        item: "pf-carousel-item",
+        mask: "pf-carousel-mask",
+        content: "pf-carousel-content",
     },
     scrim: { root: "pf-scrim-root" },
     ripple: { root: "pf-ripple-root", ripple: "pf-ripple-ripple" },

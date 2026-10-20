@@ -5,6 +5,7 @@ export * from "./components/button";
 export * from "./components/button-group";
 export * from "./components/icon-button";
 export * from "./components/card";
+export * from "./components/carousel";
 export * from "./components/scrim";
 export * from "./components/radio";
 export * from "./components/ripple";
