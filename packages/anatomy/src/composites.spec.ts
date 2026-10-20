@@ -9,12 +9,14 @@ import {
     radioGroupAnatomy,
     selectMenuAnatomy,
     tabsCompositeAnatomy,
+    richTooltipOverlayAnatomy,
     tooltipOverlayAnatomy,
 } from "./composites";
 import {
     anatomy,
     dialogAnatomy,
     menuAnatomy,
+    richTooltipAnatomy,
     tabsAnatomy,
     tooltipAnatomy,
 } from "./generated";
@@ -71,6 +73,12 @@ describe("composites", () => {
             tooltipOverlayAnatomy,
             tooltipAnatomy,
             compositeTestIds.tooltip,
+        ],
+        [
+            "richTooltip",
+            richTooltipOverlayAnatomy,
+            richTooltipAnatomy,
+            compositeTestIds.richTooltip,
         ],
         [
             "dialog",

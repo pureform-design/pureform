@@ -75,6 +75,13 @@
                 "default": "./dist/tooltip.mjs"
             }
         },
+        "./rich-tooltip": {
+            "types": "./dist/rich-tooltip/index.d.ts",
+            "import": {
+                "development": "./src/rich-tooltip/index.ts",
+                "default": "./dist/rich-tooltip.mjs"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "import": {

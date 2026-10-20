@@ -323,12 +323,25 @@ export type {
 } from "./components/text-field";
 export {
     isInteractiveTooltip,
-    isRichTooltip,
+    CARET_STYLE,
     TOOLTIP_CONTENT_PROPS,
     TOOLTIP_ROOT_PROPS,
     tooltipMachineProps,
     tooltipSelection,
 } from "./components/tooltip";
+export {
+    isInteractiveRichTooltip,
+    RICH_TOOLTIP_CONTENT_PROPS,
+    RICH_TOOLTIP_ROOT_PROPS,
+    richTooltipMachineProps,
+    richTooltipSelection,
+} from "./components/rich-tooltip";
+export type {
+    RichTooltipContentProps,
+    RichTooltipPart,
+    RichTooltipRootOwnProps,
+    RichTooltipVariantProps,
+} from "./components/rich-tooltip";
 export type {
     TooltipBehaviorProps,
     TooltipContentProps,

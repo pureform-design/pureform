@@ -34,6 +34,7 @@ import { NavigationRail } from "@pureform/react-native/navigation-rail";
 import { Radio } from "@pureform/react-native/radio-group";
 import { reanimated } from "@pureform/react-native/reanimated";
 import { reanimatedSvg } from "@pureform/react-native/reanimated-svg";
+import { RichTooltip } from "@pureform/react-native/rich-tooltip";
 import { Scrim } from "@pureform/react-native/scrim";
 import { SearchBar } from "@pureform/react-native/search-bar";
 import { Select } from "@pureform/react-native/select";
@@ -626,8 +627,7 @@ function Page(props: { controls: ReactNode }) {
                             action="Undo"
                         />
                         <Tooltip supportingText="Save to drafts" />
-                        <Tooltip
-                            variant="rich"
+                        <RichTooltip
                             subhead="Drafts"
                             supportingText="Drafts stay on this device."
                         />

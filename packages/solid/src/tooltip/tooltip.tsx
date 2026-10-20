@@ -1,20 +1,21 @@
-// The tooltip: Root on Zag's tooltip machine, an unstyled element around the trigger and the
+// The plain tooltip: Root on Zag's tooltip machine, an unstyled element around the trigger and the
 // tooltip; the trigger, a `<button>` or any component (`as={IconButton}`), which opens it on hover
-// and keyboard focus; Zag's positioner, which places it; the tooltip's surface (`Content`) with a
-// rich tooltip's subhead, supporting text, and actions; and the ready-made Tooltip over them.
+// and keyboard focus; Zag's positioner, which places it; the tooltip's surface (`Content`) with its
+// supporting text and optional caret; and the ready-made Tooltip over them. The rich tooltip is
+// `RichTooltip`.
 // Everything renders in place, inside Root.
 
 import { tooltipOverlayAnatomy } from "@pureform/anatomy";
 import {
     isInteractiveTooltip,
     isPresent,
-    isRichTooltip,
     overlayPositionerProps,
     presentProps,
     TOOLTIP_CONTENT_PROPS,
     TOOLTIP_ROOT_PROPS,
     tooltipMachineProps,
     tooltipSelection,
+    CARET_STYLE,
 } from "@pureform/binding-core";
 import type {
     TooltipContentProps,
@@ -26,6 +27,7 @@ import {
     type Accessor,
     createMemo,
     createUniqueId,
+    merge,
     omit,
     Show,
 } from "solid-js";
@@ -152,8 +154,7 @@ function Positioner(props: TooltipPartProps): JSX.Element {
     });
 }
 
-/** The tooltip's surface: a plain tooltip's text, or a rich tooltip's parts. It stays while its
- *  exit animation runs. */
+/** The tooltip's surface, holding its text. It stays while its exit animation runs. */
 function Content(props: TooltipPartProps): JSX.Element {
     const { scope, api, presence } = context.use("Content");
     return scope.render("content", {
@@ -166,17 +167,7 @@ function Content(props: TooltipPartProps): JSX.Element {
     });
 }
 
-/** A rich tooltip's title. */
-function Subhead(props: TooltipPartProps): JSX.Element {
-    const { scope } = context.use("Subhead");
-    return scope.render("subhead", {
-        element: "span",
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
-/** A rich tooltip's text. */
+/** The tooltip's text. */
 function SupportingText(props: TooltipPartProps): JSX.Element {
     const { scope } = context.use("SupportingText");
     return scope.render("supportingText", {
@@ -186,18 +177,33 @@ function SupportingText(props: TooltipPartProps): JSX.Element {
     });
 }
 
-/** A rich tooltip's actions: text buttons. */
-function Actions(props: TooltipPartProps): JSX.Element {
-    const { scope } = context.use("Actions");
-    return scope.render("actions", {
+/** A caret pointing at the trigger, a child of the positioner. Zag places it and draws its tip,
+ *  in the surface's color. */
+function Caret(props: TooltipPartProps): JSX.Element {
+    const { scope, api } = context.use("Caret");
+    return scope.render("caret", {
         element: "div",
+        machine: () => {
+            const machine = api().getArrowProps();
+            return {
+                ...machine,
+                style: {
+                    ...(machine.style as JSX.CSSProperties),
+                    ...CARET_STYLE,
+                },
+            };
+        },
         unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
+        props: merge(omit(props, "unstyled"), {
+            get children() {
+                return <div {...api().getArrowTipProps()} />;
+            },
+        }),
     });
 }
 
 /** The ready-made tooltip's props: Root's, with `class`, `style`, and `slotProps` keyed by part,
- *  the trigger's label, and the text, subhead, and actions as content. */
+ *  the trigger's label, the text, and `caret`. */
 export interface TooltipProps
     extends
         Omit<TooltipRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
@@ -211,9 +217,8 @@ const READY_MADE_PROPS = [
     ...TOOLTIP_CONTENT_PROPS,
 ] as const;
 
-/** The ready-made tooltip: the trigger, drawn as a button, when given a label, and the tooltip.
- *  A plain tooltip holds its text; a rich one, the subhead, supporting text, and actions, each
- *  only when given. */
+/** The ready-made tooltip: the trigger, drawn as a button, when given a label, and the tooltip
+ *  with its text and, given `caret`, a caret. */
 function ReadyMade(props: TooltipProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as TooltipRootProps;
@@ -221,9 +226,8 @@ function ReadyMade(props: TooltipProps): JSX.Element {
     const trigger = slots("trigger") as object;
     const positioner = slots("positioner");
     const content = slots("content");
-    const subhead = slots("subhead");
+    const caret = slots("caret");
     const supportingText = slots("supportingText");
-    const actions = slots("actions");
     return (
         <Root {...own} {...root}>
             <Show when={isPresent(props.trigger)}>
@@ -231,38 +235,27 @@ function ReadyMade(props: TooltipProps): JSX.Element {
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
-                    <Show
-                        when={isRichTooltip(props)}
-                        fallback={props.supportingText}
-                    >
-                        <Show when={isPresent(props.subhead)}>
-                            <Subhead {...subhead}>{props.subhead}</Subhead>
-                        </Show>
-                        <Show when={isPresent(props.supportingText)}>
-                            <SupportingText {...supportingText}>
-                                {props.supportingText}
-                            </SupportingText>
-                        </Show>
-                        <Show when={isPresent(props.actions)}>
-                            <Actions {...actions}>{props.actions}</Actions>
-                        </Show>
-                    </Show>
+                    <SupportingText {...supportingText}>
+                        {props.supportingText}
+                    </SupportingText>
                 </Content>
+                <Show when={props.caret}>
+                    <Caret {...caret} />
+                </Show>
             </Positioner>
         </Root>
     );
 }
 
-/** Material's plain and rich tooltips. Use it ready-made, `<Tooltip trigger="Save"
- *  supportingText="Save to drafts" />`, or compose its parts under `Tooltip.Root`: `Trigger`
- *  (`as={IconButton}` draws it as an icon button), then `Positioner` holding `Content`, which
- *  holds a plain tooltip's text, or a rich one's `Subhead`, `SupportingText`, and `Actions`. */
+/** Material's plain tooltip. Use it ready-made, `<Tooltip trigger="Save" supportingText="Save to
+ *  drafts" />`, or compose its parts under `Tooltip.Root`: `Trigger` (`as={IconButton}` draws it
+ *  as an icon button), then `Positioner` holding `Content` with `SupportingText`, and a `Caret`.
+ *  For a subhead and actions, use `RichTooltip`. */
 export const Tooltip = Object.assign(ReadyMade, {
     Root,
     Trigger,
     Positioner,
     Content,
-    Subhead,
     SupportingText,
-    Actions,
+    Caret,
 });

@@ -66,6 +66,7 @@ import {
     createLinearProgress,
 } from "./components/progress";
 import { createRadio } from "./components/radio";
+import { richTooltip } from "./components/rich-tooltip";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
@@ -291,6 +292,7 @@ const defaultComponents = <G extends string>(
         dialog,
         snackbar,
         tooltip,
+        richTooltip,
         card,
         scrim,
         ripple,

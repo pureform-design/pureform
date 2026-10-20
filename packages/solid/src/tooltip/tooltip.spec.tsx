@@ -24,7 +24,7 @@ const pointerOff = async (trigger: HTMLElement) => {
 };
 
 describe("Tooltip, ready-made", () => {
-    it("renders a plain tooltip's text in its surface, hidden while closed", async () => {
+    it("renders its text in its surface, hidden while closed", async () => {
         withRegistry(() => (
             <Tooltip trigger="Save" supportingText="Save to drafts" />
         ));
@@ -32,33 +32,25 @@ describe("Tooltip, ready-made", () => {
         const content = byTestId(ids.content);
         expect(content.className).toBe("tooltip");
         expect(content.getAttribute("role")).toBe("tooltip");
-        expect(content.textContent).toBe("Save to drafts");
+        expect(byTestId(ids.supportingText).textContent).toBe("Save to drafts");
         expect(byTestId(ids.positioner).hidden).toBe(true);
-        expect(
-            document.querySelector(`[data-testid="${ids.supportingText}"]`),
-        ).toBeNull();
         expect(byTestId(ids.trigger).className).toBe("button");
+        expect(
+            document.querySelector(`[data-testid="${ids.caret}"]`),
+        ).toBeNull();
     });
 
-    it("renders a rich tooltip's parts", async () => {
+    it("draws a caret, with Zag's tip inside, when given caret", async () => {
         withRegistry(() => (
-            <Tooltip
-                trigger="Save"
-                variant="rich"
-                subhead="Drafts"
-                supportingText="Drafts stay here."
-                actions={<button type="button">Learn more</button>}
-            />
+            <Tooltip trigger="Save" supportingText="Save to drafts" caret />
         ));
         await settle();
-        expect(byTestId(ids.content).className).toBe(
-            "tooltip tooltip--variant-rich",
+        const caret = byTestId(ids.caret);
+        expect(caret.parentElement).toBe(byTestId(ids.positioner));
+        expect(caret.style.getPropertyValue("--arrow-background")).toBe(
+            "currentColor",
         );
-        expect(byTestId(ids.subhead).textContent).toBe("Drafts");
-        expect(byTestId(ids.supportingText).textContent).toBe(
-            "Drafts stay here.",
-        );
-        expect(byTestId(ids.actions).querySelector("button")).not.toBeNull();
+        expect(caret.querySelector("[data-part=arrow-tip]")).not.toBeNull();
     });
 
     it("opens on hover after its delay and describes the trigger", async () => {
@@ -137,18 +129,13 @@ describe("Tooltip, ready-made", () => {
         expect(trigger.contains(hit)).toBe(true);
     });
 
-    it("keeps the pointer on a rich tooltip, for its actions", async () => {
+    it("lets the pointer through unless interactive", async () => {
         withRegistry(() => (
-            <Tooltip
-                trigger="Drafts"
-                variant="rich"
-                supportingText="Drafts stay here."
-                defaultOpen
-            />
+            <Tooltip trigger="Save" supportingText="Save" defaultOpen />
         ));
         await settle();
         expect(getComputedStyle(byTestId(ids.positioner)).pointerEvents).toBe(
-            "auto",
+            "none",
         );
     });
 });

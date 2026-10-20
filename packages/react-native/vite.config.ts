@@ -44,6 +44,7 @@ export default createConfig({
                     "text-area": "src/text-area/index.ts",
                     "text-field": "src/text-field/index.ts",
                     tooltip: "src/tooltip/index.ts",
+                    "rich-tooltip": "src/rich-tooltip/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
