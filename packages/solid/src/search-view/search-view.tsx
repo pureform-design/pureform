@@ -226,13 +226,14 @@ function Root(props: SearchViewRootProps): JSX.Element {
 }
 
 /** Around the search bar that opens the view: a press on it, Enter, the down arrow, or typing
- *  opens it, and a typed character carries over to the view's query. The registry doesn't style
- *  it. */
+ *  opens it, and a typed character carries over to the view's query. It marks whether the view
+ *  is open (`data-state`). The registry doesn't style it. */
 function Trigger(props: SearchViewPartProps): JSX.Element {
     const { scope, view, query } = context.use("Trigger");
     return scope.render("trigger", {
         element: "div",
         machine: () => ({
+            "data-state": view().open ? "open" : "closed",
             onClick: () => view().setOpen(true),
             onKeyDown: (event: KeyboardEvent) => {
                 if (view().open || !opensSearchView(event)) return;

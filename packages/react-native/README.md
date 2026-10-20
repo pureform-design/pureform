@@ -265,6 +265,17 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,
       given a node or `({ close }) => node`) over a scrolling body (the children). Escape and
       back close it, as the dialog's do. Import it from `@pureform/react-native/fullscreen-dialog`.
+    - **The autocomplete** (`@pureform/react-native/autocomplete`) is the select's field with an
+      editable input: typing opens the suggestions `filter` keeps (`autocompleteMatches`) under
+      it, through the portal host rather than a `Modal`, so the input keeps the keyboard; the
+      trailing arrow opens or closes it. Choosing one sets `value` and the text (`inputValue`) to
+      its label; a press outside, Escape, and back close it.
+    - **The search view** (`@pureform/react-native/search-view`) opens from its `trigger` (a
+      read-only `SearchBar` showing the query, by default) in a `Modal`: a header (back, the
+      query's input, clear), a divider, and the suggestions as menu items, or `children`.
+      Choosing one calls `onSelect` and closes (`closeOnSelect`); the keyboard's submit calls
+      `onSubmit`. `fullScreen` fills the screen; `docked` and `contained` sit over the trigger's
+      measured place. The contained view's icons don't move as it opens (the web's keyframes).
 
     Without a trigger (or, for the dialog, `onOpenChange` and `defaultOpen`) each is its surface,
     as before: the app places it, and given `open` it enters and leaves in place. The select
