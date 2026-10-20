@@ -375,6 +375,44 @@ describe("icons", () => {
         );
         expect(fills).toEqual({ a: false, b: true });
     });
+
+    it("put a horizontal destination's label beside its icon, in the pill", async () => {
+        await render(
+            <NavigationBar
+                items={DESTINATIONS}
+                itemLayout="horizontal"
+                defaultValue="mail"
+                testId="h"
+            />,
+        );
+        expect(computed("h-item").flexDirection).toBe("row");
+        expect(computed("h-indicator").position).toBe("absolute");
+    });
+
+    it("render the rail's header, expanded, and as a modal over the scrim", async () => {
+        await render(
+            <>
+                <NavigationRail
+                    items={DESTINATIONS}
+                    header={<Glyph glyph="☰" />}
+                    expanded
+                    testId="r"
+                />
+                <NavigationRail
+                    items={DESTINATIONS}
+                    modal
+                    defaultOpen
+                    testId="m"
+                />
+            </>,
+        );
+        expect(
+            document.querySelector('[data-testid="r-header"]'),
+        ).not.toBeNull();
+        expect(computed("r-item").flexDirection).toBe("row");
+        expect(computed("m-root").borderTopRightRadius).not.toBe("0px");
+        expect(computed("m-item").flexDirection).toBe("row");
+    });
 });
 
 describe("motion engines", () => {

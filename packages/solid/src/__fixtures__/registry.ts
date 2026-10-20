@@ -230,8 +230,9 @@ export const navigationRegistry = () =>
             "indicator",
         ]),
         navigationBar: named("navigation-bar", NAV_SLOTS),
-        navigationRail: named("navigation-rail", NAV_SLOTS),
+        navigationRail: named("navigation-rail", [...NAV_SLOTS, "header"]),
         list: named("list", ["root", "item"]),
+        scrim: named("scrim", ["root"]),
         listItem: named("list-item", [
             "root",
             "leading",

@@ -1,19 +1,26 @@
 // What the navigation bar and the navigation rail share: Root on pureform's navigation machine (a
 // `<nav>`), each destination as the preset draws it (a link or a button holding the pill, which
 // holds the active indicator and the icon, then the label), and the ready-made component over
-// them. Each component builds its own from `createNavigation`.
+// them. Each component builds its own from `createNavigation`. The rail adds its header, and as a
+// modal rail renders in a dialog (Zag's) over the scrim: fixed along the viewport's start edge,
+// focus kept inside while it's open.
 
 import type {
     navigationBarAnatomy,
     navigationRailAnatomy,
+    scrimAnatomy,
 } from "@pureform/anatomy";
 import {
+    dialogBackdropLayout,
     isPresent,
     NAVIGATION_ROOT_PROPS,
     navigationItemElement,
     navigationItemElementProps,
     navigationItemMachineProps,
     navigationMachineProps,
+    navigationModalContentLayout,
+    navigationModalMachineProps,
+    navigationModalPositionerLayout,
     navigationSelection,
 } from "@pureform/binding-core";
 import type {
@@ -23,9 +30,10 @@ import type {
     NavigationRootOwnProps,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import * as dialog from "@pureform/machines/dialog";
 import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
-import { normalizeProps } from "@zag-js/react";
+import { mergeProps, normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
 import { type ElementType, type ReactNode, useId } from "react";
 
@@ -93,6 +101,8 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The component's name, for warnings and errors: `"NavigationBar"`. */
     readonly component: string;
     readonly anatomy: Anatomy & { readonly name: C };
+    /** The scrim a modal component draws under it: the rail's. */
+    readonly scrim?: typeof scrimAnatomy;
 }) {
     const context = createPartContext<NavigationContextValue>(config.component);
     const itemContext = createPartContext<ItemContextValue>(
@@ -100,8 +110,80 @@ export function createNavigation<C extends NavigationComponent>(config: {
         "Item",
     );
 
-    /** The component's root, a `<nav>` holding its destinations. Name it with `aria-label`. */
+    /** A modal rail's dialog: the scrim, and the rail in a dialog along the viewport's start edge,
+     *  open while `open` is. A click on the scrim or Escape closes it. */
+    function Modal(props: {
+        readonly own: NavigationRootProps<C>;
+        readonly children: ReactNode;
+    }): ReactNode {
+        const id = useId();
+        const dir = useDirection();
+        const open = useControllable<"open", boolean>(
+            config.component,
+            "open",
+            props.own,
+        );
+        const service = useMachine(dialog.machine, {
+            id,
+            dir,
+            ...navigationModalMachineProps(props.own),
+            ...open.machineProps,
+        });
+        const api = dialog.connect(service, normalizeProps);
+        const testId = props.own.testId;
+        const scrim = useComponent(config.scrim!, {
+            selection: {},
+            testId:
+                typeof testId === "string"
+                    ? { root: `${testId}-scrim` }
+                    : undefined,
+        });
+        return (
+            <>
+                {scrim.render("root", {
+                    element: "div",
+                    machine: mergeProps(
+                        api.getBackdropProps(),
+                        normalizeProps.element(dialogBackdropLayout(api.open)),
+                    ),
+                })}
+                <div
+                    {...mergeProps(
+                        api.getPositionerProps(),
+                        normalizeProps.element(
+                            navigationModalPositionerLayout(api.open),
+                        ),
+                    )}
+                >
+                    <div
+                        {...mergeProps(
+                            api.getContentProps(),
+                            normalizeProps.element(
+                                navigationModalContentLayout(api.open),
+                            ),
+                        )}
+                    >
+                        {props.children}
+                    </div>
+                </div>
+            </>
+        );
+    }
+
+    /** The component's root, a `<nav>` holding its destinations. Name it with `aria-label`. A
+     *  modal rail (`modal`) renders it in a dialog over the scrim. */
     function Root(props: NavigationRootProps<C>): ReactNode {
+        if ((props as { readonly modal?: boolean | undefined }).modal) {
+            return (
+                <Modal own={props}>
+                    <Nav {...props} />
+                </Modal>
+            );
+        }
+        return <Nav {...props} />;
+    }
+
+    function Nav(props: NavigationRootProps<C>): ReactNode {
         const id = useId();
         const dir = useDirection();
         const value = useControllable<"value", string | null>(
@@ -215,6 +297,24 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** The rail's header, above the destinations: its menu button and FAB. */
+    function Header({ unstyled, ...props }: NavigationPartProps): ReactNode {
+        const { scope, api } = context.use("Header");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("header", {
+            element: "div",
+            machine: api.getHeaderProps(),
+            unstyled,
+            props,
+        });
+    }
+
+    // Only the rail has a header.
+    const hasHeader = (config.anatomy.partNames as readonly string[]).includes(
+        "header",
+    );
+
     /** The destination's label, which names it. */
     function Label({ unstyled, ...props }: NavigationPartProps): ReactNode {
         const { scope, api } = context.use("Label");
@@ -235,6 +335,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
             style: _style,
             slotProps: _slotProps,
             items = [],
+            header,
             ...rootProps
         } = props;
         const slot = useSlotProps(props);
@@ -243,6 +344,11 @@ export function createNavigation<C extends NavigationComponent>(config: {
                 {...(rootProps as NavigationRootProps<C>)}
                 {...(slot("root") as object)}
             >
+                {hasHeader && isPresent(header) ? (
+                    <Header {...(slot as (part: string) => object)("header")}>
+                        {header}
+                    </Header>
+                ) : null}
                 {items.map((item) => (
                     <Item
                         key={item.value}
@@ -272,6 +378,6 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
     };
 }

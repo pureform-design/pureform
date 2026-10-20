@@ -39,6 +39,12 @@ export function connect<T extends PropTypes>(
                 "data-disabled": dataAttr(prop("disabled")),
             });
         },
+        getHeaderProps() {
+            return normalize.element({
+                ...parts.header.attrs,
+                dir: prop("dir"),
+            });
+        },
         // Each destination emits to its own interaction source.
         getItemProps(item) {
             const state = getItemState(item);

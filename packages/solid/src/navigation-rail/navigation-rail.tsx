@@ -2,7 +2,7 @@
 // pureform's navigation machine. Its parts and ready-made component come from `createNavigation`,
 // which the navigation bar shares.
 
-import { navigationRailAnatomy } from "@pureform/anatomy";
+import { navigationRailAnatomy, scrimAnatomy } from "@pureform/anatomy";
 import type { JSX } from "@solidjs/web";
 
 import { createNavigation } from "../navigation";
@@ -19,12 +19,14 @@ export type NavigationRailProps = NavigationProps<"navigationRail">;
 const { ReadyMade, parts } = createNavigation({
     component: "NavigationRail",
     anatomy: navigationRailAnatomy,
+    scrim: scrimAnatomy,
 });
 
 /** Material's navigation rail. Use it ready-made, `<NavigationRail aria-label="Main" items={[{
  *  value: "home", label: "Home", icon: …, href: "/" }, …]} />`, or compose its parts under
- *  `NavigationRail.Root`: an `Item` per destination holding `Indicator` (with
- *  `ActiveIndicator` and `Icon`) and `Label`. */
+ *  `NavigationRail.Root`: an optional `Header` (menu button, FAB), then an `Item` per destination
+ *  holding `Indicator` (with `ActiveIndicator` and `Icon`) and `Label`. `expanded` puts each label
+ *  beside its icon; `modal` draws it in a dialog over the scrim while `open`. */
 export const NavigationRail = Object.assign(
     ReadyMade as (props: NavigationRailProps) => JSX.Element,
     parts,

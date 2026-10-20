@@ -300,6 +300,10 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   whose content differs in width: not on mount or hydration, not under reduced motion, and from
   where a running slide has got to.
 - **The navigation bar and rail** share their parts and behavior: a `<nav>` (name it with
+  The bar's `itemLayout="horizontal"` and the rail's `expanded` put labels beside icons. The rail
+  takes a `header` (a `Header` part: menu button, FAB) and `modal`: it then renders in Zag's
+  dialog over the scrim, along the viewport's start edge, open while `open` (controllable; Escape
+  and a click on the scrim close it). `modal` is read once, when Root mounts.
   `aria-label`) of destinations, each a link when it has an `href` and a button otherwise, reached
   in turn with Tab (arrow keys do nothing). `value` (the current destination, controllable) marks
   its item with `aria-current` (`"page"` on a link, `"true"` on a button), which draws its pill and

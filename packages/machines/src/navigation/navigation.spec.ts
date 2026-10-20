@@ -45,6 +45,16 @@ const nav = (
 };
 
 describe("navigation machine", () => {
+    it("names the rail's header part, in the component's direction", () => {
+        const { api, stop } = nav({ dir: "rtl" });
+        expect(api().getHeaderProps()).toMatchObject({
+            "data-scope": "navigation",
+            "data-part": "header",
+            dir: "rtl",
+        });
+        stop();
+    });
+
     it("marks the current destination with aria-current", () => {
         const { item, stop } = nav({ defaultValue: "search" });
         expect(item("search").getAttribute("aria-current")).toBe("page");
