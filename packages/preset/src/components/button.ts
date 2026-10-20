@@ -34,6 +34,8 @@ import {
     DEFAULT_GROUP,
     blend,
     colorTokenVariants,
+    cornerMorphTokens,
+    cornerMorphVariants,
     cornerRadius,
     cornerTransition,
     componentTokens,
@@ -148,14 +150,9 @@ export const BUTTON_SIZES = {
 } satisfies Record<string, ButtonSize>;
 
 const { tokens, ref } = componentTokens("button", {
-    radius: radius("full"),
-    // The size's square and pressed corners, and the `corner` variant's flag between round (0)
-    // and square (1), which `cornerRadius` reads.
-    squareRadius: radius("medium"),
-    pressedRadius: radius("small"),
-    square: unitless(0),
-    // The `toggle` variant's flag: only a toggle swaps its corners when selected.
-    toggles: unitless(0),
+    // The size's square and pressed corners, and the `corner` and `toggle` variants' flags,
+    // which `cornerRadius` reads.
+    ...cornerMorphTokens("round", radius("medium"), radius("small")),
     gap: spacing("2"),
     iconSize: px(20),
     iconFill: unitless(0),
@@ -406,14 +403,7 @@ export const createButton = <
                             },
                         ]),
                     ),
-                    corner: {
-                        round: {},
-                        square: { root: { tokens: { square: unitless(1) } } },
-                    },
-                    toggle: {
-                        false: {},
-                        true: { root: { tokens: { toggles: unitless(1) } } },
-                    },
+                    ...cornerMorphVariants("round"),
                     secondaryIconPosition: {
                         end: {},
                         start: {
