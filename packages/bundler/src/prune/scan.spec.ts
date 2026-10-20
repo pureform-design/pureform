@@ -50,9 +50,15 @@ describe("scanUsage", () => {
                     variant: ["filled", "text"],
                     size: ["large", "small"],
                     density: [],
+                    secondaryIconPosition: [],
                 },
                 checkbox: { color: [], density: [] },
-                chip: { variant: ["assist"], color: [], density: [] },
+                chip: {
+                    variant: ["assist"],
+                    color: [],
+                    density: [],
+                    corner: [],
+                },
             },
         });
     });
@@ -175,6 +181,7 @@ describe("scanUsage", () => {
                     color: [],
                     size: [],
                     density: [],
+                    secondaryIconPosition: [],
                 },
             },
         });

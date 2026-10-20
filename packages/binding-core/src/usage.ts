@@ -27,7 +27,13 @@ export const COMPONENT_USAGE = {
     avatar: { entries: { avatar: same("size", "color", "shape") } },
     button: {
         entries: {
-            button: same("color", "variant", "size", "density"),
+            button: same(
+                "color",
+                "variant",
+                "size",
+                "density",
+                "secondaryIconPosition",
+            ),
             ripple: {},
         },
     },
@@ -35,7 +41,10 @@ export const COMPONENT_USAGE = {
     card: { entries: { card: same("variant", "actionsAlign"), ripple: {} } },
     checkbox: { entries: { checkbox: same("color", "density"), ripple: {} } },
     chip: {
-        entries: { chip: same("variant", "color", "density"), ripple: {} },
+        entries: {
+            chip: same("variant", "color", "density", "corner"),
+            ripple: {},
+        },
     },
     // `indeterminate` follows the value.
     "circular-progress": { entries: { circularProgress: same("color") } },
