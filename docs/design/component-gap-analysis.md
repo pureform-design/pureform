@@ -656,6 +656,8 @@ Expressive values are the defaults; every deprecated option stays as a variant.
 | Separator      | `orientation`                                                                                                                                                                                                    | —                                               |
 | Tooltip / rich | `tooltip` split from `richTooltip` (c2a); optional `caret`; `supportingText` part                                                                                                                                | `variant` (plain, rich) removed: `richTooltip`  |
 | Dialog         | `fullscreenDialog` (c2b): header (`closeTrigger`, `headline`, `confirmAction`) over a scrolling `body`; fills the screen, no scrim, icon or actions row                                                          | —                                               |
+| Split button   | New (c2f): `leadingButton` and `trailingButton` 2px apart, inner corners by size, rounder pressed; the trailing button opens the `menu` component, its icon turns over and it rounds while open; 0 compounds     | —                                               |
+| FAB menu       | New (c2f): the FAB (`closeTrigger`) turns into the round close button while open; `item` pills in a `list` above it at its end (logical insets, so it mirrors); a `list` part beyond the draft; 0 compounds      | —                                               |
 
 **Removed, and why:** the per-size tokens were renamed with the sizes (`heightMedium` →
 the new size names; `sizeDefault` is the 56 dp FAB). Same capability, new names. Nothing else

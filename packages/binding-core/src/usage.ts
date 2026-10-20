@@ -75,6 +75,8 @@ export const COMPONENT_USAGE = {
     fab: {
         entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },
     },
+    // The FAB's colour and size; the items are its own.
+    "fab-menu": { entries: { fabMenu: same("color", "size"), ripple: {} } },
     icon: { entries: { icon: same("size", "color", "filled") } },
     // `toggle` follows `selected`.
     "icon-button": {
@@ -139,6 +141,14 @@ export const COMPONENT_USAGE = {
         },
     },
     separator: { entries: { separator: same("inset") } },
+    // The menu it opens is the menu component, in its default colours.
+    "split-button": {
+        entries: {
+            splitButton: same("color", "variant", "size", "density"),
+            menu: {},
+            ripple: {},
+        },
+    },
     slider: { entries: { slider: same("color"), ripple: {} } },
     snackbar: { entries: { snackbar: same("layout"), ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },

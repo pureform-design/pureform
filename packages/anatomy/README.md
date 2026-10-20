@@ -95,6 +95,10 @@ interface PartAnatomy<P extends string = string> {
 |                               | `close`      | `close`                        | no       | `close`  |
 | icon button                   | `root`       | `container`                    | yes      | `root`   |
 | FAB                           | `root`       | `container`                    | no       | `root`   |
+| FAB menu                      | `closeTrigger` | `closeTrigger`               | no       | `closeTrigger` |
+|                               | `item`       | `item`                         | no       | `item`   |
+| split button                  | `leadingButton` | `leadingButton`             | no       | `leadingButton` |
+|                               | `trailingButton` | `trailingButton`           | no       | `trailingButton` |
 | navigation bar and rail       | `item`       | `indicator`                    | yes      | `item`   |
 | checkbox, radio               | `input`      | `root`                         | yes      | `root`   |
 | switch                        | `input`      | `stateLayer`                   | yes      | `root`   |

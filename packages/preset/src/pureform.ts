@@ -54,6 +54,7 @@ import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createFab } from "./components/fab";
+import { createFabMenu } from "./components/fab-menu";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
@@ -81,6 +82,7 @@ import type { Shapes } from "./components/shaped";
 import type { Densities } from "./components/shared";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
+import { createSplitButton } from "./components/split-button";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTabs } from "./components/tabs";
@@ -274,6 +276,8 @@ const defaultComponents = <G extends string>(
         ),
         buttonGroup,
         fab: createFab(theme.color.groups, shapes),
+        fabMenu: createFabMenu(theme.color.groups),
+        splitButton: createSplitButton<G, Step>(theme.color.groups, densities),
         avatar: createAvatar(theme.color.groups, shapes),
         badge,
         media: createMedia(shapes),

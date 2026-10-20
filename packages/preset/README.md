@@ -261,6 +261,15 @@ target first, and render the icon slot only when there is an icon.
 
 - `fab`: `variant` is `tonal`, `filled`, or `surface`; `size` is `small`, `medium`, or
   `large`. Set `extended` and render the label for an extended FAB.
+- `splitButton` (M3 Expressive): `leadingButton` and `trailingButton` 2px apart, round outside
+  and with small inner corners that round further while pressed; `trailingIcon` turns over and
+  the trailing button rounds all over while it's `aria-expanded`. `variant` is `filled`,
+  `tonal`, `outlined`, or `elevated`; `size` is the button's `xsmall` to `xlarge`; `color` and
+  `density` as the button's. Render the menu component under the trailing button.
+- `fabMenu` (M3 Expressive): `closeTrigger` is the FAB (`size` `default`, `medium`, `large`),
+  which turns into a round close button in the group's main color while `aria-expanded`;
+  `list` (the menu's content) sits above it at its end through logical insets, holding `item`
+  pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group.
 
 ## Shapes
 

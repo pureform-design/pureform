@@ -17,6 +17,7 @@ const ICON_PARTS: Record<string, string[]> = {
     chip: ["icon", "trailingIcon"],
     dialog: ["icon"],
     fab: ["icon"],
+    fabMenu: ["itemIcon"],
     icon: ["root"],
     iconButton: ["icon"],
     inputChip: ["icon", "remove"],
@@ -26,6 +27,7 @@ const ICON_PARTS: Record<string, string[]> = {
     navigationRail: ["icon"],
     searchBar: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
+    splitButton: ["trailingIcon"],
     tabs: ["icon"],
     tagsInput: ["leadingIcon", "trailingIcon"],
     textArea: ["leadingIcon", "trailingIcon"],
@@ -59,6 +61,16 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     snackbar: [at("action", "action", false), at("close", "close", false)],
     iconButton: [at("root", "container", true)],
     fab: [at("root", "container", false)],
+    // The FAB that opens and closes it, and each item.
+    fabMenu: [
+        at("closeTrigger", "closeTrigger", false),
+        at("item", "item", false),
+    ],
+    // Each of its two buttons.
+    splitButton: [
+        at("leadingButton", "leadingButton", false),
+        at("trailingButton", "trailingButton", false),
+    ],
     // The pill: the active indicator inside it draws only on the current destination.
     navigationBar: [at("item", "indicator", true)],
     navigationRail: [at("item", "indicator", true)],
