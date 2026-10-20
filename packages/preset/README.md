@@ -724,6 +724,38 @@ The bindings place it in a positioner that covers the viewport, so `root` fills 
 `closeTrigger` and `confirmAction` only keep their size (`flex-shrink: 0`); the bindings draw
 them as an icon button and a text button.
 
+## Sheets and the drag handle
+
+`bottomSheet` is a surface anchored to the bottom of the screen: `dragHandle` over `content`,
+which scrolls. Its top corners take the `extraLarge` role (`runCorners`), it is at most 640 wide
+and centered, on `surfaceContainerLow` at level 1. `modal` (default) stacks it at the `dialog`
+layer, over a scrim; `modal: false` is a standard sheet at the `raised` layer. The `dragHandle`
+slot only centers what the bindings draw there: the `dragHandle` component.
+
+`sideSheet` sits against the end edge: `header` (`backButton`, `headline`, `closeTrigger`) over
+`content`, then `actions` under a divider. A standard sheet is square, on `surface` at level 0, at
+the `raised` layer; `coplanar` puts it on the page's own layer (`base`), for a sheet in the
+page's layout. `modal` (default) moves it to the `dialog` layer on `surfaceContainerLow` at level
+1, with its start corners on the `large` role. `coplanar` is meant for a standard sheet; the
+bindings never set both.
+
+Both slide in from their edge on `data-state` (`sheetMotion`, with `SHEET_KEYFRAMES` added to the
+config); the side sheet's keyframes run the other way under right to left, and reduced motion
+fades. Neither has compounds.
+
+`dragHandle` is a touch-sized button holding the `handle` pill (32 by 4 in `onSurfaceVariant`);
+`orientation: "vertical"` stands the pill up (4 by 48) for a pane divider. It draws only the
+focus ring, no state layer.
+
+```html
+<div class="{bottomSheet.root}" role="dialog" aria-label="Share">
+    <button class="{bottomSheet.dragHandle} {dragHandle.root}" aria-label="Close sheet">
+        <span class="{dragHandle.handle}"></span>
+    </button>
+    <div class="{bottomSheet.content}">…</div>
+</div>
+```
+
 ## Snackbar and tooltip
 
 Both sit on the inverse surface. Placing, showing, and dismissing them is the app's job; placed,
