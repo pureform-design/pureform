@@ -49,7 +49,7 @@ export interface TagsInputBehaviorProps extends Controllable<
     /** The input's placeholder, shown while there's no chip. The label floats while it shows,
      *  so the default is a single space. */
     readonly placeholder?: string | undefined;
-    /** The name the values submit under, joined by commas. */
+    /** The name the values submit under, joined by ", " (Zag's). */
     readonly name?: string | undefined;
     /** The id of the form the values belong to, for a field outside it. */
     readonly form?: string | undefined;
