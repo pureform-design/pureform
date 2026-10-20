@@ -123,9 +123,10 @@ component:
 1. Draws its geometry from its own tokens (an arc, a full circle) rather than from the radius
    roles.
 2. Still follows everything else the theme drives: colour, size, density, thickness, motion.
-3. Is named on an allow-list in `radii.spec.ts` with the reason next to it, so the exception
-   is visible and reviewed rather than silent. (The allow-list doesn't exist yet; add it with
-   the first component that needs it.)
+3. Is named on the allow-list in `radii.spec.ts` (`ALLOWED`: component, then the radius's
+   path inside it such as `base.borderRadius`, then the reason), so the exception is visible
+   and reviewed rather than silent. An entry with an empty reason, or one that no longer
+   matches a fixed radius, fails the check.
 4. Says so in its docs. A theme that wants a different shape for it sets the component's own
    tokens, not the roles.
 
