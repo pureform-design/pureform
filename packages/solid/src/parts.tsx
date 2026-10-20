@@ -39,6 +39,7 @@ import {
     createSignal,
     isStatic,
     merge,
+    omit,
     Show,
     untrack,
 } from "solid-js";
@@ -449,6 +450,45 @@ export function optionalPart<P>(
         const value = (props as Record<string, unknown>)[key];
         return isPresent(value) ? part : None;
     });
+}
+
+/** An icon part's props: the element's own, the part's `unstyled`, and, for a part that takes
+ *  it, `mirror` to flip a pointing icon under right to left. */
+export interface IconPartProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+    readonly mirror?: boolean | undefined;
+}
+
+/** An icon part rendered as a `<span>` from Root's `scope`, with `machine`'s props (hidden from
+ *  assistive technology by them): `Part` to compose, and `Optional` for the ready-made's
+ *  `optionalPart`, which builds the icon once. `mirror` marks the part `mirrored` while its
+ *  `mirror` prop is on. `use` reads Root's context, naming the part. */
+export function iconParts<A extends ComponentAnatomy, P extends IconPartProps>(
+    use: (name: string) => {
+        readonly scope: PartScope<A>;
+        readonly machine: () => object | undefined;
+    },
+    name: string,
+    part: PartName<A>,
+    { mirror = false }: { readonly mirror?: boolean } = {},
+) {
+    const render = (props: P, optional: boolean): JSX.Element => {
+        const { scope, machine } = use(name);
+        return scope.render(part, {
+            element: "span",
+            machine,
+            ...(mirror ? { states: () => ({ mirrored: props.mirror }) } : {}),
+            unstyled: () => props.unstyled,
+            props: mirror
+                ? omit(props, "unstyled", "mirror")
+                : omit(props, "unstyled"),
+            optional,
+        });
+    };
+    return {
+        Part: (props: P): JSX.Element => render(props, false),
+        Optional: (props: P): JSX.Element => render(props, true),
+    };
 }
 
 /** A part shown only while its children are there (`isPresent`), for text whose double read

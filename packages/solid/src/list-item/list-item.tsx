@@ -35,6 +35,7 @@ import {
 import { createPartContext } from "../part-context";
 import {
     createSlotProps,
+    iconParts,
     optionalPart,
     useComponent,
     whenPresent,
@@ -121,22 +122,18 @@ function Root(props: ListItemRootProps): JSX.Element {
     );
 }
 
-const iconPart = (
-    part: "leading" | "trailing",
-    name: string,
-    optional = false,
-) =>
-    function IconPart(props: ListItemIconProps): JSX.Element {
-        const { scope } = context.use(name);
-        return scope.render(part, {
-            element: "span",
+const iconPart = (part: "leading" | "trailing", name: string) =>
+    iconParts<Anatomy, ListItemIconProps>(
+        (use) => ({
+            scope: context.use(use).scope,
             machine: () => ({ "aria-hidden": "true" }),
-            states: () => ({ mirrored: props.mirror }),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
-            optional,
-        });
-    };
+        }),
+        name,
+        part,
+        { mirror: true },
+    );
+const leading = iconPart("leading", "Leading");
+const trailing = iconPart("trailing", "Trailing");
 
 const textPart = (
     part:
@@ -159,7 +156,7 @@ const textPart = (
 
 /** An icon, avatar, or image before the text, hidden from assistive technology (give it
  *  `aria-hidden={false}` when it says something). */
-const Leading = iconPart("leading", "Leading");
+const Leading = leading.Part;
 /** The text: the overline, headline, and supporting text. */
 const Content = textPart("content", "Content", "div");
 /** A line above the headline. */
@@ -169,13 +166,13 @@ const Headline = textPart("headline", "Headline", "span");
 /** Text under the headline. */
 const SupportingText = textPart("supportingText", "SupportingText", "span");
 /** An icon after the text, hidden from assistive technology. */
-const Trailing = iconPart("trailing", "Trailing");
+const Trailing = trailing.Part;
 /** Text after the text, such as a count. */
 const TrailingText = textPart("trailingText", "TrailingText", "span");
 // The ready-made's parts for content that can come and go: the leading and trailing parts build
 // theirs once.
-const OptionalLeading = iconPart("leading", "Leading", true);
-const OptionalTrailing = iconPart("trailing", "Trailing", true);
+const OptionalLeading = leading.Optional;
+const OptionalTrailing = trailing.Optional;
 const OptionalOverline = whenPresent(Overline);
 const OptionalSupportingText = whenPresent(SupportingText);
 const OptionalTrailingText = whenPresent(TrailingText);
