@@ -188,7 +188,9 @@ const CASES: RnCase[] = [
         "Slider",
         Slider as never,
         sliderAnatomy,
-        { "aria-label": "Volume", defaultValue: 40 },
+        // The round slider: Expressive's bar slider draws no state layer, only its handle
+        // narrowing on a press.
+        { "aria-label": "Volume", defaultValue: 40, handleShape: "round" },
         { drags: true },
     ),
     items("RadioGroup", RadioGroup as never, radioAnatomy, {
