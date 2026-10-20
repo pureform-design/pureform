@@ -106,7 +106,7 @@ export const COMPONENT_USAGE = {
     },
     separator: { entries: { separator: same("inset") } },
     slider: { entries: { slider: same("color"), ripple: {} } },
-    snackbar: { entries: { snackbar: {}, ripple: {} } },
+    snackbar: { entries: { snackbar: same("layout"), ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.

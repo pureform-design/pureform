@@ -647,8 +647,10 @@ they stack at their layers and grow in on `data-state` (see
 ```html
 <div class="{root}" role="status">
     <span class="{supportingText}">Message archived</span>
-    <button class="{action}">Undo</button>
-    <button class="{close}" aria-label="Dismiss">×</button>
+    <span class="{actions}">
+        <button class="{action}">Undo</button>
+        <button class="{close}" aria-label="Dismiss">×</button>
+    </span>
 </div>
 
 <div class="{root}" role="tooltip" id="tip">Save to drafts</div>

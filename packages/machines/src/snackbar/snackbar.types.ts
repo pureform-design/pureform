@@ -81,6 +81,7 @@ export interface SnackbarApi<T extends PropTypes = PropTypes> {
     setOpen: (open: boolean) => void;
     getRootProps: () => T["element"];
     getSupportingTextProps: () => T["element"];
+    getActionsProps: () => T["element"];
     getActionProps: () => T["button"];
     getCloseProps: () => T["button"];
 }
