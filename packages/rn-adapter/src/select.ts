@@ -327,7 +327,7 @@ export const selectWithTransitions = (
         transitions[slot] = Array.isArray(own)
             ? (own as unknown as Transition[])
             : [];
-        const shape = style[SHAPE] as ShapeValue | undefined;
+        const shape = style[SHAPE] as unknown as ShapeValue | undefined;
         delete style[SHAPE];
         const tint = style[TINT];
         const gradient =
