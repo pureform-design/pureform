@@ -100,6 +100,7 @@ export {
     listItemPosition,
     listItemVariants,
     listSelection,
+    tilePosition,
 } from "./components/list";
 export type {
     ListContentProps,
@@ -108,6 +109,7 @@ export type {
     ListPart,
     ListRootOwnProps,
     ListVariantProps,
+    TilePosition,
 } from "./components/list";
 export {
     LIST_ITEM_CONTENT_PROPS,

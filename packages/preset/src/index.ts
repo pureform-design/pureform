@@ -36,6 +36,7 @@ export * from "./components/field";
 export * from "./components/media";
 export * from "./components/text-area";
 export * from "./components/text-field";
+export * from "./components/tiles";
 export * from "./contrast";
 export * from "./corners";
 export * from "./shapes";

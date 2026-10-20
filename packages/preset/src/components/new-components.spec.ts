@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
 import { dialog } from "./dialog";
-import { list, positionCorners, POSITIONS } from "./list";
+import { list } from "./list";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
@@ -17,6 +17,7 @@ import { select } from "./select";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
+import { positionCorners, POSITIONS } from "./tiles";
 import { tooltip } from "./tooltip";
 
 describe.each([

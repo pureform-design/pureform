@@ -38,7 +38,7 @@ import {
 import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { rowGroupColors, rowParts, rowTokens, TILE_RADII } from "./list";
+import { rowGroupColors, rowParts, rowTokens } from "./list";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
 import {
     DEFAULT_GROUP,
@@ -54,6 +54,7 @@ import {
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
+import { TILE_RADII } from "./tiles";
 
 const pf = typed();
 

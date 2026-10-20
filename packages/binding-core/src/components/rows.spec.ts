@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { listItemPosition, listItemVariants, listSelection } from "./list";
+import {
+    listItemPosition,
+    listItemVariants,
+    listSelection,
+    tilePosition,
+} from "./list";
 import { listItemSelection } from "./list-item";
 import { menuGrouped, menuItemMachineProps, menuSelection } from "./menu";
 import { selectGroupedItems, selectItemGroups } from "./select";
@@ -14,6 +19,16 @@ describe("list", () => {
             "last",
         ]);
         expect(listItemPosition(1, 3, false)).toBe("none");
+    });
+
+    it("places a tile in any run of tiles", () => {
+        expect([0, 1, 2, 3].map((i) => tilePosition(i, 4))).toEqual([
+            "first",
+            "middle",
+            "middle",
+            "last",
+        ]);
+        expect(tilePosition(0, 1)).toBe("single");
     });
 
     it("selects its variant, and gives its items its leading type", () => {
