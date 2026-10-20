@@ -2,6 +2,7 @@
 // `anatomy`, `props`, and its types), also importable from its own subpath.
 
 export * as button from "./button";
+export * as buttonGroup from "./button-group";
 export * as checkbox from "./checkbox";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
