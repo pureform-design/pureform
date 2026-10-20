@@ -11,6 +11,7 @@ import type {
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
+import { isToggle } from "./button";
 import type { ButtonBehaviorProps } from "./button";
 import type { InteractiveProps } from "./indication";
 import type { VariantProp } from "./variants";
@@ -25,6 +26,10 @@ export interface IconButtonVariantProps {
     readonly variant?: VariantProp<"iconButton", "variant">;
     readonly shape?: VariantProp<"iconButton", "shape">;
     readonly size?: VariantProp<"iconButton", "size">;
+    /** Narrow, default, or wide, at the size's height. */
+    readonly width?: VariantProp<"iconButton", "width">;
+    /** Round or square corners, which tighten while pressed and swap once a toggle is on. */
+    readonly corner?: VariantProp<"iconButton", "corner">;
     readonly density?: VariantProp<"iconButton", "density">;
     readonly tokens?: InstanceTokens<"iconButton"> | undefined;
 }
@@ -44,6 +49,8 @@ export const ICON_BUTTON_ROOT_PROPS = [
     "variant",
     "shape",
     "size",
+    "width",
+    "corner",
     "density",
     "tokens",
     "disabled",
@@ -63,11 +70,7 @@ export const ICON_BUTTON_ROOT_PROPS = [
     "interactionSource",
 ] as const satisfies readonly (keyof IconButtonRootOwnProps)[];
 
-/** Whether a press toggles `selected`: `toggle` when given, else whether `selected` or
- *  `defaultSelected` is. The button machine decides the same way. */
-export const isToggle = (props: ButtonBehaviorProps): boolean =>
-    props.toggle ??
-    (props.selected !== undefined || props.defaultSelected !== undefined);
+export { isToggle };
 
 /** The registry selection from Root's props, with `toggle` set for a toggle icon button. */
 export const iconButtonSelection = (
@@ -77,6 +80,8 @@ export const iconButtonSelection = (
     variant: props.variant,
     shape: props.shape,
     size: props.size,
+    width: props.width,
+    corner: props.corner,
     density: props.density,
     toggle: isToggle(props),
     tokens: props.tokens,

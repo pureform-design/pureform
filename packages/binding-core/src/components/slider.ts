@@ -22,6 +22,10 @@ export type SliderPart = PartName<typeof sliderAnatomy>;
  *  value. */
 export interface SliderVariantProps {
     readonly color?: VariantProp<"slider", "color">;
+    /** M3 Expressive's bar handle on a thick track, or the earlier round handle. */
+    readonly handleShape?: VariantProp<"slider", "handleShape">;
+    /** The bar slider's size, `xsmall` to `xlarge`. */
+    readonly size?: VariantProp<"slider", "size">;
     readonly tokens?: InstanceTokens<"slider"> | undefined;
 }
 
@@ -64,6 +68,8 @@ export interface SliderRootOwnProps
 /** The keys of `SliderRootOwnProps`, which Root keeps off its element. */
 export const SLIDER_ROOT_PROPS = [
     "color",
+    "handleShape",
+    "size",
     "tokens",
     "min",
     "max",
@@ -100,6 +106,8 @@ export const sliderSelection = (
     percent: number,
 ): Selection<"slider"> => ({
     color: props.color,
+    handleShape: props.handleShape,
+    size: props.size,
     tokens: { value: percent, ...props.tokens },
 });
 

@@ -62,7 +62,9 @@ describe("button", () => {
             color: undefined,
             variant: "tonal",
             size: "small",
+            corner: undefined,
             density: undefined,
+            toggle: undefined,
             tokens: { radius: "4px" },
         });
     });

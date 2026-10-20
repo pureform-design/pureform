@@ -18,6 +18,8 @@ export type SeparatorPart = PartName<typeof separatorAnatomy>;
 /** The separator's variant groups and instance tokens. */
 export interface SeparatorVariantProps {
     readonly inset?: VariantProp<"separator", "inset">;
+    /** Horizontal, or vertical between items in a row. */
+    readonly orientation?: VariantProp<"separator", "orientation">;
     readonly tokens?: InstanceTokens<"separator"> | undefined;
 }
 
@@ -32,6 +34,7 @@ export interface SeparatorRootOwnProps extends SeparatorVariantProps {
 /** The keys of `SeparatorRootOwnProps`, which Root keeps off its element. */
 export const SEPARATOR_ROOT_PROPS = [
     "inset",
+    "orientation",
     "tokens",
     "testId",
     "unstyled",
@@ -40,7 +43,11 @@ export const SEPARATOR_ROOT_PROPS = [
 /** The registry selection from Root's props. */
 export const separatorSelection = (
     props: SeparatorVariantProps,
-): Selection<"separator"> => ({ inset: props.inset, tokens: props.tokens });
+): Selection<"separator"> => ({
+    inset: props.inset,
+    orientation: props.orientation,
+    tokens: props.tokens,
+});
 
 /** Root's element props: an `<hr>` is a separator already; any other element gets the role. */
 export const separatorRootProps = (element: unknown) =>
