@@ -56,6 +56,9 @@ export const NAV_TOKENS = {
     iconColor: sys("onSurfaceVariant"),
     // M3 Expressive labels the current destination in the secondary color.
     activeLabelColor: sys("secondary"),
+    // Compose 1.5 labels a horizontal item's current destination in its icon's color, as the
+    // label sits on the pill with the icon.
+    horizontalActiveLabelColor: sys("onSecondaryContainer"),
     labelColor: sys("onSurfaceVariant"),
     stateLayerColor: sys("onSurface"),
     iconSize: sizeToken("iconMedium"),
