@@ -102,6 +102,10 @@ export const COMPONENT_USAGE = {
     },
     // The group's color and density reach each radio.
     "radio-group": { entries: { radio: same("color", "density"), ripple: {} } },
+    // The trigger is a button.
+    "rich-tooltip": {
+        entries: { richTooltip: {}, button: {}, ripple: {} },
+    },
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
@@ -136,7 +140,7 @@ export const COMPONENT_USAGE = {
         },
     },
     // The trigger is a button.
-    tooltip: { entries: { tooltip: same("variant"), button: {}, ripple: {} } },
+    tooltip: { entries: { tooltip: {}, button: {}, ripple: {} } },
     "touch-target": { entries: { touchTarget: {} } },
 } as const satisfies Readonly<Record<string, ComponentUsage>>;
 

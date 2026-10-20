@@ -45,20 +45,11 @@ export const tooltip: ComponentCase = {
     root: ids.root,
     examples: {
         plain: {},
-        rich: {
-            variant: "rich",
-            subhead: "Drafts",
-            supportingText: "Drafts stay on this device.",
-        },
+        caret: { caret: true },
     },
     opened: {
         plain: { defaultOpen: true },
-        rich: {
-            defaultOpen: true,
-            variant: "rich",
-            subhead: "Drafts",
-            supportingText: "Drafts stay on this device.",
-        },
+        caret: { defaultOpen: true, caret: true },
     },
     state: { prop: "open", from: false, to: true, act: focus, read },
     overlay: overlay(),

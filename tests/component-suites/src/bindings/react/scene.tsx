@@ -26,6 +26,7 @@ import { Menu } from "@pureform/react/menu";
 import { NavigationBar } from "@pureform/react/navigation-bar";
 import { NavigationRail } from "@pureform/react/navigation-rail";
 import { RadioGroup } from "@pureform/react/radio-group";
+import { RichTooltip } from "@pureform/react/rich-tooltip";
 import { Ripple } from "@pureform/react/ripple";
 import { Scrim } from "@pureform/react/scrim";
 import { SearchBar } from "@pureform/react/search-bar";
@@ -75,6 +76,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     NavigationRail,
     RadioGroup,
     Ripple,
+    RichTooltip,
     Scrim,
     SearchBar,
     Select,

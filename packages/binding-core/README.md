@@ -218,14 +218,19 @@ menuSelection(props); menuMachineProps(props); // placement "bottom-start" unles
 menuItemProps(item);                     // Zag's item props from an item's data
 
 // Tooltip: Zag's tooltip; tooltipOverlayAnatomy
-interface TooltipRootOwnProps            // variant, tokens, openDelay, closeDelay, disabled,
+interface TooltipRootOwnProps            // tokens, openDelay, closeDelay, disabled,
                                          // interactive, closeOnEscape, closeOnClick, positioning,
                                          // ids, open, defaultOpen, onOpenChange, testId, unstyled
-TOOLTIP_ROOT_PROPS; TOOLTIP_CONTENT_PROPS; // trigger, supportingText, subhead, actions
-tooltipSelection(props); isRichTooltip(props);
-isInteractiveTooltip(props);             // `interactive`, else rich; otherwise it lets the
-                                         // pointer through, positioner and all
-tooltipMachineProps(props);              // a rich tooltip is interactive; placement "bottom"
+TOOLTIP_ROOT_PROPS; TOOLTIP_CONTENT_PROPS; // trigger, supportingText, caret
+tooltipSelection(props);
+isInteractiveTooltip(props, byDefault);  // `interactive`, else `byDefault` (false); otherwise
+                                         // it lets the pointer through, positioner and all
+tooltipMachineProps(props, interactive); // placement "bottom"
+CARET_STYLE;                             // `--arrow-background: currentColor`, for the caret
+
+// Rich tooltip: Zag's tooltip, interactive; richTooltipOverlayAnatomy
+RichTooltipRootOwnProps; RICH_TOOLTIP_ROOT_PROPS; RICH_TOOLTIP_CONTENT_PROPS; // + subhead, actions
+richTooltipSelection(props); isInteractiveRichTooltip(props); richTooltipMachineProps(props);
 
 // Dialog: Zag's dialog; dialogOverlayAnatomy, and dialogBackdropAnatomy (the scrim)
 type DialogPart                          // the overlay's parts, and "backdrop"

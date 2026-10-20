@@ -33,4 +33,5 @@ export const RN_COMPONENTS = [
     "dialog",
     "snackbar",
     "tooltip",
+    "richTooltip",
 ];

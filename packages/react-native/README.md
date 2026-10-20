@@ -37,26 +37,26 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 
 ## Architecture
 
-| Module                                                                  | What it holds                                                                                                             |
-| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| `provider.tsx`                                                          | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`, `useEngine`                                |
-| `styles.ts`                                                             | `useStyles`, `useStyleFactory` (the registry's hooks), `useComponentSlots`, `useSelectedStyles` (what components use)     |
-| `engine.ts`, `engines/`                                                 | `MotionEngine` and the engines: `animated` here, `animatedSvg`, `reanimated`, `reanimatedSvg` at their subpaths           |
-| `icon-style.tsx`                                                        | `useIconStyle`, `IconSlot` (what an icon part provides), `Glyph` (a text glyph as an icon)                                |
-| `interaction.ts`                                                        | `useInteractionSource`, `useInteractionState`; `NativeInteraction` (Pressable's callbacks → the source), focus visibility |
-| `indication.tsx`, `indication-tokens.ts`                                | `materialIndication` (with its native ripple), `useIndication`; each component's `useSurfaceIndication` (internal)        |
-| `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                               |
-| `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                           |
-| `presence.ts`                                                           | `usePresence`: an overlay's enter and exit (the preset's motions), present until the exit ends                            |
-| `tab-indicator.ts`                                                      | `useIndicatorSlides` (internal): the tabs' indicator sliding from the tab selected before, from `onLayout` boxes          |
-| `portal-host.tsx`, `portal.tsx`                                         | `PortalHost` (the root provider holds one) and `Portal`: overlays rendered over the page, sorted by layer                 |
-| `overlay.tsx`                                                           | `placeOverlay` (placement, flip, shift), the trigger's box from its source, `useDismiss` (Escape and the back button)     |
-| `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
-| `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
-| `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share (prefix and suffix text, `counterMax`'s counter, and `secure`'s visibility toggle)  |
-| `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                     |
-| `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`)                        |
-| `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                         |
+| Module                                                                  | What it holds                                                                                                                                                         |
+| ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `provider.tsx`                                                          | `PureformProvider`, `usePureform`, `useRegistry`, `useDirection`, `useMotion`, `useEngine`                                                                            |
+| `styles.ts`                                                             | `useStyles`, `useStyleFactory` (the registry's hooks), `useComponentSlots`, `useSelectedStyles` (what components use)                                                 |
+| `engine.ts`, `engines/`                                                 | `MotionEngine` and the engines: `animated` here, `animatedSvg`, `reanimated`, `reanimatedSvg` at their subpaths                                                       |
+| `icon-style.tsx`                                                        | `useIconStyle`, `IconSlot` (what an icon part provides), `Glyph` (a text glyph as an icon)                                                                            |
+| `interaction.ts`                                                        | `useInteractionSource`, `useInteractionState`; `NativeInteraction` (Pressable's callbacks → the source), focus visibility                                             |
+| `indication.tsx`, `indication-tokens.ts`                                | `materialIndication` (with its native ripple), `useIndication`; each component's `useSurfaceIndication` (internal)                                                    |
+| `parts.tsx`                                                             | `useControllable`, `withEngine`, `testIdOf`                                                                                                                           |
+| `layer.ts`                                                              | `useLayer`: a stacking layer's z-index from the theme, for an overlay's wrapper                                                                                       |
+| `presence.ts`                                                           | `usePresence`: an overlay's enter and exit (the preset's motions), present until the exit ends                                                                        |
+| `tab-indicator.ts`                                                      | `useIndicatorSlides` (internal): the tabs' indicator sliding from the tab selected before, from `onLayout` boxes                                                      |
+| `portal-host.tsx`, `portal.tsx`                                         | `PortalHost` (the root provider holds one) and `Portal`: overlays rendered over the page, sorted by layer                                                             |
+| `overlay.tsx`                                                           | `placeOverlay` (placement, flip, shift), the trigger's box from its source, `useDismiss` (Escape and the back button)                                                 |
+| `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                                                             |
+| `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                                                              |
+| `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share (prefix and suffix text, `counterMax`'s counter, and `secure`'s visibility toggle)                                              |
+| `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                                                                 |
+| `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`; `tooltip-overlay.tsx`, the trigger overlay the two tooltips share) |
+| `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                                                                     |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory
@@ -245,7 +245,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       keyboard focus, or on a long press, and hides as the pointer leaves (`closeDelay`, 150 ms), on
       blur, a press, Escape or back, or `LONG_PRESS_TOOLTIP_MS` (1.5 s) after a long press. Give
       the trigger the `onLongPress` it's given (the button, icon button, FAB, and chip take one), so
-      a long press shows the tooltip rather than pressing. A rich tooltip is interactive.
+      a long press shows the tooltip rather than pressing. `RichTooltip` (`@pureform/react-native/rich-tooltip`,
+      with `subhead`, `supportingText` and `actions`) replaces `variant="rich"`; it is interactive. Neither draws a
+      caret here: the web's comes from Zag's positioner.
     - **The snackbar queue** is the nearest host's: one at a time, each for `duration` (5 s, `null`
       to stay), held while it's pressed or hovered, closed by its action, its close button, or
       `dismiss(id)`, with the reason in `onOpenChange`. It's a polite live region; VoiceOver is

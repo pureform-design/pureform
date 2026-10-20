@@ -13,16 +13,13 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { OverlayPositioning } from "./overlay";
-import type { VariantProp } from "./variants";
 
-/** The tooltip's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `| "subhead"
- *  | "supportingText" | "actions"`. */
+/** The tooltip's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `| "caret"
+ *  | "supportingText"`. */
 export type TooltipPart = PartName<typeof tooltipOverlayAnatomy>;
 
-/** The tooltip's variant groups and instance tokens: `plain`, a short label, or `rich`, with a
- *  subhead and actions. */
+/** The tooltip's instance tokens. It has no variants: the rich tooltip is `richTooltip`. */
 export interface TooltipVariantProps {
-    readonly variant?: VariantProp<"tooltip", "variant">;
     readonly tokens?: InstanceTokens<"tooltip"> | undefined;
 }
 
@@ -42,7 +39,7 @@ export interface TooltipBehaviorProps extends Controllable<"open", boolean> {
     /** Never opens. The trigger stays as it is. */
     readonly disabled?: boolean | undefined;
     /** Whether the pointer can move onto the tooltip and use it, as a rich tooltip's actions
-     *  need. @default true for a rich tooltip, else false */
+     *  need. @default false (true for the rich tooltip) */
     readonly interactive?: boolean | undefined;
     /** @default true */
     readonly closeOnEscape?: boolean | undefined;
@@ -65,7 +62,6 @@ export interface TooltipRootOwnProps
 
 /** The keys of `TooltipRootOwnProps`, which Root keeps off its element. */
 export const TOOLTIP_ROOT_PROPS = [
-    "variant",
     "tokens",
     "openDelay",
     "closeDelay",
@@ -87,48 +83,43 @@ export interface TooltipContentProps<Node> {
     /** The trigger's label: the ready-made tooltip renders its trigger as a button only when
      *  given. */
     readonly trigger?: Node;
-    /** The text. A plain tooltip shows it on its own; a rich one, under the subhead. */
+    /** The text. */
     readonly supportingText?: Node;
-    /** A rich tooltip's title. */
-    readonly subhead?: Node;
-    /** A rich tooltip's actions: text buttons. */
-    readonly actions?: Node;
+    /** Whether to draw a caret pointing at the trigger. */
+    readonly caret?: boolean | undefined;
 }
 
 /** The keys of `TooltipContentProps`. */
 export const TOOLTIP_CONTENT_PROPS = [
     "trigger",
     "supportingText",
-    "subhead",
-    "actions",
+    "caret",
 ] as const satisfies readonly (keyof TooltipContentProps<unknown>)[];
 
 /** The tooltip's registry selection from Root's props. */
 export const tooltipSelection = (
     props: TooltipVariantProps,
 ): Selection<"tooltip"> => ({
-    variant: props.variant,
     tokens: props.tokens,
 });
 
-/** Whether the tooltip is rich: its variant says so. */
-export const isRichTooltip = (props: TooltipVariantProps): boolean =>
-    props.variant === "rich";
-
 /** Whether the pointer can move onto the tooltip and use it: `interactive` when given, else
- *  whether it's rich. Otherwise it lets the pointer through, positioner and all. */
+ *  `byDefault` (false; the rich tooltip passes true). Otherwise it lets the pointer through,
+ *  positioner and all. */
 export const isInteractiveTooltip = (
-    props: Pick<TooltipBehaviorProps, "interactive"> & TooltipVariantProps,
-): boolean => props.interactive ?? isRichTooltip(props);
+    props: Pick<TooltipBehaviorProps, "interactive">,
+    byDefault = false,
+): boolean => props.interactive ?? byDefault;
 
 /** Zag's tooltip props from Root's, besides `id`, `dir`, and the controllable `open`. */
 export const tooltipMachineProps = (
-    props: TooltipBehaviorProps & TooltipVariantProps,
+    props: TooltipBehaviorProps,
+    interactiveByDefault = false,
 ) => ({
     openDelay: props.openDelay,
     closeDelay: props.closeDelay,
     disabled: props.disabled,
-    interactive: isInteractiveTooltip(props),
+    interactive: isInteractiveTooltip(props, interactiveByDefault),
     closeOnEscape: props.closeOnEscape,
     closeOnClick: props.closeOnClick,
     positioning: { placement: "bottom" as const, ...props.positioning },
@@ -138,3 +129,7 @@ export const tooltipMachineProps = (
         content: props.ids?.content,
     },
 });
+
+/** The caret's style: Zag's arrow tip paints `var(--arrow-background)`, so the caret takes the
+ *  surface's color (its slot's `color`) through `currentColor`. */
+export const CARET_STYLE = { "--arrow-background": "currentColor" } as const;

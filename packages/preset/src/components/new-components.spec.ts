@@ -12,6 +12,7 @@ import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
 import { circularProgress, linearProgress } from "./progress";
+import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
 import { select } from "./select";
 import { slider } from "./slider";
@@ -32,6 +33,7 @@ describe.each([
     ["navigationRail", navigationRail],
     ["snackbar", snackbar],
     ["tooltip", tooltip],
+    ["richTooltip", richTooltip],
     ["slider", slider],
     ["linearProgress", linearProgress],
     ["circularProgress", circularProgress],
