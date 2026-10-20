@@ -42,6 +42,7 @@ export default createConfig({
                     snackbar: "src/snackbar/index.ts",
                     toast: "src/toast/index.ts",
                     tabs: "src/tabs/index.ts",
+                    carousel: "src/carousel/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",

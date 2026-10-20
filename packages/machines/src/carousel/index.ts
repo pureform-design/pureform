@@ -163,6 +163,8 @@ export function connect<T extends PropTypes>(
                 normalize.element({
                     ...parts.mask.attrs,
                     "data-index": index,
+                    "data-disabled": disabled ? "" : undefined,
+                    "aria-disabled": disabled || undefined,
                     tabIndex: index === api.page ? 0 : -1,
                 }),
                 emitters.item(String(index)),
