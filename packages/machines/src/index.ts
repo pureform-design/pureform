@@ -4,6 +4,7 @@
 export * as button from "./button";
 export * as buttonGroup from "./button-group";
 export * as checkbox from "./checkbox";
+export * as combobox from "./combobox";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
 export * as navigation from "./navigation";
