@@ -55,6 +55,48 @@ export const menu: ComponentCase = {
             color: "secondary",
             density: "compact",
         },
+        "with supporting text, vibrant": {
+            defaultOpen: true,
+            vibrant: true,
+            items: [
+                {
+                    value: "cut",
+                    label: "Cut",
+                    supportingText: "To the clipboard",
+                },
+                {
+                    value: "grid",
+                    label: "Grid",
+                    type: "checkbox",
+                    checked: true,
+                },
+            ],
+        },
+        groups: {
+            defaultOpen: true,
+            items: [],
+            groups: [
+                { id: "edit", label: "Edit", items: ITEMS.slice(0, 2) },
+                {
+                    id: "view",
+                    label: "View",
+                    items: [
+                        {
+                            value: "grid",
+                            label: "Grid",
+                            type: "checkbox",
+                            checked: true,
+                        },
+                        {
+                            value: "list",
+                            label: "List",
+                            type: "checkbox",
+                            checked: false,
+                        },
+                    ],
+                },
+            ],
+        },
     },
     state: { prop: "open", from: false, to: true, act: click, read },
     keyboard: {
