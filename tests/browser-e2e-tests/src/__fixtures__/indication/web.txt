@@ -803,6 +803,12 @@ textField[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 30
 textField[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4771 0.0852 217.083)
     focused-checked: color oklch(0.4771 0.0852 217.083)
+textField[secure=true].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4955 0.1304 293.718)
+    focused-checked: color oklch(0.4955 0.1304 293.718)
+textField[secure=true].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    focused-checked: outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 textArea.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4955 0.1304 293.718)
     focused-checked: color oklch(0.4955 0.1304 293.718)
