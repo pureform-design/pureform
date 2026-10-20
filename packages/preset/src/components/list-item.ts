@@ -16,11 +16,19 @@
 // a state layer and the focus ring. Mark it selected with `aria-selected` or `aria-current`.
 
 import { typed } from "@pureform/core";
-import { column, flex, pct, px, start, add } from "@pureform/core/ast";
-import { spacing, textStyle } from "@pureform/theme";
+import { column, flex, hidden, pct, px, start, add } from "@pureform/core/ast";
+import type { StyleMap } from "@pureform/core/ast";
+import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { rowParts, rowTokens } from "./list";
+import type { Position } from "./list";
+import {
+    positionCorners,
+    POSITIONS,
+    rowParts,
+    rowTokens,
+    TILE_RADII,
+} from "./list";
 import {
     DEFAULT_GROUP,
     colorVariant,
@@ -30,6 +38,7 @@ import {
     densityTokenVariant,
     densitySteps,
     INDICATION_ROOT,
+    sys,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
@@ -42,12 +51,43 @@ const { tokens, ref } = rowTokens("listItem", {
     heightOne: px(56),
     heightTwo: px(72),
     heightThree: px(88),
+    // A segmented list's tiles.
+    segmentedContainer: sys("surfaceContainer"),
+    ...TILE_RADII,
+    // The leading part's sizes by type.
+    avatarSize: px(40),
+    thumbnailSize: px(56),
+    videoWidth: px(114),
+    videoHeight: px(64),
     ...DENSITY_TOKEN,
 });
 
 const parts = rowParts(ref, "root");
 
 type LineHeight = "heightOne" | "heightTwo" | "heightThree";
+
+const box = (
+    width: ReturnType<typeof ref>,
+    height: ReturnType<typeof ref>,
+    corners: StyleMap = {},
+) => ({
+    leading: {
+        minWidth: width,
+        width,
+        height,
+        overflow: hidden,
+        ...corners,
+    } satisfies StyleMap,
+});
+
+const corners = positionCorners(ref("outerRadius"), ref("innerRadius"));
+
+const tile = (position: Exclude<Position, "none">) => ({
+    root: {
+        ...corners[position],
+        tokens: { container: ref("segmentedContainer") },
+    },
+});
 
 const lines = (height: LineHeight) => ({
     root: { minHeight: add(ref(height), ref("densityOffset")) },
@@ -67,7 +107,7 @@ export const createListItem = <
             name: "listItem",
             $meta: {
                 description:
-                    "Material list item. Set lines to the number of text lines, and interactive when it is clickable. Mark it selected with aria-selected or aria-current.",
+                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current.",
             },
             tokens,
             slots: [
@@ -96,6 +136,8 @@ export const createListItem = <
             variants: {
                 lines: ["one", "two", "three"],
                 interactive: ["true", "false"],
+                leadingType: ["icon", "avatar", "thumbnail", "video"],
+                position: [...POSITIONS],
                 density: densitySteps<string>(densities),
                 color: groups as ColorGroups,
             },
@@ -146,6 +188,28 @@ export const createListItem = <
                         true: { root: parts.interactive },
                         false: {},
                     },
+                    // What the leading part holds: an icon, a round avatar, a square
+                    // thumbnail, or a video's frame.
+                    leadingType: {
+                        icon: {},
+                        avatar: box(ref("avatarSize"), ref("avatarSize"), {
+                            borderRadius: radius("full"),
+                        }),
+                        thumbnail: box(
+                            ref("thumbnailSize"),
+                            ref("thumbnailSize"),
+                        ),
+                        video: box(ref("videoWidth"), ref("videoHeight")),
+                    },
+                    // Its place among a segmented list's tiles: a tile's color, and its
+                    // corners rounded on the run's outside.
+                    position: {
+                        none: {},
+                        first: tile("first"),
+                        middle: tile("middle"),
+                        last: tile("last"),
+                        single: tile("single"),
+                    },
                     density: densityTokenVariant(densities),
                     // A group points the selected colors, which the row and its parts read,
                     // at its container roles.
@@ -161,6 +225,8 @@ export const createListItem = <
                 defaultVariants: {
                     lines: "one",
                     interactive: "false",
+                    leadingType: "icon",
+                    position: "none",
                     color: DEFAULT_GROUP,
                     density: "inherit",
                 },

@@ -1,3 +1,4 @@
+import { px } from "@pureform/core/ast";
 import type { SlottedComponentSpec } from "@pureform/core/types";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
@@ -5,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
 import { dialog } from "./dialog";
+import { list, positionCorners, POSITIONS } from "./list";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
@@ -18,6 +20,7 @@ import { tabs } from "./tabs";
 import { tooltip } from "./tooltip";
 
 describe.each([
+    ["list", list],
     ["listItem", listItem],
     ["menu", menu],
     ["tabs", tabs],
@@ -52,6 +55,48 @@ describe("rows", () => {
     it("color a menu item's parts from the item, a list item's from the root", () => {
         expect(recipe("menu", menu)).toContain(".menu__item:is(");
         expect(recipe("listItem", listItem)).toContain(".listItem__root:is(");
+    });
+
+    it("round a segmented list's tiles by position, with no compound", () => {
+        const corners = positionCorners(px(16), px(4));
+        expect(corners.none).toEqual({});
+        expect(corners.first.borderStartStartRadius).toEqual(px(16));
+        expect(corners.first.borderEndEndRadius).toEqual(px(4));
+        expect(corners.last.borderEndStartRadius).toEqual(px(16));
+        expect(corners.middle.borderStartEndRadius).toEqual(px(4));
+        expect(Object.keys(listItem.recipe.variants?.position ?? {})).toEqual([
+            ...POSITIONS,
+        ]);
+        expect(listItem.recipe.compoundVariants ?? []).toEqual([]);
+        expect(Object.keys(list.recipe.variants?.variant ?? {})).toEqual([
+            "standard",
+            "segmented",
+        ]);
+    });
+
+    it("size a list item's leading part by its type", () => {
+        expect(
+            Object.keys(listItem.recipe.variants?.leadingType ?? {}),
+        ).toEqual(["icon", "avatar", "thumbnail", "video"]);
+        const video = recipe("listItem", listItem);
+        expect(video).toContain("videoWidth");
+        expect(video).toContain("avatarSize");
+    });
+
+    it("give the menu groups, supporting text, toggleable items, and vibrant colors", () => {
+        expect(menu.slots).toEqual(
+            expect.arrayContaining([
+                "itemGroup",
+                "itemGroupLabel",
+                "itemContent",
+                "itemSupportingText",
+            ]),
+        );
+        const css = recipe("menu", menu);
+        // A toggleable item, `aria-checked`, fills like a selected one.
+        expect(css).toContain("aria-checked=true");
+        expect(css).toContain("tertiaryContainer");
+        expect(menu.recipe.compoundVariants ?? []).toEqual([]);
     });
 });
 
