@@ -2,21 +2,34 @@
 //
 // The FAB (`closeTrigger`) opens the menu; while it's open (`aria-expanded`) it turns into the
 // round close button in the group's main color. The items stack above it, at its end, each a
-// pill in the group's container color with an icon and a label. Render the items in Zag's menu
-// content (the `root` slot), placed by its positioner above the FAB.
+// pill in the group's container color with an icon and a label, in the `list` (Zag's menu
+// content, placed above the FAB by its positioner). `root` holds both, and places nothing itself.
 //
-//   <button class={closeTrigger} aria-haspopup="menu" aria-expanded="true">✕</button>
-//   <div class={root} role="menu">
-//     <button class={item} role="menuitem">
-//       <span class={itemIcon}>✉</span><span class={itemLabel}>Message</span>
-//     </button>
+//   <div class={root}>
+//     <div data-part="positioner">
+//       <div class={list} role="menu">
+//         <button class={item} role="menuitem">
+//           <span class={itemIcon}>✉</span><span class={itemLabel}>Message</span>
+//         </button>
+//       </div>
+//     </div>
+//     <button class={closeTrigger} aria-haspopup="menu" aria-expanded="true">✕</button>
 //   </div>
 //
 // `color` takes M3's primary, secondary and tertiary sets, or any of the theme's groups; `size`
 // is the FAB's at rest (`default` 56, `medium` 80, `large` 96).
 
 import { typed } from "@pureform/core";
-import { column, end, flex, px, slot, when } from "@pureform/core/ast";
+import {
+    column,
+    end,
+    flex,
+    inlineFlex,
+    px,
+    relative,
+    slot,
+    when,
+} from "@pureform/core/ast";
 import {
     radius,
     size as sizeToken,
@@ -62,6 +75,8 @@ const { tokens, ref } = componentTokens("fabMenu", {
     ...sizeTokens(SIZES, "radius", "radius"),
     closeRadius: radius("full"),
     iconSize: sizeToken("iconMedium"),
+    // The FAB's icon, by size.
+    closeIconSize: sizeToken("iconMedium"),
     // The items: their height, padding, the gap between icon and label, and between items.
     itemHeight: px(56),
     itemPaddingInline: spacing("6"),
@@ -85,12 +100,20 @@ export const createFabMenu = <const G extends string = ColorGroup>(
             name: "fabMenu",
             $meta: {
                 description:
-                    "M3 Expressive FAB menu: the FAB (closeTrigger, aria-expanded while open) turns into a round close button, and the menu's items (root) stack above it, each a pill with an icon and a label.",
+                    "M3 Expressive FAB menu: the FAB (closeTrigger, aria-expanded while open) turns into a round close button, and the menu's items (in list, the menu's content) stack above it, each a pill with an icon and a label.",
             },
             tokens,
-            slots: ["root", "closeTrigger", "item", "itemIcon", "itemLabel"],
+            slots: [
+                "root",
+                "list",
+                "item",
+                "itemIcon",
+                "itemLabel",
+                "closeTrigger",
+            ],
             structure: {
-                root: ["item"],
+                root: ["list", "closeTrigger"],
+                list: ["item"],
                 item: ["itemIcon", "itemLabel"],
             },
             indication: [
@@ -115,6 +138,10 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                 base: {
                     root: {
                         ...INDICATION_ROOT,
+                        position: relative,
+                        display: inlineFlex,
+                    },
+                    list: {
                         ...overlayMotion({ ...POPUP_MOTION, fromAnchor: true }),
                         zIndex: zIndex("menu"),
                         display: flex,
@@ -123,10 +150,9 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         gap: ref("gap"),
                     },
                     closeTrigger: {
-                        ...INDICATION_ROOT,
                         ...pressableRoot(ref),
                         transition: cornerTransition,
-                        fontSize: ref("iconSize"),
+                        fontSize: ref("closeIconSize"),
                         backgroundColor: slotStateLayer(
                             ref,
                             "closeTrigger",
@@ -174,6 +200,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         entriesOf(SIZES).map(([name, f]) => [
                             name,
                             {
+                                root: { tokens: { closeIconSize: f.icon } },
                                 closeTrigger: {
                                     // Round once open.
                                     borderRadius: when(
@@ -183,7 +210,6 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                                     ),
                                     width: ref(sizeTokenName("size", name)),
                                     height: ref(sizeTokenName("size", name)),
-                                    tokens: { iconSize: f.icon },
                                 },
                             },
                         ]),

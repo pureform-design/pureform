@@ -21,6 +21,8 @@ export default createConfig({
                     "circular-progress": "src/circular-progress/index.ts",
                     dialog: "src/dialog/index.ts",
                     fab: "src/fab/index.ts",
+                    "fab-menu": "src/fab-menu/index.ts",
+                    "split-button": "src/split-button/index.ts",
                     icon: "src/icon/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",

@@ -5,6 +5,7 @@ import {
     compositeTestIds,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
+    fabMenuOverlayAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
@@ -14,6 +15,7 @@ import {
 import {
     anatomy,
     dialogAnatomy,
+    fabMenuAnatomy,
     menuAnatomy,
     tabsAnatomy,
     tooltipAnatomy,
@@ -25,6 +27,7 @@ describe("composites", () => {
         ["the select's menu", selectMenuAnatomy, menuAnatomy],
         ["the menu's overlay", menuOverlayAnatomy, menuAnatomy],
         ["the tabs", tabsCompositeAnatomy, tabsAnatomy],
+        ["the FAB menu's overlay", fabMenuOverlayAnatomy, fabMenuAnatomy],
     ] as const)(
         "%s shows indication where the preset's component does",
         (_, composite, preset) => {

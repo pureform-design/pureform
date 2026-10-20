@@ -22,6 +22,8 @@ export default createConfig({
                     checkbox: "src/checkbox/index.ts",
                     chip: "src/chip/index.ts",
                     fab: "src/fab/index.ts",
+                    "fab-menu": "src/fab-menu/index.ts",
+                    "split-button": "src/split-button/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "radio-group": "src/radio-group/index.ts",
                     select: "src/select/index.ts",

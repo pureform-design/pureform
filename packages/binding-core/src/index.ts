@@ -83,6 +83,37 @@ export type {
     FabVariantProps,
 } from "./components/fab";
 export {
+    FAB_MENU_CONTENT_PROPS,
+    FAB_MENU_ROOT_PROPS,
+    fabMenuItemProps,
+    fabMenuMachineProps,
+    fabMenuSelection,
+} from "./components/fab-menu";
+export type {
+    FabMenuContentProps,
+    FabMenuItem,
+    FabMenuPart,
+    FabMenuRootOwnProps,
+    FabMenuVariantProps,
+} from "./components/fab-menu";
+export {
+    MENU_BUTTON_BEHAVIOR_PROPS,
+    menuButtonMachineProps,
+} from "./components/menu-button";
+export {
+    SPLIT_BUTTON_CONTENT_PROPS,
+    SPLIT_BUTTON_MENU_LABEL,
+    SPLIT_BUTTON_ROOT_PROPS,
+    splitButtonMachineProps,
+    splitButtonSelection,
+} from "./components/split-button";
+export type {
+    SplitButtonContentProps,
+    SplitButtonPart,
+    SplitButtonRootOwnProps,
+    SplitButtonVariantProps,
+} from "./components/split-button";
+export {
     ICON_BUTTON_CONTENT_PROPS,
     ICON_BUTTON_ROOT_PROPS,
     iconButtonSelection,

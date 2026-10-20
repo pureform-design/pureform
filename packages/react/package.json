@@ -40,6 +40,20 @@
                 "default": "./dist/fab.mjs"
             }
         },
+        "./fab-menu": {
+            "types": "./dist/fab-menu/index.d.ts",
+            "import": {
+                "development": "./src/fab-menu/index.ts",
+                "default": "./dist/fab-menu.mjs"
+            }
+        },
+        "./split-button": {
+            "types": "./dist/split-button/index.d.ts",
+            "import": {
+                "development": "./src/split-button/index.ts",
+                "default": "./dist/split-button.mjs"
+            }
+        },
         "./icon-button": {
             "types": "./dist/icon-button/index.d.ts",
             "import": {

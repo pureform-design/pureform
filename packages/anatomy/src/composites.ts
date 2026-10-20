@@ -557,6 +557,97 @@ export const tabsCompositeAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+/** The FAB menu as the bindings render it: the preset's slots, and Zag's positioner, unstyled,
+ *  between Root and the list of items, which it places above the FAB (`closeTrigger`). */
+export const fabMenuOverlayAnatomy = {
+    name: "fabMenu",
+    scope: "fab-menu",
+    root: "root",
+    partNames: [
+        "root",
+        "positioner",
+        "list",
+        "item",
+        "itemIcon",
+        "itemLabel",
+        "closeTrigger",
+    ],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-fab-menu-root",
+            parent: null,
+            children: ["positioner", "closeTrigger"],
+            styled: true,
+            mirror: false,
+        },
+        positioner: {
+            name: "positioner",
+            attribute: "positioner",
+            testId: "pf-fab-menu-positioner",
+            parent: "root",
+            children: ["list"],
+            styled: false,
+            mirror: false,
+        },
+        list: {
+            name: "list",
+            attribute: "list",
+            testId: "pf-fab-menu-list",
+            parent: "positioner",
+            children: ["item"],
+            styled: true,
+            mirror: false,
+        },
+        item: {
+            name: "item",
+            attribute: "item",
+            testId: "pf-fab-menu-item",
+            parent: "list",
+            children: ["itemIcon", "itemLabel"],
+            styled: true,
+            mirror: false,
+        },
+        itemIcon: {
+            name: "itemIcon",
+            attribute: "item-icon",
+            testId: "pf-fab-menu-item-icon",
+            parent: "item",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+        itemLabel: {
+            name: "itemLabel",
+            attribute: "item-label",
+            testId: "pf-fab-menu-item-label",
+            parent: "item",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        closeTrigger: {
+            name: "closeTrigger",
+            attribute: "close-trigger",
+            testId: "pf-fab-menu-close-trigger",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    indication: [
+        {
+            trigger: "closeTrigger",
+            surface: "closeTrigger",
+            centered: false,
+            focus: "closeTrigger",
+        },
+        { trigger: "item", surface: "item", centered: false, focus: "item" },
+    ],
+} as const satisfies ComponentAnatomy;
+
 /** The composites' default test ids, by composite and part: `compositeTestIds.radioGroup.root`. */
 export const compositeTestIds = {
     radioGroup: { root: "pf-radio-group-root" },
@@ -613,5 +704,14 @@ export const compositeTestIds = {
         label: "pf-tabs-label",
         indicator: "pf-tabs-indicator",
         content: "pf-tabs-content",
+    },
+    fabMenu: {
+        root: "pf-fab-menu-root",
+        positioner: "pf-fab-menu-positioner",
+        list: "pf-fab-menu-list",
+        item: "pf-fab-menu-item",
+        itemIcon: "pf-fab-menu-item-icon",
+        itemLabel: "pf-fab-menu-item-label",
+        closeTrigger: "pf-fab-menu-close-trigger",
     },
 } as const;
