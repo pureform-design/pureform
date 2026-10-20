@@ -1682,6 +1682,28 @@ navigationBar[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline no
     hovered-selected: color rgba(0, 78, 94, 1)
 navigationBar[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 104, 124, 1)
+navigationBar[itemLayout=horizontal].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(74, 68, 88, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationBar[itemLayout=horizontal].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationBar[itemLayout=horizontal].activeIndicator: bg rgba(232, 222, 248, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(216, 206, 231, 1)
+    focused: bg rgba(212, 203, 226, 1)
+    pressed: bg rgba(212, 203, 226, 1)
+    hovered-selected: bg rgba(216, 206, 231, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(212, 203, 226, 1)
+    focused-checked: bg rgba(212, 203, 226, 1)
+navigationBar[itemLayout=horizontal].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationBar[itemLayout=horizontal].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
 navigationRail.item: bg transparent | color rgba(73, 69, 78, 1) | outline none
     focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
     hovered-selected: color rgba(98, 91, 112, 1)
@@ -1814,6 +1836,50 @@ navigationRail[color=info].icon: bg none | color rgba(73, 69, 78, 1) | outline n
     hovered-selected: color rgba(0, 78, 94, 1)
 navigationRail[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     hovered-selected: color rgba(0, 104, 124, 1)
+navigationRail[expanded=true].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(74, 68, 88, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[expanded=true].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[expanded=true].activeIndicator: bg rgba(232, 222, 248, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(216, 206, 231, 1)
+    focused: bg rgba(212, 203, 226, 1)
+    pressed: bg rgba(212, 203, 226, 1)
+    hovered-selected: bg rgba(216, 206, 231, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(212, 203, 226, 1)
+    focused-checked: bg rgba(212, 203, 226, 1)
+navigationRail[expanded=true].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationRail[expanded=true].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationRail[modal=true].item: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    hovered-selected: color rgba(98, 91, 112, 1)
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+navigationRail[modal=true].indicator: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1)
+    pressed: bg rgba(28, 27, 30, 0.1)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1)
+navigationRail[modal=true].activeIndicator: bg rgba(232, 222, 248, 1) | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(216, 206, 231, 1)
+    focused: bg rgba(212, 203, 226, 1)
+    pressed: bg rgba(212, 203, 226, 1)
+    hovered-selected: bg rgba(216, 206, 231, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(212, 203, 226, 1)
+    focused-checked: bg rgba(212, 203, 226, 1)
+navigationRail[modal=true].icon: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+navigationRail[modal=true].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(98, 91, 112, 1)
 snackbar.action: bg transparent | color rgba(207, 188, 255, 1) | outline none
     hovered: bg rgba(207, 188, 255, 0.08)
     focused: bg rgba(207, 188, 255, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
