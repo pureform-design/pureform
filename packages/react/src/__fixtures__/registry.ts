@@ -157,13 +157,22 @@ const FIELD_SLOTS = [
     "counter",
 ] as const;
 
-/** The text inputs' fake factories, all static: the text field, text area, select, and the menu
+/** The text inputs' fake factories, all static: the text field, text area, select, tags input and its input chips, and the menu
  *  the select draws its list with. */
 export const textInputsRegistry = () =>
     createRegistry({
         textField: named("text-field", FIELD_SLOTS),
         textArea: named("text-area", FIELD_SLOTS),
         select: named("select", FIELD_SLOTS),
+        tagsInput: named("tags-input", FIELD_SLOTS),
+        inputChip: named("input-chip", [
+            "root",
+            "avatar",
+            "icon",
+            "label",
+            "remove",
+            "touchTarget",
+        ]),
         menu: named("menu", [
             "root",
             "itemGroup",

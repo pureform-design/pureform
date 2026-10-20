@@ -2,10 +2,12 @@
 // part added to the preset fails here until the machine has it too.
 import {
     buttonAnatomy,
+    inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
     sliderAnatomy,
     snackbarAnatomy,
+    tagsInputAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
 } from "@pureform/anatomy";
@@ -15,6 +17,10 @@ import { anatomy as button } from "./button/button.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
+import {
+    anatomy as tagsInput,
+    chipAnatomy as inputChip,
+} from "./tags-input/tags-input.anatomy";
 import { anatomy as textField } from "./text-field/text-field.anatomy";
 
 interface Pair {
@@ -28,6 +34,8 @@ const pairs: Record<string, Pair> = {
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
     slider: { machine: slider, preset: sliderAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
+    tagsInput: { machine: tagsInput, preset: tagsInputAnatomy },
+    inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
     textArea: { machine: textField, preset: textAreaAnatomy },
 };
@@ -41,5 +49,4 @@ describe("machine anatomies against the preset's", () => {
             expect(missing(pair)).toEqual([]);
         });
     }
-
 });

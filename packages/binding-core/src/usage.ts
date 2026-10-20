@@ -136,6 +136,14 @@ export const COMPONENT_USAGE = {
     tabs: {
         entries: { tabs: same("variant", "inlineIcon", "color"), ripple: {} },
     },
+    // The icons follow their content, and the chips' groups come in one `chip` prop.
+    "tags-input": {
+        entries: {
+            tagsInput: same("variant", "color", "density"),
+            inputChip: {},
+            ripple: {},
+        },
+    },
     text: { entries: { text: { style: "textStyle" } } },
     // The icons, prefix and suffix follow their content.
     "text-area": {

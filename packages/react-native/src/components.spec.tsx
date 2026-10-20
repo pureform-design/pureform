@@ -36,6 +36,7 @@ import { Snackbar } from "./snackbar";
 import { SupportingText } from "./supporting-text";
 import { Switch } from "./switch";
 import { Tabs } from "./tabs";
+import { TagsInput } from "./tags-input";
 import { presetRegistry } from "./testing/registry";
 import type { TestRegistry } from "./testing/registry";
 import {
@@ -77,6 +78,8 @@ const COMPONENTS = [
     "textArea",
     "searchBar",
     "select",
+    "tagsInput",
+    "inputChip",
     "slider",
     "menu",
     "tabs",
@@ -504,6 +507,68 @@ describe("text field affixes, counter and secure", () => {
         await interact(() => toggle.click());
         await settle();
         expect(input.type).toBe("text");
+    });
+});
+
+describe("tags input", () => {
+    const labels = () =>
+        [
+            ...document.querySelectorAll('[data-testid="pf-input-chip-label"]'),
+        ].map((label) => label.textContent);
+    const input = () => byTestId("pf-tags-input-input") as HTMLInputElement;
+
+    it("renders a chip per value with its label and a named remove button", async () => {
+        await render(<TagsInput label="Tags" defaultValue={["red", "blue"]} />);
+        expect(labels()).toEqual(["red", "blue"]);
+        expect(
+            document.querySelector('[aria-label="Delete tag blue"]'),
+        ).not.toBeNull();
+    });
+
+    it("adds the submitted text, skipping duplicates", async () => {
+        const changes: string[][] = [];
+        await render(
+            <TagsInput
+                label="Tags"
+                defaultValue={["red"]}
+                onValueChange={({ value }) => changes.push(value)}
+            />,
+        );
+        await interact(() => userEvent.type(input(), " green {Enter}"));
+        await interact(() => userEvent.type(input(), "red{Enter}"));
+        expect(labels()).toEqual(["red", "green"]);
+        expect(changes).toEqual([["red", "green"]]);
+        await interact(() => userEvent.type(input(), "blue,"));
+        expect(labels()).toEqual(["red", "green", "blue"]);
+        expect(input().value).toBe("");
+    });
+
+    it("removes a chip by its remove button, and the last by Backspace", async () => {
+        await render(
+            <TagsInput label="Tags" defaultValue={["red", "green", "blue"]} />,
+        );
+        await interact(() =>
+            (
+                document.querySelector(
+                    '[aria-label="Delete tag red"]',
+                ) as HTMLElement
+            ).click(),
+        );
+        expect(labels()).toEqual(["green", "blue"]);
+        await interact(() => userEvent.type(input(), "{Backspace}"));
+        expect(labels()).toEqual(["green"]);
+    });
+
+    it("floats the label while it holds a chip", async () => {
+        await render(
+            <>
+                <TagsInput label="Tags" testId="empty" />
+                <TagsInput label="Tags" testId="full" defaultValue={["red"]} />
+            </>,
+        );
+        expect(computed("full-label").top).not.toBe(
+            computed("empty-label").top,
+        );
     });
 });
 

@@ -54,6 +54,7 @@ import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createFab } from "./components/fab";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
+import { createInputChip } from "./components/input-chip";
 import { list } from "./components/list";
 import { createListItem } from "./components/list-item";
 import { createMedia } from "./components/media";
@@ -81,6 +82,7 @@ import { snackbar } from "./components/snackbar";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTabs } from "./components/tabs";
+import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
@@ -272,8 +274,10 @@ const defaultComponents = <G extends string>(
         avatar: createAvatar(theme.color.groups, shapes),
         media: createMedia(shapes),
         chip: createChip<G, Step>(theme.color.groups, densities),
+        inputChip: createInputChip<G, Step>(theme.color.groups, densities),
         textField: createTextField<G, Step>(theme.color.groups, densities),
         textArea: createTextArea<G, Step>(theme.color.groups, densities),
+        tagsInput: createTagsInput<G, Step>(theme.color.groups, densities),
         searchBar,
         select: createSelect<G, Step>(theme.color.groups, densities),
         supportingText: createSupportingText(theme.color.groups),

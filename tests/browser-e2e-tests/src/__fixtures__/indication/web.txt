@@ -790,6 +790,150 @@ chip[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735)
     hovered-selected: color oklch(0.3911 0.0701 217.604)
 chip[color=info].trailingIcon: bg rgba(0, 0, 0, 0) | color oklch(0.4955 0.1304 293.718) | outline none
     hovered-selected: color oklch(0.3911 0.0701 217.604)
+inputChip.root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.8602 0.8223 0.9223) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip.touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+inputChip.avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+inputChip.icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+inputChip.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+inputChip.remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=tertiary].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.951 0.8014 0.8415) | color oklch(0.4044 0.0591 359.127)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=tertiary].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+inputChip[color=tertiary].avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+inputChip[color=tertiary].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+inputChip[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+inputChip[color=tertiary].remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.4044 0.0591 359.127)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=success].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.4183 0.9425 0.469) | color oklch(0.3849 0.1167 146.268)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=success].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+inputChip[color=success].avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+inputChip[color=success].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+inputChip[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+inputChip[color=success].remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.3849 0.1167 146.268)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=warning].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.9473 0.8295 0.4979) | color oklch(0.3956 0.0809 90.5623)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=warning].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+inputChip[color=warning].avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+inputChip[color=warning].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+inputChip[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+inputChip[color=warning].remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.3956 0.0809 90.5623)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=error].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.9661 0.7866 0.7752) | color oklch(0.4171 0.1702 27.3795)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=error].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+inputChip[color=error].avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+inputChip[color=error].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+inputChip[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+inputChip[color=error].remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.4171 0.1702 27.3795)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=info].root: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.6349 0.876 0.9495) | color oklch(0.3911 0.0701 217.604)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+inputChip[color=info].touchTarget: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+inputChip[color=info].avatar: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+inputChip[color=info].icon: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+inputChip[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+inputChip[color=info].remove: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered: bg color(srgb 0.2863 0.2706 0.3059 / 0.08)
+    focused: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    dragged: bg color(srgb 0.2863 0.2706 0.3059 / 0.16)
+    hovered-selected: bg color(srgb 0.2863 0.2706 0.3059 / 0.08) | color oklch(0.3911 0.0701 217.604)
+    pressed-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1)
+    focused-checked: bg color(srgb 0.2863 0.2706 0.3059 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
 textField.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4955 0.1304 293.718)
     focused-checked: color oklch(0.4955 0.1304 293.718)
@@ -854,6 +998,35 @@ textArea[variant=outlined].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0
 textArea[variant=outlined].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
     focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+tagsInput.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4955 0.1304 293.718)
+    focused-checked: color oklch(0.4955 0.1304 293.718)
+tagsInput[variant=outlined].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+tagsInput[variant=outlined].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+tagsInput[color=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4855 0.0342 300.379)
+    focused-checked: color oklch(0.4855 0.0342 300.379)
+tagsInput[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4904 0.0605 358.465)
+    focused-checked: color oklch(0.4904 0.0605 358.465)
+tagsInput[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4685 0.1423 146.207)
+    focused-checked: color oklch(0.4685 0.1423 146.207)
+tagsInput[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4828 0.0987 90.0339)
+    focused-checked: color oklch(0.4828 0.0987 90.0339)
+tagsInput[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.506 0.1927 27.7028)
+    focused-checked: color oklch(0.506 0.1927 27.7028)
+tagsInput[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4771 0.0852 217.083)
+    focused-checked: color oklch(0.4771 0.0852 217.083)
 searchBar.root: bg oklch(0.933 0.0075 332.402) | color oklch(0.2245 0.0059 301.135) | outline none
     hovered: bg color(srgb 0.8602 0.8419 0.8572)
     focused: bg color(srgb 0.8439 0.8259 0.8411) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px

@@ -57,6 +57,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                                                                 |
 | `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`; `tooltip-overlay.tsx`, the trigger overlay the two tooltips share) |
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                                                                     |
+| `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)   |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory

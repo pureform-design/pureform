@@ -66,6 +66,7 @@ const INTERACTIVE = [
     "iconButton",
     "fab",
     "chip",
+    "inputChip",
     "card",
     "checkbox",
     "radio",
