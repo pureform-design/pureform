@@ -9,6 +9,7 @@ import {
 import type { Indication } from "@pureform/solid";
 import { Avatar } from "@pureform/solid/avatar";
 import { Button } from "@pureform/solid/button";
+import { ButtonGroup } from "@pureform/solid/button-group";
 import { Card } from "@pureform/solid/card";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
@@ -59,6 +60,7 @@ import { sceneTheme } from "../../harness/themes";
 export const components: Record<ComponentName, ValidComponent> = {
     Avatar,
     Button,
+    ButtonGroup,
     Card,
     Checkbox,
     Chip,
