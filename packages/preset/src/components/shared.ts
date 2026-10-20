@@ -49,6 +49,7 @@ import {
     duration,
     easing,
     opacity,
+    radius,
     size,
     spacing,
     textStyle,
@@ -665,6 +666,43 @@ export const cornerRadius = (
         .on(slot("root", "pressed"), ref("pressedRadius"))
         .else(rest);
 };
+
+/** Which corners a corner-morphing component rests in by default. */
+export type RestingCorner = "round" | "square";
+
+/** The tokens `cornerRadius` reads: the round `radius` (full), the given square and pressed
+ *  radii, the `corner` variant's `square` flag (1 when `rest` is square), and the `toggle`
+ *  variant's `toggles` flag. A component spreads them first in its token set. */
+export const cornerMorphTokens = (
+    rest: RestingCorner,
+    squareRadius: ValueNode,
+    pressedRadius: ValueNode,
+) => ({
+    radius: radius("full"),
+    squareRadius,
+    pressedRadius,
+    square: unitless(rest === "square" ? 1 : 0),
+    toggles: unitless(0),
+});
+
+/** The `corner` and `toggle` variant groups that set `cornerMorphTokens`' flags; the resting
+ *  corner's entry stays empty, since the tokens' defaults already name it. */
+export const cornerMorphVariants = (rest: RestingCorner) => ({
+    corner: {
+        round:
+            rest === "round"
+                ? {}
+                : { root: { tokens: { square: unitless(0) } } },
+        square:
+            rest === "square"
+                ? {}
+                : { root: { tokens: { square: unitless(1) } } },
+    },
+    toggle: {
+        false: {},
+        true: { root: { tokens: { toggles: unitless(1) } } },
+    },
+});
 
 /** Corner changes ease on the emphasized curve, with the state colors; under reduced motion the
  *  corners change at once and the colors still fade. */

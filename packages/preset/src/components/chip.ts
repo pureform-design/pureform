@@ -27,6 +27,8 @@ import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
     DEFAULT_GROUP,
     colorVariant,
+    cornerMorphTokens,
+    cornerMorphVariants,
     cornerRadius,
     cornerTransition,
     componentTokens,
@@ -48,13 +50,9 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = componentTokens("chip", {
     height: sizeToken("controlSmall"),
-    // The round corner, and the square one the chip rests in. `square` is the `corner`
-    // variant's flag, and `toggles` the `toggle` variant's: only a toggle swaps when selected.
-    radius: radius("full"),
-    squareRadius: radius("small"),
-    pressedRadius: radius("extraSmall"),
-    square: unitless(1),
-    toggles: unitless(0),
+    // The round corner, and the square one the chip rests in, with the `corner` and `toggle`
+    // variants' flags: only a toggle swaps when selected.
+    ...cornerMorphTokens("square", radius("small"), radius("extraSmall")),
     gap: spacing("2"),
     padding: spacing("4"),
     iconSize: sizeToken("iconSmall"),
@@ -219,14 +217,7 @@ export const createChip = <
                             root: fillRoot("elevated", TOKEN_SELECTED),
                         },
                     },
-                    corner: {
-                        round: { root: { tokens: { square: unitless(0) } } },
-                        square: {},
-                    },
-                    toggle: {
-                        false: {},
-                        true: { root: { tokens: { toggles: unitless(1) } } },
-                    },
+                    ...cornerMorphVariants("square"),
                     // A group points the selected colors, which the fills and the icon read,
                     // at its container roles.
                     color: colorVariant(groups, (g) => ({
