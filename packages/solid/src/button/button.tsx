@@ -27,7 +27,12 @@ import { useOwnInteractionSource } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, optionalPart, useComponent } from "../parts";
+import {
+    createSlotProps,
+    iconParts,
+    optionalPart,
+    useComponent,
+} from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -106,49 +111,34 @@ function Label(props: ButtonPartProps): JSX.Element {
 }
 
 /** The icon's box, hidden from assistive technology. Render it only when there's an icon. */
-function Icon(props: ButtonIconProps): JSX.Element {
-    return renderIcon(props, false);
-}
-
-// The ready-made's icon, only while it has one, which it builds once.
-const OptionalIcon = (props: ButtonIconProps): JSX.Element =>
-    renderIcon(props, true);
-
-function renderIcon(props: ButtonIconProps, optional: boolean): JSX.Element {
-    const { scope, api } = context.use("Icon");
-    return scope.render("icon", {
-        element: "span",
-        machine: () => api().getIconProps(),
-        states: () => ({ mirrored: props.mirror }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
-        optional,
-    });
-}
+// The ready-made's `OptionalIcon` builds its icon once, only while it has one.
+const { Part: Icon, Optional: OptionalIcon } = iconParts<
+    Anatomy,
+    ButtonIconProps
+>(
+    (name) => {
+        const { scope, api } = context.use(name);
+        return { scope, machine: () => api().getIconProps() };
+    },
+    "Icon",
+    "icon",
+    { mirror: true },
+);
 
 /** The secondary icon's box (a dropdown arrow, say), hidden from assistive technology. Render it
  *  only when there's one, on the side `secondaryIconPosition` names. */
-function SecondaryIcon(props: ButtonIconProps): JSX.Element {
-    return renderSecondaryIcon(props, false);
-}
-
-const OptionalSecondaryIcon = (props: ButtonIconProps): JSX.Element =>
-    renderSecondaryIcon(props, true);
-
-function renderSecondaryIcon(
-    props: ButtonIconProps,
-    optional: boolean,
-): JSX.Element {
-    const { scope, api } = context.use("SecondaryIcon");
-    return scope.render("secondaryIcon", {
-        element: "span",
-        machine: () => api().getSecondaryIconProps(),
-        states: () => ({ mirrored: props.mirror }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
-        optional,
-    });
-}
+const { Part: SecondaryIcon, Optional: OptionalSecondaryIcon } = iconParts<
+    Anatomy,
+    ButtonIconProps
+>(
+    (name) => {
+        const { scope, api } = context.use(name);
+        return { scope, machine: () => api().getSecondaryIconProps() };
+    },
+    "SecondaryIcon",
+    "secondaryIcon",
+    { mirror: true },
+);
 
 /** The 48px touch target around a smaller button. Empty. */
 function TouchTarget(props: ButtonPartProps): JSX.Element {

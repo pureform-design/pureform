@@ -20,7 +20,12 @@ import { type Accessor, omit } from "solid-js";
 
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, optionalPart, useComponent } from "../parts";
+import {
+    createSlotProps,
+    iconParts,
+    optionalPart,
+    useComponent,
+} from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePressable } from "../pressable";
 import type { PartProps } from "../props";
@@ -92,48 +97,33 @@ function TouchTarget(props: ChipPartProps): JSX.Element {
 
 /** The leading icon's box, hidden from assistive technology. Render it only when there's an
  *  icon. */
-function Icon(props: ChipIconProps): JSX.Element {
-    return renderIcon(props, false);
-}
-
-// The ready-made's icon, only while it has one, which it builds once.
-const OptionalIcon = (props: ChipIconProps): JSX.Element =>
-    renderIcon(props, true);
-
-function renderIcon(props: ChipIconProps, optional: boolean): JSX.Element {
-    const { scope, api } = context.use("Icon");
-    return scope.render("icon", {
-        element: "span",
-        machine: () => api().getIconProps(),
-        states: () => ({ mirrored: props.mirror }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
-        optional,
-    });
-}
+// The ready-made's `OptionalIcon` builds its icon once, only while it has one.
+const { Part: Icon, Optional: OptionalIcon } = iconParts<
+    Anatomy,
+    ChipIconProps
+>(
+    (name) => {
+        const { scope, api } = context.use(name);
+        return { scope, machine: () => api().getIconProps() };
+    },
+    "Icon",
+    "icon",
+    { mirror: true },
+);
 
 /** The trailing icon's box (a filter chip's dropdown arrow), hidden from assistive technology.
  *  Render it only when there's one. */
-function TrailingIcon(props: ChipPartProps): JSX.Element {
-    return renderTrailingIcon(props, false);
-}
-
-const OptionalTrailingIcon = (props: ChipPartProps): JSX.Element =>
-    renderTrailingIcon(props, true);
-
-function renderTrailingIcon(
-    props: ChipPartProps,
-    optional: boolean,
-): JSX.Element {
-    const { scope, api } = context.use("TrailingIcon");
-    return scope.render("trailingIcon", {
-        element: "span",
-        machine: () => api().getSecondaryIconProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-        optional,
-    });
-}
+const { Part: TrailingIcon, Optional: OptionalTrailingIcon } = iconParts<
+    Anatomy,
+    ChipPartProps
+>(
+    (name) => {
+        const { scope, api } = context.use(name);
+        return { scope, machine: () => api().getSecondaryIconProps() };
+    },
+    "TrailingIcon",
+    "trailingIcon",
+);
 
 /** The chip's text. */
 function Label(props: ChipPartProps): JSX.Element {
