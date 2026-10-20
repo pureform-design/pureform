@@ -128,6 +128,7 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
       "--components-fabMenu-statePressedOpacity": "token(opacity.statePressed)",
       "display": "inline-flex",
       "position": "relative",
+      "zIndex": "token(zIndex.menu)",
     },
   },
   "className": "fabMenu",
