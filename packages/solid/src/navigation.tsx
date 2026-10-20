@@ -5,10 +5,10 @@
 // modal rail renders in a dialog (Zag's) over the scrim: fixed along the viewport's start edge,
 // focus kept inside while it's open.
 
-import { scrimAnatomy } from "@pureform/anatomy";
 import type {
     navigationBarAnatomy,
     navigationRailAnatomy,
+    scrimAnatomy,
 } from "@pureform/anatomy";
 import {
     dialogBackdropLayout,
@@ -112,6 +112,8 @@ export function createNavigation<C extends NavigationComponent>(config: {
     /** The component's name, for warnings and errors: `"NavigationBar"`. */
     readonly component: string;
     readonly anatomy: Anatomy & { readonly name: C };
+    /** The scrim a modal component draws under it: the rail's. */
+    readonly scrim?: typeof scrimAnatomy;
 }) {
     const context = createPartContext<NavigationContextValue>(config.component);
     const itemContext = createPartContext<ItemContextValue>(
@@ -141,7 +143,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
             ...open.machineProps(),
         }));
         const api = createMemo(() => dialog.connect(service, normalizeProps));
-        const scrim = useComponent(scrimAnatomy, {
+        const scrim = useComponent(config.scrim!, {
             selection: () => ({}),
             testId: () => {
                 const testId = props.own.testId;
