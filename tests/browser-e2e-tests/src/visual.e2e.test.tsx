@@ -43,6 +43,7 @@ const SECTIONS = [
     "row-colors",
     "search-and-feedback",
     "select",
+    "search-and-autocomplete",
     "progress",
     "navigation",
     "badges",

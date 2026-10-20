@@ -137,6 +137,9 @@ export interface IndicationCase {
     focus?(host: HTMLElement): Promise<void>;
     /** Whether a drag tints the surface (the slider). */
     readonly drags?: boolean | undefined;
+    /** Whether the surface is in a modal (the search view), which keeps the pointer off the rest
+     *  of the page, so another component sharing its source can't be pressed. */
+    readonly modal?: boolean | undefined;
 }
 
 export interface ComponentCase {
