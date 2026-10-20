@@ -1,14 +1,20 @@
-// The parts Material's text inputs share: the text field and the text area.
+// The parts Material's text inputs share: the text field, the text area, and the select.
 //
 // Each input has a container (filled or outlined) holding the input and a floating label, and
 // supporting text below. The container reads its state from the input inside it; the label
 // follows the container, and the supporting text the root. `fieldParts` builds those styles
 // over a component's own tokens, so each component keeps its own overridable vars.
+// `affixParts` adds the prefix and suffix text around the input (the text field and the
+// select), and `counterParts` the character counter at the end of the supporting text's row
+// (the text field and the text area).
 
 import {
     absolute,
     add,
     alias,
+    auto,
+    center,
+    row,
     sub,
     column,
     flex,
@@ -42,6 +48,7 @@ import {
 } from "@pureform/theme";
 
 import {
+    blend,
     iconBox,
     iconFill,
     inputText,
@@ -110,6 +117,50 @@ export const FIELD_STRUCTURE: {
     root: ["container", "supportingText"],
     container: ["leadingIcon", "input", "label", "trailingIcon"],
 };
+
+/** The slots of a text input with a prefix and a suffix, in markup order. */
+export const AFFIX_FIELD_SLOTS = [
+    "root",
+    "container",
+    "leadingIcon",
+    "prefixText",
+    "input",
+    "suffixText",
+    "label",
+    "trailingIcon",
+    "supportingText",
+] as const;
+
+/** How the slots of a text input with a prefix and a suffix nest. */
+export const AFFIX_FIELD_STRUCTURE: {
+    root: (typeof AFFIX_FIELD_SLOTS)[number][];
+    container: (typeof AFFIX_FIELD_SLOTS)[number][];
+} = {
+    root: ["container", "supportingText"],
+    container: [
+        "leadingIcon",
+        "prefixText",
+        "input",
+        "suffixText",
+        "label",
+        "trailingIcon",
+    ],
+};
+
+/** The slots a counter adds after the supporting text: the row holding both, and the counter. */
+export const COUNTER_SLOTS = ["supportingRow", "counter"] as const;
+
+/** The tokens a prefix and a suffix add. `prefixed` and `suffixed` are the 0/1 flags the
+ *  `prefixText` and `suffixText` variants set: the input hands its inline padding on that side
+ *  to the affix. */
+export const AFFIX_TOKENS = {
+    affixColor: sys("onSurfaceVariant"),
+    affixGap: px(2),
+    prefixed: unitless(0),
+    suffixed: unitless(0),
+} satisfies Record<string, ValueNode>;
+
+export type AffixToken = keyof typeof AFFIX_TOKENS;
 
 // The container's states, read from the input inside it. The adapter ranks them, so a later
 // state wins: hover, then focus, then invalid, then disabled.
@@ -428,3 +479,131 @@ export const fieldParts = (
 
     return { base, variant, colors, icons, densityParts };
 };
+
+/** The prefix and suffix text, over a text input's tokens with `AFFIX_TOKENS`. Both sit in the
+ *  container's row beside the input, in the input's type, and show once the label floats, as
+ *  the label would otherwise cover them. Merge `base` and `variants` into the component's, and
+ *  use `icons` in place of `fieldParts`' icon variants: an icon's room goes to the affix on its
+ *  side. The container becomes a flex row, which draws the input as before. */
+export const affixParts = (
+    ref: (token: FieldToken | AffixToken) => AliasNode,
+    sized: Record<
+        "filled" | "outlined",
+        {
+            input: {
+                paddingBlockStart: NumericValue;
+                paddingBlockEnd: NumericValue;
+            };
+        }
+    >,
+) => {
+    const affix = (side: "Start" | "End"): StyleMap => ({
+        textStyle: textStyle("bodyLarge"),
+        color: when()
+            .on(DISABLED, disabledColor("disabledContent"))
+            .else(ref("affixColor")),
+        display: flex,
+        alignItems: center,
+        flexShrink: unitless(0),
+        [`paddingInline${side}`]: ref("paddingInline"),
+        [`paddingInline${side === "Start" ? "End" : "Start"}`]: ref("affixGap"),
+        opacity: floated(unitless(0), unitless(1)),
+        transition: tweens("opacity"),
+        pointerEvents: none,
+    });
+    const flagged = (padding: NumericValue, flag: AffixToken) =>
+        blend(padding, px(0), ref(flag));
+    // The affixes' text lines up with the input's, at the same block padding.
+    const affixSized = (fill: "filled" | "outlined") => {
+        const { paddingBlockStart, paddingBlockEnd } = sized[fill].input;
+        return {
+            prefixText: { paddingBlockStart, paddingBlockEnd },
+            suffixText: { paddingBlockStart, paddingBlockEnd },
+        };
+    };
+    return {
+        base: {
+            container: { display: flex },
+            input: {
+                flexShrink: unitless(1),
+                minWidth: px(0),
+                paddingInlineStart: flagged(ref("paddingInline"), "prefixed"),
+                paddingInlineEnd: flagged(ref("paddingInline"), "suffixed"),
+            },
+            prefixText: affix("Start"),
+            suffixText: affix("End"),
+        } satisfies Record<string, StyleMap>,
+        variant: {
+            filled: affixSized("filled"),
+            outlined: affixSized("outlined"),
+        },
+        variants: {
+            prefixText: {
+                true: { root: { tokens: { prefixed: unitless(1) } } },
+                false: {},
+            },
+            suffixText: {
+                true: { root: { tokens: { suffixed: unitless(1) } } },
+                false: {},
+            },
+        },
+        icons: {
+            leadingIcon: {
+                true: {
+                    input: {
+                        paddingInlineStart: flagged(
+                            ref("textInsetWithIcon"),
+                            "prefixed",
+                        ),
+                    },
+                    prefixText: {
+                        paddingInlineStart: ref("textInsetWithIcon"),
+                    },
+                    label: { insetInlineStart: ref("textInsetWithIcon") },
+                },
+                false: {},
+            },
+            trailingIcon: {
+                true: {
+                    input: {
+                        paddingInlineEnd: flagged(
+                            ref("textInsetWithIcon"),
+                            "suffixed",
+                        ),
+                    },
+                    suffixText: { paddingInlineEnd: ref("textInsetWithIcon") },
+                },
+                false: {},
+            },
+        },
+        defaultVariants: {
+            prefixText: "false" as const,
+            suffixText: "false" as const,
+        },
+    };
+};
+
+/** The character counter at the end of the supporting text's row, over a text input's tokens.
+ *  `supportingRow` holds the supporting text and the counter side by side; the counter takes
+ *  the supporting text's type and colors, the error color included, which a count over the
+ *  limit sets, since the field is then invalid. A supporting text outside the row keeps its own
+ *  line, as before. */
+export const counterParts = (ref: (token: FieldToken) => AliasNode) =>
+    ({
+        supportingRow: {
+            display: flex,
+            flexDirection: row,
+        },
+        // Long helper text wraps before the counter rather than pushing it out.
+        supportingText: { flexShrink: unitless(1) },
+        counter: {
+            ...supportingTextStyle,
+            flexShrink: unitless(0),
+            marginInlineStart: auto,
+            color: when()
+                .on(slot("root", "invalid"), ref("errorColor"))
+                .on(slot("root", "disabled"), disabledColor("disabledContent"))
+                .else(ref("supportingColor")),
+            paddingInlineEnd: ref("paddingInline"),
+        },
+    }) satisfies Record<string, StyleMap>;
