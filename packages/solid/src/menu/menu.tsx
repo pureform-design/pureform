@@ -7,7 +7,10 @@ import { menuOverlayAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     MENU_CONTENT_PROPS,
+    MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
+    menuGrouped,
+    menuItemMachineProps,
     menuItemProps,
     menuMachineProps,
     menuSelection,
@@ -15,9 +18,10 @@ import {
     presentProps,
 } from "@pureform/binding-core";
 import type {
-    InteractionSourceProps,
     MenuContentProps,
+    MenuGroup,
     MenuItem,
+    MenuItemBehaviorProps,
     MenuRootOwnProps,
 } from "@pureform/binding-core";
 import * as menu from "@pureform/machines/menu";
@@ -88,22 +92,19 @@ export interface MenuIconProps extends MenuPartProps {
     readonly mirror?: boolean | undefined;
 }
 
-/** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`) and a part's. */
-export interface MenuItemProps extends MenuPartProps, InteractionSourceProps {
-    readonly value: string;
-    /** The text typeahead matches, when the label isn't plain text. */
-    readonly valueText?: string | undefined;
-    readonly disabled?: boolean | undefined;
-    readonly closeOnSelect?: boolean | undefined;
+/** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`), for a toggleable
+ *  item its `type`, `checked`, and `onCheckedChange`, and a part's. */
+export interface MenuItemProps extends MenuPartProps, MenuItemBehaviorProps {}
+
+/** A group's props: its `id` among the groups, and a part's. */
+export interface MenuItemGroupProps extends MenuPartProps {
+    readonly id: string;
 }
 
-const ITEM_PROPS = [
-    "value",
-    "valueText",
-    "disabled",
-    "closeOnSelect",
-    "interactionSource",
-] as const;
+/** A group label's props: the `id` of the group it names, and a part's. */
+export interface MenuItemGroupLabelProps extends MenuPartProps {
+    readonly htmlFor: string;
+}
 
 /** The menu's root, a `<div>` around the trigger and the menu. The registry doesn't style it. */
 function Root(props: MenuRootProps): JSX.Element {
@@ -179,7 +180,30 @@ function Content(props: MenuPartProps): JSX.Element {
     });
 }
 
-/** An item; the highlighted one shows the hover state. */
+/** A group of items, named by the ItemGroupLabel whose `htmlFor` is its `id`. */
+function ItemGroup(props: MenuItemGroupProps): JSX.Element {
+    const { scope, api } = context.use("ItemGroup");
+    return scope.render("itemGroup", {
+        element: "div",
+        machine: () => api().getItemGroupProps({ id: props.id }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "id"),
+    });
+}
+
+/** A group's label. */
+function ItemGroupLabel(props: MenuItemGroupLabelProps): JSX.Element {
+    const { scope, api } = context.use("ItemGroupLabel");
+    return scope.render("itemGroupLabel", {
+        element: "div",
+        machine: () => api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "htmlFor"),
+    });
+}
+
+/** An item; the highlighted one shows the hover state. A toggleable item (`type`) fills while
+ *  `checked`. */
 function Item(props: MenuItemProps): JSX.Element {
     const { scope, api, sources } = context.use("Item");
     const source = sources.item(
@@ -191,18 +215,29 @@ function Item(props: MenuItemProps): JSX.Element {
         valueText: props.valueText,
         disabled: props.disabled,
         closeOnSelect: props.closeOnSelect,
+        type: props.type,
+        checked: props.checked,
+        onCheckedChange: props.onCheckedChange,
     });
+    const highlighted = () => {
+        const { type, checked, ...rest } = item();
+        return type === undefined
+            ? api().getItemState(rest).highlighted
+            : api().getOptionItemState({
+                  ...rest,
+                  type,
+                  checked: checked ?? false,
+              }).highlighted;
+    };
     return (
         <itemContext.Provider value={{ value: () => props.value }}>
             {scope.render("item", {
                 element: "div",
                 interactionSource: source,
-                machine: () => api().getItemProps(item()),
-                states: () => ({
-                    hover: api().getItemState(item()).highlighted,
-                }),
+                machine: () => menuItemMachineProps(api(), item()),
+                states: () => ({ hover: highlighted() }),
                 unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", ...ITEM_PROPS),
+                props: omit(props, "unstyled", ...MENU_ITEM_PROPS),
             })}
         </itemContext.Provider>
     );
@@ -218,6 +253,28 @@ function ItemLeading(props: MenuIconProps): JSX.Element {
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "mirror"),
+    });
+}
+
+/** An item's text: its label and supporting text. */
+function ItemContent(props: MenuPartProps): JSX.Element {
+    const { scope } = context.use("ItemContent");
+    itemContext.use("ItemContent");
+    return scope.render("itemContent", {
+        element: "span",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
+
+/** A line under an item's label. */
+function ItemSupportingText(props: MenuPartProps): JSX.Element {
+    const { scope } = context.use("ItemSupportingText");
+    itemContext.use("ItemSupportingText");
+    return scope.render("itemSupportingText", {
+        element: "span",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
     });
 }
 
@@ -272,9 +329,10 @@ const READY_MADE_PROPS = [
 ] as const;
 
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
- *  item per entry of `items`. */
+ *  item per entry of `items`, then a group per entry of `groups`. */
 function ReadyMade(props: MenuProps): JSX.Element {
     const items = () => props.items ?? [];
+    const groups = () => props.groups ?? [];
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
     const root = slots("root") as object;
@@ -282,49 +340,76 @@ function ReadyMade(props: MenuProps): JSX.Element {
     const positioner = slots("positioner");
     const content = slots("content");
     // Views, so every item reads the same ones.
+    const itemGroup = slots("itemGroup");
+    const itemGroupLabel = slots("itemGroupLabel");
     const itemSlot = slots("item");
     const itemLeading = slots("itemLeading");
+    const itemContent = slots("itemContent");
     const itemLabel = slots("itemLabel");
+    const itemSupportingText = slots("itemSupportingText");
     const itemTrailing = slots("itemTrailing");
     const itemTrailingText = slots("itemTrailingText");
+    const renderItems = (list: () => readonly MenuItem<JSX.Element>[]) => (
+        <For each={list()} keyed={(item: MenuItem<JSX.Element>) => item.value}>
+            {(item) => (
+                <Item {...menuItemProps(item())} {...itemSlot}>
+                    <Show when={isPresent(item().leadingIcon)}>
+                        <ItemLeading
+                            mirror={item().mirrorLeadingIcon}
+                            {...itemLeading}
+                        >
+                            {item().leadingIcon}
+                        </ItemLeading>
+                    </Show>
+                    <ItemContent {...itemContent}>
+                        <ItemLabel {...itemLabel}>{item().label}</ItemLabel>
+                        <Show when={isPresent(item().supportingText)}>
+                            <ItemSupportingText {...itemSupportingText}>
+                                {item().supportingText}
+                            </ItemSupportingText>
+                        </Show>
+                    </ItemContent>
+                    <Show when={isPresent(item().trailingIcon)}>
+                        <ItemTrailing
+                            mirror={item().mirrorTrailingIcon}
+                            {...itemTrailing}
+                        >
+                            {item().trailingIcon}
+                        </ItemTrailing>
+                    </Show>
+                    <Show when={isPresent(item().trailingText)}>
+                        <ItemTrailingText {...itemTrailingText}>
+                            {item().trailingText}
+                        </ItemTrailingText>
+                    </Show>
+                </Item>
+            )}
+        </For>
+    );
     return (
-        <Root {...own} {...root}>
+        <Root {...own} grouped={menuGrouped(props) || props.grouped} {...root}>
             <Show when={isPresent(props.trigger)}>
                 <Trigger as={Button} label={props.trigger} {...trigger} />
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
+                    {renderItems(items)}
                     <For
-                        each={items()}
-                        keyed={(item: MenuItem<JSX.Element>) => item.value}
+                        each={groups()}
+                        keyed={(group: MenuGroup<JSX.Element>) => group.id}
                     >
-                        {(item) => (
-                            <Item {...menuItemProps(item())} {...itemSlot}>
-                                <Show when={isPresent(item().leadingIcon)}>
-                                    <ItemLeading
-                                        mirror={item().mirrorLeadingIcon}
-                                        {...itemLeading}
+                        {(group) => (
+                            <ItemGroup {...itemGroup} id={group().id}>
+                                <Show when={isPresent(group().label)}>
+                                    <ItemGroupLabel
+                                        htmlFor={group().id}
+                                        {...itemGroupLabel}
                                     >
-                                        {item().leadingIcon}
-                                    </ItemLeading>
+                                        {group().label}
+                                    </ItemGroupLabel>
                                 </Show>
-                                <ItemLabel {...itemLabel}>
-                                    {item().label}
-                                </ItemLabel>
-                                <Show when={isPresent(item().trailingIcon)}>
-                                    <ItemTrailing
-                                        mirror={item().mirrorTrailingIcon}
-                                        {...itemTrailing}
-                                    >
-                                        {item().trailingIcon}
-                                    </ItemTrailing>
-                                </Show>
-                                <Show when={isPresent(item().trailingText)}>
-                                    <ItemTrailingText {...itemTrailingText}>
-                                        {item().trailingText}
-                                    </ItemTrailingText>
-                                </Show>
-                            </Item>
+                                {renderItems(() => group().items)}
+                            </ItemGroup>
                         )}
                     </For>
                 </Content>
@@ -336,15 +421,20 @@ function ReadyMade(props: MenuProps): JSX.Element {
 /** Material's menu. Use it ready-made, `<Menu trigger="Edit" items={[{ value: "cut", label:
  *  "Cut" }, …]} onSelect={…} />`, or compose its parts under `Menu.Root`: `Trigger` (`as={Button}`
  *  draws it as a button), then `Positioner` holding `Content`, with an `Item` per entry holding
- *  `ItemLeading`, `ItemLabel`, `ItemTrailing`, and `ItemTrailingText`. */
+ *  `ItemLeading`, `ItemContent` (holding `ItemLabel` and `ItemSupportingText`), `ItemTrailing`,
+ *  and `ItemTrailingText`. Items can sit in an `ItemGroup`, named by an `ItemGroupLabel`. */
 export const Menu = Object.assign(ReadyMade, {
     Root,
     Trigger,
     Positioner,
     Content,
+    ItemGroup,
+    ItemGroupLabel,
     Item,
     ItemLeading,
+    ItemContent,
     ItemLabel,
+    ItemSupportingText,
     ItemTrailing,
     ItemTrailingText,
 });

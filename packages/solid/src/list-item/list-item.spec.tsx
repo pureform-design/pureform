@@ -1,4 +1,4 @@
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { testIds } from "@pureform/anatomy";
 import { createSignal, createStore, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
 
@@ -53,6 +53,22 @@ describe("ListItem", () => {
         expect(root.getAttribute("href")).toBe("#inbox");
         expect(root.getAttribute("aria-current")).toBe("page");
         expect(root.className).toContain("list-item--interactive-true");
+    });
+
+    it("takes its leading type and position, off its element", async () => {
+        withRegistry(() => (
+            <ListItem
+                headline="Inbox"
+                leadingType="thumbnail"
+                position="first"
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        expect(root.className).toContain("list-item--leadingType-thumbnail");
+        expect(root.className).toContain("list-item--position-first");
+        expect(root.hasAttribute("position")).toBe(false);
+        expect(root.hasAttribute("leadingtype")).toBe(false);
     });
 
     it("is a disabled button with as", async () => {
@@ -170,11 +186,11 @@ describe("List", () => {
             />
         ));
         await settle();
-        const root = byTestId(compositeTestIds.list.root);
+        const root = byTestId(testIds.list.root);
         expect(root.tagName).toBe("UL");
-        expect(root.className).toBe("");
+        expect(root.className).toBe("list");
         const wrappers = document.querySelectorAll(
-            `[data-testid="${compositeTestIds.list.item}"]`,
+            `[data-testid="${testIds.list.item}"]`,
         );
         expect(wrappers).toHaveLength(2);
         expect(wrappers[0]!.tagName).toBe("LI");
@@ -186,6 +202,59 @@ describe("List", () => {
         );
     });
 
+    it("gives a segmented list's items their positions, an item's own winning", async () => {
+        withRegistry(() => (
+            <List
+                variant="segmented"
+                leadingType="avatar"
+                items={[
+                    { headline: "Inbox", testId: "inbox" },
+                    { headline: "Sent", testId: "sent" },
+                    {
+                        headline: "Drafts",
+                        testId: "drafts",
+                        position: "single",
+                    },
+                    { headline: "Trash", testId: "trash" },
+                ]}
+            />
+        ));
+        await settle();
+        expect(byTestId(testIds.list.root).className).toBe(
+            "list list--variant-segmented",
+        );
+        const position = (id: string) =>
+            byTestId(`${id}-root`).className.match(
+                /list-item--position-(\w+)/,
+            )?.[1];
+        expect(["inbox", "sent", "drafts", "trash"].map(position)).toEqual([
+            "first",
+            "middle",
+            "single",
+            "last",
+        ]);
+        expect(byTestId("inbox-root").className).toContain(
+            "list-item--leadingType-avatar",
+        );
+    });
+
+    it("gives a lone segmented item the single position, and none outside a segmented list", async () => {
+        withRegistry(() => (
+            <>
+                <List
+                    variant="segmented"
+                    items={[{ headline: "Only", testId: "only" }]}
+                />
+                <List items={[{ headline: "Plain", testId: "plain" }]} />
+            </>
+        ));
+        await settle();
+        expect(byTestId("only-root").className).toContain(
+            "list-item--position-single",
+        );
+        expect(byTestId("plain-root").className).not.toContain("position");
+    });
+
     it("keeps an item's row while its value stays, and updates it", async () => {
         const [items, setItems] = createSignal([
             { value: "inbox", headline: "Inbox" },
@@ -195,7 +264,7 @@ describe("List", () => {
         await settle();
         const rows = () => [
             ...document.querySelectorAll<HTMLElement>(
-                `[data-testid="${compositeTestIds.list.item}"]`,
+                `[data-testid="${testIds.list.item}"]`,
             ),
         ];
         const [inbox, sent] = rows();
