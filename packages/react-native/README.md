@@ -54,6 +54,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `button/`, `chip/`, `icon-button/`, `fab/`, `card/`                     | One subpath each: the component's file and its `index.ts`                                                                 |
 | `checkbox/`, `switch/`, `radio-group/`, `slider/`                       | Controls                                                                                                                  |
 | `text-input.tsx`, `text-field/`, `text-area/`, `select/`, `search-bar/` | The text inputs; the field they share (prefix and suffix text, `counterMax`'s counter, and `secure`'s visibility toggle)  |
+| `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)   |
 | `navigation.tsx`, `tabs/`, `navigation-bar/`, `navigation-rail/`        | Tabs and navigation, sharing one file                                                                                     |
 | `list/`, `list-item/`, `menu/`, `dialog/`, `snackbar/`, `tooltip/`      | Lists and overlays: each surface, and the ready-made overlay (`snackbar/queue.tsx`: `useSnackbar`)                        |
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                         |
