@@ -77,7 +77,7 @@ contexts exist.
   ([guidelines §5](../design/component-guidelines.md#5-theme-conformance)).
 - Deprecated options are removed when the new version has an equivalent, naming the
   replacement; those without one stay as variants
-  ([guidelines §3](../design/component-guidelines.md)).
+  ([guidelines §3](../design/component-guidelines.md#3-deciding-what-a-component-is)).
 - Nothing is copied from the sources: they are open-source docs and public APIs we read
   ([guidelines §1](../design/component-guidelines.md#1-sources-and-provenance)).
 - A phase is done only when `omni run build test -f all -o continue` passes, the type check
