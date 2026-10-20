@@ -52,6 +52,7 @@ import {
     iconBox,
     iconFill,
     inputText,
+    DEFAULT_GROUP,
     DENSITY_TOKEN,
     densityTokenVariant,
     colorVariant,
@@ -149,6 +150,16 @@ export const AFFIX_FIELD_STRUCTURE: {
 
 /** The slots a counter adds after the supporting text: the row holding both, and the counter. */
 export const COUNTER_SLOTS = ["supportingRow", "counter"] as const;
+
+/** How a counter's slots nest: the root holds the container and the supporting row, which
+ *  holds the supporting text and the counter. Spread over the field's own structure. */
+export const COUNTER_STRUCTURE = {
+    root: ["container", "supportingRow"],
+    supportingRow: ["supportingText", "counter"],
+} satisfies Record<
+    string,
+    (typeof COUNTER_SLOTS | typeof FIELD_SLOTS)[number][]
+>;
 
 /** The tokens a prefix and a suffix add. `prefixed` and `suffixed` are the 0/1 flags the
  *  `prefixText` and `suffixText` variants set: the input hands its inline padding on that side
@@ -607,3 +618,61 @@ export const counterParts = (ref: (token: FieldToken) => AliasNode) =>
             paddingInlineEnd: ref("paddingInline"),
         },
     }) satisfies Record<string, StyleMap>;
+
+/** A single-line field with a prefix and a suffix (the text field and the select), over a text
+ *  input's tokens with `AFFIX_TOKENS`: `fieldParts` at a centered resting label with the icons'
+ *  room on the input and density, and `affixParts` merged into it. `parts` builds its recipe
+ *  pieces for the given groups and density steps: the merged `base` (the container sized by
+ *  density), and `variants` and `defaultVariants` up to the affixes, after which the component
+ *  adds its own and then `density`'s. */
+export const affixField = (
+    ref: (token: FieldToken | AffixToken) => AliasNode,
+) => {
+    const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
+        labelRest: pct(50),
+        iconRoom: "input",
+        density: true,
+    });
+    const affixes = affixParts(ref, variant);
+    const parts = (groups: ColorGroups, densities: Densities) => {
+        const density = densityParts(densities);
+        return {
+            density,
+            base: {
+                ...base,
+                ...icons.base,
+                ...affixes.base,
+                container: {
+                    ...base.container,
+                    ...affixes.base.container,
+                    height: density.height,
+                },
+                input: {
+                    ...base.input,
+                    ...affixes.base.input,
+                    height: pct(100),
+                },
+            },
+            variants: {
+                variant: {
+                    filled: { ...variant.filled, ...affixes.variant.filled },
+                    outlined: {
+                        ...variant.outlined,
+                        ...affixes.variant.outlined,
+                    },
+                },
+                color: colors(groups).color,
+                ...affixes.icons,
+                ...affixes.variants,
+            },
+            compoundVariants: [...icons.compoundVariants],
+            defaultVariants: {
+                color: DEFAULT_GROUP,
+                variant: "filled" as const,
+                ...icons.defaultVariants,
+                ...affixes.defaultVariants,
+            },
+        };
+    };
+    return { base, icons, parts };
+};

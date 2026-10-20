@@ -35,6 +35,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import {
     COUNTER_SLOTS,
+    COUNTER_STRUCTURE,
     FIELD_SLOTS,
     FIELD_STRUCTURE,
     counterParts,
@@ -116,11 +117,7 @@ export const createTextArea = <
             },
             tokens,
             slots: [...FIELD_SLOTS, ...COUNTER_SLOTS],
-            structure: {
-                ...FIELD_STRUCTURE,
-                root: ["container", "supportingRow"],
-                supportingRow: ["supportingText", "counter"],
-            },
+            structure: { ...FIELD_STRUCTURE, ...COUNTER_STRUCTURE },
             variants: {
                 color: groups as ColorGroups,
                 leadingIcon: ["true", "false"],

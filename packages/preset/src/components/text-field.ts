@@ -28,7 +28,7 @@
 // the text.
 
 import { typed } from "@pureform/core";
-import { pct, pointer, px, transparent } from "@pureform/core/ast";
+import { pointer, px, transparent } from "@pureform/core/ast";
 import { radius } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
@@ -38,9 +38,9 @@ import {
     AFFIX_FIELD_STRUCTURE,
     AFFIX_TOKENS,
     COUNTER_SLOTS,
-    affixParts,
+    COUNTER_STRUCTURE,
+    affixField,
     counterParts,
-    fieldParts,
     fieldTokens,
 } from "./field";
 import {
@@ -55,12 +55,7 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
 const { tokens, ref } = fieldTokens("textField", AFFIX_TOKENS);
 
-const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
-    labelRest: pct(50),
-    iconRoom: "input",
-    density: true,
-});
-const affixes = affixParts(ref, variant);
+const field = affixField(ref);
 const counter = counterParts(ref);
 
 // The secure field's trailing icon is a button that shows or hides the text: no button chrome,
@@ -88,8 +83,7 @@ export const createTextField = <
     groups: ColorGroups<G> = defaultGroups(),
     densities: Densities<D> = defaultDensities(),
 ) => {
-    const color = colors(groups);
-    const density = densityParts(densities);
+    const { density, ...parts } = field.parts(groups, densities);
     return variantsOf<{
         color: G | typeof DEFAULT_GROUP;
         density: "inherit" | D;
@@ -102,11 +96,7 @@ export const createTextField = <
             },
             tokens,
             slots: [...AFFIX_FIELD_SLOTS, ...COUNTER_SLOTS],
-            structure: {
-                ...AFFIX_FIELD_STRUCTURE,
-                root: ["container", "supportingRow"],
-                supportingRow: ["supportingText", "counter"],
-            },
+            structure: { ...AFFIX_FIELD_STRUCTURE, ...COUNTER_STRUCTURE },
             variants: {
                 variant: ["filled", "outlined"],
                 color: groups as ColorGroups,
@@ -119,51 +109,24 @@ export const createTextField = <
             },
             recipe: () => ({
                 base: {
-                    ...base,
-                    ...icons.base,
-                    ...affixes.base,
+                    ...parts.base,
                     ...counter,
-                    container: {
-                        ...base.container,
-                        ...affixes.base.container,
-                        height: density.height,
-                    },
-                    input: {
-                        ...base.input,
-                        ...affixes.base.input,
-                        height: pct(100),
-                    },
                     supportingText: {
-                        ...base.supportingText,
+                        ...field.base.supportingText,
                         ...counter.supportingText,
                     },
                 },
                 variants: {
-                    variant: {
-                        filled: {
-                            ...variant.filled,
-                            ...affixes.variant.filled,
-                        },
-                        outlined: {
-                            ...variant.outlined,
-                            ...affixes.variant.outlined,
-                        },
-                    },
-                    color: color.color,
-                    ...affixes.icons,
-                    ...affixes.variants,
+                    ...parts.variants,
                     secure: {
                         true: { trailingIcon: visibilityToggle },
                         false: {},
                     },
                     ...density.variants,
                 },
-                compoundVariants: [...icons.compoundVariants],
+                compoundVariants: parts.compoundVariants,
                 defaultVariants: {
-                    color: DEFAULT_GROUP,
-                    variant: "filled",
-                    ...icons.defaultVariants,
-                    ...affixes.defaultVariants,
+                    ...parts.defaultVariants,
                     secure: "false",
                     ...density.defaultVariants,
                 },
