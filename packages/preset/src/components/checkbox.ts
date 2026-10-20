@@ -33,9 +33,10 @@ import {
     transform,
     translateY,
     add,
+    mul,
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
-import { size as sizeToken } from "@pureform/theme";
+import { radius, size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
@@ -72,7 +73,8 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 const { tokens, ref } = componentTokens("checkbox", {
     size: sizeToken("controlMedium"),
     boxSize: px(18),
-    boxRadius: px(2),
+    // Half the theme's extra-small corner (2px in Material), so a shape theme rounds it too.
+    boxRadius: mul(radius("extraSmall"), unitless(0.5)),
     borderWidth: px(2),
     // The check is an L of two borders turned 45 degrees; the dash is a bar.
     checkWidth: px(6),
