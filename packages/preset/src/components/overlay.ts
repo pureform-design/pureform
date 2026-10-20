@@ -83,18 +83,27 @@ export interface OverlayMotion {
 
 const FADES = new Set([FADE_IN, FADE_OUT]);
 
+/** One run of a keyframes over the theme's duration and easing; `forwards` holds the last frame
+ *  (an exit that stays gone until the overlay hides). Shared by every overlay's motion. */
+export const motionAnimation = (
+    name: string,
+    time: DurationRole,
+    curve: EasingRole,
+    fillMode: "none" | "forwards" = "none",
+) =>
+    animation({
+        name,
+        duration: duration(time),
+        easing: easing(curve),
+        ...(fillMode === "forwards" ? { fillMode } : {}),
+    });
+
 const step = (
     { keyframes, duration: time, easing: curve }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
-    const run = (name: string) =>
-        animation({
-            name,
-            duration: duration(time),
-            easing: easing(curve),
-            ...(fillMode === "forwards" ? { fillMode } : {}),
-        });
+    const run = (name: string) => motionAnimation(name, time, curve, fillMode);
     if (FADES.has(keyframes)) return run(keyframes);
     return when("reducedMotion", run(fade), run(keyframes));
 };

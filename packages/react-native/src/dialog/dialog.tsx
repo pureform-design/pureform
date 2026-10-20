@@ -11,22 +11,14 @@ import type { PartName, TestIdOverride } from "@pureform/anatomy";
 import { dialogSelection, isPresent } from "@pureform/binding-core";
 import type { ChangeDetails, DialogVariantProps } from "@pureform/binding-core";
 import type { ReactNode } from "react";
-import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { StyleSheet } from "react-native";
 
 import { Button } from "../button/button";
 import { IconSlot, iconSlot } from "../icon-style";
-import { useLayer } from "../layer";
-import { dismissTopOverlay, useDismiss } from "../overlay";
-import {
-    testIdOf,
-    useControllable,
-    useStableCallback,
-    withEngine,
-} from "../parts";
-import { PortalHost } from "../portal-host";
-import { useOverlayPresence, usePresence } from "../presence";
+import { ModalScrimLayer, ModalWindow, useModalOverlay } from "../modal";
+import { testIdOf, withEngine } from "../parts";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
-import { Scrim } from "../single-part";
 import { useComponentSlots } from "../styles";
 
 /** The dialog's parts this binding renders. */
@@ -145,37 +137,14 @@ function ModalDialog(props: DialogProps): ReactNode {
     const {
         trigger,
         open: _open,
-        defaultOpen,
-        onOpenChange,
+        defaultOpen: _defaultOpen,
+        onOpenChange: _onOpenChange,
         closeOnInteractOutside,
-        closeOnEscape = true,
+        closeOnEscape: _closeOnEscape,
         actions,
         ...surface
     } = props;
-    const engine = useEngine();
-    const [open, setOpen] = useControllable(
-        "Dialog",
-        "open",
-        props.open,
-        defaultOpen,
-        onOpenChange,
-        false,
-    );
-    const presence = usePresence(open, "dialog");
-    // The scrim takes its layer in its own style, and React Native's `zIndex` only orders
-    // siblings, so the dialog's wrapper beside it takes the dialog's layer to draw over it.
-    const layer = useLayer("dialog");
-    const close = useStableCallback(() => {
-        if (open) setOpen(false);
-    });
-    const show = useStableCallback(() => {
-        if (!open) setOpen(true);
-    });
-    // Escape and the back button close the topmost overlay: a menu opened in the dialog first,
-    // then the dialog, unless it keeps them from closing it.
-    useDismiss(open, () => {
-        if (closeOnEscape) close();
-    });
+    const { open, presence, close, show } = useModalOverlay("Dialog", props);
     const outside = closeOnInteractOutside ?? props.role !== "alertdialog";
     const given: DialogTriggerProps = {
         onPress: show,
@@ -188,51 +157,23 @@ function ModalDialog(props: DialogProps): ReactNode {
             ) : (
                 <Button label={trigger} onPress={show} />
             )}
-            <Modal
-                transparent
-                visible={presence.present}
-                animationType="none"
-                statusBarTranslucent
-                navigationBarTranslucent
-                onRequestClose={() => {
-                    dismissTopOverlay();
-                }}
-            >
-                <PortalHost>
-                    <View style={StyleSheet.absoluteFill}>
-                        <Scrim open={open} />
-                        <Pressable
-                            accessible={false}
-                            focusable={false}
-                            style={StyleSheet.absoluteFill}
-                            {...(outside ? { onPress: close } : {})}
-                        />
-                        <View
-                            pointerEvents="box-none"
-                            aria-modal
-                            style={[styles.positioner, { zIndex: layer }]}
-                        >
-                            <engine.View
-                                {...presence.props}
-                                style={{
-                                    // A closing dialog takes no more presses.
-                                    pointerEvents: open ? "auto" : "none",
-                                    ...presence.style,
-                                }}
-                            >
-                                <Surface
-                                    {...surface}
-                                    actions={
-                                        typeof actions === "function"
-                                            ? actions({ close })
-                                            : actions
-                                    }
-                                />
-                            </engine.View>
-                        </View>
-                    </View>
-                </PortalHost>
-            </Modal>
+            <ModalWindow visible={presence.present}>
+                <ModalScrimLayer
+                    open={open}
+                    presence={presence}
+                    onPressOutside={outside ? close : undefined}
+                    positionerStyle={styles.positioner}
+                >
+                    <Surface
+                        {...surface}
+                        actions={
+                            typeof actions === "function"
+                                ? actions({ close })
+                                : actions
+                        }
+                    />
+                </ModalScrimLayer>
+            </ModalWindow>
         </>
     );
 }

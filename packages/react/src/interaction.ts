@@ -15,6 +15,7 @@ import { normalizeProps } from "@zag-js/react";
 import { useEffect, useRef, useState } from "react";
 
 import { isServer } from "./env";
+import { combinePartProps } from "./props";
 
 /** A component's source: the app's when it passes one, else its own (none on the server). Pass it
  *  to the machine as `interactionSource` and to `useComponent`. */
@@ -91,4 +92,31 @@ export function useInteractionHandlers(
         disabled,
         normalizeProps,
     ) as Readonly<Record<string, unknown>>;
+}
+
+type Dict = Readonly<Record<string, unknown>>;
+
+/** What a plain button part takes: the app's source, and its own `unstyled`. */
+export interface MachineButtonProps {
+    readonly interactionSource?: MutableInteractionSource | undefined;
+    readonly unstyled?: boolean | undefined;
+}
+
+/** How a plain `<button>` part renders when no machine emits its interactions (a snackbar's and a
+ *  toast's buttons, the split button's leading button, a chip's remove button): its own source,
+ *  the handlers that emit to it, and `machine`'s props before them. Pass it to `scope.render`. */
+export function useMachineButton(
+    { unstyled, interactionSource, ...props }: MachineButtonProps,
+    machine: readonly (Dict | undefined)[],
+    disabled = false,
+) {
+    const source = useOwnInteractionSource(interactionSource);
+    const handlers = useInteractionHandlers(source, disabled);
+    return {
+        element: "button",
+        interactionSource: source,
+        machine: combinePartProps([...machine, handlers]),
+        unstyled,
+        props,
+    } as const;
 }

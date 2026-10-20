@@ -23,11 +23,7 @@ import { type ElementType, type ReactNode, useId } from "react";
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
-import {
-    useInteractionHandlers,
-    useItemInteractionSources,
-    useOwnInteractionSource,
-} from "../interaction";
+import { useItemInteractionSources, useMachineButton } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
@@ -35,7 +31,7 @@ import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
-import { combinePartProps, omitProps } from "../props";
+import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -164,24 +160,14 @@ function ItemLabel({ unstyled, ...props }: FabMenuPartProps): ReactNode {
 }
 
 /** The FAB, which opens the menu and, while it's open, closes it: name it with `aria-label`. */
-function CloseTrigger({
-    unstyled,
-    interactionSource,
-    ...props
-}: FabMenuCloseTriggerProps): ReactNode {
+function CloseTrigger(props: FabMenuCloseTriggerProps): ReactNode {
     const { scope, api } = context.use("CloseTrigger");
-    const source = useOwnInteractionSource(interactionSource);
-    const handlers = useInteractionHandlers(source, false);
-    return scope.render("closeTrigger", {
-        element: "button",
-        interactionSource: source,
-        machine: combinePartProps([
+    return scope.render(
+        "closeTrigger",
+        useMachineButton(props, [
             api.getTriggerProps() as Readonly<Record<string, unknown>>,
-            handlers,
         ]),
-        unstyled,
-        props,
-    });
+    );
 }
 
 /** The FAB's icon: `icon` while the menu is closed, `closeIcon` (or a cross) while it's open. */

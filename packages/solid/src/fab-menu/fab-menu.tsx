@@ -31,11 +31,7 @@ import {
 
 import { useControllable } from "../controllable";
 import { CloseIcon } from "../glyphs";
-import {
-    itemInteractionSources,
-    useInteractionHandlers,
-    useOwnInteractionSource,
-} from "../interaction";
+import { itemInteractionSources, useMachineButton } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -44,7 +40,6 @@ import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
-import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -190,19 +185,12 @@ function ItemLabel(props: FabMenuPartProps): JSX.Element {
 /** The FAB, which opens the menu and, while it's open, closes it: name it with `aria-label`. */
 function CloseTrigger(props: FabMenuCloseTriggerProps): JSX.Element {
     const { scope, api } = context.use("CloseTrigger");
-    const source = useOwnInteractionSource(() => props.interactionSource);
-    const handlers = useInteractionHandlers(source, () => false);
-    return scope.render("closeTrigger", {
-        element: "button",
-        interactionSource: source,
-        machine: () =>
-            combinePartProps([
-                api().getTriggerProps() as Readonly<Record<string, unknown>>,
-                handlers(),
-            ]),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
-    });
+    return scope.render(
+        "closeTrigger",
+        useMachineButton(props, () => [
+            api().getTriggerProps() as Readonly<Record<string, unknown>>,
+        ]),
+    );
 }
 
 /** The ready-made FAB menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part,

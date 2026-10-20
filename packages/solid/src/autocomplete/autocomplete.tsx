@@ -19,13 +19,11 @@ import {
     autocompleteSupportingTextId,
     autocompleteTriggerProps,
     isPresent,
-    presentProps,
     SELECT_COLLECTION,
     SELECT_CONTENT_PROPS,
     SELECT_INPUT_LABEL_PROPS,
     selectGroupedItems,
     selectItemGroups,
-    selectPositionerProps,
     selectValueProps,
     toZagValue,
 } from "@pureform/binding-core";
@@ -43,7 +41,6 @@ import {
     createSignal,
     createUniqueId,
     For,
-    merge,
     omit,
     Show,
     untrack,
@@ -51,17 +48,21 @@ import {
 
 import { useControllable } from "../controllable";
 import { useFieldsetDisabled, useFormReset } from "../form";
+import { DropDownArrow } from "../glyphs";
 import { itemInteractionSources } from "../interaction";
 import type { ItemInteractionSources } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
+import type { PartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { selectFieldParts } from "../select-field-parts";
+import type { SelectFieldContext } from "../select-field-parts";
 
 type Anatomy = typeof autocompleteAnatomy;
 type MenuAnatomy = typeof autocompleteMenuAnatomy;
@@ -266,43 +267,36 @@ function Input(props: AutocompletePartProps): JSX.Element {
     });
 }
 
+const field = selectFieldParts(
+    context as unknown as PartContext<SelectFieldContext>,
+    itemContext,
+);
+
 /** The floating label. */
-function Label(props: AutocompletePartProps): JSX.Element {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: () => api().getLabelProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const Label: (props: AutocompletePartProps) => JSX.Element = field.Label;
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-function LeadingIcon(props: AutocompleteIconProps): JSX.Element {
-    const { scope } = context.use("LeadingIcon");
-    return scope.render("leadingIcon", {
-        element: "span",
-        machine: () => ({ "aria-hidden": "true" }),
-        states: () => ({ mirrored: props.mirror }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "mirror"),
-    });
-}
-
-const affix = (part: "prefixText" | "suffixText", name: string) =>
-    function Affix(props: AutocompletePartProps): JSX.Element {
-        const { scope } = context.use(name);
-        return scope.render(part, {
-            element: "span",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const LeadingIcon: (props: AutocompleteIconProps) => JSX.Element =
+    field.LeadingIcon;
 
 /** Text before the input's, shown once the label floats. Turn on Root's `prefixText` with it. */
-const PrefixText = affix("prefixText", "PrefixText");
+const PrefixText: (props: AutocompletePartProps) => JSX.Element =
+    field.PrefixText;
 /** Text after the input's, shown once the label floats. Turn on Root's `suffixText` with it. */
-const SuffixText = affix("suffixText", "SuffixText");
+const SuffixText: (props: AutocompletePartProps) => JSX.Element =
+    field.SuffixText;
+
+/** Helper text under the field. With an `error`, it shows the error instead. */
+const SupportingText: (props: AutocompletePartProps) => JSX.Element =
+    field.SupportingText;
+
+/** Places the list under the field; hidden once it's closed and its exit animation is over. The
+ *  registry doesn't style it. */
+const Positioner: (props: AutocompletePartProps) => JSX.Element =
+    field.Positioner;
+
+/** The list of suggestions, drawn as a menu. It stays while its exit animation runs. */
+const Content: (props: AutocompletePartProps) => JSX.Element = field.Content;
 
 /** The arrow at the end, which opens or closes the list and turns over while it's open. It
  *  isn't in the tab order: the input has the keys. */
@@ -317,52 +311,6 @@ function TrailingIcon(props: AutocompleteIconProps): JSX.Element {
     });
 }
 
-/** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText(props: AutocompletePartProps): JSX.Element {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    const children = {
-        get children() {
-            return errorText() ?? props.children;
-        },
-    };
-    return scope.render("supportingText", {
-        element: "span",
-        machine: () => ({ id: supportingTextId() }),
-        unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), children),
-    });
-}
-
-/** Places the list under the field; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner(props: AutocompletePartProps): JSX.Element {
-    const { menu, api, presence } = context.use("Positioner");
-    return menu.render("positioner", {
-        element: "div",
-        machine: () =>
-            selectPositionerProps(
-                api().getPositionerProps(),
-                presence.present(),
-            ),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
-/** The list of suggestions, drawn as a menu. It stays while its exit animation runs. */
-function Content(props: AutocompletePartProps): JSX.Element {
-    const { menu, api, presence } = context.use("Content");
-    return menu.render("root", {
-        element: "div",
-        ref: presence.ref,
-        machine: () =>
-            presentProps(api().getContentProps(), presence.present()),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
 /** A group's props: its `id`, and a part's. */
 export interface AutocompleteItemGroupProps extends AutocompletePartProps {
     readonly id: string;
@@ -374,75 +322,19 @@ export interface AutocompleteItemGroupLabelProps extends AutocompletePartProps {
 }
 
 /** A group of suggestions, named by the ItemGroupLabel whose `htmlFor` is its `id`. */
-function ItemGroup(props: AutocompleteItemGroupProps): JSX.Element {
-    const { menu, api } = context.use("ItemGroup");
-    return menu.render("itemGroup", {
-        element: "div",
-        machine: () => api().getItemGroupProps({ id: props.id }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "id"),
-    });
-}
+const ItemGroup: (props: AutocompleteItemGroupProps) => JSX.Element =
+    field.ItemGroup;
 
 /** A group's label. */
-function ItemGroupLabel(props: AutocompleteItemGroupLabelProps): JSX.Element {
-    const { menu, api } = context.use("ItemGroupLabel");
-    return menu.render("itemGroupLabel", {
-        element: "div",
-        machine: () => api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "htmlFor"),
-    });
-}
+const ItemGroupLabel: (props: AutocompleteItemGroupLabelProps) => JSX.Element =
+    field.ItemGroupLabel;
 
 /** A suggestion, drawn as a menu item; the highlighted one shows the hover state. */
-function Item(props: AutocompleteItemProps): JSX.Element {
-    const { menu, api, sources } = context.use("Item");
-    const item = () => props.item;
-    const source = sources.item(
-        () => props.item.value,
-        () => props.item.interactionSource,
-    );
-    return (
-        <itemContext.Provider value={{ item }}>
-            {menu.render("item", {
-                element: "div",
-                interactionSource: source,
-                machine: () => api().getItemProps({ item: item() }),
-                states: () => ({
-                    hover: api().getItemState({ item: item() }).highlighted,
-                }),
-                unstyled: () => props.unstyled,
-                props: omit(props, "unstyled", "item"),
-            })}
-        </itemContext.Provider>
-    );
-}
+const Item: (props: AutocompleteItemProps) => JSX.Element = field.Item;
 
 /** A suggestion's label. */
-function ItemLabel(props: AutocompletePartProps): JSX.Element {
-    const { menu, api } = context.use("ItemLabel");
-    const { item } = itemContext.use("ItemLabel");
-    return menu.render("itemLabel", {
-        element: "span",
-        machine: () => api().getItemTextProps({ item: item() }),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
-
-/** The arrow the ready-made autocomplete shows unless given another. */
-const DropDownArrow = (): JSX.Element => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
+const ItemLabel: (props: AutocompletePartProps) => JSX.Element =
+    field.ItemLabel;
 
 /** The ready-made autocomplete's props: Root's, with `class`, `style`, and `slotProps` keyed by
  *  the field's parts, and the label, supporting text, and icons as content. `aria-label`,

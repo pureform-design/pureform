@@ -416,3 +416,35 @@ export function useAnchoredOverlay(
     useDismiss(open, close);
     return { open, source, measured, presence, close, toggle };
 }
+
+/** A notification's timer (the snackbar's, a toast's): while `open`, `onTimeout` runs once
+ *  `duration` ms pass, unless the pointer hovers it or a press holds it, which starts the time
+ *  over. An infinite or `null` duration never runs out. Spread `holdProps` on a `Pressable` around
+ *  the notification. */
+export function useHeldTimeout(
+    open: boolean,
+    duration: number | null,
+    onTimeout: () => void,
+) {
+    const [hovered, setHovered] = useState(false);
+    const [pressed, setPressed] = useState(false);
+    const held = hovered || pressed;
+    const timeout = useStableCallback(onTimeout);
+    useEffect(() => {
+        if (!open || held || duration === null || !Number.isFinite(duration)) {
+            return undefined;
+        }
+        const timer = setTimeout(timeout, duration);
+        return () => clearTimeout(timer);
+    }, [open, held, duration, timeout]);
+    return {
+        holdProps: {
+            accessible: false,
+            focusable: false,
+            onHoverIn: () => setHovered(true),
+            onHoverOut: () => setHovered(false),
+            onPressIn: () => setPressed(true),
+            onPressOut: () => setPressed(false),
+        },
+    } as const;
+}

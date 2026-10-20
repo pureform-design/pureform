@@ -19,8 +19,10 @@ import type {
 } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
+import { DropDownArrow } from "../glyphs";
 import {
     useInteractionHandlers,
+    useMachineButton,
     useOwnInteractionSource,
 } from "../interaction";
 import { Menu } from "../menu";
@@ -97,24 +99,16 @@ function Root(props: SplitButtonRootProps): ReactNode {
 }
 
 /** The leading button, a `<button>` for the main action. */
-function LeadingButton({
-    unstyled,
-    interactionSource,
-    ...props
-}: SplitButtonButtonProps): ReactNode {
+function LeadingButton(props: SplitButtonButtonProps): ReactNode {
     const { scope, disabled } = context.use("LeadingButton");
-    const source = useOwnInteractionSource(interactionSource);
-    const handlers = useInteractionHandlers(source, disabled);
-    return scope.render("leadingButton", {
-        element: "button",
-        interactionSource: source,
-        machine: combinePartProps([
-            { type: "button", disabled: disabled || undefined },
-            handlers,
-        ]),
-        unstyled,
-        props,
-    });
+    return scope.render(
+        "leadingButton",
+        useMachineButton(
+            props,
+            [{ type: "button", disabled: disabled || undefined }],
+            disabled,
+        ),
+    );
 }
 
 /** The trailing button the menu's trigger renders, as its part: the trigger's props, without the
@@ -179,19 +173,6 @@ function SplitButtonMenu(props: SplitButtonPartProps): ReactNode {
     );
 }
 
-/** The arrow the ready-made trailing button shows unless given another icon. */
-const ArrowIcon = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
-
 /** The ready-made split button's props: Root's, with `className`, `style`, and `slotProps` keyed
  *  by part, and the label, icons, and items as content. */
 export interface SplitButtonProps
@@ -230,7 +211,7 @@ function ReadyMade(props: SplitButtonProps): ReactNode {
                 {...slot("trailingButton")}
             >
                 <TrailingIcon {...slot("trailingIcon")}>
-                    {isPresent(trailingIcon) ? trailingIcon : <ArrowIcon />}
+                    {isPresent(trailingIcon) ? trailingIcon : <DropDownArrow />}
                 </TrailingIcon>
             </TrailingButton>
             <SplitButtonMenu>

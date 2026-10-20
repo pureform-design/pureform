@@ -21,8 +21,10 @@ import type {
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, omit } from "solid-js";
 
+import { DropDownArrow } from "../glyphs";
 import {
     useInteractionHandlers,
+    useMachineButton,
     useOwnInteractionSource,
 } from "../interaction";
 import { Menu } from "../menu";
@@ -107,19 +109,14 @@ function Root(props: SplitButtonRootProps): JSX.Element {
 /** The leading button, a `<button>` for the main action. */
 function LeadingButton(props: SplitButtonButtonProps): JSX.Element {
     const { scope, disabled } = context.use("LeadingButton");
-    const source = useOwnInteractionSource(() => props.interactionSource);
-    const handlers = useInteractionHandlers(source, disabled);
-    return scope.render("leadingButton", {
-        element: "button",
-        interactionSource: source,
-        machine: () =>
-            combinePartProps([
-                { type: "button", disabled: disabled() || undefined },
-                handlers(),
-            ]),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled", "interactionSource"),
-    });
+    return scope.render(
+        "leadingButton",
+        useMachineButton(
+            props,
+            () => [{ type: "button", disabled: disabled() || undefined }],
+            disabled,
+        ),
+    );
 }
 
 /** The trailing button the menu's trigger renders, as its part. */
@@ -179,19 +176,6 @@ function SplitButtonMenu(props: SplitButtonPartProps): JSX.Element {
     );
 }
 
-/** The arrow the ready-made trailing button shows unless given another icon. */
-const ArrowIcon = (): JSX.Element => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M7 10l5 5 5-5z" />
-    </svg>
-);
-
 /** The ready-made split button's props: Root's, with `class`, `style`, and `slotProps` keyed by
  *  part, and the label, icons, and items as content. */
 export interface SplitButtonProps
@@ -233,7 +217,7 @@ function ReadyMade(props: SplitButtonProps): JSX.Element {
                     {isPresent(props.trailingIcon) ? (
                         props.trailingIcon
                     ) : (
-                        <ArrowIcon />
+                        <DropDownArrow />
                     )}
                 </TrailingIcon>
             </TrailingButton>
