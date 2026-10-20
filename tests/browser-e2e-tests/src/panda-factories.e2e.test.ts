@@ -308,8 +308,8 @@ describe("instance tokens", () => {
             tokens: { boxSize: "30px" },
         });
         const root = document.createElement("span");
-        root.className = slots.root.class;
-        for (const [property, value] of Object.entries(slots.root.style ?? {}))
+        root.className = slots.root!.class;
+        for (const [property, value] of Object.entries(slots.root!.style ?? {}))
             root.style.setProperty(property, value);
         const box = document.createElement("span");
         box.className = slots.box!.class;
