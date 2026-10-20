@@ -17,42 +17,11 @@
 //     <span class={supportingText}>Helper text</span>
 //   </div>
 
-import { typed } from "@pureform/core";
-import {
-    numeric,
-    pct,
-    rotate,
-    slot,
-    transform,
-    translateY,
-    when,
-} from "@pureform/core/ast";
 import type { MaterialDensity } from "@pureform/theme";
 
-import {
-    AFFIX_FIELD_SLOTS,
-    AFFIX_FIELD_STRUCTURE,
-    AFFIX_TOKENS,
-    affixField,
-    fieldTokens,
-} from "./field";
-import {
-    DEFAULT_GROUP,
-    defaultDensities,
-    defaultGroups,
-    densitySteps,
-    tweens,
-    variantsOf,
-} from "./shared";
+import { selectField } from "./select";
+import { defaultDensities, defaultGroups } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
-
-const { tokens, ref } = fieldTokens("autocomplete", AFFIX_TOKENS);
-
-const field = affixField(ref);
-
-const EXPANDED = slot("container", "expanded");
-
-const pf = typed();
 
 /** Build the autocomplete with a `color` variant per group in `groups`, setting its focus color. */
 export const createAutocomplete = <
@@ -61,62 +30,16 @@ export const createAutocomplete = <
 >(
     groups: ColorGroups<G> = defaultGroups(),
     densities: Densities<D> = defaultDensities(),
-) => {
-    const { density, ...parts } = field.parts(groups, densities);
-    return variantsOf<{
-        color: G | typeof DEFAULT_GROUP;
-        density: "inherit" | D;
-    }>()(
-        pf.slotComponent({
+) =>
+    selectField(
+        {
             name: "autocomplete",
-            $meta: {
-                description:
-                    "Material autocomplete (editable exposed dropdown menu): the select's field over an editable combobox input that filters suggestions. Mark it aria-expanded while its menu is open; render the menu component below. Turn on prefixText or suffixText when you render one.",
-            },
-            tokens,
-            slots: [...AFFIX_FIELD_SLOTS],
-            structure: AFFIX_FIELD_STRUCTURE,
-            variants: {
-                variant: ["filled", "outlined"],
-                color: groups as ColorGroups,
-                leadingIcon: ["true", "false"],
-                trailingIcon: ["true", "false"],
-                prefixText: ["true", "false"],
-                suffixText: ["true", "false"],
-                density: densitySteps<string>(densities),
-            },
-            recipe: () => ({
-                base: {
-                    ...parts.base,
-                    // The arrow turns over while the menu is open.
-                    trailingIcon: {
-                        ...field.icons.base.trailingIcon,
-                        transform: when()
-                            .on(
-                                EXPANDED,
-                                transform(
-                                    translateY(pct(-50)),
-                                    rotate(numeric(180, "deg")),
-                                ),
-                            )
-                            .else(transform(translateY(pct(-50)))),
-                        transition: tweens("transform", "color"),
-                    },
-                },
-                variants: {
-                    ...parts.variants,
-                    ...density.variants,
-                },
-                compoundVariants: parts.compoundVariants,
-                // The arrow is always there: it opens the suggestions.
-                defaultVariants: {
-                    ...parts.defaultVariants,
-                    ...density.defaultVariants,
-                    trailingIcon: "true",
-                },
-            }),
-        }),
+            description:
+                "Material autocomplete (editable exposed dropdown menu): the select's field over an editable combobox input that filters suggestions. Mark it aria-expanded while its menu is open; render the menu component below. Turn on prefixText or suffixText when you render one.",
+            editable: true,
+        },
+        groups,
+        densities,
     );
-};
 
 export const autocomplete = createAutocomplete();

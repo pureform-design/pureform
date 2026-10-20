@@ -5,7 +5,6 @@
 // no motion.
 
 import {
-    animation,
     pct,
     px,
     transform,
@@ -15,8 +14,9 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import { duration, easing } from "@pureform/theme";
 import type { DurationRole, EasingRole } from "@pureform/theme";
+
+import { motionAnimation } from "./overlay";
 
 /** The keyframes the sheets slide with; `pureform()` adds them to the config. */
 export const SHEET_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
@@ -93,18 +93,7 @@ export const SHEET_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
 /** The edge a sheet slides from. */
 export type SheetEdge = "bottom" | "end";
 
-const run = (
-    name: string,
-    time: DurationRole,
-    curve: EasingRole,
-    fillMode: "none" | "forwards",
-) =>
-    animation({
-        name,
-        duration: duration(time),
-        easing: easing(curve),
-        ...(fillMode === "forwards" ? { fillMode } : {}),
-    });
+const run = motionAnimation;
 
 // One way in or out: the slide, its right-to-left form for the end edge, and a fade under reduced
 // motion.
