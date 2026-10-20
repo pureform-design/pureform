@@ -1,0 +1,426 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`autocomplete > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "container": {
+      "display": "flex",
+      "height": "calc(var(--components-autocomplete-height, 56px) + var(--components-autocomplete-densityOffset, token(sizes.densityOffset)))",
+      "position": "relative",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "input": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-autocomplete-inputColor, token(colors.onSurface))",
+      "flexShrink": "1",
+      "height": "100%",
+      "minWidth": "0px",
+      "outlineStyle": "none",
+      "paddingInlineEnd": "calc(var(--components-autocomplete-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-autocomplete-paddingInline, token(spacing.4))) * var(--components-autocomplete-suffixed, 0)))",
+      "paddingInlineStart": "calc(var(--components-autocomplete-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-autocomplete-paddingInline, token(spacing.4))) * var(--components-autocomplete-prefixed, 0)))",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "label": {
+      "color": {
+        ".autocomplete__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "var(--components-autocomplete-focusColor, token(colors.primary))",
+        ".autocomplete__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-autocomplete-errorColor, token(colors.error))",
+        "base": "var(--components-autocomplete-labelColor, token(colors.onSurfaceVariant))",
+      },
+      "fontSize": {
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "token(fontSizes.bodySmall)",
+        ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(fontSizes.bodySmall)",
+        "base": "token(fontSizes.bodyLarge)",
+      },
+      "insetInlineStart": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+      "letterSpacing": {
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "token(letterSpacings.bodySmall)",
+        ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(letterSpacings.bodySmall)",
+        "base": "token(letterSpacings.bodyLarge)",
+      },
+      "lineHeight": {
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "token(lineHeights.bodySmall)",
+        ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(lineHeights.bodySmall)",
+        "base": "token(lineHeights.bodyLarge)",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "textStyle": "bodyLarge",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+    },
+    "leadingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".autocomplete__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-autocomplete-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-autocomplete-iconFill, 0)",
+      "height": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "insetInlineStart": "var(--components-autocomplete-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+    },
+    "prefixText": {
+      "alignItems": "center",
+      "color": {
+        ".autocomplete__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-autocomplete-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "1",
+        ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-autocomplete-affixGap, 2px)",
+      "paddingInlineStart": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "suffixText": {
+      "alignItems": "center",
+      "color": {
+        ".autocomplete__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-autocomplete-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".autocomplete__container:is(:focus-within):is(:focus-within) &": "1",
+        ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-autocomplete-affixGap, 2px)",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "supportingText": {
+      "color": {
+        ".autocomplete__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".autocomplete__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-autocomplete-errorColor, token(colors.error))",
+        "base": "var(--components-autocomplete-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
+    "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".autocomplete__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".autocomplete__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-autocomplete-errorColor, token(colors.error))",
+        "base": "var(--components-autocomplete-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-autocomplete-iconFill, 0)",
+      "height": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "insetInlineEnd": "var(--components-autocomplete-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": {
+        ".autocomplete__container:is([aria-expanded=true], :has([aria-expanded=true])) &": "translateY(-50%) rotate(180deg)",
+        "base": "translateY(-50%)",
+      },
+      "transition": {
+        "_motionReduce": "color token(durations.short3) token(easings.standard)",
+        "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-autocomplete-iconSize, token(sizes.iconMedium))",
+    },
+  },
+  "className": "autocomplete",
+  "compoundVariants": [
+    {
+      "css": {
+        "label": {
+          "insetInlineStart": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-autocomplete-paddingInline, token(spacing.4))",
+            "base": "var(--components-autocomplete-textInsetWithIcon, 52px)",
+          },
+        },
+      },
+      "leadingIcon": true,
+      "variant": "outlined",
+    },
+  ],
+  "defaultVariants": {
+    "color": "primary",
+    "density": "inherit",
+    "leadingIcon": false,
+    "prefixText": false,
+    "suffixText": false,
+    "trailingIcon": true,
+    "variant": "filled",
+  },
+  "jsx": [
+    "Autocomplete",
+  ],
+  "slots": [
+    "root",
+    "container",
+    "leadingIcon",
+    "prefixText",
+    "input",
+    "suffixText",
+    "label",
+    "trailingIcon",
+    "supportingText",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.error)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.info)",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.secondary)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.success)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.tertiary)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-autocomplete-focusColor": "token(colors.warning)",
+        },
+      },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "--components-autocomplete-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-autocomplete-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-autocomplete-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-autocomplete-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-autocomplete-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
+    },
+    "leadingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineStart": "calc(var(--components-autocomplete-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-autocomplete-textInsetWithIcon, 52px)) * var(--components-autocomplete-prefixed, 0)))",
+        },
+        "label": {
+          "insetInlineStart": "var(--components-autocomplete-textInsetWithIcon, 52px)",
+        },
+        "prefixText": {
+          "paddingInlineStart": "var(--components-autocomplete-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "prefixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-autocomplete-prefixed": "1",
+        },
+      },
+    },
+    "suffixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-autocomplete-suffixed": "1",
+        },
+      },
+    },
+    "trailingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineEnd": "calc(var(--components-autocomplete-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-autocomplete-textInsetWithIcon, 52px)) * var(--components-autocomplete-suffixed, 0)))",
+        },
+        "suffixText": {
+          "paddingInlineEnd": "var(--components-autocomplete-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "variant": {
+      "filled": {
+        "container": {
+          "backgroundColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-autocomplete-container, token(colors.surfaceContainerHighest))",
+          },
+          "borderStartEndRadius": "var(--components-autocomplete-radius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-autocomplete-radius, token(radii.extraSmall))",
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "inset 0px calc(var(--components-autocomplete-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-autocomplete-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-autocomplete-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "inset 0px calc(var(--components-autocomplete-indicatorWidth, 1px) * -1) 0px 0px var(--components-autocomplete-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "inset 0px calc(var(--components-autocomplete-indicatorWidth, 1px) * -1) 0px 0px var(--components-autocomplete-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-autocomplete-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-autocomplete-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-autocomplete-indicatorWidth, 1px) * -1) 0px 0px var(--components-autocomplete-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "top": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.2) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.2) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            "base": "50%",
+          },
+          "transform": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "none",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "none",
+            "base": "translateY(-50%)",
+          },
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+      "outlined": {
+        "container": {
+          "borderRadius": "var(--components-autocomplete-radius, token(radii.extraSmall))",
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-autocomplete-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "var(--components-autocomplete-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-autocomplete-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-autocomplete-errorColor, token(colors.error))",
+            "base": "var(--components-autocomplete-outlineColor, token(colors.outline))",
+          },
+          "outlineOffset": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "calc(var(--components-autocomplete-indicatorWidth, 1px) * -1)",
+            "&:is(:focus-within):is(:focus-within)": "calc(var(--components-autocomplete-focusIndicatorWidth, 2px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "calc(var(--components-autocomplete-indicatorWidth, 1px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "calc(var(--components-autocomplete-focusIndicatorWidth, 2px) * -1)",
+            "base": "calc(var(--components-autocomplete-indicatorWidth, 1px) * -1)",
+          },
+          "outlineStyle": "solid",
+          "outlineWidth": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-autocomplete-indicatorWidth, 1px)",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-autocomplete-focusIndicatorWidth, 2px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-autocomplete-indicatorWidth, 1px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-autocomplete-focusIndicatorWidth, 2px)",
+            "base": "var(--components-autocomplete-indicatorWidth, 1px)",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "backgroundColor": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "var(--components-autocomplete-labelBackground, token(colors.surface))",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-autocomplete-labelBackground, token(colors.surface))",
+            "base": "transparent",
+          },
+          "marginInlineStart": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.1) * -1)",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.1) * -1)",
+            "base": "0px",
+          },
+          "paddingInlineEnd": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "paddingInlineStart": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "top": {
+            ".autocomplete__container:is(:focus-within):is(:focus-within) &": "0px",
+            ".autocomplete__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "0px",
+            "base": "50%",
+          },
+          "transform": "translateY(-50%)",
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-autocomplete-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+    },
+  },
+}
+`;

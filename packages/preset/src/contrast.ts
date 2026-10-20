@@ -118,6 +118,13 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("leadingColor"), token("container"), UI_CONTRAST),
         pair(token("trailingColor"), token("container"), UI_CONTRAST),
     ],
+    searchView: [
+        pair(token("inputColor"), token("container"), TEXT_CONTRAST),
+        pair(token("placeholderColor"), token("container"), TEXT_CONTRAST),
+        pair(token("contentColor"), token("container"), TEXT_CONTRAST),
+        pair(token("leadingColor"), token("container"), UI_CONTRAST),
+        pair(token("trailingColor"), token("container"), UI_CONTRAST),
+    ],
     navigationBar: NAV_PAIRS,
     navigationRail: NAV_PAIRS,
     snackbar: [
@@ -140,6 +147,7 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     textField: FIELD_PAIRS,
     textArea: FIELD_PAIRS,
     select: FIELD_PAIRS,
+    autocomplete: FIELD_PAIRS,
     supportingText: [
         pair(token("color"), SURFACE, TEXT_CONTRAST),
         pair(token("errorColor"), SURFACE, TEXT_CONTRAST),

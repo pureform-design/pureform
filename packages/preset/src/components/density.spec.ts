@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
+import { autocomplete } from "./autocomplete";
 import { button } from "./button";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
@@ -25,6 +26,7 @@ describe.each([
     ["radio", radio],
     ["textField", textField],
     ["select", select],
+    ["autocomplete", autocomplete],
     ["tagsInput", tagsInput],
     ["listItem", listItem],
     ["menu", menu],

@@ -1,6 +1,7 @@
 import type { SlottedComponentSpec } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
+import { createAutocomplete } from "./autocomplete";
 import { createCheckbox } from "./checkbox";
 import { createChip } from "./chip";
 import { createInputChip } from "./input-chip";
@@ -31,6 +32,7 @@ describe.each([
     ["textArea", createTextArea],
     ["tagsInput", createTagsInput],
     ["select", createSelect],
+    ["autocomplete", createAutocomplete],
     ["listItem", createListItem],
     ["menu", createMenu],
     ["tabs", createTabs],
