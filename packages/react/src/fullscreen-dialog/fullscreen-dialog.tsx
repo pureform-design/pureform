@@ -36,6 +36,7 @@ import {
 
 import { Button } from "../button";
 import { useControllable } from "../controllable";
+import { CloseIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
@@ -230,19 +231,6 @@ function Body({ unstyled, ...props }: FullscreenDialogPartProps): ReactNode {
         props,
     });
 }
-
-/** The cross the ready-made close trigger shows unless given another icon. */
-const CloseIcon = (): ReactNode => (
-    <svg
-        viewBox="0 0 24 24"
-        width="1em"
-        height="1em"
-        fill="currentColor"
-        aria-hidden="true"
-    >
-        <path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-    </svg>
-);
 
 /** The ready-made dialog's props: Root's, with `className`, `style`, and `slotProps` keyed by
  *  part, the trigger's label, and the close trigger's name and icon, the headline, the confirm
