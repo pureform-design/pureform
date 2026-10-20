@@ -15,19 +15,13 @@ import type {
     FullscreenDialogVariantProps,
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
-import { Modal, ScrollView, StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 
 import { Button } from "../button/button";
 import { IconButton } from "../icon-button/icon-button";
-import { dismissTopOverlay, useDismiss } from "../overlay";
-import {
-    testIdOf,
-    useControllable,
-    useStableCallback,
-    withEngine,
-} from "../parts";
-import { PortalHost } from "../portal-host";
-import { useOverlayPresence, usePresence } from "../presence";
+import { ModalWindow, useModalOverlay } from "../modal";
+import { testIdOf, withEngine } from "../parts";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -167,32 +161,16 @@ function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
     const {
         trigger,
         open: _open,
-        defaultOpen,
-        onOpenChange,
-        closeOnEscape = true,
+        defaultOpen: _defaultOpen,
+        onOpenChange: _onOpenChange,
+        closeOnEscape: _closeOnEscape,
         ...surface
     } = props;
     const engine = useEngine();
-    const [open, setOpen] = useControllable(
+    const { open, presence, close, show } = useModalOverlay(
         "FullscreenDialog",
-        "open",
-        props.open,
-        defaultOpen,
-        onOpenChange,
-        false,
+        props,
     );
-    const presence = usePresence(open, "dialog");
-    const close = useStableCallback(() => {
-        if (open) setOpen(false);
-    });
-    const show = useStableCallback(() => {
-        if (!open) setOpen(true);
-    });
-    // Escape and the back button close the topmost overlay: a menu opened in the dialog first,
-    // then the dialog, unless it keeps them from closing it.
-    useDismiss(open, () => {
-        if (closeOnEscape) close();
-    });
     const given: FullscreenDialogTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",
@@ -204,32 +182,21 @@ function ModalFullscreenDialog(props: FullscreenDialogProps): ReactNode {
             ) : (
                 <Button label={trigger} onPress={show} />
             )}
-            <Modal
-                transparent
-                visible={presence.present}
-                animationType="none"
-                statusBarTranslucent
-                navigationBarTranslucent
-                onRequestClose={() => {
-                    dismissTopOverlay();
-                }}
-            >
-                <PortalHost>
-                    <View aria-modal style={StyleSheet.absoluteFill}>
-                        <engine.View
-                            {...presence.props}
-                            style={{
-                                flex: 1,
-                                // A closing dialog takes no more presses.
-                                pointerEvents: open ? "auto" : "none",
-                                ...presence.style,
-                            }}
-                        >
-                            <Surface {...surface} close={close} />
-                        </engine.View>
-                    </View>
-                </PortalHost>
-            </Modal>
+            <ModalWindow visible={presence.present}>
+                <View aria-modal style={StyleSheet.absoluteFill}>
+                    <engine.View
+                        {...presence.props}
+                        style={{
+                            flex: 1,
+                            // A closing dialog takes no more presses.
+                            pointerEvents: open ? "auto" : "none",
+                            ...presence.style,
+                        }}
+                    >
+                        <Surface {...surface} close={close} />
+                    </engine.View>
+                </View>
+            </ModalWindow>
         </>
     );
 }
