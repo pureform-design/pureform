@@ -116,6 +116,93 @@ describe("Menu, ready-made", () => {
     });
 });
 
+describe("Menu, groups and toggles", () => {
+    it("renders groups after the items, each labelled, and is grouped unless told otherwise", async () => {
+        withRegistry(
+            <Menu
+                trigger="View"
+                items={[
+                    { value: "zoom", label: "Zoom", supportingText: "Ctrl +" },
+                ]}
+                groups={[
+                    {
+                        id: "sort",
+                        label: "Sort by",
+                        items: [{ value: "name", label: "Name" }],
+                    },
+                    { id: "misc", items: [{ value: "help", label: "Help" }] },
+                ]}
+                vibrant
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.content).className).toBe(
+            "menu menu--vibrant-true menu--grouped-true",
+        );
+        const groups = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.itemGroup}"]`,
+        );
+        expect(groups).toHaveLength(2);
+        expect(groups[0]!.getAttribute("role")).toBe("group");
+        const label = byTestId(ids.itemGroupLabel);
+        expect(label.textContent).toBe("Sort by");
+        expect(groups[0]!.getAttribute("aria-labelledby")).toBe(label.id);
+        expect(groups[0]!.textContent).toContain("Name");
+        expect(items()[0]!.textContent).toBe("ZoomCtrl +");
+        const content = items()[0]!.querySelector<HTMLElement>(
+            `[data-testid="${ids.itemContent}"]`,
+        )!;
+        expect(content.className).toBe("menu__itemContent");
+        expect(byTestId(ids.itemSupportingText).parentElement).toBe(content);
+        expect(byTestId(ids.itemSupportingText).textContent).toBe("Ctrl +");
+    });
+
+    it("takes grouped={false} over its groups", async () => {
+        withRegistry(
+            <Menu
+                trigger="View"
+                grouped={false}
+                groups={[{ id: "a", items: [{ value: "x", label: "X" }] }]}
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.content).className).toBe("menu");
+    });
+
+    it("toggles a checkbox item, reporting the change", async () => {
+        const onCheckedChange = vi.fn();
+        withRegistry(
+            <Menu
+                trigger="View"
+                items={[
+                    {
+                        value: "grid",
+                        label: "Grid",
+                        type: "checkbox",
+                        checked: false,
+                        onCheckedChange,
+                    },
+                    {
+                        value: "list",
+                        label: "List",
+                        type: "checkbox",
+                        checked: true,
+                    },
+                ]}
+            />,
+        );
+        await settle();
+        expect(items()[0]!.getAttribute("role")).toBe("menuitemcheckbox");
+        expect(items()[0]!.getAttribute("aria-checked")).toBe("false");
+        expect(items()[1]!.getAttribute("aria-checked")).toBe("true");
+        await interact(() => userEvent.click(byTestId(ids.trigger)));
+        await frames();
+        await interact(() => userEvent.click(items()[0]!));
+        await frames();
+        expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(true);
+    });
+});
+
 describe("Menu, compound", () => {
     it("composes its parts, with any component as the trigger", async () => {
         const onSelect = vi.fn();

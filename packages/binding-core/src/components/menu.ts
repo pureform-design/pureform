@@ -17,14 +17,20 @@ import type { IndicationProps, InteractionSourceProps } from "./indication";
 import type { OverlayPositioning } from "./overlay";
 import type { VariantProp } from "./variants";
 
-/** The menu's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `| "item" |
- *  "itemLeading" | "itemLabel" | "itemTrailing" | "itemTrailingText"`. */
+/** The menu's parts: `"root" | "trigger" | "positioner" | "content"` (the surface) `|
+ *  "itemGroup" | "itemGroupLabel" | "item" | "itemLeading" | "itemContent" | "itemLabel" |
+ *  "itemSupportingText" | "itemTrailing" | "itemTrailingText"`. */
 export type MenuPart = PartName<typeof menuOverlayAnatomy>;
 
 /** The menu's variant groups and instance tokens. */
 export interface MenuVariantProps {
     readonly color?: VariantProp<"menu", "color">;
     readonly density?: VariantProp<"menu", "density">;
+    /** Material's vibrant colors: the tertiary container's. */
+    readonly vibrant?: boolean | undefined;
+    /** Each group drawn as its own tile, apart from the next. The ready-made menu sets it when
+     *  given `groups`, unless given. */
+    readonly grouped?: boolean | undefined;
     readonly tokens?: InstanceTokens<"menu"> | undefined;
 }
 
@@ -72,6 +78,8 @@ export interface MenuRootOwnProps
 export const MENU_ROOT_PROPS = [
     "color",
     "density",
+    "vibrant",
+    "grouped",
     "tokens",
     "onSelect",
     "closeOnSelect",
@@ -97,6 +105,14 @@ export interface MenuItem<Node = unknown> extends InteractionSourceProps {
     readonly disabled?: boolean | undefined;
     /** Whether choosing it closes the menu, over the menu's `closeOnSelect`. */
     readonly closeOnSelect?: boolean | undefined;
+    /** A toggleable item: `checkbox` turns on and off, `radio` is one of its group. It fills
+     *  while `checked`. */
+    readonly type?: "checkbox" | "radio" | undefined;
+    readonly checked?: boolean | undefined;
+    /** Called when a toggleable item turns on or off. */
+    readonly onCheckedChange?: ((checked: boolean) => void) | undefined;
+    /** A line under the label. */
+    readonly supportingText?: Node;
     /** An icon before the label. */
     readonly leadingIcon?: Node;
     /** An icon after the label. */
@@ -108,26 +124,46 @@ export interface MenuItem<Node = unknown> extends InteractionSourceProps {
     readonly mirrorTrailingIcon?: boolean | undefined;
 }
 
+/** A group of the ready-made menu's items, with an optional label. */
+export interface MenuGroup<Node = unknown> {
+    /** Its id among the groups, which its label's id is built from. */
+    readonly id: string;
+    readonly label?: Node;
+    readonly items: readonly MenuItem<Node>[];
+}
+
 /** What the ready-made menu renders inside Root, in the framework's node type. */
 export interface MenuContentProps<Node> {
     /** The trigger's label: the ready-made menu renders its trigger as a button only when given. */
     readonly trigger?: Node;
     /** The items, in order. */
     readonly items?: readonly MenuItem<Node>[] | undefined;
+    /** Groups of items, after `items`; the menu is `grouped` unless told otherwise. */
+    readonly groups?: readonly MenuGroup<Node>[] | undefined;
 }
 
 /** The keys of `MenuContentProps`. */
 export const MENU_CONTENT_PROPS = [
     "trigger",
     "items",
+    "groups",
 ] as const satisfies readonly (keyof MenuContentProps<unknown>)[];
 
 /** The menu's registry selection from Root's props. */
 export const menuSelection = (props: MenuVariantProps): Selection<"menu"> => ({
     color: props.color,
     density: props.density,
+    vibrant: props.vibrant,
+    grouped: props.grouped,
     tokens: props.tokens,
 });
+
+/** Whether the ready-made menu draws its groups as tiles: `grouped`, else whether it has
+ *  groups. */
+export const menuGrouped = (
+    props: Pick<MenuVariantProps, "grouped"> &
+        Pick<MenuContentProps<unknown>, "groups">,
+): boolean => props.grouped ?? (props.groups?.length ?? 0) > 0;
 
 /** Zag's menu props from Root's, besides `id`, `dir`, and the controllable `open`. */
 export const menuMachineProps = (props: MenuBehaviorProps) => ({
@@ -150,5 +186,69 @@ export const menuItemProps = (item: MenuItem) => ({
     valueText: item.valueText,
     disabled: item.disabled,
     closeOnSelect: item.closeOnSelect,
+    type: item.type,
+    checked: item.checked,
+    onCheckedChange: item.onCheckedChange,
     interactionSource: item.interactionSource,
 });
+
+/** The props an item part takes about what it is: Zag's, and for a toggleable item its type,
+ *  whether it's checked, and the callback. */
+export interface MenuItemBehaviorProps extends InteractionSourceProps {
+    readonly value: string;
+    readonly valueText?: string | undefined;
+    readonly disabled?: boolean | undefined;
+    readonly closeOnSelect?: boolean | undefined;
+    readonly type?: "checkbox" | "radio" | undefined;
+    readonly checked?: boolean | undefined;
+    readonly onCheckedChange?: ((checked: boolean) => void) | undefined;
+}
+
+/** The keys of `MenuItemBehaviorProps`, which an item keeps off its element. */
+export const MENU_ITEM_PROPS = [
+    "value",
+    "valueText",
+    "disabled",
+    "closeOnSelect",
+    "type",
+    "checked",
+    "onCheckedChange",
+    "interactionSource",
+] as const satisfies readonly (keyof MenuItemBehaviorProps)[];
+
+/** Zag's item props, a toggleable item's (`getOptionItemProps`) when it has a type. */
+export const menuItemMachineProps = <P>(
+    api: {
+        getItemProps(item: {
+            value: string;
+            valueText?: string | undefined;
+            disabled?: boolean | undefined;
+            closeOnSelect?: boolean | undefined;
+        }): P;
+        getOptionItemProps(item: {
+            value: string;
+            valueText?: string | undefined;
+            disabled?: boolean | undefined;
+            closeOnSelect?: boolean | undefined;
+            type: "checkbox" | "radio";
+            checked: boolean;
+            onCheckedChange?: ((checked: boolean) => void) | undefined;
+        }): P;
+    },
+    item: MenuItemBehaviorProps,
+): P => {
+    const base = {
+        value: item.value,
+        valueText: item.valueText,
+        disabled: item.disabled,
+        closeOnSelect: item.closeOnSelect,
+    };
+    return item.type === undefined
+        ? api.getItemProps(base)
+        : api.getOptionItemProps({
+              ...base,
+              type: item.type,
+              checked: item.checked ?? false,
+              onCheckedChange: item.onCheckedChange,
+          });
+};

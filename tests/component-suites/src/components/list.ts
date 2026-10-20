@@ -1,7 +1,7 @@
 // The list item and the list: no state of their own. A list item is a row, a link (`href`), or a
 // button (`as="button"`), which Enter clicks; the list is a `<ul>` of them, each in an `<li>`.
 
-import { compositeTestIds, listItemAnatomy, testIds } from "@pureform/anatomy";
+import { listAnatomy, listItemAnatomy, testIds } from "@pureform/anatomy";
 
 import type { ComponentCase } from "./types";
 import { byTestId, ownSource } from "./types";
@@ -23,6 +23,19 @@ export const listItem: ComponentCase = {
             leading: "✉",
             trailingText: "3",
         },
+        avatar: {
+            leading: "A",
+            leadingType: "avatar",
+            lines: "two",
+            supportingText: "Ada",
+        },
+        video: {
+            leading: "▶",
+            leadingType: "video",
+            lines: "three",
+            supportingText: "Clip",
+        },
+        "first of a segmented run": { position: "first", leading: "✉" },
         "with a mirrored trailing icon": {
             trailing: "→",
             mirrorTrailing: true,
@@ -62,9 +75,14 @@ const links = (host: HTMLElement) => [
 export const list: ComponentCase = {
     component: "List",
     props: { "aria-label": "Mailboxes", items: ITEMS },
-    root: compositeTestIds.list.root,
+    root: listAnatomy.parts.root.testId,
     examples: {
         links: {},
+        segmented: { variant: "segmented" },
+        "segmented, thumbnails": {
+            variant: "segmented",
+            leadingType: "thumbnail",
+        },
         "secondary color, compact": { color: "secondary", density: "compact" },
         "not interactive": {
             items: [

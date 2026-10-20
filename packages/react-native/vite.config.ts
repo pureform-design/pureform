@@ -24,6 +24,7 @@ export default createConfig({
                     icon: "src/icon/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",
+                    list: "src/list/index.ts",
                     "list-item": "src/list-item/index.ts",
                     media: "src/media/index.ts",
                     menu: "src/menu/index.ts",

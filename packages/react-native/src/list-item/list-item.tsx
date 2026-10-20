@@ -7,13 +7,16 @@ import {
     isPresent,
     listItemLines,
     listItemSelection,
+    listItemVariants,
 } from "@pureform/binding-core";
 import type {
     InteractiveProps,
     ListItemContentProps,
     ListItemPart,
     ListItemVariantProps,
+    ListVariantProps,
 } from "@pureform/binding-core";
+import { createContext, use } from "react";
 import type { ReactNode } from "react";
 
 import { IconSlot, iconSlot } from "../icon-style";
@@ -36,7 +39,11 @@ export interface ListItemProps
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
 }
 
+/** A list's variants, its items' defaults: an item's own win. */
+export const ListDefaults = createContext<ListVariantProps | null>(null);
+
 function ListItemImpl(props: ListItemProps): ReactNode {
+    const list = use(ListDefaults);
     const interactive = props.onPress !== undefined;
     const indication = useSurfaceIndication(INDICATION!, {
         indication: props.indication,
@@ -52,7 +59,10 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         "listItem",
         indication.select(
             listItemSelection(
-                { ...props, lines: props.lines ?? listItemLines(props) },
+                {
+                    ...listItemVariants(list, props),
+                    lines: props.lines ?? listItemLines(props),
+                },
                 interactive ? "button" : "div",
             ),
         ),

@@ -6,7 +6,10 @@
 import { menuOverlayAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
+    MENU_ITEM_PROPS,
     MENU_ROOT_PROPS,
+    menuGrouped,
+    menuItemMachineProps,
     menuItemProps,
     menuMachineProps,
     menuSelection,
@@ -14,8 +17,9 @@ import {
     presentProps,
 } from "@pureform/binding-core";
 import type {
-    InteractionSourceProps,
     MenuContentProps,
+    MenuItem as MenuItemData,
+    MenuItemBehaviorProps,
     MenuRootOwnProps,
 } from "@pureform/binding-core";
 import * as menu from "@pureform/machines/menu";
@@ -80,13 +84,21 @@ export interface MenuIconProps extends MenuPartProps {
     readonly mirror?: boolean | undefined;
 }
 
-/** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`) and a part's. */
-export interface MenuItemProps extends MenuPartProps, InteractionSourceProps {
-    readonly value: string;
-    /** The text typeahead matches, when the label isn't plain text. */
-    readonly valueText?: string | undefined;
-    readonly disabled?: boolean | undefined;
-    readonly closeOnSelect?: boolean | undefined;
+/** An item's props: Zag's (`value`, `valueText`, `disabled`, `closeOnSelect`), a toggleable
+ *  item's `type`, `checked`, and `onCheckedChange`, and a part's. */
+export interface MenuItemProps
+    extends
+        Omit<MenuPartProps, keyof MenuItemBehaviorProps>,
+        MenuItemBehaviorProps {}
+
+/** A group's props: its `id`, which its label points at, and a part's. */
+export interface MenuItemGroupProps extends MenuPartProps {
+    readonly id: string;
+}
+
+/** A group label's props: the `id` of its group, and a part's. */
+export interface MenuItemGroupLabelProps extends Omit<MenuPartProps, "id"> {
+    readonly group: string;
 }
 
 /** The menu's root, a `<div>` around the trigger and the menu. The registry doesn't style it. */
@@ -158,28 +170,61 @@ function Content({ unstyled, ...props }: MenuPartProps): ReactNode {
     });
 }
 
-/** An item; the highlighted one shows the hover state. */
-function Item({
+/** A group of items, labelled by the ItemGroupLabel with its `id` as `group`. */
+function ItemGroup({ unstyled, id, ...props }: MenuItemGroupProps): ReactNode {
+    const { scope, api } = context.use("ItemGroup");
+    return scope.render("itemGroup", {
+        element: "div",
+        machine: api.getItemGroupProps({ id }),
+        unstyled,
+        props,
+    });
+}
+
+/** A group's label. */
+function ItemGroupLabel({
     unstyled,
-    value,
-    valueText,
-    disabled,
-    closeOnSelect,
-    interactionSource,
+    group,
     ...props
-}: MenuItemProps): ReactNode {
+}: MenuItemGroupLabelProps): ReactNode {
+    const { scope, api } = context.use("ItemGroupLabel");
+    return scope.render("itemGroupLabel", {
+        element: "div",
+        machine: api.getItemGroupLabelProps({ htmlFor: group }),
+        unstyled,
+        props,
+    });
+}
+
+/** An item; the highlighted one shows the hover state. A toggleable item (`type`) fills while
+ *  checked. */
+function Item(props: MenuItemProps): ReactNode {
     const { scope, api, sources } = context.use("Item");
-    const source = sources.item(value, interactionSource);
-    const item = { value, valueText, disabled, closeOnSelect };
+    const { unstyled, ...rest } = omitProps(props, MENU_ITEM_PROPS);
+    const source = sources.item(props.value, props.interactionSource);
+    const base = {
+        value: props.value,
+        valueText: props.valueText,
+        disabled: props.disabled,
+        closeOnSelect: props.closeOnSelect,
+    };
+    const state =
+        props.type === undefined
+            ? api.getItemState(base)
+            : api.getOptionItemState({
+                  ...base,
+                  type: props.type,
+                  checked: props.checked ?? false,
+              });
     return (
-        <itemContext.Provider value={{ value }}>
+        <itemContext.Provider value={{ value: props.value }}>
             {scope.render("item", {
                 element: "div",
                 interactionSource: source,
-                machine: api.getItemProps(item),
-                states: { hover: api.getItemState(item).highlighted },
+                machine: menuItemMachineProps(api, props),
+                states: { hover: state.highlighted },
                 unstyled,
-                props,
+                props: rest,
             })}
         </itemContext.Provider>
     );
@@ -198,11 +243,29 @@ function ItemLeading({ unstyled, mirror, ...props }: MenuIconProps): ReactNode {
     });
 }
 
+/** The text of an item: its label and supporting text. */
+function ItemContent({ unstyled, ...props }: MenuPartProps): ReactNode {
+    const { scope } = context.use("ItemContent");
+    itemContext.use("ItemContent");
+    return scope.render("itemContent", { element: "span", unstyled, props });
+}
+
 /** An item's label. */
 function ItemLabel({ unstyled, ...props }: MenuPartProps): ReactNode {
     const { scope } = context.use("ItemLabel");
     itemContext.use("ItemLabel");
     return scope.render("itemLabel", { element: "span", unstyled, props });
+}
+
+/** A line under an item's label. */
+function ItemSupportingText({ unstyled, ...props }: MenuPartProps): ReactNode {
+    const { scope } = context.use("ItemSupportingText");
+    itemContext.use("ItemSupportingText");
+    return scope.render("itemSupportingText", {
+        element: "span",
+        unstyled,
+        props,
+    });
 }
 
 /** An icon after an item's label, hidden from assistive technology. */
@@ -242,7 +305,7 @@ export interface MenuProps
         MenuContentProps<ReactNode> {}
 
 /** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
- *  item per entry of `items`. */
+ *  item per entry of `items`, then a group per entry of `groups`. */
 function ReadyMade(props: MenuProps): ReactNode {
     const {
         className: _className,
@@ -250,47 +313,71 @@ function ReadyMade(props: MenuProps): ReactNode {
         slotProps: _slotProps,
         trigger,
         items = [],
+        groups = [],
         ...rootProps
     } = props;
     const slot = useSlotProps(props);
+    const renderItem = (item: MenuItemData<ReactNode>) => (
+        <Item key={item.value} {...menuItemProps(item)} {...slot("item")}>
+            {isPresent(item.leadingIcon) ? (
+                <ItemLeading
+                    mirror={item.mirrorLeadingIcon}
+                    {...slot("itemLeading")}
+                >
+                    {item.leadingIcon}
+                </ItemLeading>
+            ) : null}
+            <ItemContent {...slot("itemContent")}>
+                <ItemLabel {...slot("itemLabel")}>{item.label}</ItemLabel>
+                {isPresent(item.supportingText) ? (
+                    <ItemSupportingText {...slot("itemSupportingText")}>
+                        {item.supportingText}
+                    </ItemSupportingText>
+                ) : null}
+            </ItemContent>
+            {isPresent(item.trailingIcon) ? (
+                <ItemTrailing
+                    mirror={item.mirrorTrailingIcon}
+                    {...slot("itemTrailing")}
+                >
+                    {item.trailingIcon}
+                </ItemTrailing>
+            ) : null}
+            {isPresent(item.trailingText) ? (
+                <ItemTrailingText {...slot("itemTrailingText")}>
+                    {item.trailingText}
+                </ItemTrailingText>
+            ) : null}
+        </Item>
+    );
     return (
-        <Root {...rootProps} {...(slot("root") as object)}>
+        <Root
+            {...rootProps}
+            grouped={menuGrouped(props) || undefined}
+            {...(slot("root") as object)}
+        >
             {isPresent(trigger) ? (
                 <Trigger as={Button} label={trigger} {...slot("trigger")} />
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
-                    {items.map((item) => (
-                        <Item
-                            key={item.value}
-                            {...menuItemProps(item)}
-                            {...slot("item")}
+                    {items.map(renderItem)}
+                    {groups.map((group) => (
+                        <ItemGroup
+                            key={group.id}
+                            {...slot("itemGroup")}
+                            id={group.id}
                         >
-                            {isPresent(item.leadingIcon) ? (
-                                <ItemLeading
-                                    mirror={item.mirrorLeadingIcon}
-                                    {...slot("itemLeading")}
+                            {isPresent(group.label) ? (
+                                <ItemGroupLabel
+                                    group={group.id}
+                                    {...slot("itemGroupLabel")}
                                 >
-                                    {item.leadingIcon}
-                                </ItemLeading>
+                                    {group.label}
+                                </ItemGroupLabel>
                             ) : null}
-                            <ItemLabel {...slot("itemLabel")}>
-                                {item.label}
-                            </ItemLabel>
-                            {isPresent(item.trailingIcon) ? (
-                                <ItemTrailing
-                                    mirror={item.mirrorTrailingIcon}
-                                    {...slot("itemTrailing")}
-                                >
-                                    {item.trailingIcon}
-                                </ItemTrailing>
-                            ) : null}
-                            {isPresent(item.trailingText) ? (
-                                <ItemTrailingText {...slot("itemTrailingText")}>
-                                    {item.trailingText}
-                                </ItemTrailingText>
-                            ) : null}
-                        </Item>
+                            {group.items.map(renderItem)}
+                        </ItemGroup>
                     ))}
                 </Content>
             </Positioner>
@@ -301,15 +388,20 @@ function ReadyMade(props: MenuProps): ReactNode {
 /** Material's menu. Use it ready-made, `<Menu trigger="Edit" items={[{ value: "cut", label:
  *  "Cut" }, …]} onSelect={…} />`, or compose its parts under `Menu.Root`: `Trigger` (`as={Button}`
  *  draws it as a button), then `Positioner` holding `Content`, with an `Item` per entry holding
- *  `ItemLeading`, `ItemLabel`, `ItemTrailing`, and `ItemTrailingText`. */
+ *  `ItemLeading`, `ItemContent` (around `ItemLabel` and `ItemSupportingText`), `ItemTrailing`, and
+ *  `ItemTrailingText`; an `ItemGroup` holds an `ItemGroupLabel` and its items. */
 export const Menu = Object.assign(ReadyMade, {
     Root,
     Trigger,
     Positioner,
     Content,
+    ItemGroup,
+    ItemGroupLabel,
     Item,
     ItemLeading,
+    ItemContent,
     ItemLabel,
+    ItemSupportingText,
     ItemTrailing,
     ItemTrailingText,
 });

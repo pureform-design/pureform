@@ -1,4 +1,4 @@
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { testIds } from "@pureform/anatomy";
 import { useState } from "react";
 import type { ReactNode } from "react";
 import { act } from "react";
@@ -121,19 +121,66 @@ describe("List", () => {
             />,
         );
         await settle();
-        const root = byTestId(compositeTestIds.list.root);
+        const root = byTestId(testIds.list.root);
         expect(root.tagName).toBe("UL");
-        expect(root.className).toBe("");
+        expect(root.className).toBe("list");
         const wrappers = document.querySelectorAll(
-            `[data-testid="${compositeTestIds.list.item}"]`,
+            `[data-testid="${testIds.list.item}"]`,
         );
         expect(wrappers).toHaveLength(2);
         expect(wrappers[0]!.tagName).toBe("LI");
+        expect(wrappers[0]!.className).toBe("list__item");
         expect(byTestId("inbox-root").className).toContain(
             "list-item--density-compact",
         );
         expect(byTestId("sent-headline").className).toBe(
             "list-item__headline bold",
+        );
+    });
+
+    it("gives a segmented list's items their positions, an item's own winning", async () => {
+        withRegistry(
+            <List
+                variant="segmented"
+                leadingType="avatar"
+                items={[
+                    { headline: "A", testId: "a" },
+                    { headline: "B", testId: "b" },
+                    { headline: "C", testId: "c", position: "single" },
+                    { headline: "D", testId: "d", leadingType: "icon" },
+                ]}
+            />,
+        );
+        await settle();
+        expect(byTestId(testIds.list.root).className).toBe(
+            "list list--variant-segmented",
+        );
+        expect(byTestId("a-root").className).toContain(
+            "list-item--position-first",
+        );
+        expect(byTestId("a-root").className).toContain(
+            "list-item--leadingType-avatar",
+        );
+        expect(byTestId("b-root").className).toContain(
+            "list-item--position-middle",
+        );
+        expect(byTestId("c-root").className).toContain(
+            "list-item--position-single",
+        );
+        expect(byTestId("d-root").className).toContain(
+            "list-item--position-last",
+        );
+        expect(byTestId("d-root").className).toContain(
+            "list-item--leadingType-icon",
+        );
+        expect(byTestId("d-root").hasAttribute("position")).toBe(false);
+    });
+
+    it("leaves a standard list's items without a position", async () => {
+        withRegistry(<List items={[{ headline: "A", testId: "a" }]} />);
+        await settle();
+        expect(byTestId("a-root").className).toContain(
+            "list-item--position-none",
         );
     });
 });
