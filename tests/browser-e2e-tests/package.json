@@ -5,6 +5,8 @@
     "description": "Browser tests over the demo and the adapters",
     "type": "module",
     "devDependencies": {
+        "@fontsource/jetbrains-mono": "catalog:",
+        "@fontsource/roboto": "catalog:",
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "catalog:",
         "@pureform/core": "catalog:",
