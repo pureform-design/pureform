@@ -30,6 +30,7 @@ export default createConfig({
                     select: "src/select/index.ts",
                     menu: "src/menu/index.ts",
                     dialog: "src/dialog/index.ts",
+                    "fullscreen-dialog": "src/fullscreen-dialog/index.ts",
                     tooltip: "src/tooltip/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     tabs: "src/tabs/index.ts",
