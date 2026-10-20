@@ -257,6 +257,20 @@
                 "default": "./dist/search-bar.mjs"
             }
         },
+        "./search-view": {
+            "types": "./dist/search-view/index.d.ts",
+            "import": {
+                "development": "./src/search-view/index.ts",
+                "default": "./dist/search-view.mjs"
+            }
+        },
+        "./autocomplete": {
+            "types": "./dist/autocomplete/index.d.ts",
+            "import": {
+                "development": "./src/autocomplete/index.ts",
+                "default": "./dist/autocomplete.mjs"
+            }
+        },
         "./separator": {
             "types": "./dist/separator/index.d.ts",
             "import": {
