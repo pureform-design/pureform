@@ -71,6 +71,18 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // A modal sheet is drawn over the scrim; the trigger is a button, and the drag handle its own
+    // component.
+    "bottom-sheet": {
+        entries: {
+            bottomSheet: same("modal"),
+            dragHandle: {},
+            scrim: {},
+            button: {},
+            ripple: {},
+        },
+    },
+    "drag-handle": { entries: { dragHandle: same("orientation") } },
     // `extended` follows the label.
     fab: {
         entries: { fab: same("color", "variant", "size", "shape"), ripple: {} },
@@ -131,6 +143,17 @@ export const COMPONENT_USAGE = {
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
     "search-bar": { entries: { searchBar: {} } },
+    // `coplanar` applies to a standard sheet only. A modal sheet is drawn over the scrim; the
+    // trigger and actions are buttons, the back and close buttons icon buttons.
+    "side-sheet": {
+        entries: {
+            sideSheet: same("modal"),
+            scrim: {},
+            button: {},
+            iconButton: {},
+            ripple: {},
+        },
+    },
     // `leadingIcon` follows the icon content and `trailingIcon` is always set; the list is a
     // menu in the select's color and density.
     select: {
