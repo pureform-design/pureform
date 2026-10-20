@@ -22,7 +22,7 @@ import type { VariantProp } from "./variants";
 export type SelectPart = PartName<typeof selectAnatomy>;
 
 /** The parts of the select's list of options: `"positioner" | "root"` (the list, `Select.Content`)
- *  `| "item" | "itemLabel"`. */
+ *  `| "itemGroup" | "itemGroupLabel" | "item" | "itemLabel"`. */
 export type SelectMenuPart = PartName<typeof selectMenuAnatomy>;
 
 /** The select's variant groups and instance tokens. `leadingIcon` makes room for an icon at the
@@ -55,7 +55,47 @@ export interface SelectItem extends InteractionSourceProps {
     /** What the option and the field show, and typeahead matches. */
     readonly label: string;
     readonly disabled?: boolean | undefined;
+    /** The label of the option group it belongs to. A group's options sit together, in the
+     *  order the groups first appear. */
+    readonly group?: string | undefined;
 }
+
+/** A run of options under one group label (`undefined` for options outside any group). */
+export interface SelectItemGroup {
+    readonly group: string | undefined;
+    readonly items: readonly SelectItem[];
+}
+
+/** The options by group, in the order each group first appears; options outside any group form
+ *  their own runs. The list shows them in this order, so give it the items in it too (see
+ *  `selectGroupedItems`), or the arrow keys move in a different order than the eye. */
+export const selectItemGroups = (
+    items: readonly SelectItem[],
+): SelectItemGroup[] => {
+    const groups: { group: string | undefined; items: SelectItem[] }[] = [];
+    const byName = new Map<string, SelectItem[]>();
+    for (const item of items) {
+        if (item.group === undefined) {
+            const last = groups.at(-1);
+            if (last && last.group === undefined) last.items.push(item);
+            else groups.push({ group: undefined, items: [item] });
+            continue;
+        }
+        let run = byName.get(item.group);
+        if (!run) {
+            run = [];
+            byName.set(item.group, run);
+            groups.push({ group: item.group, items: run });
+        }
+        run.push(item);
+    }
+    return groups;
+};
+
+/** The items in the order the list shows them: by group. */
+export const selectGroupedItems = (
+    items: readonly SelectItem[],
+): SelectItem[] => selectItemGroups(items).flatMap((group) => group.items);
 
 /** Where the list opens: Zag's positioning options that matter here. @default `{ placement:
  *  "bottom-start", sameWidth: true }`, and the list never wider or taller than the room the

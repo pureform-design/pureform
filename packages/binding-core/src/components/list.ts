@@ -1,9 +1,10 @@
 // The list's contract, shared by every binding: the props the list takes for itself, the items the
 // ready-made list takes as data, and how the list's variants become every item's defaults. The list
-// is an unstyled `<ul>` (`listAnatomy`) with each list item in an `<li>`, so an item can be a link
-// or a button.
+// is a `<ul>` (`listAnatomy`) with each list item in an `<li>`, so an item can be a link or a
+// button. A segmented list gives each item its position among the tiles.
 
 import type { listAnatomy, PartName, TestIdOverride } from "@pureform/anatomy";
+import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { ListItemContentProps, ListItemPart } from "./list-item";
 import type { ListItemVariantProps } from "./list-item";
@@ -14,11 +15,18 @@ export type ListPart = PartName<typeof listAnatomy>;
 /** The list's variants: every list item's defaults, which an item's own override. */
 export type ListVariantProps = Pick<
     ListItemVariantProps,
-    "density" | "color" | "tokens"
+    "density" | "color" | "tokens" | "leadingType"
 >;
 
+/** The list's own variant and tokens: `segmented` sets its items apart as tiles. */
+export interface ListOwnVariantProps {
+    readonly variant?: "standard" | "segmented" | undefined;
+    readonly listTokens?: InstanceTokens<"list"> | undefined;
+}
+
 /** Everything Root takes for itself, besides the element's own props and `as`. */
-export interface ListRootOwnProps extends ListVariantProps {
+export interface ListRootOwnProps
+    extends ListVariantProps, ListOwnVariantProps {
     /** The list's and its `<li>`s' test ids: a prefix (`mail` → `mail-root`, `mail-item`), or by
      *  part. */
     readonly testId?: TestIdOverride<ListPart> | undefined;
@@ -26,9 +34,12 @@ export interface ListRootOwnProps extends ListVariantProps {
 
 /** The keys of `ListRootOwnProps`, which Root keeps off its element. */
 export const LIST_ROOT_PROPS = [
+    "variant",
+    "listTokens",
     "density",
     "color",
     "tokens",
+    "leadingType",
     "testId",
 ] as const satisfies readonly (keyof ListRootOwnProps)[];
 
@@ -64,6 +75,8 @@ export const listItemVariants = (
 ): ListItemVariantProps => ({
     lines: item.lines,
     interactive: item.interactive,
+    leadingType: item.leadingType ?? list?.leadingType,
+    position: item.position,
     density: item.density ?? list?.density,
     color: item.color ?? list?.color,
     tokens:
@@ -71,3 +84,28 @@ export const listItemVariants = (
             ? { ...list?.tokens, ...item.tokens }
             : undefined,
 });
+
+/** The list's registry selection. */
+export const listSelection = (
+    props: ListOwnVariantProps,
+): Selection<"list"> => ({
+    variant: props.variant,
+    tokens: props.listTokens,
+});
+
+/** Where an item sits among `count` tiles, by its `index`: its corners follow. Outside a
+ *  segmented list, `none`. */
+export const listItemPosition = (
+    index: number,
+    count: number,
+    segmented: boolean,
+): "none" | "first" | "middle" | "last" | "single" =>
+    !segmented
+        ? "none"
+        : count === 1
+          ? "single"
+          : index === 0
+            ? "first"
+            : index === count - 1
+              ? "last"
+              : "middle";
