@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { partAttributes, partSlot } from "./attributes";
 import {
+    bottomSheetBackdropAnatomy,
+    bottomSheetOverlayAnatomy,
     compositeTestIds,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
@@ -9,16 +11,20 @@ import {
     menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
+    sideSheetBackdropAnatomy,
+    sideSheetOverlayAnatomy,
     tabsCompositeAnatomy,
     richTooltipOverlayAnatomy,
     tooltipOverlayAnatomy,
 } from "./composites";
 import {
     anatomy,
+    bottomSheetAnatomy,
     dialogAnatomy,
     fullscreenDialogAnatomy,
     menuAnatomy,
     richTooltipAnatomy,
+    sideSheetAnatomy,
     tabsAnatomy,
     tooltipAnatomy,
 } from "./generated";
@@ -162,4 +168,45 @@ describe("composites", () => {
             expect(parts[name]!.children).toEqual(preset[name]!.children);
         }
     });
+
+    it.each([
+        [
+            "bottomSheet",
+            bottomSheetOverlayAnatomy,
+            bottomSheetAnatomy,
+            bottomSheetBackdropAnatomy,
+            compositeTestIds.bottomSheet,
+        ],
+        [
+            "sideSheet",
+            sideSheetOverlayAnatomy,
+            sideSheetAnatomy,
+            sideSheetBackdropAnatomy,
+            compositeTestIds.sideSheet,
+        ],
+    ] as const)(
+        "the %s's overlay draws every slot of the preset's, its surface as content and its content as body, over a scrim backdrop",
+        (_, overlay, preset, backdrop, ids) => {
+            const parts = overlay.parts as ComponentAnatomy["parts"];
+            const slots = Object.values(parts)
+                .filter((part) => part.styled)
+                .map(partSlot);
+            expect(slots.sort()).toEqual([...preset.partNames].sort());
+            expect(partSlot(parts.content!)).toBe("root");
+            expect(partSlot(parts.body!)).toBe("content");
+            for (const name of ["root", "trigger", "positioner"]) {
+                expect(parts[name]!.styled).toBe(false);
+            }
+            for (const name of overlay.partNames) {
+                expect(parts[name]!.testId).toBe(
+                    (ids as Record<string, string>)[name],
+                );
+            }
+            expect(backdrop.name).toBe("scrim");
+            expect(backdrop.scope).toBe(overlay.scope);
+            expect(partAttributes(backdrop, "root")["data-pf-part"]).toBe(
+                "backdrop",
+            );
+        },
+    );
 });

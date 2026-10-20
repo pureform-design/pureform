@@ -266,6 +266,25 @@ FULLSCREEN_DIALOG_ROOT_PROPS; FULLSCREEN_DIALOG_CONTENT_PROPS; // trigger, close
 fullscreenDialogSelection(props);
 fullscreenDialogPositionerLayout(present); // hidden once gone; fixed over the viewport, stretching
 
+// Sheets: the dialog's Zag machine; bottomSheetOverlayAnatomy, sideSheetOverlayAnatomy
+type BottomSheetPart; type SideSheetPart  // the overlays' parts, and "backdrop"
+interface BottomSheetRootOwnProps        // modal, tokens, the dialog's behavior props (no role), testId, unstyled
+interface SideSheetRootOwnProps          // modal, coplanar, tokens, and the same
+BOTTOM_SHEET_ROOT_PROPS; BOTTOM_SHEET_CONTENT_PROPS; // trigger, dragHandle, dragHandleLabel, body
+SIDE_SHEET_ROOT_PROPS; SIDE_SHEET_CONTENT_PROPS;     // trigger, headline, onBack, backLabel, backIcon,
+                                         // closeLabel, closeIcon, body, actions
+sheetModal(props);                       // modal unless `modal: false`
+bottomSheetSelection(props); sideSheetSelection(props); // a modal side sheet isn't coplanar
+sheetMachineProps(props);                // modal by default; a click outside closes only a modal sheet
+bottomSheetPositionerLayout(present, modal); // fixed to the bottom; a standard one lets presses through
+sideSheetPositionerLayout(present, modal, coplanar); // fixed to the end edge, or in the page's layout
+sheetContentLayout;                      // the surface takes presses back
+dragToDismiss(handle, sheet, dismiss);   // from /dom: drag a sheet down by its handle to close it
+
+// Drag handle: dragHandleAnatomy
+interface DragHandleRootOwnProps         // orientation, tokens, testId, unstyled
+DRAG_HANDLE_ROOT_PROPS; dragHandleSelection(props);
+
 // Snackbar: pureform's snackbar machine; the generated snackbarAnatomy
 interface SnackbarRootOwnProps           // layout, tokens, duration, onAction, id, ids, open, defaultOpen,
                                          // onOpenChange ({ open, reason }), testId, unstyled

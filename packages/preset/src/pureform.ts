@@ -46,15 +46,17 @@ import type {
 
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
+import { bottomSheet } from "./components/bottom-sheet";
 import { createButton } from "./components/button";
 import { buttonGroup } from "./components/button-group";
 import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
-import { fullscreenDialog } from "./components/fullscreen-dialog";
+import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
+import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
@@ -81,6 +83,8 @@ import { separator } from "./components/separator";
 import { DEFAULT_SHAPES } from "./components/shaped";
 import type { Shapes } from "./components/shaped";
 import type { Densities } from "./components/shared";
+import { SHEET_KEYFRAMES } from "./components/sheet";
+import { sideSheet } from "./components/side-sheet";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSplitButton } from "./components/split-button";
@@ -305,6 +309,9 @@ const defaultComponents = <G extends string>(
         navigationRail: createNavigationRail(theme.color.groups),
         dialog,
         fullscreenDialog,
+        bottomSheet,
+        sideSheet,
+        dragHandle,
         snackbar,
         toast,
         tooltip,
@@ -458,7 +465,11 @@ export const pureform = <
             theme.config,
             {
                 componentBaseStyles: { fontFamily: fontRole("plain") },
-                keyframes: { ...PROGRESS_KEYFRAMES, ...OVERLAY_KEYFRAMES },
+                keyframes: {
+                    ...PROGRESS_KEYFRAMES,
+                    ...OVERLAY_KEYFRAMES,
+                    ...SHEET_KEYFRAMES,
+                },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
             },

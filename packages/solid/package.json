@@ -148,6 +148,39 @@
                 "default": "./dist/fullscreen-dialog.jsx"
             }
         },
+        "./bottom-sheet": {
+            "types": "./dist/bottom-sheet/index.d.ts",
+            "solid": {
+                "development": "./src/bottom-sheet/index.ts",
+                "default": "./dist/bottom-sheet.jsx"
+            },
+            "import": {
+                "development": "./src/bottom-sheet/index.ts",
+                "default": "./dist/bottom-sheet.jsx"
+            }
+        },
+        "./side-sheet": {
+            "types": "./dist/side-sheet/index.d.ts",
+            "solid": {
+                "development": "./src/side-sheet/index.ts",
+                "default": "./dist/side-sheet.jsx"
+            },
+            "import": {
+                "development": "./src/side-sheet/index.ts",
+                "default": "./dist/side-sheet.jsx"
+            }
+        },
+        "./drag-handle": {
+            "types": "./dist/drag-handle/index.d.ts",
+            "solid": {
+                "development": "./src/drag-handle/index.ts",
+                "default": "./dist/drag-handle.jsx"
+            },
+            "import": {
+                "development": "./src/drag-handle/index.ts",
+                "default": "./dist/drag-handle.jsx"
+            }
+        },
         "./tooltip": {
             "types": "./dist/tooltip/index.d.ts",
             "solid": {
