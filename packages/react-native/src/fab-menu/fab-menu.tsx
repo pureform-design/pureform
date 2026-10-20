@@ -3,7 +3,7 @@
 // pressed. A press outside, the back button or Escape, or picking an item closes it.
 
 import { fabMenuAnatomy } from "@pureform/anatomy";
-import type { PartName, TestIdOverride } from "@pureform/anatomy";
+import type { TestIdOverride } from "@pureform/anatomy";
 import {
     fabMenuMachineProps,
     fabMenuSelection,
@@ -13,6 +13,7 @@ import type {
     ChangeDetails,
     FabMenuContentProps,
     FabMenuItem,
+    FabMenuPart,
     FabMenuVariantProps,
     IndicationProps,
     MenuSelectDetails,
@@ -40,9 +41,6 @@ import type { WindowRect } from "../portal-host";
 import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
-
-/** The FAB menu's parts this binding renders: Zag's positioner is the web's. */
-type FabMenuPart = PartName<typeof fabMenuAnatomy>;
 
 // The FAB's and each item's.
 const INDICATIONS = Object.fromEntries(
@@ -184,6 +182,15 @@ const CloseTrigger = withEngine(CloseTriggerImpl, "FabMenuCloseTrigger");
 // The FAB's box when the menu last opened: pending while it's measured, then the box.
 type Anchor = { readonly rect: WindowRect | undefined } | undefined;
 
+// The list's place above the FAB, which the web's styles give it, is the portal's here.
+const PLACING =
+    /^(position|top|bottom|left|right|start|end|inset\w*|marginBottom|marginBlockEnd)$/;
+
+const inFlow = (style: Readonly<Record<string, unknown>> | undefined) =>
+    Object.fromEntries(
+        Object.entries(style ?? {}).filter(([key]) => !PLACING.test(key)),
+    );
+
 function FabMenuImpl(props: FabMenuProps): ReactNode {
     const engine = useEngine();
     const selection = fabMenuSelection(props);
@@ -247,7 +254,7 @@ function FabMenuImpl(props: FabMenuProps): ReactNode {
                                     ? {}
                                     : { "aria-label": props["aria-label"] })}
                                 style={{
-                                    ...s.list,
+                                    ...inFlow(s.list),
                                     pointerEvents: open ? "auto" : "none",
                                     ...(placed
                                         ? {

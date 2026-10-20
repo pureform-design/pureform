@@ -11,7 +11,7 @@ import { FabMenu } from "../fab-menu";
 import { mount, settle } from "../testing/render";
 
 const split = testIds.splitButton;
-const fab = compositeTestIds.fabMenu;
+const fab = testIds.fabMenu;
 const menuIds = compositeTestIds.menu;
 
 const byTestId = <E extends HTMLElement = HTMLElement>(id: string): E =>
@@ -125,7 +125,7 @@ describe("FabMenu, ready-made", () => {
         expect(trigger.getAttribute("aria-label")).toBe("Create");
         expect(trigger.getAttribute("aria-expanded")).toBe("false");
         expect(trigger.textContent).toBe("+");
-        expect(byTestId(fab.positioner).hidden).toBe(true);
+        expect(byTestId(fab.list).hidden).toBe(true);
         expect(byTestId(fab.list).className).toBe("fab-menu__list");
         expect(byTestId(fab.list).getAttribute("role")).toBe("menu");
         const items = document.querySelectorAll(`[data-testid="${fab.item}"]`);
@@ -153,7 +153,7 @@ describe("FabMenu, ready-made", () => {
         await frames();
         expect(trigger.getAttribute("aria-expanded")).toBe("true");
         expect(trigger.querySelector("svg")).not.toBeNull();
-        expect(byTestId(fab.positioner).hidden).toBe(false);
+        expect(byTestId(fab.list).hidden).toBe(false);
         await userEvent.keyboard("{ArrowDown}{ArrowDown}{Enter}");
         await frames();
         expect(onSelect).toHaveBeenCalledExactlyOnceWith({ value: "call" });

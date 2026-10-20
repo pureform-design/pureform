@@ -6,6 +6,7 @@ import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { dialog } from "./dialog";
 import { fab } from "./fab";
+import { fabMenu, fabMenuItems } from "./fab-menu";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
 import { menu } from "./menu";
@@ -16,6 +17,7 @@ import { searchBar } from "./search-bar";
 import { select } from "./select";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
+import { splitButton } from "./split-button";
 import {
     avatar,
     icon,
@@ -44,6 +46,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     circularProgress,
     dialog,
     fab,
+    fabMenu,
+    fabMenuItems,
     icon,
     iconButton,
     linearProgress,
@@ -61,6 +65,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     separator,
     slider,
     snackbar,
+    splitButton,
     supportingText,
     switchControl,
     tabsCase,

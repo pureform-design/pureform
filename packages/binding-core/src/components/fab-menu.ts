@@ -3,7 +3,7 @@
 // props.
 
 import type {
-    fabMenuOverlayAnatomy,
+    fabMenuAnatomy,
     PartName,
     TestIdOverride,
 } from "@pureform/anatomy";
@@ -18,9 +18,8 @@ import {
 } from "./menu-button";
 import type { VariantProp } from "./variants";
 
-/** The FAB menu's parts: `"root" | "positioner" | "list" | "item" | "itemIcon" | "itemLabel" |
- *  "closeTrigger"`. */
-export type FabMenuPart = PartName<typeof fabMenuOverlayAnatomy>;
+/** The FAB menu's parts: `"root" | "list" | "item" | "itemIcon" | "itemLabel" | "closeTrigger"`. */
+export type FabMenuPart = PartName<typeof fabMenuAnatomy>;
 
 /** The FAB menu's variant groups and instance tokens. */
 export interface FabMenuVariantProps {

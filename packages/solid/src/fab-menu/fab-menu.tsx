@@ -1,9 +1,8 @@
-// The FAB menu: Root on Zag's menu machine, the preset's root around the menu and the FAB; Zag's
-// positioner, which places the list of items above the FAB; the list (the menu's content) and its
-// items, each with an icon and a label; and the FAB (`CloseTrigger`), the menu's trigger, which
+// The FAB menu: Root on Zag's menu machine, the preset's root around the menu and the FAB; the
+// list (the menu's content), which the preset places above the FAB, and its items, each with an icon and a label; and the FAB (`CloseTrigger`), the menu's trigger, which
 // turns into the close button while the menu is open. Everything renders in place, inside Root.
 
-import { fabMenuOverlayAnatomy } from "@pureform/anatomy";
+import { fabMenuAnatomy } from "@pureform/anatomy";
 import {
     FAB_MENU_CONTENT_PROPS,
     FAB_MENU_ROOT_PROPS,
@@ -11,7 +10,6 @@ import {
     fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
-    overlayPositionerProps,
     presentProps,
 } from "@pureform/binding-core";
 import type {
@@ -49,7 +47,7 @@ import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-type Anatomy = typeof fabMenuOverlayAnatomy;
+type Anatomy = typeof fabMenuAnatomy;
 
 /** What Root shares with its parts. */
 interface FabMenuContextValue {
@@ -106,7 +104,7 @@ function Root(props: FabMenuRootProps): JSX.Element {
     }));
     const api = createMemo(() => menu.connect(service, normalizeProps));
     const presence = usePresence(() => api().open);
-    const scope = useComponent(fabMenuOverlayAnatomy, {
+    const scope = useComponent(fabMenuAnatomy, {
         selection: () => fabMenuSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,
@@ -121,22 +119,6 @@ function Root(props: FabMenuRootProps): JSX.Element {
             })}
         </context.Provider>
     );
-}
-
-/** Places the list above the FAB; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner(props: FabMenuPartProps): JSX.Element {
-    const { scope, api, presence } = context.use("Positioner");
-    return scope.render("positioner", {
-        element: "div",
-        machine: () =>
-            overlayPositionerProps(
-                api().getPositionerProps(),
-                presence.present(),
-            ),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
 }
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
@@ -256,7 +238,6 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(props, ...READY_MADE_PROPS) as FabMenuRootProps;
     const root = slots("root") as object;
-    const positioner = slots("positioner");
     const list = slots("list");
     const itemSlot = slots("item");
     const itemIcon = slots("itemIcon");
@@ -264,30 +245,26 @@ function ReadyMade(props: FabMenuProps): JSX.Element {
     const closeTrigger = slots("closeTrigger");
     return (
         <Root {...own} {...root}>
-            <Positioner {...positioner}>
-                <List {...list}>
-                    <For
-                        each={props.items ?? []}
-                        keyed={(item: FabMenuItem<JSX.Element>) => item.value}
-                    >
-                        {(item) => (
-                            <Item {...fabMenuItemProps(item())} {...itemSlot}>
-                                <Show when={isPresent(item().icon)}>
-                                    <ItemIcon
-                                        mirror={item().mirrorIcon}
-                                        {...itemIcon}
-                                    >
-                                        {item().icon}
-                                    </ItemIcon>
-                                </Show>
-                                <ItemLabel {...itemLabel}>
-                                    {item().label}
-                                </ItemLabel>
-                            </Item>
-                        )}
-                    </For>
-                </List>
-            </Positioner>
+            <List {...list}>
+                <For
+                    each={props.items ?? []}
+                    keyed={(item: FabMenuItem<JSX.Element>) => item.value}
+                >
+                    {(item) => (
+                        <Item {...fabMenuItemProps(item())} {...itemSlot}>
+                            <Show when={isPresent(item().icon)}>
+                                <ItemIcon
+                                    mirror={item().mirrorIcon}
+                                    {...itemIcon}
+                                >
+                                    {item().icon}
+                                </ItemIcon>
+                            </Show>
+                            <ItemLabel {...itemLabel}>{item().label}</ItemLabel>
+                        </Item>
+                    )}
+                </For>
+            </List>
             <CloseTrigger aria-label={props.fabLabel} {...closeTrigger}>
                 <FabIcon icon={props.icon} closeIcon={props.closeIcon} />
             </CloseTrigger>
@@ -312,11 +289,10 @@ function FabIcon(props: {
 
 /** M3 Expressive's FAB menu. Use it ready-made, `<FabMenu icon={<AddIcon />} fabLabel="Create"
  *  items={[{ value: "message", label: "Message", icon: <MessageIcon /> }, …]} onSelect={…} />`,
- *  or compose its parts under `FabMenu.Root`: `Positioner` holding `List`, with an `Item` per
+ *  or compose its parts under `FabMenu.Root`: `List`, with an `Item` per
  *  action holding `ItemIcon` and `ItemLabel`, then `CloseTrigger`, the FAB. */
 export const FabMenu = Object.assign(ReadyMade, {
     Root,
-    Positioner,
     List,
     Item,
     ItemIcon,

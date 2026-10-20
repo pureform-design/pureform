@@ -1,4 +1,4 @@
-import { compositeTestIds, testIds } from "@pureform/anatomy";
+import { testIds } from "@pureform/anatomy";
 import type { ReactNode } from "react";
 import { View } from "react-native";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -33,7 +33,7 @@ const render = (node: ReactNode) =>
     );
 
 const split = testIds.splitButton;
-const fab = compositeTestIds.fabMenu;
+const fab = testIds.fabMenu;
 const box = (element: Element) => element.getBoundingClientRect();
 const query = (id: string) =>
     document.querySelector<HTMLElement>(`[data-testid="${id}"]`);
