@@ -432,3 +432,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `I18nManager.isRTL`; a nested provider's `dir` changes what the styles read, not the layout.
 - **No server rendering and no forms:** React Native has neither, so there's no hydration,
   `useLazyClassFactory` counterpart, or form reset.
+
+## Navigation variants
+
+`NavigationBar` takes `itemLayout="horizontal"`; `NavigationRail` takes `header`, `expanded`, and
+`modal` (with `open`, `defaultOpen`, `onOpenChange`): a modal rail renders in a `Modal` over the
+scrim, along the start edge; a press on the scrim or the back button closes it.
