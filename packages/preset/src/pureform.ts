@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { APP_BAR_KEYFRAMES, appBar } from "./components/app-bar";
 import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
@@ -75,7 +76,6 @@ import {
 } from "./components/progress";
 import { createRadio } from "./components/radio";
 import { richTooltip } from "./components/rich-tooltip";
-import { toast } from "./components/toast";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
@@ -97,6 +97,7 @@ import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { toast } from "./components/toast";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
@@ -314,6 +315,7 @@ const defaultComponents = <G extends string>(
         tabs: createTabs(theme.color.groups),
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
+        appBar,
         dialog,
         fullscreenDialog,
         bottomSheet,
@@ -477,6 +479,7 @@ export const pureform = <
                     ...OVERLAY_KEYFRAMES,
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
+                    ...APP_BAR_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),
