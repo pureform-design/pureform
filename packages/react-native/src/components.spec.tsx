@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Glyph, PureformProvider, useIconStyle } from ".";
+import { AppBar } from "./app-bar";
 import { Autocomplete } from "./autocomplete";
 import { Avatar } from "./avatar";
 import { Badge } from "./badge";
@@ -84,6 +85,7 @@ const COMPONENTS = [
     "textField",
     "textArea",
     "searchBar",
+    "appBar",
     "select",
     "autocomplete",
     "searchView",
@@ -895,5 +897,68 @@ describe("lists, menus, and selects", () => {
             userEvent.click(document.querySelector('[aria-label="Back"]')!),
         );
         await until(() => expect(view()).toBeNull());
+    });
+});
+
+describe("app bar", () => {
+    const children = () =>
+        [...byTestId("bar-root").children].map((child) =>
+            child.getAttribute("data-testid"),
+        );
+
+    it("lays out its parts, and puts an expanded flexible bar's headline last", async () => {
+        const offset = outside(0);
+        await render(
+            <offset.Holder>
+                {(current) => (
+                    <AppBar
+                        size="largeFlexible"
+                        leading={
+                            <IconButton
+                                aria-label="Back"
+                                icon={<Glyph glyph="←" />}
+                            />
+                        }
+                        headline="Inbox"
+                        subtitle="12 unread"
+                        scrollOffset={current}
+                        testId="bar"
+                    />
+                )}
+            </offset.Holder>,
+        );
+        expect(children()).toEqual([
+            "bar-leading",
+            "bar-trailing",
+            "bar-content",
+        ]);
+        expect(byTestId("bar-headline").textContent).toBe("Inbox");
+        const resting = computed("bar-root").backgroundColor;
+        await offset.set(10);
+        await until(() =>
+            expect(computed("bar-root").backgroundColor).not.toBe(resting),
+        );
+        await offset.set(200);
+        expect(children()).toEqual([
+            "bar-leading",
+            "bar-content",
+            "bar-trailing",
+        ]);
+    });
+
+    it("holds a search bar, drawn scrolled with the bar", async () => {
+        await render(
+            <>
+                <AppBar searchBar={{}} testId="bar" />
+                <SearchBar testId="plain" />
+                <SearchBar scrolled testId="scrolled" />
+            </>,
+        );
+        expect(
+            byTestId("bar-content").contains(byTestId("pf-search-bar-root")),
+        ).toBe(true);
+        expect(computed("pf-search-bar-root").backgroundColor).toBe(
+            computed("plain-root").backgroundColor,
+        );
     });
 });
