@@ -42,6 +42,8 @@ export const slider: ComponentCase = {
         empty: { defaultValue: 0 },
         full: { defaultValue: 100 },
         "secondary color": { defaultValue: 60, color: "secondary" },
+        round: { defaultValue: 40, handleShape: "round" },
+        large: { defaultValue: 40, size: "large" },
         "from 1 to 5": { min: 1, max: 5, defaultValue: 3 },
         disabled: { defaultValue: 40, disabled: true },
         "read-only": { defaultValue: 40, readOnly: true },
@@ -81,8 +83,10 @@ export const slider: ComponentCase = {
             ],
         },
     },
+    // The round slider: its state layer is the surface the anatomy declares. M3 Expressive's bar
+    // slider (the default) draws none, only its handle narrowing on a press.
     indication: ownSource(sliderAnatomy, {
-        props: { defaultValue: 40 },
+        props: { defaultValue: 40, handleShape: "round" },
         drags: true,
     }),
 };
