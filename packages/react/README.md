@@ -333,13 +333,16 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   (from `min` to `max`, 0 to 100 by default) sets the preset's `value` token as a percentage.
   Without a value (or with `indeterminate`) it's indeterminate: no `aria-valuenow`, and the preset
   animates it. Name it with `aria-label`. `<LinearProgress value={40} aria-label="Uploading" />`.
-- **The slider** runs pureform's slider machine over a native `<input type="range">` laid over the
-  track: the browser handles dragging, the keyboard (its arrow keys follow `dir`), forms, and
-  screen readers. `value` is controllable (`number`); `min`, `max`, `step`, `name`, `form`,
-  `disabled`, `readOnly`, `invalid` go to the machine and the input; the value sets the root's
-  `value` token. The ready-made puts `aria-label`, `aria-labelledby`, `aria-describedby`, and
-  `aria-valuetext` on the input. A controlled or read-only slider's input is put back after a
-  change it didn't take.
+- **The slider** runs Zag's slider machine (`@pureform/machines/slider`). Each thumb's handle has
+  the `slider` role and takes focus and the keys (arrows by `dir`, Home, End, Page Up and Down);
+  the root takes the pointer. `value` is controllable as a number, or a range's numbers
+  (`defaultValue={[20, 60]}`), and reported in the shape given. `centered`, `stops` (`true` or
+  values), `valueIndicator`, and `orientation` add M3's configurations. Each thumb submits
+  through a hidden input (`name`, or `name[]` for a range). The ready-made puts `aria-label` (one
+  per thumb for a range), `aria-labelledby`, `aria-describedby`, and `aria-valuetext` on the
+  handles. Compose with `StartTrack`, `Track`, `ActiveTrack`, `MarkerGroup`/`Marker`, and per
+  thumb `Handle` (holding `StateLayer`), `ValueIndicator`, `Input`. Removed with c1g: the native
+  `<input type="range">` (the handle replaces it).
 - **The card** has no machine. Root is a `<div>` surface, a link with `href`, or any element with
   `as`; a link or a button is `interactive` (state layer, hover lift, touch target) unless told
   otherwise, and `disabled` disables a button or sets `aria-disabled`. The ready-made takes its

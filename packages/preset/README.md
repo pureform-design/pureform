@@ -661,17 +661,31 @@ and `actions` slots.
 
 ## Slider and progress
 
-The slider lays a native range input over its drawn track and handle. Both it and the linear
-progress indicators read their value from a `value` token, a CSS var you keep in step as a
-number from 0 to 100 (prefixed like every var, for example `--components-slider-value: 40`).
+The slider (on Zag's slider machine in the bindings) and the linear progress indicators read
+their value from tokens you keep in step, as numbers from 0 to 100 (prefixed like every var). The
+slider's: `value` (where a handle sits; a range's first thumb sets its own on its handle),
+`activeStart` and `activeEnd` (the active track), and `startGap` and `endGap` (1 where a handle
+cuts that end of the active track). A stop sets its own `value` and `stopActive`. `orientation`
+is `horizontal` or `vertical`; `handleShape: "round"` is the deprecated round handle, kept since
+Expressive has no equivalent.
 
 ```html
-<div class="{root}" style="--components-slider-value: 40">
+<div
+    class="{root}"
+    style="--components-slider-value: 40; --components-slider-activeEnd: 40"
+>
+    <span class="{startTrack}"></span>
     <span class="{track}"></span>
     <span class="{activeTrack}"></span>
-    <span class="{stateLayer}"></span>
-    <span class="{handle}"></span>
-    <input class="{input}" type="range" aria-label="Volume" />
+    <div
+        class="{handle}"
+        role="slider"
+        tabindex="0"
+        aria-label="Volume"
+        aria-valuenow="40"
+    >
+        <span class="{stateLayer}"></span>
+    </div>
 </div>
 
 <div

@@ -1,6 +1,6 @@
-// The slider: `value` from 40 to 50, by a click in the middle of the native range input, which
-// submits, resets, and takes the arrow keys by direction (the browser's own). The root's value
-// token follows the value.
+// The slider: `value` from 40 to 50, by a click in the middle of the root (Zag's control), which
+// submits through its hidden input, resets, and takes the arrow keys by direction on its handle.
+// The root's value token, and the handle's `aria-valuenow`, follow the value.
 
 import { sliderAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
@@ -10,26 +10,25 @@ import { byTestId, ownSource } from "./types";
 
 const ids = testIds.slider;
 
-const input = (host: HTMLElement) =>
-    byTestId<HTMLInputElement>(host, ids.input);
+const handle = (host: HTMLElement) => byTestId(host, ids.handle);
 
-/** The input's value, checked against the root's value token (a percentage of 0 to 100, so the
+/** The handle's value, checked against the root's value token (a percentage of 0 to 100, so the
  *  value itself). */
 const read = (host: HTMLElement): number => {
-    const value = Number(input(host).value);
+    const value = Number(handle(host).getAttribute("aria-valuenow"));
     const root = byTestId(host, ids.root);
     const token = [...root.style].find((name) => name.endsWith("value"));
     const percent = token && root.style.getPropertyValue(token).trim();
     if (percent !== String(value)) {
         throw new Error(
-            `the input holds ${value}, the root's value token ${String(percent)}`,
+            `the handle holds ${value}, the root's value token ${String(percent)}`,
         );
     }
     return value;
 };
 
 const click = (host: HTMLElement, options: ActOptions = {}) =>
-    userEvent.click(input(host), options);
+    userEvent.click(byTestId(host, ids.root), options);
 
 const step = (by: number) => 40 + by;
 
@@ -45,12 +44,23 @@ export const slider: ComponentCase = {
         round: { defaultValue: 40, handleShape: "round" },
         large: { defaultValue: 40, size: "large" },
         "from 1 to 5": { min: 1, max: 5, defaultValue: 3 },
+        range: { defaultValue: [20, 60], "aria-label": ["From", "To"] },
+        centered: { defaultValue: 30, centered: true },
+        stops: { min: 0, max: 10, defaultValue: 4, stops: true },
+        "value indicator": { defaultValue: 40, valueIndicator: true },
+        vertical: {
+            defaultValue: 40,
+            orientation: "vertical",
+            style: { height: "200px" },
+        },
         disabled: { defaultValue: 40, disabled: true },
         "read-only": { defaultValue: 40, readOnly: true },
     },
     state: { prop: "value", from: 40, to: 50, act: click, read },
     form: {
-        control: input,
+        control: (host) =>
+            byTestId<HTMLInputElement>(host, ids.input),
+        aria: handle,
         disabled: (host) =>
             byTestId(host, ids.root).hasAttribute("data-disabled"),
         submits: {
@@ -61,7 +71,7 @@ export const slider: ComponentCase = {
         invalid: { props: { invalid: true } },
     },
     keyboard: {
-        focusable: input,
+        focusable: handle,
         keys: [
             { key: "{Enter}", does: "nothing" },
             { key: " ", does: "nothing" },
