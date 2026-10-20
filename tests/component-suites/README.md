@@ -216,7 +216,10 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   ids, so cases find them by value), select (opened with a click and chosen from its list, which
   takes focus while open; `src/components/select.ts`), switch, text area, and text field (one
   shared case, `src/components/text-input.ts`: `value` from `""` to `"a"`, typed), and the
-  overlays (menu, tooltip, dialog, snackbar).
+  overlays (menu, tooltip, dialog, snackbar). The tags input (`tags-input.ts`) goes from `["red"]`
+  to `["red", "blue"]` by typing and Enter; its indication case highlights the chip with the left
+  arrow (shown as hover) and focuses the remove button by script, since Zag keeps it out of the tab
+  order.
 - **Navigation and lists** (`tabs.ts`, `navigation.ts`, `list.ts`): the tabs' `value` moves with
   a click, Home and End, and the sideways arrows by direction (`read` checks each panel's `hidden`
   against its tab); `keyboard.focusable` is the selected tab, the only one Tab reaches. The
