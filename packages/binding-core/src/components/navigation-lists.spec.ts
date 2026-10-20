@@ -2,6 +2,7 @@ import type {
     listAnatomy,
     listItemAnatomy,
     navigationBarAnatomy,
+    navigationRailAnatomy,
     tabsCompositeAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, expectTypeOf, it } from "vitest";
@@ -43,7 +44,8 @@ describe("parts", () => {
             (typeof tabsCompositeAnatomy.partNames)[number]
         >();
         expectTypeOf<NavigationPart>().toEqualTypeOf<
-            (typeof navigationBarAnatomy.partNames)[number]
+            | (typeof navigationBarAnatomy.partNames)[number]
+            | (typeof navigationRailAnatomy.partNames)[number]
         >();
         expectTypeOf<ListItemPart>().toEqualTypeOf<
             (typeof listItemAnatomy.partNames)[number]
@@ -138,6 +140,23 @@ describe("tabs", () => {
 });
 
 describe("navigation", () => {
+    it("selects the bar's layout and the rail's flags; a modal rail is expanded", () => {
+        expect(navigationSelection({ itemLayout: "horizontal" })).toEqual({
+            color: undefined,
+            itemLayout: "horizontal",
+            tokens: undefined,
+        });
+        expect(
+            navigationSelection<"navigationRail">({ modal: true }),
+        ).toMatchObject({ expanded: true, modal: true });
+        expect(
+            navigationSelection<"navigationRail">({
+                modal: true,
+                expanded: false,
+            }),
+        ).toMatchObject({ expanded: false, modal: true });
+    });
+
     it("selects the color and tokens", () => {
         expect(navigationSelection({ color: "secondary" })).toEqual({
             color: "secondary",

@@ -2,7 +2,7 @@
 // pureform's navigation machine. Its parts and ready-made component come from `createNavigation`,
 // which the navigation bar shares.
 
-import { navigationRailAnatomy } from "@pureform/anatomy";
+import { navigationRailAnatomy, scrimAnatomy } from "@pureform/anatomy";
 import type { ReactNode } from "react";
 
 import { createNavigation } from "../navigation";
@@ -19,6 +19,7 @@ export type NavigationRailProps = NavigationProps<"navigationRail">;
 const { ReadyMade, parts } = createNavigation({
     component: "NavigationRail",
     anatomy: navigationRailAnatomy,
+    scrim: scrimAnatomy,
 });
 
 /** Material's navigation rail. Use it ready-made, `<NavigationRail aria-label="Main" items={[{
