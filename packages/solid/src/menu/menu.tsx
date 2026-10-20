@@ -4,6 +4,7 @@
 // the ready-made Menu over them. Everything renders in place, inside Root.
 
 import { menuOverlayAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     MENU_CONTENT_PROPS,
@@ -33,6 +34,7 @@ import {
     For,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { Button } from "../button";
@@ -313,44 +315,31 @@ function ItemTrailingText(props: MenuPartProps): JSX.Element {
     });
 }
 
-/** The ready-made menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part, the
- *  trigger's label, and the items as data. */
-export interface MenuProps
-    extends
-        Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        MenuContentProps<JSX.Element> {}
+/** `Items`' props: the items as data, and the slot props each of their parts takes. */
+export interface MenuItemsProps {
+    readonly items: readonly MenuItem<JSX.Element>[];
+    readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+}
 
-const READY_MADE_PROPS = [
-    "class",
-    "style",
-    "slotProps",
-    ...MENU_CONTENT_PROPS,
-] as const;
+const NO_SLOT = (): PartProps => ({});
 
-/** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
- *  item per entry of `items`, then a group per entry of `groups`. */
-function ReadyMade(props: MenuProps): JSX.Element {
-    const items = () => props.items ?? [];
-    const groups = () => props.groups ?? [];
-    const slots = createSlotProps(props);
-    const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
-    const root = slots("root") as object;
-    const trigger = slots("trigger") as object;
-    const positioner = slots("positioner");
-    const content = slots("content");
+/** An `Item` per entry of `items`, with its icons, label, supporting text and trailing text:
+ *  what the ready-made menu renders, for a component that holds a menu (the split button). */
+function Items(props: MenuItemsProps): JSX.Element {
+    const slot = untrack(() => props.slot) ?? NO_SLOT;
     // Views, so every item reads the same ones.
-    const itemGroup = slots("itemGroup");
-    const itemGroupLabel = slots("itemGroupLabel");
-    const itemSlot = slots("item");
-    const itemLeading = slots("itemLeading");
-    const itemContent = slots("itemContent");
-    const itemLabel = slots("itemLabel");
-    const itemSupportingText = slots("itemSupportingText");
-    const itemTrailing = slots("itemTrailing");
-    const itemTrailingText = slots("itemTrailingText");
-    const renderItems = (list: () => readonly MenuItem<JSX.Element>[]) => (
-        <For each={list()} keyed={(item: MenuItem<JSX.Element>) => item.value}>
+    const itemSlot = slot("item");
+    const itemLeading = slot("itemLeading");
+    const itemContent = slot("itemContent");
+    const itemLabel = slot("itemLabel");
+    const itemSupportingText = slot("itemSupportingText");
+    const itemTrailing = slot("itemTrailing");
+    const itemTrailingText = slot("itemTrailingText");
+    return (
+        <For
+            each={props.items}
+            keyed={(item: MenuItem<JSX.Element>) => item.value}
+        >
             {(item) => (
                 <Item {...menuItemProps(item())} {...itemSlot}>
                     <Show when={isPresent(item().leadingIcon)}>
@@ -386,6 +375,36 @@ function ReadyMade(props: MenuProps): JSX.Element {
             )}
         </For>
     );
+}
+
+/** The ready-made menu's props: Root's, with `class`, `style`, and `slotProps` keyed by part, the
+ *  trigger's label, and the items as data. */
+export interface MenuProps
+    extends
+        Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        SlotKeyedProps<Anatomy>,
+        MenuContentProps<JSX.Element> {}
+
+const READY_MADE_PROPS = [
+    "class",
+    "style",
+    "slotProps",
+    ...MENU_CONTENT_PROPS,
+] as const;
+
+/** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
+ *  item per entry of `items`, then a group per entry of `groups`. */
+function ReadyMade(props: MenuProps): JSX.Element {
+    const items = () => props.items ?? [];
+    const groups = () => props.groups ?? [];
+    const slots = createSlotProps(props);
+    const own = omit(props, ...READY_MADE_PROPS) as MenuRootProps;
+    const root = slots("root") as object;
+    const trigger = slots("trigger") as object;
+    const positioner = slots("positioner");
+    const content = slots("content");
+    const itemGroup = slots("itemGroup");
+    const itemGroupLabel = slots("itemGroupLabel");
     return (
         <Root {...own} grouped={menuGrouped(props) || props.grouped} {...root}>
             <Show when={isPresent(props.trigger)}>
@@ -393,7 +412,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
             </Show>
             <Positioner {...positioner}>
                 <Content {...content}>
-                    {renderItems(items)}
+                    <Items items={items()} slot={slots} />
                     <For
                         each={groups()}
                         keyed={(group: MenuGroup<JSX.Element>) => group.id}
@@ -408,7 +427,7 @@ function ReadyMade(props: MenuProps): JSX.Element {
                                         {group().label}
                                     </ItemGroupLabel>
                                 </Show>
-                                {renderItems(() => group().items)}
+                                <Items items={group().items} slot={slots} />
                             </ItemGroup>
                         )}
                     </For>
@@ -431,6 +450,7 @@ export const Menu = Object.assign(ReadyMade, {
     ItemGroup,
     ItemGroupLabel,
     Item,
+    Items,
     ItemLeading,
     ItemContent,
     ItemLabel,

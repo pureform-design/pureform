@@ -4,6 +4,7 @@
 // the ready-made Menu over them. Everything renders in place, inside Root.
 
 import { menuOverlayAnatomy } from "@pureform/anatomy";
+import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
     MENU_ITEM_PROPS,
@@ -296,29 +297,19 @@ function ItemTrailingText({ unstyled, ...props }: MenuPartProps): ReactNode {
     });
 }
 
-/** The ready-made menu's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
- *  the trigger's label, and the items as data. */
-export interface MenuProps
-    extends
-        Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
-        SlotKeyedProps<Anatomy>,
-        MenuContentProps<ReactNode> {}
+/** `ItemEntry`'s props: the item as data, and the slot props each of its parts takes. */
+export interface MenuItemEntryProps {
+    readonly item: MenuItemData<ReactNode>;
+    readonly slot?: ((part: PartName<Anatomy>) => PartProps) | undefined;
+}
 
-/** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
- *  item per entry of `items`, then a group per entry of `groups`. */
-function ReadyMade(props: MenuProps): ReactNode {
-    const {
-        className: _className,
-        style: _style,
-        slotProps: _slotProps,
-        trigger,
-        items = [],
-        groups = [],
-        ...rootProps
-    } = props;
-    const slot = useSlotProps(props);
-    const renderItem = (item: MenuItemData<ReactNode>) => (
-        <Item key={item.value} {...menuItemProps(item)} {...slot("item")}>
+const NO_SLOT = (): PartProps => ({});
+
+/** An `Item` from data, with its icons, label, supporting text and trailing text: what the
+ *  ready-made menu renders per entry, for a component that holds a menu (the split button). */
+function ItemEntry({ item, slot = NO_SLOT }: MenuItemEntryProps): ReactNode {
+    return (
+        <Item {...menuItemProps(item)} {...slot("item")}>
             {isPresent(item.leadingIcon) ? (
                 <ItemLeading
                     mirror={item.mirrorLeadingIcon}
@@ -350,6 +341,29 @@ function ReadyMade(props: MenuProps): ReactNode {
             ) : null}
         </Item>
     );
+}
+
+/** The ready-made menu's props: Root's, with `className`, `style`, and `slotProps` keyed by part,
+ *  the trigger's label, and the items as data. */
+export interface MenuProps
+    extends
+        Omit<MenuRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
+        SlotKeyedProps<Anatomy>,
+        MenuContentProps<ReactNode> {}
+
+/** The ready-made menu: the trigger, drawn as a button, when given a label, and the menu with an
+ *  item per entry of `items`, then a group per entry of `groups`. */
+function ReadyMade(props: MenuProps): ReactNode {
+    const {
+        className: _className,
+        style: _style,
+        slotProps: _slotProps,
+        trigger,
+        items = [],
+        groups = [],
+        ...rootProps
+    } = props;
+    const slot = useSlotProps(props);
     return (
         <Root
             {...rootProps}
@@ -361,7 +375,9 @@ function ReadyMade(props: MenuProps): ReactNode {
             ) : null}
             <Positioner {...slot("positioner")}>
                 <Content {...slot("content")}>
-                    {items.map(renderItem)}
+                    {items.map((item) => (
+                        <ItemEntry key={item.value} item={item} slot={slot} />
+                    ))}
                     {groups.map((group) => (
                         <ItemGroup
                             key={group.id}
@@ -376,7 +392,13 @@ function ReadyMade(props: MenuProps): ReactNode {
                                     {group.label}
                                 </ItemGroupLabel>
                             ) : null}
-                            {group.items.map(renderItem)}
+                            {group.items.map((item) => (
+                                <ItemEntry
+                                    key={item.value}
+                                    item={item}
+                                    slot={slot}
+                                />
+                            ))}
                         </ItemGroup>
                     ))}
                 </Content>
@@ -398,6 +420,7 @@ export const Menu = Object.assign(ReadyMade, {
     ItemGroup,
     ItemGroupLabel,
     Item,
+    ItemEntry,
     ItemLeading,
     ItemContent,
     ItemLabel,
