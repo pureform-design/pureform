@@ -258,6 +258,11 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       measures the view the source last saw (`measureInWindow`), or opens at the press's point
       when a trigger doesn't emit.
 
+    - **The full-screen dialog** is the same, in a `Modal` that fills the screen with no scrim:
+      a header (a close icon button named by `closeLabel`, the headline, and the `confirmAction`,
+      given a node or `({ close }) => node`) over a scrolling body (the children). Escape and
+      back close it, as the dialog's do. Import it from `@pureform/react-native/fullscreen-dialog`.
+
     Without a trigger (or, for the dialog, `onOpenChange` and `defaultOpen`) each is its surface,
     as before: the app places it, and given `open` it enters and leaves in place. The select
     still opens its menu in a `Modal` under the field.

@@ -15,6 +15,7 @@ import { Dialog } from "./dialog";
 import { animated } from "./engine";
 import { animatedSvg } from "./engines/svg";
 import { Fab } from "./fab";
+import { FullscreenDialog } from "./fullscreen-dialog";
 import { Icon } from "./icon";
 import { IconButton } from "./icon-button";
 import { LinearProgress } from "./linear-progress";
@@ -81,6 +82,7 @@ const COMPONENTS = [
     "navigationBar",
     "navigationRail",
     "dialog",
+    "fullscreenDialog",
     "snackbar",
     "tooltip",
     "ripple",
@@ -154,6 +156,12 @@ describe("every component", () => {
                 >
                     Gone for good.
                 </Dialog>
+                <FullscreenDialog
+                    headline="New event"
+                    confirmAction={<Button label="Save" variant="text" />}
+                >
+                    Details.
+                </FullscreenDialog>
                 <Snackbar supportingText="Archived" action="Undo" />
                 <Tooltip supportingText="Save" />
             </>,
@@ -193,6 +201,11 @@ describe("every component", () => {
             "pf-navigation-bar-active-indicator",
             "pf-navigation-rail-icon",
             "pf-dialog-headline",
+            "pf-fullscreen-dialog-header",
+            "pf-fullscreen-dialog-headline",
+            "pf-fullscreen-dialog-close-trigger",
+            "pf-fullscreen-dialog-confirm-action",
+            "pf-fullscreen-dialog-body",
             "pf-snackbar-close",
             "pf-tooltip-root",
         ]) {

@@ -9,6 +9,7 @@ import { Dialog } from "./dialog";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
 import { reanimated } from "./engines/reanimated";
+import { FullscreenDialog } from "./fullscreen-dialog";
 import { IconButton } from "./icon-button";
 import { Menu } from "./menu";
 import { useSnackbar } from "./snackbar";
@@ -35,6 +36,7 @@ beforeAll(async () => {
         "snackbar",
         "tooltip",
         "dialog",
+        "fullscreenDialog",
         "scrim",
         "ripple",
     ];
@@ -584,6 +586,83 @@ describe.each([animated, reanimated])(
             await interact(() => userEvent.keyboard("{Escape}"));
             await until(() => dialog() === null);
             expect(dialog()).toBeNull();
+        });
+    },
+);
+
+describe.each([animated, reanimated])(
+    "the modal full-screen dialog with $name",
+    (engine) => {
+        const dialog = () =>
+            document.querySelector<HTMLElement>(
+                '[data-testid="pf-fullscreen-dialog-root"]',
+            );
+        const press = (name: string) =>
+            interact(() =>
+                userEvent.click(
+                    [
+                        ...document.querySelectorAll<HTMLElement>(
+                            '[role="button"]',
+                        ),
+                    ].find(
+                        (button) =>
+                            button.textContent === name ||
+                            button.getAttribute("aria-label") === name,
+                    )!,
+                ),
+            );
+
+        it("opens from its trigger, fills the screen, has no scrim, and its close button, Escape, and confirm action close it", async () => {
+            const asked: boolean[] = [];
+            await render(
+                <FullscreenDialog
+                    trigger="New event"
+                    headline="New event"
+                    onOpenChange={(details) => asked.push(details.open)}
+                    confirmAction={({ close }) => (
+                        <Button variant="text" label="Save" onPress={close} />
+                    )}
+                >
+                    Fill in the details.
+                </FullscreenDialog>,
+                engine,
+            );
+            const open = async () => {
+                await press("New event");
+                await settle(600);
+                expect(dialog()).not.toBeNull();
+            };
+            expect(dialog()).toBeNull();
+            await open();
+            expect(
+                document.querySelector('[data-testid="pf-scrim-root"]'),
+            ).toBeNull();
+            expect(dialog()!.getAttribute("aria-label")).toBe("New event");
+            expect(dialog()!.closest('[aria-modal="true"]')).not.toBeNull();
+            expect(
+                document.querySelector(
+                    '[data-testid="pf-fullscreen-dialog-header"]',
+                ),
+            ).not.toBeNull();
+            const at = box(dialog()!);
+            // The dialog's `Modal` is a window, so it fills the viewport, not the test's frame.
+            expect(at.width).toBeGreaterThanOrEqual(window.innerWidth - 1);
+            expect(at.height).toBeGreaterThanOrEqual(window.innerHeight - 1);
+
+            await press("Close");
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+
+            await open();
+            await interact(() => userEvent.keyboard("{Escape}"));
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+
+            await open();
+            await press("Save");
+            await until(() => dialog() === null);
+            expect(dialog()).toBeNull();
+            expect(asked).toEqual([true, false, true, false, true, false]);
         });
     },
 );
