@@ -58,8 +58,7 @@ export const slider: ComponentCase = {
     },
     state: { prop: "value", from: 40, to: 50, act: click, read },
     form: {
-        control: (host) =>
-            byTestId<HTMLInputElement>(host, ids.input),
+        control: (host) => byTestId<HTMLInputElement>(host, ids.input),
         aria: handle,
         disabled: (host) =>
             byTestId(host, ids.root).hasAttribute("data-disabled"),
