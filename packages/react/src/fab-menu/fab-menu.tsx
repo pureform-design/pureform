@@ -1,16 +1,14 @@
-// The FAB menu: Root on Zag's menu machine, the preset's root around the menu and the FAB; Zag's
-// positioner, which places the list of items above the FAB; the list (the menu's content) and its
-// items, each with an icon and a label; and the FAB (`CloseTrigger`), the menu's trigger, which
+// The FAB menu: Root on Zag's menu machine, the preset's root around the menu and the FAB; the
+// list (the menu's content), which the preset places above the FAB, and its items, each with an icon and a label; and the FAB (`CloseTrigger`), the menu's trigger, which
 // turns into the close button while the menu is open. Everything renders in place, inside Root.
 
-import { fabMenuOverlayAnatomy } from "@pureform/anatomy";
+import { fabMenuAnatomy } from "@pureform/anatomy";
 import {
     FAB_MENU_ROOT_PROPS,
     fabMenuItemProps,
     fabMenuMachineProps,
     fabMenuSelection,
     isPresent,
-    overlayPositionerProps,
     presentProps,
 } from "@pureform/binding-core";
 import type {
@@ -40,7 +38,7 @@ import { combinePartProps, omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-type Anatomy = typeof fabMenuOverlayAnatomy;
+type Anatomy = typeof fabMenuAnatomy;
 
 /** What Root shares with its parts. */
 interface FabMenuContextValue {
@@ -97,7 +95,7 @@ function Root(props: FabMenuRootProps): ReactNode {
     });
     const api = menu.connect(service, normalizeProps);
     const presence = usePresence(api.open);
-    const scope = useComponent(fabMenuOverlayAnatomy, {
+    const scope = useComponent(fabMenuAnatomy, {
         selection: fabMenuSelection(props),
         testId: props.testId,
         unstyled: props.unstyled,
@@ -109,21 +107,6 @@ function Root(props: FabMenuRootProps): ReactNode {
             {scope.render("root", { element: "div", as, props: rest })}
         </context.Provider>
     );
-}
-
-/** Places the list above the FAB; hidden once it's closed and its exit animation is over. The
- *  registry doesn't style it. */
-function Positioner({ unstyled, ...props }: FabMenuPartProps): ReactNode {
-    const { scope, api, presence } = context.use("Positioner");
-    return scope.render("positioner", {
-        element: "div",
-        machine: overlayPositionerProps(
-            api.getPositionerProps(),
-            presence.present,
-        ),
-        unstyled,
-        props,
-    });
 }
 
 /** The list of items, the menu's content, which holds focus while it's open and moves through
@@ -247,29 +230,27 @@ function ReadyMade(props: FabMenuProps): ReactNode {
     const slot = useSlotProps(props);
     return (
         <Root {...rootProps} {...(slot("root") as object)}>
-            <Positioner {...slot("positioner")}>
-                <List {...slot("list")}>
-                    {items.map((item) => (
-                        <Item
-                            key={item.value}
-                            {...fabMenuItemProps(item)}
-                            {...slot("item")}
-                        >
-                            {isPresent(item.icon) ? (
-                                <ItemIcon
-                                    mirror={item.mirrorIcon}
-                                    {...slot("itemIcon")}
-                                >
-                                    {item.icon}
-                                </ItemIcon>
-                            ) : null}
-                            <ItemLabel {...slot("itemLabel")}>
-                                {item.label}
-                            </ItemLabel>
-                        </Item>
-                    ))}
-                </List>
-            </Positioner>
+            <List {...slot("list")}>
+                {items.map((item) => (
+                    <Item
+                        key={item.value}
+                        {...fabMenuItemProps(item)}
+                        {...slot("item")}
+                    >
+                        {isPresent(item.icon) ? (
+                            <ItemIcon
+                                mirror={item.mirrorIcon}
+                                {...slot("itemIcon")}
+                            >
+                                {item.icon}
+                            </ItemIcon>
+                        ) : null}
+                        <ItemLabel {...slot("itemLabel")}>
+                            {item.label}
+                        </ItemLabel>
+                    </Item>
+                ))}
+            </List>
             <CloseTrigger aria-label={fabLabel} {...slot("closeTrigger")}>
                 <FabIcon icon={icon} closeIcon={closeIcon} />
             </CloseTrigger>
@@ -279,11 +260,10 @@ function ReadyMade(props: FabMenuProps): ReactNode {
 
 /** M3 Expressive's FAB menu. Use it ready-made, `<FabMenu icon={<AddIcon />} fabLabel="Create"
  *  items={[{ value: "message", label: "Message", icon: <MessageIcon /> }, …]} onSelect={…} />`,
- *  or compose its parts under `FabMenu.Root`: `Positioner` holding `List`, with an `Item` per
+ *  or compose its parts under `FabMenu.Root`: `List`, with an `Item` per
  *  action holding `ItemIcon` and `ItemLabel`, then `CloseTrigger`, the FAB. */
 export const FabMenu = Object.assign(ReadyMade, {
     Root,
-    Positioner,
     List,
     Item,
     ItemIcon,

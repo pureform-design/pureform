@@ -3,15 +3,13 @@
 // The FAB (`closeTrigger`) opens the menu; while it's open (`aria-expanded`) it turns into the
 // round close button in the group's main color. The items stack above it, at its end, each a
 // pill in the group's container color with an icon and a label, in the `list` (Zag's menu
-// content, placed above the FAB by its positioner). `root` holds both, and places nothing itself.
+// content), which sits above the FAB at its end, in either direction. `root` holds both.
 //
 //   <div class={root}>
-//     <div data-part="positioner">
-//       <div class={list} role="menu">
-//         <button class={item} role="menuitem">
-//           <span class={itemIcon}>✉</span><span class={itemLabel}>Message</span>
-//         </button>
-//       </div>
+//     <div class={list} role="menu">
+//       <button class={item} role="menuitem">
+//         <span class={itemIcon}>✉</span><span class={itemLabel}>Message</span>
+//       </button>
 //     </div>
 //     <button class={closeTrigger} aria-haspopup="menu" aria-expanded="true">✕</button>
 //   </div>
@@ -21,10 +19,12 @@
 
 import { typed } from "@pureform/core";
 import {
+    absolute,
     column,
     end,
     flex,
     inlineFlex,
+    pct,
     px,
     relative,
     slot,
@@ -83,6 +83,7 @@ const { tokens, ref } = componentTokens("fabMenu", {
     itemGap: spacing("2"),
     itemRadius: radius("full"),
     gap: spacing("1"),
+    listGap: spacing("2"),
     ...groupTokens(DEFAULT_GROUP),
     ...INDICATION_TOKENS,
 });
@@ -141,8 +142,13 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                         position: relative,
                         display: inlineFlex,
                     },
+                    // Above the FAB, at its end, in either direction.
                     list: {
-                        ...overlayMotion({ ...POPUP_MOTION, fromAnchor: true }),
+                        position: absolute,
+                        insetBlockEnd: pct(100),
+                        insetInlineEnd: px(0),
+                        marginBlockEnd: ref("listGap"),
+                        ...overlayMotion(POPUP_MOTION),
                         zIndex: zIndex("menu"),
                         display: flex,
                         flexDirection: column,
