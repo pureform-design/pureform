@@ -72,6 +72,8 @@ export interface NavigationApi<T extends PropTypes = PropTypes> {
     setValue: (value: string | null) => void;
     getItemState: (props: ItemProps) => ItemState;
     getRootProps: () => T["element"];
+    /** The rail's header, above the destinations: its menu button and FAB. */
+    getHeaderProps: () => T["element"];
     getItemProps: (props: ItemProps) => T["element"];
     getIconProps: () => T["element"];
     getLabelProps: () => T["element"];
