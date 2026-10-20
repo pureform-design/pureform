@@ -193,8 +193,11 @@ export const sheetMachineProps = (
     props: SheetBehaviorProps & { readonly modal?: boolean | undefined },
 ) => {
     const modal = sheetModal(props);
+    // Read through `props` rather than spread it: a binding's props can be getters (Solid's
+    // children), which a spread would run.
     return {
-        ...dialogMachineProps({ ...props, modal }),
+        ...dialogMachineProps(props),
+        modal,
         role: "dialog" as const,
         closeOnInteractOutside: props.closeOnInteractOutside ?? modal,
     };
@@ -270,3 +273,9 @@ export const sideSheetPositionerLayout = (
 /** What a sheet's surface adds to Zag's props: presses on it count, inside a standard bottom
  *  sheet's positioner that lets them through. */
 export const sheetContentLayout = { style: { pointerEvents: "auto" } as const };
+
+/** What a bottom sheet's drag handle adds to Zag's props: touch moves on it drag the sheet rather
+ *  than scroll the page. It's rendered on the server too, so hydration changes nothing. */
+export const sheetDragHandleLayout = {
+    style: { touchAction: "none" } as const,
+};
