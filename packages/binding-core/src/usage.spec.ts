@@ -30,6 +30,8 @@ const select = (
 ): Record<string, unknown> => {
     const p = props as never;
     switch (`${subpath}:${entry}`) {
+        case "app-bar:appBar":
+            return core.appBarSelection(p, core.APP_BAR_AT_REST);
         case "card:card":
             return core.cardSelection(p, "div");
         case "list-item:listItem":
