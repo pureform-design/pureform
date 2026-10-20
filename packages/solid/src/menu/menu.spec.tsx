@@ -1,5 +1,5 @@
 import { compositeTestIds } from "@pureform/anatomy";
-import { Errored } from "solid-js";
+import { createSignal, Errored } from "solid-js";
 import { describe, expect, it, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -30,8 +30,9 @@ const frames = async (count = 3) => {
     await settle();
 };
 
-const items = () =>
-    document.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`);
+const items = () => [
+    ...document.querySelectorAll<HTMLElement>(`[data-testid="${ids.item}"]`),
+];
 
 describe("Menu, ready-made", () => {
     it("renders the trigger as a button and the menu in place, hidden while closed", async () => {
@@ -109,6 +110,107 @@ describe("Menu, ready-made", () => {
         expect(
             document.querySelector('[data-testid="edit-item"]')!.className,
         ).toBe("menu__item row");
+    });
+});
+
+describe("Menu, groups and toggleable items", () => {
+    it("renders groups after the items, each a group named by its label, and sets grouped", async () => {
+        withRegistry(() => (
+            <Menu
+                trigger="Edit"
+                items={[{ value: "undo", label: "Undo" }]}
+                groups={[
+                    {
+                        id: "clipboard",
+                        label: "Clipboard",
+                        items: [
+                            {
+                                value: "cut",
+                                label: "Cut",
+                                supportingText: "To the clipboard",
+                            },
+                        ],
+                    },
+                    { id: "more", items: [{ value: "share", label: "Share" }] },
+                ]}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.content).className).toBe("menu menu--grouped-true");
+        const groups = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.itemGroup}"]`,
+        );
+        expect(groups).toHaveLength(2);
+        expect(groups[0]!.className).toBe("menu__itemGroup");
+        expect(groups[0]!.getAttribute("role")).toBe("group");
+        const label = byTestId(ids.itemGroupLabel);
+        expect(label.textContent).toBe("Clipboard");
+        expect(groups[0]!.getAttribute("aria-labelledby")).toBe(label.id);
+        expect(
+            document.querySelectorAll(`[data-testid="${ids.itemGroupLabel}"]`),
+        ).toHaveLength(1);
+        expect(items().map((item) => item.textContent)).toEqual([
+            "Undo",
+            "CutTo the clipboard",
+            "Share",
+        ]);
+        expect(items()[0]!.parentElement).toBe(byTestId(ids.content));
+        const supporting = byTestId(ids.itemSupportingText);
+        expect(supporting.textContent).toBe("To the clipboard");
+        expect(supporting.parentElement!.getAttribute("data-testid")).toBe(
+            ids.itemContent,
+        );
+        expect(
+            document.querySelectorAll(`[data-testid="${ids.itemContent}"]`),
+        ).toHaveLength(3);
+    });
+
+    it("takes vibrant, and grouped over its groups", async () => {
+        withRegistry(() => (
+            <Menu
+                items={ITEMS}
+                groups={[{ id: "g", items: [{ value: "a", label: "A" }] }]}
+                vibrant
+                grouped={false}
+            />
+        ));
+        await settle();
+        expect(byTestId(ids.content).className).toBe(
+            "menu menu--vibrant-true menu--grouped-false",
+        );
+    });
+
+    it("toggles a checkbox item, reporting the change", async () => {
+        const onCheckedChange = vi.fn();
+        const [checked, setChecked] = createSignal(false);
+        withRegistry(() => (
+            <Menu
+                trigger="View"
+                closeOnSelect={false}
+                items={[
+                    {
+                        value: "ruler",
+                        label: "Ruler",
+                        type: "checkbox",
+                        checked: checked(),
+                        onCheckedChange: (next: boolean) => {
+                            onCheckedChange(next);
+                            setChecked(next);
+                        },
+                    },
+                ]}
+            />
+        ));
+        await settle();
+        const item = () => items()[0]!;
+        expect(item().getAttribute("role")).toBe("menuitemcheckbox");
+        expect(item().getAttribute("aria-checked")).toBe("false");
+        await userEvent.click(byTestId(ids.trigger));
+        await frames();
+        await userEvent.click(item());
+        await settle();
+        expect(onCheckedChange).toHaveBeenCalledExactlyOnceWith(true);
+        expect(item().getAttribute("aria-checked")).toBe("true");
     });
 });
 

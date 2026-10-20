@@ -66,6 +66,45 @@ describe("Select, ready-made", () => {
         expect(byTestId(menu.root).getAttribute("data-scope")).toBe("select");
     });
 
+    it("renders grouped options together in a group named by its label", async () => {
+        withRegistry(() => (
+            <Select
+                label="Food"
+                items={[
+                    { value: "apple", label: "Apple", group: "Fruit" },
+                    { value: "none", label: "None" },
+                    { value: "kale", label: "Kale", group: "Vegetables" },
+                    { value: "pear", label: "Pear", group: "Fruit" },
+                ]}
+            />
+        ));
+        await settle();
+        const groups = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${menu.itemGroup}"]`,
+            ),
+        ];
+        expect(groups).toHaveLength(2);
+        expect(groups[0]!.className).toBe("menu__itemGroup");
+        expect(groups[0]!.getAttribute("role")).toBe("group");
+        const labels = [
+            ...document.querySelectorAll<HTMLElement>(
+                `[data-testid="${menu.itemGroupLabel}"]`,
+            ),
+        ];
+        expect(labels.map((label) => label.textContent)).toEqual([
+            "Fruit",
+            "Vegetables",
+        ]);
+        expect(groups[0]!.getAttribute("aria-labelledby")).toBe(labels[0]!.id);
+        expect(
+            [
+                ...groups[0]!.querySelectorAll(`[data-testid="${menu.item}"]`),
+            ].map((option) => option.getAttribute("data-value")),
+        ).toEqual(["apple", "pear"]);
+        expect(item("none").parentElement).toBe(byTestId(menu.root));
+    });
+
     it("opens with a click and chooses an option, reporting the change once", async () => {
         const onValueChange = vi.fn();
         withRegistry(() => (

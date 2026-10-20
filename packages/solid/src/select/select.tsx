@@ -12,8 +12,10 @@ import {
     SELECT_CONTENT_PROPS,
     SELECT_INPUT_LABEL_PROPS,
     SELECT_ROOT_PROPS,
+    selectGroupedItems,
     selectHiddenSelectProps,
     selectInputProps,
+    selectItemGroups,
     selectMachineProps,
     selectMenuSelection,
     selectPositionerProps,
@@ -127,7 +129,7 @@ function Root(props: SelectRootProps): JSX.Element {
     const items = createMemo(() => props.items ?? []);
     const collection = createMemo(() =>
         select.collection<SelectItem>({
-            items: [...items()],
+            items: selectGroupedItems(items()),
             ...SELECT_COLLECTION,
         }),
     );
@@ -352,6 +354,38 @@ function Content(props: SelectPartProps): JSX.Element {
     });
 }
 
+/** A group's props: its `id`, and a part's. */
+export interface SelectItemGroupProps extends SelectPartProps {
+    readonly id: string;
+}
+
+/** A group label's props: the `id` of the group it names, and a part's. */
+export interface SelectItemGroupLabelProps extends SelectPartProps {
+    readonly htmlFor: string;
+}
+
+/** A group of options, named by the ItemGroupLabel whose `htmlFor` is its `id`. */
+function ItemGroup(props: SelectItemGroupProps): JSX.Element {
+    const { menu, api } = context.use("ItemGroup");
+    return menu.render("itemGroup", {
+        element: "div",
+        machine: () => api().getItemGroupProps({ id: props.id }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "id"),
+    });
+}
+
+/** A group's label. */
+function ItemGroupLabel(props: SelectItemGroupLabelProps): JSX.Element {
+    const { menu, api } = context.use("ItemGroupLabel");
+    return menu.render("itemGroupLabel", {
+        element: "div",
+        machine: () => api().getItemGroupLabelProps({ htmlFor: props.htmlFor }),
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled", "htmlFor"),
+    });
+}
+
 /** An option, drawn as a menu item; the highlighted one shows the hover state. */
 function Item(props: SelectItemProps): JSX.Element {
     const { menu, api, sources } = context.use("Item");
@@ -435,6 +469,17 @@ function ReadyMadeContent(props: {
     const trailingIcon = props.slots("trailingIcon");
     const supportingText = props.slots("supportingText");
     const hiddenSelect = props.slots("hiddenSelect") as object;
+    const groups = createMemo(() => selectItemGroups(items()));
+    const groupId = createUniqueId();
+    const renderItems = (list: () => readonly SelectItem[]) => (
+        <For each={list()} keyed={(item: SelectItem) => item.value}>
+            {(item) => (
+                <Item item={item()}>
+                    <ItemLabel>{item().label}</ItemLabel>
+                </Item>
+            )}
+        </For>
+    );
     const showsSupporting = createMemo(
         () => isPresent(own.supportingText) || errorText() !== undefined,
     );
@@ -472,14 +517,23 @@ function ReadyMadeContent(props: {
             <HiddenSelect {...hiddenSelect} />
             <Positioner>
                 <Content>
-                    <For
-                        each={items()}
-                        keyed={(item: SelectItem) => item.value}
-                    >
-                        {(item) => (
-                            <Item item={item()}>
-                                <ItemLabel>{item().label}</ItemLabel>
-                            </Item>
+                    <For each={groups()} keyed={false}>
+                        {(group, index) => (
+                            <Show
+                                when={group().group}
+                                fallback={renderItems(() => group().items)}
+                            >
+                                {(name) => (
+                                    <ItemGroup id={`${groupId}-${index}`}>
+                                        <ItemGroupLabel
+                                            htmlFor={`${groupId}-${index}`}
+                                        >
+                                            {name()}
+                                        </ItemGroupLabel>
+                                        {renderItems(() => group().items)}
+                                    </ItemGroup>
+                                )}
+                            </Show>
                         )}
                     </For>
                 </Content>
@@ -509,7 +563,9 @@ function ReadyMade(props: SelectProps): JSX.Element {
 /** Material's select. Use it ready-made, `<Select label="Size" name="size" items={[{ value: "s",
  *  label: "Small" }, …]} />`, or compose its parts under `Select.Root`: `Container` holding
  *  `LeadingIcon`, `Input`, `Label`, and `TrailingIcon`, then `SupportingText`, `HiddenSelect`,
- *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option. */
+ *  and `Positioner` holding `Content`, with an `Item` (holding an `ItemLabel`) per option. Options
+ *  can sit in an `ItemGroup`, named by an `ItemGroupLabel`; list them in `selectGroupedItems`'
+ *  order. */
 export const Select = Object.assign(ReadyMade, {
     Root,
     Container,
@@ -521,6 +577,8 @@ export const Select = Object.assign(ReadyMade, {
     HiddenSelect,
     Positioner,
     Content,
+    ItemGroup,
+    ItemGroupLabel,
     Item,
     ItemLabel,
 });
