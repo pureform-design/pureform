@@ -147,8 +147,14 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
     // How many elements stay in the row; all of them, with the overflow button, until measured.
     const [count, setCount] = createSignal<number>();
     createEffect(
-        () => [root(), !!props.overflow, items()] as const,
-        ([element, overflow]) => {
+        () =>
+            [
+                root(),
+                !!props.overflow,
+                props.orientation === "vertical",
+                items(),
+            ] as const,
+        ([element, overflow, vertical]) => {
             if (!element || !overflow) return;
             const watcher = watchOverflow({
                 root: element,
@@ -161,7 +167,7 @@ function ReadyMade(props: ToolbarProps): JSX.Element {
                     element.querySelector<HTMLElement>(
                         `:scope > [${OVERFLOW}]`,
                     ),
-                vertical: () => props.orientation === "vertical",
+                vertical: () => vertical,
                 onCount: setCount,
             });
             return () => watcher.stop();
