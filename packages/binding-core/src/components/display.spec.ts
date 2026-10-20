@@ -9,6 +9,7 @@ import type {
 import { describe, expect, expectTypeOf, it, vi } from "vitest";
 
 import { avatarElement, avatarRootProps } from "./avatar";
+import { badgeRootProps, badgeSelection } from "./badge";
 import {
     CARD_ROOT_PROPS,
     cardElement,
@@ -321,6 +322,20 @@ describe("static components", () => {
             "aria-label": "Ada",
         });
         expect(avatarRootProps({}, "span")).toEqual({ "aria-hidden": "true" });
+    });
+
+    it("names a badge by its label and hides a dot without one", () => {
+        expect(badgeRootProps({ label: "3 unread" })).toEqual({
+            role: "img",
+            "aria-label": "3 unread",
+        });
+        expect(badgeRootProps({ size: "small" })).toEqual({
+            "aria-hidden": "true",
+        });
+        expect(badgeRootProps({})).toEqual({});
+        expect(badgeSelection({ placement: "anchored" })).toMatchObject({
+            placement: "anchored",
+        });
     });
 
     it("names an icon only with a label", () => {

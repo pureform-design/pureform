@@ -1,10 +1,11 @@
-// The single-part components: text in a type style, the avatar, the standalone icon, the
+// The single-part components: text in a type style, the avatar, the badge, the standalone icon, the
 // separator, supporting text, the scrim, and media. Each is one view (or text, or image) in its
 // component's style; they don't move, so they render without the engine's animated views, but for
 // a scrim given `open`, which fades in and out on the engine's view.
 
 import {
     avatarAnatomy,
+    badgeAnatomy,
     iconAnatomy,
     mediaAnatomy,
     scrimAnatomy,
@@ -15,6 +16,7 @@ import {
 import type { TestIdOverride } from "@pureform/anatomy";
 import {
     avatarSelection,
+    badgeSelection,
     iconSelection,
     mediaSelection,
     scrimSelection,
@@ -24,6 +26,7 @@ import {
 } from "@pureform/binding-core";
 import type {
     AvatarVariantProps,
+    BadgeVariantProps,
     IconVariantProps,
     MediaVariantProps,
     ScrimVariantProps,
@@ -108,6 +111,42 @@ function AvatarImpl(props: AvatarProps): ReactNode {
 
 /** Material's avatar, in its shape: `<Avatar label="Ada Lovelace">AL</Avatar>`. */
 export const Avatar = withEngine(AvatarImpl, "Avatar");
+
+export interface BadgeProps extends BadgeVariantProps {
+    /** What it says for assistive technology ("3 unread"). */
+    readonly label?: string | undefined;
+    /** The count or short label of a large badge. */
+    readonly children?: ReactNode;
+    readonly testId?: TestIdOverride<Root> | undefined;
+}
+
+function BadgeImpl(props: BadgeProps): ReactNode {
+    const engine = useEngine();
+    const selected = useSelectedStyles("badge", badgeSelection(props));
+    const style = rootOf(selected);
+    const Drawing = engine.Drawing;
+    const hidden = props.label === undefined && props.size === "small";
+    return (
+        <View
+            {...(props.label === undefined
+                ? {}
+                : { role: "img" as const, "aria-label": props.label })}
+            aria-hidden={hidden ? true : undefined}
+            style={style as ViewStyle}
+            testID={testIdOf(badgeAnatomy, "root", props.testId)}
+        >
+            {Drawing ? <Drawing drawing={rootDrawing(selected)} /> : null}
+            {props.children === undefined ? null : (
+                <NativeText style={ownText(style) as TextStyle}>
+                    {props.children}
+                </NativeText>
+            )}
+        </View>
+    );
+}
+
+/** Material's badge: `<Badge>3</Badge>`, or a dot, `<Badge size="small" />`. */
+export const Badge = withEngine(BadgeImpl, "Badge");
 
 export interface IconProps extends IconVariantProps {
     /** The icon's name for assistive technology; without it, the icon is decorative. */
