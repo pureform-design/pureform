@@ -47,6 +47,13 @@
                 "default": "./dist/icon-button.mjs"
             }
         },
+        "./button-group": {
+            "types": "./dist/button-group/index.d.ts",
+            "import": {
+                "development": "./src/button-group/index.ts",
+                "default": "./dist/button-group.mjs"
+            }
+        },
         "./radio-group": {
             "types": "./dist/radio-group/index.d.ts",
             "import": {

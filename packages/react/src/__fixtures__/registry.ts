@@ -2,7 +2,11 @@
 // read what the factory was given, plus a lazy chip whose loader the test controls.
 
 import { createRegistry, withTokenStyle } from "@pureform/styling";
-import type { ClassFactory, ComponentShape, Selection } from "@pureform/styling";
+import type {
+    ClassFactory,
+    ComponentShape,
+    Selection,
+} from "@pureform/styling";
 
 export type ButtonShape = {
     variants: { variant: "filled" | "text"; size: "small" | "large" };
@@ -332,4 +336,24 @@ export const displayRegistry = () =>
         text: named("text", ["root"]),
         icon: named("icon", ["root"]),
         touchTarget: named("touch-target", ["root"]),
+    });
+
+/** The button group's fake factories: the group, and the buttons and icon buttons in it. */
+export const buttonGroupRegistry = () =>
+    createRegistry({
+        buttonGroup: named("button-group", ["root"]),
+        button: named("button", [
+            "root",
+            "label",
+            "icon",
+            "secondaryIcon",
+            "touchTarget",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
     });
