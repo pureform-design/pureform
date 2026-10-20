@@ -134,7 +134,7 @@ function Root(props: SearchViewRootProps): JSX.Element {
     }));
     const viewApi = createMemo(() => dialog.connect(view, normalizeProps));
     const [typed, setTyped] = createSignal(
-        props.inputValue ?? props.defaultInputValue ?? "",
+        untrack(() => props.inputValue ?? props.defaultInputValue ?? ""),
     );
     const matches = createMemo(() =>
         searchViewMatches(props.items ?? [], typed(), props.filter),

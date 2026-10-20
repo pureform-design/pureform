@@ -10,11 +10,14 @@ import {
 import type { PartName } from "@pureform/anatomy";
 import {
     AUTOCOMPLETE_ROOT_PROPS,
+    autocompleteFilterText,
+    autocompleteInitialText,
     autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
+    autocompleteTriggerProps,
     isPresent,
     presentProps,
     SELECT_COLLECTION,
@@ -43,6 +46,7 @@ import {
     merge,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -133,10 +137,18 @@ function Root(props: AutocompleteRootProps): JSX.Element {
         { ownedWrite: true },
     );
     const fieldsetDisabled = useFieldsetDisabled(input);
-    // What the input shows, for the filter: Zag's own once it runs, the given text before.
-    const [typed, setTyped] = createSignal(
-        props.inputValue ?? props.defaultInputValue ?? "",
-    );
+    // What the user typed, which the list filters by; every suggestion until then.
+    const [typed, setTyped] = createSignal("");
+    const initialText = untrack(() => autocompleteInitialText(props));
+    // A reset's text: the default's, or the label of the value the reset leaves (a controlled
+    // value stays until its owner takes the change).
+    const defaultText = () =>
+        autocompleteInitialText({
+            items: props.items,
+            defaultInputValue: inputValue.defaultValue,
+            value: value.controlled() ? value.value() : undefined,
+            defaultValue: value.defaultValue,
+        });
     const matches = createMemo(() =>
         selectGroupedItems(
             autocompleteMatches(props.items ?? [], typed(), props.filter),
@@ -159,23 +171,21 @@ function Root(props: AutocompleteRootProps): JSX.Element {
             ...autocompleteMachineProps(props, fieldsetDisabled()),
             ...selectValueProps(value.machineProps()),
             ...text,
-            onInputValueChange: (details: { inputValue: string }) => {
-                setTyped(details.inputValue);
+            defaultInputValue: initialText,
+            onInputValueChange: (details: {
+                inputValue: string;
+                reason?: string | undefined;
+            }) => {
+                setTyped(autocompleteFilterText(details));
                 text.onInputValueChange({ inputValue: details.inputValue });
             },
             ...open.machineProps(),
         };
     });
     const api = createMemo(() => combobox.connect(service, normalizeProps));
-    createEffect(
-        () => api().inputValue,
-        (text) => {
-            setTyped(text);
-        },
-    );
     const presence = usePresence(() => api().open);
     useFormReset(input, {
-        resetsTo: () => inputValue.resetsTo() ?? "",
+        resetsTo: () => inputValue.resetsTo() ?? defaultText() ?? "",
         onBeforeReset: () => {
             value.beforeReset();
             inputValue.beforeReset();
@@ -188,7 +198,7 @@ function Root(props: AutocompleteRootProps): JSX.Element {
                 }),
             );
             inputValue.reset(() =>
-                api().setInputValue(inputValue.defaultValue ?? "", "script"),
+                api().setInputValue(untrack(defaultText) ?? "", "script"),
             );
         },
     });
@@ -300,7 +310,7 @@ function TrailingIcon(props: AutocompleteIconProps): JSX.Element {
     const { scope, api } = context.use("TrailingIcon");
     return scope.render("trailingIcon", {
         element: "span",
-        machine: () => api().getTriggerProps(),
+        machine: () => autocompleteTriggerProps(api().getTriggerProps()),
         states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "mirror"),

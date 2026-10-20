@@ -9,11 +9,14 @@ import {
 } from "@pureform/anatomy";
 import {
     AUTOCOMPLETE_ROOT_PROPS,
+    autocompleteFilterText,
+    autocompleteInitialText,
     autocompleteMachineProps,
     autocompleteMatches,
     autocompleteMenuSelection,
     autocompleteSelection,
     autocompleteSupportingTextId,
+    autocompleteTriggerProps,
     isPresent,
     presentProps,
     SELECT_COLLECTION,
@@ -131,10 +134,17 @@ function Root(props: AutocompleteRootProps): ReactNode {
     );
     const [input, setInput] = useState<HTMLInputElement | null>(null);
     const fieldsetDisabled = useFieldsetDisabled(input);
-    // What the input shows, for the filter: Zag's own once it runs, the given text before.
-    const [typed, setTyped] = useState(
-        () => props.inputValue ?? props.defaultInputValue ?? "",
-    );
+    // What the user typed, which the list filters by; every suggestion until then.
+    const [typed, setTyped] = useState("");
+    const [initialText] = useState(() => autocompleteInitialText(props));
+    // A reset's text: the default's, or the label of the value the reset leaves (a controlled
+    // value stays until its owner takes the change).
+    const defaultText = autocompleteInitialText({
+        items: props.items,
+        defaultInputValue: inputValue.defaultValue,
+        value: value.controlled ? value.value : undefined,
+        defaultValue: value.defaultValue,
+    });
     const items = props.items ?? NO_ITEMS;
     const matches = useMemo(
         () =>
@@ -149,6 +159,7 @@ function Root(props: AutocompleteRootProps): ReactNode {
             }),
         [matches],
     );
+    const resetTo = useRef<string | null | undefined>(undefined);
     const sources = useItemInteractionSources();
     const text = inputValue.machineProps;
     const service = useMachine(combobox.machine, {
@@ -157,45 +168,65 @@ function Root(props: AutocompleteRootProps): ReactNode {
         dir,
         collection,
         ...autocompleteMachineProps(props, fieldsetDisabled),
-        ...selectValueProps(value.machineProps),
+        ...selectValueProps({
+            ...value.machineProps,
+            // A reset reports its change itself (Zag sets the value a microtask later, past the
+            // reset's reason), so Zag's own report of it is dropped.
+            onValueChange: (details) => {
+                if (resetTo.current !== undefined) {
+                    const dropped = resetTo.current === details.value;
+                    resetTo.current = undefined;
+                    if (dropped) return;
+                }
+                value.machineProps.onValueChange(details);
+            },
+        }),
         ...text,
-        onInputValueChange: (details: { inputValue: string }) => {
-            setTyped(details.inputValue);
+        defaultInputValue: initialText,
+        onInputValueChange: (details: {
+            inputValue: string;
+            reason?: string | undefined;
+        }) => {
+            setTyped(autocompleteFilterText(details));
             text.onInputValueChange({ inputValue: details.inputValue });
         },
         ...open.machineProps,
     });
     const api = combobox.connect(service, normalizeProps);
-    useEffect(() => {
-        setTyped(api.inputValue);
-    }, [api.inputValue]);
     const presence = usePresence(api.open);
-    const textAfterValue = useRef(false);
     const resetText = () =>
         inputValue.reset(() =>
             service.send({
                 type: "INPUT_VALUE.SET",
-                value: inputValue.defaultValue ?? "",
+                value: defaultText ?? "",
                 src: "script",
             }),
         );
     useFormReset(input, {
-        resetsTo: inputValue.resetsTo ?? "",
+        resetsTo: inputValue.resetsTo ?? defaultText ?? "",
         onBeforeReset: () => {
             value.beforeReset();
             inputValue.beforeReset();
         },
         onReset: () => {
             const resetValue = toZagValue(value.defaultValue ?? null)!;
-            if (resetValue.join() === api.value.join()) return resetText();
+            // The machine's value now: this handler may be an earlier render's.
+            const current = service.context.get("value") as string[];
+            if (resetValue.join() === current.join()) return resetText();
             textAfterValue.current = true;
+            const next = value.defaultValue ?? null;
             value.reset(() =>
-                service.send({ type: "VALUE.SET", value: resetValue }),
+                value.machineProps.onValueChange({ value: next }),
             );
+            // A controlled value moves when its owner takes the change.
+            if (value.controlled) return;
+            resetTo.current = next;
+            service.send({ type: "VALUE.SET", value: resetValue });
         },
     });
-    // A new value replaces the text in a microtask Zag queues once React commits it, so a reset
+    // A new value rewrites the text in a microtask Zag queues once React commits it, so a reset
     // that changed the value puts the text back after that.
+    const textAfterValue = useRef(false);
     const valueKey = api.value.join("\u0000");
     useEffect(() => {
         if (!textAfterValue.current) return;
@@ -313,7 +344,7 @@ function TrailingIcon({
     const { scope, api } = context.use("TrailingIcon");
     return scope.render("trailingIcon", {
         element: "span",
-        machine: api.getTriggerProps(),
+        machine: autocompleteTriggerProps(api.getTriggerProps()),
         states: { mirrored: mirror },
         unstyled,
         props,
