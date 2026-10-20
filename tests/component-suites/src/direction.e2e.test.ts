@@ -6,6 +6,7 @@
 // suite.
 
 import { describe, expect, it } from "vitest";
+import { commands } from "vitest/browser";
 
 import {
     boxesWithin,
@@ -35,6 +36,9 @@ const measure = async (
     props: SceneProps,
     dir: "ltr" | "rtl",
 ) => {
+    // The pointer stays wherever an earlier test left it. Resting on a tooltip's trigger in one
+    // direction only, it would open the tooltip in that one, so it waits in the far corner.
+    await commands.mouse("move", window.innerWidth - 1, window.innerHeight - 1);
     const scene = mountCase(component, props, { provider: { dir } });
     await settlePlaced();
     const root = byTestId(scene.host, component.root);
