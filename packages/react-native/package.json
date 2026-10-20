@@ -278,6 +278,13 @@
                 "default": "./dist/toast.mjs"
             }
         },
+        "./toolbar": {
+            "types": "./dist/toolbar/index.d.ts",
+            "import": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.mjs"
+            }
+        },
         "./supporting-text": {
             "types": "./dist/supporting-text/index.d.ts",
             "import": {
