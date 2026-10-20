@@ -169,8 +169,13 @@ describe("the interaction source from Pressable", () => {
         expect(presses[0]).toMatchObject({ pointer: "mouse" });
         const origin = (presses[0] as { origin: { x: number; y: number } })
             .origin;
-        expect(origin.x).toBeCloseTo(box.left + box.width / 2, 0);
-        expect(origin.y).toBeCloseTo(box.top + box.height / 2, 0);
+        // The click lands on a whole pixel, so within one of the box's center.
+        expect(
+            Math.abs(origin.x - (box.left + box.width / 2)),
+        ).toBeLessThanOrEqual(1);
+        expect(
+            Math.abs(origin.y - (box.top + box.height / 2)),
+        ).toBeLessThanOrEqual(1);
         root.focus();
         await interact(() => userEvent.keyboard("{Enter}"));
         expect(presses[1]).toMatchObject({

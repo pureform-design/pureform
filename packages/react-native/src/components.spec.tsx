@@ -342,7 +342,8 @@ describe("icons", () => {
             return null;
         }
         await render(<Button label="Add" icon={<Probe />} />);
-        expect(style!.size).toBe(18);
+        // M3 Expressive's small button holds a 20dp icon.
+        expect(style!.size).toBe(20);
         expect(style!.color).toMatch(/^rgba?\(/);
         expect(style!.filled).toBe(false);
         expect(computed("pf-button-label").color).toBe(
