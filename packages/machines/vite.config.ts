@@ -25,6 +25,7 @@ export default createConfig({
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",
                     slider: "src/slider/index.ts",
+                    "tags-input": "src/tags-input/index.ts",
                     form: "src/form/index.ts",
                     interaction: "src/interaction/index.ts",
                 },

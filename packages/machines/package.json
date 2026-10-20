@@ -117,6 +117,13 @@
                 "default": "./dist/slider.mjs"
             }
         },
+        "./tags-input": {
+            "types": "./dist/tags-input/index.d.ts",
+            "import": {
+                "development": "./src/tags-input/index.ts",
+                "default": "./dist/tags-input.mjs"
+            }
+        },
         "./form": {
             "types": "./dist/form/index.d.ts",
             "import": {
@@ -148,6 +155,7 @@
         "@zag-js/slider": "catalog:",
         "@zag-js/switch": "catalog:",
         "@zag-js/tabs": "catalog:",
+        "@zag-js/tags-input": "catalog:",
         "@zag-js/tooltip": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
