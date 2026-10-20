@@ -165,11 +165,13 @@ isToggle(props);                         // toggle ?? (selected or defaultSelect
 FAB_ROOT_PROPS; FAB_CONTENT_PROPS; fabSelection(props); fabMachineProps(props); // never a toggle
 
 // Text field and text area: on pureform's text field machine; one contract for both
-interface TextFieldRootOwnProps          // variant, color, density, leadingIcon, trailingIcon (room
-                                         // for the icons), tokens, disabled, invalid, error,
+interface TextFieldRootOwnProps          // variant, color, density, leadingIcon, trailingIcon,
+                                         // prefixText, suffixText (room for them), secure, counterMax,
+                                         // revealLabel, tokens, disabled, invalid, error,
                                          // validate, required, readOnly, placeholder, name, form,
                                          // id, ids, value, defaultValue, onValueChange, testId, unstyled
-interface TextAreaRootOwnProps           // the same, and autoGrow
+interface TextAreaRootOwnProps           // the same without affixes and secure, and autoGrow
+TEXT_FIELD_AFFIX_PROPS;                  // prefixText, suffixText: the ready-made text field's and select's
 TEXT_FIELD_ROOT_PROPS; TEXT_AREA_ROOT_PROPS; TEXT_FIELD_CONTENT_PROPS; // label, supportingText,
                                          // leadingIcon, trailingIcon, mirrorLeadingIcon, mirrorTrailingIcon
 TEXT_FIELD_INPUT_PROPS; TEXT_AREA_INPUT_PROPS; // the ready-made's props that go on the input,

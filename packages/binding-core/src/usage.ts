@@ -96,14 +96,16 @@ export const COMPONENT_USAGE = {
         entries: { tabs: same("variant", "inlineIcon", "color"), ripple: {} },
     },
     text: { entries: { text: { style: "textStyle" } } },
-    // The icons follow their content.
+    // The icons, prefix and suffix follow their content.
     "text-area": {
         entries: {
             textArea: same("variant", "color", "density", "autoGrow"),
         },
     },
     "text-field": {
-        entries: { textField: same("variant", "color", "density") },
+        entries: {
+            textField: same("variant", "color", "density", "secure"),
+        },
     },
     // The trigger is a button.
     tooltip: { entries: { tooltip: same("variant"), button: {}, ripple: {} } },
