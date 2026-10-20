@@ -48,7 +48,7 @@ describe("partTestId", () => {
 
     it("throws for an unknown part", () => {
         expect(() => partTestId(buttonAnatomy, "nope" as "root")).toThrow(
-            'pureform: button has no part "nope" (it has root, label, icon, touchTarget)',
+            'pureform: button has no part "nope" (it has root, label, icon, secondaryIcon, touchTarget)',
         );
     });
 });
@@ -81,7 +81,7 @@ describe("types", () => {
     it("keeps names and test ids literal", () => {
         expectTypeOf(testIds.button.root).toEqualTypeOf<"pf-button-root">();
         expectTypeOf<PartName<typeof buttonAnatomy>>().toEqualTypeOf<
-            "root" | "label" | "icon" | "touchTarget"
+            "root" | "label" | "icon" | "secondaryIcon" | "touchTarget"
         >();
         expectTypeOf<"hiddenSelect">().toExtend<PartOf<"select">>();
         expectTypeOf<"button">().toExtend<AnatomyName>();

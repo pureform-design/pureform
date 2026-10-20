@@ -36,8 +36,13 @@ export type {
     CheckboxVariantProps,
     CheckedState,
 } from "./components/checkbox";
-export { CHIP_ROOT_PROPS, chipSelection } from "./components/chip";
+export {
+    CHIP_CONTENT_PROPS,
+    CHIP_ROOT_PROPS,
+    chipSelection,
+} from "./components/chip";
 export type {
+    ChipContentProps,
     ChipPart,
     ChipRootOwnProps,
     ChipVariantProps,

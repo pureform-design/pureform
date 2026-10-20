@@ -36,6 +36,12 @@ export const button: ComponentCase = {
             mirrorIcon: true,
             variant: "outlined",
         },
+        "with a secondary icon": { secondaryIcon: "▾", variant: "tonal" },
+        "with a secondary icon first": {
+            icon: "+",
+            secondaryIcon: "▾",
+            secondaryIconPosition: "start",
+        },
         "toggle, selected": { defaultSelected: true, variant: "tonal" },
         disabled: { disabled: true },
     },

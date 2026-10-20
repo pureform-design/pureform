@@ -136,5 +136,14 @@ export function connect<T extends PropTypes>(
                 "aria-hidden": true,
             });
         },
+
+        getSecondaryIconProps() {
+            return normalize.element({
+                ...parts.secondaryIcon.attrs,
+                ...dataAttrs,
+                dir: prop("dir"),
+                "aria-hidden": true,
+            });
+        },
     };
 }

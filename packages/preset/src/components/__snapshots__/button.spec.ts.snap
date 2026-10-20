@@ -58,6 +58,24 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
       },
     },
+    "secondaryIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "display": "inline-flex",
+      "fontSize": "var(--components-button-secondaryIconSize, 20px)",
+      "fontVariationSettings": ""FILL" var(--components-button-iconFill, 0)",
+      "height": "var(--components-button-secondaryIconSize, 20px)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "marginInlineEnd": "calc(0px + calc(calc(var(--components-button-secondaryIconSpacing, token(spacing.1)) - 0px) * var(--components-button-secondaryStart, 0)))",
+      "marginInlineStart": "calc(var(--components-button-secondaryIconSpacing, token(spacing.1)) + calc(calc(0px - var(--components-button-secondaryIconSpacing, token(spacing.1))) * var(--components-button-secondaryStart, 0)))",
+      "minWidth": "var(--components-button-secondaryIconSize, 20px)",
+      "width": "var(--components-button-secondaryIconSize, 20px)",
+    },
     "touchTarget": {
       "height": "100%",
       "left": "50%",
@@ -216,6 +234,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
     "color": "primary",
     "corner": "round",
     "density": "inherit",
+    "secondaryIconPosition": "end",
     "size": "small",
     "toggle": false,
     "variant": "filled",
@@ -227,6 +246,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
     "root",
     "label",
     "icon",
+    "secondaryIcon",
     "touchTarget",
   ],
   "variants": {
@@ -318,6 +338,14 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "secondaryIconPosition": {
+      "end": {},
+      "start": {
+        "root": {
+          "--components-button-secondaryStart": "1",
+        },
+      },
+    },
     "size": {
       "compact": {
         "label": {
@@ -328,6 +356,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "token(sizes.iconSmall)",
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-secondaryIconSize": "token(sizes.iconSmall)",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightCompact, token(sizes.controlLarge)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingCompact, token(spacing.8))",
@@ -343,6 +372,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "32px",
           "--components-button-outlineWidth": "2px",
           "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-secondaryIconSize": "32px",
           "--components-button-squareRadius": "token(radii.extraLarge)",
           "height": "calc(var(--components-button-heightLarge, 96px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingLarge, token(spacing.12))",
@@ -358,6 +388,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "24px",
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedRadius": "token(radii.medium)",
+          "--components-button-secondaryIconSize": "24px",
           "--components-button-squareRadius": "token(radii.large)",
           "height": "calc(var(--components-button-heightMedium, 56px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingMedium, token(spacing.6))",
@@ -373,6 +404,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "20px",
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-secondaryIconSize": "20px",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightSmall, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingSmall, token(spacing.4))",
@@ -388,6 +420,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "40px",
           "--components-button-outlineWidth": "3px",
           "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-secondaryIconSize": "40px",
           "--components-button-squareRadius": "token(radii.extraLarge)",
           "height": "calc(var(--components-button-heightXlarge, 136px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingXlarge, token(spacing.16))",
@@ -403,6 +436,7 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
           "--components-button-iconSize": "20px",
           "--components-button-outlineWidth": "1px",
           "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-secondaryIconSize": "20px",
           "--components-button-squareRadius": "token(radii.medium)",
           "height": "calc(var(--components-button-heightXsmall, token(sizes.controlSmall)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingXsmall, token(spacing.3))",

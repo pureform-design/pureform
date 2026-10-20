@@ -33,7 +33,10 @@ describe("classesFor", () => {
         // @ts-expect-error a group the component doesn't have
         button({ shade: "dark" });
         expectTypeOf(button()).toEqualTypeOf<
-            Record<"root" | "label" | "icon" | "touchTarget", string>
+            Record<
+                "root" | "label" | "icon" | "secondaryIcon" | "touchTarget",
+                string
+            >
         >();
         expectTypeOf(avatar()).toEqualTypeOf<string>();
         // @ts-expect-error a value the variant doesn't have

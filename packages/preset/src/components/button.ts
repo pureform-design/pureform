@@ -17,6 +17,11 @@
 //
 // The icon slot is styled but never toggled by a variant. Render the icon element only when
 // there is one, before or after the label; the root's gap spaces it from the label.
+//
+// The optional `secondaryIcon` slot (a dropdown arrow, say) is sized like the icon and has its own
+// spacing on top of the gap: `secondaryIconSpacing`, on the side that faces the label. The
+// `secondaryIconPosition` variant says which side the slot is on, `end` (the default) or `start`; render
+// the element on that side of the label.
 
 import { typed } from "@pureform/core";
 import { add, px, slot, transparent, unitless, when } from "@pureform/core/ast";
@@ -27,6 +32,7 @@ import type { MaterialDensity } from "@pureform/theme";
 import { INDICATION_TOKENS } from "../state-layer";
 import {
     DEFAULT_GROUP,
+    blend,
     colorTokenVariants,
     cornerRadius,
     cornerTransition,
@@ -153,6 +159,11 @@ const { tokens, ref } = componentTokens("button", {
     gap: spacing("2"),
     iconSize: px(20),
     iconFill: unitless(0),
+    // The secondary icon's size (each size sets it with the icon's), the spacing on top of the
+    // gap, and the flag the `secondaryIconPosition` variant sets: 0 when it is after the label, 1 before.
+    secondaryIconSize: px(20),
+    secondaryIconSpacing: spacing("1"),
+    secondaryStart: unitless(0),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
     // Each size's height and padding, so a theme can retune a size.
@@ -292,8 +303,10 @@ export const createButton = <
                     'Material common button at M3 Expressive\'s sizes (xsmall to xlarge; compact is deprecated), with round or square corners. Render the icon slot only when there is an icon. A toggle sets toggle to "true" and marks itself selected with aria-pressed="true".',
             },
             tokens,
-            slots: ["root", "label", "icon", "touchTarget"],
-            structure: { root: ["touchTarget", "icon", "label"] },
+            slots: ["root", "label", "icon", "secondaryIcon", "touchTarget"],
+            structure: {
+                root: ["touchTarget", "icon", "label", "secondaryIcon"],
+            },
             indication: [
                 {
                     trigger: "root",
@@ -308,6 +321,7 @@ export const createButton = <
                 size: keysOf(BUTTON_SIZES),
                 corner: ["round", "square"],
                 toggle: ["false", "true"],
+                secondaryIconPosition: ["end", "start"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
@@ -323,6 +337,21 @@ export const createButton = <
                     icon: iconBox(ref("iconSize"), {
                         fill: iconFill(ref("iconFill")),
                     }),
+                    secondaryIcon: {
+                        ...iconBox(ref("secondaryIconSize"), {
+                            fill: iconFill(ref("iconFill")),
+                        }),
+                        marginInlineStart: blend(
+                            ref("secondaryIconSpacing"),
+                            px(0),
+                            ref("secondaryStart"),
+                        ),
+                        marginInlineEnd: blend(
+                            px(0),
+                            ref("secondaryIconSpacing"),
+                            ref("secondaryStart"),
+                        ),
+                    },
                     touchTarget,
                 },
                 variants: {
@@ -357,6 +386,7 @@ export const createButton = <
                                     tokens: {
                                         gap: s.gap,
                                         iconSize: s.icon,
+                                        secondaryIconSize: s.icon,
                                         outlineWidth: s.outline,
                                         squareRadius: s.square,
                                         pressedRadius: s.pressed,
@@ -384,6 +414,12 @@ export const createButton = <
                         false: {},
                         true: { root: { tokens: { toggles: unitless(1) } } },
                     },
+                    secondaryIconPosition: {
+                        end: {},
+                        start: {
+                            root: { tokens: { secondaryStart: unitless(1) } },
+                        },
+                    },
                     density: densityTokenVariant(densities),
                 },
                 // A toggle's colors need both its fill and the toggle: one compound per fill.
@@ -397,6 +433,7 @@ export const createButton = <
                     size: "small",
                     corner: "round",
                     toggle: "false",
+                    secondaryIconPosition: "end",
                     density: "inherit",
                 },
             }),
