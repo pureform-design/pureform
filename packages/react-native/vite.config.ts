@@ -20,6 +20,7 @@ export default createConfig({
                     chip: "src/chip/index.ts",
                     "circular-progress": "src/circular-progress/index.ts",
                     dialog: "src/dialog/index.ts",
+                    "fullscreen-dialog": "src/fullscreen-dialog/index.ts",
                     fab: "src/fab/index.ts",
                     icon: "src/icon/index.ts",
                     "icon-button": "src/icon-button/index.ts",
