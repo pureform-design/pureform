@@ -55,11 +55,12 @@ const ROW_PAIRS = [
     pair(token("selectedContent"), token("selectedContainer"), TEXT_CONTRAST),
 ];
 
-// A navigation destination: its label on the container, and its icon on the pill or the
-// container.
+// A navigation destination: its label on the container (or, in a horizontal item, on the
+// pill), and its icon on the pill or the container.
 const NAV_PAIRS = [
     pair(token("labelColor"), token("container"), TEXT_CONTRAST),
     pair(token("activeLabelColor"), token("container"), TEXT_CONTRAST),
+    pair(token("horizontalActiveLabelColor"), token("indicatorColor"), TEXT_CONTRAST),
     pair(token("iconColor"), token("container"), UI_CONTRAST),
     pair(token("activeIconColor"), token("indicatorColor"), UI_CONTRAST),
 ];
