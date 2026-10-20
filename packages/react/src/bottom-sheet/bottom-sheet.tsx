@@ -20,6 +20,7 @@ import {
     isPresent,
     presentProps,
     sheetContentLayout,
+    sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
 } from "@pureform/binding-core";
@@ -262,7 +263,10 @@ function DragHandle({
         element: "button",
         as: (as as ElementType | undefined) ?? DragHandleComponent,
         ref,
-        machine: api.getCloseTriggerProps(),
+        machine: mergeProps(
+            api.getCloseTriggerProps(),
+            normalizeProps.element(sheetDragHandleLayout),
+        ),
         unstyled,
         props,
     });

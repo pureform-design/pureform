@@ -10,6 +10,7 @@ import {
 import type { Indication } from "@pureform/react";
 import { Avatar } from "@pureform/react/avatar";
 import { Badge } from "@pureform/react/badge";
+import { BottomSheet } from "@pureform/react/bottom-sheet";
 import { Button } from "@pureform/react/button";
 import { ButtonGroup } from "@pureform/react/button-group";
 import { Card } from "@pureform/react/card";
@@ -17,6 +18,7 @@ import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { CircularProgress } from "@pureform/react/circular-progress";
 import { Dialog } from "@pureform/react/dialog";
+import { DragHandle } from "@pureform/react/drag-handle";
 import { Fab } from "@pureform/react/fab";
 import { FabMenu } from "@pureform/react/fab-menu";
 import { FullscreenDialog } from "@pureform/react/fullscreen-dialog";
@@ -36,6 +38,7 @@ import { Scrim } from "@pureform/react/scrim";
 import { SearchBar } from "@pureform/react/search-bar";
 import { Select } from "@pureform/react/select";
 import { Separator } from "@pureform/react/separator";
+import { SideSheet } from "@pureform/react/side-sheet";
 import { Slider } from "@pureform/react/slider";
 import { Snackbar } from "@pureform/react/snackbar";
 import { SplitButton } from "@pureform/react/split-button";
@@ -65,6 +68,7 @@ import { sceneTheme } from "../../harness/themes";
 export const components: Record<ComponentName, ComponentType<never>> = {
     Avatar,
     Badge,
+    BottomSheet,
     Button,
     ButtonGroup,
     Card,
@@ -72,6 +76,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Chip,
     CircularProgress,
     Dialog,
+    DragHandle,
     Fab,
     FullscreenDialog,
     FabMenu,
@@ -91,6 +96,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     SearchBar,
     Select,
     Separator,
+    SideSheet,
     Slider,
     Snackbar,
     SplitButton,

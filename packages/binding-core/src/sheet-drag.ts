@@ -10,7 +10,8 @@ export const SHEET_FLICK_SPEED = 0.5;
 // Moves shorter than this are a press, not a drag.
 const SLOP = 4;
 
-/** Lets `handle` drag `sheet` down, calling `dismiss` when a drag should close it. Returns what
+/** Lets `handle` drag `sheet` down (give the handle `sheetDragHandleLayout` too, so touch moves
+ *  drag rather than scroll), calling `dismiss` when a drag should close it. Returns what
  *  stops it. */
 export const dragToDismiss = (
     handle: HTMLElement,
@@ -76,8 +77,6 @@ export const dragToDismiss = (
         event.stopImmediatePropagation();
     };
 
-    // Touch moves drag the sheet rather than scroll the page.
-    handle.style.touchAction = "none";
     handle.addEventListener("pointerdown", onDown);
     handle.addEventListener("pointermove", onMove);
     handle.addEventListener("pointerup", onUp);

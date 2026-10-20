@@ -22,7 +22,7 @@ export const sideSheet: ComponentCase = {
     root: ids.root,
     examples: {
         closed: {},
-        "with a back button": { onBack: () => {} },
+        "with actions": { actions: "Save" },
     },
     opened: {
         plain: { defaultOpen: true },

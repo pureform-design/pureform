@@ -21,6 +21,7 @@ import {
     isPresent,
     presentProps,
     sheetContentLayout,
+    sheetDragHandleLayout,
     sheetMachineProps,
     sheetModal,
 } from "@pureform/binding-core";
@@ -250,7 +251,11 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
             stop?.();
             stop = dragToDismiss(element, surface, () => api().setOpen(false));
         },
-        machine: () => api().getCloseTriggerProps(),
+        machine: () =>
+            mergeProps(
+                api().getCloseTriggerProps(),
+                normalizeProps.element(sheetDragHandleLayout),
+            ),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled", "as"),
     });
