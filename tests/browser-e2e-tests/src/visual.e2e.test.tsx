@@ -41,6 +41,7 @@ const SECTIONS = [
     "select",
     "progress",
     "navigation",
+    "badges",
 ];
 
 let dispose: (() => void) | undefined;
