@@ -8,7 +8,7 @@ here imports a framework.
 
 It depends on Zag's framework-free packages (`@zag-js/core`, `anatomy`, `dom-query`, `types`,
 `utils`, `collection`, and the `checkbox`, `switch`, `radio-group`, `select`, `menu`, `dialog`,
-`tooltip`, `tabs`, and `presence` machines), on `@pureform/js-effects` for the ripple, and on
+`tooltip`, `tabs`, `toggle-group`, and `presence` machines), on `@pureform/js-effects` for the ripple, and on
 `@pureform/binding-core/interaction` for the interaction source its machines emit to. The bindings
 depend on it.
 
@@ -49,6 +49,7 @@ callback reports user actions only, with a details object.
 | `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                               |
 | `dialog.ts`                                               | Zag's dialog, re-exported; its dismissable layer doesn't mirror the dialog's layer onto the backdrop and positioner (no forced style read). |
 | `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                       |
+| `button-group.ts`                                         | Zag's toggle group behind a selectable button group: the root is a `group` and every item a toggle button with `aria-pressed`.              |
 | `presence.ts`                                             | Zag's presence, re-exported; keeps an overlay mounted until its exit animation ends, and only the exit's own animations end it.             |
 | `slider/`                                                 | Zag's slider under the preset's part names: thumbs, range, stops, value indicator, fieldsets.                                               |
 | `checkbox.ts`, `switch.ts`, `radio-group.ts`, `select.ts` | Zag's machines, re-exported, emitting to an interaction source; all but the checkbox's with pureform's form rules.                          |
@@ -59,26 +60,27 @@ callback reports user actions only, with a details object.
 
 ## Public API
 
-| Import                           | Exports                                                                                                                                                                                                                                 |
-| -------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `@pureform/machines`             | the namespaces below, the form helpers, Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types, and `InteractionProps`, `ItemInteractionProps`                                                                                 |
-| `@pureform/machines/button`      | `button`'s members                                                                                                                                                                                                                      |
-| `@pureform/machines/checkbox`    | `@zag-js/checkbox`                                                                                                                                                                                                                      |
-| `@pureform/machines/switch`      | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                                                                                                  |
-| `@pureform/machines/radio-group` | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                                                                                                              |
-| `@pureform/machines/select`      | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules and derived selected items                                                                                                     |
-| `@pureform/machines/menu`        | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
-| `@pureform/machines/dialog`      | `@zag-js/dialog` (`dialog` at the root), its `machine` without the layer mirrored onto the backdrop and positioner                                                                                                                      |
-| `@pureform/machines/tooltip`     | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
-| `@pureform/machines/presence`    | `@zag-js/presence` (`presence` at the root), its `machine` ending an exit only on the exit's own animations                                                                                                                             |
-| `@pureform/machines/tabs`        | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
-| `@pureform/machines/snackbar`    | `snackbar`'s members                                                                                                                                                                                                                    |
-| `@pureform/machines/navigation`  | `navigation`'s members                                                                                                                                                                                                                  |
-| `@pureform/machines/ripple`      | `ripple`'s members                                                                                                                                                                                                                      |
-| `@pureform/machines/text-field`  | `textField`'s members                                                                                                                                                                                                                   |
-| `@pureform/machines/slider`      | `slider`'s members (Zag's slider, wrapped)                                                                                                                                                                                              |
-| `@pureform/machines/form`        | the form helpers                                                                                                                                                                                                                        |
-| `@pureform/machines/interaction` | `InteractionEmitter`, `InteractionEmitters`, `claimEvent`, `pointerKind`, `isFocusVisible`, `withInteraction`, `chainProps`, `emittersOf`: emitting to an interaction source from a machine of your own (or React Native's `Pressable`) |
+| Import                            | Exports                                                                                                                                                                                                                                 |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/machines`              | the namespaces below, the form helpers, Zag's `Machine`, `Service`, `PropTypes`, `NormalizeProps` types, and `InteractionProps`, `ItemInteractionProps`                                                                                 |
+| `@pureform/machines/button`       | `button`'s members                                                                                                                                                                                                                      |
+| `@pureform/machines/checkbox`     | `@zag-js/checkbox`                                                                                                                                                                                                                      |
+| `@pureform/machines/switch`       | `@zag-js/switch` (the `switchControl` namespace at the root), its `machine` with pureform's form rules                                                                                                                                  |
+| `@pureform/machines/radio-group`  | `@zag-js/radio-group` (`radioGroup` at the root), its `machine` with pureform's form rules                                                                                                                                              |
+| `@pureform/machines/select`       | `@zag-js/select` (`select` at the root, `collection` included), its `machine` with pureform's form rules and derived selected items                                                                                                     |
+| `@pureform/machines/menu`         | `@zag-js/menu` (`menu` at the root)                                                                                                                                                                                                     |
+| `@pureform/machines/dialog`       | `@zag-js/dialog` (`dialog` at the root), its `machine` without the layer mirrored onto the backdrop and positioner                                                                                                                      |
+| `@pureform/machines/tooltip`      | `@zag-js/tooltip` (`tooltip` at the root)                                                                                                                                                                                               |
+| `@pureform/machines/presence`     | `@zag-js/presence` (`presence` at the root), its `machine` ending an exit only on the exit's own animations                                                                                                                             |
+| `@pureform/machines/tabs`         | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
+| `@pureform/machines/button-group` | `@zag-js/toggle-group` (`buttonGroup` at the root), its `connect` making the root a `group` and each item a toggle button (`aria-pressed`) in single mode too                                                                           |
+| `@pureform/machines/snackbar`     | `snackbar`'s members                                                                                                                                                                                                                    |
+| `@pureform/machines/navigation`   | `navigation`'s members                                                                                                                                                                                                                  |
+| `@pureform/machines/ripple`       | `ripple`'s members                                                                                                                                                                                                                      |
+| `@pureform/machines/text-field`   | `textField`'s members                                                                                                                                                                                                                   |
+| `@pureform/machines/slider`       | `slider`'s members (Zag's slider, wrapped)                                                                                                                                                                                              |
+| `@pureform/machines/form`         | the form helpers                                                                                                                                                                                                                        |
+| `@pureform/machines/interaction`  | `InteractionEmitter`, `InteractionEmitters`, `claimEvent`, `pointerKind`, `isFocusVisible`, `withInteraction`, `chainProps`, `emittersOf`: emitting to an interaction source from a machine of your own (or React Native's `Pressable`) |
 
 ```ts
 import { button } from "@pureform/machines";
@@ -122,13 +124,13 @@ design doc §9.8). A machine with one surface takes it as `interactionSource`; a
 binding makes them and passes them in; without one, nothing is emitted (the button keeps a source of
 its own, since its API reads one).
 
-| Machine          | Surface (element the handlers are on)  | Emits                                                                                                                  |
-| ---------------- | -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| button           | root                                   | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
-| checkbox, switch | root (label) and native input          | pointer press and hover on the root; Space press and focus on the input                                                |
-| radio group      | each item (label) and its native input | the same, per radio                                                                                                    |
-| slider           | root and handles                       | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
-| tabs, navigation | each tab or destination                | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
+| Machine          | Surface (element the handlers are on)               | Emits                                                                                                                  |
+| ---------------- | --------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| button           | root                                                | press (pointer from its point, Enter or Space from the center), release/cancel, hover, focus                           |
+| checkbox, switch | root (label) and native input                       | pointer press and hover on the root; Space press and focus on the input                                                |
+| radio group      | each item (label) and its native input              | the same, per radio                                                                                                    |
+| slider           | root and handles                                    | press and `dragStart` while the pointer is down, then `dragStop` and release; hover, focus                             |
+| tabs, navigation | each tab or destination                             | press (pointer; Enter, or Space unless it's a link), hover, focus                                                      |
 | menu, select     | each item or option (a menu's toggleable items too) | the highlighted one hovers (no origin element); pointer press; Enter or Space presses and releases the highlighted one |
 
 - **Touch never hovers**: a `pointerType` of `touch` emits no `hoverEnter`.
