@@ -5,7 +5,6 @@ import {
     compositeTestIds,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
-    listAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
@@ -145,16 +144,6 @@ describe("composites", () => {
         for (const name of ["tabContent", "icon", "label", "indicator"]) {
             expect(parts[name]!.parent).toBe(preset[name]!.parent);
             expect(parts[name]!.children).toEqual(preset[name]!.children);
-        }
-    });
-
-    it("the list is unstyled, around its items", () => {
-        expect(Object.keys(anatomy)).not.toContain(listAnatomy.name);
-        for (const name of listAnatomy.partNames) {
-            expect(listAnatomy.parts[name].styled).toBe(false);
-            expect(listAnatomy.parts[name].testId).toBe(
-                compositeTestIds.list[name],
-            );
         }
     });
 });

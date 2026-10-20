@@ -53,6 +53,7 @@ import { dialog } from "./components/dialog";
 import { createFab } from "./components/fab";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
+import { list } from "./components/list";
 import { createListItem } from "./components/list-item";
 import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
@@ -281,6 +282,7 @@ const defaultComponents = <G extends string>(
         linearProgress: createLinearProgress(theme.color.groups),
         circularProgress: createCircularProgress(theme.color.groups),
         separator,
+        list,
         listItem: createListItem<G, Step>(theme.color.groups, densities),
         menu: createMenu<G, Step>(theme.color.groups, densities),
         tabs: createTabs(theme.color.groups),

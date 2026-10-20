@@ -6,24 +6,29 @@
 // disabled. The parts inside follow the row through slot conditions, so `rowParts` takes the
 // row's slot name.
 
+import { typed } from "@pureform/core";
 import {
     center,
+    column,
     flex,
     none,
     pointer,
+    px,
     relative,
     row,
     slot,
+    transparent,
     unitless,
     when,
 } from "@pureform/core/ast";
 import type {
     AliasNode,
     ColorValue,
+    NumericValue,
     StyleMap,
     ValueNode,
 } from "@pureform/core/ast";
-import { size as sizeToken, textStyle } from "@pureform/theme";
+import { radius, size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import {
@@ -73,16 +78,20 @@ export const rowParts = (
         container: ref("selectedContainer"),
         content: ref("selectedContent"),
     },
+    // The states that mark the row chosen: a toggleable menu item is `checked` too.
+    chosen: readonly ("selected" | "checked")[] = ["selected"],
 ) => {
-    const selected = slot(rowSlot, "selected");
     const disabled = slot(rowSlot, "disabled");
+    const byChosen = (style: StyleMap) =>
+        Object.fromEntries(chosen.map((state) => [state, style]));
 
     // A part's color: its own at rest, the selected content once selected, dimmed if disabled.
-    const partColor = (rest: ColorValue) =>
-        when()
-            .on(selected, selectedColors.content)
-            .on(disabled, disabledColor("disabledContent"))
-            .else(rest);
+    const partColor = (rest: ColorValue) => {
+        const cases = when();
+        for (const state of chosen)
+            cases.on(slot(rowSlot, state), selectedColors.content);
+        return cases.on(disabled, disabledColor("disabledContent")).else(rest);
+    };
 
     const row_: StyleMap = {
         transition: stateTransition,
@@ -93,10 +102,10 @@ export const rowParts = (
         backgroundColor: ref("container"),
         color: ref("content"),
         states: {
-            selected: {
+            ...byChosen({
                 backgroundColor: selectedColors.container,
                 color: selectedColors.content,
-            },
+            }),
             disabled: { color: disabledColor("disabledContent") },
         },
     };
@@ -110,13 +119,13 @@ export const rowParts = (
             content: ref("content"),
         }),
         states: {
-            selected: {
+            ...byChosen({
                 backgroundColor: stateLayer(ref, {
                     base: selectedColors.container,
                     content: selectedColors.content,
                 }),
                 color: selectedColors.content,
-            },
+            }),
             disabled: {
                 pointerEvents: none,
                 color: disabledColor("disabledContent"),
@@ -155,20 +164,111 @@ export const rowGroupColors = (
     ref: (token: RowToken) => AliasNode,
     rowSlot: string,
     group: { container: ColorValue; onContainer: ColorValue },
+    chosen: readonly ("selected" | "checked")[] = ["selected"],
 ) => {
-    const p = rowParts(ref, rowSlot, {
-        container: group.container,
-        content: group.onContainer,
-    });
+    const p = rowParts(
+        ref,
+        rowSlot,
+        { container: group.container, content: group.onContainer },
+        chosen,
+    );
     const color = (style: StyleMap): StyleMap =>
         style.color === undefined ? {} : { color: style.color };
+    const pick = (style: StyleMap) =>
+        Object.fromEntries(
+            chosen.map((state) => [state, style.states?.[state] ?? {}]),
+        );
     return {
-        row: { states: { selected: p.row.states?.selected ?? {} } },
-        interactive: {
-            states: { selected: p.interactive.states?.selected ?? {} },
-        },
+        row: { states: pick(p.row) },
+        interactive: { states: pick(p.interactive) },
         leading: color(p.leading),
         trailing: color(p.trailing),
         supportingText: color(p.supportingText),
     } satisfies Record<string, StyleMap>;
 };
+
+/** Where a tile sits in a run of separate tiles (a segmented list's items, a menu's groups):
+ *  `none` outside such a run. */
+export const POSITIONS = ["none", "first", "middle", "last", "single"] as const;
+
+export type Position = (typeof POSITIONS)[number];
+
+/** The corners of a tile by its position in a run stacked in the block direction: `outer` on
+ *  the run's outside corners, `inner` where it meets the tile next to it. `none` sets nothing. */
+export const positionCorners = (
+    outer: NumericValue,
+    inner: NumericValue,
+): Record<Position, StyleMap> => {
+    const corners = (start: NumericValue, end: NumericValue): StyleMap => ({
+        borderStartStartRadius: start,
+        borderStartEndRadius: start,
+        borderEndStartRadius: end,
+        borderEndEndRadius: end,
+    });
+    return {
+        none: {},
+        first: corners(outer, inner),
+        middle: corners(inner, inner),
+        last: corners(inner, outer),
+        single: corners(outer, outer),
+    };
+};
+
+const listPf = typed();
+
+const LIST = componentTokens("list", {
+    container: sys("surface"),
+    paddingBlock: spacing("2"),
+    segmentedGap: px(2),
+});
+
+/** The list around list items: a `<ul>` with the list's padding and container color, and an
+ *  `<li>` per item. `segmented` sets its items apart as tiles with a gap between them; the
+ *  binding gives each item its `position`, which rounds its corners. */
+export const list = listPf.slotComponent({
+    name: "list",
+    $meta: {
+        description:
+            "Material list container: a ul around list items in li elements. Segmented sets the items apart as tiles; give each item its position.",
+    },
+    tokens: LIST.tokens,
+    slots: ["root", "item"],
+    structure: { root: ["item"] },
+    variants: { variant: ["standard", "segmented"] },
+    recipe: () => ({
+        base: {
+            root: {
+                display: flex,
+                flexDirection: column,
+                backgroundColor: LIST.ref("container"),
+                marginBlockStart: px(0),
+                marginBlockEnd: px(0),
+                paddingInlineStart: px(0),
+                paddingInlineEnd: px(0),
+                paddingBlockStart: LIST.ref("paddingBlock"),
+                paddingBlockEnd: LIST.ref("paddingBlock"),
+            },
+            // A flex box draws no list marker.
+            item: { display: flex, flexDirection: column },
+        },
+        variants: {
+            variant: {
+                standard: {},
+                // The tiles carry the color; the gap between them shows what's behind.
+                segmented: {
+                    root: {
+                        gap: LIST.ref("segmentedGap"),
+                        backgroundColor: transparent,
+                    },
+                },
+            },
+        },
+        defaultVariants: { variant: "standard" },
+    }),
+});
+
+/** The radii a tile takes by position: the theme's large and extra-small roles. */
+export const TILE_RADII = {
+    outerRadius: radius("large"),
+    innerRadius: radius("extraSmall"),
+} satisfies Record<string, ValueNode>;
