@@ -570,8 +570,18 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   targets. Built CSS is about 28% smaller raw (7% gzipped) on the CSS target and 34% (9%)
   on Tailwind; React Native's precomputed styles are 12% smaller.
 - **What stays compound:** cases that need both conditions at once: the FAB's size with
-  its shape and with `extended`, each text input's fill with a leading icon, primary tabs
-  with an icon, and interactive cards per fill (3).
+  its shape, each text input's fill with a leading icon, primary tabs with an icon,
+  interactive cards per fill (3), and each fill's toggle colors on the button and icon button
+  (5 each), whose selected colors read the `color` group's tokens. 21 across the preset.
+- **Flags for two groups (M3 Expressive):** when a value depends on two groups, one sets a
+  literal token and the other a 0/1 flag token, and `blend(from, to, flag)` picks between
+  them: the size sets `squareRadius` and `corner: square` sets `square`; `width` sets
+  `narrow`/`wide`; `inset` sets `insetStart`/`insetEnd`. A FAB that isn't extended is square
+  through `aspectRatio: 1`, not a width per size.
+- **No chained tokens:** a variant must not set a token to another token that a variant sets
+  (`a: token("b")`). CSS resolves the chain on the element, but React Native resolves `b` from
+  the theme's default before the variant's, so the targets disagree. Read such tokens in styles
+  instead, and read theme- or instance-set tokens (per-size tokens) directly.
 
 ### 5.6 Themes
 
@@ -2005,7 +2015,8 @@ From today's preset:
 | navigation bar and rail destination                      | item            | `activeIndicator`                     | yes      |
 | checkbox, radio                                          | native input    | root circle                           | yes      |
 | switch                                                   | native input    | `stateLayer`                          | yes      |
-| slider                                                   | native input    | the handle's state layer (drag emits) | yes      |
+| slider (`handleShape: "round"`)                          | native input    | the handle's state layer (drag emits) | yes      |
+| slider (`handleShape: "bar"`, M3 Expressive's default)   | native input    | none drawn: the handle narrows        | —        |
 
 - **No indication:** text fields and the search bar's field draw their own active indicator;
   dialogs, menus, tooltips, progress, and static components aren't interactive.
