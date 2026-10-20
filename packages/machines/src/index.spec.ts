@@ -5,6 +5,7 @@ import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
 import * as zagSwitch from "@zag-js/switch";
 import * as zagTabs from "@zag-js/tabs";
+import * as zagTagsInput from "@zag-js/tags-input";
 import * as zagTooltip from "@zag-js/tooltip";
 import { describe, expect, it } from "vitest";
 
@@ -26,6 +27,7 @@ describe("@pureform/machines", () => {
             select: zagSelect,
             switchControl: zagSwitch,
             tabs: zagTabs,
+            tagsInput: zagTagsInput,
         };
         for (const [name, own] of Object.entries(zag)) {
             const ours = machines[name as keyof typeof zag];

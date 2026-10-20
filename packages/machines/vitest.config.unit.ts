@@ -22,6 +22,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/radio-group",
             "@zag-js/select",
             "@zag-js/switch",
+            "@zag-js/tags-input",
             "@zag-js/tooltip",
             "@zag-js/vanilla",
         ],
