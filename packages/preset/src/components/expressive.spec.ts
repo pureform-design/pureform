@@ -112,7 +112,7 @@ describe("M3 Expressive", () => {
 
     it("thickens both progress indicators", () => {
         expect(linearProgress.recipe.variants?.thickness?.thick).toHaveProperty(
-            "root.height",
+            "root.tokens",
         );
         expect(
             circularProgress.recipe.variants?.thickness?.thick,

@@ -1,5 +1,5 @@
-// The progress indicators: linear (a track and its indicator) and circular (two halves, each
-// clipping an arc). Without a value they're indeterminate. The value is the instance's `value`
+// The progress indicators: linear (a track, its indicator and a stop dot) and circular (a track,
+// then two halves, each clipping an arc). Without a value they're indeterminate. The value is the instance's `value`
 // token, a percentage of the way from `min` to `max`, which moves over its transition.
 
 import {
@@ -52,7 +52,12 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
         testIdOf(linearProgressAnatomy, part, props.testId);
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+            <v.track.View style={s.track} testID={id("track")} />
             <v.indicator.View style={s.indicator} testID={id("indicator")} />
+            <v.stopIndicator.View
+                style={s.stopIndicator}
+                testID={id("stopIndicator")}
+            />
         </v.root.View>
     );
 }
@@ -70,6 +75,26 @@ function CircularProgressImpl(props: CircularProgressProps): ReactNode {
         testIdOf(circularProgressAnatomy, part, props.testId);
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
+            <v.track.View style={s.track} testID={id("track")}>
+                <v.trackEndHalf.View
+                    style={s.trackEndHalf}
+                    testID={id("trackEndHalf")}
+                >
+                    <v.trackEndArc.View
+                        style={s.trackEndArc}
+                        testID={id("trackEndArc")}
+                    />
+                </v.trackEndHalf.View>
+                <v.trackStartHalf.View
+                    style={s.trackStartHalf}
+                    testID={id("trackStartHalf")}
+                >
+                    <v.trackStartArc.View
+                        style={s.trackStartArc}
+                        testID={id("trackStartArc")}
+                    />
+                </v.trackStartHalf.View>
+            </v.track.View>
             <v.endHalf.View style={s.endHalf} testID={id("endHalf")}>
                 <v.endArc.View style={s.endArc} testID={id("endArc")} />
             </v.endHalf.View>

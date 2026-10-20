@@ -283,7 +283,7 @@ listItemVariants(list, item);            // the item's own over the list's; read
 
 // Linear and circular progress (no machine)
 type ProgressComponent = "linearProgress" | "circularProgress";
-type LinearProgressPart; type CircularProgressPart;
+type LinearProgressPart; type CircularProgressPart;   // incl. track, stopIndicator, trackEnd/StartHalf/Arc
 interface ProgressRootOwnProps<C>        // indeterminate, color, tokens, value, min, max, testId,
                                          // unstyled
 PROGRESS_ROOT_PROPS;

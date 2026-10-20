@@ -255,7 +255,7 @@ describe("movingSlots", () => {
         );
         expect(nativeFactory("dialog", styles).moving).toEqual(new Set());
         expect(nativeFactory("linearProgress", styles).moving).toEqual(
-            new Set(["indicator"]),
+            new Set(["track", "indicator"]),
         );
     });
 });

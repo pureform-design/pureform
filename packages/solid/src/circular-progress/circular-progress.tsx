@@ -1,5 +1,5 @@
-// The circular progress indicator: Root, a `role="progressbar"` circle, around its two halves, each
-// clipping an arc, and the ready-made CircularProgress over them. It has no machine: the app sets
+// The circular progress indicator: Root, a `role="progressbar"` circle, around its track and its two
+// halves, each clipping an arc, and the ready-made CircularProgress over them. It has no machine: the app sets
 // the value, which turns the arcs through the preset's `value` token. Without one it's
 // indeterminate, and the circle spins.
 
@@ -64,7 +64,16 @@ function Root(props: CircularProgressRootProps): JSX.Element {
 }
 
 const part = (
-    name: "endHalf" | "endArc" | "startHalf" | "startArc",
+    name:
+        | "track"
+        | "trackEndHalf"
+        | "trackEndArc"
+        | "trackStartHalf"
+        | "trackStartArc"
+        | "endHalf"
+        | "endArc"
+        | "startHalf"
+        | "startArc",
     label: string,
 ) =>
     function Part(props: CircularProgressPartProps): JSX.Element {
@@ -76,6 +85,17 @@ const part = (
         });
     };
 
+/** The track: the rest of the circle, with a gap after the indicator and before its start. Holds
+ *  `TrackEndHalf` and `TrackStartHalf`. */
+const TrackPart = part("track", "Track");
+/** The half of the track at the end side. Holds `TrackEndArc`. */
+const TrackEndHalf = part("trackEndHalf", "TrackEndHalf");
+/** The arc the track's end half clips. Empty. */
+const TrackEndArc = part("trackEndArc", "TrackEndArc");
+/** The half of the track at the start side. Holds `TrackStartArc`. */
+const TrackStartHalf = part("trackStartHalf", "TrackStartHalf");
+/** The arc the track's start half clips. Empty. */
+const TrackStartArc = part("trackStartArc", "TrackStartArc");
 /** The half at the end side, which draws the first half of the amount. Holds `EndArc`. */
 const EndHalf = part("endHalf", "EndHalf");
 /** The arc the end half clips. Empty. */
@@ -95,7 +115,7 @@ export interface CircularProgressProps
         >,
         SlotKeyedProps<Anatomy> {}
 
-/** The ready-made circular progress indicator: Root, its halves, and their arcs. */
+/** The ready-made circular progress indicator: Root, its track, its halves, and their arcs. */
 function ReadyMade(props: CircularProgressProps): JSX.Element {
     const slots = createSlotProps(props);
     const own = omit(
@@ -105,12 +125,25 @@ function ReadyMade(props: CircularProgressProps): JSX.Element {
         "slotProps",
     ) as CircularProgressRootProps;
     const root = slots("root") as object;
+    const track = slots("track");
+    const trackEndHalf = slots("trackEndHalf");
+    const trackEndArc = slots("trackEndArc");
+    const trackStartHalf = slots("trackStartHalf");
+    const trackStartArc = slots("trackStartArc");
     const endHalf = slots("endHalf");
     const endArc = slots("endArc");
     const startHalf = slots("startHalf");
     const startArc = slots("startArc");
     return (
         <Root {...own} {...root}>
+            <TrackPart {...track}>
+                <TrackEndHalf {...trackEndHalf}>
+                    <TrackEndArc {...trackEndArc} />
+                </TrackEndHalf>
+                <TrackStartHalf {...trackStartHalf}>
+                    <TrackStartArc {...trackStartArc} />
+                </TrackStartHalf>
+            </TrackPart>
             <EndHalf {...endHalf}>
                 <EndArc {...endArc} />
             </EndHalf>
@@ -123,10 +156,15 @@ function ReadyMade(props: CircularProgressProps): JSX.Element {
 
 /** Material's circular progress indicator. Use it ready-made, `<CircularProgress value={40}
  *  aria-label="Loading" />` (leave `value` out while the amount is unknown), or compose its parts
- *  under `CircularProgress.Root`: `EndHalf` holding `EndArc`, then `StartHalf` holding
- *  `StartArc`. */
+ *  under `CircularProgress.Root`: `Track` (its two halves, each holding an arc), then `EndHalf`
+ *  holding `EndArc`, then `StartHalf` holding `StartArc`. */
 export const CircularProgress = Object.assign(ReadyMade, {
     Root,
+    Track: TrackPart,
+    TrackEndHalf,
+    TrackEndArc,
+    TrackStartHalf,
+    TrackStartArc,
     EndHalf,
     EndArc,
     StartHalf,
