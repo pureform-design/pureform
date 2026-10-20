@@ -1,6 +1,7 @@
 export * from "./state-layer";
 export * from "./components/avatar";
 export * from "./components/button";
+export * from "./components/button-group";
 export * from "./components/icon-button";
 export * from "./components/card";
 export * from "./components/scrim";

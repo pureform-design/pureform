@@ -262,6 +262,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
       "color": "primary",
       "corner": "round",
       "density": "inherit",
+      "position": "none",
       "shape": "none",
       "size": "small",
       "toggle": false,
@@ -367,6 +368,222 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+      "position": {
+        "first": {
+          "container": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+          },
+          "outline": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+          },
+          "root": {
+            "borderEndEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+          },
+        },
+        "last": {
+          "container": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+          "outline": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+          "root": {
+            "borderEndEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderEndStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedRadius, token(radii.small))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0))) + calc(calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-squareRadius, token(radii.medium))) * var(--components-iconButton-square, 0))) - calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))) * var(--components-iconButton-toggles, 0)))",
+              "base": "calc(var(--components-iconButton-radius, token(radii.full)) + calc(calc(var(--components-iconButton-squareRadius, token(radii.medium)) - var(--components-iconButton-radius, token(radii.full))) * var(--components-iconButton-square, 0)))",
+            },
+            "borderStartStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+        },
+        "middle": {
+          "container": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+          "outline": {
+            "borderEndEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              ".iconButton__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              ".iconButton__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+          "root": {
+            "borderEndEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderEndStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartEndRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+            "borderStartStartRadius": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-iconButton-pressedInnerRadius, token(radii.extraSmall))",
+              "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(var(--components-iconButton-innerRadius, token(radii.small)) + calc(calc(var(--components-iconButton-radius, token(radii.full)) - var(--components-iconButton-innerRadius, token(radii.small))) * var(--components-iconButton-toggles, 0)))",
+              "base": "var(--components-iconButton-innerRadius, token(radii.small))",
+            },
+          },
+        },
+        "none": {},
+        "single": {
+          "root": {
+            "--components-iconButton-pressedGrowth": "token(spacing.3)",
+            "transition": {
+              "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+              "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized), padding-inline-start token(durations.medium1) token(easings.emphasized), padding-inline-end token(durations.medium1) token(easings.emphasized), width token(durations.medium1) token(easings.emphasized)",
+            },
+          },
+        },
+      },
       "shape": {
         "circle": {
           "container": {
@@ -397,61 +614,91 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
         "compact": {
           "root": {
             "--components-iconButton-iconSize": "token(sizes.iconMedium)",
+            "--components-iconButton-innerRadius": "token(radii.small)",
             "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedInnerRadius": "token(radii.extraSmall)",
             "--components-iconButton-pressedRadius": "token(radii.small)",
             "--components-iconButton-squareRadius": "token(radii.medium)",
             "height": "calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideCompact, token(sizes.controlLarge)) - calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideCompact, token(sizes.controlLarge)) - calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideCompact, token(sizes.controlLarge)) - calc(var(--components-iconButton-sizeCompact, token(sizes.controlLarge)) + calc(calc(var(--components-iconButton-narrowCompact, token(sizes.controlLarge)) - var(--components-iconButton-sizeCompact, token(sizes.controlLarge))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
         "large": {
           "root": {
             "--components-iconButton-iconSize": "32px",
+            "--components-iconButton-innerRadius": "token(radii.large)",
             "--components-iconButton-outlineWidth": "2px",
+            "--components-iconButton-pressedInnerRadius": "token(radii.medium)",
             "--components-iconButton-pressedRadius": "token(radii.large)",
             "--components-iconButton-squareRadius": "token(radii.extraLarge)",
             "height": "calc(var(--components-iconButton-sizeLarge, 96px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideLarge, 128px) - calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideLarge, 128px) - calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideLarge, 128px) - calc(var(--components-iconButton-sizeLarge, 96px) + calc(calc(var(--components-iconButton-narrowLarge, 64px) - var(--components-iconButton-sizeLarge, 96px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
         "medium": {
           "root": {
             "--components-iconButton-iconSize": "24px",
+            "--components-iconButton-innerRadius": "token(radii.small)",
             "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedInnerRadius": "token(radii.extraSmall)",
             "--components-iconButton-pressedRadius": "token(radii.medium)",
             "--components-iconButton-squareRadius": "token(radii.large)",
             "height": "calc(var(--components-iconButton-sizeMedium, 56px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideMedium, 72px) - calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideMedium, 72px) - calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideMedium, 72px) - calc(var(--components-iconButton-sizeMedium, 56px) + calc(calc(var(--components-iconButton-narrowMedium, 48px) - var(--components-iconButton-sizeMedium, 56px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
         "small": {
           "root": {
             "--components-iconButton-iconSize": "24px",
+            "--components-iconButton-innerRadius": "token(radii.small)",
             "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedInnerRadius": "token(radii.extraSmall)",
             "--components-iconButton-pressedRadius": "token(radii.small)",
             "--components-iconButton-squareRadius": "token(radii.medium)",
             "height": "calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideSmall, 52px) - calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideSmall, 52px) - calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideSmall, 52px) - calc(var(--components-iconButton-sizeSmall, token(sizes.controlMedium)) + calc(calc(var(--components-iconButton-narrowSmall, 32px) - var(--components-iconButton-sizeSmall, token(sizes.controlMedium))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
         "xlarge": {
           "root": {
             "--components-iconButton-iconSize": "40px",
+            "--components-iconButton-innerRadius": "calc(token(radii.large) + token(radii.extraSmall))",
             "--components-iconButton-outlineWidth": "3px",
+            "--components-iconButton-pressedInnerRadius": "token(radii.large)",
             "--components-iconButton-pressedRadius": "token(radii.large)",
             "--components-iconButton-squareRadius": "token(radii.extraLarge)",
             "height": "calc(var(--components-iconButton-sizeXlarge, 136px) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXlarge, 184px) - calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXlarge, 184px) - calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXlarge, 184px) - calc(var(--components-iconButton-sizeXlarge, 136px) + calc(calc(var(--components-iconButton-narrowXlarge, 104px) - var(--components-iconButton-sizeXlarge, 136px)) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
         "xsmall": {
           "root": {
             "--components-iconButton-iconSize": "20px",
+            "--components-iconButton-innerRadius": "token(radii.extraSmall)",
             "--components-iconButton-outlineWidth": "1px",
+            "--components-iconButton-pressedInnerRadius": "calc(token(radii.extraSmall) * 0.5)",
             "--components-iconButton-pressedRadius": "token(radii.small)",
             "--components-iconButton-squareRadius": "token(radii.medium)",
             "height": "calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
-            "width": "calc(calc(calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXsmall, 40px) - calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            "width": {
+              "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "calc(calc(calc(calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXsmall, 40px) - calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset))) + var(--components-iconButton-pressedGrowth, 0px))",
+              "base": "calc(calc(calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0))) + calc(calc(var(--components-iconButton-wideXsmall, 40px) - calc(var(--components-iconButton-sizeXsmall, token(sizes.controlSmall)) + calc(calc(var(--components-iconButton-narrowXsmall, 28px) - var(--components-iconButton-sizeXsmall, token(sizes.controlSmall))) * var(--components-iconButton-narrow, 0)))) * var(--components-iconButton-wide, 0))) + var(--components-iconButton-densityOffset, token(sizes.densityOffset)))",
+            },
           },
         },
       },

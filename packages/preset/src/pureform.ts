@@ -46,6 +46,7 @@ import type {
 
 import { createAvatar } from "./components/avatar";
 import { createButton } from "./components/button";
+import { buttonGroup } from "./components/button-group";
 import { card } from "./components/card";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
@@ -266,6 +267,7 @@ const defaultComponents = <G extends string>(
             densities,
             shapes,
         ),
+        buttonGroup,
         fab: createFab(theme.color.groups, shapes),
         avatar: createAvatar(theme.color.groups, shapes),
         media: createMedia(shapes),
