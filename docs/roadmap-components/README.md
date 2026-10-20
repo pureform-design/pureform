@@ -80,5 +80,6 @@ contexts exist.
   ([guidelines §3](../design/component-guidelines.md#3-deciding-what-a-component-is)).
 - Nothing is copied from the sources: they are open-source docs and public APIs we read
   ([guidelines §1](../design/component-guidelines.md#1-sources-and-provenance)).
-- A phase is done only when `omni run build test -f all -o continue` passes, the type check
-  is clean, and the gap analysis matches the code.
+- Subphases run targeted builds and tests only. A phase is done only when, after merging all
+  its branches, `omni run build test -f all -o continue` passes (failures go to one fixing
+  subagent), the type check is clean, and the gap analysis matches the code.

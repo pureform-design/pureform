@@ -27,7 +27,9 @@ when the list below looks out of date.
    component belongs in a screen.
 9. **Docs:** the gap analysis (matrix row, verdicts, totals, §7), package READMEs, and the
    output context.
-10. **Verify:** the phase gate in the [conventions](conventions.md#gate-for-a-phase).
+10. **Verify:** targeted builds and tests for what you touched (the
+    [conventions](conventions.md#parallel-work)); the whole run is the
+    [phase gate](conventions.md#gate-for-a-phase), done once after the merge.
 
 For a **variant or a part on an existing component**, steps 2, 3, 5, 6 (variant list or part
 in the binding), 8 and 9 apply, and the existing component's deprecated options are removed when the new version has an
