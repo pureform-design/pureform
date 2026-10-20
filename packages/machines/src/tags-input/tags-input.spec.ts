@@ -13,8 +13,8 @@ afterEach(() => {
 // Two chips, enough for the values the tests start with.
 const MARKUP = `<div data-root>
     <div data-container>
-        <div data-chip="0"><span data-label="0"></span><button data-remove="0"></button></div>
-        <div data-chip="1"><span data-label="1"></span><button data-remove="1"></button></div>
+        <div data-item="0"><div data-chip="0"><span data-label="0"></span><button data-remove="0"></button></div></div>
+        <div data-item="1"><div data-chip="1"><span data-label="1"></span><button data-remove="1"></button></div></div>
         <input data-input>
     </div>
 </div>`;
@@ -35,6 +35,7 @@ const render = (props: MachineProps<tagsInput.Schema>) => {
             spread($("[data-input]"), api.getInputProps());
             api.value.slice(0, 2).forEach((value, index) => {
                 const item = { index, value };
+                spread($(`[data-item="${index}"]`), api.getChipItemProps(item));
                 spread($(`[data-chip="${index}"]`), api.getChipProps(item));
                 spread(
                     $(`[data-label="${index}"]`),
@@ -59,6 +60,9 @@ describe("tags input machine", () => {
         expect(chip.dataset["part"]).toBe("item-preview");
         expect(chip.dataset["value"]).toBe("red");
         expect(chip.id).toBe("tags-input:tags:tag:red:0");
+        const item = $<HTMLElement>('[data-item="0"]');
+        expect(item.dataset["part"]).toBe("item");
+        expect(item.style.display).toBe("contents");
         expect($('[data-remove="1"]').getAttribute("aria-label")).toContain(
             "blue",
         );
@@ -110,6 +114,10 @@ describe("tags input machine", () => {
         await userEvent.keyboard("{ArrowLeft}");
         await settle();
         expect(blue.state.hovered).toBe(false);
+        expect(source("tags-input:tags:tag:red:0").state.hovered).toBe(true);
+        // Focus moving into the chip, to its remove button, keeps the field focused.
+        $<HTMLButtonElement>('[data-remove="0"]').focus();
+        await settle();
         expect(source("tags-input:tags:tag:red:0").state.hovered).toBe(true);
         stop();
     });

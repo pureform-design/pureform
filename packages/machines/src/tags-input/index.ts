@@ -45,8 +45,11 @@ export type ChipProps = ItemProps;
 export interface Api<T extends PropTypes = PropTypes> extends TagsInputApi<T> {
     /** The field's container: Zag's control. */
     getContainerProps(): T["element"];
-    /** A chip's root: Zag's item preview and item on one element. */
+    /** A chip's root: Zag's item preview. */
     getChipProps(props: ChipProps): T["element"];
+    /** The unstyled element around a chip (`display: contents`): Zag's item, which keeps a
+     *  press or focus inside the chip (its remove button) from blurring the field. */
+    getChipItemProps(props: ChipProps): T["element"];
     /** A chip's label: Zag's item text. */
     getChipLabelProps(props: ChipProps): T["element"];
     /** A chip's remove button: Zag's item delete trigger. */
@@ -94,16 +97,16 @@ export function connect<T extends PropTypes>(
         getChipProps(props) {
             const { id, disabled } = api.getItemState(props);
             return pressableItemProps(
-                // The preview's part name wins: Zag finds the chips by it.
-                chainProps(
-                    api.getItemPreviewProps(props),
-                    api.getItemProps(props),
-                ),
+                api.getItemPreviewProps(props),
                 emitters.item(id),
                 disabled,
                 normalize,
             );
         },
+        getChipItemProps: (props) =>
+            chainProps(api.getItemProps(props), {
+                style: { display: "contents" },
+            }),
         getChipLabelProps: (props) => api.getItemTextProps(props),
         getChipRemoveProps: (props) => api.getItemDeleteTriggerProps(props),
         getChipDecorationProps: () =>
