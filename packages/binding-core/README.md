@@ -307,6 +307,16 @@ toastSelection(type, props);             // an unknown type selects `info`
 TOAST_STACK_STYLE;                       // Zag's --x, --y, --scale, --opacity, --height applied
 toastGroupStyle(style);                  // Zag's region style, physical insets, no z-index
 
+// Toolbar: the generated toolbarAnatomy (root); overflow.ts and toolbar-dom.ts (`/dom`)
+interface ToolbarRootOwnProps            // placement, orientation, color, tokens, overflow, testId
+TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, aria-orientation
+interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
+TOOLBAR_CONTENT_PROPS; TOOLBAR_OVERFLOW_LABEL; toolbarOverflowTestId(testId);
+toolbarMenuItems(items, count); toolbarMenuSelect(items, value); toolbarMenuPositioning(o);
+toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
+overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
+watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);
+
 // Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, tabContent, icon, label, indicator,
 // content)
 interface TabsRootOwnProps               // variant, icon (the variant), inlineIcon, color, tokens, activationMode,
