@@ -1,4 +1,4 @@
-// The chip: a pressable root with its touch target, an icon when given, and its label; `selected`
+// The chip: a pressable root with its touch target, an icon when given, its label, and a trailing icon when given; `selected`
 // marks a filter chip that's on.
 
 import { chipAnatomy } from "@pureform/anatomy";
@@ -22,6 +22,8 @@ export interface ChipProps extends ChipVariantProps, InteractiveProps {
     readonly label?: ReactNode;
     /** An icon before the label. */
     readonly icon?: ReactNode;
+    /** A trailing icon after the label, such as a filter chip's dropdown arrow. */
+    readonly trailingIcon?: ReactNode;
     /** Flips a pointing icon under right to left. */
     readonly mirrorIcon?: boolean | undefined;
     /** A filter chip that's on. */
@@ -83,6 +85,19 @@ function ChipImpl(props: ChipProps): ReactNode {
             >
                 {props.label}
             </v.label.Text>
+            {props.trailingIcon != null && props.trailingIcon !== false ? (
+                <v.trailingIcon.View
+                    style={s.trailingIcon}
+                    testID={id("trailingIcon")}
+                >
+                    <IconSlot
+                        {...iconSlot(selected, "trailingIcon")}
+                        motion={s.trailingIcon}
+                    >
+                        {props.trailingIcon}
+                    </IconSlot>
+                </v.trailingIcon.View>
+            ) : null}
             {indication.layer(selected)}
         </v.root.Pressable>
     );

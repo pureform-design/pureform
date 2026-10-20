@@ -35,6 +35,8 @@ export const chip: ComponentCase = {
             color: "secondary",
             variant: "elevated",
         },
+        "filter, round": { corner: "round", defaultSelected: true },
+        "with a trailing icon": { trailingIcon: "▾", defaultSelected: false },
         compact: { density: "compact" },
         disabled: { disabled: true },
         "disabled and selected": { disabled: true, defaultSelected: true },

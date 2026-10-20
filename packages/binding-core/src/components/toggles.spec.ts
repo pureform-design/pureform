@@ -172,11 +172,22 @@ describe("chip", () => {
     it("selects the variant groups and tokens", () => {
         expect(chipSelection({ variant: "elevated" })).toEqual({
             variant: "elevated",
+            corner: undefined,
+            toggle: undefined,
             color: undefined,
             density: undefined,
             tokens: undefined,
         });
         expect(CHIP_ROOT_PROPS).toContain("onSelectedChange");
+        expect(CHIP_ROOT_PROPS).toContain("corner");
+    });
+
+    it("is a toggle when selected is given, which morphs a filter chip's corners", () => {
+        expect(chipSelection({ defaultSelected: false }).toggle).toBe(true);
+        expect(chipSelection({ toggle: false, selected: true }).toggle).toBe(
+            undefined,
+        );
+        expect(chipSelection({ corner: "round" }).corner).toBe("round");
     });
 });
 

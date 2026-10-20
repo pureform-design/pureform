@@ -459,6 +459,21 @@ export function Page() {
                             </For>
                         )}
                     </For>
+                    {(() => {
+                        const c = chip({ corner: "round", toggle: "true" });
+                        return (
+                            <button
+                                class={c.root}
+                                type="button"
+                                aria-pressed="true"
+                            >
+                                <span class={c.touchTarget} />
+                                <Ripple />
+                                <span class={c.label}>Round filter</span>
+                                <span class={c.trailingIcon}>▾</span>
+                            </button>
+                        );
+                    })()}
                 </section>
                 <span class={supportingText()}>
                     Pick any filters; chips use the standalone supporting text.
@@ -628,6 +643,17 @@ export function Page() {
                         );
                     }}
                 </For>
+                {(() => {
+                    const b = button({ variant: "tonal" });
+                    return (
+                        <button class={b.root} type="button">
+                            <span class={b.touchTarget} />
+                            <Ripple />
+                            <span class={b.label}>MENU</span>
+                            <span class={b.secondaryIcon}>▾</span>
+                        </button>
+                    );
+                })()}
                 <button class={button().root} type="button" disabled>
                     <span class={button().touchTarget} />
                     <span class={button().label}>DISABLED</span>
