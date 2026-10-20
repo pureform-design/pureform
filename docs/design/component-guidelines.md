@@ -149,7 +149,8 @@ A change isn't done until these pass, and until the docs say what the code does.
 | Browser suite        | `tests/browser-e2e-tests`                                                 | Screenshots, indication fixtures, Panda factories. Fonts are bundled so screenshots don't depend on the machine |
 | Component suites     | `tests/component-suites`                                                  | Each binding on each target; direction (rtl mirrors ltr), hydration                                             |
 | Type check           | `bunx tsc --noEmit -p tsconfig.json` in each package                      | Use `tsconfig.json`; `tsconfig.project.json` is only a fragment                                                 |
-| Whole build and test | `omni run build test -f all -o continue`                                  | `-f all` because omni can replay a stale cache                                                                  |
+| Targeted build/test  | `omni run build test -p <project>` or `-b <base commit> -w`               | What a change affects; the default while working                                                                |
+| Whole build and test | `omni run build test -f all -o continue`                                  | Once per phase, after merging. `-f all` because omni can replay a stale cache                                   |
 
 Test hygiene learned the hard way:
 

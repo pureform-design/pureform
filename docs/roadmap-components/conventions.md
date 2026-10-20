@@ -31,8 +31,16 @@ Subphases of one phase don't depend on each other and run at the same time.
   `tests/component-suites` and `tests/browser-e2e-tests` lists, and
   `packages/anatomy/src/generated.ts` (generated: never merge by hand, rerun `generate`).
   Edit them with small additive changes (one line per component) so merges are a union.
+- **Targeted checks only in a subphase.** Build and test just what the subphase affects:
+  `omni run build test -p <project>` for the packages you touched, or
+  `omni run build test -b <phase start commit> -w` for everything changed since the phase began
+  and its dependents, plus the type check in each touched package and the specific suites
+  (component suites, browser screenshots) for your components. Don't run the whole suite
+  (`-f all` on every project); it is slow, and the orchestrator runs it once per phase.
 - **Merging:** the orchestrator merges the subphase branches one at a time in the order the
-  phase lists, reruns `generate`, rebuilds, and runs the whole suite after the last merge.
+  phase lists, reruns `generate`, rebuilds, and runs the whole suite once, after the last
+  merge. If anything fails, it spawns **one** subagent to fix all the failures (with the
+  failing output and the subphases' contexts), rather than one per failure or per subphase.
   A conflict outside the shared files is a sign two subphases overlap: stop and say so in the
   phase's context instead of resolving it silently.
 - **Don't refactor across subphases.** Duplicated code between siblings is expected and is
@@ -111,7 +119,11 @@ evidence and stops; don't refactor for its own sake.
 
 ## Gate for a phase
 
-1. `omni run build test -f all -o continue` passes (every task, nothing replayed from cache).
+Subphases check only what they affect (see [parallel work](#parallel-work)); the whole run
+below happens once, on the merged phase.
+
+1. `omni run build test -f all -o continue` passes on the merged phase (every task, nothing
+   replayed from cache). Failures go to a single fixing subagent, then the run repeats.
 2. `bunx tsc --noEmit -p tsconfig.json` is clean in each package you touched.
 3. The gap analysis (matrix row, verdicts, totals, §7 done list) matches the code.
 4. Output contexts exist for each subphase, committed with the work.
