@@ -21,7 +21,7 @@ exports[`checkbox > compiles to a stable Panda slot recipe 1`] = `
         ".checkbox__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-checkbox-errorColor, token(colors.error))",
         "base": "var(--components-checkbox-borderColor, token(colors.onSurfaceVariant))",
       },
-      "borderRadius": "var(--components-checkbox-boxRadius, 2px)",
+      "borderRadius": "var(--components-checkbox-boxRadius, calc(token(radii.extraSmall) * 0.5))",
       "borderStyle": "solid",
       "borderWidth": "var(--components-checkbox-borderWidth, 2px)",
       "display": "inline-flex",
@@ -794,7 +794,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "icon": {
-      "color": "var(--components-switchControl-iconColor, token(colors.onPrimaryContainer))",
+      "color": {
+        ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "var(--components-switchControl-iconColor, token(colors.onPrimaryContainer))",
+        "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+      },
       "display": "inline-flex",
       "fontSize": "var(--components-switchControl-iconSize, 16px)",
       "lineHeight": "1",
@@ -904,6 +907,7 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "icons": "selected",
   },
   "jsx": [
     "SwitchControl",
@@ -931,7 +935,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onErrorContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onErrorContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -970,7 +977,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onInfoContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onInfoContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -1010,7 +1020,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onSecondaryContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSecondaryContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -1049,7 +1062,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onSuccessContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onSuccessContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -1088,7 +1104,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onTertiaryContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onTertiaryContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -1127,7 +1146,10 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
         "icon": {
-          "color": "token(colors.onWarningContainer)",
+          "color": {
+            ".switchControl__root:is(:checked, :has(:checked), [aria-checked=true]) &": "token(colors.onWarningContainer)",
+            "base": "var(--components-switchControl-uncheckedIconColor, token(colors.surfaceContainerHighest))",
+          },
         },
         "stateLayer": {
           "backgroundColor": {
@@ -1154,6 +1176,29 @@ exports[`switchControl > compiles to a stable Panda slot recipe 1`] = `
           },
         },
       },
+    },
+    "icons": {
+      "both": {
+        "handle": {
+          "height": {
+            ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+            "base": "var(--components-switchControl-handleSizeChecked, 24px)",
+          },
+          "width": {
+            ".switchControl__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-switchControl-handleSizePressed, 28px)",
+            "base": "var(--components-switchControl-handleSizeChecked, 24px)",
+          },
+        },
+        "icon": {
+          "opacity": "1",
+        },
+      },
+      "none": {
+        "icon": {
+          "display": "none",
+        },
+      },
+      "selected": {},
     },
   },
 }

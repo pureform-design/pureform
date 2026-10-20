@@ -18,7 +18,10 @@ describe("button", () => {
     });
 
     it("draws every group with one rule per fill, through its group tokens", () => {
-        expect(button.recipe.compoundVariants ?? []).toHaveLength(0);
+        // Compounds pair sizes with corners and fills with the toggle, never a color group.
+        for (const compound of button.recipe.compoundVariants ?? []) {
+            expect(compound.match).not.toHaveProperty("color");
+        }
         expect(button.recipe.variants?.color?.secondary?.root?.tokens).toEqual({
             "components.button.accent": {
                 type: "alias",

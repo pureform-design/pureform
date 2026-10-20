@@ -32,11 +32,8 @@ describe("fab", () => {
     });
 
     it("is square unless extended", () => {
-        const square = compiled()?.compoundVariants?.find(
-            (c) => c.size === "large" && c.extended === false,
-        );
-        expect(square?.css?.root).toEqual({
-            width: "var(--components-fab-sizeLarge, 96px)",
+        expect(compiled()?.variants?.extended?.false?.root).toEqual({
+            aspectRatio: "1",
         });
         expect(compiled()?.variants?.extended?.true?.container).toHaveProperty(
             "paddingInlineStart",

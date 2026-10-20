@@ -11,13 +11,13 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "alignItems": "center",
       "display": "inline-flex",
-      "fontSize": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "fontSize": "var(--components-button-iconSize, 20px)",
       "fontVariationSettings": ""FILL" var(--components-button-iconFill, 0)",
-      "height": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "height": "var(--components-button-iconSize, 20px)",
       "justifyContent": "center",
       "lineHeight": "1",
-      "minWidth": "var(--components-button-iconSize, token(sizes.iconSmall))",
-      "width": "var(--components-button-iconSize, token(sizes.iconSmall))",
+      "minWidth": "var(--components-button-iconSize, 20px)",
+      "width": "var(--components-button-iconSize, 20px)",
     },
     "label": {
       "textStyle": "labelLarge",
@@ -34,7 +34,11 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       "--components-button-stateHoverOpacity": "token(opacity.stateHover)",
       "--components-button-statePressedOpacity": "token(opacity.statePressed)",
       "alignItems": "center",
-      "borderRadius": "var(--components-button-radius, token(radii.full))",
+      "borderRadius": {
+        "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "var(--components-button-pressedRadius, token(radii.small))",
+        "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "calc(calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0))) + calc(calc(calc(var(--components-button-squareRadius, token(radii.medium)) + calc(calc(var(--components-button-radius, token(radii.full)) - var(--components-button-squareRadius, token(radii.medium))) * var(--components-button-square, 0))) - calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))) * var(--components-button-toggles, 0)))",
+        "base": "calc(var(--components-button-radius, token(radii.full)) + calc(calc(var(--components-button-squareRadius, token(radii.medium)) - var(--components-button-radius, token(radii.full))) * var(--components-button-square, 0)))",
+      },
       "borderWidth": "0px",
       "cursor": "pointer",
       "display": "inline-flex",
@@ -49,7 +53,10 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
       "outlineWidth": "var(--components-button-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
       "position": "relative",
-      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+        "base": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard), border-radius token(durations.medium1) token(easings.emphasized)",
+      },
     },
     "touchTarget": {
       "height": "100%",
@@ -63,11 +70,154 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
     },
   },
   "className": "button",
-  "compoundVariants": [],
+  "compoundVariants": [
+    {
+      "css": {
+        "root": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.surfaceContainer), token(colors.onSurfaceVariant) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, token(colors.surfaceContainer), token(colors.onSurfaceVariant) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.surfaceContainer), token(colors.onSurfaceVariant) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-accent, token(colors.primary))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "base": "token(colors.surfaceContainer)",
+          },
+          "color": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-onAccent, token(colors.onPrimary))",
+            "base": "token(colors.onSurfaceVariant)",
+          },
+        },
+      },
+      "toggle": true,
+      "variant": "filled",
+    },
+    {
+      "css": {
+        "root": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accentContainer, token(colors.primaryContainer)), var(--components-button-onAccentContainer, token(colors.onPrimaryContainer)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-accent, token(colors.primary))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "base": "var(--components-button-accentContainer, token(colors.primaryContainer))",
+          },
+          "color": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-onAccent, token(colors.onPrimary))",
+            "base": "var(--components-button-onAccentContainer, token(colors.onPrimaryContainer))",
+          },
+        },
+      },
+      "toggle": true,
+      "variant": "tonal",
+    },
+    {
+      "css": {
+        "root": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "token(colors.inverseSurface)",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.inverseSurface), token(colors.inverseOnSurface) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "base": "transparent",
+          },
+          "borderColor": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "transparent",
+            "base": "var(--components-button-outlineColor, token(colors.outline))",
+          },
+          "color": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "token(colors.inverseOnSurface)",
+            "base": "token(colors.onSurfaceVariant)",
+          },
+        },
+      },
+      "toggle": true,
+      "variant": "outlined",
+    },
+    {
+      "css": {
+        "root": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "transparent",
+            "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, token(colors.onSurfaceVariant) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "transparent",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "transparent",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover])": "color-mix(in srgb, transparent, var(--components-button-accent, token(colors.primary)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "base": "transparent",
+          },
+          "color": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-accent, token(colors.primary))",
+            "base": "token(colors.onSurfaceVariant)",
+          },
+        },
+      },
+      "toggle": true,
+      "variant": "text",
+    },
+    {
+      "css": {
+        "root": {
+          "&:is(:disabled, [aria-disabled=true])": {
+            "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+          },
+          "backgroundColor": {
+            "&:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, token(colors.surfaceContainerLow), var(--components-button-accent, token(colors.primary)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-accent, token(colors.primary))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-statePressedOpacity, token(opacity.statePressed)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:focus-visible, :has(:focus-visible)):is(:focus-visible, :has(:focus-visible))": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateFocusOpacity, token(opacity.stateFocus)))",
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])):is(:hover, [data-pf-hover])": "color-mix(in srgb, var(--components-button-accent, token(colors.primary)), var(--components-button-onAccent, token(colors.onPrimary)) var(--components-button-stateHoverOpacity, token(opacity.stateHover)))",
+            "base": "token(colors.surfaceContainerLow)",
+          },
+          "color": {
+            "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": "var(--components-button-onAccent, token(colors.onPrimary))",
+            "base": "var(--components-button-accent, token(colors.primary))",
+          },
+        },
+      },
+      "toggle": true,
+      "variant": "elevated",
+    },
+  ],
   "defaultVariants": {
     "color": "primary",
+    "corner": "round",
     "density": "inherit",
-    "size": "medium",
+    "size": "small",
+    "toggle": false,
     "variant": "filled",
   },
   "jsx": [
@@ -133,6 +283,14 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "corner": {
+      "round": {},
+      "square": {
+        "root": {
+          "--components-button-square": "1",
+        },
+      },
+    },
     "density": {
       "-1": {
         "root": {
@@ -161,25 +319,102 @@ exports[`button > compiles to a stable Panda slot recipe 1`] = `
       },
     },
     "size": {
-      "large": {
+      "compact": {
+        "label": {
+          "textStyle": "labelLarge",
+        },
         "root": {
-          "height": "calc(var(--components-button-heightLarge, token(sizes.controlLarge)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
-          "paddingInlineEnd": "var(--components-button-paddingLarge, token(spacing.8))",
-          "paddingInlineStart": "var(--components-button-paddingLarge, token(spacing.8))",
+          "--components-button-gap": "token(spacing.2)",
+          "--components-button-iconSize": "token(sizes.iconSmall)",
+          "--components-button-outlineWidth": "1px",
+          "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-squareRadius": "token(radii.medium)",
+          "height": "calc(var(--components-button-heightCompact, token(sizes.controlLarge)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-button-paddingCompact, token(spacing.8))",
+          "paddingInlineStart": "var(--components-button-paddingCompact, token(spacing.8))",
+        },
+      },
+      "large": {
+        "label": {
+          "textStyle": "headlineSmall",
+        },
+        "root": {
+          "--components-button-gap": "token(spacing.3)",
+          "--components-button-iconSize": "32px",
+          "--components-button-outlineWidth": "2px",
+          "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-squareRadius": "token(radii.extraLarge)",
+          "height": "calc(var(--components-button-heightLarge, 96px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-button-paddingLarge, token(spacing.12))",
+          "paddingInlineStart": "var(--components-button-paddingLarge, token(spacing.12))",
         },
       },
       "medium": {
+        "label": {
+          "textStyle": "titleMedium",
+        },
         "root": {
-          "height": "calc(var(--components-button-heightMedium, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "--components-button-gap": "token(spacing.2)",
+          "--components-button-iconSize": "24px",
+          "--components-button-outlineWidth": "1px",
+          "--components-button-pressedRadius": "token(radii.medium)",
+          "--components-button-squareRadius": "token(radii.large)",
+          "height": "calc(var(--components-button-heightMedium, 56px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingMedium, token(spacing.6))",
           "paddingInlineStart": "var(--components-button-paddingMedium, token(spacing.6))",
         },
       },
       "small": {
+        "label": {
+          "textStyle": "labelLarge",
+        },
         "root": {
-          "height": "calc(var(--components-button-heightSmall, token(sizes.controlSmall)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "--components-button-gap": "token(spacing.2)",
+          "--components-button-iconSize": "20px",
+          "--components-button-outlineWidth": "1px",
+          "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-squareRadius": "token(radii.medium)",
+          "height": "calc(var(--components-button-heightSmall, token(sizes.controlMedium)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
           "paddingInlineEnd": "var(--components-button-paddingSmall, token(spacing.4))",
           "paddingInlineStart": "var(--components-button-paddingSmall, token(spacing.4))",
+        },
+      },
+      "xlarge": {
+        "label": {
+          "textStyle": "headlineLarge",
+        },
+        "root": {
+          "--components-button-gap": "token(spacing.4)",
+          "--components-button-iconSize": "40px",
+          "--components-button-outlineWidth": "3px",
+          "--components-button-pressedRadius": "token(radii.large)",
+          "--components-button-squareRadius": "token(radii.extraLarge)",
+          "height": "calc(var(--components-button-heightXlarge, 136px) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-button-paddingXlarge, token(spacing.16))",
+          "paddingInlineStart": "var(--components-button-paddingXlarge, token(spacing.16))",
+        },
+      },
+      "xsmall": {
+        "label": {
+          "textStyle": "labelLarge",
+        },
+        "root": {
+          "--components-button-gap": "token(spacing.1)",
+          "--components-button-iconSize": "20px",
+          "--components-button-outlineWidth": "1px",
+          "--components-button-pressedRadius": "token(radii.small)",
+          "--components-button-squareRadius": "token(radii.medium)",
+          "height": "calc(var(--components-button-heightXsmall, token(sizes.controlSmall)) + var(--components-button-densityOffset, token(sizes.densityOffset)))",
+          "paddingInlineEnd": "var(--components-button-paddingXsmall, token(spacing.3))",
+          "paddingInlineStart": "var(--components-button-paddingXsmall, token(spacing.3))",
+        },
+      },
+    },
+    "toggle": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-button-toggles": "1",
         },
       },
     },

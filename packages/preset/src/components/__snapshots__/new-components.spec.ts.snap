@@ -65,6 +65,7 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
   "defaultVariants": {
     "color": "primary",
     "indeterminate": false,
+    "thickness": "default",
   },
   "jsx": [
     "CircularProgress",
@@ -180,6 +181,14 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
         },
         "startHalf": {
           "display": "none",
+        },
+      },
+    },
+    "thickness": {
+      "default": {},
+      "thick": {
+        "root": {
+          "--components-circularProgress-thickness": "8px",
         },
       },
     },
@@ -314,6 +323,7 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
   "defaultVariants": {
     "color": "primary",
     "indeterminate": false,
+    "thickness": "default",
   },
   "jsx": [
     "LinearProgress",
@@ -383,6 +393,14 @@ exports[`linearProgress > compiles to a stable Panda slot recipe 1`] = `
             "base": "token(durations.extraLong4) token(easings.standard) infinite linearProgressSlide",
           },
           "width": "var(--components-linearProgress-indeterminateWidth, 40%)",
+        },
+      },
+    },
+    "thickness": {
+      "default": {},
+      "thick": {
+        "root": {
+          "height": "var(--components-linearProgress-thickHeight, 8px)",
         },
       },
     },
@@ -1064,14 +1082,14 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "justifyContent": "center",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
-      "width": "var(--components-navigationBar-indicatorWidth, 64px)",
+      "width": "var(--components-navigationBar-indicatorWidth, 56px)",
     },
     "item": {
       "&:is(:disabled, [aria-disabled=true])": {
         "pointerEvents": "none",
       },
       "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-        "color": "var(--components-navigationBar-activeLabelColor, token(colors.onSurface))",
+        "color": "var(--components-navigationBar-activeLabelColor, token(colors.secondary))",
       },
       "alignItems": "center",
       "backgroundColor": "transparent",
@@ -1093,8 +1111,8 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
         "base": "none",
       },
       "outlineWidth": "var(--components-navigationBar-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
-      "paddingBlockEnd": "token(spacing.4)",
-      "paddingBlockStart": "token(spacing.3)",
+      "paddingBlockEnd": "6px",
+      "paddingBlockStart": "6px",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
     },
@@ -1114,7 +1132,7 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "color": "var(--components-navigationBar-labelColor, token(colors.onSurfaceVariant))",
       "display": "flex",
       "flexDirection": "row",
-      "height": "var(--components-navigationBar-height, 80px)",
+      "height": "var(--components-navigationBar-height, 64px)",
       "shadowElevation": "level2",
     },
   },
@@ -1152,6 +1170,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.error)",
+          },
+        },
       },
       "info": {
         "activeIndicator": {
@@ -1167,6 +1190,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.info)",
           },
         },
       },
@@ -1187,6 +1215,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.secondary)",
+          },
+        },
       },
       "success": {
         "activeIndicator": {
@@ -1202,6 +1235,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.success)",
           },
         },
       },
@@ -1221,6 +1259,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.tertiary)",
+          },
+        },
       },
       "warning": {
         "activeIndicator": {
@@ -1236,6 +1279,11 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationBar__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationBar-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.warning)",
           },
         },
       },
@@ -1323,7 +1371,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
         "pointerEvents": "none",
       },
       "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
-        "color": "var(--components-navigationRail-activeLabelColor, token(colors.onSurface))",
+        "color": "var(--components-navigationRail-activeLabelColor, token(colors.secondary))",
       },
       "alignItems": "center",
       "backgroundColor": "transparent",
@@ -1366,7 +1414,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "gap": "var(--components-navigationRail-itemGap, token(spacing.3))",
       "paddingBlockEnd": "token(spacing.3)",
       "paddingBlockStart": "token(spacing.3)",
-      "width": "var(--components-navigationRail-width, 80px)",
+      "width": "var(--components-navigationRail-width, 96px)",
     },
   },
   "className": "navigationRail",
@@ -1403,6 +1451,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.error)",
+          },
+        },
       },
       "info": {
         "activeIndicator": {
@@ -1418,6 +1471,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onInfoContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.info)",
           },
         },
       },
@@ -1438,6 +1496,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.secondary)",
+          },
+        },
       },
       "success": {
         "activeIndicator": {
@@ -1453,6 +1516,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onSuccessContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.success)",
           },
         },
       },
@@ -1472,6 +1540,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
           },
         },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.tertiary)",
+          },
+        },
       },
       "warning": {
         "activeIndicator": {
@@ -1487,6 +1560,11 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
           "color": {
             ".navigationRail__item:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "token(colors.onWarningContainer)",
             "base": "var(--components-navigationRail-iconColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "item": {
+          "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
+            "color": "token(colors.warning)",
           },
         },
       },
@@ -1585,7 +1663,9 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
   },
   "className": "searchBar",
   "compoundVariants": [],
-  "defaultVariants": {},
+  "defaultVariants": {
+    "centered": false,
+  },
   "jsx": [
     "SearchBar",
   ],
@@ -1595,7 +1675,16 @@ exports[`searchBar > compiles to a stable Panda slot recipe 1`] = `
     "input",
     "trailing",
   ],
-  "variants": {},
+  "variants": {
+    "centered": {
+      "false": {},
+      "true": {
+        "input": {
+          "textAlign": "center",
+        },
+      },
+    },
+  },
 }
 `;
 
@@ -1952,16 +2041,16 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       },
       "borderRadius": "token(radii.full)",
       "height": "var(--components-slider-trackHeight, 4px)",
+      "insetInlineEnd": "calc(100% - calc(var(--components-slider-value, 0) * 1%))",
       "insetInlineStart": "0px",
       "position": "absolute",
       "transition": {
         ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "inset-inline-end token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
         },
       },
-      "width": "calc(var(--components-slider-value, 0) * 1%)",
     },
     "handle": {
       "backgroundColor": {
@@ -2058,6 +2147,8 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
   "compoundVariants": [],
   "defaultVariants": {
     "color": "primary",
+    "handleShape": "bar",
+    "size": "xsmall",
   },
   "jsx": [
     "Slider",
@@ -2212,6 +2303,96 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
         },
       },
     },
+    "handleShape": {
+      "bar": {
+        "activeTrack": {
+          "borderEndEndRadius": "var(--components-slider-barInnerRadius, calc(token(radii.extraSmall) * 0.5))",
+          "borderEndStartRadius": "var(--components-slider-barRadius, token(radii.small))",
+          "borderStartEndRadius": "var(--components-slider-barInnerRadius, calc(token(radii.extraSmall) * 0.5))",
+          "borderStartStartRadius": "var(--components-slider-barRadius, token(radii.small))",
+          "height": "var(--components-slider-barTrackHeight, 16px)",
+          "insetInlineEnd": "calc(calc(100% - calc(var(--components-slider-value, 0) * 1%)) + calc(calc(var(--components-slider-barHandleWidth, 4px) * 0.5) + var(--components-slider-handleGap, 6px)))",
+        },
+        "handle": {
+          "borderRadius": "var(--components-slider-barInnerRadius, calc(token(radii.extraSmall) * 0.5))",
+          "height": "var(--components-slider-barHandleHeight, 44px)",
+          "insetInlineStart": "calc(calc(var(--components-slider-value, 0) * 1%) - calc(var(--components-slider-barHandleWidth, 4px) * 0.5))",
+          "transition": {
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
+              "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
+              "base": "width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+            },
+            "base": {
+              "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
+              "base": "inset-inline-start token(durations.short3) token(easings.standard), width token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+            },
+          },
+          "width": {
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "var(--components-slider-barHandlePressedWidth, 2px)",
+            "base": "var(--components-slider-barHandleWidth, 4px)",
+          },
+        },
+        "root": {
+          "height": "max(var(--components-slider-height, token(sizes.touchTarget)), var(--components-slider-barHandleHeight, 44px))",
+        },
+        "stateLayer": {
+          "display": "none",
+        },
+        "track": {
+          "borderEndEndRadius": "var(--components-slider-barRadius, token(radii.small))",
+          "borderEndStartRadius": "var(--components-slider-barInnerRadius, calc(token(radii.extraSmall) * 0.5))",
+          "borderStartEndRadius": "var(--components-slider-barRadius, token(radii.small))",
+          "borderStartStartRadius": "var(--components-slider-barInnerRadius, calc(token(radii.extraSmall) * 0.5))",
+          "height": "var(--components-slider-barTrackHeight, 16px)",
+          "insetInlineStart": "calc(calc(var(--components-slider-value, 0) * 1%) + calc(calc(var(--components-slider-barHandleWidth, 4px) * 0.5) + var(--components-slider-handleGap, 6px)))",
+          "transition": {
+            ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
+            "base": {
+              "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
+              "base": "inset-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+            },
+          },
+        },
+      },
+      "round": {},
+    },
+    "size": {
+      "large": {
+        "root": {
+          "--components-slider-barHandleHeight": "68px",
+          "--components-slider-barRadius": "token(radii.large)",
+          "--components-slider-barTrackHeight": "56px",
+        },
+      },
+      "medium": {
+        "root": {
+          "--components-slider-barHandleHeight": "52px",
+          "--components-slider-barRadius": "token(radii.medium)",
+          "--components-slider-barTrackHeight": "40px",
+        },
+      },
+      "small": {
+        "root": {
+          "--components-slider-barHandleHeight": "44px",
+          "--components-slider-barRadius": "token(radii.small)",
+          "--components-slider-barTrackHeight": "24px",
+        },
+      },
+      "xlarge": {
+        "root": {
+          "--components-slider-barHandleHeight": "108px",
+          "--components-slider-barRadius": "token(radii.extraLarge)",
+          "--components-slider-barTrackHeight": "96px",
+        },
+      },
+      "xsmall": {
+        "root": {
+          "--components-slider-barHandleHeight": "44px",
+          "--components-slider-barRadius": "token(radii.small)",
+          "--components-slider-barTrackHeight": "16px",
+        },
+      },
+    },
   },
 }
 `;
@@ -2360,8 +2541,8 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
     },
     "indicator": {
       "backgroundColor": "var(--components-tabs-indicatorColor, token(colors.primary))",
-      "borderStartEndRadius": "var(--components-tabs-indicatorRadius, 3px)",
-      "borderStartStartRadius": "var(--components-tabs-indicatorRadius, 3px)",
+      "borderStartEndRadius": "var(--components-tabs-indicatorRadius, calc(token(radii.extraSmall) * 0.75))",
+      "borderStartStartRadius": "var(--components-tabs-indicatorRadius, calc(token(radii.extraSmall) * 0.75))",
       "bottom": "0px",
       "height": "var(--components-tabs-indicatorHeight, 3px)",
       "insetInlineEnd": "0px",

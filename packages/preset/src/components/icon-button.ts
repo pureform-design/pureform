@@ -8,6 +8,12 @@
 //     <span class={outline} />
 //   </button>
 //
+// Sizes follow M3 Expressive: `xsmall` (32), `small` (40, the default), `medium` (56), `large`
+// (96), and `xlarge` (136), each with its icon size, and `width` makes it `narrow`, `default`,
+// or `wide`. `compact` (48) keeps the earlier large icon button and is deprecated. `corner`
+// picks round or square corners; pressing squares them a little further, and a toggle that's on
+// swaps them, as Expressive's shape morphs do. A `shape` clips the container instead.
+//
 // A toggle icon button sets `toggle: "true"` and marks its state with `aria-pressed`: it rests
 // in Material's unselected colors and takes the selected ones, with its icon filled, once
 // `aria-pressed="true"`.
@@ -23,7 +29,7 @@ import {
     unitless,
     when,
 } from "@pureform/core/ast";
-import type { StyleMap } from "@pureform/core/ast";
+import type { NumericValue } from "@pureform/core/ast";
 import { radius, size as sizeToken } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
@@ -41,6 +47,9 @@ import type { ShapedFill, Shapes } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
+    blend,
+    cornerRadius,
+    cornerTransition,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -53,6 +62,8 @@ import {
     iconFill,
     INDICATION_ROOT,
     keysOf,
+    sizeTokenName,
+    sizeTokens,
     mergeSlotStyles,
     pressableRoot,
     sys,
@@ -70,30 +81,111 @@ const FILLS = {
     elevated: "elevated",
 } satisfies Record<string, Fill>;
 
+/** One of M3 Expressive's icon button sizes, or the deprecated `compact` one. */
+export interface IconButtonSize {
+    /** The height, and the width of a `default` width button. */
+    size: NumericValue;
+    narrow: NumericValue;
+    wide: NumericValue;
+    icon: NumericValue;
+    outline: NumericValue;
+    /** The corner radius of a square button. */
+    square: NumericValue;
+    /** The corner radius while pressed, whatever the corners at rest. */
+    pressed: NumericValue;
+}
+
+export const ICON_BUTTON_SIZES = {
+    xsmall: {
+        size: sizeToken("controlSmall"),
+        narrow: px(28),
+        wide: px(40),
+        icon: px(20),
+        outline: px(1),
+        square: radius("medium"),
+        pressed: radius("small"),
+    },
+    small: {
+        size: sizeToken("controlMedium"),
+        narrow: px(32),
+        wide: px(52),
+        icon: px(24),
+        outline: px(1),
+        square: radius("medium"),
+        pressed: radius("small"),
+    },
+    medium: {
+        size: px(56),
+        narrow: px(48),
+        wide: px(72),
+        icon: px(24),
+        outline: px(1),
+        square: radius("large"),
+        pressed: radius("medium"),
+    },
+    large: {
+        size: px(96),
+        narrow: px(64),
+        wide: px(128),
+        icon: px(32),
+        outline: px(2),
+        square: radius("extraLarge"),
+        pressed: radius("large"),
+    },
+    xlarge: {
+        size: px(136),
+        narrow: px(104),
+        wide: px(184),
+        icon: px(40),
+        outline: px(3),
+        square: radius("extraLarge"),
+        pressed: radius("large"),
+    },
+    // Deprecated: the earlier large icon button, kept for apps that use it. It has one width.
+    compact: {
+        size: sizeToken("controlLarge"),
+        narrow: sizeToken("controlLarge"),
+        wide: sizeToken("controlLarge"),
+        icon: sizeToken("iconMedium"),
+        outline: px(1),
+        square: radius("medium"),
+        pressed: radius("small"),
+    },
+} satisfies Record<string, IconButtonSize>;
+
 const { tokens, ref } = componentTokens("iconButton", {
     radius: radius("full"),
+    // The size's square and pressed corners, and the `corner` variant's flag between round (0)
+    // and square (1), which `cornerRadius` reads.
+    squareRadius: radius("medium"),
+    pressedRadius: radius("small"),
+    square: unitless(0),
+    // The `toggle` variant's flag: only a toggle swaps its corners when selected.
+    toggles: unitless(0),
+    // The `width` variant's flags: narrow, wide, or neither for the default width.
+    narrow: unitless(0),
+    wide: unitless(0),
     iconSize: sizeToken("iconMedium"),
     // Material draws a selected toggle's icon filled.
     iconFill: unitless(0),
     selectedIconFill: unitless(1),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
-    sizeSmall: sizeToken("controlSmall"),
-    sizeMedium: sizeToken("controlMedium"),
-    sizeLarge: sizeToken("controlLarge"),
+    // Each size's height and widths, so a theme can retune a size.
+    ...sizeTokens(ICON_BUTTON_SIZES, "size", "size"),
+    ...sizeTokens(ICON_BUTTON_SIZES, "narrow", "narrow"),
+    ...sizeTokens(ICON_BUTTON_SIZES, "wide", "wide"),
     ...groupTokens(DEFAULT_GROUP),
     ...DENSITY_TOKEN,
     ...INDICATION_TOKENS,
 });
 
-const size = (
-    token: "sizeSmall" | "sizeMedium" | "sizeLarge",
-): { root: StyleMap } => ({
-    root: {
-        width: add(ref(token), ref("densityOffset")),
-        height: add(ref(token), ref("densityOffset")),
-    },
-});
+const dense = (value: NumericValue) => add(value, ref("densityOffset"));
+
+const corners = {
+    borderRadius: cornerRadius(ref),
+    transition: cornerTransition,
+};
 
 const SELECTED = slot("root", "selected");
 
@@ -193,25 +285,32 @@ export const createIconButton = <
                 color: groups as ColorGroups,
                 variant: keysOf(FILLS),
                 shape: ["none", ...Object.keys(shapes)],
-                size: ["small", "medium", "large"],
+                size: keysOf(ICON_BUTTON_SIZES),
+                width: ["narrow", "default", "wide"],
+                corner: ["round", "square"],
                 toggle: ["false", "true"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
                 base: {
+                    // The corners morph on the root (for the focus ring), the container, and the
+                    // outline. A shape, as a variant, clips the container over them.
                     root: {
                         ...INDICATION_ROOT,
                         ...pressableRoot(ref),
-                        borderRadius: ref("radius"),
+                        ...corners,
                     },
-                    container: shapedContainer(ref("radius")),
+                    container: {
+                        ...shapedContainer(ref("radius")),
+                        ...corners,
+                    },
                     icon: iconBox(ref("iconSize"), {
                         fill: iconFill(ref("iconFill"), {
                             on: SELECTED,
                             fill: ref("selectedIconFill"),
                         }),
                     }),
-                    outline: shapedOutline(ref("radius")),
+                    outline: { ...shapedOutline(ref("radius")), ...corners },
                     touchTarget,
                 },
                 variants: {
@@ -236,12 +335,57 @@ export const createIconButton = <
                         radius: ref("radius"),
                         outlineColor: ref("outlineColor"),
                     }),
-                    size: {
-                        small: size("sizeSmall"),
-                        medium: size("sizeMedium"),
-                        large: size("sizeLarge"),
+                    size: Object.fromEntries(
+                        entriesOf(ICON_BUTTON_SIZES).map(([name, s]) => [
+                            name,
+                            {
+                                root: {
+                                    tokens: {
+                                        iconSize: s.icon,
+                                        outlineWidth: s.outline,
+                                        squareRadius: s.square,
+                                        pressedRadius: s.pressed,
+                                    },
+                                    // The default width, or the narrow or wide one by the
+                                    // `width` variant's flags.
+                                    width: dense(
+                                        blend(
+                                            blend(
+                                                ref(
+                                                    sizeTokenName("size", name),
+                                                ),
+                                                ref(
+                                                    sizeTokenName(
+                                                        "narrow",
+                                                        name,
+                                                    ),
+                                                ),
+                                                ref("narrow"),
+                                            ),
+                                            ref(sizeTokenName("wide", name)),
+                                            ref("wide"),
+                                        ),
+                                    ),
+                                    height: dense(
+                                        ref(sizeTokenName("size", name)),
+                                    ),
+                                },
+                            },
+                        ]),
+                    ),
+                    width: {
+                        narrow: { root: { tokens: { narrow: unitless(1) } } },
+                        default: {},
+                        wide: { root: { tokens: { wide: unitless(1) } } },
                     },
-                    toggle: { false: {}, true: {} },
+                    corner: {
+                        round: {},
+                        square: { root: { tokens: { square: unitless(1) } } },
+                    },
+                    toggle: {
+                        false: {},
+                        true: { root: { tokens: { toggles: unitless(1) } } },
+                    },
                     density: densityTokenVariant(densities),
                 },
                 // A toggle rests in the unselected colors and takes the selected ones once
@@ -265,7 +409,9 @@ export const createIconButton = <
                 defaultVariants: {
                     color: "primary",
                     variant: "standard",
-                    size: "medium",
+                    size: "small",
+                    width: "default",
+                    corner: "round",
                     toggle: "false",
                     density: "inherit",
                     shape: "none",

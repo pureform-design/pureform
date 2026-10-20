@@ -79,6 +79,7 @@ const linear = componentTokens("linearProgress", {
     activeColor: sys("primary"),
     trackColor: sys("secondaryContainer"),
     height: px(4),
+    thickHeight: px(8),
     value: unitless(0),
     indeterminateWidth: pct(40),
 });
@@ -108,6 +109,7 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
             structure: { root: ["indicator"] },
             variants: {
                 indeterminate: ["true", "false"],
+                thickness: ["default", "thick"],
                 color: groups as ColorGroups,
             },
             recipe: () => ({
@@ -145,6 +147,11 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                         },
                         false: {},
                     },
+                    // M3 Expressive's thick track.
+                    thickness: {
+                        default: {},
+                        thick: { root: { height: ref("thickHeight") } },
+                    },
                     color: colorVariant(groups, (g) => ({
                         root: { backgroundColor: g.container },
                         indicator: { backgroundColor: g.main },
@@ -152,6 +159,7 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                 },
                 defaultVariants: {
                     indeterminate: "false",
+                    thickness: "default",
                     color: DEFAULT_GROUP,
                 },
             }),
@@ -231,6 +239,7 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
         },
         variants: {
             indeterminate: ["true", "false"],
+            thickness: ["default", "thick"],
             color: groups as ColorGroups,
         },
         recipe: () => ({
@@ -274,6 +283,13 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     },
                     false: {},
                 },
+                // M3 Expressive's thick track: every ring takes the thick width.
+                thickness: {
+                    default: {},
+                    thick: {
+                        root: { tokens: { thickness: px(8) } },
+                    },
+                },
                 color: colorVariant(groups, (g) => {
                     const sides = {
                         borderBlockStartColor: g.main,
@@ -282,7 +298,11 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     return { root: sides, endArc: sides, startArc: sides };
                 }),
             },
-            defaultVariants: { indeterminate: "false", color: DEFAULT_GROUP },
+            defaultVariants: {
+                indeterminate: "false",
+                thickness: "default",
+                color: DEFAULT_GROUP,
+            },
         }),
     });
 };

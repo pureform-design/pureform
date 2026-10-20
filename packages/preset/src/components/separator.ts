@@ -8,7 +8,7 @@
 // sides (`middle`).
 
 import { typed } from "@pureform/core";
-import { px } from "@pureform/core/ast";
+import { mul, pct, px, stretch, unitless } from "@pureform/core/ast";
 import { spacing } from "@pureform/theme";
 
 import { componentTokens, sys } from "./shared";
@@ -17,6 +17,9 @@ const { tokens, ref } = componentTokens("separator", {
     thickness: px(1),
     color: sys("outlineVariant"),
     inset: spacing("4"),
+    // The `inset` variant's flags: whether the start, and the end, indent.
+    insetStart: unitless(0),
+    insetEnd: unitless(0),
 });
 
 const pf = typed();
@@ -28,7 +31,10 @@ export const separator = pf.component({
             "Material divider. Use an hr; inset indents it from the start or both sides.",
     },
     tokens,
-    variants: { inset: ["none", "start", "middle"] },
+    variants: {
+        inset: ["none", "start", "middle"],
+        orientation: ["horizontal", "vertical"],
+    },
     recipe: () => ({
         base: {
             // An hr draws a border by default; this is a filled line of the token's color.
@@ -39,15 +45,30 @@ export const separator = pf.component({
             marginBlockEnd: px(0),
         },
         variants: {
+            // `inset` sets which ends indent, as flags; `orientation` reads them along its own
+            // axis, so neither needs a compound with the other.
             inset: {
                 none: {},
-                start: { marginInlineStart: ref("inset") },
+                start: { tokens: { insetStart: unitless(1) } },
                 middle: {
-                    marginInlineStart: ref("inset"),
-                    marginInlineEnd: ref("inset"),
+                    tokens: { insetStart: unitless(1), insetEnd: unitless(1) },
+                },
+            },
+            orientation: {
+                horizontal: {
+                    marginInlineStart: mul(ref("inset"), ref("insetStart")),
+                    marginInlineEnd: mul(ref("inset"), ref("insetEnd")),
+                },
+                // A vertical divider stands between items in a row, as tall as the row.
+                vertical: {
+                    height: pct(100),
+                    width: ref("thickness"),
+                    alignSelf: stretch,
+                    marginBlockStart: mul(ref("inset"), ref("insetStart")),
+                    marginBlockEnd: mul(ref("inset"), ref("insetEnd")),
                 },
             },
         },
-        defaultVariants: { inset: "none" },
+        defaultVariants: { inset: "none", orientation: "horizontal" },
     }),
 });

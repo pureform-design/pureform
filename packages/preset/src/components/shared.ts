@@ -5,6 +5,7 @@ import {
     absolute,
     add,
     mul,
+    sub,
     pointer,
     relative,
     row,
@@ -632,3 +633,66 @@ export const entriesOf = <T extends object>(object: T) =>
 /** A name in lower case, typed as such, for a variant value made from a token suffix. */
 export const lower = <S extends string>(name: S) =>
     name.toLowerCase() as Lowercase<S>;
+
+/** `from` while `flag` is 0, `to` while it's 1: a variant sets the flag, so a value can follow
+ *  two variant groups without a compound for each pair of their values. */
+export const blend = (
+    from: NumericValue,
+    to: NumericValue,
+    flag: NumericValue,
+): NumericValue => add(from, mul(sub(to, from), flag));
+
+/** M3 Expressive's corner morph from a component's tokens: `radius` (round) and `squareRadius`
+ *  at rest, swapped while a toggle is on, and `pressedRadius` while pressed (which wins, from
+ *  the element or a shared interaction source). `square` is the flag the `corner` variant
+ *  sets, so the size sets the radii and the corner picks between them with no compound per
+ *  size and corner. `toggles` is the flag the `toggle` variant sets: `selected` also matches
+ *  `aria-current` and `aria-selected`, so only a toggle swaps its corners when selected. */
+export const cornerRadius = (
+    ref: (
+        token:
+            | "radius"
+            | "squareRadius"
+            | "pressedRadius"
+            | "square"
+            | "toggles",
+    ) => NumericValue,
+) => {
+    const rest = blend(ref("radius"), ref("squareRadius"), ref("square"));
+    const swapped = blend(ref("squareRadius"), ref("radius"), ref("square"));
+    return when()
+        .on(slot("root", "selected"), blend(rest, swapped, ref("toggles")))
+        .on(slot("root", "pressed"), ref("pressedRadius"))
+        .else(rest);
+};
+
+/** Corner changes ease on the emphasized curve, with the state colors; under reduced motion the
+ *  corners change at once and the colors still fade. */
+export const cornerTransition = motionTransition(
+    ...STATE_TWEENS,
+    tween("borderRadius", duration("medium1"), easing("emphasized")),
+);
+
+/** A component token per size for one of its measures, named `<prefix><Size>`
+ *  (`heightSmall`), so a theme can retune each size. */
+export const sizeTokens = <
+    S extends string,
+    M extends string,
+    P extends string,
+>(
+    sizes: Record<S, Record<M, ValueNode>>,
+    measure: M,
+    prefix: P,
+) =>
+    Object.fromEntries(
+        entriesOf(sizes).map(([name, s]) => [
+            sizeTokenName(prefix, name),
+            s[measure],
+        ]),
+    ) as Record<`${P}${Capitalize<S>}`, ValueNode>;
+
+/** The token `sizeTokens` names for a size's measure. */
+export const sizeTokenName = <P extends string, S extends string>(
+    prefix: P,
+    size: S,
+) => `${prefix}${capitalize(size)}` as `${P}${Capitalize<S>}`;
