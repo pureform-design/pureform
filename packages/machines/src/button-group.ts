@@ -20,13 +20,17 @@ export function connect<T extends PropTypes>(
     const api = zagConnect(service as never, normalize);
     return {
         ...api,
-        // Zag's props are already normalized for the framework; only these keys change.
-        getRootProps: () => ({ ...api.getRootProps(), role: "group" }),
+        getRootProps: () => ({
+            ...api.getRootProps(),
+            ...normalize.element({ role: "group" }),
+        }),
         getItemProps: (props) => ({
             ...api.getItemProps(props),
-            role: undefined,
-            "aria-checked": undefined,
-            "aria-pressed": api.getItemState(props).pressed,
+            ...normalize.button({
+                role: undefined,
+                "aria-checked": undefined,
+                "aria-pressed": api.getItemState(props).pressed,
+            }),
         }),
     };
 }
