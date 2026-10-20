@@ -44,10 +44,11 @@ callback reports user actions only, with a details object.
 | `button/`                                                 | Press, focus, hover, and an optional toggle (`selected`).                                                                                                                                                                  |
 | `ripple/`                                                 | The ripple of `@pureform/js-effects`, run as a machine.                                                                                                                                                                    |
 | `text-field/`                                             | The text field and text area: value, focus, fieldsets, and validation (`error`, `validate`).                                                                                                                               |
-| `snackbar/`                                               | The snackbar (parts include the `actions` wrapper): `open`, closing itself after `duration` unless held by the pointer or focus.                                                                                           |
+| `snackbar/`                                               | The snackbar (parts include the `actions` wrapper): `open`, closing itself after `duration` unless held by the pointer or focus; `createQueue`, the queue that shows one at a time.                                        |
 | `navigation/`                                             | The navigation bar and rail: `value`, the current destination, marked with `aria-current`; the rail's `header` part (`getHeaderProps`).                                                                                    |
 | `menu.ts`, `tabs.ts`                                      | Zag's machines, re-exported, emitting each item's interactions to its source.                                                                                                                                              |
 | `dialog.ts`                                               | Zag's dialog, re-exported; its dismissable layer doesn't mirror the dialog's layer onto the backdrop and positioner (no forced style read).                                                                                |
+| `toast/`                                                  | Zag's toast (store, group and toast machines), with the `icon` part pureform's toast adds.                                                                                                                                 |
 | `tooltip.ts`                                              | Zag's tooltip, re-exported unchanged.                                                                                                                                                                                      |
 | `button-group.ts`                                         | Zag's toggle group behind a selectable button group: the root is a `group` and every item a toggle button with `aria-pressed`.                                                                                             |
 | `presence.ts`                                             | Zag's presence, re-exported; keeps an overlay mounted until its exit animation ends, and only the exit's own animations end it.                                                                                            |
@@ -76,6 +77,7 @@ callback reports user actions only, with a details object.
 | `@pureform/machines/presence`     | `@zag-js/presence` (`presence` at the root), its `machine` ending an exit only on the exit's own animations                                                                                                                             |
 | `@pureform/machines/tabs`         | `@zag-js/tabs` (`tabs` at the root)                                                                                                                                                                                                     |
 | `@pureform/machines/snackbar`     | `snackbar`'s members                                                                                                                                                                                                                    |
+| `@pureform/machines/toast`        | `@zag-js/toast` (`toast` at the root: `createStore`, `group`, `machine`), with an `icon` part in `anatomy` and `getIconProps` in `connect`                                                                                              |
 | `@pureform/machines/navigation`   | `navigation`'s members                                                                                                                                                                                                                  |
 | `@pureform/machines/ripple`       | `ripple`'s members                                                                                                                                                                                                                      |
 | `@pureform/machines/text-field`   | `textField`'s members                                                                                                                                                                                                                   |
@@ -232,6 +234,13 @@ is inside it; the countdown starts again from the start once both leave). A cont
 only asks, as Zag's dialog does, and moves with the prop. `connect` returns `open`, `paused`,
 `setOpen(open)`, and part props for `root` (`role="status"`, `hidden` while closed; Escape inside
 it closes it), `supportingText`, `action`, and `close` (both `type="button"`).
+
+The queue (`createQueue<Options>(prefix?)`) holds snackbars in order and shows one at a time:
+`show(options)` returns an id, `dismiss(id?, reason?)` marks the shown one closing (calling its
+`onOpenChange` with the reason) or drops a waiting one unseen, `gone(id)` moves on once the shown
+one's exit animation is over, and `clear()` closes the shown one and drops the rest. `items()`,
+`current()` and `subscribe(listener)` are what a binding renders from. Each shown snackbar times
+itself on the snackbar machine.
 
 ### Navigation
 
