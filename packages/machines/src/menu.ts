@@ -1,7 +1,8 @@
 // Zag's menu, re-exported so bindings take every machine from one package. A menu isn't a form
-// control, so its form behavior is unchanged. Each item emits to its own interaction source: the
-// highlighted item hovers, the pointer presses an item, and Enter or Space presses the highlighted
-// one.
+// control, so its form behavior is unchanged. Each item, and each toggleable (checkbox or radio)
+// item, emits to its own interaction source: the highlighted item hovers, the pointer presses an
+// item, and Enter or Space presses the highlighted one. Zag's item groups and their labels
+// (`getItemGroupProps`, `getItemGroupLabelProps`) pass through unchanged.
 
 import type {
     Machine as AnyMachine,
@@ -61,6 +62,14 @@ export function connect<T extends PropTypes>(
         getItemProps: (props) =>
             itemPressProps(
                 api.getItemProps(props),
+                emitters,
+                props.value,
+                !!props.disabled,
+                normalize,
+            ),
+        getOptionItemProps: (props) =>
+            itemPressProps(
+                api.getOptionItemProps(props),
                 emitters,
                 props.value,
                 !!props.disabled,
