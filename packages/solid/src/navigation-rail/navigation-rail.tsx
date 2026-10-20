@@ -23,8 +23,9 @@ const { ReadyMade, parts } = createNavigation({
 
 /** Material's navigation rail. Use it ready-made, `<NavigationRail aria-label="Main" items={[{
  *  value: "home", label: "Home", icon: …, href: "/" }, …]} />`, or compose its parts under
- *  `NavigationRail.Root`: an `Item` per destination holding `Indicator` (with
- *  `ActiveIndicator` and `Icon`) and `Label`. */
+ *  `NavigationRail.Root`: an optional `Header` (menu button, FAB), then an `Item` per destination
+ *  holding `Indicator` (with `ActiveIndicator` and `Icon`) and `Label`. `expanded` puts each label
+ *  beside its icon; `modal` draws it in a dialog over the scrim while `open`. */
 export const NavigationRail = Object.assign(
     ReadyMade as (props: NavigationRailProps) => JSX.Element,
     parts,

@@ -20,6 +20,7 @@ import type {
     IndicationProps,
     NavigationComponent,
     NavigationItem,
+    NavigationModalProps,
     NavigationVariantProps,
     TabsItem,
     TabsVariantProps,
@@ -29,10 +30,13 @@ import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import type { Selection } from "@pureform/styling";
 import { memo } from "react";
 import type { ReactNode } from "react";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
 
 import { IconSlot, iconSlot } from "./icon-style";
 import { useSurfaceIndication } from "./indication";
+import { useLayer } from "./layer";
+import { dismissTopOverlay, useDismiss } from "./overlay";
 import {
     testIdOf,
     unselectable,
@@ -41,13 +45,16 @@ import {
     useStableSelection,
     withEngine,
 } from "./parts";
+import { PortalHost } from "./portal-host";
 import { useEngine } from "./provider";
+import { Scrim } from "./single-part";
 import { useComponentSlots } from "./styles";
 import { useIndicatorSlides } from "./tab-indicator";
 import type { IndicatorSlides } from "./tab-indicator";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
-type NavigationPart = PartName<typeof navigationBarAnatomy>;
+type NavigationPart = PartName<typeof navigationBarAnatomy> | "header";
+type RailPart = PartName<typeof navigationRailAnatomy>;
 
 const [TAB_INDICATION] = tabsAnatomy.indication!;
 
@@ -224,8 +231,10 @@ function TabsImpl(props: TabsProps): ReactNode {
 export const Tabs = withEngine(TabsImpl, "Tabs");
 
 export interface NavigationProps<C extends NavigationComponent>
-    extends NavigationVariantProps<C>, IndicationProps {
+    extends NavigationVariantProps<C>, NavigationModalProps, IndicationProps {
     readonly items: readonly NavigationItem<ReactNode>[];
+    /** The rail's header, above the destinations: a menu button and a FAB, say. */
+    readonly header?: ReactNode;
     /** Disables every destination. */
     readonly disabled?: boolean | undefined;
     /** The current destination's value. Controlled when defined. */
@@ -280,7 +289,7 @@ function DestinationImpl(props: DestinationProps): ReactNode {
     const id = (part: string) =>
         testIdOf(
             ANATOMIES[name] as typeof navigationBarAnatomy,
-            part as NavigationPart,
+            part as PartName<typeof navigationBarAnatomy>,
             props.testId,
         );
     return (
@@ -355,6 +364,18 @@ function NavigationImpl<C extends NavigationComponent>(
                 props.testId as TestIdOverride<NavigationPart>,
             )}
         >
+            {props.name === "navigationRail" && isPresent(props.header) ? (
+                <v.header.View
+                    style={s.header}
+                    testID={testIdOf(
+                        navigationRailAnatomy,
+                        "header",
+                        props.testId as TestIdOverride<RailPart>,
+                    )}
+                >
+                    {props.header}
+                </v.header.View>
+            ) : null}
             {props.items.map((item) => (
                 <Destination
                     key={item.value}
@@ -386,7 +407,79 @@ export function NavigationBar(props: NavigationBarProps): ReactNode {
     return <Navigation {...props} name="navigationBar" />;
 }
 
-/** Material's navigation rail, the bar's form along a side. */
+/** A modal rail: the scrim, and the rail over it along the start edge, while `open`. A press on
+ *  the scrim, Escape, or the back button closes it. */
+function ModalRail(props: NavigationRailProps): ReactNode {
+    const {
+        open: _open,
+        defaultOpen,
+        onOpenChange,
+        closeOnEscape = true,
+        closeOnInteractOutside = true,
+        ...rail
+    } = props;
+    const [open, setOpen] = useControllable(
+        "NavigationRail",
+        "open",
+        props.open,
+        defaultOpen,
+        onOpenChange,
+        false,
+    );
+    const layer = useLayer("dialog");
+    const close = useStableCallback(() => {
+        if (open) setOpen(false);
+    });
+    useDismiss(open, () => {
+        if (closeOnEscape) close();
+    });
+    return (
+        <Modal
+            transparent
+            visible={open}
+            animationType="none"
+            statusBarTranslucent
+            navigationBarTranslucent
+            onRequestClose={() => {
+                dismissTopOverlay();
+            }}
+        >
+            <PortalHost>
+                <View style={StyleSheet.absoluteFill}>
+                    <Scrim open={open} />
+                    <Pressable
+                        accessible={false}
+                        focusable={false}
+                        style={StyleSheet.absoluteFill}
+                        {...(closeOnInteractOutside ? { onPress: close } : {})}
+                    />
+                    <View
+                        pointerEvents="box-none"
+                        aria-modal
+                        role="dialog"
+                        style={[modalStyles.positioner, { zIndex: layer }]}
+                    >
+                        <Navigation {...rail} name="navigationRail" />
+                    </View>
+                </View>
+            </PortalHost>
+        </Modal>
+    );
+}
+
+const modalStyles = StyleSheet.create({
+    positioner: {
+        position: "absolute",
+        top: 0,
+        bottom: 0,
+        start: 0,
+        flexDirection: "row",
+    },
+});
+
+/** Material's navigation rail, the bar's form along a side. `expanded` puts each label beside
+ *  its icon; `modal` draws it over the page on a scrim while `open`. */
 export function NavigationRail(props: NavigationRailProps): ReactNode {
+    if (props.modal) return <ModalRail {...props} />;
     return <Navigation {...props} name="navigationRail" />;
 }

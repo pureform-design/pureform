@@ -142,4 +142,64 @@ describe("NavigationRail", () => {
             items(testIds.navigationRail.item)[1]!.getAttribute("aria-current"),
         ).toBe("true");
     });
+
+    it("renders its header above the destinations", async () => {
+        withRegistry(
+            <NavigationRail
+                aria-label="Main"
+                items={ITEMS}
+                header={<button type="button">Menu</button>}
+            />,
+        );
+        await settle();
+        const header = byTestId(testIds.navigationRail.root).firstElementChild!;
+        expect(header.getAttribute("data-testid")).toBe(
+            testIds.navigationRail.header,
+        );
+        expect(header.className).toBe("navigation-rail__header");
+        expect(header.textContent).toBe("Menu");
+    });
+
+    it("as a modal, sits in a dialog over the scrim, and closes with Escape", async () => {
+        const onOpenChange = vi.fn();
+        withRegistry(
+            <NavigationRail
+                aria-label="Main"
+                items={ITEMS}
+                modal
+                defaultOpen
+                onOpenChange={onOpenChange}
+            />,
+        );
+        await settle();
+        const root = byTestId(testIds.navigationRail.root);
+        expect(root.className).toContain("navigation-rail--modal-true");
+        expect(root.className).toContain("navigation-rail--expanded-true");
+        const dialog = root.closest<HTMLElement>("[role=dialog]")!;
+        expect(dialog.getAttribute("aria-modal")).toBe("true");
+        expect(dialog.hidden).toBe(false);
+        expect(document.querySelector(".scrim")).not.toBeNull();
+        await userEvent.keyboard("{Escape}");
+        await settle();
+        expect(onOpenChange).toHaveBeenCalledWith(
+            expect.objectContaining({ open: false }),
+        );
+        expect(dialog.hidden).toBe(true);
+    });
+});
+
+describe("NavigationBar, item layout", () => {
+    it("selects the horizontal layout", async () => {
+        withRegistry(
+            <NavigationBar
+                aria-label="Main"
+                items={ITEMS}
+                itemLayout="horizontal"
+            />,
+        );
+        await settle();
+        expect(byTestId(ids.root).className).toContain(
+            "navigation-bar--itemLayout-horizontal",
+        );
+    });
 });

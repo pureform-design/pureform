@@ -142,6 +142,9 @@ export {
     navigationItemElementProps,
     navigationItemMachineProps,
     navigationMachineProps,
+    navigationModalContentLayout,
+    navigationModalMachineProps,
+    navigationModalPositionerLayout,
     navigationSelection,
 } from "./components/navigation";
 export type {
@@ -151,6 +154,7 @@ export type {
     NavigationElementIds,
     NavigationItem,
     NavigationItemOwnProps,
+    NavigationModalProps,
     NavigationPart,
     NavigationRootOwnProps,
     NavigationVariantProps,

@@ -1,13 +1,17 @@
 // What the navigation bar and the navigation rail share: Root on pureform's navigation machine (a
 // `<nav>`), each destination as the preset draws it (a link or a button holding the pill, which
 // holds the active indicator and the icon, then the label), and the ready-made component over
-// them. Each component builds its own from `createNavigation`.
+// them. Each component builds its own from `createNavigation`. The rail adds its header, and as a
+// modal rail renders in a dialog (Zag's) over the scrim: fixed along the viewport's start edge,
+// focus kept inside while it's open.
 
+import { scrimAnatomy } from "@pureform/anatomy";
 import type {
     navigationBarAnatomy,
     navigationRailAnatomy,
 } from "@pureform/anatomy";
 import {
+    dialogBackdropLayout,
     isPresent,
     NAVIGATION_CONTENT_PROPS,
     NAVIGATION_ITEM_PROPS,
@@ -16,6 +20,9 @@ import {
     navigationItemElementProps,
     navigationItemMachineProps,
     navigationMachineProps,
+    navigationModalContentLayout,
+    navigationModalMachineProps,
+    navigationModalPositionerLayout,
     navigationSelection,
 } from "@pureform/binding-core";
 import type {
@@ -26,6 +33,7 @@ import type {
     NavigationRootOwnProps,
 } from "@pureform/binding-core";
 import type { InteractionSource } from "@pureform/binding-core/interaction";
+import * as dialog from "@pureform/machines/dialog";
 import * as navigation from "@pureform/machines/navigation";
 import type { Selection } from "@pureform/styling";
 import type { JSX, ValidComponent } from "@solidjs/web";
@@ -36,12 +44,13 @@ import {
     For,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "./controllable";
 import { itemInteractionSources } from "./interaction";
 import type { ItemInteractionSources } from "./interaction";
-import { normalizeProps, useMachine } from "./internal/zag";
+import { mergeProps, normalizeProps, useMachine } from "./internal/zag";
 import type { PropTypes } from "./internal/zag";
 import { createPartContext } from "./part-context";
 import { createSlotProps, useComponent } from "./parts";
@@ -110,8 +119,89 @@ export function createNavigation<C extends NavigationComponent>(config: {
         "Item",
     );
 
-    /** The component's root, a `<nav>` holding its destinations. Name it with `aria-label`. */
+    /** A modal rail's dialog: the scrim, and the rail in a dialog along the viewport's start edge,
+     *  open while `open` is. A click on the scrim or Escape closes it. */
+    function Modal(props: {
+        readonly own: NavigationRootProps<C>;
+        readonly children: JSX.Element;
+    }): JSX.Element {
+        const id = createUniqueId();
+        const dir = useDirection();
+        const open = useControllable<"open", boolean>(
+            config.component,
+            "open",
+            props.own,
+        );
+        const service = useMachine(dialog.machine, () => ({
+            id,
+            dir: dir(),
+            ...navigationModalMachineProps(
+                props.own as Parameters<typeof navigationModalMachineProps>[0],
+            ),
+            ...open.machineProps(),
+        }));
+        const api = createMemo(() => dialog.connect(service, normalizeProps));
+        const scrim = useComponent(scrimAnatomy, {
+            selection: () => ({}),
+            testId: () => {
+                const testId = props.own.testId;
+                return typeof testId === "string"
+                    ? { root: `${testId}-scrim` }
+                    : undefined;
+            },
+        });
+        const positioner = createMemo(() =>
+            mergeProps(
+                api().getPositionerProps(),
+                normalizeProps.element(
+                    navigationModalPositionerLayout(api().open),
+                ),
+            ),
+        );
+        const content = createMemo(() =>
+            mergeProps(
+                api().getContentProps(),
+                normalizeProps.element(
+                    navigationModalContentLayout(api().open),
+                ),
+            ),
+        );
+        return (
+            <>
+                {scrim.render("root", {
+                    element: "div",
+                    machine: () =>
+                        mergeProps(
+                            api().getBackdropProps(),
+                            normalizeProps.element(
+                                dialogBackdropLayout(api().open),
+                            ),
+                        ),
+                })}
+                <div {...positioner()}>
+                    <div {...content()}>{props.children}</div>
+                </div>
+            </>
+        );
+    }
+
+    /** The component's root, a `<nav>` holding its destinations. Name it with `aria-label`. A
+     *  modal rail (`modal`, read once) renders it in a dialog over the scrim. */
     function Root(props: NavigationRootProps<C>): JSX.Element {
+        const modal = untrack(
+            () => (props as { readonly modal?: boolean | undefined }).modal,
+        );
+        if (modal) {
+            return (
+                <Modal own={props}>
+                    <Nav {...props} />
+                </Modal>
+            );
+        }
+        return <Nav {...props} />;
+    }
+
+    function Nav(props: NavigationRootProps<C>): JSX.Element {
         const id = createUniqueId();
         const dir = useDirection();
         const value = useControllable<"value", string | null>(
@@ -185,6 +275,19 @@ export function createNavigation<C extends NavigationComponent>(config: {
         );
     }
 
+    /** The rail's header, above the destinations: its menu button and FAB. */
+    function Header(props: NavigationPartProps): JSX.Element {
+        const { scope, api } = context.use("Header");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("header", {
+            element: "div",
+            machine: () => api().getHeaderProps(),
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled"),
+        });
+    }
+
     /** The pill behind the icon, which takes the state layer. */
     function Indicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("Indicator");
@@ -234,6 +337,11 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    // Only the rail has a header.
+    const hasHeader = (config.anatomy.partNames as readonly string[]).includes(
+        "header",
+    );
+
     const READY_MADE_PROPS = [
         "class",
         "style",
@@ -253,8 +361,12 @@ export function createNavigation<C extends NavigationComponent>(config: {
         const activeIndicator = slots("activeIndicator");
         const icon = slots("icon");
         const label = slots("label");
+        const header = (slots as (part: string) => object)("header");
         return (
             <Root {...own} {...root}>
+                <Show when={hasHeader && isPresent(props.header)}>
+                    <Header {...header}>{props.header}</Header>
+                </Show>
                 <For
                     each={props.items ?? []}
                     keyed={(item: NavigationItem<JSX.Element>) => item.value}
@@ -285,6 +397,6 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
     };
 }
