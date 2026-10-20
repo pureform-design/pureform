@@ -44,6 +44,7 @@ export const RN_COMPONENTS = [
     "dragHandle",
     "snackbar",
     "toast",
+    "toolbar",
     "tooltip",
     "richTooltip",
 ];

@@ -47,6 +47,7 @@ import {
     text,
     textArea,
     textField,
+    toolbar,
 } from "$recipes";
 import { MATERIAL_SHAPES } from "@pureform/preset";
 import type { MaterialShape } from "@pureform/preset";
@@ -75,6 +76,31 @@ const grouped = menu({ grouped: true, vibrant: true });
 
 // Named themes from pureform.config.ts, each applied to a subtree by `data-panda-theme`.
 const THEMES = [undefined, "teal", "sharp", "dense"] as const;
+
+// A toolbar's icons, and whether each is a toggle that's on: bold, italic (on) and underline
+// toggles, and a link button.
+const TOOLBAR_ICONS: readonly (readonly [
+    string,
+    string,
+    "true" | "false" | undefined,
+])[] = [
+    [
+        "Bold",
+        "M8 4h5a4 4 0 0 1 2.5 7.1A4 4 0 0 1 14 19H8zm3 3v3h2a1.5 1.5 0 0 0 0-3zm0 6v3h3a1.5 1.5 0 0 0 0-3z",
+        "false",
+    ],
+    ["Italic", "M10 4h8v3h-2.7l-3 10H15v3H7v-3h2.7l3-10H10z", "true"],
+    [
+        "Underline",
+        "M6 21h12v-2H6zM12 17a6 6 0 0 0 6-6V3h-2.5v8a3.5 3.5 0 0 1-7 0V3H6v8a6 6 0 0 0 6 6",
+        "false",
+    ],
+    [
+        "Link",
+        "M17 7h-4v2h4a3 3 0 0 1 0 6h-4v2h4a5 5 0 0 0 0-10m-6 8H7a3 3 0 0 1 0-6h4V7H7a5 5 0 0 0 0 10h4zm-3-4h8v2H8z",
+        undefined,
+    ],
+];
 
 const TOAST_TYPES = ["info", "success", "warning", "error", "loading"] as const;
 // Plain glyphs: the bundled Roboto draws them the same on every machine.
@@ -945,6 +971,127 @@ export function Page() {
                     <span class={button().touchTarget} />
                     <span class={button().label}>DISABLED</span>
                 </button>
+            </section>
+
+            <section
+                data-section="toolbars"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={[undefined, "teal", "sharp"] as const}>
+                    {(theme) => (
+                        <div
+                            data-panda-theme={theme}
+                            style={{
+                                display: "grid",
+                                gap: "12px",
+                                width: "280px",
+                                "justify-items": "center",
+                            }}
+                        >
+                            <For
+                                each={
+                                    [
+                                        { placement: "floating" },
+                                        {
+                                            placement: "floating",
+                                            color: "vibrant",
+                                        },
+                                        { placement: "docked" },
+                                        {
+                                            placement: "docked",
+                                            color: "vibrant",
+                                        },
+                                    ] as const
+                                }
+                            >
+                                {(variants) => (
+                                    <div
+                                        class={toolbar(variants).root}
+                                        role="toolbar"
+                                        aria-label={`${theme ?? "base"} ${variants.placement}`}
+                                    >
+                                        <For each={TOOLBAR_ICONS}>
+                                            {([label, path, pressed]) => {
+                                                const b = iconButton({
+                                                    toggle:
+                                                        pressed !== undefined,
+                                                });
+                                                return (
+                                                    <button
+                                                        class={b.root}
+                                                        type="button"
+                                                        aria-label={label}
+                                                        aria-pressed={pressed}
+                                                    >
+                                                        <span
+                                                            class={
+                                                                b.touchTarget
+                                                            }
+                                                        />
+                                                        <span
+                                                            class={b.container}
+                                                        >
+                                                            <svg
+                                                                class={b.icon}
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    fill="currentColor"
+                                                                    d={path}
+                                                                />
+                                                            </svg>
+                                                        </span>
+                                                        <span
+                                                            class={b.outline}
+                                                        />
+                                                    </button>
+                                                );
+                                            }}
+                                        </For>
+                                    </div>
+                                )}
+                            </For>
+                            <div
+                                class={
+                                    toolbar({
+                                        orientation: "vertical",
+                                        color: "vibrant",
+                                    }).root
+                                }
+                                role="toolbar"
+                                aria-orientation="vertical"
+                                aria-label={`${theme ?? "base"} vertical`}
+                            >
+                                <For each={TOOLBAR_ICONS.slice(0, 3)}>
+                                    {([label, path]) => {
+                                        const b = iconButton();
+                                        return (
+                                            <button
+                                                class={b.root}
+                                                type="button"
+                                                aria-label={label}
+                                            >
+                                                <span class={b.touchTarget} />
+                                                <span class={b.container}>
+                                                    <svg
+                                                        class={b.icon}
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            fill="currentColor"
+                                                            d={path}
+                                                        />
+                                                    </svg>
+                                                </span>
+                                                <span class={b.outline} />
+                                            </button>
+                                        );
+                                    }}
+                                </For>
+                            </div>
+                        </div>
+                    )}
+                </For>
             </section>
 
             <section data-section="shapes">
