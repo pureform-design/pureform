@@ -28,6 +28,7 @@ import {
     center,
     column,
     flex,
+    mul,
     px,
     relative,
     row,
@@ -42,6 +43,7 @@ import type { ColorValue } from "@pureform/core/ast";
 import {
     duration,
     easing,
+    radius,
     size as sizeToken,
     spacing,
     textStyle,
@@ -79,7 +81,7 @@ const { tokens, ref } = componentTokens("tabs", {
     iconFill: unitless(0),
     indicatorHeight: px(3),
     // Material's 3dp top corners on a primary indicator.
-    indicatorRadius: px(3),
+    indicatorRadius: mul(radius("extraSmall"), unitless(0.75)),
     secondaryIndicatorHeight: px(2),
     // A primary indicator is as wide as the tab's content, and never narrower than this.
     indicatorMinWidth: px(24),
