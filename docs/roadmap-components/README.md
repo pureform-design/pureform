@@ -75,7 +75,9 @@ contexts exist.
 - Every component conforms to the theme, static and dynamic, with the documented shape
   exception only for geometry
   ([guidelines §5](../design/component-guidelines.md#5-theme-conformance)).
-- Deprecated Expressive options stay as variants; a removal must say why.
+- Deprecated options are removed when the new version has an equivalent, naming the
+  replacement; those without one stay as variants
+  ([guidelines §3](../design/component-guidelines.md)).
 - Nothing is copied from the sources: they are open-source docs and public APIs we read
   ([guidelines §1](../design/component-guidelines.md#1-sources-and-provenance)).
 - A phase is done only when `omni run build test -f all -o continue` passes, the type check

@@ -95,4 +95,4 @@ those two by hand and record it.
 ## Done when
 
 Each subphase passes the guidelines checklist, its parts exist in preset, anatomy, machine and
-bindings, deprecated options still work, and the context lists hints. The phase gate passes.
+bindings, deprecated options are removed where the new version has an equivalent and still work otherwise, and the context lists hints. The phase gate passes.

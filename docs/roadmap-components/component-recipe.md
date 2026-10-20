@@ -30,5 +30,5 @@ when the list below looks out of date.
 10. **Verify:** the phase gate in the [conventions](conventions.md#gate-for-a-phase).
 
 For a **variant or a part on an existing component**, steps 2, 3, 5, 6 (variant list or part
-in the binding), 8 and 9 apply, and the existing component's deprecated options must keep
-their tests.
+in the binding), 8 and 9 apply, and the existing component's deprecated options are removed when the new version has an
+equivalent, otherwise they keep their tests.
