@@ -195,7 +195,13 @@ The text field and the text area share it: the input part is an `<input>` (`getI
 | `error`                                  | `string`                                               | invalid, the error text, and the input's custom validity                                |
 | `validate`                               | `"native"`                                             | the input's own constraints decide once the user commits a change or the form checks it |
 | `placeholder`                            | `string`                                               | default `" "`: the label floats while no placeholder shows                              |
+| `counterMax`                             | `number`                                               | `counterText` (`"3 / 20"`); a longer value is `overflow` and marks the field invalid    |
+| `secure`, `revealLabel`                  | `boolean`, `string`                                    | password field: `getVisibilityTriggerProps()` toggles `revealed` and the input's `type` |
 | `name`, `form`, `dir`, `getRootNode`     |                                                        | forwarded or as in Zag                                                                  |
+
+Parts: `getPrefixTextProps`, `getSuffixTextProps`, `getSupportingRowProps`, `getCounterProps`
+(`id`, `data-overflow`), and `getVisibilityTriggerProps` (a `type="button"` toggle with
+`aria-pressed` and `aria-controls`) besides the input, label, root and supporting text.
 
 States: `idle` and `focused`. The input keeps its own text: `connect` gives it the value as
 `defaultValue` (the server renders it, and React leaves the input to the user), and the machine

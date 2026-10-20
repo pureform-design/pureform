@@ -16,6 +16,7 @@ export const machine = createMachine<TextFieldSchema>({
             ...props,
             defaultValue: props.defaultValue ?? "",
             placeholder: props.placeholder ?? " ",
+            revealLabel: props.revealLabel ?? "Show password",
         };
     },
 
@@ -40,6 +41,7 @@ export const machine = createMachine<TextFieldSchema>({
             })),
             interacted: bindable<boolean>(() => ({ defaultValue: false })),
             validationMessage: bindable<string>(() => ({ defaultValue: "" })),
+            revealed: bindable<boolean>(() => ({ defaultValue: false })),
         };
     },
 
@@ -54,8 +56,14 @@ export const machine = createMachine<TextFieldSchema>({
                 return undefined;
             return context.get("validationMessage") || undefined;
         },
+        overflow: ({ prop, context }) => {
+            const max = prop("counterMax");
+            return max !== undefined && context.get("value").length > max;
+        },
         invalid: ({ prop, computed }) =>
-            !!prop("invalid") || computed("errorText") !== undefined,
+            !!prop("invalid") ||
+            computed("errorText") !== undefined ||
+            computed("overflow"),
     },
 
     entry: ["syncCustomValidity", "syncValidity"],
@@ -81,6 +89,7 @@ export const machine = createMachine<TextFieldSchema>({
 
     on: {
         "VALUE.SET": { actions: ["setValue"] },
+        "REVEALED.SET": { actions: ["setRevealed"] },
         RESET: { actions: ["clearInteracted", "setValue", "syncValidity"] },
         COMMIT: { actions: ["markInteracted", "syncValidity"] },
         INVALID: { actions: ["markInteracted", "syncValidity"] },
@@ -124,6 +133,9 @@ export const machine = createMachine<TextFieldSchema>({
         actions: {
             setValue({ context, event }) {
                 context.set("value", String(event["value"] ?? ""));
+            },
+            setRevealed({ context, event }) {
+                context.set("revealed", !!event["revealed"]);
             },
             markInteracted({ context }) {
                 context.set("interacted", true);

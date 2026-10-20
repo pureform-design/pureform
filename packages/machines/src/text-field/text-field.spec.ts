@@ -99,6 +99,56 @@ describe("text field machine", () => {
         stop();
     });
 
+    it("counts toward counterMax, and a longer value marks the field invalid", async () => {
+        const { api, input, stop } = field({
+            defaultValue: "abc",
+            counterMax: 4,
+        });
+        expect(api().counterText).toBe("3 / 4");
+        expect(api().overflow).toBe(false);
+        expect(api().invalid).toBe(false);
+        expect(api().getCounterProps()).toMatchObject({
+            id: api().counterId,
+            "data-part": "counter",
+        });
+        api().setValue("abcde");
+        await settle();
+        expect(api().counterText).toBe("5 / 4");
+        expect(api().overflow).toBe(true);
+        expect(input.getAttribute("aria-invalid")).toBe("true");
+        stop();
+    });
+
+    it("has no counter without counterMax", () => {
+        const { api, stop } = field({ defaultValue: "abc" });
+        expect(api().counterText).toBeUndefined();
+        stop();
+    });
+
+    it("hides a secure field's text until the toggle reveals it", async () => {
+        const { api, input, stop } = field({ secure: true });
+        expect(input.type).toBe("password");
+        const trigger = api().getVisibilityTriggerProps() as Record<
+            string,
+            unknown
+        >;
+        expect(trigger).toMatchObject({
+            type: "button",
+            "aria-label": "Show password",
+            "aria-pressed": false,
+            "aria-controls": input.id,
+        });
+        const click = (trigger["onClick"] ?? trigger["onclick"]) as () => void;
+        click();
+        await settle();
+        expect(api().revealed).toBe(true);
+        expect(input.type).toBe("text");
+        api().setRevealed(false);
+        await settle();
+        expect(input.type).toBe("password");
+        stop();
+    });
+
     describe("validation", () => {
         it("`invalid` marks the input and nothing else", async () => {
             const { api, input, stop } = field({ invalid: true });
