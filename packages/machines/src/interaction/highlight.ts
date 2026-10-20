@@ -11,16 +11,16 @@ import { chainProps } from "./zag";
 
 type HighlightParams = Pick<Params<any>, "track" | "context">;
 
-/** Watches a machine's `highlightedValue`: the item it names hovers, and the one before stops.
- *  Everything ends when `open()` turns false. A highlight's hover has no origin element, since the
- *  item itself may not be hovered. */
-export function trackHighlight(
-    { track, context }: HighlightParams,
+/** Follows a highlighted item's value (`read`, tracked): the item it names hovers, and the one
+ *  before stops. A highlight's hover has no origin element, since the item itself may not be
+ *  hovered. */
+export function followHighlight(
+    track: HighlightParams["track"],
+    read: () => string | null | undefined,
     emitters: InteractionEmitters,
-    open: () => boolean,
 ): void {
-    track([() => context.get("highlightedValue") as string | null], () => {
-        const next = (context.get("highlightedValue") as string | null) ?? null;
+    track([read], () => {
+        const next = read() ?? null;
         const previous = emitters.highlighted;
         if (previous !== null && previous !== next) {
             emitters.item(previous).hoverExit();
@@ -28,6 +28,20 @@ export function trackHighlight(
         if (next !== null) emitters.item(next).hoverEnter();
         emitters.highlighted = next;
     });
+}
+
+/** Watches a machine's `highlightedValue` with `followHighlight`. Everything ends when `open()`
+ *  turns false. */
+export function trackHighlight(
+    { track, context }: HighlightParams,
+    emitters: InteractionEmitters,
+    open: () => boolean,
+): void {
+    followHighlight(
+        track,
+        () => context.get("highlightedValue") as string | null,
+        emitters,
+    );
     track([open], () => {
         if (open()) return;
         emitters.end();

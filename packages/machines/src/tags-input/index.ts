@@ -26,6 +26,7 @@ import {
     withInteraction,
     type WithProps,
 } from "../interaction";
+import { followHighlight } from "../interaction/highlight";
 import { pressableItemProps } from "../interaction/pressable";
 
 export * from "@zag-js/tags-input";
@@ -71,17 +72,8 @@ export const machine: Machine = withInteraction(
                 props: { editable: false, ...params.props },
             }),
     },
-    ({ track, context }, emitters) => {
-        track([() => context.get("highlightedTagId")], () => {
-            const next = context.get("highlightedTagId") ?? null;
-            const previous = emitters.highlighted;
-            if (previous !== null && previous !== next) {
-                emitters.item(previous).hoverExit();
-            }
-            if (next !== null) emitters.item(next).hoverEnter();
-            emitters.highlighted = next;
-        });
-    },
+    ({ track, context }, emitters) =>
+        followHighlight(track, () => context.get("highlightedTagId"), emitters),
 );
 
 /** Zag's connect, with the preset's parts, each chip emitting to its source. */
