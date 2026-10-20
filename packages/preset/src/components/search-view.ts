@@ -2,7 +2,7 @@
 // the query in a header over the suggestions or results.
 //
 // Markup: a surface holding the header (a leading icon button, usually back, the search input,
-// and trailing icons such as clear), a divider, and the content (the suggestions, often a list
+// and trailing icon buttons such as clear), a divider, and the content (the suggestions, often a list
 // or the menu's items). The binding opens it as a modal: focus stays in it while it's open and
 // goes back to the search bar when it closes.
 //
@@ -76,8 +76,9 @@ const { tokens, ref } = componentTokens("searchView", {
     // Room around the contained view's header pill.
     headerInset: px(0),
     radius: radius("extraLarge"),
-    paddingInline: spacing("4"),
-    gap: spacing("4"),
+    // The header's inline padding, around icon buttons.
+    paddingInline: spacing("2"),
+    gap: spacing("1"),
     iconSize: sizeToken("iconMedium"),
     iconFill: unitless(0),
     // The docked and contained views' size.
@@ -125,11 +126,21 @@ const travel = (side: "leading" | "trailing"): StyleMap => {
     };
 };
 
-const icon = (color: "leadingColor" | "trailingColor"): StyleMap => ({
-    ...iconBox(ref("iconSize"), { fill: iconFill(ref("iconFill")) }),
-    color: ref(color),
-    flexShrink: unitless(0),
-});
+// An icon, or icon buttons (the ready-made's back and clear buttons), which grow it past the
+// icon's size.
+const icon = (color: "leadingColor" | "trailingColor"): StyleMap => {
+    const {
+        width: _width,
+        height: _height,
+        ...box
+    } = iconBox(ref("iconSize"), { fill: iconFill(ref("iconFill")) });
+    return {
+        ...box,
+        minHeight: ref("iconSize"),
+        color: ref(color),
+        flexShrink: unitless(0),
+    };
+};
 
 // The docked and contained views: dropped over the search bar's place, at the bar's width.
 const dropped: StyleMap = {
