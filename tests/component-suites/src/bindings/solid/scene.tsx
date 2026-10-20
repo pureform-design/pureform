@@ -15,6 +15,7 @@ import { Chip } from "@pureform/solid/chip";
 import { CircularProgress } from "@pureform/solid/circular-progress";
 import { Dialog } from "@pureform/solid/dialog";
 import { Fab } from "@pureform/solid/fab";
+import { FullscreenDialog } from "@pureform/solid/fullscreen-dialog";
 import { Icon } from "@pureform/solid/icon";
 import { IconButton } from "@pureform/solid/icon-button";
 import { LinearProgress } from "@pureform/solid/linear-progress";
@@ -66,6 +67,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     CircularProgress,
     Dialog,
     Fab,
+    FullscreenDialog,
     Icon,
     IconButton,
     LinearProgress,

@@ -104,6 +104,17 @@
                 "default": "./dist/dialog.jsx"
             }
         },
+        "./fullscreen-dialog": {
+            "types": "./dist/fullscreen-dialog/index.d.ts",
+            "solid": {
+                "development": "./src/fullscreen-dialog/index.ts",
+                "default": "./dist/fullscreen-dialog.jsx"
+            },
+            "import": {
+                "development": "./src/fullscreen-dialog/index.ts",
+                "default": "./dist/fullscreen-dialog.jsx"
+            }
+        },
         "./tooltip": {
             "types": "./dist/tooltip/index.d.ts",
             "solid": {

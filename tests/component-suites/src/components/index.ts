@@ -6,6 +6,7 @@ import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { dialog } from "./dialog";
 import { fab } from "./fab";
+import { fullscreenDialog } from "./fullscreen-dialog";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
 import { menu } from "./menu";
@@ -45,6 +46,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     circularProgress,
     dialog,
     fab,
+    fullscreenDialog,
     icon,
     iconButton,
     linearProgress,

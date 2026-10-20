@@ -189,6 +189,12 @@ by the scrim's entry (`name: "scrim"`) under the dialog's scope (`pf-dialog-back
 ids are in `compositeTestIds.menu`, `.tooltip`, `.richTooltip`, `.dialog`, `.dialogBackdrop`; the snackbar uses
 its generated anatomy as is.
 
+**The full-screen dialog** (`fullscreenDialogOverlayAnatomy`, scope `fullscreen-dialog`) is the
+same, with no backdrop: unstyled `root`, `trigger` and `positioner`, then the surface (`content`,
+the preset's `root` slot) holding `header` (with `closeTrigger`, `headline` and `confirmAction`) and
+`body`. Unlike the basic dialog's, its `closeTrigger` is a styled slot. Test ids are in
+`compositeTestIds.fullscreenDialog`.
+
 **The tabs** (`tabsCompositeAnatomy`) are the same idea: an unstyled `root` (`pf-tabs-root`, Zag's
 root) around the tab list and the panels. The preset's `root` slot is the tab list, so its part
 is `list` (`data-pf-part="list"`, `pf-tabs-list`, `slot: "root"`), holding `tab`, `tabContent`

@@ -173,8 +173,8 @@ export const textInputsRegistry = () =>
         ]),
     });
 
-/** The overlays' fake factories, all static: the menu, tooltip, dialog, scrim, and snackbar, and
- *  the button their ready-made triggers draw. */
+/** The overlays' fake factories, all static: the menu, tooltip, dialog, full-screen dialog,
+ *  scrim, and snackbar, and the buttons their ready-made triggers and close triggers draw. */
 export const overlaysRegistry = () =>
     createRegistry({
         menu: named("menu", [
@@ -203,6 +203,21 @@ export const overlaysRegistry = () =>
             "headline",
             "body",
             "actions",
+        ]),
+        fullscreenDialog: named("fullscreen-dialog", [
+            "root",
+            "header",
+            "closeTrigger",
+            "headline",
+            "confirmAction",
+            "body",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
         ]),
         scrim: named("scrim", ["root"]),
         snackbar: named("snackbar", [

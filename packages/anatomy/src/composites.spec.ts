@@ -5,6 +5,7 @@ import {
     compositeTestIds,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
+    fullscreenDialogOverlayAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
     selectMenuAnatomy,
@@ -15,6 +16,7 @@ import {
 import {
     anatomy,
     dialogAnatomy,
+    fullscreenDialogAnatomy,
     menuAnatomy,
     richTooltipAnatomy,
     tabsAnatomy,
@@ -85,6 +87,12 @@ describe("composites", () => {
             dialogOverlayAnatomy,
             dialogAnatomy,
             compositeTestIds.dialog,
+        ],
+        [
+            "fullscreenDialog",
+            fullscreenDialogOverlayAnatomy,
+            fullscreenDialogAnatomy,
+            compositeTestIds.fullscreenDialog,
         ],
     ] as const)(
         "the %s's overlay draws every slot of the preset's, its surface as content, and wraps it in unstyled parts",

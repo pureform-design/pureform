@@ -108,6 +108,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("bodyColor"), token("container"), TEXT_CONTRAST),
         pair(token("iconColor"), token("container"), UI_CONTRAST),
     ],
+    fullscreenDialog: [
+        pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
+        pair(token("bodyColor"), token("container"), TEXT_CONTRAST),
+    ],
     searchBar: [
         pair(token("inputColor"), token("container"), TEXT_CONTRAST),
         pair(token("placeholderColor"), token("container"), TEXT_CONTRAST),

@@ -25,6 +25,7 @@ import {
     tabs,
     separator,
     fab,
+    fullscreenDialog,
     icon,
     iconButton,
     radio,
@@ -1816,6 +1817,65 @@ export function Page() {
                     content under a scrim
                 </div>
                 <div class={scrim().root} />
+            </section>
+
+            <section
+                data-section="fullscreen-dialog"
+                style={{
+                    display: "flex",
+                    width: "480px",
+                    height: "280px",
+                    outline: "1px solid currentColor",
+                }}
+            >
+                {(() => {
+                    const d = fullscreenDialog();
+                    const b = iconButton({ variant: "standard" });
+                    return (
+                        <div
+                            class={d.root}
+                            role="dialog"
+                            aria-labelledby="fullscreen-dialog-title"
+                        >
+                            <div class={d.header}>
+                                <button
+                                    class={`${d.closeTrigger} ${b.root}`}
+                                    type="button"
+                                    aria-label="Close"
+                                >
+                                    <span class={b.touchTarget} />
+                                    <span class={b.container}>
+                                        <Ripple centered />
+                                        <svg class={b.icon} viewBox="0 0 24 24">
+                                            <path
+                                                fill="currentColor"
+                                                d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"
+                                            />
+                                        </svg>
+                                    </span>
+                                </button>
+                                <h2
+                                    class={d.headline}
+                                    id="fullscreen-dialog-title"
+                                    style={{ margin: 0 }}
+                                >
+                                    New event
+                                </h2>
+                                <button
+                                    class={`${d.confirmAction} ${button({ variant: "text" }).root}`}
+                                    type="button"
+                                >
+                                    <span class={button().label}>Save</span>
+                                </button>
+                            </div>
+                            <div class={d.body}>
+                                Fill in the details. The body scrolls when it is
+                                taller than the screen, under a header that
+                                stays put.
+                            </div>
+                        </div>
+                    );
+                })()}
             </section>
 
             <section

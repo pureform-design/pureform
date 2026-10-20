@@ -24,6 +24,7 @@ const SECTIONS = [
     "disabled-buttons",
     "cards",
     "scrim",
+    "fullscreen-dialog",
     "media",
     "controls",
     "color-groups",

@@ -179,6 +179,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 | `Tooltip`                         | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the tooltip's `root` slot), `SupportingText` (`span`), `Caret` (`div`, with Zag's arrow tip inside)                                                                                                   | Zag's tooltip (`@pureform/machines/tooltip`)         |
 | `RichTooltip`                     | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the rich tooltip's `root` slot), `Subhead`, `SupportingText` (`span`), `Actions` (`div`), `Caret`                                                                                                     | Zag's tooltip (`@pureform/machines/tooltip`)         |
 | `Dialog`                          | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Backdrop` (`div`, the scrim), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Icon` (`span`), `Headline` (`h2`), `Body`, `Actions` (`div`), `CloseTrigger` (`button`, unstyled, or `as`)                                 | Zag's dialog (`@pureform/machines/dialog`)           |
+| `FullscreenDialog`                | `Root` (`div`, unstyled), `Trigger` (`button`, or `as`), `Positioner` (`div`, unstyled), `Content` (`div`, the dialog's `root` slot), `Header`, `Body` (`div`), `CloseTrigger` (`button`, or `as`), `Headline` (`h2`), `ConfirmAction` (`button`, or `as={Button}`)                                              | Zag's dialog (`@pureform/machines/dialog`)           |
 | `Snackbar`                        | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Actions` (`span`, wraps the buttons), `Action`, `Close` (`button`); `layout`: `oneLine`, `twoLine`, `longAction`                                                                                                                                    | `@pureform/machines/snackbar`                        |
 | `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`, around its content, a `span` it renders), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                                                 | Zag's tabs (`@pureform/machines/tabs`)               |
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                                                             | `@pureform/machines/navigation`                      |
@@ -274,6 +275,12 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   `Headline` (an `<h2>`) names it and the `Body` describes it. The ready-made takes `icon` (turning
   on the `icon` variant), `mirrorIcon`, `headline`, `body`, and `actions`; `Dialog.CloseTrigger`
   closes it (`as={Button}`).
+- **The full-screen dialog** runs on the same Zag machine, in a positioner that fills the viewport
+  (no padding, no backdrop). Its `Header` holds the `CloseTrigger` (the ready-made draws an icon
+  button named by `closeLabel`, "Close" by default, with `closeIcon` or a cross), the `Headline`
+  and the `ConfirmAction` (a text button); the `Body` scrolls. Zag focuses the first focusable
+  element, the close trigger. The ready-made takes `trigger`, `closeLabel`, `closeIcon`,
+  `headline`, `confirmAction` and `body`. Import it from `@pureform/solid/fullscreen-dialog`.
 - **The snackbar** is its `Root`: a `role="status"` region, hidden once closed and its exit
   animation over, that closes itself after `duration` (5000 ms; `null` to stay) unless the pointer or focus is in it. `onOpenChange`
   gets `{ open, reason }` (`timeout`, `action`, `close`, `escape`, `open`); `onAction` runs before

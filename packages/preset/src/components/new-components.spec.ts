@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
 import { dialog } from "./dialog";
+import { fullscreenDialog } from "./fullscreen-dialog";
 import { list } from "./list";
 import { listItem } from "./list-item";
 import { menu } from "./menu";
@@ -27,6 +28,7 @@ describe.each([
     ["menu", menu],
     ["tabs", tabs],
     ["dialog", dialog],
+    ["fullscreenDialog", fullscreenDialog],
     ["searchBar", searchBar],
     ["select", select],
     ["navigationBar", navigationBar],
@@ -213,5 +215,38 @@ describe("select", () => {
             (css?.defaultVariants as Record<string, unknown> | undefined)
                 ?.trailingIcon,
         ).toBe(true);
+    });
+});
+
+describe("fullscreenDialog", () => {
+    it("has a header over a body, and neither an icon nor an actions row", () => {
+        expect(fullscreenDialog.slots).toEqual([
+            "root",
+            "header",
+            "closeTrigger",
+            "headline",
+            "confirmAction",
+            "body",
+        ]);
+        expect(dialog.slots).toEqual(
+            expect.arrayContaining(["icon", "actions"]),
+        );
+        expect(fullscreenDialog.slots).not.toContain("icon");
+        expect(fullscreenDialog.slots).not.toContain("actions");
+        expect(fullscreenDialog.structure).toEqual({
+            root: ["header", "body"],
+            header: ["closeTrigger", "headline", "confirmAction"],
+        });
+    });
+
+    it("fills its container with a square surface, and has no variants to count", () => {
+        const base = fullscreenDialog.recipe.base!.root as Record<
+            string,
+            unknown
+        >;
+        expect(base).toHaveProperty("flexGrow");
+        expect(base).not.toHaveProperty("borderRadius");
+        expect(fullscreenDialog.recipe.variants ?? {}).toEqual({});
+        expect(fullscreenDialog.recipe.compoundVariants ?? []).toEqual([]);
     });
 });
