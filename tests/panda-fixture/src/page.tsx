@@ -539,7 +539,7 @@ export function Page() {
                         )}
                     </For>
                     {(() => {
-                        const c = chip({ corner: "round", toggle: "true" });
+                        const c = chip({ corner: "round", toggle: true });
                         return (
                             <button
                                 class={c.root}
@@ -1767,14 +1767,16 @@ export function Page() {
                             <div style={{ width: "400px" }}>
                                 {nav(navigationBar)}
                             </div>
-                            {nav(navigationRail as typeof navigationBar)}
+                            {nav(
+                                navigationRail as unknown as typeof navigationBar,
+                            )}
                             <div style={{ width: "600px" }}>
                                 {nav(navigationBar, {
                                     itemLayout: "horizontal",
                                 })}
                             </div>
                             {nav(
-                                navigationRail as typeof navigationBar,
+                                navigationRail as unknown as typeof navigationBar,
                                 {
                                     expanded: "true",
                                 } as Parameters<typeof navigationBar>[0],
