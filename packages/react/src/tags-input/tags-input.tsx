@@ -22,9 +22,10 @@ import type {
 import * as tagsInput from "@pureform/machines/tags-input";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import { type ElementType, type ReactNode, useId } from "react";
+import { type ElementType, type ReactNode, useId, useState } from "react";
 
 import { useControllable } from "../controllable";
+import { useFieldsetDisabled } from "../form";
 import {
     useInteractionHandlers,
     useItemInteractionSources,
@@ -90,6 +91,8 @@ export interface TagsInputChipProps
     readonly disabled?: boolean | undefined;
 }
 
+const noop = () => {};
+
 /** The field's root, a `<div>` around the container, the supporting text, and the hidden input
  *  the values submit with. */
 function Root(props: TagsInputRootProps): ReactNode {
@@ -100,12 +103,16 @@ function Root(props: TagsInputRootProps): ReactNode {
         "value",
         props,
     );
+    const [hidden, setHidden] = useState<HTMLInputElement | null>(null);
+    const fieldsetDisabled = useFieldsetDisabled(hidden);
     const sources = useItemInteractionSources();
     const service = useMachine(tagsInput.machine, {
         id: props.id ?? id,
         dir,
         ...sources.machineProps,
         ...tagsInputMachineProps(props),
+        // Zag reads a disabled fieldset only for its own form control state.
+        disabled: props.disabled || fieldsetDisabled || undefined,
         ...value.machineProps,
     });
     const api = tagsInput.connect(service, normalizeProps);
@@ -133,7 +140,14 @@ function Root(props: TagsInputRootProps): ReactNode {
                     children: (
                         <>
                             {children}
-                            <input {...api.getHiddenInputProps()} />
+                            {/* Its value follows the tags: Zag's sets it once. */}
+                            <input
+                                {...api.getHiddenInputProps()}
+                                ref={setHidden}
+                                defaultValue={undefined}
+                                value={api.valueAsString}
+                                onChange={noop}
+                            />
                         </>
                     ),
                 },

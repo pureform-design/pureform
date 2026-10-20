@@ -25,6 +25,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
     createMemo,
+    createSignal,
     createUniqueId,
     For,
     merge,
@@ -33,6 +34,7 @@ import {
 } from "solid-js";
 
 import { useControllable } from "../controllable";
+import { useFieldsetDisabled } from "../form";
 import {
     itemInteractionSources,
     type ItemInteractionSources,
@@ -109,12 +111,19 @@ function Root(props: TagsInputRootProps): JSX.Element {
         "value",
         props,
     );
+    const [hidden, setHidden] = createSignal<HTMLInputElement | undefined>(
+        undefined,
+        { ownedWrite: true },
+    );
+    const fieldsetDisabled = useFieldsetDisabled(hidden);
     const sources = itemInteractionSources();
     const service = useMachine(tagsInput.machine, () => ({
         id: props.id ?? id,
         dir: dir(),
         ...sources.machineProps,
         ...tagsInputMachineProps(props),
+        // Zag reads a disabled fieldset only for its own form control state.
+        disabled: props.disabled || fieldsetDisabled() || undefined,
         ...value.machineProps(),
     }));
     const api = createMemo(() => tagsInput.connect(service, normalizeProps));
@@ -141,7 +150,12 @@ function Root(props: TagsInputRootProps): JSX.Element {
                         return (
                             <>
                                 {props.children}
-                                <input {...api().getHiddenInputProps()} />
+                                {/* Its value follows the tags: Zag's sets it once. */}
+                                <input
+                                    {...api().getHiddenInputProps()}
+                                    ref={setHidden}
+                                    value={api().valueAsString}
+                                />
                             </>
                         );
                     },
