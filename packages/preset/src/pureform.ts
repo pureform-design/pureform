@@ -51,6 +51,7 @@ import { bottomSheet } from "./components/bottom-sheet";
 import { createButton } from "./components/button";
 import { buttonGroup } from "./components/button-group";
 import { card } from "./components/card";
+import { carousel } from "./components/carousel";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
@@ -324,6 +325,7 @@ const defaultComponents = <G extends string>(
         tooltip,
         richTooltip,
         card,
+        carousel,
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),
