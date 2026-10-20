@@ -20,26 +20,23 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import type { Selection } from "@pureform/styling";
-import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { memo, useEffect, useRef } from "react";
 import type { ComponentRef, ReactNode } from "react";
 import { Platform, View } from "react-native";
 
 import { Button } from "../button/button";
 import { IconSlot, iconSlot } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
-import { useInteractionSource } from "../interaction";
-import { Anchored, useAnchor, useDismiss } from "../overlay";
+import { Anchored, useAnchoredOverlay } from "../overlay";
 import {
     testIdOf,
     unselectable,
-    useControllable,
     useStableCallback,
     useStableSelection,
     withEngine,
 } from "../parts";
 import { Portal } from "../portal";
-import type { WindowRect } from "../portal-host";
-import { useOverlayPresence, usePresence } from "../presence";
+import { useOverlayPresence } from "../presence";
 import { useEngine } from "../provider";
 import { useComponentSlots } from "../styles";
 
@@ -326,10 +323,6 @@ function Popup(props: {
     );
 }
 
-// The trigger's box when the menu last opened: pending while it's measured, then the box, or
-// `undefined` when nothing says where the trigger is.
-type Anchor = { readonly rect: WindowRect | undefined } | undefined;
-
 function MenuOverlay(props: MenuProps): ReactNode {
     const {
         trigger,
@@ -342,38 +335,12 @@ function MenuOverlay(props: MenuProps): ReactNode {
         ...surface
     } = props;
     const engine = useEngine();
-    const [open, setOpen] = useControllable(
-        "Menu",
-        "open",
-        props.open,
-        defaultOpen,
-        onOpenChange,
-        false,
-    );
-    const source = useInteractionSource();
-    const anchor = useAnchor(source);
-    const [measured, setMeasured] = useState<Anchor>();
-    const presence = usePresence(open, "popup");
-    useLayoutEffect(() => {
-        if (!open) return;
-        let current = true;
-        anchor.measure((rect) => current && setMeasured({ rect }));
-        return () => {
-            current = false;
-        };
-    }, [open, anchor]);
-    if (!presence.present && measured) setMeasured(undefined);
-    const close = useStableCallback(() => {
-        if (!open) return;
-        setOpen(false);
-        // Focus goes back to the trigger, as the web's menu returns it.
-        if (Platform.OS === "web") anchor.focus();
-    });
-    const toggle = useStableCallback(() => {
-        if (open) close();
-        else setOpen(true);
-    });
-    useDismiss(open, close);
+    const { open, source, measured, presence, close, toggle } =
+        useAnchoredOverlay("Menu", {
+            open: props.open,
+            defaultOpen,
+            onOpenChange,
+        });
     const select = (details: MenuSelectDetails) => {
         onSelect?.(details);
         const item = [
