@@ -77,7 +77,6 @@ const { tokens, ref } = componentTokens("toast", {
     radius: radius("medium"),
     minHeight: px(56),
     width: px(356),
-    gap: spacing("2"),
     paddingInline: spacing("4"),
     paddingBlock: spacing("3"),
     iconSize: sizeToken("iconMedium"),

@@ -324,6 +324,7 @@ export {
     TOASTER_DEFAULTS,
     TOASTER_PROPS,
     toasterOptions,
+    toastGroupStyle,
     toastSelection,
 } from "./components/toast";
 export type {

@@ -133,3 +133,27 @@ export const TOAST_STACK_STYLE = {
     opacity: "var(--opacity, 1)",
     height: "var(--height, auto)",
 } as const;
+
+/** The group's placement style from Zag, made physical and left to the theme's layer. Zag has
+ *  already turned the placement's `start` and `end` into left and right by the direction, but
+ *  writes them as `insetInlineStart` (left) and `insetInlineEnd` (right), which the region's own
+ *  `dir` would flip back; and it stacks the region at the highest `zIndex`, over the theme's
+ *  layers. */
+export const toastGroupStyle = <S extends object>(style: S | undefined): S => {
+    const {
+        insetInlineStart,
+        insetInlineEnd,
+        "inset-inline-start": kebabStart,
+        "inset-inline-end": kebabEnd,
+        zIndex: _zIndex,
+        "z-index": _kebabZIndex,
+        ...rest
+    } = (style ?? {}) as Record<string, unknown>;
+    const left = insetInlineStart ?? kebabStart;
+    const right = insetInlineEnd ?? kebabEnd;
+    return {
+        ...rest,
+        ...(left === undefined ? {} : { left }),
+        ...(right === undefined ? {} : { right }),
+    } as S;
+};

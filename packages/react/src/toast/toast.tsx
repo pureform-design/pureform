@@ -12,6 +12,7 @@ import {
     TOAST_STACK_STYLE,
     TOASTER_PROPS,
     toasterOptions,
+    toastGroupStyle,
     toastSelection,
 } from "@pureform/binding-core";
 import type {
@@ -84,6 +85,9 @@ function Group(props: ToastGroupProps): ReactNode {
         store: props.toaster,
     });
     const api = toast.group.connect(service, normalizeProps);
+    const group = api.getGroupProps({ label: props.label }) as {
+        style?: CSSProperties;
+    };
     const scope = useComponent(toastAnatomy, {
         selection: toastSelection(undefined, props),
         testId: props.testId,
@@ -99,7 +103,10 @@ function Group(props: ToastGroupProps): ReactNode {
         <groupContext.Provider value={{ service, props }}>
             {scope.render("group", {
                 element: "div",
-                machine: api.getGroupProps({ label: props.label }),
+                machine: {
+                    ...group,
+                    style: toastGroupStyle(group.style),
+                },
                 props: {
                     ...rest,
                     children: (api.getToasts() as ToastData[]).map(

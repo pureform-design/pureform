@@ -94,3 +94,20 @@ describe("Toaster, ready-made", () => {
         expect(style.getPropertyValue("--offset")).not.toBe("");
     });
 });
+
+describe("Toaster, right to left", () => {
+    it("puts the region's end on the left, at the theme's layer", async () => {
+        const toaster = createToaster({ placement: "bottom-end" });
+        mount(() => (
+            <PureformProvider registry={overlaysRegistry()} dir="rtl">
+                <Toaster toaster={toaster} />
+            </PureformProvider>
+        ));
+        await settle();
+        const group = byTestId(ids.group);
+        expect(group.style.left).not.toBe("");
+        expect(group.style.right).toBe("");
+        // The theme's layer, not Zag's highest one.
+        expect(group.style.zIndex).toBe("");
+    });
+});
