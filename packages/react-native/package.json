@@ -222,6 +222,13 @@
                 "default": "./dist/tabs.mjs"
             }
         },
+        "./tags-input": {
+            "types": "./dist/tags-input/index.d.ts",
+            "import": {
+                "development": "./src/tags-input/index.ts",
+                "default": "./dist/tags-input.mjs"
+            }
+        },
         "./text": {
             "types": "./dist/text/index.d.ts",
             "import": {
