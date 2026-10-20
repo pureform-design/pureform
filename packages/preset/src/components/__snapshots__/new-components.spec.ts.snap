@@ -1692,6 +1692,7 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
 {
   "base": {
     "container": {
+      "display": "flex",
       "height": "calc(var(--components-select-height, 56px) + var(--components-select-densityOffset, token(sizes.densityOffset)))",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
@@ -1704,10 +1705,12 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "borderWidth": "0px",
       "color": "var(--components-select-inputColor, token(colors.onSurface))",
       "cursor": "pointer",
+      "flexShrink": "1",
       "height": "100%",
+      "minWidth": "0px",
       "outlineStyle": "none",
-      "paddingInlineEnd": "var(--components-select-paddingInline, token(spacing.4))",
-      "paddingInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
+      "paddingInlineEnd": "calc(var(--components-select-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-select-paddingInline, token(spacing.4))) * var(--components-select-suffixed, 0)))",
+      "paddingInlineStart": "calc(var(--components-select-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-select-paddingInline, token(spacing.4))) * var(--components-select-prefixed, 0)))",
       "textStyle": "bodyLarge",
       "width": "100%",
     },
@@ -1766,9 +1769,47 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "transform": "translateY(-50%)",
       "width": "var(--components-select-iconSize, token(sizes.iconMedium))",
     },
+    "prefixText": {
+      "alignItems": "center",
+      "color": {
+        ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-select-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".select__container:is(:focus-within):is(:focus-within) &": "1",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-select-affixGap, 2px)",
+      "paddingInlineStart": "var(--components-select-paddingInline, token(spacing.4))",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
     "root": {
       "display": "flex",
       "flexDirection": "column",
+    },
+    "suffixText": {
+      "alignItems": "center",
+      "color": {
+        ".select__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-select-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".select__container:is(:focus-within):is(:focus-within) &": "1",
+        ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-select-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-select-affixGap, 2px)",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
     },
     "supportingText": {
       "color": {
@@ -1836,6 +1877,8 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     "color": "primary",
     "density": "inherit",
     "leadingIcon": false,
+    "prefixText": false,
+    "suffixText": false,
     "trailingIcon": true,
     "variant": "filled",
   },
@@ -1846,7 +1889,9 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
     "root",
     "container",
     "leadingIcon",
+    "prefixText",
     "input",
+    "suffixText",
     "label",
     "trailingIcon",
     "supportingText",
@@ -1916,10 +1961,29 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "input": {
-          "paddingInlineStart": "var(--components-select-textInsetWithIcon, 52px)",
+          "paddingInlineStart": "calc(var(--components-select-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-select-textInsetWithIcon, 52px)) * var(--components-select-prefixed, 0)))",
         },
         "label": {
           "insetInlineStart": "var(--components-select-textInsetWithIcon, 52px)",
+        },
+        "prefixText": {
+          "paddingInlineStart": "var(--components-select-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "prefixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-select-prefixed": "1",
+        },
+      },
+    },
+    "suffixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-select-suffixed": "1",
         },
       },
     },
@@ -1927,6 +1991,9 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "input": {
+          "paddingInlineEnd": "calc(var(--components-select-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-select-textInsetWithIcon, 52px)) * var(--components-select-suffixed, 0)))",
+        },
+        "suffixText": {
           "paddingInlineEnd": "var(--components-select-textInsetWithIcon, 52px)",
         },
       },
@@ -1964,6 +2031,14 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
             ".select__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "none",
             "base": "translateY(-50%)",
           },
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
       },
       "outlined": {
@@ -2024,6 +2099,14 @@ exports[`select > compiles to a stable Panda slot recipe 1`] = `
             "base": "50%",
           },
           "transform": "translateY(-50%)",
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-select-densityOffset, token(sizes.densityOffset)) * 0.5))",
         },
       },
     },

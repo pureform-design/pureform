@@ -1,29 +1,50 @@
 // The pureform text field: Material's filled and outlined single-line text fields.
 //
 // Markup: a root holding the container and the supporting text. Inside the container, the
-// optional leading icon, the input, the label, and the optional trailing icon, in that order.
-// The input needs a placeholder (a single space when none should show), so CSS can tell when
-// it holds a value and float the label. Turn on `leadingIcon` or `trailingIcon` when you
-// render one, so the text makes room for it.
+// optional leading icon, the optional prefix text, the input, the optional suffix text, the
+// label, and the optional trailing icon, in that order. The input needs a placeholder (a single
+// space when none should show), so CSS can tell when it holds a value and float the label. Turn
+// on `leadingIcon`, `trailingIcon`, `prefixText` or `suffixText` when you render one, so the
+// text makes room for it. The prefix and suffix show once the label floats.
 //
 //   <div class={root}>
 //     <div class={container}>
 //       <span class={leadingIcon}>…</span>
-//       <input class={input} id="name" placeholder=" " />
-//       <label class={label} for="name">Name</label>
+//       <span class={prefixText}>$</span>
+//       <input class={input} id="price" placeholder=" " />
+//       <span class={suffixText}>.00</span>
+//       <label class={label} for="price">Price</label>
 //     </div>
-//     <span class={supportingText}>Helper or error text</span>
+//     <div class={supportingRow}>
+//       <span class={supportingText}>Helper or error text</span>
+//       <span class={counter}>3 / 20</span>
+//     </div>
 //   </div>
 //
-// Mark an error with `aria-invalid="true"` on the input. The container reads its state from
-// the input, and the label, icons, and supporting text follow it.
+// The supporting row is only needed with a counter; supporting text alone can sit in the root.
+// Mark an error with `aria-invalid="true"` on the input, and a count over the limit too. The
+// container reads its state from the input, and the label, icons, supporting text and counter
+// follow it. `secure` is the password field: the trailing icon is a button that shows or hides
+// the text.
 
 import { typed } from "@pureform/core";
-import { pct } from "@pureform/core/ast";
+import { pct, pointer, px, transparent } from "@pureform/core/ast";
+import { radius } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { FIELD_SLOTS, FIELD_STRUCTURE, fieldParts, fieldTokens } from "./field";
+import { themeIndication } from "../state-layer";
 import {
+    AFFIX_FIELD_SLOTS,
+    AFFIX_FIELD_STRUCTURE,
+    AFFIX_TOKENS,
+    COUNTER_SLOTS,
+    affixParts,
+    counterParts,
+    fieldParts,
+    fieldTokens,
+} from "./field";
+import {
+    focusRing,
     DEFAULT_GROUP,
     defaultDensities,
     defaultGroups,
@@ -32,13 +53,29 @@ import {
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities } from "./shared";
 
-const { tokens, ref } = fieldTokens("textField");
+const { tokens, ref } = fieldTokens("textField", AFFIX_TOKENS);
 
 const { base, variant, colors, icons, densityParts } = fieldParts(ref, {
     labelRest: pct(50),
     iconRoom: "input",
     density: true,
 });
+const affixes = affixParts(ref, variant);
+const counter = counterParts(ref);
+
+// The secure field's trailing icon is a button that shows or hides the text: no button chrome,
+// and a focus ring around the icon.
+const visibilityToggle = {
+    cursor: pointer,
+    backgroundColor: transparent,
+    borderWidth: px(0),
+    paddingInlineStart: px(0),
+    paddingInlineEnd: px(0),
+    paddingBlockStart: px(0),
+    paddingBlockEnd: px(0),
+    borderRadius: radius("full"),
+    ...focusRing(themeIndication),
+};
 
 const pf = typed();
 
@@ -61,29 +98,64 @@ export const createTextField = <
             name: "textField",
             $meta: {
                 description:
-                    "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon or trailingIcon when you render one.",
+                    "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon, trailingIcon, prefixText or suffixText when you render one. A counter sits beside the supporting text in supportingRow. secure makes the trailing icon a show/hide button for a password.",
             },
             tokens,
-            slots: [...FIELD_SLOTS],
-            structure: FIELD_STRUCTURE,
+            slots: [...AFFIX_FIELD_SLOTS, ...COUNTER_SLOTS],
+            structure: {
+                ...AFFIX_FIELD_STRUCTURE,
+                root: ["container", "supportingRow"],
+                supportingRow: ["supportingText", "counter"],
+            },
             variants: {
                 variant: ["filled", "outlined"],
                 color: groups as ColorGroups,
                 leadingIcon: ["true", "false"],
                 trailingIcon: ["true", "false"],
+                prefixText: ["true", "false"],
+                suffixText: ["true", "false"],
+                secure: ["true", "false"],
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
                 base: {
                     ...base,
                     ...icons.base,
-                    container: { ...base.container, height: density.height },
-                    input: { ...base.input, height: pct(100) },
+                    ...affixes.base,
+                    ...counter,
+                    container: {
+                        ...base.container,
+                        ...affixes.base.container,
+                        height: density.height,
+                    },
+                    input: {
+                        ...base.input,
+                        ...affixes.base.input,
+                        height: pct(100),
+                    },
+                    supportingText: {
+                        ...base.supportingText,
+                        ...counter.supportingText,
+                    },
                 },
                 variants: {
-                    variant,
+                    variant: {
+                        filled: {
+                            ...variant.filled,
+                            ...affixes.variant.filled,
+                        },
+                        outlined: {
+                            ...variant.outlined,
+                            ...affixes.variant.outlined,
+                        },
+                    },
                     color: color.color,
-                    ...icons.variants,
+                    ...affixes.icons,
+                    ...affixes.variants,
+                    secure: {
+                        true: { trailingIcon: visibilityToggle },
+                        false: {},
+                    },
                     ...density.variants,
                 },
                 compoundVariants: [...icons.compoundVariants],
@@ -91,6 +163,8 @@ export const createTextField = <
                     color: DEFAULT_GROUP,
                     variant: "filled",
                     ...icons.defaultVariants,
+                    ...affixes.defaultVariants,
+                    secure: "false",
                     ...density.defaultVariants,
                 },
             }),
