@@ -125,7 +125,11 @@ describe("FabMenu, ready-made", () => {
         expect(byTestId(fab.list).getAttribute("role")).toBe("menu");
         const items = document.querySelectorAll(`[data-testid="${fab.item}"]`);
         expect(items).toHaveLength(2);
-        expect(byTestId(fab.itemIcon).getAttribute("aria-hidden")).toBe("true");
+        expect(
+            document
+                .querySelector(`[data-testid="${fab.itemIcon}"]`)
+                ?.getAttribute("aria-hidden"),
+        ).toBe("true");
     });
 
     it("opens, turns the FAB into the close button, and reports the chosen item", async () => {
