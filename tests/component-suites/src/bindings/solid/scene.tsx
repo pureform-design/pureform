@@ -7,6 +7,7 @@ import {
     PureformProvider,
 } from "@pureform/solid";
 import type { Indication } from "@pureform/solid";
+import { AppBar } from "@pureform/solid/app-bar";
 import { Autocomplete } from "@pureform/solid/autocomplete";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
@@ -112,6 +113,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Ripple,
     RichTooltip,
     Scrim,
+    AppBar,
     SearchBar,
     SearchView,
     Select,

@@ -2,6 +2,7 @@
 // visual suite in `tests/browser-e2e-tests` screenshots each section.
 
 import {
+    appBar,
     avatar,
     badge,
     media,
@@ -68,6 +69,93 @@ const ICON_FILLS = [
     "elevated",
 ] as const;
 const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
+
+// An app bar's icon button: the standard icon button around a glyph.
+function BarButton(props: { readonly label: string; readonly glyph: string }) {
+    const b = iconButton({ variant: "standard" });
+    return (
+        <button class={b.root} type="button" aria-label={props.label}>
+            <span class={b.touchTarget} />
+            <span class={b.container}>
+                <span class={b.icon}>{props.glyph}</span>
+            </span>
+        </button>
+    );
+}
+
+type AppBarExample = {
+    readonly label: string;
+    readonly size?: "small" | "mediumFlexible" | "largeFlexible";
+    readonly centered?: boolean;
+    readonly scrolled?: boolean;
+    readonly collapsed?: boolean;
+    readonly search?: boolean;
+    readonly subtitle?: string;
+};
+
+const APP_BARS: readonly AppBarExample[] = [
+    { label: "Small" },
+    { label: "Centered", centered: true },
+    { label: "Scrolled", scrolled: true, subtitle: "12 unread" },
+    { label: "Medium flexible", size: "mediumFlexible", subtitle: "12 unread" },
+    { label: "Large flexible", size: "largeFlexible" },
+    {
+        label: "Collapsed",
+        size: "largeFlexible",
+        scrolled: true,
+        collapsed: true,
+    },
+    { label: "Search", search: true, scrolled: true },
+];
+
+// An app bar drawn from the recipe: the content after the actions while a flexible bar is
+// expanded, as the bindings render it.
+function AppBarExampleView(props: { readonly example: AppBarExample }) {
+    const e = props.example;
+    // A collapsed flexible bar draws as the small one, as the bindings select it.
+    const a = appBar({
+        size: e.collapsed ? "small" : e.size,
+        centered: e.centered,
+        scrolled: e.scrolled,
+        collapsed: e.collapsed,
+        search: e.search,
+    });
+    const last = e.size !== undefined && e.size !== "small" && !e.collapsed;
+    const content = (
+        <div class={a.content}>
+            {e.search ? (
+                <label
+                    class={
+                        searchBar({ centered: true, scrolled: e.scrolled }).root
+                    }
+                >
+                    <input
+                        class={searchBar({ centered: true }).input}
+                        type="search"
+                        placeholder="Search mail"
+                    />
+                </label>
+            ) : (
+                <>
+                    <h2 class={a.headline}>{e.label}</h2>
+                    {e.subtitle ? <p class={a.subtitle}>{e.subtitle}</p> : null}
+                </>
+            )}
+        </div>
+    );
+    return (
+        <header class={a.root} style={{ width: "360px" }}>
+            <div class={a.leading} data-pf-mirror="">
+                <BarButton label="Back" glyph="←" />
+            </div>
+            {last ? null : content}
+            <div class={a.trailing}>
+                <BarButton label="More" glyph="⋮" />
+            </div>
+            {last ? content : null}
+        </header>
+    );
+}
 
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
 
@@ -2590,6 +2678,14 @@ export function Page() {
                         </p>
                     </div>
                 </article>
+            </section>
+            <section
+                data-section="app-bars"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={APP_BARS}>
+                    {(example) => <AppBarExampleView example={example} />}
+                </For>
             </section>
         </main>
     );

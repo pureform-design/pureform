@@ -949,16 +949,19 @@ describe("app bar", () => {
     it("holds a search bar, drawn scrolled with the bar", async () => {
         await render(
             <>
-                <AppBar searchBar={{}} testId="bar" />
+                <AppBar searchBar={{}} scrolled testId="bar" />
                 <SearchBar testId="plain" />
                 <SearchBar scrolled testId="scrolled" />
             </>,
         );
+        await pointerAway();
         expect(
             byTestId("bar-content").contains(byTestId("pf-search-bar-root")),
         ).toBe(true);
-        expect(computed("pf-search-bar-root").backgroundColor).toBe(
-            computed("plain-root").backgroundColor,
+        await until(() =>
+            expect(computed("pf-search-bar-root").backgroundColor).toBe(
+                computed("scrolled-root").backgroundColor,
+            ),
         );
     });
 });

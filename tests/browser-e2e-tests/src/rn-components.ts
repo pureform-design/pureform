@@ -28,6 +28,7 @@ export const RN_COMPONENTS = [
     "textField",
     "textArea",
     "tagsInput",
+    "appBar",
     "searchBar",
     "searchView",
     "select",
