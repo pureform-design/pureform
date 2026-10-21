@@ -51,6 +51,7 @@ import {
     AFFIX_FIELD_STRUCTURE,
     AFFIX_TOKENS,
     affixField,
+    affixFieldVariants,
     fieldTokens,
 } from "./field";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
@@ -137,12 +138,7 @@ export const createDockedDatePicker = <
                 grid: ["week"],
             },
             variants: {
-                variant: ["filled", "outlined"],
-                color: groups as ColorGroups,
-                leadingIcon: ["true", "false"],
-                trailingIcon: ["true", "false"],
-                prefixText: ["true", "false"],
-                suffixText: ["true", "false"],
+                ...affixFieldVariants(groups as ColorGroups),
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({

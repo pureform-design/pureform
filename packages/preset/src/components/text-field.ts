@@ -39,6 +39,7 @@ import {
     COUNTER_SLOTS,
     COUNTER_STRUCTURE,
     affixField,
+    affixFieldVariants,
     counterParts,
     fieldTokens,
 } from "./field";
@@ -97,12 +98,7 @@ export const createTextField = <
             slots: [...AFFIX_FIELD_SLOTS, ...COUNTER_SLOTS],
             structure: { ...AFFIX_FIELD_STRUCTURE, ...COUNTER_STRUCTURE },
             variants: {
-                variant: ["filled", "outlined"],
-                color: groups as ColorGroups,
-                leadingIcon: ["true", "false"],
-                trailingIcon: ["true", "false"],
-                prefixText: ["true", "false"],
-                suffixText: ["true", "false"],
+                ...affixFieldVariants(groups as ColorGroups),
                 secure: ["true", "false"],
                 density: densitySteps<string>(densities),
             },
