@@ -134,6 +134,33 @@ describe("DatePicker, ready-made", () => {
         await until(() => expect(byTestId(ids.positioner).hidden).toBe(true));
     });
 
+    it("draws Cancel and OK as type=button, so they don't submit a form", async () => {
+        const onSubmit = vi.fn((event: { preventDefault(): void }) =>
+            event.preventDefault(),
+        );
+        const onValueChange = vi.fn();
+        withRegistry(
+            <form onSubmit={onSubmit}>
+                <DatePicker
+                    trigger="Pick"
+                    locale="en-US"
+                    defaultValue={["2026-08-17"]}
+                    onValueChange={onValueChange}
+                />
+            </form>,
+        );
+        await settle();
+        await open();
+        const ok = screen.getByRole("button", { name: "OK" });
+        const cancel = screen.getByRole("button", { name: "Cancel" });
+        expect(ok.getAttribute("type")).toBe("button");
+        expect(cancel.getAttribute("type")).toBe("button");
+        await interact(() => press(trigger("2026-08-21")));
+        await interact(() => press(ok));
+        expect(onValueChange).toHaveBeenCalledWith({ value: ["2026-08-21"] });
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it("moves between days with the arrows, chooses with Enter, closes with Escape", async () => {
         const onOpenChange = vi.fn();
         withRegistry(

@@ -116,7 +116,7 @@ function Root(props: DateInputRootProps): JSX.Element {
         ...value(),
     }));
     const api = createMemo(() => dateInput.connect(service, normalizeProps));
-    const dates = createMemo(() => api().value.map(toISO));
+    const dates = createMemo(() => api().value.filter(Boolean).map(toISO));
     const scope = useComponent(dateInputAnatomy, {
         selection: () => dateInputSelection(props),
         testId: () => props.testId,
@@ -222,8 +222,7 @@ function Container(props: DateInputPartProps): JSX.Element {
 const LeadingIcon: (props: DateInputIconProps) => JSX.Element =
     field.LeadingIcon;
 /** Text before the segments. Turn on Root's `prefixText` with it. */
-const PrefixText: (props: DateInputPartProps) => JSX.Element =
-    field.PrefixText;
+const PrefixText: (props: DateInputPartProps) => JSX.Element = field.PrefixText;
 
 /** The group of segments, named by the label. */
 function Input(props: DateInputInputProps): JSX.Element {
@@ -261,8 +260,7 @@ function Segment(props: DateInputSegmentProps): JSX.Element {
 }
 
 /** Text after the segments. Turn on Root's `suffixText` with it. */
-const SuffixText: (props: DateInputPartProps) => JSX.Element =
-    field.SuffixText;
+const SuffixText: (props: DateInputPartProps) => JSX.Element = field.SuffixText;
 
 /** The floating label, which names the segments. */
 const Label: (props: DateInputPartProps) => JSX.Element = field.Label;
