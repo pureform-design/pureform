@@ -58,3 +58,13 @@ export const EditIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.edit} />;
 
 /** Three dots in a column: the toolbar's overflow button. */
 export const MoreIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.more} />;
+
+/** An arrow pointing up: a table's sort arrow, ascending. */
+export const ArrowUpwardIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.arrowUpward} />
+);
+
+/** An arrow pointing down: a table's sort arrow, descending. */
+export const ArrowDownwardIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.arrowDownward} />
+);

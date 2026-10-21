@@ -474,6 +474,26 @@ export type {
     ToolbarVariantProps,
 } from "./components/toolbar";
 export {
+    TABLE_CONTENT_PROPS,
+    TABLE_ROOT_PROPS,
+    tableCellValue,
+    tableMachineProps,
+    tableRowPart,
+    tableRowValue,
+    tableSelection,
+} from "./components/table";
+export type {
+    TableBehaviorProps,
+    TableColumn,
+    TableContentProps,
+    TablePart,
+    TableRootOwnProps,
+    TableSelectionMode,
+    TableSort,
+    TableSortDirection,
+    TableVariantProps,
+} from "./components/table";
+export {
     TIME_CONTENT_PROPS,
     TIME_INPUT_HEADLINE,
     TIME_INPUT_ROOT_PROPS,
