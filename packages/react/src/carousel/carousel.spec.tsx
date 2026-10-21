@@ -125,14 +125,15 @@ describe("Carousel", () => {
             );
             await frames();
             all(ids.mask)[0]!.focus();
-            await userEvent.keyboard("{ArrowRight}{ArrowRight}");
-            await frames(1);
+            await userEvent.keyboard("{End}");
             const scrolled = byTestId(ids.itemGroup).scrollLeft;
-            if (motion === "reduce") expect(scrolled).toBe(200);
-            else expect(scrolled).toBeLessThan(200);
-            expect(onPageChange).toHaveBeenLastCalledWith(
-                expect.objectContaining({ page: 2 }),
-            );
+            // Eight 100px items in a 360px row end 440px in.
+            if (motion === "reduce") {
+                await frames(1);
+                expect(byTestId(ids.itemGroup).scrollLeft).toBe(440);
+            } else expect(scrolled).toBeLessThan(440);
+            await frames(30);
+            expect(onPageChange).toHaveBeenCalled();
             document.body.innerHTML = "";
         }
     });

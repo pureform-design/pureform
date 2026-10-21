@@ -21,7 +21,10 @@ import type {
     CarouselRootOwnProps,
     InteractionSourceProps,
 } from "@pureform/binding-core";
-import { observeCarouselRow } from "@pureform/binding-core/dom";
+import {
+    carouselRowPadding,
+    observeCarouselRow,
+} from "@pureform/binding-core/dom";
 import * as carousel from "@pureform/machines/carousel";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
@@ -45,7 +48,7 @@ import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { useDirection } from "../provider";
+import { useDirection, usePureform } from "../provider";
 
 type Anatomy = typeof carouselAnatomy;
 
@@ -107,11 +110,13 @@ function Root(props: CarouselRootProps): JSX.Element {
     const reducedMotion = useReducedMotion();
     const page = useControllable<"page", number>("Carousel", "page", props);
     const sources = itemInteractionSources();
+    const state = usePureform();
     const service = useMachine(carousel.machine, () => ({
         id,
         ...sources.machineProps,
         dir: dir(),
         slideCount: props.slideCount,
+        padding: carouselRowPadding(state().registry),
         reducedMotion: reducedMotion(),
         ...carouselMachineProps(props),
         ...page.machineProps(),

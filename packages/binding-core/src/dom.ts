@@ -178,7 +178,11 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
     stacked.set(positioner, positioner.style.zIndex);
 };
 
-export { measureCarouselRow, observeCarouselRow } from "./carousel-row";
+export {
+    carouselRowPadding,
+    measureCarouselRow,
+    observeCarouselRow,
+} from "./carousel-row";
 export {
     dragToDismiss,
     SHEET_DISMISS_SHARE,
