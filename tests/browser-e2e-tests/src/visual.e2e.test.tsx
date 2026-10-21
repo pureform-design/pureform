@@ -29,6 +29,7 @@ const SECTIONS = [
     "sheets",
     "media",
     "carousels",
+    "steppers",
     "controls",
     "color-groups",
     "text-fields",
