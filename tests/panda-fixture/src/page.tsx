@@ -460,12 +460,8 @@ export function Page() {
                                         Price
                                     </label>
                                 </div>
-                                <div class={t.supportingRow}>
-                                    <span class={t.supportingText}>
-                                        Before tax
-                                    </span>
-                                    <span class={t.counter}>2 / 8</span>
-                                </div>
+                                <span class={t.supportingText}>Before tax</span>
+                                <span class={t.counter}>2 / 8</span>
                             </div>
                         );
                     }}
@@ -501,9 +497,7 @@ export function Page() {
                                         ◉
                                     </button>
                                 </div>
-                                <div class={t.supportingRow}>
-                                    <span class={t.counter}>7 / 6</span>
-                                </div>
+                                <span class={t.counter}>7 / 6</span>
                             </div>
                         );
                     }}

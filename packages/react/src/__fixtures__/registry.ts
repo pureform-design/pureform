@@ -152,7 +152,6 @@ const FIELD_SLOTS = [
     "suffixText",
     "label",
     "trailingIcon",
-    "supportingRow",
     "supportingText",
     "counter",
 ] as const;

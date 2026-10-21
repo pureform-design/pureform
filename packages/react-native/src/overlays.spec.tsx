@@ -355,6 +355,7 @@ describe.each([animated, reanimated])(
             await interact(() => {
                 snackbars.show({
                     supportingText: "Raised",
+                    action: "Undo",
                     duration: null,
                     offset: 80,
                     layout: "longAction",
@@ -364,7 +365,22 @@ describe.each([animated, reanimated])(
             expect(
                 window.innerHeight - box(roots()[0]!).bottom,
             ).toBeGreaterThanOrEqual(96);
-            expect(getComputedStyle(roots()[0]!).flexDirection).toBe("column");
+            const root = roots()[0]!;
+            expect(getComputedStyle(root).flexWrap).toBe("wrap");
+            // The actions wrap below the text, at the end.
+            const part = (name: string) =>
+                box(
+                    root.querySelector<HTMLElement>(
+                        `[data-testid="pf-snackbar-${name}"]`,
+                    )!,
+                );
+            expect(part("actions").top).toBeGreaterThanOrEqual(
+                part("supporting-text").bottom,
+            );
+            expect(part("actions").right).toBeGreaterThan(
+                part("supporting-text").right - 1,
+            );
+            expect(part("actions").left).toBeGreaterThan(box(root).left + 50);
             await interact(() => snackbars.dismiss());
             await until(() => roots().length === 0);
         });

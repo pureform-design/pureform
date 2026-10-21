@@ -19,7 +19,7 @@ describe("textField", () => {
 
     it("declares how its slots nest", () => {
         expect(textField.structure).toEqual({
-            root: ["container", "supportingRow"],
+            root: ["container", "supportingText", "counter"],
             container: [
                 "leadingIcon",
                 "prefixText",
@@ -28,7 +28,6 @@ describe("textField", () => {
                 "label",
                 "trailingIcon",
             ],
-            supportingRow: ["supportingText", "counter"],
         });
     });
 
@@ -142,16 +141,18 @@ describe("textField", () => {
         }
     });
 
-    it("puts the counter at the end of the supporting row, in the error color with the field", () => {
+    it("puts the counter at the end of the supporting text's line, in the error color with the field", () => {
         const base = compiled()?.base as Record<
             string,
             Record<string, Record<string, string> | string>
         >;
         const helper = `.textField__root${INVALID}${INVALID}${INVALID}${INVALID} &`;
-        expect(base.supportingRow).toMatchObject({
+        expect(base.root).toMatchObject({
             display: "flex",
             flexDirection: "row",
+            flexWrap: "wrap",
         });
+        expect(base.container?.flexBasis).toBe("100%");
         expect(base.counter?.marginInlineStart).toBe("auto");
         expect(
             (base.counter!.color as Record<string, string>)[helper],

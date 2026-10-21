@@ -209,7 +209,7 @@ The text field and the text area share it: the input part is an `<input>` (`getI
 | `secure`, `revealLabel`                  | `boolean`, `string`                                    | password field: `getVisibilityTriggerProps()` toggles `revealed` and the input's `type` |
 | `name`, `form`, `dir`, `getRootNode`     |                                                        | forwarded or as in Zag                                                                  |
 
-Parts: `getPrefixTextProps`, `getSuffixTextProps`, `getSupportingRowProps`, `getCounterProps`
+Parts: `getPrefixTextProps`, `getSuffixTextProps`, `getCounterProps`
 (`id`, `data-overflow`), and `getVisibilityTriggerProps` (a `type="button"` toggle with
 `aria-pressed` and `aria-controls`) besides the input, label, root and supporting text.
 
