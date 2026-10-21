@@ -1696,6 +1696,42 @@ export const circularProgressAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const loadingIndicatorAnatomy = {
+    name: "loadingIndicator",
+    scope: "loading-indicator",
+    root: "root",
+    partNames: ["root", "container", "indicator"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-loading-indicator-root",
+            parent: null,
+            children: ["container"],
+            styled: true,
+            mirror: false,
+        },
+        container: {
+            name: "container",
+            attribute: "container",
+            testId: "pf-loading-indicator-container",
+            parent: "root",
+            children: ["indicator"],
+            styled: true,
+            mirror: false,
+        },
+        indicator: {
+            name: "indicator",
+            attribute: "indicator",
+            testId: "pf-loading-indicator-indicator",
+            parent: "container",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const separatorAnatomy = {
     name: "separator",
     scope: "separator",
@@ -2998,6 +3034,7 @@ export const anatomy = {
     slider: sliderAnatomy,
     linearProgress: linearProgressAnatomy,
     circularProgress: circularProgressAnatomy,
+    loadingIndicator: loadingIndicatorAnatomy,
     separator: separatorAnatomy,
     list: listAnatomy,
     listItem: listItemAnatomy,
@@ -3203,6 +3240,11 @@ export const testIds = {
         endArc: "pf-circular-progress-end-arc",
         startHalf: "pf-circular-progress-start-half",
         startArc: "pf-circular-progress-start-arc",
+    },
+    loadingIndicator: {
+        root: "pf-loading-indicator-root",
+        container: "pf-loading-indicator-container",
+        indicator: "pf-loading-indicator-indicator",
     },
     separator: { root: "pf-separator-root" },
     list: { root: "pf-list-root", item: "pf-list-item" },

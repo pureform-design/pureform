@@ -243,6 +243,13 @@
                 "default": "./dist/circular-progress.mjs"
             }
         },
+        "./loading-indicator": {
+            "types": "./dist/loading-indicator/index.d.ts",
+            "import": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.mjs"
+            }
+        },
         "./icon": {
             "types": "./dist/icon/index.d.ts",
             "import": {

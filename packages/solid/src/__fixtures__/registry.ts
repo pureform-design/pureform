@@ -359,6 +359,11 @@ export const displayRegistry = () =>
             "startHalf",
             "startArc",
         ]),
+        loadingIndicator: named("loading-indicator", [
+            "root",
+            "container",
+            "indicator",
+        ]),
         slider: ((s: Selection<ComponentShape>) =>
             withTokenStyle(
                 named("slider", [

@@ -13,6 +13,9 @@ const examples = {
     "unknown amount": { value: null },
     indeterminate: { indeterminate: true },
     "secondary color": { color: "secondary" },
+    wavy: { shape: "wavy" },
+    "wavy thick": { shape: "wavy", thickness: "thick" },
+    "wavy indeterminate": { shape: "wavy", value: null },
 };
 
 export const linearProgress: ComponentCase = {

@@ -643,6 +643,16 @@ export type {
     MediaVariantProps,
 } from "./components/media";
 export {
+    LOADING_INDICATOR_ROOT_PROPS,
+    loadingIndicatorRootProps,
+    loadingIndicatorSelection,
+} from "./components/loading-indicator";
+export type {
+    LoadingIndicatorPart,
+    LoadingIndicatorRootOwnProps,
+    LoadingIndicatorVariantProps,
+} from "./components/loading-indicator";
+export {
     isIndeterminate,
     PROGRESS_ROOT_PROPS,
     progressPercent,

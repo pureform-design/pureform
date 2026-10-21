@@ -28,6 +28,7 @@ import { IconButton } from "@pureform/react/icon-button";
 import { LinearProgress } from "@pureform/react/linear-progress";
 import { List } from "@pureform/react/list";
 import { ListItem } from "@pureform/react/list-item";
+import { LoadingIndicator } from "@pureform/react/loading-indicator";
 import { Media } from "@pureform/react/media";
 import { Menu } from "@pureform/react/menu";
 import { NavigationBar } from "@pureform/react/navigation-bar";
@@ -102,6 +103,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Checkbox,
     Chip,
     CircularProgress,
+    LoadingIndicator,
     Dialog,
     DragHandle,
     Fab,

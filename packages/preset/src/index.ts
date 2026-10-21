@@ -31,6 +31,8 @@ export * from "./components/navigation-bar";
 export * from "./components/navigation-rail";
 export * from "./components/overlay";
 export * from "./components/progress";
+export * from "./components/loading-indicator";
+export * from "./components/shape-paths";
 export * from "./components/search-bar";
 export * from "./components/search-view";
 export * from "./components/select";

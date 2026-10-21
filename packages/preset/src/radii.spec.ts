@@ -52,7 +52,12 @@ const radii = (
  * then by the radius's path inside it (as the check reports it, for example `base.borderRadius`),
  * each with the reason. Exceptions are for geometry, not taste.
  */
-const ALLOWED: Allowed = {};
+const ALLOWED: Allowed = {
+    loadingIndicator: {
+        "tokens.containerRadius":
+            "The contained loading indicator's container is a circle (half its 48px size): its geometry is the shape, so a shape theme mustn't square it. A theme retunes the token instead.",
+    },
+};
 
 type Allowed = Record<string, Record<string, string>>;
 type Found = { path: string; lengths: number[] };
