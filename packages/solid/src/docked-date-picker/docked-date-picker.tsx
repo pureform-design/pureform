@@ -44,6 +44,7 @@ import type {
 } from "../calendar-parts";
 import { useControllable } from "../controllable";
 import { CalendarIcon, DropDownArrow } from "../glyphs";
+import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
@@ -446,16 +447,24 @@ function ReadyMadeContent(props: {
                 <Content {...slots("content")}>
                     <Controls {...slots("controls")}>
                         <Show when={view() === "day"}>
-                            <Prev {...slots("prev")} />
+                            <Prev as={IconButton} {...slots("prev")} />
                         </Show>
                         <MonthButton {...slots("monthButton")} />
                         <Show when={view() === "day"}>
-                            <Next {...slots("next")} />
-                            <Prev unit="year" {...slots("prev")} />
+                            <Next as={IconButton} {...slots("next")} />
+                            <Prev
+                                as={IconButton}
+                                unit="year"
+                                {...slots("prev")}
+                            />
                         </Show>
                         <YearButton {...slots("yearButton")} />
                         <Show when={view() === "day"}>
-                            <Next unit="year" {...slots("next")} />
+                            <Next
+                                as={IconButton}
+                                unit="year"
+                                {...slots("next")}
+                            />
                         </Show>
                     </Controls>
                     <Switch>

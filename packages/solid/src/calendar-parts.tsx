@@ -13,7 +13,7 @@ import {
 import type { CalendarView } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as datePicker from "@pureform/machines/date-picker";
-import type { JSX } from "@solidjs/web";
+import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, createMemo, For, merge, omit } from "solid-js";
 
 import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
@@ -40,6 +40,8 @@ export interface CalendarPartProps extends PartProps {
 export interface CalendarStepProps extends CalendarPartProps {
     readonly mirror?: boolean | undefined;
     readonly unit?: "page" | "year" | undefined;
+    /** Another element or component to render instead of `<button>`: `IconButton`. */
+    readonly as?: ValidComponent | undefined;
 }
 
 /** A table's props: a part's, and the view it lays out and how many cells a row holds, for the
@@ -106,11 +108,12 @@ export function calendarParts(use: (name: string) => CalendarContext) {
             };
             return scope.render(name(direction), {
                 element: "button",
+                as: () => props.as,
                 machine,
                 states: () => ({ mirrored: props.mirror ?? true }),
                 unstyled: () => props.unstyled,
                 props: merge(
-                    omit(props, "unstyled", "mirror", "unit", "children"),
+                    omit(props, "unstyled", "mirror", "unit", "children", "as"),
                     children,
                 ),
             });
