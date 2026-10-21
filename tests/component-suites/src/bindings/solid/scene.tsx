@@ -27,6 +27,7 @@ import { IconButton } from "@pureform/solid/icon-button";
 import { LinearProgress } from "@pureform/solid/linear-progress";
 import { List } from "@pureform/solid/list";
 import { ListItem } from "@pureform/solid/list-item";
+import { LoadingIndicator } from "@pureform/solid/loading-indicator";
 import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
@@ -94,6 +95,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Checkbox,
     Chip,
     CircularProgress,
+    LoadingIndicator,
     Dialog,
     DragHandle,
     Fab,

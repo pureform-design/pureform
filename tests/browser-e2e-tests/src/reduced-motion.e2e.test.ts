@@ -216,3 +216,53 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
         });
     },
 );
+
+// The loading indicator's animation is its only sign of a wait, so reduced motion keeps it
+// turning and stops the shape from changing: its morph gives way to a plain spin.
+const animationName = async (
+    name: keyof typeof STYLINGS,
+    scenario: Scenario,
+): Promise<string> => {
+    await commands.emulateReducedMotion(scenario.system);
+    const fns =
+        name === "Panda"
+            ? (pandaRecipes as unknown as Record<string, ClassFn>)
+            : (classesFor(pureformConfig) as Record<string, ClassFn>);
+    const indicator = (fns.loadingIndicator!({}) as Record<string, string>)
+        .indicator!;
+    const frame = document.createElement("iframe");
+    document.body.append(frame);
+    try {
+        const markup = scenario.providers.reduceRight(
+            (inner, motion) =>
+                `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
+            `<div data-id class="${indicator}"></div>`,
+        );
+        const doc = frame.contentDocument!;
+        doc.open();
+        doc.write(
+            `<!doctype html><html><head>${(await STYLINGS[name].css())
+                .map((sheet) => `<style>${sheet}</style>`)
+                .join("")}</head><body>${markup}</body></html>`,
+        );
+        doc.close();
+        return frame.contentWindow!.getComputedStyle(
+            doc.querySelector("[data-id]")!,
+        ).animationName;
+    } finally {
+        frame.remove();
+    }
+};
+
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: the loading indicator under reduced motion",
+    (name) => {
+        it.each(SCENARIOS)("$name", async (scenario) => {
+            expect(await animationName(name, scenario)).toMatch(
+                scenario.reduced
+                    ? /loadingIndicatorSpin/
+                    : /loadingIndicatorMorph/,
+            );
+        });
+    },
+);
