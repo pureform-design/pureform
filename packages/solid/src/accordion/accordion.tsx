@@ -26,6 +26,7 @@ import {
     For,
     merge,
     omit,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -259,7 +260,7 @@ function ReadyMade(props: AccordionProps): JSX.Element {
             >
                 {(entry) => {
                     const LeadingPart = optionalPart(
-                        entry(),
+                        untrack(entry),
                         "leading",
                         Leading,
                         leading.Optional,
