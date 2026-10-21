@@ -33,10 +33,10 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
+import { morphSequence } from "@pureform/core/ast";
 import { duration, easing } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
-import { morphSequence } from "./shape-paths";
 import {
     DEFAULT_GROUP,
     circle,
