@@ -983,6 +983,64 @@ motion)` keeps the overlay present until the exit's end is reported, never on a 
   `reduceMotionChanged`, and passes the result to every selection as `reducedMotion`. The old
   `reducedMotion` prop stays on `rn-adapter`'s styles-based provider only.
 
+#### 5.8.1 Springs
+
+Material 3 Expressive times spatial motion with springs. Built (m1): the plumbing, with no
+component moved to springs yet (m2 migrates them).
+
+- **The node.** `SpringNode { type: "spring", stiffness, damping, mass }` in `@pureform/core`:
+  damping is the ratio ζ (1 critical, below bounces), mass defaults to 1. `spring({ stiffness,
+damping, mass? })` builds one; `spring({ duration, bounce })` converts a perceptual duration
+  and bounce at build time (SwiftUI's and Motion's formula). It isn't an easing: a spring sets a
+  motion's duration and curve together, so a transition part or a keyframe animation takes a
+  `Timing`, `{ duration, easing?, delay? }` or `{ spring, delay? }`. Giving a spring a duration
+  or easing is a type error, and `validateConfig` throws `MotionConfigError` for an untyped
+  config (so does stiffness or mass not above 0, or a negative damping). A new easing kind,
+  `linear` (`linearEasing(...)`, CSS's `linear()`), carries sampled curves.
+- **Sampling.** `sampleSpring(node)` is the one sampler every web target uses: the closed-form
+  solution of the damped spring released from rest, run until it stays within 0.001 of its
+  target (the settle time, whole ms), sampled at 1000 points and simplified (Ramer–Douglas–
+  Peucker, vertical error) to within 0.002, at most 48 points, ending exactly at 1. A spec checks
+  the curve against the physics, and the settle time against the tolerance.
+- **Tokens.** `CoreConfig.springs` (and a theme override's) holds spring tokens, read with
+  `alias("springs", name)`, or the theme's `spring(role)`. The motion contract has
+  `SPRING_ROLES`: `spatialFast`, `spatialDefault`, `spatialSlow`, `effectsFast`,
+  `effectsDefault`, `effectsSlow`. Spatial springs move things and may bounce; effects springs
+  (critically damped) fade.
+- **Web (CSS, Panda, Tailwind).** A spring token is two vars, `--springs-<name>-duration` and
+  `--springs-<name>-easing` (the sampled `linear()`); Panda nests them under the `springs`
+  category, and Tailwind's stylesheet carries them through the CSS adapter's tokens. A
+  transition or animation timed by a spring token reads both
+  (`transform var(--springs-spatial-fast-duration) var(--springs-spatial-fast-easing)`), so a
+  theme or runtime theme retimes it; a literal spring is sampled in place.
+- **React Native.** A theme holds each spring as five values: the sampled duration and curve, and
+  the physics as engines take them, stiffness, mass, and the damping coefficient
+  `c = 2ζ√(k·m)`. A spring timing lowers to the sampled `duration` and `easing` plus
+  `spring: { type: "spring", stiffness, damping, mass }`. The Animated engine runs transitions,
+  token tweens, shape morphs, and overlay steps with `Animated.spring` (resting within 0.001);
+  keyframe animations (several frames, iterations) run over the sampled duration and curve, an
+  Animated easing interpolated through the `linear()` points. The Reanimated engine runs CSS
+  animations and transitions, which have no springs, so it takes the sampled duration and
+  `linear()` curve (Reanimated's `linear(...)` easing), the same as the web; `withSpring` would
+  leave its CSS animation model. `timeScale` slows a spring by dividing its stiffness by the
+  scale squared and its damping coefficient by the scale (and the sampled duration times it).
+- **Reduced motion.** A spring times a motion; it doesn't decide whether it moves. So the rule
+  above holds unchanged: a spring on a property that moves is instant under reduced motion (its
+  part drops out, `transitionMoves`), and a spring on a fade keeps running; an overlay's moving
+  keyframes give way to a fade on the same timing, spring or not. Spatial springs never run
+  under reduced motion; effects springs do.
+- **Schemes.** `materialMotion({ scheme })` takes M3's `standard` (default) or `expressive`
+  springs, from Compose's `StandardMotionTokens` and `ExpressiveMotionTokens`. Standard: spatial
+  1400/700/300 stiffness at ζ 0.9; expressive: spatial 800 at ζ 0.6, 380 and 200 at ζ 0.8; both:
+  effects 3800/1600/800 at ζ 1 (fast/default/slow). The preset's `tweens(...)` and
+  `timedAnimation` and each overlay step (`OverlayMotionStep`) take a spring role in place of a
+  duration and easing.
+- **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
+  draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
+  material-components-android's tokens with `sampleCubicPath` (each segment densely along its
+  parameter, simplified to within 0.001), about 45 stops, in place of the standard curve it used
+  to copy.
+
 ### 5.9 Direction
 
 The preset already uses logical properties (`paddingInline`, `insetInlineStart`) almost
