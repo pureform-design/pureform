@@ -13,7 +13,7 @@ import {
     shapeCoordinates,
     shapePath,
 } from "./geometry";
-import { stylesFor } from "./resolve";
+import { stylesFor, withSetTokens } from "./resolve";
 import { selectWithTransitions } from "./select";
 
 describe("shapePath", () => {
@@ -127,18 +127,27 @@ describe("placeGradient", () => {
 });
 
 describe("drawings", () => {
-    const styles = stylesFor(
-        precompute(pureform(), { components: ["iconButton", "ripple"] }),
-        "base:light",
-    );
+    const precomputed = precompute(pureform(), {
+        components: ["iconButton", "ripple"],
+    });
+    const styles = stylesFor(precomputed, "base:light");
 
     it("draws a shaped slot's fill and outline ring with SVG, only under the svg state", () => {
-        const pick = (svg: boolean) =>
-            selectWithTransitions(
-                styles.iconButton!,
-                { shape: "cookie4Sided", variant: "outlined" },
-                { svg },
-            );
+        // With the tokens the variants set (the shape's `shaped` flag), as the factory selects.
+        const pick = (svg: boolean) => {
+            const from = (component: typeof styles.iconButton) =>
+                selectWithTransitions(
+                    component!,
+                    { shape: "cookie4Sided", variant: "outlined" },
+                    { svg },
+                );
+            return withSetTokens(from(styles.iconButton), from, {
+                styles: precomputed,
+                key: "base:light",
+                name: "iconButton",
+                scheme: "light",
+            });
+        };
         const off = pick(false);
         expect(off.drawings).toEqual({});
         expect(off.styles.container!.borderRadius).toBe(9999);
