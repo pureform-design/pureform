@@ -74,6 +74,11 @@ describe.each([animated, reanimated])("the stepper with $name", (engine) => {
         expect(all("pf-stepper-content")[0]!.parentElement).toBe(
             all("pf-stepper-item")[1],
         );
+        // A column's headers disclose their content.
+        expect(byTestId("pf-stepper-list").getAttribute("role")).toBe("list");
+        const headers = all("pf-stepper-trigger");
+        expect(headers[1]!.getAttribute("aria-expanded")).toBe("true");
+        expect(headers[0]!.getAttribute("aria-expanded")).toBe("false");
     });
 
     it("marks a done step with a check and one in error, and disables a done step that isn't editable", async () => {
