@@ -438,7 +438,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   them its `density`, `color`, `tokens`, and `leadingType` (`icon`, `avatar`, `thumbnail`,
   `video`) unless an item sets its own. `variant="segmented"` sets the items apart as tiles, each
   item rounded by its `position` (`first`, `middle`, `last`, `single`), which a `ListItem` outside
-  a `List` can take too. An item's `href` isn't followed; give it `onPress`.
+  a `List` can take too. An item's `href` isn't followed; give it `onPress`. An item with a
+  `region` is expandable: a button whose `⌄` indicator turns over, showing the region under it
+  while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
+  accordion.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
   `density`, each with its `position` (`single`, or its place in the run when `connected`).
@@ -448,7 +451,11 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `radio`) with `checked` and `onCheckedChange`: a toggleable item fills while checked. `groups`
   render after `items`, each in an `itemGroup` with its optional label, and draw the menu as tiles
   (`grouped`) unless told otherwise; `vibrant` takes the tertiary colors. A select's items with a
-  `group` sit together under its label, in the order each group first appears.
+  `group` sit together under its label, in the order each group first appears. An item with
+  `items` opens a submenu, an arrow (`›`) at its end: React Native drills into it in place, under a
+  row that goes back, where the web cascades it beside the item.
+- **Navigation rail:** a destination's `sectionLabel` heads it and the ones after, shown only while
+  the rail is `expanded`.
 - **Split button and FAB menu:** `SplitButton` renders its two buttons as the `Menu`'s trigger
   (`trigger` as a function), so the menu opens over the page under the trailing button, at its
   end. `FabMenu` opens its items in the portal above the FAB, at its end; the `list` slot's
