@@ -51,11 +51,15 @@ import { badge } from "./components/badge";
 import { bottomSheet } from "./components/bottom-sheet";
 import { createButton } from "./components/button";
 import { buttonGroup } from "./components/button-group";
+import { calendarCell } from "./components/calendar";
 import { card } from "./components/card";
 import { carousel } from "./components/carousel";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
+import { createDateInput } from "./components/date-input";
+import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
+import { createDockedDatePicker } from "./components/docked-date-picker";
 import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
@@ -307,6 +311,13 @@ const defaultComponents = <G extends string>(
             theme.color.groups,
             densities,
         ),
+        calendarCell,
+        datePicker,
+        dockedDatePicker: createDockedDatePicker<G, Step>(
+            theme.color.groups,
+            densities,
+        ),
+        dateInput: createDateInput<G, Step>(theme.color.groups, densities),
         supportingText: createSupportingText(theme.color.groups),
         checkbox: createCheckbox<G, Step>(theme.color.groups, densities),
         radio: createRadio<G, Step>(theme.color.groups, densities),

@@ -1,0 +1,1442 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`calendarCell > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "root": {
+      "--components-calendarCell-focusIndicatorColor": "token(colors.secondary)",
+      "--components-calendarCell-focusIndicatorOuterOffset": "token(sizes.focusIndicatorOuterOffset)",
+      "--components-calendarCell-focusIndicatorThickness": "token(sizes.focusIndicatorThickness)",
+      "--components-calendarCell-stateDraggedOpacity": "token(opacity.stateDragged)",
+      "--components-calendarCell-stateFocusOpacity": "token(opacity.stateFocus)",
+      "--components-calendarCell-stateHoverOpacity": "token(opacity.stateHover)",
+      "--components-calendarCell-statePressedOpacity": "token(opacity.statePressed)",
+      "alignItems": "center",
+      "backgroundColor": "color-mix(in srgb, transparent, var(--components-calendarCell-rangeContainer, token(colors.secondaryContainer)) var(--components-calendarCell-ranged, 0%))",
+      "borderEndEndRadius": "0px",
+      "borderEndStartRadius": "0px",
+      "borderStartEndRadius": "0px",
+      "borderStartStartRadius": "0px",
+      "display": "flex",
+      "flexShrink": "0",
+      "height": "var(--components-calendarCell-cellHeight, 48px)",
+      "justifyContent": "center",
+      "width": "var(--components-calendarCell-cellWidth, 48px)",
+    },
+    "trigger": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "borderColor": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "alignItems": "center",
+      "backgroundColor": {
+        "&:focus-visible": "color-mix(in srgb, color-mix(in srgb, transparent, var(--components-calendarCell-selectedContainer, token(colors.primary)) var(--components-calendarCell-selected, 0%)), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--components-calendarCell-content, token(colors.onSurface)), var(--components-calendarCell-rangeContent, token(colors.onSecondaryContainer)) var(--components-calendarCell-ranged, 0%)), var(--components-calendarCell-todayContent, token(colors.primary)) var(--components-calendarCell-today, 0%)), var(--components-calendarCell-selectedContent, token(colors.onPrimary)) var(--components-calendarCell-selected, 0%)) var(--components-calendarCell-stateFocusOpacity, token(opacity.stateFocus)))",
+        "&:is(:active, [data-pf-active])": "color-mix(in srgb, color-mix(in srgb, transparent, var(--components-calendarCell-selectedContainer, token(colors.primary)) var(--components-calendarCell-selected, 0%)), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--components-calendarCell-content, token(colors.onSurface)), var(--components-calendarCell-rangeContent, token(colors.onSecondaryContainer)) var(--components-calendarCell-ranged, 0%)), var(--components-calendarCell-todayContent, token(colors.primary)) var(--components-calendarCell-today, 0%)), var(--components-calendarCell-selectedContent, token(colors.onPrimary)) var(--components-calendarCell-selected, 0%)) var(--components-calendarCell-statePressedOpacity, token(opacity.statePressed)))",
+        "&:is(:hover, [data-pf-hover])": "color-mix(in srgb, color-mix(in srgb, transparent, var(--components-calendarCell-selectedContainer, token(colors.primary)) var(--components-calendarCell-selected, 0%)), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--components-calendarCell-content, token(colors.onSurface)), var(--components-calendarCell-rangeContent, token(colors.onSecondaryContainer)) var(--components-calendarCell-ranged, 0%)), var(--components-calendarCell-todayContent, token(colors.primary)) var(--components-calendarCell-today, 0%)), var(--components-calendarCell-selectedContent, token(colors.onPrimary)) var(--components-calendarCell-selected, 0%)) var(--components-calendarCell-stateHoverOpacity, token(opacity.stateHover)))",
+        "&[data-pf-dragging][data-pf-dragging]": "color-mix(in srgb, color-mix(in srgb, transparent, var(--components-calendarCell-selectedContainer, token(colors.primary)) var(--components-calendarCell-selected, 0%)), color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--components-calendarCell-content, token(colors.onSurface)), var(--components-calendarCell-rangeContent, token(colors.onSecondaryContainer)) var(--components-calendarCell-ranged, 0%)), var(--components-calendarCell-todayContent, token(colors.primary)) var(--components-calendarCell-today, 0%)), var(--components-calendarCell-selectedContent, token(colors.onPrimary)) var(--components-calendarCell-selected, 0%)) var(--components-calendarCell-stateDraggedOpacity, token(opacity.stateDragged)))",
+        "base": "color-mix(in srgb, transparent, var(--components-calendarCell-selectedContainer, token(colors.primary)) var(--components-calendarCell-selected, 0%))",
+      },
+      "borderColor": "var(--components-calendarCell-todayContent, token(colors.primary))",
+      "borderRadius": "var(--components-calendarCell-radius, token(radii.full))",
+      "borderStyle": "solid",
+      "borderWidth": "var(--components-calendarCell-todayOutlineWidth, 0px)",
+      "color": "color-mix(in srgb, color-mix(in srgb, color-mix(in srgb, var(--components-calendarCell-content, token(colors.onSurface)), var(--components-calendarCell-rangeContent, token(colors.onSecondaryContainer)) var(--components-calendarCell-ranged, 0%)), var(--components-calendarCell-todayContent, token(colors.primary)) var(--components-calendarCell-today, 0%)), var(--components-calendarCell-selectedContent, token(colors.onPrimary)) var(--components-calendarCell-selected, 0%))",
+      "cursor": "pointer",
+      "display": "inline-flex",
+      "flexDirection": "row",
+      "height": "var(--components-calendarCell-triggerHeight, 40px)",
+      "justifyContent": "center",
+      "outlineColor": "var(--components-calendarCell-focusIndicatorColor, token(colors.secondary))",
+      "outlineOffset": "var(--components-calendarCell-focusIndicatorOuterOffset, token(sizes.focusIndicatorOuterOffset))",
+      "outlineStyle": {
+        "&:focus-visible": "solid",
+        "base": "none",
+      },
+      "outlineWidth": "var(--components-calendarCell-focusIndicatorThickness, token(sizes.focusIndicatorThickness))",
+      "position": "relative",
+      "textStyle": "bodyLarge",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      "width": "var(--components-calendarCell-triggerWidth, 40px)",
+    },
+  },
+  "className": "calendarCell",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "outside": false,
+    "selection": "none",
+    "today": false,
+    "view": "day",
+  },
+  "jsx": [
+    "CalendarCell",
+  ],
+  "slots": [
+    "root",
+    "trigger",
+  ],
+  "variants": {
+    "outside": {
+      "false": {},
+      "true": {
+        "root": {
+          "opacity": "var(--components-calendarCell-outsideOpacity, 0)",
+          "pointerEvents": "none",
+        },
+      },
+    },
+    "selection": {
+      "none": {},
+      "rangeEnd": {
+        "root": {
+          "--components-calendarCell-ranged": "100%",
+          "--components-calendarCell-selected": "100%",
+          "borderEndEndRadius": "token(radii.full)",
+          "borderEndStartRadius": "0px",
+          "borderStartEndRadius": "token(radii.full)",
+          "borderStartStartRadius": "0px",
+        },
+      },
+      "rangeMiddle": {
+        "root": {
+          "--components-calendarCell-ranged": "100%",
+        },
+      },
+      "rangeStart": {
+        "root": {
+          "--components-calendarCell-ranged": "100%",
+          "--components-calendarCell-selected": "100%",
+          "borderEndEndRadius": "0px",
+          "borderEndStartRadius": "token(radii.full)",
+          "borderStartEndRadius": "0px",
+          "borderStartStartRadius": "token(radii.full)",
+        },
+      },
+      "selected": {
+        "root": {
+          "--components-calendarCell-selected": "100%",
+        },
+      },
+    },
+    "today": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-calendarCell-today": "100%",
+          "--components-calendarCell-todayOutlineWidth": "var(--components-calendarCell-todayOutline, 1px)",
+        },
+      },
+    },
+    "view": {
+      "day": {},
+      "month": {
+        "root": {
+          "--components-calendarCell-cellHeight": "52px",
+          "--components-calendarCell-cellWidth": "88px",
+          "--components-calendarCell-triggerHeight": "36px",
+          "--components-calendarCell-triggerWidth": "72px",
+        },
+      },
+      "year": {
+        "root": {
+          "--components-calendarCell-cellHeight": "52px",
+          "--components-calendarCell-cellWidth": "88px",
+          "--components-calendarCell-triggerHeight": "36px",
+          "--components-calendarCell-triggerWidth": "72px",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`dateInput > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-dateInput-actionsGap, token(spacing.2))",
+      "justifyContent": "end",
+      "paddingBlockEnd": "var(--components-dateInput-actionsPadding, token(spacing.3))",
+      "paddingBlockStart": "token(spacing.2)",
+      "paddingInlineEnd": "var(--components-dateInput-actionsPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dateInput-actionsPadding, token(spacing.3))",
+    },
+    "container": {
+      "display": "flex",
+      "height": "calc(var(--components-dateInput-height, 56px) + var(--components-dateInput-densityOffset, token(sizes.densityOffset)))",
+      "position": "relative",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "divider": {
+      "backgroundColor": "var(--components-dateInput-dividerColor, token(colors.outlineVariant))",
+      "borderWidth": "0px",
+      "flexShrink": "0",
+      "height": "1px",
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "width": "100%",
+    },
+    "field": {
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockEnd": "token(spacing.4)",
+      "paddingBlockStart": "var(--components-dateInput-fieldPadding, token(spacing.6))",
+      "paddingInlineEnd": "var(--components-dateInput-fieldPadding, token(spacing.6))",
+      "paddingInlineStart": "var(--components-dateInput-fieldPadding, token(spacing.6))",
+    },
+    "header": {
+      "alignItems": "end",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "justifyContent": "space-between",
+      "paddingBlockEnd": "token(spacing.3)",
+      "paddingBlockStart": "token(spacing.4)",
+      "paddingInlineEnd": "var(--components-dateInput-headerPaddingEnd, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dateInput-headerPaddingStart, token(spacing.6))",
+    },
+    "headline": {
+      "color": "var(--components-dateInput-headlineColor, token(colors.onSurfaceVariant))",
+      "flexBasis": "100%",
+      "paddingBlockEnd": "36px",
+      "textStyle": "labelLarge",
+    },
+    "input": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "alignItems": "center",
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-dateInput-inputColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "1",
+      "height": "100%",
+      "minWidth": "0px",
+      "outlineStyle": "none",
+      "paddingInlineEnd": "calc(var(--components-dateInput-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-dateInput-paddingInline, token(spacing.4))) * var(--components-dateInput-suffixed, 0)))",
+      "paddingInlineStart": "calc(var(--components-dateInput-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-dateInput-paddingInline, token(spacing.4))) * var(--components-dateInput-prefixed, 0)))",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "label": {
+      "color": {
+        ".dateInput__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "var(--components-dateInput-focusColor, token(colors.primary))",
+        ".dateInput__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dateInput-errorColor, token(colors.error))",
+        "base": "var(--components-dateInput-labelColor, token(colors.onSurfaceVariant))",
+      },
+      "fontSize": {
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "token(fontSizes.bodySmall)",
+        ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(fontSizes.bodySmall)",
+        "base": "token(fontSizes.bodyLarge)",
+      },
+      "insetInlineStart": "var(--components-dateInput-paddingInline, token(spacing.4))",
+      "letterSpacing": {
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "token(letterSpacings.bodySmall)",
+        ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(letterSpacings.bodySmall)",
+        "base": "token(letterSpacings.bodyLarge)",
+      },
+      "lineHeight": {
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "token(lineHeights.bodySmall)",
+        ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(lineHeights.bodySmall)",
+        "base": "token(lineHeights.bodyLarge)",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "textStyle": "bodyLarge",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+    },
+    "leadingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".dateInput__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dateInput-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dateInput-iconFill, 0)",
+      "height": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "insetInlineStart": "var(--components-dateInput-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+    },
+    "modeToggle": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-dateInput-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dateInput-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+    },
+    "prefixText": {
+      "alignItems": "center",
+      "color": {
+        ".dateInput__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dateInput-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "1",
+        ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-dateInput-affixGap, 2px)",
+      "paddingInlineStart": "var(--components-dateInput-paddingInline, token(spacing.4))",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "root": {
+      "backgroundColor": "var(--components-dateInput-pickerContainer, token(colors.surfaceContainerHigh))",
+      "borderRadius": "var(--components-dateInput-pickerRadius, token(radii.extraLarge))",
+      "borderWidth": "0px",
+      "color": "var(--components-dateInput-selectedDateColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "maxWidth": "100%",
+      "shadowElevation": "level3",
+      "width": "var(--components-dateInput-width, 360px)",
+    },
+    "segment": {
+      "backgroundColor": {
+        "&:focus": "var(--components-dateInput-focusColor, token(colors.primary))",
+        "base": "transparent",
+      },
+      "borderRadius": "var(--components-dateInput-segmentRadius, token(radii.extraSmall))",
+      "color": {
+        "&:focus": "var(--components-dateInput-pickerContainer, token(colors.surfaceContainerHigh))",
+        "base": "var(--components-dateInput-inputColor, token(colors.onSurface))",
+      },
+      "outlineStyle": "none",
+      "paddingInlineEnd": "1px",
+      "paddingInlineStart": "1px",
+      "textAlign": "center",
+    },
+    "selectedDate": {
+      "color": "var(--components-dateInput-selectedDateColor, token(colors.onSurface))",
+      "flexGrow": "1",
+      "minWidth": "0px",
+      "textStyle": "headlineLarge",
+    },
+    "suffixText": {
+      "alignItems": "center",
+      "color": {
+        ".dateInput__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dateInput-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".dateInput__container:is(:focus-within):is(:focus-within) &": "1",
+        ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-dateInput-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-dateInput-affixGap, 2px)",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "supportingText": {
+      "color": {
+        ".dateInput__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dateInput__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dateInput-errorColor, token(colors.error))",
+        "base": "var(--components-dateInput-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-dateInput-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-dateInput-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
+    "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".dateInput__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dateInput__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dateInput-errorColor, token(colors.error))",
+        "base": "var(--components-dateInput-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dateInput-iconFill, 0)",
+      "height": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "insetInlineEnd": "var(--components-dateInput-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-dateInput-iconSize, token(sizes.iconMedium))",
+    },
+  },
+  "className": "dateInput",
+  "compoundVariants": [
+    {
+      "css": {
+        "label": {
+          "insetInlineStart": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "var(--components-dateInput-paddingInline, token(spacing.4))",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-dateInput-paddingInline, token(spacing.4))",
+            "base": "var(--components-dateInput-textInsetWithIcon, 52px)",
+          },
+        },
+      },
+      "leadingIcon": true,
+      "variant": "outlined",
+    },
+  ],
+  "defaultVariants": {
+    "color": "primary",
+    "density": "inherit",
+    "leadingIcon": false,
+    "prefixText": false,
+    "suffixText": false,
+    "trailingIcon": false,
+    "variant": "outlined",
+  },
+  "jsx": [
+    "DateInput",
+  ],
+  "slots": [
+    "root",
+    "header",
+    "headline",
+    "selectedDate",
+    "modeToggle",
+    "divider",
+    "field",
+    "container",
+    "leadingIcon",
+    "prefixText",
+    "input",
+    "suffixText",
+    "label",
+    "trailingIcon",
+    "supportingText",
+    "segment",
+    "actions",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.error)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.info)",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.secondary)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.success)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.tertiary)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-dateInput-focusColor": "token(colors.warning)",
+        },
+      },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "--components-dateInput-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-dateInput-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-dateInput-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-dateInput-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-dateInput-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
+    },
+    "leadingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineStart": "calc(var(--components-dateInput-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-dateInput-textInsetWithIcon, 52px)) * var(--components-dateInput-prefixed, 0)))",
+        },
+        "label": {
+          "insetInlineStart": "var(--components-dateInput-textInsetWithIcon, 52px)",
+        },
+        "prefixText": {
+          "paddingInlineStart": "var(--components-dateInput-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "prefixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-dateInput-prefixed": "1",
+        },
+      },
+    },
+    "suffixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-dateInput-suffixed": "1",
+        },
+      },
+    },
+    "trailingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineEnd": "calc(var(--components-dateInput-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-dateInput-textInsetWithIcon, 52px)) * var(--components-dateInput-suffixed, 0)))",
+        },
+        "suffixText": {
+          "paddingInlineEnd": "var(--components-dateInput-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "variant": {
+      "filled": {
+        "container": {
+          "backgroundColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-dateInput-container, token(colors.surfaceContainerHighest))",
+          },
+          "borderStartEndRadius": "var(--components-dateInput-radius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-dateInput-radius, token(radii.extraSmall))",
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "inset 0px calc(var(--components-dateInput-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-dateInput-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-dateInput-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "inset 0px calc(var(--components-dateInput-indicatorWidth, 1px) * -1) 0px 0px var(--components-dateInput-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "inset 0px calc(var(--components-dateInput-indicatorWidth, 1px) * -1) 0px 0px var(--components-dateInput-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-dateInput-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-dateInput-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-dateInput-indicatorWidth, 1px) * -1) 0px 0px var(--components-dateInput-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "top": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.2) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.2) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            "base": "50%",
+          },
+          "transform": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "none",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "none",
+            "base": "translateY(-50%)",
+          },
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+      "outlined": {
+        "container": {
+          "borderRadius": "var(--components-dateInput-radius, token(radii.extraSmall))",
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-dateInput-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "var(--components-dateInput-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-dateInput-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-dateInput-errorColor, token(colors.error))",
+            "base": "var(--components-dateInput-outlineColor, token(colors.outline))",
+          },
+          "outlineOffset": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "calc(var(--components-dateInput-indicatorWidth, 1px) * -1)",
+            "&:is(:focus-within):is(:focus-within)": "calc(var(--components-dateInput-focusIndicatorWidth, 2px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "calc(var(--components-dateInput-indicatorWidth, 1px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "calc(var(--components-dateInput-focusIndicatorWidth, 2px) * -1)",
+            "base": "calc(var(--components-dateInput-indicatorWidth, 1px) * -1)",
+          },
+          "outlineStyle": "solid",
+          "outlineWidth": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-dateInput-indicatorWidth, 1px)",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-dateInput-focusIndicatorWidth, 2px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-dateInput-indicatorWidth, 1px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-dateInput-focusIndicatorWidth, 2px)",
+            "base": "var(--components-dateInput-indicatorWidth, 1px)",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "backgroundColor": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "var(--components-dateInput-labelBackground, token(colors.surfaceContainerHigh))",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-dateInput-labelBackground, token(colors.surfaceContainerHigh))",
+            "base": "transparent",
+          },
+          "marginInlineStart": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.1) * -1)",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.1) * -1)",
+            "base": "0px",
+          },
+          "paddingInlineEnd": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "paddingInlineStart": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "top": {
+            ".dateInput__container:is(:focus-within):is(:focus-within) &": "0px",
+            ".dateInput__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "0px",
+            "base": "50%",
+          },
+          "transform": "translateY(-50%)",
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dateInput-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+    },
+  },
+}
+`;
+
+exports[`datePicker > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-datePicker-actionsGap, token(spacing.2))",
+      "justifyContent": "end",
+      "paddingBlockEnd": "var(--components-datePicker-actionsPadding, token(spacing.3))",
+      "paddingBlockStart": "token(spacing.2)",
+      "paddingInlineEnd": "var(--components-datePicker-actionsPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-actionsPadding, token(spacing.3))",
+    },
+    "controls": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "justifyContent": "space-between",
+      "minHeight": "var(--components-datePicker-controlHeight, 48px)",
+      "paddingInlineEnd": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+    },
+    "divider": {
+      "backgroundColor": "var(--components-datePicker-dividerColor, token(colors.outlineVariant))",
+      "borderWidth": "0px",
+      "flexShrink": "0",
+      "height": "1px",
+      "marginBlockEnd": "0px",
+      "marginBlockStart": "0px",
+      "width": "100%",
+    },
+    "grid": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingInlineEnd": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+    },
+    "header": {
+      "alignItems": "end",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "justifyContent": "space-between",
+      "paddingBlockEnd": "token(spacing.3)",
+      "paddingBlockStart": "token(spacing.4)",
+      "paddingInlineEnd": "var(--components-datePicker-headerPaddingEnd, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-headerPaddingStart, token(spacing.6))",
+    },
+    "headline": {
+      "color": "var(--components-datePicker-headlineColor, token(colors.onSurfaceVariant))",
+      "flexBasis": "100%",
+      "paddingBlockEnd": "36px",
+      "textStyle": "labelLarge",
+    },
+    "modeToggle": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-datePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-datePicker-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "next": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-datePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-datePicker-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "prev": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-datePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-datePicker-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-datePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "&[data-state=closed]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+          "base": "token(durations.short3) token(easings.emphasizedAccelerate) forwards dialogSlideOut",
+        },
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.long2) token(easings.emphasizedDecelerate) dialogSlideIn",
+        },
+      },
+      "backgroundColor": "var(--components-datePicker-pickerContainer, token(colors.surfaceContainerHigh))",
+      "borderRadius": "var(--components-datePicker-pickerRadius, token(radii.extraLarge))",
+      "borderWidth": "0px",
+      "color": "var(--components-datePicker-selectedDateColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "maxWidth": "100%",
+      "shadowElevation": "level3",
+      "width": "var(--components-datePicker-width, 360px)",
+      "zIndex": "token(zIndex.dialog)",
+    },
+    "selectedDate": {
+      "color": "var(--components-datePicker-selectedDateColor, token(colors.onSurface))",
+      "flexGrow": "1",
+      "minWidth": "0px",
+      "textStyle": "headlineLarge",
+    },
+    "viewTrigger": {
+      "alignItems": "center",
+      "color": "var(--components-datePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexShrink": "0",
+      "gap": "token(spacing.2)",
+      "marginInlineEnd": "auto",
+      "textStyle": "labelLarge",
+    },
+    "week": {
+      "display": "flex",
+      "flexDirection": "row",
+    },
+    "weekday": {
+      "alignItems": "center",
+      "color": "var(--components-datePicker-weekdayColor, token(colors.onSurface))",
+      "display": "flex",
+      "height": "var(--components-datePicker-cellSize, 48px)",
+      "justifyContent": "center",
+      "textStyle": "bodyLarge",
+      "width": "var(--components-datePicker-cellSize, 48px)",
+    },
+    "weekdays": {
+      "display": "flex",
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "paddingInlineEnd": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+    },
+    "yearList": {
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "height": "var(--components-datePicker-yearListHeight, 288px)",
+      "justifyContent": "center",
+      "overflow": "auto",
+      "paddingInlineEnd": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-datePicker-calendarPadding, token(spacing.3))",
+    },
+  },
+  "className": "datePicker",
+  "compoundVariants": [],
+  "defaultVariants": {},
+  "jsx": [
+    "DatePicker",
+  ],
+  "slots": [
+    "root",
+    "header",
+    "headline",
+    "selectedDate",
+    "modeToggle",
+    "divider",
+    "controls",
+    "viewTrigger",
+    "prev",
+    "next",
+    "weekdays",
+    "weekday",
+    "grid",
+    "week",
+    "yearList",
+    "actions",
+  ],
+  "variants": {},
+}
+`;
+
+exports[`dockedDatePicker > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "actions": {
+      "display": "flex",
+      "flexDirection": "row",
+      "gap": "var(--components-dockedDatePicker-actionsGap, token(spacing.2))",
+      "justifyContent": "end",
+      "paddingBlockEnd": "var(--components-dockedDatePicker-actionsPadding, token(spacing.3))",
+      "paddingBlockStart": "token(spacing.2)",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-actionsPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-actionsPadding, token(spacing.3))",
+    },
+    "container": {
+      "display": "flex",
+      "height": "calc(var(--components-dockedDatePicker-height, 56px) + var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)))",
+      "position": "relative",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+    },
+    "content": {
+      "&[data-state=closed]": {
+        "animation": "token(durations.short2) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(durations.short3) token(easings.emphasizedDecelerate) overlayFadeIn",
+          "base": "token(durations.short3) token(easings.emphasizedDecelerate) overlayGrowIn",
+        },
+        "transformOrigin": "var(--transform-origin)",
+      },
+      "backgroundColor": "var(--components-dockedDatePicker-popupContainer, token(colors.surfaceContainerHigh))",
+      "borderRadius": "var(--components-dockedDatePicker-popupRadius, token(radii.large))",
+      "color": "var(--components-dockedDatePicker-selectedDateColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "column",
+      "marginBlockStart": "var(--components-dockedDatePicker-popupGap, 4px)",
+      "maxWidth": "100%",
+      "paddingBlockStart": "token(spacing.2)",
+      "shadowElevation": "level3",
+      "width": "var(--components-dockedDatePicker-width, 360px)",
+      "zIndex": "token(zIndex.menu)",
+    },
+    "controls": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexShrink": "0",
+      "justifyContent": "space-between",
+      "minHeight": "var(--components-dockedDatePicker-controlHeight, 48px)",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+    },
+    "grid": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+    },
+    "input": {
+      "&:is(:disabled, [aria-disabled=true])": {
+        "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+      },
+      "backgroundColor": "transparent",
+      "borderWidth": "0px",
+      "color": "var(--components-dockedDatePicker-inputColor, token(colors.onSurface))",
+      "flexShrink": "1",
+      "height": "100%",
+      "minWidth": "0px",
+      "outlineStyle": "none",
+      "paddingInlineEnd": "calc(var(--components-dockedDatePicker-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-dockedDatePicker-paddingInline, token(spacing.4))) * var(--components-dockedDatePicker-suffixed, 0)))",
+      "paddingInlineStart": "calc(var(--components-dockedDatePicker-paddingInline, token(spacing.4)) + calc(calc(0px - var(--components-dockedDatePicker-paddingInline, token(spacing.4))) * var(--components-dockedDatePicker-prefixed, 0)))",
+      "textStyle": "bodyLarge",
+      "width": "100%",
+    },
+    "label": {
+      "color": {
+        ".dockedDatePicker__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "var(--components-dockedDatePicker-focusColor, token(colors.primary))",
+        ".dockedDatePicker__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dockedDatePicker-errorColor, token(colors.error))",
+        "base": "var(--components-dockedDatePicker-labelColor, token(colors.onSurfaceVariant))",
+      },
+      "fontSize": {
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "token(fontSizes.bodySmall)",
+        ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(fontSizes.bodySmall)",
+        "base": "token(fontSizes.bodyLarge)",
+      },
+      "insetInlineStart": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+      "letterSpacing": {
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "token(letterSpacings.bodySmall)",
+        ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(letterSpacings.bodySmall)",
+        "base": "token(letterSpacings.bodyLarge)",
+      },
+      "lineHeight": {
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "token(lineHeights.bodySmall)",
+        ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(lineHeights.bodySmall)",
+        "base": "token(lineHeights.bodyLarge)",
+      },
+      "pointerEvents": "none",
+      "position": "absolute",
+      "textStyle": "bodyLarge",
+      "transition": {
+        "_motionReduce": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+        "base": "top token(durations.short3) token(easings.standard), inset-inline-start token(durations.short3) token(easings.standard), padding-inline-start token(durations.short3) token(easings.standard), padding-inline-end token(durations.short3) token(easings.standard), margin-inline-start token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard), transform token(durations.short3) token(easings.standard), font-size token(durations.short3) token(easings.standard), line-height token(durations.short3) token(easings.standard), letter-spacing token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+    },
+    "leadingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".dockedDatePicker__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dockedDatePicker-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dockedDatePicker-iconFill, 0)",
+      "height": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "insetInlineStart": "var(--components-dockedDatePicker-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "monthButton": {
+      "alignItems": "center",
+      "color": "var(--components-dockedDatePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexShrink": "0",
+      "gap": "token(spacing.2)",
+      "textStyle": "labelLarge",
+    },
+    "monthList": {
+      "alignItems": "center",
+      "display": "flex",
+      "flexDirection": "column",
+      "height": "var(--components-dockedDatePicker-yearListHeight, 288px)",
+      "overflow": "auto",
+    },
+    "next": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-dockedDatePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dockedDatePicker-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "prefixText": {
+      "alignItems": "center",
+      "color": {
+        ".dockedDatePicker__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dockedDatePicker-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "1",
+        ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-dockedDatePicker-affixGap, 2px)",
+      "paddingInlineStart": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "prev": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-dockedDatePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dockedDatePicker-iconFill, 0)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minHeight": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "minWidth": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "root": {
+      "display": "flex",
+      "flexDirection": "column",
+    },
+    "suffixText": {
+      "alignItems": "center",
+      "color": {
+        ".dockedDatePicker__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        "base": "var(--components-dockedDatePicker-affixColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexShrink": "0",
+      "opacity": {
+        ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "1",
+        ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "1",
+        "base": "0",
+      },
+      "paddingInlineEnd": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-affixGap, 2px)",
+      "pointerEvents": "none",
+      "textStyle": "bodyLarge",
+      "transition": "opacity token(durations.short3) token(easings.standard)",
+    },
+    "supportingText": {
+      "color": {
+        ".dockedDatePicker__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dockedDatePicker__root:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dockedDatePicker-errorColor, token(colors.error))",
+        "base": "var(--components-dockedDatePicker-supportingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "flex",
+      "flexDirection": "column",
+      "paddingBlockStart": "token(spacing.1)",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+      "textStyle": "bodySmall",
+    },
+    "trailingIcon": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "translateY(-50%) scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".dockedDatePicker__container:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".dockedDatePicker__container:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])) &": "var(--components-dockedDatePicker-errorColor, token(colors.error))",
+        "base": "var(--components-dockedDatePicker-iconColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-dockedDatePicker-iconFill, 0)",
+      "height": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "insetInlineEnd": "var(--components-dockedDatePicker-iconInset, token(spacing.3))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+      "position": "absolute",
+      "top": "50%",
+      "transform": "translateY(-50%)",
+      "width": "var(--components-dockedDatePicker-iconSize, token(sizes.iconMedium))",
+    },
+    "week": {
+      "display": "flex",
+      "flexDirection": "row",
+    },
+    "weekday": {
+      "alignItems": "center",
+      "color": "var(--components-dockedDatePicker-weekdayColor, token(colors.onSurface))",
+      "display": "flex",
+      "height": "var(--components-dockedDatePicker-cellSize, 48px)",
+      "justifyContent": "center",
+      "textStyle": "bodyLarge",
+      "width": "var(--components-dockedDatePicker-cellSize, 48px)",
+    },
+    "weekdays": {
+      "display": "flex",
+      "flexDirection": "row",
+      "justifyContent": "center",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+    },
+    "yearButton": {
+      "alignItems": "center",
+      "color": "var(--components-dockedDatePicker-controlColor, token(colors.onSurfaceVariant))",
+      "display": "flex",
+      "flexShrink": "0",
+      "gap": "token(spacing.2)",
+      "textStyle": "labelLarge",
+    },
+    "yearList": {
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "height": "var(--components-dockedDatePicker-yearListHeight, 288px)",
+      "justifyContent": "center",
+      "overflow": "auto",
+      "paddingInlineEnd": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+      "paddingInlineStart": "var(--components-dockedDatePicker-calendarPadding, token(spacing.3))",
+    },
+  },
+  "className": "dockedDatePicker",
+  "compoundVariants": [
+    {
+      "css": {
+        "label": {
+          "insetInlineStart": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-dockedDatePicker-paddingInline, token(spacing.4))",
+            "base": "var(--components-dockedDatePicker-textInsetWithIcon, 52px)",
+          },
+        },
+      },
+      "leadingIcon": true,
+      "variant": "outlined",
+    },
+  ],
+  "defaultVariants": {
+    "color": "primary",
+    "density": "inherit",
+    "leadingIcon": false,
+    "prefixText": false,
+    "suffixText": false,
+    "trailingIcon": true,
+    "variant": "outlined",
+  },
+  "jsx": [
+    "DockedDatePicker",
+  ],
+  "slots": [
+    "root",
+    "container",
+    "leadingIcon",
+    "prefixText",
+    "input",
+    "suffixText",
+    "label",
+    "trailingIcon",
+    "supportingText",
+    "content",
+    "controls",
+    "prev",
+    "monthButton",
+    "next",
+    "yearButton",
+    "weekdays",
+    "weekday",
+    "grid",
+    "week",
+    "monthList",
+    "yearList",
+    "actions",
+  ],
+  "variants": {
+    "color": {
+      "error": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.error)",
+        },
+      },
+      "info": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.info)",
+        },
+      },
+      "primary": {},
+      "secondary": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.secondary)",
+        },
+      },
+      "success": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.success)",
+        },
+      },
+      "tertiary": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.tertiary)",
+        },
+      },
+      "warning": {
+        "root": {
+          "--components-dockedDatePicker-focusColor": "token(colors.warning)",
+        },
+      },
+    },
+    "density": {
+      "-1": {
+        "root": {
+          "--components-dockedDatePicker-densityOffset": "calc(token(spacing.1) * -1)",
+        },
+      },
+      "-2": {
+        "root": {
+          "--components-dockedDatePicker-densityOffset": "calc(token(spacing.1) * -2)",
+        },
+      },
+      "-3": {
+        "root": {
+          "--components-dockedDatePicker-densityOffset": "calc(token(spacing.1) * -3)",
+        },
+      },
+      "0": {
+        "root": {
+          "--components-dockedDatePicker-densityOffset": "0px",
+        },
+      },
+      "inherit": {
+        "root": {
+          "--components-dockedDatePicker-densityOffset": "token(sizes.densityOffset)",
+        },
+      },
+    },
+    "leadingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineStart": "calc(var(--components-dockedDatePicker-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-dockedDatePicker-textInsetWithIcon, 52px)) * var(--components-dockedDatePicker-prefixed, 0)))",
+        },
+        "label": {
+          "insetInlineStart": "var(--components-dockedDatePicker-textInsetWithIcon, 52px)",
+        },
+        "prefixText": {
+          "paddingInlineStart": "var(--components-dockedDatePicker-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "prefixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-dockedDatePicker-prefixed": "1",
+        },
+      },
+    },
+    "suffixText": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-dockedDatePicker-suffixed": "1",
+        },
+      },
+    },
+    "trailingIcon": {
+      "false": {},
+      "true": {
+        "input": {
+          "paddingInlineEnd": "calc(var(--components-dockedDatePicker-textInsetWithIcon, 52px) + calc(calc(0px - var(--components-dockedDatePicker-textInsetWithIcon, 52px)) * var(--components-dockedDatePicker-suffixed, 0)))",
+        },
+        "suffixText": {
+          "paddingInlineEnd": "var(--components-dockedDatePicker-textInsetWithIcon, 52px)",
+        },
+      },
+    },
+    "variant": {
+      "filled": {
+        "container": {
+          "backgroundColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "base": "var(--components-dockedDatePicker-container, token(colors.surfaceContainerHighest))",
+          },
+          "borderStartEndRadius": "var(--components-dockedDatePicker-radius, token(radii.extraSmall))",
+          "borderStartStartRadius": "var(--components-dockedDatePicker-radius, token(radii.extraSmall))",
+          "boxShadow": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "inset 0px calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1) 0px 0px color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+            "&:is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-dockedDatePicker-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-dockedDatePicker-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "inset 0px calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1) 0px 0px var(--components-dockedDatePicker-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "inset 0px calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1) 0px 0px var(--components-dockedDatePicker-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "inset 0px calc(var(--components-dockedDatePicker-focusIndicatorWidth, 2px) * -1) 0px 0px var(--components-dockedDatePicker-errorColor, token(colors.error))",
+            "base": "inset 0px calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1) 0px 0px var(--components-dockedDatePicker-indicatorColor, token(colors.onSurfaceVariant))",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "top": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.2) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.2) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+            "base": "50%",
+          },
+          "transform": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "none",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "none",
+            "base": "translateY(-50%)",
+          },
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.2) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.6) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+      "outlined": {
+        "container": {
+          "borderRadius": "var(--components-dockedDatePicker-radius, token(radii.extraSmall))",
+          "outlineColor": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-dockedDatePicker-focusColor, token(colors.primary))",
+            "&:is(:hover, [data-pf-hover])": "var(--components-dockedDatePicker-hoverColor, token(colors.onSurface))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-dockedDatePicker-errorColor, token(colors.error))",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-dockedDatePicker-errorColor, token(colors.error))",
+            "base": "var(--components-dockedDatePicker-outlineColor, token(colors.outline))",
+          },
+          "outlineOffset": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1)",
+            "&:is(:focus-within):is(:focus-within)": "calc(var(--components-dockedDatePicker-focusIndicatorWidth, 2px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "calc(var(--components-dockedDatePicker-focusIndicatorWidth, 2px) * -1)",
+            "base": "calc(var(--components-dockedDatePicker-indicatorWidth, 1px) * -1)",
+          },
+          "outlineStyle": "solid",
+          "outlineWidth": {
+            "&:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true])": "var(--components-dockedDatePicker-indicatorWidth, 1px)",
+            "&:is(:focus-within):is(:focus-within)": "var(--components-dockedDatePicker-focusIndicatorWidth, 2px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true]))": "var(--components-dockedDatePicker-indicatorWidth, 1px)",
+            "&:is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is([aria-invalid=true], :has([aria-invalid=true])):is(:focus-within):is(:focus-within)": "var(--components-dockedDatePicker-focusIndicatorWidth, 2px)",
+            "base": "var(--components-dockedDatePicker-indicatorWidth, 1px)",
+          },
+        },
+        "input": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "label": {
+          "backgroundColor": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "var(--components-dockedDatePicker-labelBackground, token(colors.surface))",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "var(--components-dockedDatePicker-labelBackground, token(colors.surface))",
+            "base": "transparent",
+          },
+          "marginInlineStart": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "calc(token(spacing.1) * -1)",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "calc(token(spacing.1) * -1)",
+            "base": "0px",
+          },
+          "paddingInlineEnd": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "paddingInlineStart": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "token(spacing.1)",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "token(spacing.1)",
+            "base": "0px",
+          },
+          "top": {
+            ".dockedDatePicker__container:is(:focus-within):is(:focus-within) &": "0px",
+            ".dockedDatePicker__container:is(:is(input, textarea):not(:placeholder-shown), :has(:is(input, textarea):not(:placeholder-shown)), [data-pf-filled]) &": "0px",
+            "base": "50%",
+          },
+          "transform": "translateY(-50%)",
+        },
+        "prefixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+        "suffixText": {
+          "paddingBlockEnd": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+          "paddingBlockStart": "calc(token(spacing.4) + calc(var(--components-dockedDatePicker-densityOffset, token(sizes.densityOffset)) * 0.5))",
+        },
+      },
+    },
+  },
+}
+`;
