@@ -40,7 +40,7 @@ import {
     stateFromTokens,
     typographyFromTokens,
 } from "./provider";
-import { colorRole, zIndex } from "./refs";
+import { colorRole, spring, zIndex } from "./refs";
 import { ContractError, resolveTheme } from "./resolve";
 
 describe("resolveTheme", () => {
@@ -54,7 +54,15 @@ describe("resolveTheme", () => {
         expect(config.tokens.sizes?.focusIndicatorThickness).toEqual(px(3));
         expect(config.durations?.medium2).toEqual(numeric(200, "ms"));
         expect(config.easings?.emphasized).toBeDefined();
+        expect(config.springs?.spatialFast).toMatchObject({ type: "spring" });
         expect(config.fonts?.brand).toEqual(fontFamily(["Fraunces"], "serif"));
+    });
+
+    it("refers to a spring by its role", () => {
+        expect(spring("spatialFast")).toEqual({
+            type: "alias",
+            path: ["springs", "spatialFast"],
+        });
     });
 
     it("lowers each text style value to a token the style reads", () => {
@@ -232,6 +240,18 @@ describe("resolveTheme", () => {
                 }),
             },
             'gives duration "short1" a numeric value, not a duration in ms or s',
+        );
+        bad(
+            {
+                motion: motionFromTokens({
+                    ...theme.motion.generate({} as never),
+                    springs: {
+                        ...theme.motion.generate({} as never).springs,
+                        spatialFast: px(50) as never,
+                    },
+                }),
+            },
+            'gives spring "spatialFast" a numeric value, not a spring',
         );
         bad(
             {

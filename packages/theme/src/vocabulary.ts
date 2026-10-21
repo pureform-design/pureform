@@ -9,6 +9,7 @@ import type {
     StyleMap,
     ValueNode,
     EasingNode,
+    SpringNode,
 } from "@pureform/core/ast";
 import type { StaticUtilityDef } from "@pureform/core/types";
 
@@ -16,6 +17,7 @@ import type { ColorRole } from "./contracts/color";
 import type {
     DurationRole,
     EasingRole,
+    SpringRole,
     ElevationLevel,
     FocusIndicatorRole,
     ShapeRole,
@@ -37,7 +39,7 @@ type ElevationUtility = Omit<StaticUtilityDef, "values"> & {
 };
 
 /** The names in a theme's config, by tier: its color roles, radii, spacing, sizes, opacities,
- *  durations, easings, stacking layers, fonts, text styles (and each style's values), and the elevation
+ *  durations, easings, springs, stacking layers, fonts, text styles (and each style's values), and the elevation
  *  utilities with their levels. */
 export interface ThemeVocabulary<
     G extends string = string,
@@ -65,6 +67,7 @@ export interface ThemeVocabulary<
     textStyles: Tokens<BaseTextStyle | TStyle, StyleMap>;
     durations: Tokens<DurationRole, NumericScalarNode>;
     easings: Tokens<EasingRole, EasingNode>;
+    springs: Tokens<SpringRole, SpringNode>;
     zIndices: Tokens<StackingRole, NumericScalarNode>;
     utilities: {
         [ELEVATION_UTILITY]: ElevationUtility;

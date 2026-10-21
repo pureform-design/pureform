@@ -20,6 +20,7 @@ describe("a theme's config with typed()", () => {
         pf.alias("tokens", "spacing", "4");
         pf.alias("durations", "medium2");
         pf.alias("easings", "emphasized");
+        pf.alias("springs", "spatialFast");
         pf.alias("textStyles", "labelLarge");
         pf.apply({ shadowElevation: "level3", filterElevation: "level1" });
     });
