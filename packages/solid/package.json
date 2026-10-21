@@ -478,6 +478,17 @@
                 "default": "./dist/scrim.jsx"
             }
         },
+        "./table": {
+            "types": "./dist/table/index.d.ts",
+            "solid": {
+                "development": "./src/table/index.ts",
+                "default": "./dist/table.jsx"
+            },
+            "import": {
+                "development": "./src/table/index.ts",
+                "default": "./dist/table.jsx"
+            }
+        },
         "./time-picker": {
             "types": "./dist/time-picker/index.d.ts",
             "solid": {
