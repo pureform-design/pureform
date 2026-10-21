@@ -25,6 +25,7 @@ import { IconButton } from "./icon-button";
 import { LinearProgress } from "./linear-progress";
 import { List } from "./list";
 import { ListItem } from "./list-item";
+import { LoadingIndicator } from "./loading-indicator";
 import { Media } from "./media";
 import { Menu } from "./menu";
 import { NavigationBar } from "./navigation-bar";
@@ -78,6 +79,7 @@ const COMPONENTS = [
     "listItem",
     "linearProgress",
     "circularProgress",
+    "loadingIndicator",
     "scrim",
     "supportingText",
     "media",
@@ -156,6 +158,7 @@ describe("every component", () => {
                 <List items={[{ headline: "Drafts" }]} />
                 <LinearProgress value={40} />
                 <CircularProgress />
+                <LoadingIndicator aria-label="Loading" variant="contained" />
                 <Scrim />
                 <SupportingText>Help</SupportingText>
                 <Media source={{ uri: "data:," }} />
@@ -218,6 +221,7 @@ describe("every component", () => {
             "pf-list-item",
             "pf-linear-progress-indicator",
             "pf-circular-progress-end-arc",
+            "pf-loading-indicator-indicator",
             "pf-scrim-root",
             "pf-supporting-text-root",
             "pf-media-root",

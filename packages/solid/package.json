@@ -390,6 +390,17 @@
                 "default": "./dist/circular-progress.jsx"
             }
         },
+        "./loading-indicator": {
+            "types": "./dist/loading-indicator/index.d.ts",
+            "solid": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.jsx"
+            },
+            "import": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.jsx"
+            }
+        },
         "./icon": {
             "types": "./dist/icon/index.d.ts",
             "solid": {

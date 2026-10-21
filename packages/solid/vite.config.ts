@@ -54,6 +54,7 @@ export default createConfig({
                     badge: "src/badge/index.ts",
                     card: "src/card/index.ts",
                     "circular-progress": "src/circular-progress/index.ts",
+                    "loading-indicator": "src/loading-indicator/index.ts",
                     icon: "src/icon/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",
                     media: "src/media/index.ts",

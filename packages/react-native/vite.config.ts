@@ -20,6 +20,7 @@ export default createConfig({
                     checkbox: "src/checkbox/index.ts",
                     chip: "src/chip/index.ts",
                     "circular-progress": "src/circular-progress/index.ts",
+                    "loading-indicator": "src/loading-indicator/index.ts",
                     dialog: "src/dialog/index.ts",
                     "fullscreen-dialog": "src/fullscreen-dialog/index.ts",
                     "bottom-sheet": "src/bottom-sheet/index.ts",
