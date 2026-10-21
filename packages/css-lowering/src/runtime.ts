@@ -11,6 +11,7 @@ import type { CoreConfig, Token } from "@pureform/core/types";
 import { compileNodeToCSS } from "./compile-node";
 import type { LowerCtx, VarPrefix } from "./context";
 import { aliasTarget, tokenVarName, varTokenRef } from "./css";
+import { springTokenEntries } from "./spring";
 
 export interface ThemeVarsOptions {
     /** The token var prefix, if the adapter sets one (Panda's own `prefix`). Default none. */
@@ -85,6 +86,9 @@ export const themeVars = (
         for (const [name, entry] of Object.entries(config[tier] ?? {})) {
             add([tier, name], entry as Token<ValueNode>);
         }
+    }
+    for (const [path, node] of springTokenEntries(config.springs)) {
+        add(path, node);
     }
     return vars;
 };
