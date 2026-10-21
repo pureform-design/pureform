@@ -13,11 +13,12 @@
 //   </nav>
 //
 // `expanded` widens it, M3 Expressive's replacement for the navigation drawer: each label sits
-// beside its icon, inside the pill. `modal` draws it as a surface over the page; the bindings
+// beside its icon, inside the pill, and a `sectionLabel` heads a run of destinations. A
+// collapsed rail hides its section labels. `modal` draws it as a surface over the page; the bindings
 // put it in a dialog over a scrim.
 
 import { typed } from "@pureform/core";
-import { center, column, flex, pct, px, start } from "@pureform/core/ast";
+import { center, column, flex, none, pct, px, start } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 
 import {
@@ -60,13 +61,21 @@ const { tokens, ref } = navTokens("navigationRail", {
     // The header's controls, and the space between it and the destinations.
     headerGap: spacing("2"),
     headerSpacing: spacing("4"),
+    // An expanded rail's section label: its color, and its height (M3 Expressive's 56, as a
+    // destination's), its text at the label's start.
+    sectionLabelColor: sys("onSurfaceVariant"),
+    sectionLabelHeight: px(56),
+    sectionLabelPaddingInline: spacing("4"),
 });
 
 const parts = navParts(ref, ref("indicatorWidth"));
 const horizontal = navHorizontalParts(ref, ref("horizontalIndicatorHeight"));
 
-const SLOTS = [...NAV_SLOTS, "header"] as const;
-const STRUCTURE = { ...NAV_STRUCTURE, root: ["header", "item"] } as {
+const SLOTS = [...NAV_SLOTS, "header", "sectionLabel"] as const;
+const STRUCTURE = {
+    ...NAV_STRUCTURE,
+    root: ["header", "sectionLabel", "item"],
+} as {
     [K in "root" | "item" | "indicator"]: (typeof SLOTS)[number][];
 };
 
@@ -84,7 +93,7 @@ export const createNavigationRail = <const G extends string = ColorGroup>(
             name: "navigationRail",
             $meta: {
                 description:
-                    'Material navigation rail. Mark the current destination with aria-current="page".',
+                    'Material navigation rail. Mark the current destination with aria-current="page". An expanded rail shows its section labels; a collapsed one hides them.',
             },
             tokens,
             slots: [...SLOTS],
@@ -125,6 +134,7 @@ export const createNavigationRail = <const G extends string = ColorGroup>(
                     activeIndicator: parts.activeIndicator,
                     icon: parts.icon,
                     label: parts.label,
+                    sectionLabel: { display: none },
                 },
                 variants: {
                     color: colorVariant(groups, (g) => ({
@@ -145,6 +155,19 @@ export const createNavigationRail = <const G extends string = ColorGroup>(
                                 paddingInlineEnd: spacing("5"),
                             },
                             header: { alignItems: start },
+                            sectionLabel: {
+                                display: flex,
+                                alignItems: center,
+                                minHeight: ref("sectionLabelHeight"),
+                                paddingInlineStart: ref(
+                                    "sectionLabelPaddingInline",
+                                ),
+                                paddingInlineEnd: ref(
+                                    "sectionLabelPaddingInline",
+                                ),
+                                textStyle: textStyle("titleSmall"),
+                                color: ref("sectionLabelColor"),
+                            },
                             item: horizontal.item,
                             indicator: horizontal.indicator,
                             icon: horizontal.icon,

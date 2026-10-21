@@ -14,13 +14,35 @@
 //
 // Set `interactive` when the item is clickable (a button or link, or `tabindex`); it then takes
 // a state layer and the focus ring. Mark it selected with `aria-selected` or `aria-current`.
+//
+// An expandable item is a button marked `aria-expanded`, its expand `indicator` in the trailing
+// place (turned over while expanded, as the accordion's), and the nested `region` it shows after
+// the row, beside it rather than inside it:
+//
+//   <li>
+//     <button class={root} aria-expanded="true" aria-controls="r">
+//       <div class={content}>…</div>
+//       <span class={indicator}>⌄</span>
+//     </button>
+//     <div class={region} id="r" role="region">…nested list items…</div>
+//   </li>
 
 import { typed } from "@pureform/core";
-import { column, flex, hidden, pct, px, start, add } from "@pureform/core/ast";
+import {
+    add,
+    column,
+    flex,
+    hidden,
+    pct,
+    px,
+    slot,
+    start,
+} from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
+import { expandIndicator } from "./accordion";
 import { rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
@@ -54,6 +76,8 @@ const { tokens, ref } = rowTokens("listItem", {
     thumbnailSize: px(56),
     videoWidth: px(114),
     videoHeight: px(64),
+    // An expandable item's nested region: how far its rows sit in from the item's.
+    regionIndent: spacing("4"),
     ...DENSITY_TOKEN,
 });
 
@@ -102,7 +126,7 @@ export const createListItem = <
             name: "listItem",
             $meta: {
                 description:
-                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current.",
+                    "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it.",
             },
             tokens,
             slots: [
@@ -114,9 +138,18 @@ export const createListItem = <
                 "supportingText",
                 "trailing",
                 "trailingText",
+                "indicator",
+                "region",
             ],
+            // The region is the row's sibling, not its child: the row is a button.
             structure: {
-                root: ["leading", "content", "trailing", "trailingText"],
+                root: [
+                    "leading",
+                    "content",
+                    "trailing",
+                    "trailingText",
+                    "indicator",
+                ],
                 content: ["overline", "headline", "supportingText"],
             },
             // When interactive: a link or a button.
@@ -161,6 +194,12 @@ export const createListItem = <
                     supportingText: parts.supportingText,
                     trailing: parts.trailing,
                     trailingText: parts.trailingText("labelSmall"),
+                    indicator: expandIndicator(
+                        parts.trailing,
+                        slot("root", "expanded"),
+                    ),
+                    // Its display is left to the `hidden` attribute that collapses it.
+                    region: { paddingInlineStart: ref("regionIndent") },
                 },
                 variants: {
                     lines: {

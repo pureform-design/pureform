@@ -131,7 +131,11 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("supportingColor"), SURFACE, TEXT_CONTRAST),
         pair(token("trailingColor"), SURFACE, TEXT_CONTRAST),
         pair(token("iconColor"), SURFACE, UI_CONTRAST),
-        pair(token("selectedContent"), token("selectedContainer"), TEXT_CONTRAST),
+        pair(
+            token("selectedContent"),
+            token("selectedContainer"),
+            TEXT_CONTRAST,
+        ),
     ],
     stepper: [
         pair(token("content"), token("container"), TEXT_CONTRAST),
@@ -223,7 +227,10 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("trailingColor"), token("container"), UI_CONTRAST),
     ],
     navigationBar: NAV_PAIRS,
-    navigationRail: NAV_PAIRS,
+    navigationRail: [
+        ...NAV_PAIRS,
+        pair(token("sectionLabelColor"), token("container"), TEXT_CONTRAST),
+    ],
     snackbar: [
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("actionColor"), token("container"), TEXT_CONTRAST),

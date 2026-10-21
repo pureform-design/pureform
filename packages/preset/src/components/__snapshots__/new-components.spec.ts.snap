@@ -685,6 +685,35 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "headline": {
       "textStyle": "bodyLarge",
     },
+    "indicator": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": {
+        ".listItem__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+        ".listItem__root:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false])) &": "var(--components-listItem-selectedContent, token(colors.onSecondaryContainer))",
+        "base": "var(--components-listItem-trailingColor, token(colors.onSurfaceVariant))",
+      },
+      "display": "inline-flex",
+      "fontSize": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-listItem-iconFill, 0)",
+      "height": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "minWidth": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+      "transform": {
+        ".listItem__root:is([aria-expanded=true], :has([aria-expanded=true])) &": "rotate(180deg)",
+        "base": "rotate(0deg)",
+      },
+      "transition": {
+        "_motionReduce": "color token(durations.short3) token(easings.standard)",
+        "base": "transform token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard)",
+      },
+      "width": "var(--components-listItem-iconSize, token(sizes.iconMedium))",
+    },
     "leading": {
       "_rtl": {
         "&[data-pf-mirror]": {
@@ -713,6 +742,9 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
         "base": "var(--components-listItem-supportingColor, token(colors.onSurfaceVariant))",
       },
       "textStyle": "labelSmall",
+    },
+    "region": {
+      "paddingInlineStart": "var(--components-listItem-regionIndent, token(spacing.4))",
     },
     "root": {
       "&:is(:disabled, [aria-disabled=true])": {
@@ -801,6 +833,8 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "supportingText",
     "trailing",
     "trailingText",
+    "indicator",
+    "region",
   ],
   "variants": {
     "color": {
@@ -2112,6 +2146,9 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "paddingBlockStart": "token(spacing.3)",
       "width": "var(--components-navigationRail-width, 96px)",
     },
+    "sectionLabel": {
+      "display": "none",
+    },
   },
   "className": "navigationRail",
   "compoundVariants": [],
@@ -2131,6 +2168,7 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
     "icon",
     "label",
     "header",
+    "sectionLabel",
   ],
   "variants": {
     "color": {
@@ -2311,6 +2349,15 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
           "paddingInlineEnd": "token(spacing.5)",
           "paddingInlineStart": "token(spacing.5)",
           "width": "var(--components-navigationRail-expandedWidth, 220px)",
+        },
+        "sectionLabel": {
+          "alignItems": "center",
+          "color": "var(--components-navigationRail-sectionLabelColor, token(colors.onSurfaceVariant))",
+          "display": "flex",
+          "minHeight": "var(--components-navigationRail-sectionLabelHeight, 56px)",
+          "paddingInlineEnd": "var(--components-navigationRail-sectionLabelPaddingInline, token(spacing.4))",
+          "paddingInlineStart": "var(--components-navigationRail-sectionLabelPaddingInline, token(spacing.4))",
+          "textStyle": "titleSmall",
         },
       },
     },
