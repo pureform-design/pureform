@@ -216,6 +216,8 @@ it("a paginator is a 56px row ending at the inline end, holding a compact select
     expect(compact!.getBoundingClientRect().right).toBeGreaterThan(
         rangeBox.right,
     );
+});
+
 it("a grid list shares the row between its columns around the gutter, at the aspect", () => {
     const [medium, large, none] = [
         ...section("grid-lists").querySelectorAll<HTMLElement>(
