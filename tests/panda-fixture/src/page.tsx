@@ -3,6 +3,8 @@
 
 import {
     appBar,
+    timeInput,
+    timePicker,
     avatar,
     badge,
     media,
@@ -158,6 +160,214 @@ function AppBarExampleView(props: { readonly example: AppBarExample }) {
             </div>
             {last ? content : null}
         </header>
+    );
+}
+
+// A time picker drawn from the recipe, its dial placed as the bindings place it: twelve hours on
+// a ring 39% out (a 24-hour dial has twelve more 25% out), the handle on the selected one.
+type TimePickerExample = {
+    readonly mode?: "dial" | "scroll";
+    readonly color?: "standard" | "vibrant";
+    readonly cycle: 12 | 24;
+    readonly hour: number;
+    readonly theme?: string;
+};
+
+const TIME_PICKERS: readonly TimePickerExample[] = [
+    { cycle: 12, hour: 9 },
+    { cycle: 24, hour: 15 },
+    // Vibrant, under the sharp shape theme: its dial stays round.
+    { cycle: 12, hour: 21, color: "vibrant", theme: "sharp" },
+    { cycle: 24, hour: 10, mode: "scroll" },
+];
+
+const ringPoint = (turn: number, radius: number) => ({
+    left: `${50 + radius * Math.sin(turn * 2 * Math.PI)}%`,
+    top: `${50 - radius * Math.cos(turn * 2 * Math.PI)}%`,
+});
+
+const pad = (value: number) => String(value).padStart(2, "0");
+
+function TimePickerExampleView(props: { readonly example: TimePickerExample }) {
+    const e = props.example;
+    const t = timePicker({ mode: e.mode, color: e.color });
+    const shown = e.cycle === 12 ? e.hour % 12 || 12 : e.hour;
+    const inner = e.cycle === 24 && e.hour >= 12;
+    const radius = inner ? 25 : 39;
+    const turn = (e.hour % 12) / 12;
+    const labels = Array.from({ length: e.cycle }, (_, index) => {
+        const ring = index >= 12;
+        const value = e.cycle === 12 ? index || 12 : index;
+        return {
+            text: e.cycle === 12 ? String(value) : pad(value),
+            selected: value === (e.cycle === 12 ? shown : e.hour),
+            ...ringPoint((index % 12) / 12, ring ? 25 : 39),
+        };
+    });
+    const scrollItems = (values: readonly string[]) =>
+        values.map((value, index) => (
+            <span
+                class={t.scrollItem}
+                aria-hidden="true"
+                aria-selected={index === 1 ? "true" : "false"}
+            >
+                {value}
+            </span>
+        ));
+    return (
+        <div
+            class={t.root}
+            role="group"
+            aria-label="Select time"
+            data-panda-theme={e.theme}
+        >
+            <div class={t.headline}>Select time</div>
+            <div class={t.body}>
+                {e.mode === "scroll" ? (
+                    <>
+                        <div
+                            class={t.hourSelector}
+                            role="spinbutton"
+                            aria-label="Hour"
+                        >
+                            {scrollItems([
+                                pad(e.hour - 1),
+                                pad(e.hour),
+                                pad(e.hour + 1),
+                            ])}
+                        </div>
+                        <span class={t.separator}>:</span>
+                        <div
+                            class={t.minuteSelector}
+                            role="spinbutton"
+                            aria-label="Minute"
+                        >
+                            {scrollItems(["29", "30", "31"])}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        <button
+                            class={t.hourSelector}
+                            type="button"
+                            aria-pressed="true"
+                        >
+                            {e.cycle === 12 ? String(shown) : pad(shown)}
+                        </button>
+                        <span class={t.separator}>:</span>
+                        <button
+                            class={t.minuteSelector}
+                            type="button"
+                            aria-pressed="false"
+                        >
+                            30
+                        </button>
+                    </>
+                )}
+                {e.cycle === 12 ? (
+                    <div
+                        class={t.periodSelector}
+                        role="group"
+                        aria-label="Period"
+                    >
+                        <button
+                            class={t.period}
+                            type="button"
+                            aria-pressed={e.hour < 12 ? "true" : "false"}
+                        >
+                            AM
+                        </button>
+                        <button
+                            class={t.period}
+                            type="button"
+                            aria-pressed={e.hour >= 12 ? "true" : "false"}
+                        >
+                            PM
+                        </button>
+                    </div>
+                ) : null}
+            </div>
+            {e.mode === "scroll" ? null : (
+                <div
+                    class={t.dial}
+                    role="slider"
+                    aria-label="Hour"
+                    aria-valuenow={shown}
+                >
+                    <span
+                        class={t.dialTrack}
+                        style={{
+                            left: "50%",
+                            bottom: "50%",
+                            height: `${radius}%`,
+                            "transform-origin": "bottom",
+                            transform: `rotate(${turn * 360}deg)`,
+                        }}
+                    />
+                    <span
+                        class={t.dialHandle}
+                        style={ringPoint(turn, radius)}
+                    />
+                    <span
+                        class={t.dialCenter}
+                        style={{ left: "50%", top: "50%" }}
+                    />
+                    <For each={labels}>
+                        {(label) => (
+                            <span
+                                class={t.dialLabel}
+                                aria-hidden="true"
+                                aria-selected={
+                                    label.selected ? "true" : "false"
+                                }
+                                style={{ left: label.left, top: label.top }}
+                            >
+                                {label.text}
+                            </span>
+                        )}
+                    </For>
+                </div>
+            )}
+            <div class={t.actions}>
+                <button class={button({ variant: "text" }).root} type="button">
+                    Cancel
+                </button>
+                <button class={button({ variant: "text" }).root} type="button">
+                    OK
+                </button>
+            </div>
+        </div>
+    );
+}
+
+// The time input drawn from the recipe: two fields, the hour focused.
+function TimeInputExampleView() {
+    const t = timeInput({});
+    return (
+        <div class={t.root} role="group" aria-label="Enter time">
+            <div class={t.headline}>Enter time</div>
+            <div class={t.body}>
+                <label class={t.hourField}>
+                    <input class={t.input} value="9" aria-label="Hour" />
+                    <span class={t.fieldLabel}>Hour</span>
+                </label>
+                <span class={t.separator} style={{ height: "72px" }}>
+                    :
+                </span>
+                <label class={t.minuteField}>
+                    <input class={t.input} value="30" aria-label="Minute" />
+                    <span class={t.fieldLabel}>Minute</span>
+                </label>
+                <div class={t.periodSelector} role="group" aria-label="Period">
+                    <button class={t.period} type="button" aria-pressed="true">
+                        AM
+                    </button>
+                    <button class={t.period} type="button" aria-pressed="false">
+                        PM
+                    </button>
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -3038,6 +3248,15 @@ export function Page() {
                 </For>
             </section>
             <DatePickerSection />
+            <section
+                data-section="time-pickers"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={TIME_PICKERS}>
+                    {(example) => <TimePickerExampleView example={example} />}
+                </For>
+                <TimeInputExampleView />
+            </section>
         </main>
     );
 }

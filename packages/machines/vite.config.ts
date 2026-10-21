@@ -25,6 +25,7 @@ export default createConfig({
                     snackbar: "src/snackbar/index.ts",
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",
+                    "time-picker": "src/time-picker/index.ts",
                     slider: "src/slider/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     toast: "src/toast/index.ts",

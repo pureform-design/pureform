@@ -106,6 +106,8 @@ import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { timeInput } from "./components/time-input";
+import { timePicker } from "./components/time-picker";
 import { toast } from "./components/toast";
 import { toolbar } from "./components/toolbar";
 import { tooltip } from "./components/tooltip";
@@ -334,6 +336,8 @@ const defaultComponents = <G extends string>(
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
         appBar,
+        timePicker,
+        timeInput,
         dialog,
         fullscreenDialog,
         bottomSheet,

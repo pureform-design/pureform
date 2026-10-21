@@ -38,6 +38,21 @@ const ALLOWED: { where: string; property: string; reason: string }[] = [
         property: "left",
         reason: "the ripple is placed from pointer coordinates, which are physical",
     },
+    {
+        where: "timePicker.dialHandle",
+        property: "transform",
+        reason: "a clock dial doesn't mirror: its handle is placed by its centre at physical coordinates",
+    },
+    {
+        where: "timePicker.dialCenter",
+        property: "transform",
+        reason: "a clock dial doesn't mirror: its centre dot is placed by its centre at physical coordinates",
+    },
+    {
+        where: "timePicker.dialLabel",
+        property: "transform",
+        reason: "a clock dial doesn't mirror: its labels is placed by its centre at physical coordinates",
+    },
 ];
 
 const PHYSICAL_PROPERTY = /^(left|right)$|Left|Right/;

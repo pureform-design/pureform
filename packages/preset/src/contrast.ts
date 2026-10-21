@@ -129,6 +129,33 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
         pair(token("content"), token("container"), TEXT_CONTRAST),
     ],
+    timePicker: [
+        pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
+        pair(token("fieldContent"), token("fieldContainer"), TEXT_CONTRAST),
+        pair(
+            token("fieldSelectedContent"),
+            token("fieldSelectedContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(token("periodContent"), token("container"), TEXT_CONTRAST),
+        pair(
+            token("periodSelectedContent"),
+            token("periodSelectedContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(token("dialContent"), token("dialContainer"), TEXT_CONTRAST),
+        pair(
+            token("dialSelectedContent"),
+            token("dialHandleColor"),
+            TEXT_CONTRAST,
+        ),
+    ],
+    timeInput: [
+        pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
+        pair(token("fieldContent"), token("fieldContainer"), TEXT_CONTRAST),
+        pair(token("fieldLabelColor"), token("container"), TEXT_CONTRAST),
+        pair(token("periodContent"), token("container"), TEXT_CONTRAST),
+    ],
     appBar: [
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
         pair(token("subtitleColor"), token("container"), TEXT_CONTRAST),
