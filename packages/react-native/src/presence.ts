@@ -55,12 +55,19 @@ export const OVERLAY_KEYFRAMES = {
 type KeyframesName = keyof typeof OVERLAY_KEYFRAMES;
 
 /** One way in or out, as the preset names it: the keyframes, and the theme's duration and
- *  easing roles for them. */
-export interface OverlayMotionStep {
-    readonly keyframes: KeyframesName;
-    readonly duration: string;
-    readonly easing: string;
-}
+ *  easing roles for them, or its spring role. */
+export type OverlayMotionStep = { readonly keyframes: KeyframesName } & (
+    | {
+          readonly duration: string;
+          readonly easing: string;
+          readonly spring?: never;
+      }
+    | {
+          readonly spring: string;
+          readonly duration?: never;
+          readonly easing?: never;
+      }
+);
 
 /** The preset's overlay motions (`POPUP_MOTION`, `DIALOG_MOTION`, `SCRIM_MOTION`). */
 export const OVERLAY_MOTIONS = {
@@ -154,16 +161,45 @@ export const overlayMotion = (
     timeScale = 1,
 ): PresenceMotion => {
     const step = (phase: PresencePhase): PresenceStep => {
-        const given: OverlayMotionStep = OVERLAY_MOTIONS[name][phase];
+        const given = OVERLAY_MOTIONS[name][phase] as OverlayMotionStep;
         const keyframes =
             reducedMotion && MOVES.has(given.keyframes)
                 ? FADES[phase]
                 : given.keyframes;
         const frames = OVERLAY_KEYFRAMES[keyframes];
-        const easing = tokens[`easings.${given.easing}`];
-        return {
+        const ends = {
             from: frameOf(frames.from, tokens),
             to: frameOf(frames.to, tokens),
+        };
+        const role = given.spring;
+        if (role !== undefined) {
+            // The theme holds a spring as its sampled duration and curve, and its physics; a
+            // spring `timeScale` times as slow has its stiffness over timeScale², its damping
+            // over timeScale.
+            const field = (name: string) => tokens[`springs.${role}.${name}`];
+            const easing = field("easing");
+            return {
+                ...ends,
+                duration: numberOf(field("duration"), 0) * timeScale,
+                easing: typeof easing === "string" ? easing : "linear",
+                ...(timeScale > 0
+                    ? {
+                          spring: {
+                              type: "spring" as const,
+                              stiffness:
+                                  numberOf(field("stiffness"), 1) /
+                                  (timeScale * timeScale),
+                              damping:
+                                  numberOf(field("damping"), 0) / timeScale,
+                              mass: numberOf(field("mass"), 1),
+                          },
+                      }
+                    : {}),
+            };
+        }
+        const easing = tokens[`easings.${given.easing}`];
+        return {
+            ...ends,
             duration:
                 numberOf(tokens[`durations.${given.duration}`], 0) * timeScale,
             easing: typeof easing === "string" ? easing : "linear",
