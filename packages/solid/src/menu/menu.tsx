@@ -140,6 +140,14 @@ function Root(props: MenuRootProps): JSX.Element {
     );
 }
 
+/** The attributes Trigger gives its element to name the menu's part. A component that renders its
+ *  own part as the trigger drops them, keeping its own. */
+export const MENU_TRIGGER_ATTRIBUTES = [
+    "data-scope",
+    "data-pf-part",
+    "data-testid",
+] as const;
+
 /** The button that opens the menu: a click, Enter, Space, or the arrow keys up and down. */
 function Trigger(props: MenuTriggerProps): JSX.Element {
     const { scope, api } = context.use("Trigger");

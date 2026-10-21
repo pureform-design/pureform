@@ -28,6 +28,7 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { Menu } from "../menu";
+import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { createPartContext } from "../part-context";
 import { createSlotProps, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
@@ -68,9 +69,6 @@ export interface SplitButtonButtonProps
 export interface SplitButtonIconProps extends SplitButtonPartProps {
     readonly mirror?: boolean | undefined;
 }
-
-// The menu's own attributes on its trigger, which the trailing button replaces with its part's.
-const TRIGGER_ATTRIBUTES = ["data-scope", "data-pf-part", "data-testid"];
 
 /** The split button's root, a `<div>` holding both buttons and the menu, inside the menu's Root,
  *  which runs the menu machine. */
@@ -131,7 +129,7 @@ function TrailingButtonPart(
         "unstyled",
         "interactionSource",
         "children",
-        ...TRIGGER_ATTRIBUTES,
+        ...MENU_TRIGGER_ATTRIBUTES,
     );
     return scope.render("trailingButton", {
         element: "button",
