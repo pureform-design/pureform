@@ -13,6 +13,7 @@ const REFRESH = "the preset changed: run @pureform/anatomy's generate task";
 
 // The icon slots, which take `mirror`; the preset's icons spec lists the same ones.
 const ICON_PARTS: Record<string, string[]> = {
+    accordion: ["leading", "indicator"],
     button: ["icon", "secondaryIcon"],
     autocomplete: ["leadingIcon", "trailingIcon"],
     datePicker: ["modeToggle", "prev", "next"],
@@ -38,6 +39,7 @@ const ICON_PARTS: Record<string, string[]> = {
     tagsInput: ["leadingIcon", "trailingIcon"],
     textArea: ["leadingIcon", "trailingIcon"],
     textField: ["leadingIcon", "trailingIcon"],
+    tree: ["leading", "indicator"],
 };
 
 // Where each interactive component shows indication, as the design's table has it: the
@@ -62,6 +64,9 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     ],
     // Each item's mask.
     carousel: [at("mask", "mask", false)],
+    // Each item's header, and each node's row.
+    accordion: [at("trigger", "trigger", false)],
+    tree: [at("node", "node", false)],
     listItem: [at("root", "root", false)],
     // Each day, month or year of a date picker's calendar.
     calendarCell: [at("trigger", "trigger", true)],
