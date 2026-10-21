@@ -17,6 +17,7 @@ export * as ripple from "./ripple";
 export * as select from "./select";
 export * as slider from "./slider";
 export * as snackbar from "./snackbar";
+export * as stepper from "./stepper";
 export * as switchControl from "./switch";
 export * as tabs from "./tabs";
 export * as tagsInput from "./tags-input";

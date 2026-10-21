@@ -23,6 +23,7 @@ export default createConfig({
                     "button-group": "src/button-group.ts",
                     navigation: "src/navigation/index.ts",
                     snackbar: "src/snackbar/index.ts",
+                    stepper: "src/stepper/index.ts",
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",
                     "time-picker": "src/time-picker/index.ts",
