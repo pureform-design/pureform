@@ -1,6 +1,7 @@
 import { testIds } from "@pureform/anatomy";
 import { createSignal, createStore, flush } from "solid-js";
 import { describe, expect, it } from "vitest";
+import { userEvent } from "vitest/browser";
 
 import { ListItem } from ".";
 import { PureformProvider, useIconStyle } from "..";
@@ -301,5 +302,105 @@ describe("List", () => {
         setItems([{ value: "drafts", headline: "Drafts" }, inbox]);
         await settle();
         expect(reads).toBe(before);
+    });
+});
+
+describe("ListItem, expandable", () => {
+    it("draws a button with an indicator, and its region after it, hidden while collapsed", async () => {
+        withRegistry(() => (
+            <ListItem headline="Folders" region={<span>Work</span>} />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        const region = byTestId(ids.region);
+        expect(root.tagName).toBe("BUTTON");
+        expect(root.className).toContain("list-item--interactive-true");
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        expect(root.getAttribute("aria-controls")).toBe(region.id);
+        expect(root.lastElementChild).toBe(byTestId(ids.indicator));
+        expect(byTestId(ids.indicator).getAttribute("aria-hidden")).toBe(
+            "true",
+        );
+        expect(byTestId(ids.indicator).querySelector("svg")).not.toBeNull();
+        expect(root.nextElementSibling).toBe(region);
+        expect(region.className).toBe("list-item__region");
+        expect(region.getAttribute("role")).toBe("region");
+        expect(region.getAttribute("aria-labelledby")).toBe(root.id);
+        expect(region.hidden).toBe(true);
+        expect(region.textContent).toBe("Work");
+    });
+
+    it("expands and collapses with a click or Enter, and reports it", async () => {
+        const seen: boolean[] = [];
+        withRegistry(() => (
+            <ListItem
+                headline="Folders"
+                region="Work"
+                onExpandedChange={({ expanded }) => seen.push(expanded)}
+            />
+        ));
+        await settle();
+        const root = byTestId(ids.root);
+        await userEvent.click(root);
+        await settle();
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId(ids.region).hidden).toBe(false);
+        await userEvent.keyboard("{Enter}");
+        await settle();
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        expect(byTestId(ids.region).hidden).toBe(true);
+        expect(seen).toEqual([true, false]);
+    });
+
+    it("follows a controlled expanded", async () => {
+        const [expanded, setExpanded] = createSignal(true);
+        withRegistry(() => (
+            <ListItem headline="Folders" region="Work" expanded={expanded()} />
+        ));
+        await settle();
+        expect(byTestId(ids.region).hidden).toBe(false);
+        setExpanded(false);
+        flush();
+        await settle();
+        expect(byTestId(ids.root).getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("composes Expandable around Root and Region, and nests in a List's item", async () => {
+        withRegistry(() => (
+            <List.Root>
+                <List.Item>
+                    <ListItem.Expandable defaultExpanded>
+                        <ListItem.Root>
+                            <ListItem.Content>
+                                <ListItem.Headline>Folders</ListItem.Headline>
+                            </ListItem.Content>
+                            <ListItem.Indicator />
+                        </ListItem.Root>
+                        <ListItem.Region>
+                            <ListItem headline="Work" />
+                        </ListItem.Region>
+                    </ListItem.Expandable>
+                </List.Item>
+            </List.Root>
+        ));
+        await settle();
+        const [row, nested] = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.root}"]`,
+        );
+        expect(row!.tagName).toBe("BUTTON");
+        expect(row!.getAttribute("aria-expanded")).toBe("true");
+        expect(row!.parentElement!.tagName).toBe("LI");
+        expect(byTestId(ids.region).contains(nested!)).toBe(true);
+        expect(nested!.tagName).toBe("DIV");
+        expect(nested!.hasAttribute("aria-expanded")).toBe(false);
+    });
+
+    it("keeps an item without a region as it was", async () => {
+        withRegistry(() => <ListItem headline="Inbox" />);
+        await settle();
+        expect(byTestId(ids.root).tagName).toBe("DIV");
+        expect(document.querySelector(`[data-testid="${ids.indicator}"]`)).toBe(
+            null,
+        );
     });
 });
