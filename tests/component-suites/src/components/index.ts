@@ -20,6 +20,7 @@ import { list, listItem } from "./list";
 import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar, navigationRail } from "./navigation";
+import { paginator } from "./paginator";
 import { circularProgress, linearProgress } from "./progress";
 import { radioGroup } from "./radio-group";
 import { richTooltip } from "./rich-tooltip";
@@ -86,6 +87,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     ripple,
     scrim,
     appBar,
+    paginator,
     timePicker,
     timeInput,
     searchBar,
