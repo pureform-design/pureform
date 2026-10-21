@@ -547,6 +547,40 @@ export type {
     SwitchVariantProps,
 } from "./components/switch";
 export {
+    TREE_CONTENT_PROPS,
+    TREE_ROOT_PROPS,
+    isTreeBranch,
+    treeCollectionOptions,
+    treeControlProps,
+    treeMachineProps,
+    treeNaming,
+    treeSelection,
+} from "./components/tree";
+export type {
+    TreeBehaviorProps,
+    TreeContentProps,
+    TreeNode,
+    TreePart,
+    TreeRootOwnProps,
+    TreeVariantProps,
+} from "./components/tree";
+export {
+    ACCORDION_CONTENT_PROPS,
+    ACCORDION_ROOT_PROPS,
+    accordionItemProps,
+    accordionMachineProps,
+    accordionSelection,
+} from "./components/accordion";
+export type {
+    AccordionBehaviorProps,
+    AccordionContentProps,
+    AccordionElementIds,
+    AccordionItem,
+    AccordionPart,
+    AccordionRootOwnProps,
+    AccordionVariantProps,
+} from "./components/accordion";
+export {
     TABS_CONTENT_PROPS,
     TABS_LIST_LABEL_PROPS,
     TABS_ROOT_PROPS,

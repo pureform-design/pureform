@@ -77,6 +77,10 @@ describe("accordion", () => {
         await userEvent.keyboard("{ArrowDown}");
         await settle();
         expect(document.activeElement).toBe(triggers[1]);
+        await userEvent.keyboard("{Enter}");
+        await settle();
+        expect(triggers[1]!.getAttribute("aria-expanded")).toBe("true");
+        expect(triggers[0]!.getAttribute("aria-expanded")).toBe("false");
     });
 });
 
