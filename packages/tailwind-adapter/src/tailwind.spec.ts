@@ -115,6 +115,26 @@ describe("compileTailwind", () => {
         );
     });
 
+    it("writes each spring as a duration var and a linear() easing var", () => {
+        const springs = [...css.matchAll(/(--springs-[a-z-]+): ([^;]+);/g)].map(
+            ([, name, value]) => [name, value],
+        );
+        expect(springs.map(([name]) => name)).toEqual(
+            [
+                "spatial-fast",
+                "spatial-default",
+                "spatial-slow",
+                "effects-fast",
+                "effects-default",
+                "effects-slow",
+            ].flatMap((role) => [
+                `--springs-${role}-duration`,
+                `--springs-${role}-easing`,
+            ]),
+        );
+        expect(Object.fromEntries(springs)).toMatchSnapshot();
+    });
+
     it("generates utilities from pureform's tokens", async () => {
         const out = await build(css, [
             "bg-primary",
