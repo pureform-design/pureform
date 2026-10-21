@@ -258,3 +258,82 @@ describe("Menu, compound", () => {
         );
     });
 });
+
+describe("Menu, submenus", () => {
+    const NESTED = [
+        { value: "cut", label: "Cut" },
+        {
+            value: "share",
+            label: "Share",
+            items: [
+                { value: "mail", label: "Mail" },
+                { value: "link", label: "Copy link" },
+            ],
+        },
+    ];
+
+    const contents = () => [
+        ...document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.content}"]`,
+        ),
+    ];
+
+    it("draws an item with items as the submenu's trigger, an arrow at its end", async () => {
+        withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+        await settle();
+        expect(contents()).toHaveLength(2);
+        const share = items()[1]!;
+        expect(share.textContent).toContain("Share");
+        expect(share.className).toBe("menu__item");
+        expect(share.getAttribute("aria-haspopup")).toBe("menu");
+        expect(share.getAttribute("aria-controls")).toBe(contents()[1]!.id);
+        const arrow = share.querySelector<HTMLElement>(
+            `[data-testid="${ids.itemTrailing}"]`,
+        )!;
+        expect(arrow.hasAttribute("data-pf-mirror")).toBe(true);
+        expect(arrow.querySelector("svg")).not.toBeNull();
+        expect(contents()[0]!.contains(contents()[1]!)).toBe(true);
+    });
+
+    it("opens the submenu with the arrow toward the end, and reports its items' choice", async () => {
+        const onSelect = vi.fn();
+        withRegistry(() => (
+            <Menu trigger="Edit" items={NESTED} onSelect={onSelect} />
+        ));
+        await settle();
+        await userEvent.click(byTestId(ids.trigger));
+        await frames();
+        await userEvent.keyboard("{ArrowDown}{ArrowDown}");
+        await settle();
+        const share = items()[1]!;
+        expect(share.hasAttribute("data-pf-hover")).toBe(true);
+        await userEvent.keyboard("{ArrowRight}");
+        await frames();
+        expect(share.getAttribute("aria-expanded")).toBe("true");
+        const positioners = document.querySelectorAll<HTMLElement>(
+            `[data-testid="${ids.positioner}"]`,
+        );
+        expect(positioners[1]!.hidden).toBe(false);
+        expect(document.activeElement).toBe(contents()[1]);
+        // The item that opened it stays hovered while it's open.
+        expect(share.hasAttribute("data-pf-hover")).toBe(true);
+        // Opened from the keyboard, it highlights its first item.
+        expect(items()[2]!.hasAttribute("data-pf-hover")).toBe(true);
+        await userEvent.keyboard("{Enter}");
+        await frames();
+        expect(onSelect).toHaveBeenCalledWith({ value: "mail" });
+    });
+
+    it("closes the submenu with the arrow toward the start, back on its item", async () => {
+        withRegistry(() => <Menu trigger="Edit" items={NESTED} />);
+        await settle();
+        await userEvent.click(byTestId(ids.trigger));
+        await frames();
+        await userEvent.keyboard("{ArrowDown}{ArrowDown}{ArrowRight}");
+        await frames();
+        await userEvent.keyboard("{ArrowLeft}");
+        await frames(6);
+        expect(items()[1]!.getAttribute("aria-expanded")).toBe("false");
+        expect(document.activeElement).toBe(contents()[0]);
+    });
+});
