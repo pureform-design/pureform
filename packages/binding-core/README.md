@@ -392,6 +392,16 @@ type AutocompletePart; interface AutocompleteRootOwnProps // variants, items, fi
 AUTOCOMPLETE_ROOT_PROPS; autocompleteSelection(props); autocompleteMenuSelection(props);
 autocompleteMachineProps(props, fieldsetDisabled); autocompleteMatches(items, text, filter);
 
+// Date pickers: ISO dates (`2026-08-17`) on every target. The web runs Zag's date picker (modal:
+// inline in Zag's dialog, holding a draft until OK; docked: a popover) and date input; React
+// Native draws its calendar from the same helpers, so every target shows the same weeks.
+monthWeeks(month, firstDay, fixedWeeks?); weekStartOf(locale); weekdayLabels(locale, firstDay);
+calendarCellSelection(date, value, mode); chooseDate(date, value, mode); isSelectableDate(date, rules);
+parseDateText(text, locale); formatDateText(date, locale); dateFormatHint(locale); selectedDateText();
+dateMachineProps(props, parse);          // locale, startOfWeek from the locale, min/max parsed
+DATE_PICKER_ROOT_PROPS; DOCKED_DATE_PICKER_ROOT_PROPS; DATE_INPUT_ROOT_PROPS; *_CONTENT_PROPS;
+datePickerSelection; dockedDatePickerSelection; dateInputSelection; calendarCellSelectionOf;
+
 // Search view: Zag's dialog (modal; focus goes back to the search bar) and Zag's combobox (the
 // query and its suggestions). The search bar is its trigger: a press, Enter, ArrowDown or a
 // typed key (opensSearchView) opens it.
