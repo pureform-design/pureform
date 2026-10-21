@@ -14,7 +14,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, useComponent, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -63,27 +63,7 @@ function Root(props: CircularProgressRootProps): JSX.Element {
     );
 }
 
-const part = (
-    name:
-        | "track"
-        | "trackEndHalf"
-        | "trackEndArc"
-        | "trackStartHalf"
-        | "trackStartArc"
-        | "endHalf"
-        | "endArc"
-        | "startHalf"
-        | "startArc",
-    label: string,
-) =>
-    function Part(props: CircularProgressPartProps): JSX.Element {
-        const { scope } = context.use(label);
-        return scope.render(name, {
-            element: "span",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const part = plainParts(context.use, "span");
 
 /** The track: the rest of the circle, with a gap after the indicator and before its start. Holds
  *  `TrackEndHalf` and `TrackStartHalf`. */

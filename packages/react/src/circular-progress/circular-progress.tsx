@@ -13,7 +13,7 @@ import type { ProgressRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { useComponent, useSlotProps, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -64,26 +64,7 @@ function Root(props: CircularProgressRootProps): ReactNode {
     );
 }
 
-const part = (
-    name:
-        | "track"
-        | "trackEndHalf"
-        | "trackEndArc"
-        | "trackStartHalf"
-        | "trackStartArc"
-        | "endHalf"
-        | "endArc"
-        | "startHalf"
-        | "startArc",
-    label: string,
-) =>
-    function Part({
-        unstyled,
-        ...props
-    }: CircularProgressPartProps): ReactNode {
-        const { scope } = context.use(label);
-        return scope.render(name, { element: "span", unstyled, props });
-    };
+const part = plainParts(context.use, "span");
 
 /** The track: the rest of the circle, with a gap after the indicator and before its start. Holds
  *  `TrackEndHalf` and `TrackStartHalf`. */

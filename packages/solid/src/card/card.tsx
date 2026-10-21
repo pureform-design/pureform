@@ -19,7 +19,6 @@ import {
 } from "@pureform/binding-core";
 import type {
     CardContentProps,
-    CardPart,
     CardRootOwnProps,
 } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
@@ -31,7 +30,7 @@ import {
     useOwnInteractionSource,
 } from "../interaction";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, useComponent, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
@@ -152,15 +151,7 @@ function ActionArea(props: CardActionAreaProps): JSX.Element {
     });
 }
 
-const part = (name: CardPart, label: string) =>
-    function CardPartElement(props: CardPartProps): JSX.Element {
-        const { scope } = context.use(label);
-        return scope.render(name, {
-            element: "div",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const part = plainParts(context.use, "div");
 
 /** A picture or video at the card's top, full bleed: an `<img>`, a `<video>`, or a `Media`
  *  inside. */

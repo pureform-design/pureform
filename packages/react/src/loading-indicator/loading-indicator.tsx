@@ -12,7 +12,7 @@ import type { LoadingIndicatorRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { useComponent, useSlotProps, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -62,14 +62,7 @@ function Root(props: LoadingIndicatorRootProps): ReactNode {
     );
 }
 
-const part = (name: "container" | "indicator", label: string) =>
-    function Part({
-        unstyled,
-        ...props
-    }: LoadingIndicatorPartProps): ReactNode {
-        const { scope } = context.use(label);
-        return scope.render(name, { element: "span", unstyled, props });
-    };
+const part = plainParts(context.use, "span");
 
 /** The container: round and filled when `contained`, empty otherwise. Holds `Indicator`. */
 const Container = part("container", "Container");

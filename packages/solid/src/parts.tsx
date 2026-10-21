@@ -502,3 +502,29 @@ export const whenPresent =
             <Part {...props} />
         </Show>
     );
+
+/** A plain part's props: the element's own, and the part's `unstyled`. */
+export interface PlainPartProps extends PartProps {
+    readonly unstyled?: boolean | undefined;
+}
+
+/** Builds a component's plain parts: each renders `element` from Root's `scope` with only the
+ *  user's props, such as a card's sections or the pieces the preset draws a progress indicator
+ *  with. `use` reads Root's context, naming the part. */
+export const plainParts =
+    <A extends ComponentAnatomy>(
+        use: (name: string) => { readonly scope: PartScope<A> },
+        element: "div" | "span",
+    ) =>
+    <P extends PlainPartProps = PlainPartProps>(
+        part: PartName<A>,
+        label: string,
+    ) =>
+        function Part(props: P): JSX.Element {
+            const { scope } = use(label);
+            return scope.render(part, {
+                element,
+                unstyled: () => props.unstyled,
+                props: omit(props, "unstyled"),
+            });
+        };

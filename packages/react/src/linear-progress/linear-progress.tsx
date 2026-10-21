@@ -13,7 +13,7 @@ import type { ProgressRootOwnProps } from "@pureform/binding-core";
 import type { ElementType, ReactNode } from "react";
 
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { useComponent, useSlotProps, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
@@ -63,11 +63,7 @@ function Root(props: LinearProgressRootProps): ReactNode {
     );
 }
 
-const part = (name: "track" | "indicator" | "stopIndicator", label: string) =>
-    function Part({ unstyled, ...props }: LinearProgressPartProps): ReactNode {
-        const { scope } = context.use(label);
-        return scope.render(name, { element: "div", unstyled, props });
-    };
+const part = plainParts(context.use, "div");
 
 /** The track: the rest of the bar, after the indicator and a gap. Empty. */
 const Track = part("track", "Track");
