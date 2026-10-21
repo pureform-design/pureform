@@ -310,6 +310,22 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** The rail's section label, over a run of destinations: shown while the rail is expanded. */
+    function SectionLabel({
+        unstyled,
+        ...props
+    }: NavigationPartProps): ReactNode {
+        const { scope, api } = context.use("SectionLabel");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("sectionLabel", {
+            element: "div",
+            machine: api.getSectionLabelProps(),
+            unstyled,
+            props,
+        });
+    }
+
     // Only the rail has a header.
     const hasHeader = (config.anatomy.partNames as readonly string[]).includes(
         "header",
@@ -378,6 +394,15 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: {
+            Root,
+            Header,
+            SectionLabel,
+            Item,
+            Indicator,
+            ActiveIndicator,
+            Icon,
+            Label,
+        },
     };
 }

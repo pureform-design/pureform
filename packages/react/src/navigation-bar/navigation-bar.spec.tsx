@@ -160,6 +160,25 @@ describe("NavigationRail", () => {
         expect(header.textContent).toBe("Menu");
     });
 
+    it("composes a section label over a run of destinations", async () => {
+        withRegistry(
+            <NavigationRail.Root aria-label="Main" expanded>
+                <NavigationRail.SectionLabel>Mail</NavigationRail.SectionLabel>
+                <NavigationRail.Item value="inbox">
+                    <NavigationRail.Label>Inbox</NavigationRail.Label>
+                </NavigationRail.Item>
+            </NavigationRail.Root>,
+        );
+        await settle();
+        const label = byTestId(testIds.navigationRail.root).firstElementChild!;
+        expect(label.getAttribute("data-testid")).toBe(
+            testIds.navigationRail.sectionLabel,
+        );
+        expect(label.getAttribute("data-part")).toBe("section-label");
+        expect(label.className).toBe("navigation-rail__sectionLabel");
+        expect(label.textContent).toBe("Mail");
+    });
+
     it("as a modal, sits in a dialog over the scrim, and closes with Escape", async () => {
         const onOpenChange = vi.fn();
         withRegistry(
