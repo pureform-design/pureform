@@ -269,6 +269,18 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   move between them; each reports `aria-pressed`), with `value`, `defaultValue` and
   `onValueChange` on the group and a `value` per button. It replaces the deprecated segmented
   button.
+- **The chip set** (`@pureform/solid/chip-set`) is a `div` with `role="group"` (`chipSetAnatomy`)
+  holding chips in its variants (`variant`, `corner`, `color`, `density`, `tokens` under each
+  chip's own); `singleLine` keeps them on one scrolling line. With `selectable` (`single` or
+  `multiple`) it runs Zag's toggle group, as the button group does, and its chips are filter
+  chips (`aria-pressed`). `ChipSet.Root` and `ChipSet.Chip` compose it.
+- **The selection list** (`@pureform/solid/selection-list`) is a `List` that is Zag's listbox:
+  each option is a `ListItem` with `role="option"` and `aria-selected` (the list item's selected
+  colors), in an `li` with `role="presentation"`. `selectionMode` is `multiple` by default, as
+  Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
+  shown as hover, and Enter, Space or a press select.
+- **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
+  (`revealInRow` from `@pureform/binding-core/dom`).
 - **The radio group** is an unstyled `div` (`radioGroupAnatomy`, `data-scope="radio-group"`, test
   id `pf-radio-group-root`) holding a preset `radio` per item. Name the group with `aria-label` or
   `aria-labelledby`, and each radio on its `ItemInput` (the ready-made uses each item's `label`).

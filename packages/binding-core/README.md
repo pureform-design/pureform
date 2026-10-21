@@ -171,6 +171,19 @@ buttonGroupPosition(index, count, connected); // "single" unless connected, then
 groupedButtonVariants(group, button, position); // the button's own win
 buttonGroupRootProps(p); buttonGroupItemProps(p); // without Zag's style; without id, disabled, type
 
+// Chip set: the row (chipSetAnatomy) on the button group's toggle group when selectable.
+interface ChipSetRootOwnProps  // singleLine, setTokens, the chips' variant, corner, color,
+                               // density, tokens; selectable, deselectable, disabled, id, value
+interface ChipSetItem { value?; label?; icon?; trailingIcon?; disabled?; onClick?; testId? }
+chipSetSelection(props); chipSetMachineProps(props); chipSetChipVariants(set, chip);
+
+// Selection list: a list on Zag's listbox; `multiple` by default.
+interface SelectionListRootOwnProps // the list's props, selectionMode, deselectable, loopFocus,
+                                    // disabled, id, value
+interface SelectionListItem         // a list item's content and variants, value, textValue?, disabled?
+selectionListOptions(items); selectionListMachineProps(props);
+revealInRow(item); // (dom) scrolls an item's scrolling row, never the page
+
 // Chip, icon button, FAB: on the button machine (buttonMachineProps, or fabMachineProps)
 CHIP_ROOT_PROPS; chipSelection(props);
 ICON_BUTTON_ROOT_PROPS; ICON_BUTTON_CONTENT_PROPS; iconButtonSelection(props); // sets `toggle`
