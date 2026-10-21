@@ -195,6 +195,7 @@ export const timePicker = pf.slotComponent({
                 minuteSelector: selector,
                 scrollItem: {
                     display: flex,
+                    width: ref("fieldWidth"),
                     alignItems: center,
                     justifyContent: center,
                     flexShrink: unitless(0),

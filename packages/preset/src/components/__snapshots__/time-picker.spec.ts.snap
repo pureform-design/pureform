@@ -414,6 +414,7 @@ exports[`timePicker > compiles to a stable Panda slot recipe 1`] = `
       "height": "var(--components-timePicker-scrollItemHeight, 56px)",
       "justifyContent": "center",
       "textStyle": "displayMedium",
+      "width": "var(--components-timePicker-fieldWidth, 96px)",
     },
     "separator": {
       "alignItems": "center",

@@ -53,6 +53,7 @@ const SECTIONS = [
     "navigation",
     "badges",
     "app-bars",
+    "time-pickers",
 ];
 
 let dispose: (() => void) | undefined;
