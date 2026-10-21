@@ -402,17 +402,17 @@
         "access": "public"
     },
     "dependencies": {
-        "@pureform/anatomy": "catalog:",
-        "@pureform/binding-core": "catalog:",
-        "@pureform/machines": "catalog:",
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/react": "catalog:"
     },
     "devDependencies": {
-        "@pureform/styling": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/styling": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@testing-library/dom": "catalog:",
         "@testing-library/react": "catalog:",
         "@types/react": "catalog:",
@@ -428,7 +428,7 @@
         "vitest": "catalog:"
     },
     "peerDependencies": {
-        "@pureform/styling": "catalog:",
+        "@pureform/styling": "workspace:^",
         "react": "^19.0.0",
         "react-dom": "^19.0.0"
     }

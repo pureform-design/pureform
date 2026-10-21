@@ -5,9 +5,9 @@
     "description": "The Panda setup the browser suites test against: a pureform config, its Panda preset and generated registry, a stylesheet, and a page of every component",
     "type": "module",
     "dependencies": {
-        "@pureform/js-effects": "catalog:",
-        "@pureform/preset": "catalog:",
-        "@pureform/styling": "catalog:",
+        "@pureform/js-effects": "workspace:^",
+        "@pureform/preset": "workspace:^",
+        "@pureform/styling": "workspace:^",
         "@solidjs/web": "catalog:",
         "solid-js": "catalog:"
     },
@@ -16,13 +16,13 @@
         "@pandacss/preset-base": "catalog:",
         "@pandacss/preset-panda": "catalog:",
         "@pandacss/preset-typography": "catalog:",
-        "@pureform/bundler": "catalog:",
-        "@pureform/cli": "catalog:",
-        "@pureform/core": "catalog:",
-        "@pureform/material": "catalog:",
-        "@pureform/panda-adapter": "catalog:",
-        "@pureform/theme": "catalog:",
-        "@pureform/tsconfig": "catalog:",
+        "@pureform/bundler": "workspace:^",
+        "@pureform/cli": "workspace:^",
+        "@pureform/core": "workspace:^",
+        "@pureform/material": "workspace:^",
+        "@pureform/panda-adapter": "workspace:^",
+        "@pureform/theme": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
         "typescript": "catalog:"
     }
 }

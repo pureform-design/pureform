@@ -100,10 +100,10 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/type-utils": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/type-utils": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

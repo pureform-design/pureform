@@ -637,18 +637,18 @@
         "access": "public"
     },
     "dependencies": {
-        "@pureform/anatomy": "catalog:",
-        "@pureform/binding-core": "catalog:",
-        "@pureform/machines": "catalog:",
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/machines": "workspace:^",
         "@zag-js/core": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
     },
     "devDependencies": {
-        "@pureform/styling": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/styling": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
         "@solidjs/web": "catalog:",
         "@vitest/browser-playwright": "catalog:",
@@ -662,7 +662,7 @@
         "vitest": "catalog:"
     },
     "peerDependencies": {
-        "@pureform/styling": "catalog:",
+        "@pureform/styling": "workspace:^",
         "@solidjs/web": "2.0.0-rc.15",
         "solid-js": "2.0.0-rc.15"
     }

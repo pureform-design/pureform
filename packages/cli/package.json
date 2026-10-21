@@ -21,13 +21,13 @@
         }
     },
     "dependencies": {
-        "@pureform/generate": "catalog:",
+        "@pureform/generate": "workspace:^",
         "jiti": "catalog:"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

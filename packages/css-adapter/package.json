@@ -40,17 +40,17 @@
         "./reset.css": "./reset.css"
     },
     "dependencies": {
-        "@pureform/core": "catalog:",
-        "@pureform/css-lowering": "catalog:",
-        "@pureform/generate": "catalog:",
-        "@pureform/styling": "catalog:"
+        "@pureform/core": "workspace:^",
+        "@pureform/css-lowering": "workspace:^",
+        "@pureform/generate": "workspace:^",
+        "@pureform/styling": "workspace:^"
     },
     "devDependencies": {
-        "@pureform/material": "catalog:",
-        "@pureform/preset": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/material": "workspace:^",
+        "@pureform/preset": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
