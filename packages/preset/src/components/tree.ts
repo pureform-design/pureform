@@ -34,6 +34,7 @@ import {
     hidden,
     px,
     slot,
+    transparent,
     unitless,
 } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
@@ -57,6 +58,8 @@ import type { ColorGroup, ColorGroups, Densities } from "./shared";
 const pf = typed();
 
 const { tokens, ref } = rowTokens("tree", {
+    // The tree and its unselected rows show what they sit on, as Angular's tree does.
+    container: transparent,
     nodeHeight: px(48),
     nodeRadius: radius("full"),
     indent: spacing("6"),
@@ -121,7 +124,6 @@ export const createTree = <
                         display: flex,
                         flexDirection: column,
                         gap: spacing("2"),
-                        backgroundColor: ref("container"),
                         color: ref("content"),
                     },
                     label: {

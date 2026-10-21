@@ -84,8 +84,9 @@ BranchControl/Item/Group/Leading/Text/Indicator`. Controllable `expandedValue` a
   item's shape), `bodyLarge` text, `selected` colors from the `color` group like the list item's.
   Children indented by `indent` (24px) with logical inline padding on the group, so the row's
   highlight indents with it. Label `titleSmall` `onSurfaceVariant`.
-- **Tree root** paints its `container` (`surface`), so rows and the space between them agree on any
-  page or theme.
+- **Tree container** is `transparent` (resolved, c6 follow-ups): the tree and its unselected rows
+  show what they sit on, as Angular's tree does; a selected row still paints `selectedContainer`.
+  The contrast spec checks the tree's row colors on `surface`. React Native reads the same token.
 - **Expanded and selected on the row:** Zag puts `aria-expanded`/`aria-selected` on the branch's
   treeitem, not on its focusable control, so the machine copies them to the control (`aria-current`
   for selected) for the row's styles. `slot("node", "expanded")` then can't match a collapsed parent
@@ -161,7 +162,7 @@ BranchControl/Item/Group/Leading/Text/Indicator`. Controllable `expandedValue` a
   matters more than a stable layout.
 - Tile corners: uniform medium vs a segmented list's large-outside / extra-small-inside. The latter
   needs a per-item position (a variant on a separate item component, or a first/last condition).
-- Should the tree's container be `surface` (now) or follow its parent (transparent)? Transparent
-  can't be checked by the contrast spec.
+- ~~Should the tree's container be `surface` or follow its parent (transparent)?~~ Resolved:
+  transparent; the contrast spec checks its rows on `surface` instead.
 - The Solid Zag adapter change (above) is outside this subphase; the orchestrator may want r6 to
   check other machines that move focus inside a transition.

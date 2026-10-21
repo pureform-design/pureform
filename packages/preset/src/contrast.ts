@@ -125,7 +125,14 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         ...ROW_PAIRS,
         pair(token("contentColor"), token("container"), TEXT_CONTRAST),
     ],
-    tree: ROW_PAIRS,
+    // The tree's container is transparent, so its rows are checked on the surface it usually sits on.
+    tree: [
+        pair(token("content"), SURFACE, TEXT_CONTRAST),
+        pair(token("supportingColor"), SURFACE, TEXT_CONTRAST),
+        pair(token("trailingColor"), SURFACE, TEXT_CONTRAST),
+        pair(token("iconColor"), SURFACE, UI_CONTRAST),
+        pair(token("selectedContent"), token("selectedContainer"), TEXT_CONTRAST),
+    ],
     stepper: [
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("activeContent"), token("container"), TEXT_CONTRAST),
