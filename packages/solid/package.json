@@ -416,11 +416,11 @@
             "types": "./dist/internal/zag/index.d.ts",
             "solid": {
                 "development": "./src/internal/zag/index.ts",
-                "default": "./dist/internal/zag.jsx"
+                "default": "./dist/internal/zag/index.jsx"
             },
             "import": {
                 "development": "./src/internal/zag/index.ts",
-                "default": "./dist/internal/zag.jsx"
+                "default": "./dist/internal/zag/index.jsx"
             }
         },
         "./avatar": {

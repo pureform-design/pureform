@@ -82,7 +82,10 @@ export default createConfig({
                     "supporting-text": "src/supporting-text/index.ts",
                     text: "src/text/index.ts",
                     "touch-target": "src/touch-target/index.ts",
-                    "internal/zag": "src/internal/zag/index.ts",
+                    // `internal/zag/index`, not `internal/zag`: a `dist/internal/zag.jsx` beside the
+                    // `dist/internal/zag/` declarations would win the declarations' extensionless
+                    // `./internal/zag` imports in a consumer with `allowJs`, type-checking the JS.
+                    "internal/zag/index": "src/internal/zag/index.ts",
                 },
                 formats: ["es"],
                 fileName: (format, entryName) =>
