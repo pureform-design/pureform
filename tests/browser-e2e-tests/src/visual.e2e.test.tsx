@@ -36,6 +36,7 @@ const SECTIONS = [
     "icons",
     "fabs",
     "split-buttons-and-fab-menus",
+    "toolbars",
     "shapes",
     "chips",
     "input-chips",
@@ -167,4 +168,25 @@ it("a standard group's button widens while pressed, and a connected group square
     };
     expect(corners(first!)).toEqual(["9999px", "8px"]);
     expect(corners(last!)).toEqual(["8px", "9999px"]);
+});
+
+it("a floating toolbar is a 64px pill hugging its buttons, a docked one fills its row square", () => {
+    const [floating, vibrant, docked] = [
+        ...section("toolbars").querySelectorAll<HTMLElement>("[role=toolbar]"),
+    ];
+    const box = floating!.getBoundingClientRect();
+    expect(box.height).toBe(64);
+    const style = getComputedStyle(floating!);
+    expect(style.borderStartStartRadius).toBe("9999px");
+    expect([style.paddingInlineStart, style.columnGap]).toEqual(["8px", "4px"]);
+    expect(style.boxShadow).not.toBe("none");
+    expect(getComputedStyle(vibrant!).backgroundColor).not.toBe(
+        style.backgroundColor,
+    );
+    const row = docked!.parentElement!.getBoundingClientRect();
+    expect(docked!.getBoundingClientRect().width).toBe(row.width);
+    const dockedStyle = getComputedStyle(docked!);
+    expect(dockedStyle.borderStartStartRadius).toBe("0px");
+    expect(dockedStyle.paddingInlineStart).toBe("16px");
+    expect(dockedStyle.boxShadow).toBe("none");
 });

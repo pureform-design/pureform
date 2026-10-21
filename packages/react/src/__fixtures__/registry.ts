@@ -448,3 +448,35 @@ export const buttonGroupRegistry = () =>
             "outline",
         ]),
     });
+
+/** The toolbar's fake factories: the bar, its icon buttons and buttons, and the overflow menu. */
+export const toolbarRegistry = () =>
+    createRegistry({
+        toolbar: named("toolbar", ["root"]),
+        button: named("button", [
+            "root",
+            "label",
+            "icon",
+            "secondaryIcon",
+            "touchTarget",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        menu: named("menu", [
+            "root",
+            "itemGroup",
+            "itemGroupLabel",
+            "item",
+            "itemLeading",
+            "itemContent",
+            "itemLabel",
+            "itemSupportingText",
+            "itemTrailing",
+            "itemTrailingText",
+        ]),
+    });

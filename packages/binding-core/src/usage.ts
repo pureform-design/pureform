@@ -209,6 +209,17 @@ export const COMPONENT_USAGE = {
     snackbar: { entries: { snackbar: same("layout"), ripple: {} } },
     // Each toast's `type` comes with the toast, not a prop.
     toast: { entries: { toast: {}, ripple: {} } },
+    // `overflow` is set only when on; the elements are icon buttons and buttons, and the
+    // overflow button opens the menu.
+    toolbar: {
+        entries: {
+            toolbar: same("placement", "orientation", "color"),
+            iconButton: {},
+            button: {},
+            menu: {},
+            ripple: {},
+        },
+    },
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.

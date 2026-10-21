@@ -184,6 +184,8 @@ export {
     SHEET_FLICK_SPEED,
 } from "./sheet-drag";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
+export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";
+export type { OverflowWatch } from "./toolbar-dom";
 export type { SlideTiming } from "./slide";
 export {
     THEME_BLOCK_ATTRIBUTE,

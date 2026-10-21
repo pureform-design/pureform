@@ -29,13 +29,20 @@ const FIXTURES = [
     { name: "linearProgress", slot: "indicator" },
 ] as const;
 
-type Fixture = (typeof FIXTURES)[number];
+type Fixture = { readonly name: string; readonly slot: string };
+
+/** Components with no motion of their own, whose transition stays empty in every scenario: the
+ *  toolbar, whose moves are its buttons' and its overflow menu's. */
+const STILL = [{ name: "toolbar", slot: "root" }] as const;
 
 const STATE =
     "background-color, color, border-color, outline-color, box-shadow";
 
 /** The transitioned properties with full motion, and with reduced motion. */
-const EXPECTED: Record<Fixture["name"], { full: string; reduced: string }> = {
+const EXPECTED: Record<
+    (typeof FIXTURES)[number]["name"],
+    { full: string; reduced: string }
+> = {
     // M3 Expressive's corner morph moves, so reduced motion drops it.
     button: { full: `${STATE}, border-radius`, reduced: STATE },
     switchControl: {
@@ -137,6 +144,7 @@ const SCENARIOS: Scenario[] = [
 const transitions = async (
     styling: (typeof STYLINGS)[keyof typeof STYLINGS],
     scenario: Scenario,
+    fixtures: readonly Fixture[] = FIXTURES,
 ): Promise<{
     reducedMedia: boolean;
     values: Record<string, { property: string; duration: string }>;
@@ -146,10 +154,12 @@ const transitions = async (
     frame.style.cssText = "width: 800px; height: 600px; border: 0";
     document.body.append(frame);
     try {
-        const elements = FIXTURES.map(
-            (fixture) =>
-                `<div data-id="${fixture.name}" class="${styling.classes(fixture)}"></div>`,
-        ).join("");
+        const elements = fixtures
+            .map(
+                (fixture) =>
+                    `<div data-id="${fixture.name}" class="${styling.classes(fixture)}"></div>`,
+            )
+            .join("");
         const markup = scenario.providers.reduceRight(
             (inner, motion) =>
                 `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
@@ -263,6 +273,22 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                     ? /loadingIndicatorSpin/
                     : /loadingIndicatorMorph/,
             );
+        });
+    },
+);
+
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: still components stay still",
+    (name) => {
+        it.each(SCENARIOS)("$name", async (scenario) => {
+            const { values } = await transitions(
+                STYLINGS[name],
+                scenario,
+                STILL,
+            );
+            for (const { name: component } of STILL) {
+                expect(values[component]?.duration, component).toBe("0s");
+            }
         });
     },
 );
