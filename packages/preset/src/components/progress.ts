@@ -20,6 +20,11 @@
 //     <span class={startHalf}><span class={startArc} /></span>
 //   </div>
 //
+// `shape: wavy` (M3 Expressive) draws the indicator as a wave: it is clipped to a band along a
+// sine wave (`waveBand`, `wavyRing`), and the track stays flat. The wave's geometry is fixed per
+// thickness (a compound with `thickness`), since a clip's points are drawn once; the `amplitude`
+// token makes room for it. Where a target can't clip to a shape, the indicator stays flat.
+//
 // A determinate indicator leaves a gap between its active part and its track (the `gap` token:
 // a length on the linear one, a share of the circle on the circular one). The track draws from
 // where the gap ends to where it begins again, so it never sits under the indicator.
@@ -52,6 +57,7 @@ import {
 import type { StyleMap } from "@pureform/core/ast";
 import { duration, easing, radius } from "@pureform/theme";
 
+import { waveBand, wavyRing } from "./shape-paths";
 import {
     DEFAULT_GROUP,
     circle,
@@ -95,7 +101,22 @@ const linear = componentTokens("linearProgress", {
     indeterminateWidth: pct(40),
     gap: px(4),
     stopSize: px(4),
+    // How far a wavy indicator's wave moves above and below the track's line.
+    amplitude: px(3),
 });
+
+// The linear wave: 40px long, as many as cover a 960px bar (a longer one ends flat), in a box as
+// tall as the track and the wave's amplitude above and below it.
+const linearWave = (height: number, amplitude = 3) => {
+    const box = height + 2 * amplitude;
+    return waveBand({
+        waves: 24,
+        wavelength: 40,
+        top: (amplitude / box) * 100,
+        bottom: ((amplitude + height) / box) * 100,
+        amplitude: (amplitude / box) * 100,
+    });
+};
 
 const slide = (name: string) =>
     animation({
@@ -123,6 +144,7 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
             variants: {
                 indeterminate: ["true", "false"],
                 thickness: ["default", "thick"],
+                shape: ["flat", "wavy"],
                 color: groups as ColorGroups,
             },
             recipe: () => ({
@@ -195,15 +217,64 @@ export const createLinearProgress = <const G extends string = ColorGroup>(
                             root: { tokens: { height: ref("thickHeight") } },
                         },
                     },
+                    // M3 Expressive's wavy indicator: the bar grows by the wave's amplitude
+                    // above and below, the track and the dot stay on its middle line, and the
+                    // indicator fills the bar's height, clipped to the wave.
+                    shape: {
+                        flat: {},
+                        wavy: {
+                            root: {
+                                height: add(
+                                    ref("height"),
+                                    mul(ref("amplitude"), unitless(2)),
+                                ),
+                            },
+                            track: {
+                                top: ref("amplitude"),
+                                height: ref("height"),
+                            },
+                            stopIndicator: {
+                                top: add(
+                                    ref("amplitude"),
+                                    div(
+                                        sub(ref("height"), ref("stopSize")),
+                                        unitless(2),
+                                    ),
+                                ),
+                            },
+                            indicator: {
+                                top: when("clipShape", px(0), ref("amplitude")),
+                                height: when(
+                                    "clipShape",
+                                    pct(100),
+                                    ref("height"),
+                                ),
+                                borderRadius: when(
+                                    "clipShape",
+                                    px(0),
+                                    radius("full"),
+                                ),
+                                clipPath: linearWave(4),
+                            },
+                        },
+                    },
                     color: colorVariant(groups, (g) => ({
                         track: { backgroundColor: g.container },
                         indicator: { backgroundColor: g.main },
                         stopIndicator: { backgroundColor: g.main },
                     })),
                 },
+                // The thick wave is a band twice as wide.
+                compoundVariants: [
+                    {
+                        match: { shape: "wavy", thickness: "thick" },
+                        style: { indicator: { clipPath: linearWave(8) } },
+                    },
+                ],
                 defaultVariants: {
                     indeterminate: "false",
                     thickness: "default",
+                    shape: "flat",
                     color: DEFAULT_GROUP,
                 },
             }),
@@ -225,9 +296,16 @@ const circular = componentTokens(
         thickness: px(4),
         value: unitless(0),
         gap: unitless(3),
+        // How far a wavy indicator's wave moves in and out of its circle.
+        amplitude: px(1.5),
     },
     { value: "number" },
 );
+
+// The circular wave: nine waves around a 48px circle, as fractions of its size, so it scales
+// with `size`.
+const circularWave = (thickness: number) =>
+    wavyRing({ waves: 9, thickness: thickness / 48, amplitude: 1.5 / 48 });
 
 const DEG_PER_PERCENT = numeric(3.6, "deg");
 
@@ -277,6 +355,12 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
         };
     };
 
+    // A ring as wide as the wave, clipped to it.
+    const wavyArc = (clip: ReturnType<typeof wavyRing>): StyleMap => ({
+        borderWidth: add(ref("thickness"), mul(ref("amplitude"), unitless(2))),
+        clipPath: clip,
+    });
+
     // The track is the same two-half ring, turned to where the gap after the indicator ends and
     // drawing what is left of the circle less a gap at each end (in percent of the circle).
     const trackTurn = add(ref("value"), ref("gap"));
@@ -315,6 +399,7 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
         variants: {
             indeterminate: ["true", "false"],
             thickness: ["default", "thick"],
+            shape: ["flat", "wavy"],
             color: groups as ColorGroups,
         },
         recipe: () => ({
@@ -400,6 +485,27 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                         root: { tokens: { thickness: px(8) } },
                     },
                 },
+                // M3 Expressive's wavy indicator: each arc's ring is as wide as the wave and
+                // clipped to it, and the flat track sits on the wave's middle line.
+                shape: {
+                    flat: {},
+                    wavy: {
+                        track: {
+                            top: ref("amplitude"),
+                            insetInlineStart: ref("amplitude"),
+                            width: sub(
+                                pct(100),
+                                mul(ref("amplitude"), unitless(2)),
+                            ),
+                            height: sub(
+                                pct(100),
+                                mul(ref("amplitude"), unitless(2)),
+                            ),
+                        },
+                        endArc: wavyArc(circularWave(4)),
+                        startArc: wavyArc(circularWave(4)),
+                    },
+                },
                 color: colorVariant(groups, (g) => {
                     const sides = {
                         borderBlockStartColor: g.main,
@@ -418,9 +524,32 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                     };
                 }),
             },
+            // The wave per thickness, and on the spinning ring while indeterminate.
+            compoundVariants: [
+                {
+                    match: { shape: "wavy", thickness: "thick" },
+                    style: {
+                        endArc: { clipPath: circularWave(8) },
+                        startArc: { clipPath: circularWave(8) },
+                    },
+                },
+                {
+                    match: { shape: "wavy", indeterminate: "true" },
+                    style: { root: wavyArc(circularWave(4)) },
+                },
+                {
+                    match: {
+                        shape: "wavy",
+                        indeterminate: "true",
+                        thickness: "thick",
+                    },
+                    style: { root: { clipPath: circularWave(8) } },
+                },
+            ],
             defaultVariants: {
                 indeterminate: "false",
                 thickness: "default",
+                shape: "flat",
                 color: DEFAULT_GROUP,
             },
         }),
