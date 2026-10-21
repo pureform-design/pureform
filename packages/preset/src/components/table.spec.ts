@@ -10,7 +10,7 @@ const json = (value: unknown) => JSON.stringify(value);
 describe("table", () => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(table)).not.toThrow();
-        expect(pureform().components.table).toBeDefined();
+        expect(pureform().components.dataTable).toBeDefined();
     });
 
     it("has Angular's table and sort header parts", () => {
@@ -91,7 +91,7 @@ describe("table", () => {
 
     it("compiles to a stable Panda slot recipe", () => {
         expect(
-            compilePreset(configWith(table)).theme?.slotRecipes?.table,
+            compilePreset(configWith(table)).theme?.slotRecipes?.dataTable,
         ).toMatchSnapshot();
     });
 });

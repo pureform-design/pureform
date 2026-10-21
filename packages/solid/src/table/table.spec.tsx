@@ -8,7 +8,7 @@ import { PureformProvider } from "..";
 import { displayRegistry } from "../__fixtures__/registry";
 import { byTestId, mount, settle } from "../testing/mount";
 
-const ids = testIds.table;
+const ids = testIds.dataTable;
 
 const withRegistry = (view: () => unknown) =>
     mount(() => (

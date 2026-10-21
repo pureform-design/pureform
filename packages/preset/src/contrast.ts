@@ -156,7 +156,7 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("fieldLabelColor"), token("container"), TEXT_CONTRAST),
         pair(token("periodContent"), token("container"), TEXT_CONTRAST),
     ],
-    table: [
+    dataTable: [
         pair(token("headerColor"), token("container"), TEXT_CONTRAST),
         pair(token("content"), token("container"), TEXT_CONTRAST),
         pair(token("content"), token("alternateContainer"), TEXT_CONTRAST),

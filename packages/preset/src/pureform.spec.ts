@@ -71,7 +71,7 @@ describe("pureform", () => {
             "richTooltip",
             "card",
             "carousel",
-            "table",
+            "dataTable",
             "scrim",
             "ripple",
             "icon",
@@ -149,7 +149,7 @@ describe("pureform", () => {
             "richTooltip",
             "card",
             "carousel",
-            "table",
+            "dataTable",
             "scrim",
             "ripple",
         ]);

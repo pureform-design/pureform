@@ -351,7 +351,7 @@ const defaultComponents = <G extends string>(
         richTooltip,
         card,
         carousel,
-        table: createTable<Step>(densities),
+        dataTable: createTable<Step>(densities),
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),

@@ -3,7 +3,11 @@
 // (`@pureform/machines/table`: the sort and the chosen rows) and the selection. The table never
 // sorts its rows itself; the ready-made table sorts its data by the sort.
 
-import type { PartName, TestIdOverride, tableAnatomy } from "@pureform/anatomy";
+import type {
+    PartName,
+    TestIdOverride,
+    dataTableAnatomy,
+} from "@pureform/anatomy";
 import type { InstanceTokens, Selection } from "@pureform/styling";
 
 import type { Unstyled } from "../parts";
@@ -11,7 +15,7 @@ import type { IndicationProps } from "./indication";
 import type { VariantProp } from "./variants";
 
 /** The table's parts. */
-export type TablePart = PartName<typeof tableAnatomy>;
+export type TablePart = PartName<typeof dataTableAnatomy>;
 
 /** Which way a sorted column runs. */
 export type TableSortDirection = "ascending" | "descending";
@@ -29,8 +33,8 @@ export type TableSelectionMode = "single" | "multiple";
 export interface TableVariantProps {
     /** Keeps the header at the top of the scrolling container (not on React Native). */
     readonly stickyHeader?: boolean | undefined;
-    readonly density?: VariantProp<"table", "density">;
-    readonly tokens?: InstanceTokens<"table"> | undefined;
+    readonly density?: VariantProp<"dataTable", "density">;
+    readonly tokens?: InstanceTokens<"dataTable"> | undefined;
 }
 
 /** What Root takes for its behavior: the sort, the selection and the words. */
@@ -166,7 +170,7 @@ export const tableMachineProps = (props: TableBehaviorProps) => ({
 /** The table's registry selection. */
 export const tableSelection = (
     props: TableVariantProps,
-): Selection<"table"> => ({
+): Selection<"dataTable"> => ({
     stickyHeader: props.stickyHeader,
     density: props.density,
     tokens: props.tokens,

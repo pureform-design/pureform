@@ -410,7 +410,7 @@ export const displayRegistry = () =>
             "actions",
             "footer",
         ]),
-        table: named("table", [
+        dataTable: named("data-table", [
             "root",
             "header",
             "body",

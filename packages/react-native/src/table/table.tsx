@@ -5,7 +5,7 @@
 // so `stickyHeader` leaves the header where it is; put the table in a ScrollView with
 // `stickyHeaderIndices` for that.
 
-import { tableAnatomy } from "@pureform/anatomy";
+import { dataTableAnatomy } from "@pureform/anatomy";
 import {
     isPresent,
     tableCellValue,
@@ -36,7 +36,7 @@ import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
 
-const [INDICATION] = tableAnatomy.indication!;
+const [INDICATION] = dataTableAnatomy.indication!;
 
 export interface TableProps<Row = Record<string, unknown>>
     extends
@@ -95,7 +95,7 @@ function SortHeader(props: {
         selected,
         views: v,
     } = useComponentSlots<TablePart>(
-        "table",
+        "dataTable",
         indication.select(props.selection),
         indication.states({ filled: sorted }),
     );
@@ -152,7 +152,7 @@ function BodyRow<Row>(props: {
     readonly id: Id;
 }): ReactNode {
     const { styles: s, views: v } = useComponentSlots<TablePart>(
-        "table",
+        "dataTable",
         props.selection,
         props.selectable ? { selected: props.selected } : {},
     );
@@ -222,10 +222,10 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
     );
     const registry = tableSelection(props);
     const { styles: s, views: v } = useComponentSlots<TablePart>(
-        "table",
+        "dataTable",
         registry,
     );
-    const id: Id = (part) => testIdOf(tableAnatomy, part, props.testId);
+    const id: Id = (part) => testIdOf(dataTableAnatomy, part, props.testId);
     const columns = props.columns ?? [];
     const selectable = props.selectionMode !== undefined;
     const entries = (props.rows ?? []).map((row, index) => ({
