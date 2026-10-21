@@ -28,6 +28,7 @@ const SECTIONS = [
     "fullscreen-dialog",
     "sheets",
     "media",
+    "grid-lists",
     "carousels",
     "controls",
     "color-groups",
@@ -192,4 +193,47 @@ it("a floating toolbar is a 64px pill hugging its buttons, a docked one fills it
     expect(dockedStyle.borderStartStartRadius).toBe("0px");
     expect(dockedStyle.paddingInlineStart).toBe("16px");
     expect(dockedStyle.boxShadow).toBe("none");
+});
+
+it("a grid list shares the row between its columns around the gutter, at the aspect", () => {
+    const [medium, large, none] = [
+        ...section("grid-lists").querySelectorAll<HTMLElement>(
+            "[data-grid-list]",
+        ),
+    ];
+    const contents = (grid: HTMLElement) =>
+        [...grid.querySelectorAll<HTMLElement>("[data-part=content]")].map(
+            (content) => content.getBoundingClientRect(),
+        );
+    const box = medium!.getBoundingClientRect();
+    // 320 wide with 8 padding: three columns and a gutter of 8 between them.
+    const rects = contents(medium!);
+    expect(rects[0]!.left - box.left).toBe(8);
+    expect(rects[0]!.width).toBeCloseTo(96, 1);
+    expect(rects[0]!.height).toBeCloseTo(96, 1);
+    expect(rects[1]!.left - rects[0]!.right).toBeCloseTo(8, 1);
+    expect(rects[2]!.right).toBeCloseTo(box.right - 8, 1);
+    expect(rects[3]!.top - rects[0]!.bottom).toBeCloseTo(8, 1);
+    expect(rects[3]!.left).toBeCloseTo(rects[0]!.left, 1);
+    // Two columns, a 16px gutter, landscape (4:3).
+    const wide = contents(large!);
+    expect(wide[0]!.width / wide[0]!.height).toBeCloseTo(4 / 3, 2);
+    expect(wide[1]!.left - wide[0]!.right).toBeCloseTo(16, 1);
+    // No gutter: the tiles touch.
+    const flush = contents(none!);
+    expect(flush[1]!.left - flush[0]!.right).toBeCloseTo(0, 1);
+    // The header and footer sit over the tile's top and bottom edges.
+    const header = medium!.querySelector<HTMLElement>("[data-part=header]")!;
+    const footer = medium!.querySelector<HTMLElement>("[data-part=footer]")!;
+    expect(header.getBoundingClientRect().top).toBeCloseTo(rects[0]!.top, 1);
+    expect(footer.getBoundingClientRect().bottom).toBeCloseTo(
+        rects[1]!.bottom,
+        1,
+    );
+    expect(getComputedStyle(header).position).toBe("absolute");
+    expect(getComputedStyle(header).borderStartStartRadius).toBe("0px");
+    expect(
+        getComputedStyle(medium!.querySelector("[data-part=content]")!)
+            .borderStartStartRadius,
+    ).toBe("12px");
 });
