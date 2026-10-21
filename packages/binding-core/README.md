@@ -764,3 +764,9 @@ by its `children`), `treeSelection`, `treeMachineProps`, `treeControlProps` (the
 `expandedValue` and `selectedValue` under Zag's names), `treeCollectionOptions` (Zag's tree
 collection over the data), `treeNaming` (Zag's tree props without a label that isn't there) and
 `isTreeBranch`. `GLYPH_PATHS.expand` is the chevron both show.
+
+## Grid list
+
+`components/grid-list.ts`: `GridListRootOwnProps`, `GRID_LIST_ROOT_PROPS`, `gridListSelection`
+(`columns`, `gutter`, `aspect`, `tokens`), `gridListRootProps` (`role="list"`) and
+`gridListTileProps` (`role="listitem"`). No machine and no state.

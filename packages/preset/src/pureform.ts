@@ -55,6 +55,7 @@ import { buttonGroup } from "./components/button-group";
 import { calendarCell } from "./components/calendar";
 import { card } from "./components/card";
 import { carousel } from "./components/carousel";
+import { gridList } from "./components/grid-list";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { createDateInput } from "./components/date-input";
@@ -360,6 +361,7 @@ const defaultComponents = <G extends string>(
         tree: createTree<G, Step>(theme.color.groups, densities),
         stepper: createStepper<Step>(densities),
         dataTable: createTable<Step>(densities),
+        gridList,
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),

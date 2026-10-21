@@ -9,6 +9,7 @@ export * from "./components/accordion";
 export * from "./components/carousel";
 export * from "./components/tree";
 export * from "./components/stepper";
+export * from "./components/grid-list";
 export * from "./components/scrim";
 export * from "./components/radio";
 export * from "./components/ripple";

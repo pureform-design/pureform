@@ -45,6 +45,7 @@ export default createConfig({
                     accordion: "src/accordion/index.ts",
                     tree: "src/tree/index.ts",
                     stepper: "src/stepper/index.ts",
+                    "grid-list": "src/grid-list/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     "navigation-bar": "src/navigation-bar/index.ts",
                     "navigation-rail": "src/navigation-rail/index.ts",

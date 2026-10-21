@@ -8,6 +8,7 @@ export const RN_COMPONENTS = [
     "accordion",
     "tree",
     "stepper",
+    "gridList",
     "chip",
     "inputChip",
     "checkbox",

@@ -16,6 +16,7 @@ import { accordionCase, treeCase } from "./expandable";
 import { fab } from "./fab";
 import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
+import { gridList } from "./grid-list";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
 import { loadingIndicator } from "./loading-indicator";
@@ -78,6 +79,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     fullscreenDialog,
     fabMenu,
     fabMenuItems,
+    gridList,
     icon,
     iconButton,
     linearProgress,

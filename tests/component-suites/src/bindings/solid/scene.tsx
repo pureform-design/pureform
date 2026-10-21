@@ -28,6 +28,7 @@ import { DragHandle } from "@pureform/solid/drag-handle";
 import { Fab } from "@pureform/solid/fab";
 import { FabMenu } from "@pureform/solid/fab-menu";
 import { FullscreenDialog } from "@pureform/solid/fullscreen-dialog";
+import { GridList } from "@pureform/solid/grid-list";
 import { Icon } from "@pureform/solid/icon";
 import { IconButton } from "@pureform/solid/icon-button";
 import { LinearProgress } from "@pureform/solid/linear-progress";
@@ -70,7 +71,7 @@ import { TouchTarget } from "@pureform/solid/touch-target";
 import { Tree } from "@pureform/solid/tree";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, omit, untrack } from "solid-js";
+import { type Accessor, For, omit, untrack } from "solid-js";
 
 import { registry } from "#registry";
 
@@ -97,6 +98,52 @@ function ToastScene(
     return <Toaster toaster={toaster} {...(omit(props, "toasts") as object)} />;
 }
 
+/** A tile of the grid list scene: a picture, with a header and a footer when it has them. */
+interface GridTile {
+    readonly src: string;
+    readonly header?: string;
+    readonly footer?: string;
+    readonly subhead?: string;
+}
+
+/** The grid list with the scene's `tiles` in it. */
+function GridListScene(
+    props: { readonly tiles?: readonly GridTile[] } & Record<string, unknown>,
+): JSX.Element {
+    return (
+        <GridList {...(omit(props, "tiles") as object)}>
+            <For each={props.tiles ?? []}>
+                {(tile) => (
+                    <GridList.Tile>
+                        <GridList.Content>
+                            <GridList.Media src={tile.src} alt="" />
+                            {tile.header ? (
+                                <GridList.Header>
+                                    <GridList.Headline>
+                                        {tile.header}
+                                    </GridList.Headline>
+                                </GridList.Header>
+                            ) : null}
+                            {tile.footer ? (
+                                <GridList.Footer>
+                                    <GridList.Headline>
+                                        {tile.footer}
+                                    </GridList.Headline>
+                                    {tile.subhead ? (
+                                        <GridList.Subhead>
+                                            {tile.subhead}
+                                        </GridList.Subhead>
+                                    ) : null}
+                                </GridList.Footer>
+                            ) : null}
+                        </GridList.Content>
+                    </GridList.Tile>
+                )}
+            </For>
+        </GridList>
+    );
+}
+
 /** Every component the suites render, by name. */
 export const components: Record<ComponentName, ValidComponent> = {
     Avatar,
@@ -116,6 +163,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     DragHandle,
     Fab,
     FullscreenDialog,
+    GridList: GridListScene,
     FabMenu,
     Icon,
     IconButton,

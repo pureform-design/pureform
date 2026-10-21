@@ -96,6 +96,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `time-picker/`, `time-input/`                                           | `TimePicker` (a dial on the responder system, `adjustable` for assistive technology, or scroll fields) and `TimeInput` (number-pad fields): the time in state, through `@pureform/machines/time-picker`'s arithmetic       |
 | `table/`                                                                | `Table`: views in flex rows with their table roles, sort headers and a checkbox column, the sort and selection in state through `@pureform/machines/table`'s arithmetic; `stickyHeader` doesn't stick (no sticky position) |
 | `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                              |
+| `grid-list/`                                                            | `GridList`: Root (a list), `Tile` (`listitem`), `Content`, `Media` (an `Image`), `Header`, `Footer`, `Headline`, `Subhead`; compound only                                                                               |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory

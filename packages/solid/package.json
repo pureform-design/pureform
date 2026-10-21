@@ -258,6 +258,17 @@
                 "default": "./dist/stepper.jsx"
             }
         },
+        "./grid-list": {
+            "types": "./dist/grid-list/index.d.ts",
+            "solid": {
+                "development": "./src/grid-list/index.ts",
+                "default": "./dist/grid-list.jsx"
+            },
+            "import": {
+                "development": "./src/grid-list/index.ts",
+                "default": "./dist/grid-list.jsx"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "solid": {
