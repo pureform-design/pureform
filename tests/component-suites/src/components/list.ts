@@ -2,6 +2,7 @@
 // button (`as="button"`), which Enter clicks; the list is a `<ul>` of them, each in an `<li>`.
 
 import { listAnatomy, listItemAnatomy, testIds } from "@pureform/anatomy";
+import { userEvent } from "vitest/browser";
 
 import type { ComponentCase } from "./types";
 import { byTestId, ownSource } from "./types";
@@ -52,6 +53,54 @@ export const listItem: ComponentCase = {
         keys: [
             { key: "{Enter}", does: "click" },
             { key: " ", does: "click" },
+        ],
+    },
+    indication: ownSource(listItemAnatomy),
+};
+
+/** Whether an expandable item is expanded, checked against its region. */
+const readExpanded = (host: HTMLElement): boolean => {
+    const expanded = root(host).getAttribute("aria-expanded") === "true";
+    const region = host.querySelector<HTMLElement>(
+        `[data-testid="${ids.region}"]`,
+    );
+    // React Native renders the region only while expanded; the web hides it.
+    const shown = region !== null && !region.hidden;
+    if (shown !== expanded) {
+        throw new Error(`the item shows its region ${shown}`);
+    }
+    return expanded;
+};
+
+/** An expandable list item: the accordion's behaviour for one item. `expanded`, by a click on the
+ *  row, which Enter and Space toggle too. */
+export const expandableListItem: ComponentCase = {
+    component: "ListItem",
+    props: { headline: "Folders", region: "Work, Personal" },
+    root: ids.root,
+    examples: {
+        collapsed: {},
+        expanded: { defaultExpanded: true },
+        "two lines, expanded": {
+            defaultExpanded: true,
+            supportingText: "2 folders",
+            leading: "▤",
+        },
+    },
+    state: {
+        prop: "expanded",
+        from: false,
+        to: true,
+        act: async (host, options = {}) => {
+            await userEvent.click(root(host), options);
+        },
+        read: readExpanded,
+    },
+    keyboard: {
+        focusable: root,
+        keys: [
+            { key: "{Enter}", does: "change", to: true },
+            { key: " ", does: "change", to: true },
         ],
     },
     indication: ownSource(listItemAnatomy),
