@@ -654,3 +654,27 @@ export const dateFormatHint = (locale: string): string =>
                     : part.value,
         )
         .join("");
+
+/** A date typed in a locale's numeric format ("08/17/2026" in `en-US`) as an ISO date, or `null`
+ *  when it isn't a whole, real date. React Native's date input reads its text field with it. */
+export const parseDateText = (text: string, locale: string): string | null => {
+    const order = dateFormatHint(locale)
+        .split(/[^a-z]+/)
+        .filter(Boolean);
+    const numbers = text.split(/\D+/).filter(Boolean).map(Number);
+    if (numbers.length !== 3 || order.length !== 3) return null;
+    const parts: Record<string, number> = {};
+    order.forEach((name, index) => (parts[name] = numbers[index]!));
+    const year = parts["yyyy"]!;
+    if (year < 1000) return null;
+    const iso = isoDate({ year, month: parts["mm"]!, day: parts["dd"]! });
+    return parseIsoDate(iso) ? iso : null;
+};
+
+/** An ISO date in a locale's numeric format ("08/17/2026" in `en-US`). */
+export const formatDateText = (value: string, locale: string): string =>
+    formatIsoDate(value, locale, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+    });
