@@ -385,3 +385,35 @@ describe("shape points that read tokens", () => {
         ]);
     });
 });
+
+describe("the wavy linear progress", () => {
+    const precomputed = precompute(pureform(), {
+        components: ["linearProgress"],
+    });
+    const styles = stylesFor(precomputed, "base:light");
+    // The wave's lowest point, as the factory selects it with the tokens its variants set.
+    const bottom = (thickness: string) => {
+        const from = (component: typeof styles.linearProgress) =>
+            selectWithTransitions(
+                component!,
+                { shape: "wavy", thickness },
+                { svg: true },
+            );
+        const { shape } = withSetTokens(from(styles.linearProgress), from, {
+            styles: precomputed,
+            key: "base:light",
+            name: "linearProgress",
+            scheme: "light",
+        }).drawings.indicator!;
+        const ys = shapeCoordinates(shape!, { width: 960, height: 20 }).filter(
+            (_, i) => i % 2 === 1,
+        );
+        return Math.max(...ys);
+    };
+
+    it("draws its band from the height its thickness sets", () => {
+        // The amplitude (3px) above, the track's height, and the wave's amplitude below.
+        expect(bottom("default")).toBeCloseTo(3 + 4 + 3, 1);
+        expect(bottom("thick")).toBeCloseTo(3 + 8 + 3, 1);
+    });
+});

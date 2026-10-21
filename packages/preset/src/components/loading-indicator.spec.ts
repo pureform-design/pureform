@@ -1,3 +1,4 @@
+import { px } from "@pureform/core/ast";
 import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
@@ -60,9 +61,9 @@ describe("wave paths", () => {
         const band = waveBand({
             waves: 2,
             wavelength: 40,
-            top: 30,
-            bottom: 70,
-            amplitude: 30,
+            top: px(3),
+            bottom: px(7),
+            amplitude: px(3),
         });
         expect(band.contours).toHaveLength(1);
         // Four quarter curves a wave, along each edge, and the flat end.
@@ -75,9 +76,39 @@ describe("wave paths", () => {
     });
 
     it("rings a circle with an inner and outer wavy edge, as a hole", () => {
-        const ring = wavyRing({ waves: 9, thickness: 0.1, amplitude: 0.05 });
+        const ring = wavyRing({
+            waves: 9,
+            thickness: px(4),
+            amplitude: px(1.5),
+        });
         expect(ring.fillRule).toBe("evenodd");
         expect(ring.contours).toHaveLength(2);
+    });
+
+    it("draws the waves from the progress tokens, with no compound per thickness", () => {
+        const clips = [
+            [
+                linearProgress.recipe.variants?.shape?.wavy?.indicator
+                    ?.clipPath,
+                ["linearProgress", "height", "amplitude"],
+            ],
+            [
+                circularProgress.recipe.variants?.shape?.wavy?.endArc?.clipPath,
+                ["circularProgress", "thickness", "amplitude"],
+            ],
+        ] as const;
+        for (const [clip, [name, ...read]] of clips) {
+            for (const token of read) {
+                expect(JSON.stringify(clip)).toContain(
+                    `"path":["components","${name}","${token}"]`,
+                );
+            }
+        }
+        for (const compound of circularProgress.recipe.compoundVariants ?? []) {
+            expect(compound.match).not.toHaveProperty("thickness");
+        }
+        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
+        expect(circularProgress.recipe.compoundVariants).toHaveLength(1);
     });
 });
 
@@ -163,21 +194,22 @@ describe("wavy progress", () => {
         const wavy = linearProgress.recipe.variants?.shape?.wavy;
         expect(wavy?.indicator?.clipPath).toMatchObject({ type: "shape" });
         expect(JSON.stringify(wavy?.indicator?.top)).toContain("clipShape");
-        expect(linearProgress.recipe.compoundVariants).toEqual([
-            expect.objectContaining({
-                match: { shape: "wavy", thickness: "thick" },
-            }),
-        ]);
+        // The wave reads the height, so a thick bar needs no compound.
+        expect(linearProgress.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 
-    it("clips the circular arcs to a wavy ring, the spinner too, per thickness", () => {
+    it("clips the circular arcs to a wavy ring, the spinner too while indeterminate", () => {
         const wavy = circularProgress.recipe.variants?.shape?.wavy;
         expect(wavy?.endArc?.clipPath).toMatchObject({
             type: "shape",
             fillRule: "evenodd",
         });
         expect(wavy?.startArc?.clipPath).toEqual(wavy?.endArc?.clipPath);
-        // Thick, indeterminate, and both: three compounds.
-        expect(circularProgress.recipe.compoundVariants).toHaveLength(3);
+        // Only the spinner's: the ring reads the thickness.
+        expect(circularProgress.recipe.compoundVariants).toEqual([
+            expect.objectContaining({
+                match: { shape: "wavy", indeterminate: "true" },
+            }),
+        ]);
     });
 });

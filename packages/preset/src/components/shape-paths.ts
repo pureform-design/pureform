@@ -2,13 +2,8 @@
 // can animate into the next (the loading indicator's morph, core's `morphSequence`), and wave
 // bands to clip a progress indicator to (the wavy linear and circular progress).
 
-import { clipShape, pct, px, min } from "@pureform/core/ast";
-import type {
-    ShapeNode,
-    ShapePoint,
-    UnitContour,
-    Vec,
-} from "@pureform/core/ast";
+import { add, min, mul, pct, px, unitless } from "@pureform/core/ast";
+import type { NumericValue, ShapeNode, ShapePoint } from "@pureform/core/ast";
 
 export { morphSequence } from "@pureform/core/ast";
 
@@ -30,10 +25,21 @@ const waveCurves = <P>(waves: number, at: (t: number, s: number) => P) => {
     }));
 };
 
+/** A length moved by `amount` times `by` (left as is when `amount` is 0). */
+const shifted = (
+    length: NumericValue,
+    by: NumericValue,
+    amount: number,
+): NumericValue =>
+    round(amount) === 0
+        ? length
+        : add(length, mul(by, unitless(round(amount))));
+
 /** A band along a wave, to clip a horizontal bar to: `waves` waves of `wavelength` px from the
- *  box's start, ending at the box's end (a longer box ends flat), between `top` and `bottom` (in
- *  percent of the box's height, at the wave's middle) and moving up and down by `amplitude`
- *  percent. Points past the box's end fold onto it, so the band ends where the box does. */
+ *  box's start, ending at the box's end (a longer box ends flat), between `top` and `bottom` (the
+ *  band's edges at the wave's middle, from the box's top) and moving up and down by `amplitude`.
+ *  The lengths may read tokens, so the band follows them. Points past the box's end fold onto
+ *  it, so the band ends where the box does. */
 export const waveBand = ({
     waves,
     wavelength,
@@ -43,17 +49,17 @@ export const waveBand = ({
 }: {
     waves: number;
     wavelength: number;
-    top: number;
-    bottom: number;
-    amplitude: number;
+    top: NumericValue;
+    bottom: NumericValue;
+    amplitude: NumericValue;
 }): ShapeNode => {
     const end = waves * wavelength;
     const x = (length: number) => min(px(round(length)), pct(100));
     const point =
-        (middle: number) =>
+        (middle: NumericValue) =>
         (t: number, s: number): ShapePoint => [
             x(t * wavelength),
-            pct(round(middle - s * amplitude)),
+            shifted(middle, amplitude, -s),
         ];
     const curve = (c: { c1: ShapePoint; c2: ShapePoint; to: ShapePoint }) => ({
         op: "curve" as const,
@@ -73,9 +79,9 @@ export const waveBand = ({
                 from: point(top)(0, 0),
                 segments: [
                     ...upper.map(curve),
-                    { op: "line", to: [pct(100), pct(top)] },
-                    { op: "line", to: [pct(100), pct(bottom)] },
-                    { op: "line", to: [x(end), pct(bottom)] },
+                    { op: "line", to: [pct(100), top] },
+                    { op: "line", to: [pct(100), bottom] },
+                    { op: "line", to: [x(end), bottom] },
                     ...lower.map(curve),
                 ],
             },
@@ -83,45 +89,51 @@ export const waveBand = ({
     };
 };
 
-/** A ring that waves in and out, to clip a circle's box to: `waves` waves around it, each edge
+/** A ring that waves in and out, to clip a square box to: `waves` waves around it, each edge
  *  `amplitude` in and out of its circle, the band `thickness` wide, its outer crests at the box's
- *  edge. All in fractions of the box's size. */
+ *  edge. The lengths may read tokens, so the ring follows them at any box size. */
 export const wavyRing = ({
     waves,
     thickness,
     amplitude,
 }: {
     waves: number;
-    thickness: number;
-    amplitude: number;
+    thickness: NumericValue;
+    amplitude: NumericValue;
 }): ShapeNode => {
-    const middle = 0.5 - amplitude - thickness / 2;
-    const edge =
-        (radius: number) =>
-        (t: number, s: number): Vec => {
-            // `t` waves around, so the angle is a share of the turn.
-            const angle = (t / waves) * 2 * Math.PI - Math.PI / 2;
-            const r = radius + s * amplitude;
-            return [0.5 + r * Math.cos(angle), 0.5 + r * Math.sin(angle)];
-        };
+    // A point at `angle` on a circle of radius 50% less (1 - s) amplitudes, and less the
+    // thickness on the inner edge: 50% + cos × (50% − (1 − s) × amplitude [− thickness]).
+    const coordinate = (c: number, s: number, inner: boolean) =>
+        shifted(
+            shifted(pct(round(50 + 50 * c)), amplitude, -c * (1 - s)),
+            thickness,
+            inner ? -c : 0,
+        );
     // Sampled as straight runs between close points, which a circle's curvature makes simplest.
     const samples = waves * 8;
-    const ring = (radius: number): UnitContour => {
-        const at = edge(radius);
-        const points = Array.from({ length: samples }, (_, i) => {
+    const ring = (inner: boolean) => {
+        const points = Array.from({ length: samples }, (_, i): ShapePoint => {
             const t = (i / samples) * waves;
-            return at(t, Math.sin(t * 2 * Math.PI));
+            // `t` waves around, so the angle is a share of the turn.
+            const angle = (t / waves) * 2 * Math.PI - Math.PI / 2;
+            const s = Math.sin(t * 2 * Math.PI);
+            return [
+                coordinate(Math.cos(angle), s, inner),
+                coordinate(Math.sin(angle), s, inner),
+            ];
         });
         return {
             from: points[0]!,
-            segments: points.slice(1).map((to) => ({ op: "line", to })),
+            segments: points
+                .slice(1)
+                .map((to) => ({ op: "line" as const, to })),
         };
     };
-    const shape = clipShape({
-        contours: [ring(middle + thickness / 2), ring(middle - thickness / 2)],
-        fit: { fit: "stretch" },
-    });
-    return { ...shape, fillRule: "evenodd" };
+    return {
+        type: "shape",
+        fillRule: "evenodd",
+        contours: [ring(false), ring(true)],
+    };
 };
 
 const round = (n: number) => Math.round(n * 1000) / 1000;
