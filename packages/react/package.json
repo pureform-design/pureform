@@ -138,6 +138,20 @@
                 "default": "./dist/carousel.mjs"
             }
         },
+        "./accordion": {
+            "types": "./dist/accordion/index.d.ts",
+            "import": {
+                "development": "./src/accordion/index.ts",
+                "default": "./dist/accordion.mjs"
+            }
+        },
+        "./tree": {
+            "types": "./dist/tree/index.d.ts",
+            "import": {
+                "development": "./src/tree/index.ts",
+                "default": "./dist/tree.mjs"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "import": {
