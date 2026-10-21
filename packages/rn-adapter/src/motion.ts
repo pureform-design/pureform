@@ -6,9 +6,10 @@ import { valueTypeMoves } from "@pureform/core";
 
 import { formatColor, mixSrgb, parseColor } from "./rgba";
 import { TOKEN } from "./values";
-import type { Concrete, ThemeValues, Transition } from "./values";
+import type { Concrete, Spring, ThemeValues, Transition } from "./values";
 
-/** A transition's curve as Bézier points, or `linear`. */
+/** A transition's curve as Bézier points, or `linear` (also for a `linear(...)` curve, whose
+ *  points `parseLinearEasing` from `@pureform/core` reads). */
 export const easingPoints = (
     easing: string,
 ): [number, number, number, number] | "linear" => {
@@ -264,12 +265,15 @@ export interface PresenceFrame {
 }
 
 /** One way in or out: from one frame to another, over milliseconds, on a curve as
- *  transitions take it (`cubic-bezier(...)` or `linear`). */
+ *  transitions take it (`cubic-bezier(...)`, `linear(...)`, or `linear`). A spring step also
+ *  carries its physics, which an engine with springs runs in place of the sampled duration and
+ *  curve. */
 export interface PresenceStep {
     readonly from: PresenceFrame;
     readonly to: PresenceFrame;
     readonly duration: number;
     readonly easing: string;
+    readonly spring?: Spring | undefined;
 }
 
 /** How an overlay enters and leaves. The exit holds its last frame until the overlay goes. */

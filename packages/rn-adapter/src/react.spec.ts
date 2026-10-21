@@ -1,5 +1,12 @@
 import { defineSlotComponent } from "@pureform/core";
-import { dynamic, hex } from "@pureform/core/ast";
+import {
+    alias,
+    dynamic,
+    hex,
+    spring,
+    transition,
+    tween,
+} from "@pureform/core/ast";
 import { pureform } from "@pureform/preset";
 import { createElement } from "react";
 import { renderToString } from "react-dom/server";
@@ -296,6 +303,73 @@ describe("timeScale", () => {
         expect(durations(10).split(",").map(Number)).toEqual(
             normal.map((d) => d * 10),
         );
+    });
+});
+
+describe("timeScale and springs", () => {
+    it("slows a spring by scaling its stiffness and damping", () => {
+        const springy = {
+            ...config,
+            springs: { fast: spring({ stiffness: 800, damping: 0.6 }) },
+            components: {
+                box: defineSlotComponent({
+                    name: "box",
+                    slots: ["root"],
+                    recipe: {
+                        base: {
+                            root: {
+                                transition: transition(
+                                    tween("transform", {
+                                        spring: alias("springs", "fast"),
+                                    }),
+                                ),
+                            },
+                        },
+                    },
+                }),
+            },
+        };
+        const styles = precompute(springy, {
+            components: ["box"],
+            schemes: ["light"],
+        });
+        const transitionOf = (timeScale?: number) => {
+            const Probe = () =>
+                createElement(
+                    "pre",
+                    null,
+                    JSON.stringify(
+                        useComponentState("box").transitions.root![0],
+                    ),
+                );
+            return JSON.parse(
+                renderToString(
+                    createElement(
+                        PureformProvider,
+                        {
+                            styles,
+                            scheme: "light",
+                            ...(timeScale ? { timeScale } : {}),
+                        },
+                        createElement(Probe),
+                    ),
+                )
+                    .replace(/^<pre>|<\/pre>$/g, "")
+                    .replaceAll("&quot;", '"'),
+            );
+        };
+        const normal = transitionOf();
+        expect(normal.spring).toEqual({
+            type: "spring",
+            stiffness: 800,
+            damping: 2 * 0.6 * Math.sqrt(800),
+            mass: 1,
+        });
+        const slow = transitionOf(2);
+        expect(slow.duration).toBe(normal.duration * 2);
+        expect(slow.spring.stiffness).toBeCloseTo(200, 10);
+        expect(slow.spring.damping).toBeCloseTo(normal.spring.damping / 2, 10);
+        expect(slow.spring.mass).toBe(1);
     });
 });
 

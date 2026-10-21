@@ -1,7 +1,19 @@
-import { defineComponent, defineSlotComponent } from "@pureform/core";
+import {
+    dampingCoefficient,
+    defineComponent,
+    defineSlotComponent,
+    formatLinearEasing,
+    sampleSpring,
+} from "@pureform/core";
 import {
     add,
     alias,
+    animation,
+    linearEasing,
+    numeric,
+    spring,
+    transition,
+    tween,
     center,
     colorMix,
     dynamic,
@@ -29,6 +41,7 @@ import { describe, expect, it } from "vitest";
 
 import { lowerRn } from "./lower";
 import { select } from "./select";
+import { resolveTheme } from "./theme";
 
 const configWith = (root: StyleMap, extra: Partial<CoreConfig> = {}) =>
     ({
@@ -360,6 +373,93 @@ describe("lowerRn transitions", () => {
                 style: { transition: "none" },
             },
         ]);
+    });
+});
+
+describe("lowerRn springs", () => {
+    const fast = spring({ stiffness: 800, damping: 0.6 });
+
+    it("reads a spring token's sampled timing and physics from the theme", () => {
+        const { rules } = rulesOf(
+            {
+                transition: transition(
+                    tween("transform", {
+                        spring: alias("springs", "spatialFast"),
+                    }),
+                ),
+                animation: animation({
+                    name: "grow",
+                    spring: alias("springs", "spatialFast"),
+                }),
+            },
+            {
+                springs: { spatialFast: fast },
+                keyframes: { grow: { to: { opacity: unitless(1) } } },
+            },
+        );
+        const ref = (field: string) => ({
+            $ref: `springs.spatialFast.${field}`,
+        });
+        const timing = {
+            duration: ref("duration"),
+            easing: ref("easing"),
+            delay: 0,
+            spring: {
+                type: "spring",
+                stiffness: ref("stiffness"),
+                damping: ref("damping"),
+                mass: ref("mass"),
+            },
+        };
+        expect(rules[0]!.style).toMatchObject({
+            transition: [{ property: "transform", ...timing }],
+            animation: { name: "grow", ...timing },
+        });
+    });
+
+    it("samples a literal spring, with its damping as a coefficient", () => {
+        const { rules } = rulesOf({
+            transition: transition(
+                tween("transform", { spring: fast, delay: numeric(20, "ms") }),
+                tween("opacity", numeric(100, "ms"), linearEasing(0, 1)),
+            ),
+        });
+        const sampled = sampleSpring(fast);
+        expect(rules[0]!.style.transition).toEqual([
+            {
+                property: "transform",
+                duration: sampled.duration,
+                easing: formatLinearEasing(sampled.points),
+                delay: 20,
+                spring: {
+                    type: "spring",
+                    stiffness: 800,
+                    damping: 2 * 0.6 * Math.sqrt(800),
+                    mass: 1,
+                },
+            },
+            {
+                property: "opacity",
+                duration: 100,
+                easing: "linear(0, 1)",
+                delay: 0,
+            },
+        ]);
+    });
+
+    it("resolves a theme's spring tokens to numbers and curves", () => {
+        const theme = resolveTheme(
+            configWith({}, { springs: { spatialFast: fast } }),
+            { scheme: "light" },
+        );
+        const sampled = sampleSpring(fast);
+        expect(theme).toMatchObject({
+            "springs.spatialFast.duration": sampled.duration,
+            "springs.spatialFast.easing": formatLinearEasing(sampled.points),
+            "springs.spatialFast.stiffness": 800,
+            "springs.spatialFast.damping": dampingCoefficient(fast),
+            "springs.spatialFast.mass": 1,
+        });
     });
 });
 

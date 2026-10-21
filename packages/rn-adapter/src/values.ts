@@ -20,13 +20,25 @@ export const TINT = "backgroundTint";
 /** A style's transitions, which selection returns beside the style rather than in it. */
 export const TRANSITION = "transition";
 
+/** A spring as React Native's engines run it: stiffness, the damping coefficient
+ *  (`2ζ√(k·m)`, not the ratio), and mass. */
+export interface Spring {
+    type: "spring";
+    stiffness: number;
+    damping: number;
+    mass: number;
+}
+
 /** How one property moves to a new value: React Native's name for it, milliseconds, and a
- *  `cubic-bezier(...)` or `linear` curve. */
+ *  `cubic-bezier(...)`, `linear(...)`, or `linear` curve. A spring's duration and curve are
+ *  sampled from it, for an engine that runs CSS's timing (Reanimated); an engine with springs
+ *  (Animated) runs `spring` instead. */
 export interface Transition {
     property: string;
     duration: number;
     easing: string;
     delay: number;
+    spring?: Spring;
     /** A token's type, for a tween of the token itself. */
     valueType?: ValueType;
 }
@@ -50,6 +62,8 @@ export interface Animation {
     duration: number;
     easing: string;
     delay: number;
+    /** A spring timing's physics; the frames run over its sampled duration and curve. */
+    spring?: Spring;
     iterations: number;
     direction: "normal" | "reverse" | "alternate" | "alternateReverse";
     frames: {
