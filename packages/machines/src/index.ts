@@ -6,6 +6,8 @@ export * as buttonGroup from "./button-group";
 export * as carousel from "./carousel";
 export * as checkbox from "./checkbox";
 export * as combobox from "./combobox";
+export * as datePicker from "./date-picker";
+export * as dateInput from "./date-input";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
 export * as navigation from "./navigation";

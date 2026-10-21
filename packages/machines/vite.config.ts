@@ -30,6 +30,8 @@ export default createConfig({
                     toast: "src/toast/index.ts",
                     carousel: "src/carousel/index.ts",
                     combobox: "src/combobox/index.ts",
+                    "date-picker": "src/date-picker/index.ts",
+                    "date-input": "src/date-input/index.ts",
                     form: "src/form/index.ts",
                     interaction: "src/interaction/index.ts",
                 },

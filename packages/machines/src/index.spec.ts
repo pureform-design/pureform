@@ -1,6 +1,8 @@
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
 import * as zagCombobox from "@zag-js/combobox";
+import * as zagDateInput from "@zag-js/date-input";
+import * as zagDatePicker from "@zag-js/date-picker";
 import * as zagDialog from "@zag-js/dialog";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
@@ -19,6 +21,16 @@ describe("@pureform/machines", () => {
         expect(machines.dialog.connect).toBe(zagDialog.connect);
         expect(machines.tooltip.machine).toBe(zagTooltip.machine);
         expect(machines.tooltip.connect).toBe(zagTooltip.connect);
+    });
+
+    it("re-exports Zag's date picker and date input unchanged", () => {
+        expect(machines.datePicker.machine).toBe(zagDatePicker.machine);
+        expect(machines.datePicker.connect).toBe(zagDatePicker.connect);
+        expect(machines.dateInput.machine).toBe(zagDateInput.machine);
+        expect(machines.dateInput.connect).toBe(zagDateInput.connect);
+        expect(
+            machines.datePicker.toISO(machines.datePicker.parse("2026-08-17")!),
+        ).toBe("2026-08-17");
     });
 
     it("keeps Zag's states and transitions for the machines that emit to an interaction source", () => {
