@@ -511,6 +511,39 @@
                 "default": "./dist/search-view.jsx"
             }
         },
+        "./date-picker": {
+            "types": "./dist/date-picker/index.d.ts",
+            "solid": {
+                "development": "./src/date-picker/index.ts",
+                "default": "./dist/date-picker.jsx"
+            },
+            "import": {
+                "development": "./src/date-picker/index.ts",
+                "default": "./dist/date-picker.jsx"
+            }
+        },
+        "./docked-date-picker": {
+            "types": "./dist/docked-date-picker/index.d.ts",
+            "solid": {
+                "development": "./src/docked-date-picker/index.ts",
+                "default": "./dist/docked-date-picker.jsx"
+            },
+            "import": {
+                "development": "./src/docked-date-picker/index.ts",
+                "default": "./dist/docked-date-picker.jsx"
+            }
+        },
+        "./date-input": {
+            "types": "./dist/date-input/index.d.ts",
+            "solid": {
+                "development": "./src/date-input/index.ts",
+                "default": "./dist/date-input.jsx"
+            },
+            "import": {
+                "development": "./src/date-input/index.ts",
+                "default": "./dist/date-input.jsx"
+            }
+        },
         "./autocomplete": {
             "types": "./dist/autocomplete/index.d.ts",
             "solid": {
