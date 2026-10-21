@@ -733,3 +733,14 @@ slot, mask width and mask offset at a scroll position; the keylines turn round n
 last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
 The `dom` subpath adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
 `padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).
+
+## Accordion and tree
+
+`components/accordion.ts`: `AccordionRootOwnProps`, `ACCORDION_ROOT_PROPS`, `AccordionItem` (the
+ready-made's data: `value`, `title`, `description`, `leading`, `content`), `accordionSelection`,
+`accordionMachineProps` (an item collapses from its header by default) and `accordionItemProps`.
+`components/tree.ts`: `TreeRootOwnProps`, `TREE_ROOT_PROPS`, `TreeNode` (the nodes as data, a branch
+by its `children`), `treeSelection`, `treeMachineProps`, `treeControlProps` (the bindings'
+`expandedValue` and `selectedValue` under Zag's names), `treeCollectionOptions` (Zag's tree
+collection over the data), `treeNaming` (Zag's tree props without a label that isn't there) and
+`isTreeBranch`. `GLYPH_PATHS.expand` is the chevron both show.
