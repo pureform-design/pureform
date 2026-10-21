@@ -18,15 +18,15 @@
         }
     },
     "dependencies": {
-        "@pureform/core": "catalog:",
+        "@pureform/core": "workspace:^",
         "jiti": "catalog:",
         "oxc-parser": "catalog:"
     },
     "devDependencies": {
-        "@pureform/release": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/release": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@types/node": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",

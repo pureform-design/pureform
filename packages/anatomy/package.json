@@ -32,13 +32,13 @@
         "generate": "bun --conditions=development ./scripts/generate.ts"
     },
     "dependencies": {
-        "@pureform/core": "catalog:"
+        "@pureform/core": "workspace:^"
     },
     "devDependencies": {
-        "@pureform/preset": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/preset": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

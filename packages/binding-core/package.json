@@ -62,15 +62,15 @@
         }
     },
     "dependencies": {
-        "@pureform/anatomy": "catalog:",
-        "@pureform/core": "catalog:",
-        "@pureform/js-effects": "catalog:",
-        "@pureform/styling": "catalog:"
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/core": "workspace:^",
+        "@pureform/js-effects": "workspace:^",
+        "@pureform/styling": "workspace:^"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "typescript": "catalog:",

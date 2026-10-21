@@ -190,8 +190,8 @@
     },
     "dependencies": {
         "@internationalized/date": "catalog:",
-        "@pureform/binding-core": "catalog:",
-        "@pureform/js-effects": "catalog:",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/js-effects": "workspace:^",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
@@ -217,10 +217,10 @@
         "@zag-js/utils": "catalog:"
     },
     "devDependencies": {
-        "@pureform/anatomy": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "@vitest/browser-playwright": "catalog:",
         "@zag-js/vanilla": "catalog:",
         "playwright": "catalog:",

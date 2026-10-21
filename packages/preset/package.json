@@ -17,15 +17,15 @@
         }
     },
     "dependencies": {
-        "@pureform/core": "catalog:",
-        "@pureform/material": "catalog:",
-        "@pureform/theme": "catalog:"
+        "@pureform/core": "workspace:^",
+        "@pureform/material": "workspace:^",
+        "@pureform/theme": "workspace:^"
     },
     "devDependencies": {
-        "@pureform/panda-adapter": "catalog:",
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/panda-adapter": "workspace:^",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

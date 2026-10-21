@@ -29,13 +29,13 @@
         }
     },
     "dependencies": {
-        "@pureform/core": "catalog:",
-        "@pureform/css-lowering": "catalog:"
+        "@pureform/core": "workspace:^",
+        "@pureform/css-lowering": "workspace:^"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
-        "@pureform/vitest-config": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "@pureform/vitest-config": "workspace:^",
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:"

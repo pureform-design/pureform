@@ -12,8 +12,8 @@
         "access": "public"
     },
     "devDependencies": {
-        "@pureform/tsconfig": "catalog:",
-        "@pureform/vite-config": "catalog:",
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
         "unplugin-dts": "catalog:"
     },
     "peerDependencies": {

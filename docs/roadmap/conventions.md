@@ -55,7 +55,10 @@ for what they can't do (git, formatting, linting, ad-hoc scripts).
 - **Older contexts' "glue"** is the generated registry (`.pureform/`), and their `pureform.glue.ts`
   (exporting `glue`) is `pureform.codegen.ts` (exporting `codegen`).
 - **New packages** are scaffolded with the omni `ts-package` generator (see above).
-  Dependencies go through the root `package.json` catalog. Test projects live under `tests/`.
+  Dependencies go through the root `package.json` catalog, except the workspace's own
+  `@pureform/*` packages, which each package names as `workspace:^`: bun can't resolve a
+  catalog's `workspace:^` entry for a package whose dependencies change in the same install
+  ("Workspace dependency … not found"). Test projects live under `tests/`.
 - **Package READMEs:** every package a phase creates gets a `README.md`, and every
   package a phase changes gets its `README.md` updated (created if missing). Write it for
   a person new to the package, in plain language:
