@@ -601,11 +601,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
               },
               "base": "transparent",
             },
-            "borderWidth": {
-              "@supports (clip-path: shape(from 0 0, line to 0 0))": "0px",
-              "base": "1px",
-            },
             "clipPath": "shape(evenodd from 97.553% 65.451%, line to 97.553% 65.451%, curve to 79.389% 90.451% with 94.29% 75.493% / 87.932% 84.244%, line to 79.389% 90.451%, curve to 50% 100% with 70.847% 96.657% / 60.559% 100%, line to 50% 100%, curve to 20.611% 90.451% with 39.441% 100% / 29.153% 96.657%, line to 20.611% 90.451%, curve to 2.447% 65.451% with 12.068% 84.244% / 5.71% 75.493%, line to 2.447% 65.451%, curve to 2.447% 34.549% with -0.816% 55.409% / -0.816% 44.591%, line to 2.447% 34.549%, curve to 20.611% 9.549% with 5.71% 24.507% / 12.068% 15.756%, line to 20.611% 9.549%, curve to 50% 0% with 29.153% 3.343% / 39.441% 0%, line to 50% 0%, curve to 79.389% 9.549% with 60.559% 0% / 70.847% 3.343%, line to 79.389% 9.549%, curve to 97.553% 34.549% with 87.932% 15.756% / 94.29% 24.507%, line to 97.553% 34.549%, curve to 97.553% 65.451% with 100.816% 44.591% / 100.816% 55.409%, close, move to calc(97.553% + -0.951px) calc(65.451% + -0.309px), line to calc(97.553% + -0.951px) calc(65.451% + -0.309px), curve to calc(79.389% + -0.588px) calc(90.451% + -0.809px) with calc(94.29% + -0.886px) calc(75.493% + -0.51px) / calc(87.932% + -0.759px) calc(84.244% + -0.685px), line to calc(79.389% + -0.588px) calc(90.451% + -0.809px), curve to calc(50% + 0px) calc(100% + -1px) with calc(70.847% + -0.417px) calc(96.657% + -0.933px) / calc(60.559% + -0.211px) calc(100% + -1px), line to calc(50% + 0px) calc(100% + -1px), curve to calc(20.611% + 0.588px) calc(90.451% + -0.809px) with calc(39.441% + 0.211px) calc(100% + -1px) / calc(29.153% + 0.417px) calc(96.657% + -0.933px), line to calc(20.611% + 0.588px) calc(90.451% + -0.809px), curve to calc(2.447% + 0.951px) calc(65.451% + -0.309px) with calc(12.068% + 0.759px) calc(84.244% + -0.685px) / calc(5.71% + 0.886px) calc(75.493% + -0.51px), line to calc(2.447% + 0.951px) calc(65.451% + -0.309px), curve to calc(2.447% + 0.951px) calc(34.549% + 0.309px) with calc(-0.816% + 1.016px) calc(55.409% + -0.108px) / calc(-0.816% + 1.016px) calc(44.591% + 0.108px), line to calc(2.447% + 0.951px) calc(34.549% + 0.309px), curve to calc(20.611% + 0.588px) calc(9.549% + 0.809px) with calc(5.71% + 0.886px) calc(24.507% + 0.51px) / calc(12.068% + 0.759px) calc(15.756% + 0.685px), line to calc(20.611% + 0.588px) calc(9.549% + 0.809px), curve to 50% calc(0% + 1px) with calc(29.153% + 0.417px) calc(3.343% + 0.933px) / calc(39.441% + 0.211px) calc(0% + 1px), line to calc(50% + 0px) calc(0% + 1px), curve to calc(79.389% + -0.588px) calc(9.549% + 0.809px) with calc(60.559% + -0.211px) calc(0% + 1px) / calc(70.847% + -0.417px) calc(3.343% + 0.933px), line to calc(79.389% + -0.588px) calc(9.549% + 0.809px), curve to calc(97.553% + -0.951px) calc(34.549% + 0.309px) with calc(87.932% + -0.759px) calc(15.756% + 0.685px) / calc(94.29% + -0.886px) calc(24.507% + 0.51px), line to calc(97.553% + -0.951px) calc(34.549% + 0.309px), curve to calc(97.553% + -0.951px) calc(65.451% + -0.309px) with calc(100.816% + -1.016px) calc(44.591% + 0.108px) / calc(100.816% + -1.016px) calc(55.409% + -0.108px), close)",
+          },
+          "root": {
+            "--components-iconButton-shaped": "1",
           },
         },
         "none": {},
@@ -781,7 +780,10 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
               "base": "var(--components-iconButton-outlineColor, token(colors.outline))",
             },
             "borderStyle": "solid",
-            "borderWidth": "var(--components-iconButton-outlineWidth, 1px)",
+            "borderWidth": {
+              "@supports (clip-path: shape(from 0 0, line to 0 0))": "calc(var(--components-iconButton-outlineWidth, 1px) + calc(calc(0px - var(--components-iconButton-outlineWidth, 1px)) * var(--components-iconButton-shaped, 0)))",
+              "base": "calc(var(--components-iconButton-outlineWidth, 1px) + calc(calc(1px - var(--components-iconButton-outlineWidth, 1px)) * var(--components-iconButton-shaped, 0)))",
+            },
             "display": "flex",
           },
           "root": {

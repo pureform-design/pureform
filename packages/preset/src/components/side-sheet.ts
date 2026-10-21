@@ -34,7 +34,7 @@ import {
 } from "@pureform/core/ast";
 import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
-import { componentTokens, surface, sys } from "./shared";
+import { blend, componentTokens, surface, sys } from "./shared";
 import { sheetMotion } from "./sheet";
 import { runCorners } from "./tiles";
 
@@ -51,6 +51,10 @@ const { tokens, ref } = componentTokens("sideSheet", {
     buttonInset: spacing("3"),
     gap: spacing("3"),
     actionsGap: spacing("2"),
+    // The layer the sheet stacks at, set by `modal`, and 1 when `coplanar` puts it on the page's
+    // plane instead (which wins).
+    layer: zIndex("dialog"),
+    coplanar: unitless(0),
 });
 
 const pf = typed();
@@ -88,6 +92,7 @@ export const sideSheet = pf.slotComponent({
                 height: pct(100),
                 minHeight: px(0),
                 borderWidth: px(0),
+                zIndex: blend(ref("layer"), zIndex("base"), ref("coplanar")),
             },
             header: {
                 display: flex,
@@ -145,13 +150,12 @@ export const sideSheet = pf.slotComponent({
                         tokens: { container: sys("surfaceContainerLow") },
                         apply: { shadowElevation: "level1" },
                         ...runCorners(ref("radius"), px(0), "inline"),
-                        zIndex: zIndex("dialog"),
                     },
                 },
-                false: { root: { zIndex: zIndex("raised") } },
+                false: { root: { tokens: { layer: zIndex("raised") } } },
             },
             coplanar: {
-                true: { root: { zIndex: zIndex("base") } },
+                true: { root: { tokens: { coplanar: unitless(1) } } },
                 false: {},
             },
         },

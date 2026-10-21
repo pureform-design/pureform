@@ -180,6 +180,8 @@ const { tokens, ref } = componentTokens("iconButton", {
     selectedIconFill: unitless(1),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
+    // 1 under a shape (the `shape` variant sets it): the outline's border gives way to the clip.
+    shaped: unitless(0),
     // Each size's height and widths, so a theme can retune a size.
     ...sizeTokens(ICON_BUTTON_SIZES, "size", "size"),
     ...sizeTokens(ICON_BUTTON_SIZES, "narrow", "narrow"),

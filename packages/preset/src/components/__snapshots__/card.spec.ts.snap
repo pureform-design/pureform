@@ -248,10 +248,6 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
               "&:has(> .card__actionArea:is(:hover, [data-pf-hover]))": "color-mix(in srgb, var(--components-card-container, token(colors.surfaceContainerLow)), var(--components-card-content, token(colors.onSurface)) var(--components-card-stateHoverOpacity, token(opacity.stateHover)))",
               "base": "var(--components-card-container, token(colors.surfaceContainerLow))",
             },
-            "borderColor": {
-              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
-              "base": "var(--components-card-outlineColor, token(colors.outlineVariant))",
-            },
             "boxShadow": {
               "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "token(shadows.level0)",
               "&:has(> .card__actionArea:is(:hover, [data-pf-hover]))": "var(--components-card-hoveredShadow, token(shadows.level2))",
@@ -272,6 +268,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             "&:is(:disabled, [aria-disabled=true])": {
               "pointerEvents": "none",
             },
+            "boxShadow": "var(--components-card-restingShadow, token(shadows.level1))",
             "cursor": "pointer",
           },
         },
@@ -295,9 +292,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             "--components-card-container": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
             "--components-card-hoveredShadow": "token(shadows.level2)",
             "--components-card-restingShadow": "token(shadows.level1)",
-            "backgroundColor": "var(--components-card-elevatedContainer, token(colors.surfaceContainerLow))",
-            "color": "var(--components-card-content, token(colors.onSurface))",
-            "shadowElevation": "level1",
+            "backgroundImage": "linear-gradient(token(colors.elevationTintLevel1), token(colors.elevationTintLevel1))",
           },
         },
         "filled": {
@@ -305,9 +300,7 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             "--components-card-container": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
             "--components-card-hoveredShadow": "token(shadows.level1)",
             "--components-card-restingShadow": "token(shadows.level0)",
-            "backgroundColor": "var(--components-card-filledContainer, token(colors.surfaceContainerHighest))",
-            "color": "var(--components-card-content, token(colors.onSurface))",
-            "shadowElevation": "level0",
+            "backgroundImage": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
           },
         },
         "outlined": {
@@ -315,12 +308,13 @@ exports[`card > compiles to a stable Panda slot recipe 1`] = `
             "--components-card-container": "var(--components-card-outlinedContainer, token(colors.surface))",
             "--components-card-hoveredShadow": "token(shadows.level1)",
             "--components-card-restingShadow": "token(shadows.level0)",
-            "backgroundColor": "var(--components-card-outlinedContainer, token(colors.surface))",
-            "borderColor": "var(--components-card-outlineColor, token(colors.outlineVariant))",
+            "backgroundImage": "linear-gradient(token(colors.elevationTintLevel0), token(colors.elevationTintLevel0))",
+            "borderColor": {
+              "&:has(> .card__actionArea:is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]):is(:disabled, [aria-disabled=true]))": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContainer))",
+              "base": "var(--components-card-outlineColor, token(colors.outlineVariant))",
+            },
             "borderStyle": "solid",
             "borderWidth": "var(--components-card-outlineWidth, 1px)",
-            "color": "var(--components-card-content, token(colors.onSurface))",
-            "shadowElevation": "level0",
           },
         },
       },

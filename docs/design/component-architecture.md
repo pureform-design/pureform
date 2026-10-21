@@ -583,6 +583,13 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   (`a: token("b")`). CSS resolves the chain on the element, but React Native resolves `b` from
   the theme's default before the variant's, so the targets disagree. Read such tokens in styles
   instead, and read theme- or instance-set tokens (per-size tokens) directly.
+- **No overlapping groups (r4-findings):** two groups never set the same property (or token) on
+  one slot, since Panda doesn't emit variant classes in definition order. The preset's
+  `variant-overlap.spec.ts` checks it. The circular progress's `color` sets `activeColor` and
+  `trackColor`; the icon button's `shape` sets a `shaped` flag its outline's border blends with;
+  the card's fill sets `container` and the shadows, which `interactive` reads; the app bar's
+  content inset blends from `expanded` (flexible sizes) and `search` flags; the side sheet's
+  `modal` sets `layer` and `coplanar` a flag.
 
 ### 5.6 Themes
 

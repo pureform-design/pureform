@@ -5,7 +5,8 @@
 // differ. Custom properties are left out: Panda's own preset adds tokens of its own, and what
 // matters is the values they resolve to.
 //
-// Every variant value is compared at rest. States, the dark scheme, and a named theme are
+// Every variant value is compared at rest, and again with the `shape()` clip rules dropped (a
+// target that can't clip). States, the dark scheme, and a named theme are
 // compared on each component's defaults: a state through the ARIA or `data-pf-*` attribute
 // both adapters' selectors match, set on every element, so element and slot conditions both
 // apply. Focus has no attribute, so it is forced on every element through DevTools.
@@ -26,12 +27,37 @@ const PREFIX = "pf";
 const THEME_ATTRIBUTE = "data-panda-theme";
 const OPTIONS = { prefix: PREFIX, themeAttribute: THEME_ATTRIBUTE };
 
-// One element per selection: the defaults, then each variant value on its own.
-const selections = (manifest: ComponentManifest): Record<string, string>[] => [
+// Values from two groups that once set the same property on one slot, where Panda (which orders
+// a recipe's variant classes by name) disagreed with the definition order the other adapters
+// keep. The preset's variant-overlap spec keeps groups from overlapping; these show the result.
+const COMBINATIONS: Record<string, Record<string, string>[]> = {
+    circularProgress: [
+        { indeterminate: "true", color: "success" },
+        { indeterminate: "true", color: "error", shape: "wavy" },
+    ],
+    iconButton: [
+        { variant: "outlined", shape: "circle" },
+        { variant: "outlined", shape: "cookie9Sided", size: "xlarge" },
+    ],
+    card: [{ variant: "outlined", interactive: "false" }],
+    appBar: [
+        { size: "mediumFlexible", search: "true" },
+        { size: "largeFlexible", search: "true" },
+    ],
+    sideSheet: [{ modal: "false", coplanar: "true" }],
+};
+
+// One element per selection: the defaults, then each variant value on its own, then the
+// combinations above.
+const selections = (
+    name: string,
+    manifest: ComponentManifest,
+): Record<string, string>[] => [
     {},
     ...Object.entries(manifest.variants).flatMap(([group, values]) =>
         values.map((value) => ({ [group]: value })),
     ),
+    ...(COMBINATIONS[name] ?? []),
 ];
 
 interface Item {
@@ -39,16 +65,28 @@ interface Item {
     name: string;
     slots: readonly string[] | undefined;
     selection: Record<string, string>;
+    /** For a combination, the slots nest as the anatomy does, so the tokens one group sets on
+     *  the root reach the slot the other group styles. */
+    structure?: Readonly<Record<string, readonly string[]>>;
 }
 
 const ITEMS: Item[] = Object.values(pureformConfig.components).flatMap(
     (spec) => {
         const manifest = manifestOf(spec);
-        return selections(manifest).map((selection, index) => ({
+        const all = selections(spec.name, manifest);
+        const combined = all.length - (COMBINATIONS[spec.name]?.length ?? 0);
+        return all.map((selection, index) => ({
             id: `${spec.name}-${index}`,
             name: spec.name,
             slots: manifest.slots,
             selection,
+            ...(index >= combined && "structure" in spec
+                ? {
+                      structure: spec.structure as Readonly<
+                          Record<string, readonly string[]>
+                      >,
+                  }
+                : {}),
         }));
     },
 );
@@ -93,19 +131,48 @@ interface Scenario {
     rootClass?: string;
     /** A named theme the components sit in. */
     theme?: string;
+    /** Drop the rules for browsers that clip to `shape()`, as a target that can't clip draws. */
+    noClipShape?: boolean;
 }
+
+// Delete every `@supports (clip-path: shape(…))` block, in layers and nested rules too.
+const dropClipShape = (
+    parent: { cssRules: CSSRuleList; deleteRule(index: number): void },
+    win: typeof globalThis,
+) => {
+    for (let i = parent.cssRules.length - 1; i >= 0; i--) {
+        const rule = parent.cssRules[i]!;
+        if (
+            rule instanceof win.CSSSupportsRule &&
+            rule.conditionText.includes("shape(")
+        ) {
+            parent.deleteRule(i);
+        } else if ((rule as Partial<CSSGroupingRule>).cssRules) {
+            dropClipShape(rule as CSSGroupingRule, win);
+        }
+    }
+};
 
 const markup = (classes: Classes, scenario: Scenario): string => {
     const attributes = (scenario.attributes ?? [])
         .map((name) => ` ${name}`)
         .join("");
-    const elements = ITEMS.flatMap(({ id, slots }, index) => {
+    const elements = ITEMS.flatMap(({ id, slots, structure }, index) => {
         if (!scenario.every && !id.endsWith("-0")) return [];
         const own = classes[index]!;
         if (!slots) {
             return `<div data-id="${id}"${attributes} class="${own as string}"></div>`;
         }
         const bySlot = own as Record<string, string>;
+        if (structure) {
+            const nested = (slot: string): string =>
+                `<div data-id="${id}.${slot}"${attributes} class="${bySlot[slot]}">${(
+                    structure[slot] ?? []
+                )
+                    .map(nested)
+                    .join("")}</div>`;
+            return `<div data-id="${id}">${nested(slots[0]!)}</div>`;
+        }
         return `<div data-id="${id}">${slots
             .map(
                 (slot) =>
@@ -168,6 +235,10 @@ const computed = async (
                 if (!keep) sheet.deleteRule(i);
             }
         }
+        if (scenario.noClipShape) {
+            const win = frame.contentWindow as unknown as typeof globalThis;
+            for (const sheet of doc.styleSheets) dropClipShape(sheet, win);
+        }
         const out: Record<string, Record<string, string>> = {};
         for (const element of doc.querySelectorAll<HTMLElement>("[data-id]")) {
             const style = frame.contentWindow!.getComputedStyle(element);
@@ -204,6 +275,11 @@ const same = (a: string, b: string | undefined): boolean => {
 
 const SCENARIOS: Scenario[] = [
     { name: "every variant value at rest", every: true },
+    {
+        name: "every variant value where shape() can't clip",
+        every: true,
+        noClipShape: true,
+    },
     { name: "hovered", attributes: ["data-pf-hover"] },
     {
         name: "focused",
@@ -252,7 +328,7 @@ describe.each(ADAPTERS)(
             }
             expect(Object.keys(panda).length).toBeGreaterThan(30);
             expect(Object.keys(plain)).toEqual(Object.keys(panda));
-            expect(differences).toEqual([]);
+            expect(differences, differences.join("\n")).toEqual([]);
         });
     },
 );

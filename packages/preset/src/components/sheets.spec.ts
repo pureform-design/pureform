@@ -93,9 +93,11 @@ describe("sideSheet", () => {
     });
 
     it("puts a coplanar sheet on the page's own layer", () => {
+        // The flag blends the modal's layer to the page's own.
         expect(json(sideSheet.recipe.variants!.coplanar!.true)).toContain(
-            "base",
+            "coplanar",
         );
+        expect(json(sideSheet.recipe.base.root!.zIndex)).toContain("base");
     });
 });
 
