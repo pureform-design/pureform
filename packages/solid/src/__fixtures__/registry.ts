@@ -152,7 +152,6 @@ const FIELD_SLOTS = [
     "suffixText",
     "label",
     "trailingIcon",
-    "supportingRow",
     "supportingText",
     "counter",
 ] as const;
@@ -359,6 +358,11 @@ export const displayRegistry = () =>
             "startHalf",
             "startArc",
         ]),
+        loadingIndicator: named("loading-indicator", [
+            "root",
+            "container",
+            "indicator",
+        ]),
         slider: ((s: Selection<ComponentShape>) =>
             withTokenStyle(
                 named("slider", [
@@ -381,6 +385,13 @@ export const displayRegistry = () =>
                     stopActive: "--stopActive",
                 },
             )) as never,
+        carousel: named("carousel", [
+            "root",
+            "itemGroup",
+            "item",
+            "mask",
+            "content",
+        ]),
         card: named("card", [
             "root",
             "touchTarget",
@@ -397,6 +408,14 @@ export const displayRegistry = () =>
             "supportingText",
             "actions",
             "footer",
+        ]),
+        appBar: named("app-bar", [
+            "root",
+            "leading",
+            "content",
+            "headline",
+            "subtitle",
+            "trailing",
         ]),
         searchBar: named("search-bar", [
             "root",
@@ -433,5 +452,37 @@ export const buttonGroupRegistry = () =>
             "container",
             "icon",
             "outline",
+        ]),
+    });
+
+/** The toolbar's fake factories: the bar, its icon buttons and buttons, and the overflow menu. */
+export const toolbarRegistry = () =>
+    createRegistry({
+        toolbar: named("toolbar", ["root"]),
+        button: named("button", [
+            "root",
+            "label",
+            "icon",
+            "secondaryIcon",
+            "touchTarget",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        menu: named("menu", [
+            "root",
+            "itemGroup",
+            "itemGroupLabel",
+            "item",
+            "itemLeading",
+            "itemContent",
+            "itemLabel",
+            "itemSupportingText",
+            "itemTrailing",
+            "itemTrailingText",
         ]),
     });

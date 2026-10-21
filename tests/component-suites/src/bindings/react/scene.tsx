@@ -8,6 +8,7 @@ import {
     PureformProvider,
 } from "@pureform/react";
 import type { Indication } from "@pureform/react";
+import { AppBar } from "@pureform/react/app-bar";
 import { Autocomplete } from "@pureform/react/autocomplete";
 import { Avatar } from "@pureform/react/avatar";
 import { Badge } from "@pureform/react/badge";
@@ -15,6 +16,7 @@ import { BottomSheet } from "@pureform/react/bottom-sheet";
 import { Button } from "@pureform/react/button";
 import { ButtonGroup } from "@pureform/react/button-group";
 import { Card } from "@pureform/react/card";
+import { Carousel } from "@pureform/react/carousel";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { CircularProgress } from "@pureform/react/circular-progress";
@@ -28,6 +30,7 @@ import { IconButton } from "@pureform/react/icon-button";
 import { LinearProgress } from "@pureform/react/linear-progress";
 import { List } from "@pureform/react/list";
 import { ListItem } from "@pureform/react/list-item";
+import { LoadingIndicator } from "@pureform/react/loading-indicator";
 import { Media } from "@pureform/react/media";
 import { Menu } from "@pureform/react/menu";
 import { NavigationBar } from "@pureform/react/navigation-bar";
@@ -53,6 +56,7 @@ import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
 import { createToaster, Toaster } from "@pureform/react/toast";
 import type { ToastData } from "@pureform/react/toast";
+import { Toolbar } from "@pureform/react/toolbar";
 import { Tooltip } from "@pureform/react/tooltip";
 import { TouchTarget } from "@pureform/react/touch-target";
 import {
@@ -99,9 +103,11 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Button,
     ButtonGroup,
     Card,
+    Carousel,
     Checkbox,
     Chip,
     CircularProgress,
+    LoadingIndicator,
     Dialog,
     DragHandle,
     Fab,
@@ -120,6 +126,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Ripple,
     RichTooltip,
     Scrim,
+    AppBar,
     SearchBar,
     SearchView,
     Select,
@@ -137,6 +144,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     TextArea,
     TextField,
     Toast: ToastScene,
+    Toolbar,
     Tooltip,
     TouchTarget,
 };

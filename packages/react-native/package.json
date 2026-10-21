@@ -82,6 +82,13 @@
                 "default": "./dist/circular-progress.mjs"
             }
         },
+        "./loading-indicator": {
+            "types": "./dist/loading-indicator/index.d.ts",
+            "import": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.mjs"
+            }
+        },
         "./dialog": {
             "types": "./dist/dialog/index.d.ts",
             "import": {
@@ -101,6 +108,13 @@
             "import": {
                 "development": "./src/side-sheet/index.ts",
                 "default": "./dist/side-sheet.mjs"
+            }
+        },
+        "./carousel": {
+            "types": "./dist/carousel/index.d.ts",
+            "import": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.mjs"
             }
         },
         "./drag-handle": {
@@ -222,6 +236,13 @@
                 "default": "./dist/scrim.mjs"
             }
         },
+        "./app-bar": {
+            "types": "./dist/app-bar/index.d.ts",
+            "import": {
+                "development": "./src/app-bar/index.ts",
+                "default": "./dist/app-bar.mjs"
+            }
+        },
         "./search-bar": {
             "types": "./dist/search-bar/index.d.ts",
             "import": {
@@ -276,6 +297,13 @@
             "import": {
                 "development": "./src/toast/index.ts",
                 "default": "./dist/toast.mjs"
+            }
+        },
+        "./toolbar": {
+            "types": "./dist/toolbar/index.d.ts",
+            "import": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.mjs"
             }
         },
         "./supporting-text": {

@@ -4,6 +4,7 @@ import {
     autocompleteAnatomy,
     buttonAnatomy,
     buttonGroupAnatomy,
+    carouselAnatomy,
     inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
@@ -19,6 +20,7 @@ import { describe, expect, it } from "vitest";
 
 import { anatomy as buttonGroup } from "./button-group";
 import { anatomy as button } from "./button/button.anatomy";
+import { anatomy as carousel } from "./carousel/carousel.anatomy";
 import {
     anatomy as autocomplete,
     searchViewAnatomy as searchView,
@@ -42,6 +44,7 @@ const pairs: Record<string, Pair> = {
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
+    carousel: { machine: carousel, preset: carouselAnatomy },
     navigationBar: { machine: navigation, preset: navigationBarAnatomy },
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
     searchView: { machine: searchView, preset: searchViewAnatomy },

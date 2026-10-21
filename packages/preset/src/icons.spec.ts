@@ -21,6 +21,7 @@ const ICON_SLOTS: Record<string, string[]> = {
     menu: ["itemLeading", "itemTrailing"],
     navigationBar: ["icon"],
     navigationRail: ["icon"],
+    appBar: ["leading", "trailing"],
     searchBar: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
     autocomplete: ["leadingIcon", "trailingIcon"],

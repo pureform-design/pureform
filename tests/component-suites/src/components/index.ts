@@ -1,10 +1,12 @@
 // Every component the shared suites run over. Add a component's case here.
 
+import { appBar } from "./app-bar";
 import { autocomplete } from "./autocomplete";
 import { bottomSheet } from "./bottom-sheet";
 import { button } from "./button";
 import { buttonGroup } from "./button-group";
 import { card, cardActionArea } from "./card";
+import { carouselCase } from "./carousel";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { dialog } from "./dialog";
@@ -14,6 +16,7 @@ import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
+import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar, navigationRail } from "./navigation";
 import { circularProgress, linearProgress } from "./progress";
@@ -44,6 +47,7 @@ import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
 import { toastCase } from "./toast";
+import { toolbar } from "./toolbar";
 import { tooltip } from "./tooltip";
 import type { ComponentCase } from "./types";
 
@@ -55,9 +59,11 @@ export const COMPONENTS: readonly ComponentCase[] = [
     buttonGroup,
     card,
     cardActionArea,
+    carouselCase,
     checkbox,
     chip,
     circularProgress,
+    loadingIndicator,
     dialog,
     dragHandle,
     fab,
@@ -77,6 +83,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     richTooltip,
     ripple,
     scrim,
+    appBar,
     searchBar,
     searchView,
     select,
@@ -94,6 +101,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     textArea,
     textField,
     toastCase,
+    toolbar,
     tooltip,
     touchTarget,
 ];

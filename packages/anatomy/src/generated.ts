@@ -537,7 +537,6 @@ export const textFieldAnatomy = {
         "label",
         "trailingIcon",
         "supportingText",
-        "supportingRow",
         "counter",
     ],
     parts: {
@@ -546,7 +545,7 @@ export const textFieldAnatomy = {
             attribute: "root",
             testId: "pf-text-field-root",
             parent: null,
-            children: ["container", "supportingRow"],
+            children: ["container", "supportingText", "counter"],
             styled: true,
             mirror: false,
         },
@@ -624,17 +623,8 @@ export const textFieldAnatomy = {
             name: "supportingText",
             attribute: "supporting-text",
             testId: "pf-text-field-supporting-text",
-            parent: "supportingRow",
-            children: [],
-            styled: true,
-            mirror: false,
-        },
-        supportingRow: {
-            name: "supportingRow",
-            attribute: "supporting-row",
-            testId: "pf-text-field-supporting-row",
             parent: "root",
-            children: ["supportingText", "counter"],
+            children: [],
             styled: true,
             mirror: false,
         },
@@ -642,7 +632,7 @@ export const textFieldAnatomy = {
             name: "counter",
             attribute: "counter",
             testId: "pf-text-field-counter",
-            parent: "supportingRow",
+            parent: "root",
             children: [],
             styled: true,
             mirror: false,
@@ -662,7 +652,6 @@ export const textAreaAnatomy = {
         "label",
         "trailingIcon",
         "supportingText",
-        "supportingRow",
         "counter",
     ],
     parts: {
@@ -671,7 +660,7 @@ export const textAreaAnatomy = {
             attribute: "root",
             testId: "pf-text-area-root",
             parent: null,
-            children: ["container", "supportingRow"],
+            children: ["container", "supportingText", "counter"],
             styled: true,
             mirror: false,
         },
@@ -724,17 +713,8 @@ export const textAreaAnatomy = {
             name: "supportingText",
             attribute: "supporting-text",
             testId: "pf-text-area-supporting-text",
-            parent: "supportingRow",
-            children: [],
-            styled: true,
-            mirror: false,
-        },
-        supportingRow: {
-            name: "supportingRow",
-            attribute: "supporting-row",
-            testId: "pf-text-area-supporting-row",
             parent: "root",
-            children: ["supportingText", "counter"],
+            children: [],
             styled: true,
             mirror: false,
         },
@@ -742,7 +722,7 @@ export const textAreaAnatomy = {
             name: "counter",
             attribute: "counter",
             testId: "pf-text-area-counter",
-            parent: "supportingRow",
+            parent: "root",
             children: [],
             styled: true,
             mirror: false,
@@ -1696,6 +1676,42 @@ export const circularProgressAnatomy = {
     },
 } as const satisfies ComponentAnatomy;
 
+export const loadingIndicatorAnatomy = {
+    name: "loadingIndicator",
+    scope: "loading-indicator",
+    root: "root",
+    partNames: ["root", "container", "indicator"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-loading-indicator-root",
+            parent: null,
+            children: ["container"],
+            styled: true,
+            mirror: false,
+        },
+        container: {
+            name: "container",
+            attribute: "container",
+            testId: "pf-loading-indicator-container",
+            parent: "root",
+            children: ["indicator"],
+            styled: true,
+            mirror: false,
+        },
+        indicator: {
+            name: "indicator",
+            attribute: "indicator",
+            testId: "pf-loading-indicator-indicator",
+            parent: "container",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const separatorAnatomy = {
     name: "separator",
     scope: "separator",
@@ -2184,6 +2200,76 @@ export const navigationRailAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const appBarAnatomy = {
+    name: "appBar",
+    scope: "app-bar",
+    root: "root",
+    partNames: [
+        "root",
+        "leading",
+        "content",
+        "headline",
+        "subtitle",
+        "trailing",
+    ],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-app-bar-root",
+            parent: null,
+            children: ["leading", "content", "trailing"],
+            styled: true,
+            mirror: false,
+        },
+        leading: {
+            name: "leading",
+            attribute: "leading",
+            testId: "pf-app-bar-leading",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+        content: {
+            name: "content",
+            attribute: "content",
+            testId: "pf-app-bar-content",
+            parent: "root",
+            children: ["headline", "subtitle"],
+            styled: true,
+            mirror: false,
+        },
+        headline: {
+            name: "headline",
+            attribute: "headline",
+            testId: "pf-app-bar-headline",
+            parent: "content",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        subtitle: {
+            name: "subtitle",
+            attribute: "subtitle",
+            testId: "pf-app-bar-subtitle",
+            parent: "content",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        trailing: {
+            name: "trailing",
+            attribute: "trailing",
+            testId: "pf-app-bar-trailing",
+            parent: "root",
+            children: [],
+            styled: true,
+            mirror: true,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const dialogAnatomy = {
     name: "dialog",
     scope: "dialog",
@@ -2614,6 +2700,24 @@ export const toastAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const toolbarAnatomy = {
+    name: "toolbar",
+    scope: "toolbar",
+    root: "root",
+    partNames: ["root"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-toolbar-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+} as const satisfies ComponentAnatomy;
+
 export const tooltipAnatomy = {
     name: "tooltip",
     scope: "tooltip",
@@ -2872,6 +2976,63 @@ export const cardAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
+export const carouselAnatomy = {
+    name: "carousel",
+    scope: "carousel",
+    root: "root",
+    partNames: ["root", "itemGroup", "item", "mask", "content"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-carousel-root",
+            parent: null,
+            children: ["itemGroup"],
+            styled: true,
+            mirror: false,
+        },
+        itemGroup: {
+            name: "itemGroup",
+            attribute: "item-group",
+            testId: "pf-carousel-item-group",
+            parent: "root",
+            children: ["item"],
+            styled: true,
+            mirror: false,
+        },
+        item: {
+            name: "item",
+            attribute: "item",
+            testId: "pf-carousel-item",
+            parent: "itemGroup",
+            children: ["mask"],
+            styled: true,
+            mirror: false,
+        },
+        mask: {
+            name: "mask",
+            attribute: "mask",
+            testId: "pf-carousel-mask",
+            parent: "item",
+            children: ["content"],
+            styled: true,
+            mirror: false,
+        },
+        content: {
+            name: "content",
+            attribute: "content",
+            testId: "pf-carousel-content",
+            parent: "mask",
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    indication: [
+        { trigger: "mask", surface: "mask", centered: false, focus: "mask" },
+    ],
+} as const satisfies ComponentAnatomy;
+
 export const scrimAnatomy = {
     name: "scrim",
     scope: "scrim",
@@ -2998,6 +3159,7 @@ export const anatomy = {
     slider: sliderAnatomy,
     linearProgress: linearProgressAnatomy,
     circularProgress: circularProgressAnatomy,
+    loadingIndicator: loadingIndicatorAnatomy,
     separator: separatorAnatomy,
     list: listAnatomy,
     listItem: listItemAnatomy,
@@ -3005,6 +3167,7 @@ export const anatomy = {
     tabs: tabsAnatomy,
     navigationBar: navigationBarAnatomy,
     navigationRail: navigationRailAnatomy,
+    appBar: appBarAnatomy,
     dialog: dialogAnatomy,
     fullscreenDialog: fullscreenDialogAnatomy,
     bottomSheet: bottomSheetAnatomy,
@@ -3012,9 +3175,11 @@ export const anatomy = {
     dragHandle: dragHandleAnatomy,
     snackbar: snackbarAnatomy,
     toast: toastAnatomy,
+    toolbar: toolbarAnatomy,
     tooltip: tooltipAnatomy,
     richTooltip: richTooltipAnatomy,
     card: cardAnatomy,
+    carousel: carouselAnatomy,
     scrim: scrimAnatomy,
     ripple: rippleAnatomy,
     icon: iconAnatomy,
@@ -3088,7 +3253,6 @@ export const testIds = {
         label: "pf-text-field-label",
         trailingIcon: "pf-text-field-trailing-icon",
         supportingText: "pf-text-field-supporting-text",
-        supportingRow: "pf-text-field-supporting-row",
         counter: "pf-text-field-counter",
     },
     textArea: {
@@ -3099,7 +3263,6 @@ export const testIds = {
         label: "pf-text-area-label",
         trailingIcon: "pf-text-area-trailing-icon",
         supportingText: "pf-text-area-supporting-text",
-        supportingRow: "pf-text-area-supporting-row",
         counter: "pf-text-area-counter",
     },
     tagsInput: {
@@ -3204,6 +3367,11 @@ export const testIds = {
         startHalf: "pf-circular-progress-start-half",
         startArc: "pf-circular-progress-start-arc",
     },
+    loadingIndicator: {
+        root: "pf-loading-indicator-root",
+        container: "pf-loading-indicator-container",
+        indicator: "pf-loading-indicator-indicator",
+    },
     separator: { root: "pf-separator-root" },
     list: { root: "pf-list-root", item: "pf-list-item" },
     listItem: {
@@ -3252,6 +3420,14 @@ export const testIds = {
         icon: "pf-navigation-rail-icon",
         label: "pf-navigation-rail-label",
         header: "pf-navigation-rail-header",
+    },
+    appBar: {
+        root: "pf-app-bar-root",
+        leading: "pf-app-bar-leading",
+        content: "pf-app-bar-content",
+        headline: "pf-app-bar-headline",
+        subtitle: "pf-app-bar-subtitle",
+        trailing: "pf-app-bar-trailing",
     },
     dialog: {
         root: "pf-dialog-root",
@@ -3302,6 +3478,7 @@ export const testIds = {
         actionTrigger: "pf-toast-action-trigger",
         closeTrigger: "pf-toast-close-trigger",
     },
+    toolbar: { root: "pf-toolbar-root" },
     tooltip: {
         root: "pf-tooltip-root",
         caret: "pf-tooltip-caret",
@@ -3329,6 +3506,13 @@ export const testIds = {
         supportingText: "pf-card-supporting-text",
         actions: "pf-card-actions",
         footer: "pf-card-footer",
+    },
+    carousel: {
+        root: "pf-carousel-root",
+        itemGroup: "pf-carousel-item-group",
+        item: "pf-carousel-item",
+        mask: "pf-carousel-mask",
+        content: "pf-carousel-content",
     },
     scrim: { root: "pf-scrim-root" },
     ripple: { root: "pf-ripple-root", ripple: "pf-ripple-ripple" },

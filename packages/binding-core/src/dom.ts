@@ -179,11 +179,18 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
 };
 
 export {
+    carouselRowPadding,
+    measureCarouselRow,
+    observeCarouselRow,
+} from "./carousel-row";
+export {
     dragToDismiss,
     SHEET_DISMISS_SHARE,
     SHEET_FLICK_SPEED,
 } from "./sheet-drag";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
+export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";
+export type { OverflowWatch } from "./toolbar-dom";
 export type { SlideTiming } from "./slide";
 export {
     THEME_BLOCK_ATTRIBUTE,
@@ -200,3 +207,21 @@ export {
     unloadedThemeMessage,
 } from "./web-theme";
 export type { InitialBlockOptions, ThemeBlock } from "./web-theme";
+
+/** What an app bar watches scroll on: an element that scrolls, or the window. */
+export type ScrollTarget = Element | Window;
+
+/** The vertical scroll offset of `target`, in px. */
+export const scrollOffsetOf = (target: ScrollTarget): number =>
+    "scrollY" in target ? target.scrollY : target.scrollTop;
+
+/** Calls `onOffset` with `target`'s scroll offset now and on every scroll. Returns the cleanup. */
+export const subscribeScroll = (
+    target: ScrollTarget,
+    onOffset: (offset: number) => void,
+): VoidFunction => {
+    const listener = () => onOffset(scrollOffsetOf(target));
+    listener();
+    target.addEventListener("scroll", listener, { passive: true });
+    return () => target.removeEventListener("scroll", listener);
+};

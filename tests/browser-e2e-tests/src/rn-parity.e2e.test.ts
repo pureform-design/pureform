@@ -261,9 +261,16 @@ const same = (property: string, a: string, b: string): boolean => {
     return !Number.isNaN(x) && Math.abs(x - y) <= 0.5;
 };
 
-// Shapes clip on the web and take their rounded fallback in React Native, by design.
-const SHAPED = (selection: Record<string, string>) =>
-    selection.shape !== undefined && selection.shape !== "none";
+// Shapes clip on the web and take their rounded fallback in React Native, by design. The loading
+// indicator always clips, and a wavy progress indicator's fallback is the flat bar, a box of its
+// own size where the web's is the wave's.
+const SHAPED = (name: string, selection: Record<string, string>) =>
+    name === "loadingIndicator" ||
+    (selection.shape !== undefined && selection.shape !== "none");
+const WAVE_BOX = (name: string, slot: string, property: string) =>
+    name === "linearProgress" &&
+    slot === "indicator" &&
+    (property === "height" || property === "top");
 
 // A shaped outline is a filled ring on the web and a border in React Native.
 const RING = (property: string) =>
@@ -349,11 +356,13 @@ describe("the React Native adapter matches the CSS adapter", () => {
                     frame.contentWindow!.getComputedStyle(web),
                     getComputedStyle(native),
                 ];
+                const shaped = SHAPED(name, selection);
                 for (const property of comparedFor(
                     bySlot[slot],
-                    SHAPED(selection),
+                    shaped,
                     slot,
                 )) {
+                    if (shaped && WAVE_BOX(name, slot, property)) continue;
                     compared++;
                     const [x, y] = [
                         a.getPropertyValue(property),

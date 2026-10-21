@@ -4,6 +4,7 @@
 export const RN_COMPONENTS = [
     "button",
     "card",
+    "carousel",
     "chip",
     "inputChip",
     "checkbox",
@@ -21,6 +22,7 @@ export const RN_COMPONENTS = [
     "listItem",
     "linearProgress",
     "circularProgress",
+    "loadingIndicator",
     "radio",
     "scrim",
     "supportingText",
@@ -28,6 +30,7 @@ export const RN_COMPONENTS = [
     "textField",
     "textArea",
     "tagsInput",
+    "appBar",
     "searchBar",
     "searchView",
     "select",
@@ -44,6 +47,7 @@ export const RN_COMPONENTS = [
     "dragHandle",
     "snackbar",
     "toast",
+    "toolbar",
     "tooltip",
     "richTooltip",
 ];

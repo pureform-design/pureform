@@ -9,6 +9,7 @@ import { dialog } from "./dialog";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { list } from "./list";
 import { listItem } from "./list-item";
+import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar } from "./navigation-bar";
 import { navigationRail } from "./navigation-rail";
@@ -19,8 +20,8 @@ import { select } from "./select";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
 import { tabs } from "./tabs";
-import { toast } from "./toast";
 import { positionCorners, POSITIONS } from "./tiles";
+import { toast } from "./toast";
 import { tooltip } from "./tooltip";
 
 describe.each([
@@ -41,6 +42,7 @@ describe.each([
     ["slider", slider],
     ["linearProgress", linearProgress],
     ["circularProgress", circularProgress],
+    ["loadingIndicator", loadingIndicator],
 ] as const)("%s", (name, spec) => {
     it("validates against a full pureform config", () => {
         expect(() => configWith(spec)).not.toThrow();

@@ -307,6 +307,16 @@ toastSelection(type, props);             // an unknown type selects `info`
 TOAST_STACK_STYLE;                       // Zag's --x, --y, --scale, --opacity, --height applied
 toastGroupStyle(style);                  // Zag's region style, physical insets, no z-index
 
+// Toolbar: the generated toolbarAnatomy (root); overflow.ts and toolbar-dom.ts (`/dom`)
+interface ToolbarRootOwnProps            // placement, orientation, color, tokens, overflow, testId
+TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, aria-orientation
+interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
+TOOLBAR_CONTENT_PROPS; TOOLBAR_OVERFLOW_LABEL; toolbarOverflowTestId(testId);
+toolbarMenuItems(items, count); toolbarMenuSelect(items, value); toolbarMenuPositioning(o);
+toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
+overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
+watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);
+
 // Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, tabContent, icon, label, indicator,
 // content)
 interface TabsRootOwnProps               // variant, icon (the variant), inlineIcon, color, tokens, activationMode,
@@ -360,13 +370,20 @@ listItemVariants(list, item);            // the item's own over the list's; read
 // Linear and circular progress (no machine)
 type ProgressComponent = "linearProgress" | "circularProgress";
 type LinearProgressPart; type CircularProgressPart;   // incl. track, stopIndicator, trackEnd/StartHalf/Arc
-interface ProgressRootOwnProps<C>        // indeterminate, color, tokens, value, min, max, testId,
+interface ProgressRootOwnProps<C>        // indeterminate, color, thickness, shape (flat, wavy),
+                                         // tokens, value, min, max, testId,
                                          // unstyled
 PROGRESS_ROOT_PROPS;
 isIndeterminate(props);                  // indeterminate, else no value (undefined or null)
 progressPercent(props);                  // the value as a clamped percentage of min to max
 progressSelection(props);                // the value token from the percentage, unless indeterminate
 progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
+
+// Loading indicator (no machine): a progressbar with no value
+type LoadingIndicatorPart;               // root, container, indicator
+interface LoadingIndicatorRootOwnProps   // variant (uncontained, contained), color, tokens, testId,
+                                         // unstyled
+LOADING_INDICATOR_ROOT_PROPS; loadingIndicatorSelection(props); loadingIndicatorRootProps();
 
 // Autocomplete: Zag's combobox; the select's field with an editable input. The list shows the
 // items `filter` keeps (labels containing the text by default; `false` keeps all).
@@ -419,6 +436,18 @@ cardLayout(props, element);              // { sections, actionArea, headerOutsid
                                          //   supportingText }: the action moves to the action
                                          //   area only beside actions or a header action
 cardEntryActive(rootInteractive)(entry); // the root's entry while Root acts, the action area's else
+
+// App bar: no machine; it follows the scroll offset under it
+type AppBarPart; type AppBarSize; type AppBarScrollBehavior; // "pinned" | "collapse"
+interface AppBarRootOwnProps             // size, centered, tokens, scrollBehavior, scrollOffset,
+                                         // scrolled, collapsed, search, testId, unstyled
+APP_BAR_ROOT_PROPS; APP_BAR_CONTENT_PROPS; // leading, headline, subtitle, trailing, searchBar, mirrorLeading
+appBarScrollState(offset, { size, behavior, previous }); // { scrolled, collapsed }, with hysteresis
+appBarDrawnState(props, fromOffset);     // the owner's scrolled/collapsed win
+appBarContentLast(props, state);         // an expanded flexible bar renders its content last
+appBarSelection(props, state);           // collapsed and search select the small size
+isFlexibleAppBar(size); APP_BAR_COLLAPSE_OFFSET; APP_BAR_AT_REST;
+// dom: subscribeScroll(target, onOffset); scrollOffsetOf(target); type ScrollTarget
 
 // Search bar: the text field machine
 type SearchBarPart; interface SearchBarRootOwnProps // tokens, disabled, required, readOnly,
@@ -679,3 +708,13 @@ items), and that no Solid or React source sets a listed group from anything but 
   development.
 - Design doc: §5.3 (hooks), §5.6 and §5.7 (themes, runtime themes), §5.8 (motion), §5.9 (direction), §9.2 to §9.6 (parts, controllable
   state, forms, icons).
+
+## Carousel
+
+`components/carousel.ts`: `CarouselRootOwnProps`, `CAROUSEL_ROOT_PROPS`, `carouselSelection`,
+`carouselMachineProps`, `CarouselItem`, and the layout: `carouselKeylines(layout, viewport, gap,
+itemWidth?)` (Material's sizes at rest) and `carouselItemSizes(options, metrics)` (each item's
+slot, mask width and mask offset at a scroll position; the keylines turn round near the end so the
+last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
+The `dom` subpath adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
+`padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).

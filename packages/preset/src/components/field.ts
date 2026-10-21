@@ -5,7 +5,7 @@
 // follows the container, and the supporting text the root. `fieldParts` builds those styles
 // over a component's own tokens, so each component keeps its own overridable vars.
 // `affixParts` adds the prefix and suffix text around the input (the text field and the
-// select), and `counterParts` the character counter at the end of the supporting text's row
+// select), and `counterParts` the character counter at the end of the supporting text's line
 // (the text field and the text area).
 
 import {
@@ -31,6 +31,7 @@ import {
     transparent,
     unitless,
     when,
+    wrap,
 } from "@pureform/core/ast";
 import type {
     AliasNode,
@@ -148,14 +149,13 @@ export const AFFIX_FIELD_STRUCTURE: {
     ],
 };
 
-/** The slots a counter adds after the supporting text: the row holding both, and the counter. */
-export const COUNTER_SLOTS = ["supportingRow", "counter"] as const;
+/** The slot a counter adds after the supporting text. */
+export const COUNTER_SLOTS = ["counter"] as const;
 
-/** How a counter's slots nest: the root holds the container and the supporting row, which
- *  holds the supporting text and the counter. Spread over the field's own structure. */
+/** How a counter's slot nests: the root holds the container, then the supporting text and the
+ *  counter on the line below. Spread over the field's own structure. */
 export const COUNTER_STRUCTURE = {
-    root: ["container", "supportingRow"],
-    supportingRow: ["supportingText", "counter"],
+    root: ["container", "supportingText", "counter"],
 } satisfies Record<
     string,
     (typeof COUNTER_SLOTS | typeof FIELD_SLOTS)[number][]
@@ -594,19 +594,22 @@ export const affixParts = (
     };
 };
 
-/** The character counter at the end of the supporting text's row, over a text input's tokens.
- *  `supportingRow` holds the supporting text and the counter side by side; the counter takes
- *  the supporting text's type and colors, the error color included, which a count over the
- *  limit sets, since the field is then invalid. A supporting text outside the row keeps its own
- *  line, as before. */
+/** The character counter at the end of the supporting text's line, over a text input's tokens.
+ *  The root becomes a wrapping row: the container takes a whole line, and the supporting text
+ *  and the counter share the next one. The counter takes the supporting text's type and colors,
+ *  the error color included, which a count over the limit sets, since the field is then
+ *  invalid. */
 export const counterParts = (ref: (token: FieldToken) => AliasNode) =>
     ({
-        supportingRow: {
-            display: flex,
-            flexDirection: row,
+        root: { display: flex, flexDirection: row, flexWrap: wrap },
+        container: { flexBasis: pct(100) },
+        // The supporting text fills the line beside the counter, and long helper text wraps
+        // before the counter rather than pushing it to a line of its own.
+        supportingText: {
+            flexGrow: unitless(1),
+            flexShrink: unitless(1),
+            flexBasis: px(0),
         },
-        // Long helper text wraps before the counter rather than pushing it out.
-        supportingText: { flexShrink: unitless(1) },
         counter: {
             ...supportingTextStyle,
             flexShrink: unitless(0),

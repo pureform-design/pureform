@@ -502,12 +502,13 @@ input; the label, icons, and supporting text follow it.
 - Prefix and suffix text (`textField` and `select`): render a `prefixText` before the input or a
   `suffixText` after it, and turn on the variant of the same name. They show once the label
   floats; the input hands them its inline padding (the `prefixed`/`suffixed` flag tokens).
-- Counter (`textField` and `textArea`): put the supporting text and a `counter` in a
-  `supportingRow`; the counter sits at its end and follows the field's error colour, so mark
-  the input invalid when the count is over the limit. Supporting text alone can stay in the root.
+- Counter (`textField` and `textArea`): put a `counter` after the supporting text in the root,
+  a wrapping row; it sits at the end of the supporting text's line and follows the field's
+  error colour, so mark the input invalid when the count is over the limit.
 - `secure` (`textField`): a password field. The trailing icon is a `<button>` that shows or
   hides the text; the variant draws it without button chrome and with a focus ring.
-- Nothing deprecated: no option was removed.
+- Removed: the `supportingRow` part (breaking). It held the supporting text and the counter
+  while core had no `flexWrap`; the root now wraps, so both sit in the root directly.
 
 ## Select
 
@@ -643,6 +644,40 @@ focus ring on the whole bar.
 </label>
 ```
 
+## App bar
+
+`appBar` is the strip at the top of a screen: `leading` (the navigation button), `content`
+(`headline` and `subtitle`, or a search bar) and `trailing` actions, in one wrapping row. The
+leading and trailing parts are the bar's 64px `height`, so they make the first line.
+
+- `size`: `small` (the default) keeps the content between them, the headline in `titleLarge`.
+  M3 Expressive's `mediumFlexible` and `largeFlexible` replace the deprecated medium and large
+  bars: render the content after `trailing` and it takes a line of its own under the actions,
+  at least `mediumContentHeight`/`largeContentHeight` tall, the headline in `headlineMedium` or
+  `displaySmall` and the subtitle in `labelLarge` or `titleMedium`.
+- `centered` centers the headline; `search` makes room for a search bar (use the search bar's
+  `centered` and `scrolled` with it).
+- `scrolled` takes `scrolledContainer` (`surfaceContainer`), once the page scrolls under the bar;
+  the colour fades with the state tween, which reduced motion keeps.
+- `collapsed`, for a flexible bar the page has scrolled past: select it with the `small` size
+  (the bindings do) and the headline rises into the first line (`appBarCollapseIn`, added by
+  `pureform()`; nothing moves under reduced motion).
+
+No radius (the bar is square under every shape theme), no indication of its own, and no
+compounds. Nothing deprecated was kept: the non-flexible medium and large bars aren't built,
+since the flexible sizes replace them.
+
+```html
+<header class="{root}">
+    <div class="{leading}"><button aria-label="Back">←</button></div>
+    <div class="{trailing}"><button aria-label="More">⋮</button></div>
+    <div class="{content}">
+        <h1 class="{headline}">Inbox</h1>
+        <p class="{subtitle}">12 unread</p>
+    </div>
+</header>
+```
+
 ## Navigation
 
 `navigationBar` (bottom, destinations side by side) and `navigationRail` (a narrow column)
@@ -763,7 +798,10 @@ focus ring, no state layer.
 
 ```html
 <div class="{bottomSheet.root}" role="dialog" aria-label="Share">
-    <button class="{bottomSheet.dragHandle} {dragHandle.root}" aria-label="Close sheet">
+    <button
+        class="{bottomSheet.dragHandle} {dragHandle.root}"
+        aria-label="Close sheet"
+    >
         <span class="{dragHandle.handle}"></span>
     </button>
     <div class="{bottomSheet.content}">…</div>
@@ -828,6 +866,27 @@ icon from the theme's color groups (`loading` takes `primary`); every Material p
 each toast with Zag's stacking variables, and the root transitions its transform, opacity and
 height (the movement drops out under reduced motion).
 
+## Toolbar
+
+M3 Expressive's docked and floating toolbars are one component, `toolbar`, with one part, `root`,
+holding icon buttons and buttons:
+
+```html
+<div class="{toolbar.root}" role="toolbar" aria-label="Formatting">
+    <button class="{iconButton.root}" aria-label="Bold">…</button>
+</div>
+```
+
+`placement: floating` (the default) is a pill at level 3 that hugs its elements, 8px from its
+ends and 4px apart; `docked` fills its row with square corners and no shadow, spreads its
+elements out and pads its ends 16px (it replaces the deprecated bottom app bar, which was never
+built). The bar is 64px thick (plus the theme's density offset); `orientation: vertical` stands it
+up, padding its block ends instead. `color: vibrant` takes `primaryContainer` and
+`onPrimaryContainer` for `surfaceContainer` and `onSurfaceVariant`. `overflow: true` clips the
+bar so it never grows past its parent, for the bindings that move what doesn't fit into a menu.
+Where the bar sits (16dp off the screen's edge when floating) is the page's layout. No compounds.
+The bar has no motion of its own.
+
 ## Slider and progress
 
 The slider (on Zag's slider machine in the bindings) and the linear progress indicators read
@@ -877,6 +936,38 @@ Expressive has no equivalent.
   circle, 3 by default) under a ring drawn by two halves, each turning through its share of the
   value. The arcs draw from their own tokens, not the radius roles, so they stay round under
   a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner, which needs only the root.
+- `shape: wavy` (M3 Expressive, both): the indicator is drawn as a wave and the track stays
+  flat. The linear bar grows by the `amplitude` token (3px) above and below, and its indicator is
+  clipped to a band along a sine wave of 40px waves (24 of them, so a bar wider than 960px ends
+  flat); each circular arc's ring widens by twice `amplitude` (1.5px) and is clipped to a ring of
+  nine waves, as is the spinner. A clip's points are drawn once, so the wave per thickness is a
+  compound (one on the linear, three on the circular). Where a target can't clip to a shape
+  (React Native without an SVG engine, a browser without CSS `shape()`), the indicator stays
+  flat; React Native draws the linear wave with an SVG engine, not the circular one.
+
+## Loading indicator
+
+`loadingIndicator` is M3 Expressive's indicator for a wait too short to measure: `root` (48px)
+holding a `container` holding the `indicator` (38px), which turns and morphs through seven of
+Material's shapes (`LOADING_INDICATOR_SHAPES`: soft burst, 9-sided cookie, pentagon, pill,
+sunny, 4-sided cookie, oval), two turns a cycle of seven `long2` steps on the standard curve.
+`variant: "contained"` fills the container (`containerColor`, the group's container colour) and
+draws the indicator in `containedIndicatorColor`; `color` takes a group. Under reduced motion it
+only turns (`loadingIndicatorSpin`), since the motion is the only sign of the wait.
+
+```html
+<div class="{root}" role="progressbar" aria-label="Loading">
+    <span class="{container}"><span class="{indicator}"></span></span>
+</div>
+```
+
+It's a **shape exception**: its geometry is the shape, so its container stays round under any
+shape theme and corner style (`containerRadius`, half its size, is on `radii.spec.ts`'s
+allow-list, and `pureform()` gives it no `cornerShape`). A theme that wants another shape sets
+`containerRadius`. The keyframes are `LOADING_INDICATOR_KEYFRAMES`, every shape redrawn by
+`morphSequence` (`shape-paths.ts`) to one structure so CSS `shape()` animates between them.
+Where a target can't clip, the indicator is a turning circle; React Native's keyframes carry no
+clip, so with an SVG engine it turns in its first shape without morphing.
 
 ```html
 <div
@@ -935,3 +1026,13 @@ touch target size. To check a custom palette:
 Both check light and dark, for the base theme and every named theme, and throw naming each
 pair that falls short. `componentContrastFailures(color, components)` returns the failures
 instead.
+
+## Carousel
+
+`carousel` (c4d): slots `root`, `itemGroup` (the scrolling row), `item` (an item's place in it),
+`mask` (the rounded item people see: extra-large corners, the state layer and focus ring) and
+`content`. `layout`: `multiBrowse` (default), `hero`, `uncontained`, `multiAspect`, `fullScreen`
+(no padding, the parent's height); 0 compounds. Tokens: `container`, `content`, `radius`, `height`,
+`gap`, `padding`. The bindings size each item inline from Material's keylines
+(`carouselItemSizes` in `@pureform/binding-core`); only the widths and the mask's inline offset are
+set from script.

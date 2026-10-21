@@ -133,6 +133,28 @@ export type {
     SideSheetVariantProps,
 } from "./components/sheet";
 export {
+    CAROUSEL_CONTENT_PROPS,
+    CAROUSEL_ROOT_PROPS,
+    CAROUSEL_SIZES,
+    carouselInitialStyle,
+    carouselItemSizes,
+    carouselKeylines,
+    carouselMachineProps,
+    carouselSelection,
+} from "./components/carousel";
+export type {
+    CarouselBehaviorProps,
+    CarouselContentProps,
+    CarouselItem,
+    CarouselItemSize,
+    CarouselLayout,
+    CarouselLayoutOptions,
+    CarouselMetrics,
+    CarouselPart,
+    CarouselRootOwnProps,
+    CarouselVariantProps,
+} from "./components/carousel";
+export {
     DRAG_HANDLE_ROOT_PROPS,
     dragHandleSelection,
 } from "./components/drag-handle";
@@ -374,6 +396,27 @@ export {
     snackbarMachineProps,
     snackbarSelection,
 } from "./components/snackbar";
+export {
+    TOOLBAR_CONTENT_PROPS,
+    TOOLBAR_OVERFLOW_LABEL,
+    TOOLBAR_ROOT_PROPS,
+    toolbarKeyTarget,
+    toolbarMenuItems,
+    toolbarMenuPositioning,
+    toolbarMenuSelect,
+    toolbarOverflowTestId,
+    toolbarRootProps,
+    toolbarSelection,
+} from "./components/toolbar";
+export type {
+    ToolbarContentProps,
+    ToolbarItem,
+    ToolbarPart,
+    ToolbarRootOwnProps,
+    ToolbarVariantProps,
+} from "./components/toolbar";
+export { overflowCount } from "./overflow";
+export type { OverflowLayout } from "./overflow";
 export {
     isToastType,
     TOAST_GLYPHS,
@@ -643,6 +686,16 @@ export type {
     MediaVariantProps,
 } from "./components/media";
 export {
+    LOADING_INDICATOR_ROOT_PROPS,
+    loadingIndicatorRootProps,
+    loadingIndicatorSelection,
+} from "./components/loading-indicator";
+export type {
+    LoadingIndicatorPart,
+    LoadingIndicatorRootOwnProps,
+    LoadingIndicatorVariantProps,
+} from "./components/loading-indicator";
+export {
     isIndeterminate,
     PROGRESS_ROOT_PROPS,
     progressPercent,
@@ -674,6 +727,27 @@ export type {
     ScrimRootOwnProps,
     ScrimVariantProps,
 } from "./components/scrim";
+export {
+    APP_BAR_AT_REST,
+    APP_BAR_COLLAPSE_OFFSET,
+    APP_BAR_CONTENT_PROPS,
+    APP_BAR_ROOT_PROPS,
+    appBarContentLast,
+    appBarDrawnState,
+    appBarScrollState,
+    appBarSelection,
+    isFlexibleAppBar,
+} from "./components/app-bar";
+export type {
+    AppBarContentProps,
+    AppBarPart,
+    AppBarRootOwnProps,
+    AppBarScrollBehavior,
+    AppBarScrollProps,
+    AppBarScrollState,
+    AppBarSize,
+    AppBarVariantProps,
+} from "./components/app-bar";
 export {
     SEARCH_BAR_CONTENT_PROPS,
     SEARCH_BAR_INPUT_PROPS,

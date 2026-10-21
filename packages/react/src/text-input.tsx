@@ -292,22 +292,8 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     /** Text after the input, shown once the label floats. Turn on Root's `suffixText` with it. */
     const SuffixText = affix("suffixText", "SuffixText");
 
-    /** The row holding the supporting text and the counter. */
-    function SupportingRow({
-        unstyled,
-        ...props
-    }: TextInputPartProps): ReactNode {
-        const { scope, api } = context.use("SupportingRow");
-        return scope.render("supportingRow", {
-            element: "div",
-            machine: api.getSupportingRowProps(),
-            unstyled,
-            props,
-        });
-    }
-
     /** The character count, `3 / 20` under Root's `counterMax`, at the end of the supporting
-     *  row. It turns to the error color once the value is longer. */
+     *  text's line. It turns to the error color once the value is longer. */
     function Counter({ unstyled, ...props }: TextInputPartProps): ReactNode {
         const { scope, api } = context.use("Counter");
         return scope.render("counter", {
@@ -384,14 +370,10 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                         </TrailingIcon>
                     ) : null}
                 </Container>
+                {supporting}
                 {api.counterText !== undefined ? (
-                    <SupportingRow {...slot("supportingRow")}>
-                        {supporting}
-                        <Counter {...slot("counter")} />
-                    </SupportingRow>
-                ) : (
-                    supporting
-                )}
+                    <Counter {...slot("counter")} />
+                ) : null}
             </>
         );
     }
@@ -445,7 +427,6 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             SuffixText,
             Label,
             TrailingIcon,
-            SupportingRow,
             SupportingText,
             Counter,
         },

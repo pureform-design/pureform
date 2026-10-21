@@ -14,6 +14,7 @@
 import {
     buttonAnatomy,
     cardAnatomy,
+    carouselAnatomy,
     checkboxAnatomy,
     chipAnatomy,
     fabAnatomy,
@@ -45,6 +46,7 @@ import type {
 } from "@pureform/react-native";
 import { Button } from "@pureform/react-native/button";
 import { Card } from "@pureform/react-native/card";
+import { Carousel } from "@pureform/react-native/carousel";
 import { Checkbox } from "@pureform/react-native/checkbox";
 import { Chip } from "@pureform/react-native/chip";
 import { Fab } from "@pureform/react-native/fab";
@@ -202,6 +204,17 @@ const CASES: RnCase[] = [
         "aria-label": "Size",
         items: ITEMS,
     }),
+    // The carousel has no disabled state of its own; an item's mask has.
+    items(
+        "Carousel",
+        Carousel as never,
+        carouselAnatomy,
+        {
+            "aria-label": "Places",
+            items: [{ "aria-label": "Lisbon" }, { "aria-label": "Porto" }],
+        },
+        { disabled: undefined },
+    ),
     // The tabs and the menu have no disabled state of their own; an item has.
     items(
         "Tabs",

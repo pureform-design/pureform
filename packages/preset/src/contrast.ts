@@ -112,6 +112,7 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
         pair(token("bodyColor"), token("container"), TEXT_CONTRAST),
     ],
+    carousel: [pair(token("content"), token("container"), TEXT_CONTRAST)],
     dragHandle: [
         pair(token("color"), role("surfaceContainerLow"), UI_CONTRAST),
     ],
@@ -119,6 +120,14 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     sideSheet: [
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
         pair(token("content"), token("container"), TEXT_CONTRAST),
+    ],
+    appBar: [
+        pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
+        pair(token("subtitleColor"), token("container"), TEXT_CONTRAST),
+        pair(token("leadingColor"), token("container"), UI_CONTRAST),
+        pair(token("trailingColor"), token("container"), UI_CONTRAST),
+        pair(token("headlineColor"), token("scrolledContainer"), TEXT_CONTRAST),
+        pair(token("trailingColor"), token("scrolledContainer"), UI_CONTRAST),
     ],
     searchBar: [
         pair(token("inputColor"), token("container"), TEXT_CONTRAST),

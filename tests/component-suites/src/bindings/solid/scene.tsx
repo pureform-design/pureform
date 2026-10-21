@@ -7,6 +7,7 @@ import {
     PureformProvider,
 } from "@pureform/solid";
 import type { Indication } from "@pureform/solid";
+import { AppBar } from "@pureform/solid/app-bar";
 import { Autocomplete } from "@pureform/solid/autocomplete";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
@@ -14,6 +15,7 @@ import { BottomSheet } from "@pureform/solid/bottom-sheet";
 import { Button } from "@pureform/solid/button";
 import { ButtonGroup } from "@pureform/solid/button-group";
 import { Card } from "@pureform/solid/card";
+import { Carousel } from "@pureform/solid/carousel";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { CircularProgress } from "@pureform/solid/circular-progress";
@@ -27,6 +29,7 @@ import { IconButton } from "@pureform/solid/icon-button";
 import { LinearProgress } from "@pureform/solid/linear-progress";
 import { List } from "@pureform/solid/list";
 import { ListItem } from "@pureform/solid/list-item";
+import { LoadingIndicator } from "@pureform/solid/loading-indicator";
 import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
@@ -52,6 +55,7 @@ import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
+import { Toolbar } from "@pureform/solid/toolbar";
 import { Tooltip } from "@pureform/solid/tooltip";
 import { TouchTarget } from "@pureform/solid/touch-target";
 import { Dynamic } from "@solidjs/web";
@@ -91,9 +95,11 @@ export const components: Record<ComponentName, ValidComponent> = {
     Button,
     ButtonGroup,
     Card,
+    Carousel,
     Checkbox,
     Chip,
     CircularProgress,
+    LoadingIndicator,
     Dialog,
     DragHandle,
     Fab,
@@ -112,6 +118,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Ripple,
     RichTooltip,
     Scrim,
+    AppBar,
     SearchBar,
     SearchView,
     Select,
@@ -129,6 +136,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     TextArea,
     TextField,
     Toast: ToastScene,
+    Toolbar,
     Tooltip,
     TouchTarget,
 };

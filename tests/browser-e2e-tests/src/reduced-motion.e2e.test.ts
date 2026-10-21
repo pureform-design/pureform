@@ -27,15 +27,37 @@ const FIXTURES = [
     { name: "radio", slot: "dot" },
     { name: "textField", slot: "label" },
     { name: "linearProgress", slot: "indicator" },
+    // The wavy indicator (c4a) is clipped to a wave but moves as the flat one does.
+    {
+        name: "linearProgress",
+        id: "wavyLinearProgress",
+        selection: { shape: "wavy" },
+        slot: "indicator",
+    },
 ] as const;
 
-type Fixture = (typeof FIXTURES)[number];
+type Fixture = {
+    readonly name: string;
+    readonly slot: string;
+    /** Tells apart two fixtures of one component; the name when absent. */
+    readonly id?: string;
+    readonly selection?: object;
+};
+
+const idOf = (fixture: Fixture) => fixture.id ?? fixture.name;
+
+/** Components with no motion of their own, whose transition stays empty in every scenario: the
+ *  toolbar, whose moves are its buttons' and its overflow menu's. */
+const STILL = [{ name: "toolbar", slot: "root" }] as const;
 
 const STATE =
     "background-color, color, border-color, outline-color, box-shadow";
 
 /** The transitioned properties with full motion, and with reduced motion. */
-const EXPECTED: Record<Fixture["name"], { full: string; reduced: string }> = {
+const EXPECTED: Record<
+    (typeof FIXTURES)[number]["name"] | "wavyLinearProgress",
+    { full: string; reduced: string }
+> = {
     // M3 Expressive's corner morph moves, so reduced motion drops it.
     button: { full: `${STATE}, border-radius`, reduced: STATE },
     switchControl: {
@@ -48,12 +70,16 @@ const EXPECTED: Record<Fixture["name"], { full: string; reduced: string }> = {
         reduced: "background-color, color",
     },
     linearProgress: { full: "width", reduced: "none" },
+    wavyLinearProgress: { full: "width", reduced: "none" },
 };
 
-const classOf = (fns: Record<string, ClassFn>, { name, slot }: Fixture) => {
+const classOf = (
+    fns: Record<string, ClassFn>,
+    { name, slot, selection = {} }: Fixture,
+) => {
     const fn = fns[name];
     if (!fn) throw new Error(`no classes for ${name}`);
-    return (fn({}) as Record<string, string>)[slot]!;
+    return (fn(selection) as Record<string, string>)[slot]!;
 };
 
 const STYLINGS: Record<
@@ -137,6 +163,7 @@ const SCENARIOS: Scenario[] = [
 const transitions = async (
     styling: (typeof STYLINGS)[keyof typeof STYLINGS],
     scenario: Scenario,
+    fixtures: readonly Fixture[] = FIXTURES,
 ): Promise<{
     reducedMedia: boolean;
     values: Record<string, { property: string; duration: string }>;
@@ -146,10 +173,12 @@ const transitions = async (
     frame.style.cssText = "width: 800px; height: 600px; border: 0";
     document.body.append(frame);
     try {
-        const elements = FIXTURES.map(
-            (fixture) =>
-                `<div data-id="${fixture.name}" class="${styling.classes(fixture)}"></div>`,
-        ).join("");
+        const elements = fixtures
+            .map(
+                (fixture) =>
+                    `<div data-id="${idOf(fixture)}" class="${styling.classes(fixture)}"></div>`,
+            )
+            .join("");
         const markup = scenario.providers.reduceRight(
             (inner, motion) =>
                 `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
@@ -197,9 +226,11 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 scenario,
             );
             expect(reducedMedia).toBe(scenario.system === "reduce");
-            for (const { name: component } of FIXTURES) {
+            for (const component of FIXTURES.map(idOf)) {
                 const expected =
-                    EXPECTED[component][scenario.reduced ? "reduced" : "full"];
+                    EXPECTED[component as keyof typeof EXPECTED][
+                        scenario.reduced ? "reduced" : "full"
+                    ];
                 const value = values[component]!;
                 if (expected === "none") {
                     expect(value, component).toEqual({
@@ -212,6 +243,72 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                         /^0s(, 0s)*$/,
                     );
                 }
+            }
+        });
+    },
+);
+
+// The loading indicator's animation is its only sign of a wait, so reduced motion keeps it
+// turning and stops the shape from changing: its morph gives way to a plain spin.
+const animationName = async (
+    name: keyof typeof STYLINGS,
+    scenario: Scenario,
+): Promise<string> => {
+    await commands.emulateReducedMotion(scenario.system);
+    const fns =
+        name === "Panda"
+            ? (pandaRecipes as unknown as Record<string, ClassFn>)
+            : (classesFor(pureformConfig) as Record<string, ClassFn>);
+    const indicator = (fns.loadingIndicator!({}) as Record<string, string>)
+        .indicator!;
+    const frame = document.createElement("iframe");
+    document.body.append(frame);
+    try {
+        const markup = scenario.providers.reduceRight(
+            (inner, motion) =>
+                `<div ${MOTION_ATTRIBUTE}="${motion}">${inner}</div>`,
+            `<div data-id class="${indicator}"></div>`,
+        );
+        const doc = frame.contentDocument!;
+        doc.open();
+        doc.write(
+            `<!doctype html><html><head>${(await STYLINGS[name].css())
+                .map((sheet) => `<style>${sheet}</style>`)
+                .join("")}</head><body>${markup}</body></html>`,
+        );
+        doc.close();
+        return frame.contentWindow!.getComputedStyle(
+            doc.querySelector("[data-id]")!,
+        ).animationName;
+    } finally {
+        frame.remove();
+    }
+};
+
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: the loading indicator under reduced motion",
+    (name) => {
+        it.each(SCENARIOS)("$name", async (scenario) => {
+            expect(await animationName(name, scenario)).toMatch(
+                scenario.reduced
+                    ? /loadingIndicatorSpin/
+                    : /loadingIndicatorMorph/,
+            );
+        });
+    },
+);
+
+describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
+    "%s: still components stay still",
+    (name) => {
+        it.each(SCENARIOS)("$name", async (scenario) => {
+            const { values } = await transitions(
+                STYLINGS[name],
+                scenario,
+                STILL,
+            );
+            for (const { name: component } of STILL) {
+                expect(values[component]?.duration, component).toBe("0s");
             }
         });
     },
