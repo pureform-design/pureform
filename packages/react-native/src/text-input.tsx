@@ -59,7 +59,12 @@ type FieldPart = TextFieldPart | TextAreaPart;
 /** The field the text field, text area, and select render. */
 export interface FieldOptions
     extends FieldProps, TextFieldAffixProps<ReactNode> {
-    readonly name: "textField" | "textArea" | "select" | "autocomplete";
+    readonly name:
+        | "textField"
+        | "textArea"
+        | "select"
+        | "autocomplete"
+        | "dockedDatePicker";
     readonly selection: Record<string, unknown>;
     readonly testId: (part: FieldPart) => string;
     readonly lines?: number | undefined;
@@ -171,7 +176,10 @@ function FieldImpl(props: FieldOptions): ReactNode {
                     value={value}
                     onChangeText={setValue}
                     onFocus={() => setFocused(true)}
-                    onBlur={() => setFocused(false)}
+                    onBlur={(event: unknown) => {
+                        setFocused(false);
+                        props.inputProps?.onBlur?.(event as never);
+                    }}
                     editable={
                         !props.disabled && !props.readOnly && !props.display
                     }

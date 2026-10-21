@@ -46,6 +46,14 @@ const FIELD_PAIRS = [
     pair(token("outlineColor"), SURFACE, UI_CONTRAST),
 ];
 
+// A dialog-like picker's header and calendar on its container.
+const PICKER_PAIRS = [
+    pair(token("headlineColor"), token("pickerContainer"), TEXT_CONTRAST),
+    pair(token("selectedDateColor"), token("pickerContainer"), TEXT_CONTRAST),
+    pair(token("weekdayColor"), token("pickerContainer"), TEXT_CONTRAST),
+    pair(token("controlColor"), token("pickerContainer"), TEXT_CONTRAST),
+];
+
 // A list or menu row: text on its container, selected or not.
 const ROW_PAIRS = [
     pair(token("content"), token("container"), TEXT_CONTRAST),
@@ -171,6 +179,37 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
     textArea: FIELD_PAIRS,
     select: FIELD_PAIRS,
     autocomplete: FIELD_PAIRS,
+    calendarCell: [
+        pair(token("content"), role("surfaceContainerHigh"), TEXT_CONTRAST),
+        pair(
+            token("todayContent"),
+            role("surfaceContainerHigh"),
+            TEXT_CONTRAST,
+        ),
+        pair(
+            token("selectedContent"),
+            token("selectedContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(token("rangeContent"), token("rangeContainer"), TEXT_CONTRAST),
+    ],
+    datePicker: PICKER_PAIRS,
+    dockedDatePicker: [
+        ...FIELD_PAIRS,
+        pair(token("weekdayColor"), token("popupContainer"), TEXT_CONTRAST),
+        pair(token("controlColor"), token("popupContainer"), TEXT_CONTRAST),
+    ],
+    dateInput: [
+        ...FIELD_PAIRS.filter(({ on }) => on !== SURFACE),
+        pair(token("headlineColor"), token("pickerContainer"), TEXT_CONTRAST),
+        pair(
+            token("selectedDateColor"),
+            token("pickerContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(token("labelColor"), token("pickerContainer"), TEXT_CONTRAST),
+        pair(token("inputColor"), token("pickerContainer"), TEXT_CONTRAST),
+    ],
     supportingText: [
         pair(token("color"), SURFACE, TEXT_CONTRAST),
         pair(token("errorColor"), SURFACE, TEXT_CONTRAST),

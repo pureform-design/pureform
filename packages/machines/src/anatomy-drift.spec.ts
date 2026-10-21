@@ -4,7 +4,11 @@ import {
     autocompleteAnatomy,
     buttonAnatomy,
     buttonGroupAnatomy,
+    calendarCellAnatomy,
     carouselAnatomy,
+    dateInputAnatomy,
+    datePickerAnatomy,
+    dockedDatePickerAnatomy,
     inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
@@ -25,6 +29,12 @@ import {
     anatomy as autocomplete,
     searchViewAnatomy as searchView,
 } from "./combobox/combobox.anatomy";
+import { anatomy as dateInput } from "./date-input/date-input.anatomy";
+import {
+    anatomy as datePicker,
+    cellAnatomy as calendarCell,
+    dockedAnatomy as dockedDatePicker,
+} from "./date-picker/date-picker.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
@@ -44,7 +54,14 @@ const pairs: Record<string, Pair> = {
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
+    calendarCell: { machine: calendarCell, preset: calendarCellAnatomy },
     carousel: { machine: carousel, preset: carouselAnatomy },
+    datePicker: { machine: datePicker, preset: datePickerAnatomy },
+    dockedDatePicker: {
+        machine: dockedDatePicker,
+        preset: dockedDatePickerAnatomy,
+    },
+    dateInput: { machine: dateInput, preset: dateInputAnatomy },
     navigationBar: { machine: navigation, preset: navigationBarAnatomy },
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
     searchView: { machine: searchView, preset: searchViewAnatomy },

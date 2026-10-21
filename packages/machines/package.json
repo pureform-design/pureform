@@ -131,6 +131,20 @@
                 "default": "./dist/combobox.mjs"
             }
         },
+        "./date-picker": {
+            "types": "./dist/date-picker/index.d.ts",
+            "import": {
+                "development": "./src/date-picker/index.ts",
+                "default": "./dist/date-picker.mjs"
+            }
+        },
+        "./date-input": {
+            "types": "./dist/date-input/index.d.ts",
+            "import": {
+                "development": "./src/date-input/index.ts",
+                "default": "./dist/date-input.mjs"
+            }
+        },
         "./tags-input": {
             "types": "./dist/tags-input/index.d.ts",
             "import": {
@@ -168,6 +182,7 @@
         }
     },
     "dependencies": {
+        "@internationalized/date": "catalog:",
         "@pureform/binding-core": "catalog:",
         "@pureform/js-effects": "catalog:",
         "@zag-js/anatomy": "catalog:",
@@ -176,6 +191,8 @@
         "@zag-js/collection": "catalog:",
         "@zag-js/combobox": "catalog:",
         "@zag-js/core": "catalog:",
+        "@zag-js/date-input": "catalog:",
+        "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/menu": "catalog:",

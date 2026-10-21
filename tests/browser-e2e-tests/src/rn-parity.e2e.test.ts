@@ -21,7 +21,7 @@ import type {
     NativeSelection,
 } from "@pureform/rn-adapter/factory";
 import chroma from "chroma-js";
-import { createElement } from "react";
+import { createElement, Fragment } from "react";
 import type { ReactElement } from "react";
 import { flushSync } from "react-dom";
 import { createRoot } from "react-dom/client";
@@ -136,10 +136,11 @@ const cssMarkup = (list: Item[], styles: Resolved, scenario: Scenario) => {
             const classes = fns[name]!(selection);
             const { slots, structure } = styles[name]!;
             const element = (slot: string): string => {
-                if (SKIPPED.has(slot)) return "";
+                const inner = (structure?.[slot] ?? []).map(element).join("");
+                // A skipped slot's children (the date input's segments) still compare.
+                if (SKIPPED.has(slot)) return inner;
                 const own =
                     typeof classes === "string" ? classes : classes[slot];
-                const inner = (structure?.[slot] ?? []).map(element).join("");
                 return `<div data-id="${id}.${slot}"${attributes} class="${own}">${inner}</div>`;
             };
             return tree(slots, structure)
@@ -180,7 +181,11 @@ const rnTree = (
         const bySlot = selectedStyles(styles, name, selection, scenario);
         const element = (slot: string): ReactElement | null =>
             SKIPPED.has(slot)
-                ? null
+                ? createElement(
+                      Fragment,
+                      { key: `${id}.${slot}` },
+                      ...(component.structure?.[slot] ?? []).map(element),
+                  )
                 : createElement(
                       View,
                       {

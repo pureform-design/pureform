@@ -320,6 +320,27 @@
                 "default": "./dist/search-view.mjs"
             }
         },
+        "./date-picker": {
+            "types": "./dist/date-picker/index.d.ts",
+            "import": {
+                "development": "./src/date-picker/index.ts",
+                "default": "./dist/date-picker.mjs"
+            }
+        },
+        "./docked-date-picker": {
+            "types": "./dist/docked-date-picker/index.d.ts",
+            "import": {
+                "development": "./src/docked-date-picker/index.ts",
+                "default": "./dist/docked-date-picker.mjs"
+            }
+        },
+        "./date-input": {
+            "types": "./dist/date-input/index.d.ts",
+            "import": {
+                "development": "./src/date-input/index.ts",
+                "default": "./dist/date-input.mjs"
+            }
+        },
         "./autocomplete": {
             "types": "./dist/autocomplete/index.d.ts",
             "import": {

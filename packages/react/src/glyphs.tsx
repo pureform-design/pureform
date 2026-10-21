@@ -39,3 +39,22 @@ export const DropDownArrow = (): ReactNode => (
 
 /** Three dots in a column: the toolbar's overflow button. */
 export const MoreIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.more} />;
+
+/** A chevron pointing toward the start: a calendar's previous button. Mirror it under right to
+ *  left. */
+export const ChevronStartIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.chevronStart} />
+);
+
+/** A chevron pointing toward the end: a calendar's next button. Mirror it under right to left. */
+export const ChevronEndIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.chevronEnd} />
+);
+
+/** A calendar page: the docked date picker's button and the date input's mode toggle. */
+export const CalendarIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.calendar} />
+);
+
+/** A pencil: the modal date picker's mode toggle. */
+export const EditIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.edit} />;

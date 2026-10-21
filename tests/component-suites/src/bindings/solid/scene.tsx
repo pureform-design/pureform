@@ -9,6 +9,9 @@ import {
 import type { Indication } from "@pureform/solid";
 import { AppBar } from "@pureform/solid/app-bar";
 import { Autocomplete } from "@pureform/solid/autocomplete";
+import { DateInput } from "@pureform/solid/date-input";
+import { DatePicker } from "@pureform/solid/date-picker";
+import { DockedDatePicker } from "@pureform/solid/docked-date-picker";
 import { Avatar } from "@pureform/solid/avatar";
 import { Badge } from "@pureform/solid/badge";
 import { BottomSheet } from "@pureform/solid/bottom-sheet";
@@ -123,6 +126,9 @@ export const components: Record<ComponentName, ValidComponent> = {
     SearchView,
     Select,
     Autocomplete,
+    DatePicker,
+    DockedDatePicker,
+    DateInput,
     Separator,
     SideSheet,
     Slider,

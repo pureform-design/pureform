@@ -13,6 +13,7 @@ import { dialog } from "./dialog";
 import { dragHandle } from "./drag-handle";
 import { fab } from "./fab";
 import { fabMenu, fabMenuItems } from "./fab-menu";
+import { dateInput, datePicker, dockedDatePicker } from "./date-pickers";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
@@ -88,6 +89,9 @@ export const COMPONENTS: readonly ComponentCase[] = [
     searchView,
     select,
     autocomplete,
+    datePicker,
+    dockedDatePicker,
+    dateInput,
     separator,
     sideSheet,
     slider,
