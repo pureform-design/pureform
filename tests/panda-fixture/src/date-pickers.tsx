@@ -10,8 +10,8 @@ import {
     dockedDatePicker,
     iconButton,
 } from "$recipes";
+import type { JSX } from "@solidjs/web";
 import { For } from "solid-js";
-import type { JSX } from "solid-js";
 
 const WEEKDAYS = ["S", "M", "T", "W", "T", "F", "S"];
 
@@ -111,7 +111,7 @@ const Calendar = (props: {
                                         <div
                                             class={c.trigger}
                                             role="button"
-                                            tabIndex={-1}
+                                            tabindex={-1}
                                         >
                                             {day ?? ""}
                                         </div>
@@ -295,7 +295,7 @@ export function DatePickerSection(): JSX.Element {
                             <span
                                 class={i.segment}
                                 role="spinbutton"
-                                tabIndex={0}
+                                tabindex={0}
                             >
                                 08
                             </span>
@@ -303,7 +303,7 @@ export function DatePickerSection(): JSX.Element {
                             <span
                                 class={i.segment}
                                 role="spinbutton"
-                                tabIndex={0}
+                                tabindex={0}
                             >
                                 17
                             </span>
@@ -311,7 +311,7 @@ export function DatePickerSection(): JSX.Element {
                             <span
                                 class={i.segment}
                                 role="spinbutton"
-                                tabIndex={0}
+                                tabindex={0}
                             >
                                 2026
                             </span>
