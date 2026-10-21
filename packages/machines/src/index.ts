@@ -3,6 +3,7 @@
 
 export * as button from "./button";
 export * as buttonGroup from "./button-group";
+export * as carousel from "./carousel";
 export * as checkbox from "./checkbox";
 export * as combobox from "./combobox";
 export * as dialog from "./dialog";

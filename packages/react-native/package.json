@@ -110,6 +110,13 @@
                 "default": "./dist/side-sheet.mjs"
             }
         },
+        "./carousel": {
+            "types": "./dist/carousel/index.d.ts",
+            "import": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.mjs"
+            }
+        },
         "./drag-handle": {
             "types": "./dist/drag-handle/index.d.ts",
             "import": {

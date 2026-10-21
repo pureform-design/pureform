@@ -28,6 +28,7 @@ const SECTIONS = [
     "fullscreen-dialog",
     "sheets",
     "media",
+    "carousels",
     "controls",
     "color-groups",
     "text-fields",

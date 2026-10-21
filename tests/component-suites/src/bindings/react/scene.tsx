@@ -16,6 +16,7 @@ import { BottomSheet } from "@pureform/react/bottom-sheet";
 import { Button } from "@pureform/react/button";
 import { ButtonGroup } from "@pureform/react/button-group";
 import { Card } from "@pureform/react/card";
+import { Carousel } from "@pureform/react/carousel";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
 import { CircularProgress } from "@pureform/react/circular-progress";
@@ -102,6 +103,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Button,
     ButtonGroup,
     Card,
+    Carousel,
     Checkbox,
     Chip,
     CircularProgress,

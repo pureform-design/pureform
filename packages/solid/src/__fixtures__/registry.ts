@@ -386,6 +386,13 @@ export const displayRegistry = () =>
                     stopActive: "--stopActive",
                 },
             )) as never,
+        carousel: named("carousel", [
+            "root",
+            "itemGroup",
+            "item",
+            "mask",
+            "content",
+        ]),
         card: named("card", [
             "root",
             "touchTarget",

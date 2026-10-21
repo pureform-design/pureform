@@ -138,6 +138,13 @@
                 "default": "./dist/tags-input.mjs"
             }
         },
+        "./carousel": {
+            "types": "./dist/carousel/index.d.ts",
+            "import": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.mjs"
+            }
+        },
         "./toast": {
             "types": "./dist/toast/index.d.ts",
             "import": {
@@ -164,6 +171,7 @@
         "@pureform/binding-core": "catalog:",
         "@pureform/js-effects": "catalog:",
         "@zag-js/anatomy": "catalog:",
+        "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
         "@zag-js/collection": "catalog:",
         "@zag-js/combobox": "catalog:",

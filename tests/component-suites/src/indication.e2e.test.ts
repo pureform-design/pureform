@@ -603,7 +603,7 @@ describe.each(INDICATED)("$component", (component) => {
             provider: { indication: "custom" },
         });
         expect(logged).toEqual([]);
-        expect(changes).toEqual([]);
+        if (!component.measured) expect(changes).toEqual([]);
         // The layer rendered on the server, where the surface shows closed: in the surface, or
         // in the part the entry names to hold it.
         const surface = host.querySelector(

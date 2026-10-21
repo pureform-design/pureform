@@ -176,6 +176,10 @@ export interface ComponentCase {
     /** Where it shows indication, for an interactive component (an anatomy with `indication`
      *  entries). */
     readonly indication?: IndicationCase | undefined;
+    /** `true` for a component that lays itself out from measuring the page once mounted (the
+     *  carousel sizes its items from the row's width): hydrating it changes those sizes, so the
+     *  hydration suites check it logs nothing, but not that nothing changed. */
+    readonly measured?: true | undefined;
     /** How it comes and goes, for an overlay. */
     readonly overlay?: OverlayCase | undefined;
 }
