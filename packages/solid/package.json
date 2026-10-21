@@ -214,6 +214,17 @@
                 "default": "./dist/carousel.jsx"
             }
         },
+        "./stepper": {
+            "types": "./dist/stepper/index.d.ts",
+            "solid": {
+                "development": "./src/stepper/index.ts",
+                "default": "./dist/stepper.jsx"
+            },
+            "import": {
+                "development": "./src/stepper/index.ts",
+                "default": "./dist/stepper.jsx"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "solid": {
