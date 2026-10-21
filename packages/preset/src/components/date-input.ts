@@ -37,7 +37,7 @@ import {
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
 import type { MaterialDensity } from "@pureform/theme";
-import { radius, spacing } from "@pureform/theme";
+import { radius, spacing, textStyle } from "@pureform/theme";
 
 import {
     CALENDAR_TOKENS,
@@ -184,6 +184,7 @@ export const createDateInput = <
                         alignItems: center,
                     },
                     segment: {
+                        textStyle: textStyle("bodyLarge"),
                         borderRadius: ref("segmentRadius"),
                         paddingInlineStart: px(1),
                         paddingInlineEnd: px(1),
