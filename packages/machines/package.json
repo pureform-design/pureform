@@ -169,6 +169,7 @@
     },
     "dependencies": {
         "@pureform/binding-core": "catalog:",
+        "@internationalized/date": "catalog:",
         "@pureform/js-effects": "catalog:",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/carousel": "catalog:",
@@ -176,6 +177,8 @@
         "@zag-js/collection": "catalog:",
         "@zag-js/combobox": "catalog:",
         "@zag-js/core": "catalog:",
+        "@zag-js/date-input": "catalog:",
+        "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/menu": "catalog:",
