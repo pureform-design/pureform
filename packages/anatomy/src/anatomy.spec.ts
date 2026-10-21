@@ -62,6 +62,7 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     ],
     // Each item's mask.
     carousel: [at("mask", "mask", false)],
+    stepper: [at("trigger", "trigger", false)],
     listItem: [at("root", "root", false)],
     // Each day, month or year of a date picker's calendar.
     calendarCell: [at("trigger", "trigger", true)],

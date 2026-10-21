@@ -71,6 +71,7 @@ describe("pureform", () => {
             "richTooltip",
             "card",
             "carousel",
+            "stepper",
             "scrim",
             "ripple",
             "icon",
@@ -148,6 +149,7 @@ describe("pureform", () => {
             "richTooltip",
             "card",
             "carousel",
+            "stepper",
             "scrim",
             "ripple",
         ]);

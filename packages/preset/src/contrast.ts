@@ -121,6 +121,27 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("bodyColor"), token("container"), TEXT_CONTRAST),
     ],
     carousel: [pair(token("content"), token("container"), TEXT_CONTRAST)],
+    stepper: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("activeContent"), token("container"), TEXT_CONTRAST),
+        pair(token("errorContent"), token("container"), TEXT_CONTRAST),
+        pair(token("captionColor"), token("container"), TEXT_CONTRAST),
+        pair(
+            token("indicatorContent"),
+            token("indicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(
+            token("activeIndicatorContent"),
+            token("activeIndicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(
+            token("errorIndicatorContent"),
+            token("errorIndicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+    ],
     dragHandle: [
         pair(token("color"), role("surfaceContainerLow"), UI_CONTRAST),
     ],
