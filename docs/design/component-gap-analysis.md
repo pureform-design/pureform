@@ -166,9 +166,9 @@ done (§7).
 
 ### 1.6 Data
 
-| Component          | pureform | M3 Expressive                                    | Angular Material          | zag | Notes                              |
-| ------------------ | -------- | ------------------------------------------------ | ------------------------- | --- | ---------------------------------- |
-| Table, sort header | ❌       | — (M2 data table only; Android's page is a stub) | ✅ `mat-table`, `matSort` | —   | **In scope** (§1.9); own component |
+| Component          | pureform       | M3 Expressive                                    | Angular Material          | zag | Notes                                                                |
+| ------------------ | -------------- | ------------------------------------------------ | ------------------------- | --- | -------------------------------------------------------------------- |
+| Table, sort header | ✅ `dataTable` | — (M2 data table only; Android's page is a stub) | ✅ `mat-table`, `matSort` | —   | Done (c6d): own machine (sort, selection); registered as `dataTable` |
 
 ### 1.7 Primitives
 
@@ -210,7 +210,7 @@ zag's part lists, and a design call is recorded in the component's output contex
 | Stepper                     | `stepper`     | zag `steps`                 | Horizontal and vertical; step header, connector, content.                                                 |
 | Paginator                   | `paginator`   | zag `pagination`            | Range label, page-size select (reuses `select`), previous/next icon buttons.                              |
 | Tree                        | `tree`        | zag `tree-view`             | Nodes use `listItem` parts; expand icon in `trailing`, nested group indented.                             |
-| Table, sort header          | `table`       | own (sort state, selection) | Header, row, cell, footer, sort arrow, optional selection column. No zag machine.                         |
+| Table, sort header          | `dataTable`   | own (sort state, selection) | Done (c6d): header, body, footer rows and cells, selection column, sort header; own machine.              |
 | Grid list                   | `gridList`    | none                        | Layout only: columns, gutter, tile aspect.                                                                |
 | Button toggle (group)       | `buttonGroup` | zag `toggle-group`          | Already planned (§4.0); Angular's `mat-button-toggle-group` is the connected, selectable form.            |
 | Sidenav (drawer container)  | —             | —                           | Not a separate component: a side sheet or expanded rail (`modal`, `coplanar`) plus the page's own layout. |
@@ -687,6 +687,7 @@ Expressive values are the defaults; every deprecated option stays as a variant.
 | Toolbar           | New (c4c): `root` holding icon buttons and buttons; `placement` floating (a level 3 pill) or docked (fills its edge, square, spreads its elements; replaces the bottom app bar), `orientation`, `color` standard/vibrant (vibrant provides its icon buttons its content color, r4-findings), `overflow` (a menu for what doesn't fit); 0 compounds                                                                                                              | —                                               |
 | Carousel          | New (c4d): `item` slots in a scrolling `itemGroup`, each a rounded `mask` (extra-large corners) over its `content`; `layout` multiBrowse (default), hero, uncontained, multiAspect, fullScreen; masks follow Material's keylines as the row scrolls; zag `carousel`; 0 compounds                                                                                                                                                                                | —                                               |
 | Time picker       | New (c5b): `timePicker` (`headline`, `body` with the hour and minute selectors and the `period` selector, a `dial` with track, handle, centre and labels, `actions`; `mode` dial/scroll, `color` standard/vibrant) and `timeInput` (two fields, the same period selector and actions); own machine, 12/24-hour from the locale; the dial stays round and unmirrored (shape exception); 0 compounds                                                              | —                                               |
+| Data table        | New (c6d): `dataTable` (`header`, `body`, `footer` row groups; `headerRow`, `row`, `alternateRow` (striped), `footerRow`; `headerCell`, `cell`, `footerCell`, `selectionCell`; `sortHeader` with `sortLabel` and `sortIndicator`); `stickyHeader`, `density`; own machine for the sort and selection; 0 compounds                                                                                                                                               | —                                               |
 
 **Removed, and why:** the per-size tokens were renamed with the sizes (`heightMedium` →
 the new size names; `sizeDefault` is the 56 dp FAB). Same capability, new names. Nothing else
