@@ -679,3 +679,15 @@ export const affixField = (
     };
     return { base, icons, parts };
 };
+
+/** The variant groups an affix field declares, in its order, up to its own (a text field's
+ *  `secure`) and `density`: the fill, the `color` per group in `groups`, and the icons and
+ *  affixes it shows. */
+export const affixFieldVariants = (groups: ColorGroups) => ({
+    variant: ["filled", "outlined"] as const,
+    color: groups,
+    leadingIcon: ["true", "false"] as const,
+    trailingIcon: ["true", "false"] as const,
+    prefixText: ["true", "false"] as const,
+    suffixText: ["true", "false"] as const,
+});

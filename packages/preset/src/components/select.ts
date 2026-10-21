@@ -35,6 +35,7 @@ import {
     AFFIX_FIELD_STRUCTURE,
     AFFIX_TOKENS,
     affixField,
+    affixFieldVariants,
     fieldTokens,
 } from "./field";
 import {
@@ -86,12 +87,7 @@ export const selectField = <
             slots: [...AFFIX_FIELD_SLOTS],
             structure: AFFIX_FIELD_STRUCTURE,
             variants: {
-                variant: ["filled", "outlined"],
-                color: groups as ColorGroups,
-                leadingIcon: ["true", "false"],
-                trailingIcon: ["true", "false"],
-                prefixText: ["true", "false"],
-                suffixText: ["true", "false"],
+                ...affixFieldVariants(groups as ColorGroups),
                 density: densitySteps<string>(densities),
             },
             recipe: () => ({
