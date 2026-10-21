@@ -40,6 +40,8 @@ import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
+import { pickerAction } from "../picker-actions";
+import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -292,6 +294,17 @@ function SupportingText({ unstyled, ...props }: DateInputPartProps): ReactNode {
     });
 }
 
+/** Calls `onConfirm` with the date: `as={Button}` draws it as a button. */
+const ConfirmTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
+    "ConfirmTrigger",
+    (name) => context.use(name).confirm,
+);
+/** Calls `onCancel`. */
+const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
+    "CancelTrigger",
+    (name) => context.use(name).cancel,
+);
+
 /** The ready-made date input's props: Root's, with `className`, `style`, and `slotProps` keyed
  *  by part, and the headline, label, supporting text and actions' labels as content. */
 export interface DateInputProps
@@ -375,7 +388,7 @@ function ReadyMade(props: DateInputProps): ReactNode {
  *  compose its parts under `DateInput.Root`: `Header` (`Headline`, `SelectedDate`,
  *  `ModeToggle`), `Divider`, `Field` holding `Container` (`LeadingIcon`, `PrefixText`, `Input`
  *  of `Segment`s, `SuffixText`, `Label`, `TrailingIcon`) and `SupportingText`, then
- *  `Actions`. */
+ *  `Actions` (with `CancelTrigger` and `ConfirmTrigger`). */
 export const DateInput = Object.assign(ReadyMade, {
     Root,
     Header,
@@ -394,15 +407,6 @@ export const DateInput = Object.assign(ReadyMade, {
     TrailingIcon,
     SupportingText,
     Actions,
+    CancelTrigger,
+    ConfirmTrigger,
 });
-
-/** The date input's actions, for buttons of the app's own inside Root: `confirm` calls
- *  `onConfirm` with the date typed, `cancel` calls `onCancel`. */
-export function useDateInput(): {
-    readonly value: readonly string[];
-    readonly confirm: () => void;
-    readonly cancel: () => void;
-} {
-    const { value, confirm, cancel } = context.use("useDateInput");
-    return { value, confirm, cancel };
-}

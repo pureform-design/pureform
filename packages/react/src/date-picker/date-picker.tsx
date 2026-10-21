@@ -64,6 +64,8 @@ import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { useSlotProps } from "../parts";
 import type { SlotKeyedProps } from "../parts";
+import { pickerAction } from "../picker-actions";
+import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
@@ -318,6 +320,17 @@ const Prev: (props: DatePickerStepProps) => ReactNode = calendar.Prev;
 /** Shows the next month. */
 const Next: (props: DatePickerStepProps) => ReactNode = calendar.Next;
 
+/** Commits the chosen dates and closes the dialog: `as={Button}` draws it as a button. */
+const ConfirmTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
+    "ConfirmTrigger",
+    (name) => context.use(name).confirm,
+);
+/** Closes the dialog and drops the dates chosen since it opened. */
+const CancelTrigger: (props: PickerActionProps) => ReactNode = pickerAction(
+    "CancelTrigger",
+    (name) => context.use(name).cancel,
+);
+
 /** The ready-made picker's props: Root's, with `className`, `style` and `slotProps` keyed by
  *  part, and the trigger's label, the headline, the placeholder and the actions' labels as
  *  content. */
@@ -444,7 +457,7 @@ function ReadyMade(props: DatePickerProps): ReactNode {
  *  `DatePicker.Root`: `Trigger`, `Backdrop`, then `Positioner` holding `Content`, which holds
  *  `Header` (`Headline`, `SelectedDate`, `ModeToggle`), `Divider`, `Controls` (`ViewTrigger`,
  *  `Prev`, `Next`), `Weekdays` of `Weekday`s over a `Grid` of `Week`s of `Cell`s (or a
- *  `YearList`), and `Actions`. */
+ *  `YearList`), and `Actions` (with `CancelTrigger` and `ConfirmTrigger`). */
 export const DatePicker = Object.assign(ReadyMade, {
     Root,
     Trigger,
@@ -467,15 +480,6 @@ export const DatePicker = Object.assign(ReadyMade, {
     Cell,
     YearList,
     Actions,
+    CancelTrigger,
+    ConfirmTrigger,
 });
-
-/** The picker's draft and actions, for parts of the app's own inside Root: `confirm` commits the
- *  draft and closes, `cancel` closes and drops it. */
-export function useDatePicker(): {
-    readonly value: readonly string[];
-    readonly confirm: () => void;
-    readonly cancel: () => void;
-} {
-    const { selected, confirm, cancel } = context.use("useDatePicker");
-    return { value: selected, confirm, cancel };
-}

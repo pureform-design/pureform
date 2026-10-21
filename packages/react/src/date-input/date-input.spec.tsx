@@ -104,3 +104,33 @@ describe("DateInput, ready-made", () => {
         expect(onModeToggle).toHaveBeenCalled();
     });
 });
+
+describe("DateInput, composed", () => {
+    it("runs the actions through CancelTrigger and ConfirmTrigger, unless onClick prevents it", async () => {
+        const onConfirm = vi.fn();
+        const onCancel = vi.fn();
+        withRegistry(
+            <DateInput.Root
+                defaultValue={["2026-08-17"]}
+                onConfirm={onConfirm}
+                onCancel={onCancel}
+            >
+                <DateInput.Actions>
+                    <DateInput.CancelTrigger
+                        onClick={(event) => event.preventDefault()}
+                    >
+                        Cancel
+                    </DateInput.CancelTrigger>
+                    <DateInput.ConfirmTrigger>OK</DateInput.ConfirmTrigger>
+                </DateInput.Actions>
+            </DateInput.Root>,
+        );
+        await settle();
+        const cancel = screen.getByText("Cancel");
+        expect(cancel.getAttribute("type")).toBe("button");
+        await interact(() => userEvent.click(cancel));
+        expect(onCancel).not.toHaveBeenCalled();
+        await interact(() => userEvent.click(screen.getByText("OK")));
+        expect(onConfirm).toHaveBeenCalledWith(["2026-08-17"]);
+    });
+});
