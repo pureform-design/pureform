@@ -185,6 +185,20 @@ export const PICKER_HEADER_SLOTS = [
     "divider",
 ] as const;
 
+/** A picker's actions: text buttons at the end of the last row. */
+export const pickerActions = (
+    ref: (token: "actionsGap" | "actionsPadding") => AliasNode,
+): StyleMap => ({
+    display: flex,
+    flexDirection: row,
+    justifyContent: end,
+    gap: ref("actionsGap"),
+    paddingBlockStart: spacing("2"),
+    paddingBlockEnd: ref("actionsPadding"),
+    paddingInlineStart: ref("actionsPadding"),
+    paddingInlineEnd: ref("actionsPadding"),
+});
+
 /** A dialog-like picker's root, header, divider and actions over its tokens: a surface of the
  *  picker's width, the headline over the selected date with the mode toggle at its end, and the
  *  text buttons at the end of the last row. */
@@ -237,16 +251,7 @@ export const pickerChrome = (
             borderWidth: px(0),
             backgroundColor: ref("dividerColor"),
         },
-        actions: {
-            display: flex,
-            flexDirection: row,
-            justifyContent: end,
-            gap: ref("actionsGap"),
-            paddingBlockStart: spacing("2"),
-            paddingBlockEnd: ref("actionsPadding"),
-            paddingInlineStart: ref("actionsPadding"),
-            paddingInlineEnd: ref("actionsPadding"),
-        },
+        actions: pickerActions(ref),
     }) satisfies Record<string, StyleMap>;
 
 const { tokens, ref } = componentTokens("calendarCell", {

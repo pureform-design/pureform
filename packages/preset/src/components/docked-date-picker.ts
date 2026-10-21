@@ -43,8 +43,8 @@ import {
     CALENDAR_TOKENS,
     calendarControlButton,
     calendarParts,
+    pickerActions,
     PICKER_TOKENS,
-    pickerChrome,
 } from "./calendar";
 import {
     AFFIX_FIELD_SLOTS,
@@ -96,7 +96,11 @@ export const createDockedDatePicker = <
     const { tokens, ref } = fieldTokens("dockedDatePicker", {
         ...AFFIX_TOKENS,
         ...CALENDAR_TOKENS,
-        ...PICKER_TOKENS,
+        // The popup's width, content color and actions, as the modal picker's.
+        width: PICKER_TOKENS.width,
+        selectedDateColor: PICKER_TOKENS.selectedDateColor,
+        actionsGap: PICKER_TOKENS.actionsGap,
+        actionsPadding: PICKER_TOKENS.actionsPadding,
         // The popup: a step lower than the modal picker's corners.
         popupRadius: radius("large"),
         popupContainer: sys("surfaceContainerHigh"),
@@ -105,7 +109,6 @@ export const createDockedDatePicker = <
     const field = affixField(ref);
     const { density, ...parts } = field.parts(groups, densities);
     const calendar = calendarParts(ref);
-    const chrome = pickerChrome(ref);
     return variantsOf<{
         color: G | typeof DEFAULT_GROUP;
         density: "inherit" | D;
@@ -173,7 +176,7 @@ export const createDockedDatePicker = <
                         height: ref("yearListHeight"),
                         overflow: auto,
                     },
-                    actions: chrome.actions,
+                    actions: pickerActions(ref),
                 },
                 variants: {
                     ...parts.variants,
