@@ -21,6 +21,7 @@ export const RN_COMPONENTS = [
     "listItem",
     "linearProgress",
     "circularProgress",
+    "loadingIndicator",
     "radio",
     "scrim",
     "supportingText",

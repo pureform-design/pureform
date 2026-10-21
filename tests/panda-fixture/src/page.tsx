@@ -12,6 +12,7 @@ import {
     chip,
     circularProgress,
     linearProgress,
+    loadingIndicator,
     navigationBar,
     navigationRail,
     searchBar,
@@ -2235,6 +2236,123 @@ export function Page() {
                         </>
                     );
                 })()}
+            </section>
+            {/* M3 Expressive's loading indicator (c4a), uncontained and contained, in the base
+                and a named theme, and the wavy progress indicators beside the flat track. */}
+            <section
+                data-section="loading-and-wavy"
+                style={{ display: "grid", gap: "16px", width: "480px" }}
+            >
+                <For each={[undefined, "teal"] as const}>
+                    {(theme) => (
+                        <div data-panda-theme={theme} style={row}>
+                            <For
+                                each={
+                                    [
+                                        {},
+                                        { variant: "contained" },
+                                        { color: "tertiary" },
+                                        {
+                                            variant: "contained",
+                                            color: "error",
+                                        },
+                                    ] as const
+                                }
+                            >
+                                {(selection) => {
+                                    const l = loadingIndicator(selection);
+                                    return (
+                                        <div
+                                            class={l.root}
+                                            role="progressbar"
+                                            aria-label="Loading"
+                                        >
+                                            <span class={l.container}>
+                                                <span class={l.indicator} />
+                                            </span>
+                                        </div>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    )}
+                </For>
+                <For
+                    each={
+                        [
+                            { value: 40 },
+                            { value: 70, thickness: "thick" },
+                            { value: 100 },
+                        ] as const
+                    }
+                >
+                    {({ value, ...selection }) => {
+                        const p = linearProgress({
+                            shape: "wavy",
+                            ...selection,
+                        });
+                        return (
+                            <div
+                                class={p.root}
+                                role="progressbar"
+                                aria-valuenow={value}
+                                aria-label="Wavy progress"
+                                style={{
+                                    "--pf-components-linearProgress-value": `${value}`,
+                                }}
+                            >
+                                <div class={p.track} />
+                                <div class={p.indicator} />
+                                <div class={p.stopIndicator} />
+                            </div>
+                        );
+                    }}
+                </For>
+                <div style={row}>
+                    <For
+                        each={
+                            [
+                                { value: 30 },
+                                { value: 65 },
+                                { value: 80, thickness: "thick" },
+                                { value: 65, color: "secondary" },
+                            ] as const
+                        }
+                    >
+                        {({ value, ...selection }) => {
+                            const c = circularProgress({
+                                shape: "wavy",
+                                ...selection,
+                            });
+                            return (
+                                <div
+                                    class={c.root}
+                                    role="progressbar"
+                                    aria-valuenow={value}
+                                    aria-label="Wavy progress"
+                                    style={{
+                                        "--pf-components-circularProgress-value": `${value}`,
+                                    }}
+                                >
+                                    <span class={c.track}>
+                                        <span class={c.trackEndHalf}>
+                                            <span class={c.trackEndArc} />
+                                        </span>
+                                        <span class={c.trackStartHalf}>
+                                            <span class={c.trackStartArc} />
+                                        </span>
+                                    </span>
+                                    <span class={c.endHalf}>
+                                        <span class={c.endArc} />
+                                    </span>
+                                    <span class={c.startHalf}>
+                                        <span class={c.startArc} />
+                                    </span>
+                                </div>
+                            );
+                        }}
+                    </For>
+                </div>
             </section>
             <section
                 data-section="navigation"
