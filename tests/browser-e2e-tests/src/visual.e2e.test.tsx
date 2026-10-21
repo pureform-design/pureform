@@ -55,6 +55,7 @@ const SECTIONS = [
     "app-bars",
     "date-pickers",
     "time-pickers",
+    "paginators",
 ];
 
 let dispose: (() => void) | undefined;
@@ -192,4 +193,23 @@ it("a floating toolbar is a 64px pill hugging its buttons, a docked one fills it
     expect(dockedStyle.borderStartStartRadius).toBe("0px");
     expect(dockedStyle.paddingInlineStart).toBe("16px");
     expect(dockedStyle.boxShadow).toBe("none");
+});
+
+it("a paginator is a 56px row ending at the inline end, holding a compact select", () => {
+    const [full, compact] = [
+        ...section("paginators").querySelectorAll<HTMLElement>("[role=group]"),
+    ];
+    const style = getComputedStyle(full!);
+    expect(full!.getBoundingClientRect().height).toBe(56);
+    expect(style.justifyContent).toBe("end");
+    expect(style.paddingInlineStart).toBe("8px");
+    const field = full!.querySelector<HTMLElement>("[role=combobox]")!;
+    expect(field.getBoundingClientRect().height).toBeLessThan(48);
+    expect(field.getBoundingClientRect().width).toBeGreaterThanOrEqual(96);
+    const rangeBox = compact!
+        .querySelector<HTMLElement>("span")!
+        .getBoundingClientRect();
+    expect(compact!.getBoundingClientRect().right).toBeGreaterThan(
+        rangeBox.right,
+    );
 });

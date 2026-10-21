@@ -38,6 +38,7 @@ import { Media } from "@pureform/react/media";
 import { Menu } from "@pureform/react/menu";
 import { NavigationBar } from "@pureform/react/navigation-bar";
 import { NavigationRail } from "@pureform/react/navigation-rail";
+import { Paginator } from "@pureform/react/paginator";
 import { RadioGroup } from "@pureform/react/radio-group";
 import { RichTooltip } from "@pureform/react/rich-tooltip";
 import { Ripple } from "@pureform/react/ripple";
@@ -132,6 +133,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     RichTooltip,
     Scrim,
     AppBar,
+    Paginator,
     TimePicker,
     TimeInput,
     SearchBar,

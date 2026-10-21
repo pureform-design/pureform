@@ -37,6 +37,7 @@ import { Media } from "@pureform/solid/media";
 import { Menu } from "@pureform/solid/menu";
 import { NavigationBar } from "@pureform/solid/navigation-bar";
 import { NavigationRail } from "@pureform/solid/navigation-rail";
+import { Paginator } from "@pureform/solid/paginator";
 import { RadioGroup } from "@pureform/solid/radio-group";
 import { RichTooltip } from "@pureform/solid/rich-tooltip";
 import { Ripple } from "@pureform/solid/ripple";
@@ -124,6 +125,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     RichTooltip,
     Scrim,
     AppBar,
+    Paginator,
     TimePicker,
     TimeInput,
     SearchBar,
