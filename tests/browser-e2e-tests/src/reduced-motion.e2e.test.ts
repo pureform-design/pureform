@@ -27,9 +27,24 @@ const FIXTURES = [
     { name: "radio", slot: "dot" },
     { name: "textField", slot: "label" },
     { name: "linearProgress", slot: "indicator" },
+    // The wavy indicator (c4a) is clipped to a wave but moves as the flat one does.
+    {
+        name: "linearProgress",
+        id: "wavyLinearProgress",
+        selection: { shape: "wavy" },
+        slot: "indicator",
+    },
 ] as const;
 
-type Fixture = { readonly name: string; readonly slot: string };
+type Fixture = {
+    readonly name: string;
+    readonly slot: string;
+    /** Tells apart two fixtures of one component; the name when absent. */
+    readonly id?: string;
+    readonly selection?: object;
+};
+
+const idOf = (fixture: Fixture) => fixture.id ?? fixture.name;
 
 /** Components with no motion of their own, whose transition stays empty in every scenario: the
  *  toolbar, whose moves are its buttons' and its overflow menu's. */
@@ -40,7 +55,7 @@ const STATE =
 
 /** The transitioned properties with full motion, and with reduced motion. */
 const EXPECTED: Record<
-    (typeof FIXTURES)[number]["name"],
+    (typeof FIXTURES)[number]["name"] | "wavyLinearProgress",
     { full: string; reduced: string }
 > = {
     // M3 Expressive's corner morph moves, so reduced motion drops it.
@@ -55,12 +70,16 @@ const EXPECTED: Record<
         reduced: "background-color, color",
     },
     linearProgress: { full: "width", reduced: "none" },
+    wavyLinearProgress: { full: "width", reduced: "none" },
 };
 
-const classOf = (fns: Record<string, ClassFn>, { name, slot }: Fixture) => {
+const classOf = (
+    fns: Record<string, ClassFn>,
+    { name, slot, selection = {} }: Fixture,
+) => {
     const fn = fns[name];
     if (!fn) throw new Error(`no classes for ${name}`);
-    return (fn({}) as Record<string, string>)[slot]!;
+    return (fn(selection) as Record<string, string>)[slot]!;
 };
 
 const STYLINGS: Record<
@@ -157,7 +176,7 @@ const transitions = async (
         const elements = fixtures
             .map(
                 (fixture) =>
-                    `<div data-id="${fixture.name}" class="${styling.classes(fixture)}"></div>`,
+                    `<div data-id="${idOf(fixture)}" class="${styling.classes(fixture)}"></div>`,
             )
             .join("");
         const markup = scenario.providers.reduceRight(
@@ -207,9 +226,11 @@ describe.each(Object.keys(STYLINGS) as (keyof typeof STYLINGS)[])(
                 scenario,
             );
             expect(reducedMedia).toBe(scenario.system === "reduce");
-            for (const { name: component } of FIXTURES) {
+            for (const component of FIXTURES.map(idOf)) {
                 const expected =
-                    EXPECTED[component][scenario.reduced ? "reduced" : "full"];
+                    EXPECTED[component as keyof typeof EXPECTED][
+                        scenario.reduced ? "reduced" : "full"
+                    ];
                 const value = values[component]!;
                 if (expected === "none") {
                     expect(value, component).toEqual({
