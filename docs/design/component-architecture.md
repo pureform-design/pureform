@@ -593,6 +593,60 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   content inset blends from `expanded` (flexible sizes) and `search` flags; the side sheet's
   `modal` sets `layer` and `coplanar` a flag.
 
+#### Provided tokens: a container's tokens for the components inside it
+
+A recipe sets only its own component's tokens. A container that recolours what it holds (a vibrant
+toolbar's icon buttons, an app bar's actions, as Compose's `LocalContentColor` does) declares
+it as data instead, with `providedTokens` next to `tokens` on its root slot:
+
+```ts
+color: {
+    vibrant: {
+        root: {
+            tokens: { container: sys("primaryContainer"), content: on("primaryContainer") },
+            providedTokens: { iconButton: { accent: ref("content") } },
+        },
+    },
+},
+```
+
+- **What it is:** values for another component's own tokens, by component and token name (the
+  builder stores them by path, `components.iconButton.accent`, like `tokens`). They apply to
+  every component of that kind inside the container, in its slots or passed in as children.
+- **Resolved at the container:** a value may read the container's tokens, including the ones its
+  own variants set (`ref("content")` above), and the theme's. It is resolved where the
+  container is, so the nested component receives a finished value and never a chain through its
+  own variant-set tokens (the chained-token rule above still holds inside each component).
+- **Web (CSS, Tailwind, Panda):** each becomes the nested component's custom property on the
+  container root's rule (`--pf-components-iconButton-accent: var(--pf-components-toolbar-content,
+…)`). Custom properties inherit, and `var()` in a custom property resolves on the element
+  that declares it, so the nested component reads the container's value. None of the nested
+  component's own tokens are registered as non-inheriting (`@property`) for this to hold; a
+  provided token must not be one with a `valueType`.
+- **React Native:** selection takes them out of the container's styles (`Selected.providedTokens`,
+  by theme key), and the binding gives them to its subtree through the `ProvidedTokens` context.
+  A nested component takes them as overrides under its own: they go into `withSetTokens` where
+  the provider's overrides go, so its variants' tokens and its instance tokens resolve over
+  them, as on the web.
+- **Solid and React:** styled containers need nothing, since the cascade carries the values. The
+  bindings have the same `ProvidedTokens` context and `useProvidedTokens(component)` hook (the
+  type and merge rules in binding-core), for code that renders without that cascade: a
+  component merges what the context gives it as instance tokens, under its own `tokens` prop.
+  An unstyled container draws none of its own colours, so it provides nothing.
+- **Scope:**
+    - Only a root slot provides, as only a root slot sets tokens.
+    - A container may provide any component's dynamic tokens. Provide only to components it
+      holds, and only tokens without a `valueType`.
+    - The nearest provider wins: a container inside another provides over the outer one's values,
+      per token, and a container that provides nothing passes the outer values through.
+    - The nested component's own styles win: on the web, the tokens its own variants set on its
+      root (an icon button with `color: "secondary"` sets `accent`), and its instance tokens. A
+      selection equal to its defaults sets nothing, so it follows the container. On React Native
+      the same order comes from the overrides layer.
+    - A provided token travels with the React tree on React Native and with the DOM on the web,
+      so a nested component portaled out of the container (a menu's items) follows it on React
+      Native but not on the web. Keep provided tokens to parts rendered in place.
+
 ### 5.6 Themes
 
 - **Static:** each target scopes themes the way it natively does, and the factory exposes
