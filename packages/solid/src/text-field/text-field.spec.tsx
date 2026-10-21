@@ -241,7 +241,6 @@ describe("TextField, affixes, counter and secure", () => {
             "container",
             "input",
             "label",
-            "supporting-row",
             "supporting-text",
             "counter",
         ]);

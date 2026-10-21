@@ -16,7 +16,7 @@ import type { Unstyled } from "../parts";
 import type { VariantProp } from "./variants";
 
 /** The text field's parts: `"root" | "container" | "leadingIcon" | "prefixText" | "input" |
- *  "suffixText" | "label" | "trailingIcon" | "supportingRow" | "supportingText" | "counter"`. */
+ *  "suffixText" | "label" | "trailingIcon" | "supportingText" | "counter"`. */
 export type TextFieldPart = PartName<typeof textFieldAnatomy>;
 
 /** The text area's parts: the text field's, without the prefix and suffix. */

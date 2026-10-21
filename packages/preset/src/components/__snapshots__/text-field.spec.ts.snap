@@ -5,6 +5,7 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
   "base": {
     "container": {
       "display": "flex",
+      "flexBasis": "100%",
       "height": "calc(var(--components-textField-height, 56px) + var(--components-textField-densityOffset, token(sizes.densityOffset)))",
       "position": "relative",
       "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
@@ -115,7 +116,8 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
     },
     "root": {
       "display": "flex",
-      "flexDirection": "column",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
     },
     "suffixText": {
       "alignItems": "center",
@@ -136,10 +138,6 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "bodyLarge",
       "transition": "opacity token(durations.short3) token(easings.standard)",
     },
-    "supportingRow": {
-      "display": "flex",
-      "flexDirection": "row",
-    },
     "supportingText": {
       "color": {
         ".textField__root:is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]):is(:disabled, :has(:disabled), [aria-disabled=true]) &": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
@@ -147,7 +145,9 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
         "base": "var(--components-textField-supportingColor, token(colors.onSurfaceVariant))",
       },
       "display": "flex",
+      "flexBasis": "0px",
       "flexDirection": "column",
+      "flexGrow": "1",
       "flexShrink": "1",
       "paddingBlockStart": "token(spacing.1)",
       "paddingInlineEnd": "var(--components-textField-paddingInline, token(spacing.4))",
@@ -219,7 +219,6 @@ exports[`textField > compiles to a stable Panda slot recipe 1`] = `
     "label",
     "trailingIcon",
     "supportingText",
-    "supportingRow",
     "counter",
   ],
   "variants": {
