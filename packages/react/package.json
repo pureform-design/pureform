@@ -152,6 +152,13 @@
                 "default": "./dist/tree.mjs"
             }
         },
+        "./stepper": {
+            "types": "./dist/stepper/index.d.ts",
+            "import": {
+                "development": "./src/stepper/index.ts",
+                "default": "./dist/stepper.mjs"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "import": {

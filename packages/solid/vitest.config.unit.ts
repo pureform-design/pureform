@@ -30,6 +30,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/carousel",
             "@zag-js/accordion",
             "@zag-js/tree-view",
+            "@zag-js/steps",
             "@zag-js/date-picker",
             "@zag-js/date-input",
         ],

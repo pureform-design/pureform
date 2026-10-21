@@ -50,6 +50,7 @@ import { SideSheet } from "@pureform/solid/side-sheet";
 import { Slider } from "@pureform/solid/slider";
 import { Snackbar } from "@pureform/solid/snackbar";
 import { SplitButton } from "@pureform/solid/split-button";
+import { Stepper } from "@pureform/solid/stepper";
 import { SupportingText } from "@pureform/solid/supporting-text";
 import { Switch } from "@pureform/solid/switch";
 import { Tabs } from "@pureform/solid/tabs";
@@ -142,6 +143,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Slider,
     Snackbar,
     SplitButton,
+    Stepper,
     SupportingText,
     Switch,
     Tabs,

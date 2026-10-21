@@ -1075,6 +1075,19 @@ Both check light and dark, for the base theme and every named theme, and throw n
 pair that falls short. `componentContrastFailures(color, components)` returns the failures
 instead.
 
+## Stepper
+
+`stepper` (c6b): slots `root`, `list`, `item`, `trigger` (a pressable header: the state layer and
+focus ring), `indicator` (the step's number, an icon or a check, in a circle), `label`, `caption`,
+`separator` (the connector) and `content`. `orientation`: `horizontal` (default; the connector
+fills the space between headers) or `vertical` (the connector runs down beside the content, which
+lines up with the label); `density`; 0 compounds. The indicator and label read the header's state
+(`aria-selected` or `aria-current` for the current step, `aria-invalid` for an error) and the
+indicator its own `aria-checked` (done). Tokens: `container`, `content`, `activeContent`,
+`errorContent`, `captionColor`, the indicator's container and content per state, `connector`,
+`connectorThickness`, `connectorLength`, `connectorGap`, `indicatorSize`, `height`,
+`paddingInline`, `gap`, `radius`, `contentPadding`. Colour changes fade; nothing moves.
+
 ## Carousel
 
 `carousel` (c4d): slots `root`, `itemGroup` (the scrolling row), `item` (an item's place in it),

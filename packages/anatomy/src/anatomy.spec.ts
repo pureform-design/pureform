@@ -67,6 +67,7 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     // Each item's header, and each node's row.
     accordion: [at("trigger", "trigger", false)],
     tree: [at("node", "node", false)],
+    stepper: [at("trigger", "trigger", false)],
     listItem: [at("root", "root", false)],
     // Each day, month or year of a date picker's calendar.
     calendarCell: [at("trigger", "trigger", true)],

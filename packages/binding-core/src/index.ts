@@ -581,6 +581,26 @@ export type {
     AccordionVariantProps,
 } from "./components/accordion";
 export {
+    STEPPER_CONTENT_PROPS,
+    STEPPER_LIST_LABEL_PROPS,
+    STEPPER_ROOT_PROPS,
+    stepperIndicator,
+    stepperMachineProps,
+    stepperSelection,
+    stepperTriggerDisabled,
+    stepperTriggerProps,
+} from "./components/stepper";
+export type {
+    StepperBehaviorProps,
+    StepperContentProps,
+    StepperElementIds,
+    StepperIndicator,
+    StepperItem,
+    StepperPart,
+    StepperRootOwnProps,
+    StepperVariantProps,
+} from "./components/stepper";
+export {
     TABS_CONTENT_PROPS,
     TABS_LIST_LABEL_PROPS,
     TABS_ROOT_PROPS,

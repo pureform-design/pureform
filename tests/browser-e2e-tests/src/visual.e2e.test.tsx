@@ -30,6 +30,7 @@ const SECTIONS = [
     "media",
     "carousels",
     "expandables",
+    "steppers",
     "controls",
     "color-groups",
     "text-fields",

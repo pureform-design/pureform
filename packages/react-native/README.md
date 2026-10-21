@@ -66,6 +66,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                           |
 | `accordion/`                                                            | `Accordion`: a column of item tiles, each a pressable header (`aria-expanded`) over its content while expanded; the expanded items are React state, as there's no Zag machine                                           |
 | `tree/`                                                                 | `Tree`: rows (`role="treeitem"`) with a branch's children indented under it while expanded; the expanded and selected nodes are React state                                                                             |
+| `stepper/`                                                              | `Stepper`: a list of steps with a pressable header each (an indicator, a label, a caption), a connector and the current content; `step` controllable, `linear`, `orientation`; no arrow keys or next and previous triggers |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory

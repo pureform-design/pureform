@@ -106,6 +106,7 @@
         "@zag-js/toast": "^1.46.0",
         "@zag-js/toggle-group": "^1.46.0",
         "@zag-js/carousel": "^1.46.0",
+        "@zag-js/steps": "^1.46.0",
         "@zag-js/date-picker": "^1.46.0",
         "@zag-js/date-input": "^1.46.0",
         "@zag-js/accordion": "^1.46.0",

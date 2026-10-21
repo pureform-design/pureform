@@ -73,6 +73,7 @@ describe("pureform", () => {
             "carousel",
             "accordion",
             "tree",
+            "stepper",
             "scrim",
             "ripple",
             "icon",
@@ -152,6 +153,7 @@ describe("pureform", () => {
             "carousel",
             "accordion",
             "tree",
+            "stepper",
             "scrim",
             "ripple",
         ]);

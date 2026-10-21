@@ -103,6 +103,13 @@
                 "default": "./dist/snackbar.mjs"
             }
         },
+        "./stepper": {
+            "types": "./dist/stepper/index.d.ts",
+            "import": {
+                "development": "./src/stepper/index.ts",
+                "default": "./dist/stepper.mjs"
+            }
+        },
         "./ripple": {
             "types": "./dist/ripple/index.d.ts",
             "import": {
@@ -222,6 +229,7 @@
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
         "@zag-js/slider": "catalog:",
+        "@zag-js/steps": "catalog:",
         "@zag-js/switch": "catalog:",
         "@zag-js/tabs": "catalog:",
         "@zag-js/tags-input": "catalog:",

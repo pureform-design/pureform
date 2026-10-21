@@ -407,6 +407,17 @@ export const displayRegistry = () =>
             "indicator",
             "group",
         ]),
+        stepper: named("stepper", [
+            "root",
+            "list",
+            "item",
+            "trigger",
+            "indicator",
+            "label",
+            "caption",
+            "separator",
+            "content",
+        ]),
         carousel: named("carousel", [
             "root",
             "itemGroup",

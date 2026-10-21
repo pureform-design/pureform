@@ -26,6 +26,7 @@ import {
     navigationRailAnatomy,
     radioAnatomy,
     sliderAnatomy,
+    stepperAnatomy,
     snackbarAnatomy,
     toastAnatomy,
     switchControlAnatomy,
@@ -61,6 +62,7 @@ import { NavigationRail } from "@pureform/react-native/navigation-rail";
 import { RadioGroup } from "@pureform/react-native/radio-group";
 import { Slider } from "@pureform/react-native/slider";
 import { Snackbar } from "@pureform/react-native/snackbar";
+import { Stepper } from "@pureform/react-native/stepper";
 import { Switch } from "@pureform/react-native/switch";
 import { Tabs } from "@pureform/react-native/tabs";
 import { Text } from "@pureform/react-native/text";
@@ -236,6 +238,17 @@ const CASES: RnCase[] = [
                 { value: "a", label: "README.md" },
                 { value: "b", label: "LICENSE" },
             ],
+        },
+        { disabled: undefined },
+    ),
+    // The stepper has no disabled state of its own; a step has.
+    items(
+        "Stepper",
+        Stepper as never,
+        stepperAnatomy,
+        {
+            "aria-label": "Checkout",
+            items: [{ label: "Address" }, { label: "Payment" }],
         },
         { disabled: undefined },
     ),

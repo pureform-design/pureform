@@ -152,6 +152,13 @@
                 "default": "./dist/carousel.mjs"
             }
         },
+        "./stepper": {
+            "types": "./dist/stepper/index.d.ts",
+            "import": {
+                "development": "./src/stepper/index.ts",
+                "default": "./dist/stepper.mjs"
+            }
+        },
         "./drag-handle": {
             "types": "./dist/drag-handle/index.d.ts",
             "import": {
