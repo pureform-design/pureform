@@ -763,7 +763,10 @@ focus ring, no state layer.
 
 ```html
 <div class="{bottomSheet.root}" role="dialog" aria-label="Share">
-    <button class="{bottomSheet.dragHandle} {dragHandle.root}" aria-label="Close sheet">
+    <button
+        class="{bottomSheet.dragHandle} {dragHandle.root}"
+        aria-label="Close sheet"
+    >
         <span class="{dragHandle.handle}"></span>
     </button>
     <div class="{bottomSheet.content}">…</div>
@@ -935,3 +938,13 @@ touch target size. To check a custom palette:
 Both check light and dark, for the base theme and every named theme, and throw naming each
 pair that falls short. `componentContrastFailures(color, components)` returns the failures
 instead.
+
+## Carousel
+
+`carousel` (c4d): slots `root`, `itemGroup` (the scrolling row), `item` (an item's place in it),
+`mask` (the rounded item people see: extra-large corners, the state layer and focus ring) and
+`content`. `layout`: `multiBrowse` (default), `hero`, `uncontained`, `multiAspect`, `fullScreen`
+(no padding, the parent's height); 0 compounds. Tokens: `container`, `content`, `radius`, `height`,
+`gap`, `padding`. The bindings size each item inline from Material's keylines
+(`carouselItemSizes` in `@pureform/binding-core`); only the widths and the mask's inline offset are
+set from script.

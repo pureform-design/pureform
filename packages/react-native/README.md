@@ -59,6 +59,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `progress.tsx`, `single-part.tsx`, and their subpaths                   | Progress indicators; avatar, icon, media, scrim, separator, supporting text, text                                                                                                                                       |
 | `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)                                                                                                 |
 | `toast/`                                                                | `createToaster` (Zag's toast store) and `Toaster`, which shows its toasts in a column at its placement and times them itself; `useSnackbar`'s queue is the machines' `createQueue`, and each snackbar takes an `offset` |
+| `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                           |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory

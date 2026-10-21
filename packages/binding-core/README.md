@@ -679,3 +679,13 @@ items), and that no Solid or React source sets a listed group from anything but 
   development.
 - Design doc: §5.3 (hooks), §5.6 and §5.7 (themes, runtime themes), §5.8 (motion), §5.9 (direction), §9.2 to §9.6 (parts, controllable
   state, forms, icons).
+
+## Carousel
+
+`components/carousel.ts`: `CarouselRootOwnProps`, `CAROUSEL_ROOT_PROPS`, `carouselSelection`,
+`carouselMachineProps`, `CarouselItem`, and the layout: `carouselKeylines(layout, viewport, gap,
+itemWidth?)` (Material's sizes at rest) and `carouselItemSizes(options, metrics)` (each item's
+slot, mask width and mask offset at a scroll position; the keylines turn round near the end so the
+last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
+The `dom` subpath adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
+`padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).
