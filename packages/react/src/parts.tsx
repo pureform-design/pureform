@@ -447,3 +447,21 @@ export const plainParts =
             const { scope } = use(label);
             return scope.render(part, { element, unstyled, props });
         };
+
+/** Builds a component's machine parts: as `plainParts`, but each also spreads the props
+ *  `machine` reads from Root's context (`use`), such as a time picker's selectors. */
+export const machinePart =
+    <A extends ComponentAnatomy, C>(
+        use: (name: string) => C & { readonly scope: PartScope<A> },
+        element: "div" | "span" | "label",
+    ) =>
+    (part: PartName<A>, label: string, machine: (context: C) => object) =>
+        function Part({ unstyled, ...props }: PlainPartProps): ReactElement {
+            const value = use(label);
+            return value.scope.render(part, {
+                element,
+                machine: machine(value),
+                unstyled,
+                props,
+            });
+        };

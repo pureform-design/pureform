@@ -49,7 +49,7 @@ import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, plainParts, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -273,21 +273,12 @@ function Content(props: DockedDatePickerPartProps): JSX.Element {
     });
 }
 
-const plain =
-    (part: "controls" | "actions", display: string) =>
-    (props: DockedDatePickerPartProps): JSX.Element => {
-        const { scope } = context.use(display);
-        return scope.render(part, {
-            element: "div",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const block = plainParts<Anatomy>(context.use, "div");
 
 /** The row of the month's and the year's controls. */
-const Controls = plain("controls", "Controls");
+const Controls = block<DockedDatePickerPartProps>("controls", "Controls");
 /** The buttons at the end. */
-const Actions = plain("actions", "Actions");
+const Actions = block<DockedDatePickerPartProps>("actions", "Actions");
 
 const viewButton = (
     part: "monthButton" | "yearButton",

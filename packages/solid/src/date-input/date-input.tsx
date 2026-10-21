@@ -40,7 +40,7 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, plainParts, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
@@ -184,22 +184,8 @@ function Root(props: DateInputRootProps): JSX.Element {
     );
 }
 
-const part =
-    (
-        name: PartName<Anatomy>,
-        display: string,
-        element: "div" | "span" | "hr",
-        machine?: (context: DateInputContextValue) => object,
-    ) =>
-    (props: DateInputPartProps): JSX.Element => {
-        const ctx = context.use(display);
-        return ctx.scope.render(name, {
-            element,
-            ...(machine ? { machine: () => machine(ctx) } : {}),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const block = plainParts<Anatomy>(context.use, "div");
+const inline = plainParts<Anatomy>(context.use, "span");
 
 const icon = (name: "leadingIcon" | "trailingIcon", display: string) =>
     function Icon(props: DateInputIconProps): JSX.Element {
@@ -214,11 +200,11 @@ const icon = (name: "leadingIcon" | "trailingIcon", display: string) =>
     };
 
 /** The header: the headline, the selected date, and the mode toggle. */
-const Header = part("header", "Header", "div");
+const Header = block<DateInputPartProps>("header", "Header");
 /** The title. */
-const Headline = part("headline", "Headline", "span");
+const Headline = inline<DateInputPartProps>("headline", "Headline");
 /** The date typed so far, or a placeholder. */
-const SelectedDate = part("selectedDate", "SelectedDate", "span");
+const SelectedDate = inline<DateInputPartProps>("selectedDate", "SelectedDate");
 
 /** The button that switches to the calendar: `as={IconButton}` draws it as one. */
 function ModeToggle(props: DateInputTriggerProps): JSX.Element {
@@ -233,9 +219,16 @@ function ModeToggle(props: DateInputTriggerProps): JSX.Element {
 }
 
 /** The line under the header, an `<hr>`. */
-const Divider = part("divider", "Divider", "hr");
+function Divider(props: DateInputPartProps): JSX.Element {
+    const { scope } = context.use("Divider");
+    return scope.render("divider", {
+        element: "hr",
+        unstyled: () => props.unstyled,
+        props: omit(props, "unstyled"),
+    });
+}
 /** The text field: the container and the supporting text. */
-const Field = part("field", "Field", "div");
+const Field = block<DateInputPartProps>("field", "Field");
 
 /** The filled or outlined box holding the icons, the segments, and the label. Always filled, so
  *  the label stays floated over the segments. */
@@ -253,7 +246,7 @@ function Container(props: DateInputPartProps): JSX.Element {
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
 const LeadingIcon = icon("leadingIcon", "LeadingIcon");
 /** Text before the segments. Turn on Root's `prefixText` with it. */
-const PrefixText = part("prefixText", "PrefixText", "span");
+const PrefixText = inline<DateInputPartProps>("prefixText", "PrefixText");
 
 /** The group of segments, named by the label. */
 function Input(props: DateInputInputProps): JSX.Element {
@@ -291,7 +284,7 @@ function Segment(props: DateInputSegmentProps): JSX.Element {
 }
 
 /** Text after the segments. Turn on Root's `suffixText` with it. */
-const SuffixText = part("suffixText", "SuffixText", "span");
+const SuffixText = inline<DateInputPartProps>("suffixText", "SuffixText");
 
 /** The floating label, which names the segments. */
 function Label(props: DateInputPartProps): JSX.Element {
@@ -325,7 +318,7 @@ function SupportingText(props: DateInputPartProps): JSX.Element {
 }
 
 /** The buttons at the end. */
-const Actions = part("actions", "Actions", "div");
+const Actions = block<DateInputPartProps>("actions", "Actions");
 
 /** Calls `onConfirm` with the date: `as={Button}` draws it as a button. */
 const ConfirmTrigger: (props: PickerActionProps) => JSX.Element = pickerAction(

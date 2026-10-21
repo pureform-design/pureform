@@ -25,10 +25,10 @@ import { type Accessor, merge, omit, Show } from "solid-js";
 import { useMachineButton } from "../interaction";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, machinePart, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
-import { machinePart, useTimeMachine } from "../time";
+import { useTimeMachine } from "../time";
 
 type Anatomy = typeof timeInputAnatomy;
 type Api = timePicker.Api<PropTypes>;
