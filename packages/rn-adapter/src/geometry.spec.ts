@@ -1,4 +1,14 @@
-import { morph } from "@pureform/core/ast";
+import { mergeConfigs, typed } from "@pureform/core";
+import {
+    add,
+    alias,
+    dynamic,
+    morph,
+    mul,
+    pct,
+    px,
+    unitless,
+} from "@pureform/core/ast";
 import { pureform } from "@pureform/preset";
 import { MATERIAL_SHAPES } from "@pureform/preset";
 import { describe, expect, it } from "vitest";
@@ -13,7 +23,7 @@ import {
     shapeCoordinates,
     shapePath,
 } from "./geometry";
-import { stylesFor, withSetTokens } from "./resolve";
+import { overridesFor, stylesFor, withSetTokens } from "./resolve";
 import { selectWithTransitions } from "./select";
 
 describe("shapePath", () => {
@@ -288,5 +298,90 @@ describe("conic gradients", () => {
         ).toHaveLength(1);
         expect(wedges.length).toBeLessThan(36);
         expect(wedges[0]!.d).toMatch(/^M 50 50 L /);
+    });
+});
+
+describe("shape points that read tokens", () => {
+    // A slot clipped to a band whose edge reads the component's `edge` token, which a variant
+    // and the instance set: each token set gives its own points (r4-findings, the wave clips).
+    const edge = alias("components", "band", "edge");
+    const config = mergeConfigs(pureform(), {
+        components: {
+            band: typed().slotComponent({
+                name: "band",
+                tokens: {
+                    edge: dynamic(["components", "band", "edge"], px(2)),
+                },
+                slots: ["root"],
+                variants: { wide: ["false", "true"] },
+                recipe: () => ({
+                    base: {
+                        root: {
+                            clipPath: {
+                                type: "shape",
+                                contours: [
+                                    {
+                                        from: [px(0), edge],
+                                        segments: [
+                                            {
+                                                op: "line",
+                                                to: [
+                                                    pct(100),
+                                                    add(
+                                                        edge,
+                                                        mul(edge, unitless(2)),
+                                                    ),
+                                                ],
+                                            },
+                                            {
+                                                op: "line",
+                                                to: [pct(50), pct(100)],
+                                            },
+                                        ],
+                                    },
+                                ],
+                            },
+                        },
+                    },
+                    variants: {
+                        wide: {
+                            false: {},
+                            true: { root: { tokens: { edge: px(5) } } },
+                        },
+                    },
+                    defaultVariants: { wide: "false" },
+                }),
+            }),
+        },
+    } as never);
+    const precomputed = precompute(config, { components: ["band"] });
+    const at = (wide: string, tokens?: Record<string, string>) => {
+        const scheme = "light" as const;
+        const resolved = stylesFor(
+            precomputed,
+            "base:light",
+            tokens ? overridesFor(tokens, scheme) : {},
+        ).band!;
+        const from = (component: typeof resolved) =>
+            selectWithTransitions(component, { wide }, { svg: true });
+        const selected = withSetTokens(from(resolved), from, {
+            styles: precomputed,
+            key: "base:light",
+            name: "band",
+            scheme,
+            ...(tokens ? { tokens } : {}),
+        });
+        return shapeCoordinates(selected.drawings.root!.shape!, {
+            width: 100,
+            height: 40,
+        });
+    };
+
+    it("resolves the points from the theme's token, a variant's, and the instance's", () => {
+        expect(at("false")).toEqual([0, 2, 100, 6, 50, 40]);
+        expect(at("true")).toEqual([0, 5, 100, 15, 50, 40]);
+        expect(at("true", { "components.band.edge": "8px" })).toEqual([
+            0, 8, 100, 24, 50, 40,
+        ]);
     });
 });
