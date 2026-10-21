@@ -7,6 +7,7 @@ import * as zagDialog from "@zag-js/dialog";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
+import * as zagSteps from "@zag-js/steps";
 import * as zagSwitch from "@zag-js/switch";
 import * as zagTabs from "@zag-js/tabs";
 import * as zagTagsInput from "@zag-js/tags-input";
@@ -41,6 +42,7 @@ describe("@pureform/machines", () => {
             menu: zagMenu,
             radioGroup: zagRadioGroup,
             select: zagSelect,
+            stepper: zagSteps,
             switchControl: zagSwitch,
             tabs: zagTabs,
             tagsInput: zagTagsInput,
@@ -93,6 +95,7 @@ describe("@pureform/machines", () => {
             "select",
             "slider",
             "snackbar",
+            "stepper",
             "switchControl",
             "tabs",
             "textField",
