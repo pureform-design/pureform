@@ -104,6 +104,7 @@ import { createSplitButton } from "./components/split-button";
 import { createStepper } from "./components/stepper";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
+import { createTable } from "./components/table";
 import { createTabs } from "./components/tabs";
 import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
@@ -358,6 +359,7 @@ const defaultComponents = <G extends string>(
         accordion: createAccordion<Step>(densities),
         tree: createTree<G, Step>(theme.color.groups, densities),
         stepper: createStepper<Step>(densities),
+        dataTable: createTable<Step>(densities),
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),

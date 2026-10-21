@@ -925,6 +925,24 @@ labels, handle and track from the time in physical coordinates, since a clock do
 direction spec allows the translate that centres them. The hand turns with a `transform`
 transition that reduced motion drops.
 
+## Data table
+
+`dataTable` is a data table, after Angular Material's table and sort header (M3 specifies none;
+the design calls are in `docs/roadmap-components/context/c6d.md`). It's registered as `dataTable`,
+since Tailwind's scanner makes a `display: table` utility of a bare `table` in the generated
+modules; the bindings' component is `Table`. Parts: the `root` (a `<table>`), the `header`, `body`
+and `footer` row groups, the `headerRow`, `row`, `alternateRow` (every other body row of a striped
+table) and `footerRow`, the `headerCell`, `cell` and `footerCell`, the `selectionCell` (the
+checkbox column, one width in every row), and in a sortable column's header the `sortHeader`
+button with its `sortLabel` and `sortIndicator` (the arrow). Rows and cells are flex boxes, each
+cell an equal share of its row, so every target lays it out alike; the bindings write the table
+roles out. Heights (56 header, 52 rows and footer) add the density offset; `density` sets it.
+`stickyHeader` sticks the header on the web (`platform`: React Native has no sticky position).
+A body row tints on hover and while something in it has keyboard focus, and fills with the
+selected colors under `aria-selected`. The arrow fades in on a sorted column (`filled`), and
+faintly on an unsorted one's hovered or focused header; the fade runs under reduced motion too.
+No compounds; `stickyHeader` sets header styles and `density` a root token.
+
 ## Toolbar
 
 M3 Expressive's docked and floating toolbars are one component, `toolbar`, with one part, `root`,

@@ -182,6 +182,18 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("fieldLabelColor"), token("container"), TEXT_CONTRAST),
         pair(token("periodContent"), token("container"), TEXT_CONTRAST),
     ],
+    dataTable: [
+        pair(token("headerColor"), token("container"), TEXT_CONTRAST),
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("content"), token("alternateContainer"), TEXT_CONTRAST),
+        pair(
+            token("selectedContent"),
+            token("selectedContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(token("footerColor"), token("container"), TEXT_CONTRAST),
+        pair(token("arrowColor"), token("container"), UI_CONTRAST),
+    ],
     appBar: [
         pair(token("headlineColor"), token("container"), TEXT_CONTRAST),
         pair(token("subtitleColor"), token("container"), TEXT_CONTRAST),

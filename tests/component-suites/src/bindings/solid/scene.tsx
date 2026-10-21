@@ -60,6 +60,7 @@ import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
 import { TimeInput } from "@pureform/solid/time-input";
+import { Table } from "@pureform/solid/table";
 import { TimePicker } from "@pureform/solid/time-picker";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
@@ -132,6 +133,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     AppBar,
     Paginator,
     TimePicker,
+    Table,
     TimeInput,
     SearchBar,
     SearchView,

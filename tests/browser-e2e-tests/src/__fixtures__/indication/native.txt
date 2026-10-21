@@ -3076,3 +3076,29 @@ toast[type=loading].closeTrigger: bg transparent | color rgba(73, 69, 78, 1) | o
     hovered-selected: bg rgba(73, 69, 78, 0.08)
     pressed-checked: bg rgba(73, 69, 78, 0.1)
     focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+dataTable.row: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1)
+    pressed: bg rgba(231, 226, 231, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1)
+dataTable.alternateRow: bg rgba(247, 242, 247, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(229, 225, 230, 1)
+    focused: bg rgba(225, 221, 225, 1)
+    pressed: bg rgba(225, 221, 225, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(225, 221, 225, 1)
+    focused-checked: bg rgba(225, 221, 225, 1)
+dataTable.cell: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+dataTable.selectionCell: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+dataTable.sortHeader: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

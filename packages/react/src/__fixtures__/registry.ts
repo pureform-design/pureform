@@ -340,6 +340,7 @@ const valued =
  *  their `value` token), card, search bar, ripple, and the single-part components. */
 export const displayRegistry = () =>
     createRegistry({
+        checkbox,
         linearProgress: valued("linear-progress", [
             "root",
             "track",
@@ -441,6 +442,23 @@ export const displayRegistry = () =>
             "supportingText",
             "actions",
             "footer",
+        ]),
+        dataTable: named("data-table", [
+            "root",
+            "header",
+            "body",
+            "footer",
+            "headerRow",
+            "row",
+            "alternateRow",
+            "footerRow",
+            "headerCell",
+            "cell",
+            "footerCell",
+            "selectionCell",
+            "sortHeader",
+            "sortLabel",
+            "sortIndicator",
         ]),
         timePicker: named("time-picker", [
             "root",

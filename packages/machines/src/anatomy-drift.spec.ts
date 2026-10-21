@@ -18,6 +18,7 @@ import {
     sliderAnatomy,
     snackbarAnatomy,
     stepperAnatomy,
+    dataTableAnatomy,
     tagsInputAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
@@ -47,6 +48,7 @@ import { anatomy as paginator } from "./paginator/paginator.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
 import { anatomy as stepper } from "./stepper/stepper.anatomy";
+import { anatomy as table } from "./table/table.anatomy";
 import {
     anatomy as tagsInput,
     chipAnatomy as inputChip,
@@ -84,6 +86,7 @@ const pairs: Record<string, Pair> = {
     slider: { machine: slider, preset: sliderAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
     stepper: { machine: stepper, preset: stepperAnatomy },
+    dataTable: { machine: table, preset: dataTableAnatomy },
     tagsInput: { machine: tagsInput, preset: tagsInputAnatomy },
     inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },

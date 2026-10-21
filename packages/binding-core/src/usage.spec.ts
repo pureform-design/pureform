@@ -51,6 +51,8 @@ const select = (
             return core.sliderSelection(p, 0);
         case "switch:switchControl":
             return core.switchSelection(p);
+        case "table:dataTable":
+            return core.tableSelection(p);
         case "text-area:textArea":
             return core.textAreaSelection(p);
         default: {

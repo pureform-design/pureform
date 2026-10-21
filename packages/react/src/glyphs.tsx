@@ -74,3 +74,13 @@ export const CalendarIcon = (): ReactNode => (
 
 /** A pencil: the modal date picker's mode toggle. */
 export const EditIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.edit} />;
+
+/** An arrow pointing up: a table's sort arrow, ascending. */
+export const ArrowUpwardIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.arrowUpward} />
+);
+
+/** An arrow pointing down: a table's sort arrow, descending. */
+export const ArrowDownwardIcon = (): ReactNode => (
+    <Glyph path={GLYPH_PATHS.arrowDownward} />
+);

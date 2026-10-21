@@ -60,4 +60,5 @@ export const RN_COMPONENTS = [
     "tooltip",
     "richTooltip",
     "paginator",
+    "dataTable",
 ];

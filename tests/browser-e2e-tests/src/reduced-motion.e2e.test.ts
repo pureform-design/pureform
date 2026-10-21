@@ -41,6 +41,8 @@ const FIXTURES = [
     // An expand indicator turns over (c6a); reduced motion keeps its color fade.
     { name: "accordion", slot: "indicator" },
     { name: "tree", slot: "indicator" },
+    // A table's sort arrow (c6d) only fades in, so reduced motion keeps it.
+    { name: "dataTable", slot: "sortIndicator" },
 ] as const;
 
 type Fixture = {
@@ -82,6 +84,7 @@ const EXPECTED: Record<
     timePicker: { full: "transform", reduced: "none" },
     accordion: { full: "transform, color", reduced: "color" },
     tree: { full: "transform, color", reduced: "color" },
+    dataTable: { full: "opacity", reduced: "opacity" },
 };
 
 const classOf = (
