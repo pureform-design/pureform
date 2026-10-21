@@ -20,7 +20,7 @@ import type {
 } from "@pureform/binding-core";
 import type * as timePicker from "@pureform/machines/time-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, omit, Show } from "solid-js";
+import { type Accessor, merge, omit, Show } from "solid-js";
 
 import { useMachineButton } from "../interaction";
 import type { PropTypes } from "../internal/zag";
@@ -106,28 +106,29 @@ const field = (of: TimePickerView, name: string) =>
             element: "label",
             machine: () => api().getFieldProps(of),
             unstyled: () => props.unstyled,
-            props: {
-                ...omit(props, "unstyled", "label"),
-                children: (
-                    <>
-                        {scope.render("input", {
-                            element: "input",
-                            machine: () => api().getInputProps(of),
-                        })}
-                        {scope.render("fieldLabel", {
-                            element: "span",
-                            machine: () => api().getFieldLabelProps(of),
-                            props: {
-                                get children() {
-                                    return isPresent(props.label)
-                                        ? props.label
-                                        : api().translations[of];
+            props: merge(omit(props, "unstyled", "label"), {
+                get children() {
+                    return (
+                        <>
+                            {scope.render("input", {
+                                element: "input",
+                                machine: () => api().getInputProps(of),
+                            })}
+                            {scope.render("fieldLabel", {
+                                element: "span",
+                                machine: () => api().getFieldLabelProps(of),
+                                props: {
+                                    get children() {
+                                        return isPresent(props.label)
+                                            ? props.label
+                                            : api().translations[of];
+                                    },
                                 },
-                            },
-                        })}
-                    </>
-                ),
-            },
+                            })}
+                        </>
+                    );
+                },
+            }),
         });
     };
 

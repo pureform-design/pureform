@@ -22,7 +22,7 @@ import type {
 } from "@pureform/binding-core";
 import type * as timePicker from "@pureform/machines/time-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
-import { type Accessor, For, omit, Show } from "solid-js";
+import { type Accessor, For, merge, omit, Show } from "solid-js";
 
 import { useMachineButton } from "../interaction";
 import type { PropTypes } from "../internal/zag";
@@ -213,34 +213,36 @@ function Dial(props: TimePickerPartProps): JSX.Element {
         element: "div",
         machine: () => api().getDialProps(),
         unstyled: () => props.unstyled,
-        props: {
-            ...omit(props, "unstyled"),
-            children: (
-                <>
-                    {scope.render("dialTrack", {
-                        element: "span",
-                        machine: () => api().getDialTrackProps(),
-                    })}
-                    {scope.render("dialHandle", {
-                        element: "span",
-                        machine: () => api().getDialHandleProps(),
-                    })}
-                    {scope.render("dialCenter", {
-                        element: "span",
-                        machine: () => api().getDialCenterProps(),
-                    })}
-                    <For each={api().dialLabels}>
-                        {(label) =>
-                            scope.render("dialLabel", {
-                                element: "span",
-                                machine: () => api().getDialLabelProps(label),
-                                props: { children: label.text },
-                            })
-                        }
-                    </For>
-                </>
-            ),
-        },
+        props: merge(omit(props, "unstyled"), {
+            get children() {
+                return (
+                    <>
+                        {scope.render("dialTrack", {
+                            element: "span",
+                            machine: () => api().getDialTrackProps(),
+                        })}
+                        {scope.render("dialHandle", {
+                            element: "span",
+                            machine: () => api().getDialHandleProps(),
+                        })}
+                        {scope.render("dialCenter", {
+                            element: "span",
+                            machine: () => api().getDialCenterProps(),
+                        })}
+                        <For each={api().dialLabels}>
+                            {(label) =>
+                                scope.render("dialLabel", {
+                                    element: "span",
+                                    machine: () =>
+                                        api().getDialLabelProps(label),
+                                    props: { children: label.text },
+                                })
+                            }
+                        </For>
+                    </>
+                );
+            },
+        }),
     });
 }
 

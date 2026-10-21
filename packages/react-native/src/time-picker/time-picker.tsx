@@ -152,7 +152,7 @@ function TimePickerImpl(props: TimePickerProps): ReactNode {
             ? scrollField(of)
             : button(
                   of === "hour" ? "hourSelector" : "minuteSelector",
-                  names[of],
+                  `${names[of]} ${displayValue(time, of, cycle)}`,
                   view === of,
                   () => setView(of),
                   displayValue(time, of, cycle),

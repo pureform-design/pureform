@@ -53,6 +53,8 @@ import { TagsInput } from "@pureform/solid/tags-input";
 import { Text } from "@pureform/solid/text";
 import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
+import { TimeInput } from "@pureform/solid/time-input";
+import { TimePicker } from "@pureform/solid/time-picker";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
 import { Toolbar } from "@pureform/solid/toolbar";
@@ -119,6 +121,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     RichTooltip,
     Scrim,
     AppBar,
+    TimePicker,
+    TimeInput,
     SearchBar,
     SearchView,
     Select,
