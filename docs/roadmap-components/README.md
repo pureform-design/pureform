@@ -17,7 +17,9 @@ the additions in [conventions.md](conventions.md).
   see [parallel work](conventions.md#parallel-work)).
 - **Refactor phases** (`r1`, `r2`, …) follow every wave of parallel work. Subphases built
   side by side repeat code, so each one leaves **refactoring hints** in its output context,
-  and the refactor phase finds and removes the duplication without changing output.
+  and the refactor phase finds and removes the duplication without changing output, only
+  where the shared code is logically one thing, the duplication is obvious, and the result
+  can take future changes.
 - **Similar components are one subphase.** When two components share parts, tokens and
   behaviour (list and menu rows, the date picker and date input), one agent builds both, so
   there is nothing to dedupe later.
