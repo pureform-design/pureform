@@ -242,6 +242,7 @@ function ReadyMadeParts({
                     <PageSizeSelect {...slot("pageSizeSelect")}>
                         <Select
                             variant="outlined"
+                            density={root.density}
                             aria-label={label}
                             items={sizes}
                             value={String(api.pageSize)}

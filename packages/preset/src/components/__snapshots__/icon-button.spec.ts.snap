@@ -124,7 +124,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
               "color": "var(--components-iconButton-onAccent, token(colors.onPrimary))",
@@ -153,7 +153,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
               "color": "var(--components-iconButton-onAccentContainer, token(colors.onPrimaryContainer))",
@@ -188,7 +188,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
               "color": "token(colors.inverseOnSurface)",
@@ -217,7 +217,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
               "color": "var(--components-iconButton-accent, token(colors.primary))",
@@ -246,7 +246,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))": {
               "color": "var(--components-iconButton-onAccent, token(colors.onPrimary))",
@@ -727,7 +727,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
               "filterElevation": "level0",
             },
             "&:is(:hover, [data-pf-hover])": {
@@ -754,7 +754,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
               "filterElevation": "level0",
             },
             "&:is(:hover, [data-pf-hover])": {
@@ -788,7 +788,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "color": "var(--components-iconButton-accent, token(colors.primary))",
           },
@@ -805,7 +805,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
             },
             "color": "var(--components-iconButton-accent, token(colors.primary))",
           },
@@ -827,7 +827,7 @@ exports[`iconButton > compiles to a stable Panda slot recipe 1`] = `
           },
           "root": {
             "&:is(:disabled, [aria-disabled=true])": {
-              "color": "color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent))",
+              "color": "var(--components-iconButton-disabledContent, color-mix(in srgb, transparent, token(colors.onSurface) token(opacity.disabledContent)))",
               "filterElevation": "level0",
             },
             "&:is(:hover, [data-pf-hover])": {

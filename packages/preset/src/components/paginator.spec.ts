@@ -25,9 +25,46 @@ describe("paginator", () => {
         ]);
     });
 
-    it("has no variants and no compounds: it follows the theme's density", () => {
-        expect(Object.keys(paginator.recipe.variants ?? {})).toEqual([]);
+    it("takes only a density, with no compound, following the theme's by default", () => {
+        expect(Object.keys(paginator.recipe.variants ?? {})).toEqual([
+            "density",
+        ]);
         expect(paginator.recipe.compoundVariants ?? []).toEqual([]);
+        expect(paginator.recipe.defaultVariants).toEqual({
+            density: "inherit",
+        });
+    });
+
+    it("is 56px at the default density, a grid unit less per step", () => {
+        const recipe = compilePreset(configWith(paginator)).theme?.slotRecipes
+            ?.paginator;
+        expect(recipe?.base?.root?.minHeight).toBe(
+            "calc(var(--components-paginator-height, 56px) + var(--components-paginator-densityOffset, token(sizes.densityOffset)))",
+        );
+        expect(recipe?.variants?.density?.inherit).toEqual({
+            root: {
+                "--components-paginator-densityOffset":
+                    "token(sizes.densityOffset)",
+            },
+        });
+        expect(recipe?.variants?.density?.["0"]).toEqual({
+            root: { "--components-paginator-densityOffset": "0px" },
+        });
+        for (const step of [-1, -2, -3]) {
+            expect(recipe?.variants?.density?.[String(step)]).toEqual({
+                root: {
+                    "--components-paginator-densityOffset": `calc(token(spacing.1) * ${step})`,
+                },
+            });
+        }
+    });
+
+    it("draws its page buttons' icons on-surface-variant, and on-surface at 38% disabled", () => {
+        const actions = JSON.stringify(paginator.recipe.base?.actions);
+        expect(actions).toContain("iconButton");
+        expect(actions).toContain("iconColor");
+        expect(actions).toContain("disabledIconColor");
+        expect(JSON.stringify(paginator.tokens)).toContain("onSurfaceVariant");
     });
 
     it("uses logical properties only, so right to left needs nothing extra", () => {

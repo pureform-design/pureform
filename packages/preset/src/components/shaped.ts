@@ -129,12 +129,14 @@ export interface ShapedFill {
 /** A fill's colors, split between the root (the content color the icon and label inherit)
  *  and the container (the fill, with its state layer at the opacities `token` reads, and the
  *  disabled fill). `selected` gives the colors once the root is selected (a toggle that's on); a
- *  selected container keeps a faint fill when disabled. */
+ *  selected container keeps a faint fill when disabled, and `disabledContent` colors the
+ *  disabled content (Material's on-surface at 38% by default). */
 export const shapedColors = (
     token: IndicationRef,
     fill: Fill,
     { container, content }: ShapedFill,
     selected?: ShapedFill,
+    disabledContent: ColorValue = disabledColor("disabledContent"),
 ) => {
     const disabled =
         fill === "outlined" || fill === "text"
@@ -145,7 +147,7 @@ export const shapedColors = (
             color: content,
             states: {
                 ...(selected ? { selected: { color: selected.content } } : {}),
-                disabled: { color: disabledColor("disabledContent") },
+                disabled: { color: disabledContent },
             },
         },
         container: {

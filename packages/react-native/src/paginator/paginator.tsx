@@ -137,6 +137,7 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                         >
                             <Select
                                 variant="outlined"
+                                density={props.density}
                                 label={label}
                                 items={paginatorSizeItems(
                                     paginatorPageSizes(
@@ -166,38 +167,44 @@ function PaginatorImpl(props: PaginatorProps): ReactNode {
                 )}
             </v.rangeLabel.Text>
             <v.actions.View style={s.actions} testID={id("actions")}>
-                {props.showFirstLastButtons
-                    ? trigger(
-                          "firstTrigger",
-                          words?.firstPage ?? "First page",
-                          "«",
-                          first,
-                          1,
-                      )
-                    : null}
-                {trigger(
-                    "prevTrigger",
-                    words?.previousPage ?? "Previous page",
-                    "‹",
-                    first,
-                    page - 1,
-                )}
-                {trigger(
-                    "nextTrigger",
-                    words?.nextPage ?? "Next page",
-                    "›",
-                    last,
-                    page + 1,
-                )}
-                {props.showFirstLastButtons
-                    ? trigger(
-                          "lastTrigger",
-                          words?.lastPage ?? "Last page",
-                          "»",
-                          last,
-                          pages,
-                      )
-                    : null}
+                <ProvidedTokens
+                    tokens={providedTokensFromPaths(
+                        selected.providedTokens["actions"],
+                    )}
+                >
+                    {props.showFirstLastButtons
+                        ? trigger(
+                              "firstTrigger",
+                              words?.firstPage ?? "First page",
+                              "«",
+                              first,
+                              1,
+                          )
+                        : null}
+                    {trigger(
+                        "prevTrigger",
+                        words?.previousPage ?? "Previous page",
+                        "‹",
+                        first,
+                        page - 1,
+                    )}
+                    {trigger(
+                        "nextTrigger",
+                        words?.nextPage ?? "Next page",
+                        "›",
+                        last,
+                        page + 1,
+                    )}
+                    {props.showFirstLastButtons
+                        ? trigger(
+                              "lastTrigger",
+                              words?.lastPage ?? "Last page",
+                              "»",
+                              last,
+                              pages,
+                          )
+                        : null}
+                </ProvidedTokens>
             </v.actions.View>
         </v.root.View>
     );

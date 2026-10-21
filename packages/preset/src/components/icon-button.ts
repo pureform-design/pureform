@@ -65,6 +65,7 @@ import {
     defaultDensities,
     defaultGroups,
     densitySteps,
+    disabledColor,
     densityTokenVariant,
     entriesOf,
     DENSITY_TOKEN,
@@ -180,6 +181,8 @@ const { tokens, ref } = componentTokens("iconButton", {
     selectedIconFill: unitless(1),
     outlineWidth: px(1),
     outlineColor: sys("outline"),
+    // A disabled button's content: Material's on-surface at 38%.
+    disabledContent: disabledColor("disabledContent"),
     // 1 under a shape (the `shape` variant sets it): the outline's border gives way to the clip.
     shaped: unitless(0),
     // Each size's height and widths, so a theme can retune a size.
@@ -347,6 +350,8 @@ export const createIconButton = <
                                     ref,
                                     fill,
                                     tokenFillColors(fill, ref),
+                                    undefined,
+                                    ref("disabledContent"),
                                 ),
                             ),
                         ]),
@@ -417,7 +422,13 @@ export const createIconButton = <
                     return {
                         match: { variant: name, toggle: "true" as const },
                         style: mergeSlotStyles(
-                            shapedColors(ref, fill, unselected, selected),
+                            shapedColors(
+                                ref,
+                                fill,
+                                unselected,
+                                selected,
+                                ref("disabledContent"),
+                            ),
                             fill === "outlined"
                                 ? {
                                       outline: {

@@ -6,11 +6,14 @@ Branch `c6c-paginator`, from main `f1b5b019`. Commits: see `git log f1b5b019..c6
 
 - **Preset** (`packages/preset/src/components/paginator.ts`): `paginator`, a slot component with parts
   `root, pageSize, pageSizeLabel, pageSizeSelect, rangeLabel, actions, firstTrigger, prevTrigger,
-nextTrigger, lastTrigger`. **No variants, 0 compounds** (the variant-overlap rule has nothing to
-  check). Tokens: `container` (`surface`), `content` (`onSurface`), `height` 56, `padding`,
-  `gap`, `pageSizeGap`, `pageSizeWidth` 104, `pageSizeFieldHeight` 40, `rangeStart`, `rangeEnd`.
-  The row is `flex`, `wrap`, `justifyContent: end`, `minHeight: dense(height)` (the theme's
-  density, no `density` group), `bodySmall`, logical paddings and margins only. `pageSizeSelect`
+nextTrigger, lastTrigger`. One group, `density` (c6 follow-ups), 0 compounds. Tokens:
+  `container` (`surface`), `content` (`onSurface`), `height` 56, `padding`, `gap`,
+  `pageSizeGap`, `pageSizeWidth` 104, `pageSizeFieldHeight` 40, `rangeStart`, `rangeEnd`,
+  `iconColor` (`onSurfaceVariant`), `disabledIconColor` (`onSurface` at 38%), `densityOffset`.
+  `createPaginator(densities)`, as `createAccordion`. The row is `flex`, `wrap`,
+  `justifyContent: end`, `minHeight: add(height, densityOffset)`, `bodySmall`, logical paddings
+  and margins only. `actions` provides `iconButton: { accent: iconColor, disabledContent:
+disabledIconColor }` (the icon button gained a `disabledContent` token for it). `pageSizeSelect`
   gives the select inside it a shorter field with `providedTokens: { select: { height } }`.
   Spec `paginator.spec.ts`. Registered in `index.ts`, `pureform.ts` (after `richTooltip`),
   `pureform.spec.ts`, `contrast.ts` (`content` on `container`).
@@ -64,8 +67,14 @@ nextTrigger, lastTrigger`. **No variants, 0 compounds** (the variant-overlap rul
 - **Compact select through provided tokens**, not a `density` prop on the select: density steps
   are named by the theme (`comfortable`, `compact`, … or `0`, `-1`, …), so a component can't
   name one that exists in every theme. `pageSizeFieldHeight` is the paginator's token for it.
-- **Density:** the row follows the theme's density (`dense`), with no per-instance `density`
-  group (0 groups, 0 compounds).
+- **Density (resolved, c6 follow-ups):** the paginator follows density like the other components:
+  a `density` group (`inherit` by default, the theme's), `densityOffset` added to the 56px row.
+  The bindings pass the paginator's `density` on to the ready-made page-size select, so its
+  field (`pageSizeFieldHeight` 40) takes the same step; a step's name is the theme's, so it
+  exists for the select too.
+- **Page buttons' icons (resolved, c6 follow-ups):** `onSurfaceVariant` enabled and `onSurface`
+  at 38% disabled, Angular's `paginator-enabled-icon-color`/`-disabled-icon-color`, through the
+  `iconColor`/`disabledIconColor` tokens on web and React Native.
 - **No indication of its own** (the anatomy has no `indication` entries): the triggers and the
   select draw theirs, so the component suite has no `indication` case. A text-only row says so.
 - **Disabled** is the binding's (Zag's pagination has no `disabled`): `paginatorTriggerProps`
@@ -164,7 +173,10 @@ build` in each package and `omni run generate -i -f all`.
   (Angular's is 84 with its own field), the 40px field height, the range label's 24/32 margins,
   `bodySmall` text and the `surface` container (inside a card or a table the app sets
   `tokens.container`).
-- Should the first and last buttons be on by default, as in a table's footer? Angular's aren't.
+- ~~Should the first and last buttons be on by default, as in a table's footer?~~ Resolved: off by
+  default (`showFirstLastButtons`), as Angular's.
+- ~~Should the paginator follow density?~~ Resolved: yes, through a `density` group, 56px at the
+  default step.
 - Should numbered pages (Zag's `item`) become a variant (`pages: "numbered"`) rather than being
   left to apps?
 - `doc-counts.spec.ts` fails per component until the merge bumps the number; should the spec read

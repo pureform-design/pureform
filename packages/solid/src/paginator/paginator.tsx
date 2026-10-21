@@ -246,6 +246,7 @@ function ReadyMadeParts(props: {
                     <PageSizeSelect {...props.slots("pageSizeSelect")}>
                         <Select
                             variant="outlined"
+                            density={root.density}
                             aria-label={label()}
                             items={sizes()}
                             value={String(api().pageSize)}

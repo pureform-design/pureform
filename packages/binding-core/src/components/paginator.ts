@@ -15,6 +15,7 @@ import type { InstanceTokens, Selection } from "@pureform/styling";
 import type { ChangeReason, Controllable } from "../controllable";
 import type { Unstyled } from "../parts";
 import type { SelectItem } from "./select";
+import type { VariantProp } from "./variants";
 
 /** The paginator's parts. The four triggers are icon buttons. */
 export type PaginatorPart = PartName<typeof paginatorAnatomy>;
@@ -55,8 +56,10 @@ export interface PaginatorTranslations {
     readonly lastPage?: string | undefined;
 }
 
-/** The paginator's variants and tokens. It has no variant groups: it follows the theme's density. */
+/** The paginator's variants and tokens: its density (the theme's by default), which the ready-made
+ *  passes on to its page-size select. */
 export interface PaginatorVariantProps {
+    readonly density?: VariantProp<"paginator", "density">;
     readonly tokens?: InstanceTokens<"paginator"> | undefined;
 }
 
@@ -90,6 +93,7 @@ export interface PaginatorRootOwnProps
 
 /** The keys of `PaginatorRootOwnProps`, which Root keeps off its element. */
 export const PAGINATOR_ROOT_PROPS = [
+    "density",
     "tokens",
     "page",
     "defaultPage",
@@ -117,7 +121,10 @@ export const DEFAULT_PAGE_SIZE = 10;
 /** The paginator's registry selection. */
 export const paginatorSelection = (
     props: PaginatorVariantProps,
-): Selection<"paginator"> => ({ tokens: props.tokens });
+): Selection<"paginator"> => ({
+    density: props.density,
+    tokens: props.tokens,
+});
 
 /** The page sizes the select offers: `options` and `current`, each once, smallest first. */
 export const paginatorPageSizes = (
