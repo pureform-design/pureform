@@ -19,6 +19,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/combobox",
             "@zag-js/dialog",
             "@zag-js/menu",
+            "@zag-js/pagination",
             "@zag-js/presence",
             "@zag-js/radio-group",
             "@zag-js/select",
