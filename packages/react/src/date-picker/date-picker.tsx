@@ -345,7 +345,7 @@ export interface DatePickerProps
 
 // Inside Root, so it can read the view and the draft.
 function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
-    const { picker, selected, locale, confirm, cancel } = context.use("Root");
+    const { picker, selected, locale } = context.use("Root");
     const slot = useSlotProps(own as SlotKeyedProps<ComponentAnatomy>);
     const days = picker.view === "day";
     return (
@@ -410,15 +410,15 @@ function ReadyMadeContent({ own }: { readonly own: DatePickerProps }) {
                         <YearList {...slot("yearList")} />
                     )}
                     <Actions {...slot("actions")}>
-                        <Button
+                        <CancelTrigger
+                            as={Button}
                             variant="text"
                             label={own.cancelLabel ?? "Cancel"}
-                            onClick={cancel}
                         />
-                        <Button
+                        <ConfirmTrigger
+                            as={Button}
                             variant="text"
                             label={own.confirmLabel ?? "OK"}
-                            onClick={confirm}
                         />
                     </Actions>
                 </Content>

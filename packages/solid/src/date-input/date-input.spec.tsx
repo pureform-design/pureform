@@ -89,6 +89,39 @@ describe("DateInput, ready-made", () => {
         expect(onCancel).toHaveBeenCalled();
     });
 
+    it("takes a range's end typed before its start", async () => {
+        const onValueChange = vi.fn();
+        const onConfirm = vi.fn();
+        withRegistry(() => (
+            <DateInput
+                locale="en-US"
+                selectionMode="range"
+                onValueChange={onValueChange}
+                onConfirm={onConfirm}
+            />
+        ));
+        await settle();
+        const spinbuttons = () =>
+            segments().filter(
+                (segment) => segment.getAttribute("role") === "spinbutton",
+            );
+        await userEvent.click(spinbuttons()[3]!);
+        await userEvent.keyboard("08202026");
+        await userEvent.keyboard("{Tab}");
+        // Editing it again: Zag copies the value, and the empty start becomes undefined.
+        await userEvent.click(spinbuttons()[4]!);
+        await userEvent.keyboard("21");
+        await userEvent.keyboard("{Tab}");
+        await until(() =>
+            expect(onValueChange).toHaveBeenLastCalledWith({
+                value: ["2026-08-21"],
+            }),
+        );
+        const [, ok] = byTestId(ids.actions).querySelectorAll("button");
+        await userEvent.click(ok!);
+        expect(onConfirm).toHaveBeenCalledWith(["2026-08-21"]);
+    });
+
     it("shows an error in place of the format, and the mode toggle when given", async () => {
         const onModeToggle = vi.fn();
         withRegistry(() => (

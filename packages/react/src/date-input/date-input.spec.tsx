@@ -83,6 +83,34 @@ describe("DateInput, ready-made", () => {
         expect(onCancel).toHaveBeenCalled();
     });
 
+    it("draws Cancel and OK as type=button, so they don't submit a form", async () => {
+        const onSubmit = vi.fn((event: { preventDefault(): void }) =>
+            event.preventDefault(),
+        );
+        const onConfirm = vi.fn();
+        const onCancel = vi.fn();
+        withRegistry(
+            <form onSubmit={onSubmit}>
+                <DateInput
+                    locale="en-US"
+                    defaultValue={["2026-08-17"]}
+                    onConfirm={onConfirm}
+                    onCancel={onCancel}
+                />
+            </form>,
+        );
+        await settle();
+        const ok = screen.getByRole("button", { name: "OK" });
+        const cancel = screen.getByRole("button", { name: "Cancel" });
+        expect(ok.getAttribute("type")).toBe("button");
+        expect(cancel.getAttribute("type")).toBe("button");
+        await interact(() => userEvent.click(ok));
+        await interact(() => userEvent.click(cancel));
+        expect(onConfirm).toHaveBeenCalledWith(["2026-08-17"]);
+        expect(onCancel).toHaveBeenCalled();
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it("shows the mode toggle with onModeToggle, and an error instead of the format", async () => {
         const onModeToggle = vi.fn();
         withRegistry(

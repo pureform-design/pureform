@@ -24,12 +24,7 @@ import * as dateInput from "@pureform/machines/date-input";
 import { toISO } from "@pureform/machines/date-picker";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
-import {
-    type ElementType,
-    Fragment,
-    type ReactNode,
-    useId,
-} from "react";
+import { type ElementType, Fragment, type ReactNode, useId } from "react";
 
 import { Button } from "../button";
 import { parseIso, useDateValue } from "../calendar-parts";
@@ -39,9 +34,9 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
-import { omitProps } from "../props";
 import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
+import { omitProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 import { affixFieldParts } from "../select-field-parts";
@@ -300,7 +295,7 @@ export interface DateInputProps
 
 // Inside Root, so it can read the date typed.
 function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
-    const { value, locale, confirm, cancel } = context.use("Root");
+    const { value, locale } = context.use("Root");
     const slot = useSlotProps(own);
     return (
         <>
@@ -336,15 +331,15 @@ function ReadyMadeContent({ own }: { readonly own: DateInputProps }) {
                 </SupportingText>
             </Field>
             <Actions {...slot("actions")}>
-                <Button
+                <CancelTrigger
+                    as={Button}
                     variant="text"
                     label={own.cancelLabel ?? "Cancel"}
-                    onClick={cancel}
                 />
-                <Button
+                <ConfirmTrigger
+                    as={Button}
                     variant="text"
                     label={own.confirmLabel ?? "OK"}
-                    onClick={confirm}
                 />
             </Actions>
         </>

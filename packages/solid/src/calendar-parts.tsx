@@ -67,7 +67,8 @@ export const parseDate = (value: string): datePicker.DateValue =>
     datePicker.parse(value);
 
 /** A Root's controllable `value` (ISO dates) as the props of Zag's date picker or date input,
- *  which take and give date values: `value`, `defaultValue` and `onValueChange`. */
+ *  which take and give date values: `value`, `defaultValue` and `onValueChange`. A date input's
+ *  value may hold an empty place, which isn't a date. */
 export function useDateValue(
     component: string,
     props: Controllable<
@@ -90,7 +91,7 @@ export function useDateValue(
                 readonly value: readonly datePicker.DateValue[];
             }) =>
                 state.onValueChange({
-                    value: details.value.map(datePicker.toISO),
+                    value: details.value.filter(Boolean).map(datePicker.toISO),
                 }),
         };
     };
