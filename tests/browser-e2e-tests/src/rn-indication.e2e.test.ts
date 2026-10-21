@@ -12,6 +12,7 @@
 // visible, so keyboard focus waits that long after any press.
 
 import {
+    accordionAnatomy,
     buttonAnatomy,
     cardAnatomy,
     carouselAnatomy,
@@ -29,6 +30,7 @@ import {
     toastAnatomy,
     switchControlAnatomy,
     tabsAnatomy,
+    treeAnatomy,
 } from "@pureform/anatomy";
 import type { IndicationAnatomy } from "@pureform/anatomy";
 import {
@@ -44,6 +46,7 @@ import type {
     InteractionState,
     MutableInteractionSource,
 } from "@pureform/react-native";
+import { Accordion } from "@pureform/react-native/accordion";
 import { Button } from "@pureform/react-native/button";
 import { Card } from "@pureform/react-native/card";
 import { Carousel } from "@pureform/react-native/carousel";
@@ -62,6 +65,7 @@ import { Switch } from "@pureform/react-native/switch";
 import { Tabs } from "@pureform/react-native/tabs";
 import { Text } from "@pureform/react-native/text";
 import { createToaster, Toaster } from "@pureform/react-native/toast";
+import { Tree } from "@pureform/react-native/tree";
 import { nativeFactory } from "@pureform/rn-adapter/factory";
 import { createRegistry } from "@pureform/styling";
 import type { Registry } from "@pureform/styling";
@@ -212,6 +216,26 @@ const CASES: RnCase[] = [
         {
             "aria-label": "Places",
             items: [{ "aria-label": "Lisbon" }, { "aria-label": "Porto" }],
+        },
+        { disabled: undefined },
+    ),
+    items("Accordion", Accordion as never, accordionAnatomy, {
+        items: [
+            { value: "a", title: "Shipping", content: "Free" },
+            { value: "b", title: "Returns", content: "30 days" },
+        ],
+    }),
+    // The tree has no disabled state of its own; a node has.
+    items(
+        "Tree",
+        Tree as never,
+        treeAnatomy,
+        {
+            "aria-label": "Files",
+            items: [
+                { value: "a", label: "README.md" },
+                { value: "b", label: "LICENSE" },
+            ],
         },
         { disabled: undefined },
     ),
