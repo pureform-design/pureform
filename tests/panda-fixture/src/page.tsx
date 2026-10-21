@@ -5,6 +5,7 @@ import {
     appBar,
     timeInput,
     timePicker,
+    paginator,
     avatar,
     badge,
     media,
@@ -168,6 +169,66 @@ function AppBarExampleView(props: { readonly example: AppBarExample }) {
 
 // A time picker drawn from the recipe, its dial placed as the bindings place it: twelve hours on
 // a ring 39% out (a 24-hour dial has twelve more 25% out), the handle on the selected one.
+// A paginator in its row: the page-size select, the range, and the icon-button triggers.
+function PaginatorExampleView(props: {
+    readonly label: string;
+    readonly firstLast?: boolean;
+    readonly pageSize?: boolean;
+}) {
+    const p = paginator();
+    const s = select({ variant: "outlined" });
+    const trigger = (name: string, glyph: string, disabled = false) => {
+        const b = iconButton({ variant: "standard" });
+        return (
+            <span class={p[`${name}Trigger` as "prevTrigger"]}>
+                <button
+                    class={b.root}
+                    type="button"
+                    aria-label={`${name} page`}
+                    disabled={disabled}
+                >
+                    <span class={b.touchTarget} />
+                    <span class={b.container}>
+                        <span class={b.icon}>{glyph}</span>
+                    </span>
+                </button>
+            </span>
+        );
+    };
+    return (
+        <div class={p.root} role="group" aria-label={props.label}>
+            {props.pageSize !== false && (
+                <div class={p.pageSize}>
+                    <span class={p.pageSizeLabel}>Items per page:</span>
+                    <div class={p.pageSizeSelect}>
+                        <div class={s.root}>
+                            <div class={s.container}>
+                                <input
+                                    class={s.input}
+                                    id={`size-${props.label}`}
+                                    role="combobox"
+                                    aria-expanded="false"
+                                    readonly
+                                    placeholder=" "
+                                    value="10"
+                                />
+                                <span class={s.trailingIcon}>▾</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+            <span class={p.rangeLabel}>1 – 10 of 95</span>
+            <div class={p.actions}>
+                {props.firstLast && trigger("first", "⏮", true)}
+                {trigger("prev", "‹", true)}
+                {trigger("next", "›")}
+                {props.firstLast && trigger("last", "⏭")}
+            </div>
+        </div>
+    );
+}
+
 type TimePickerExample = {
     readonly mode?: "dial" | "scroll";
     readonly color?: "standard" | "vibrant";
@@ -3528,6 +3589,17 @@ export function Page() {
                     {(example) => <TimePickerExampleView example={example} />}
                 </For>
                 <TimeInputExampleView />
+            </section>
+            <section
+                data-section="paginators"
+                style={{
+                    ...row,
+                    "flex-direction": "column",
+                    "align-items": "stretch",
+                }}
+            >
+                <PaginatorExampleView label="Paginator" firstLast />
+                <PaginatorExampleView label="Compact" pageSize={false} />
             </section>
         </main>
     );

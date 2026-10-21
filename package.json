@@ -105,6 +105,7 @@
         "@zag-js/combobox": "^1.46.0",
         "@zag-js/toast": "^1.46.0",
         "@zag-js/toggle-group": "^1.46.0",
+        "@zag-js/pagination": "^1.46.0",
         "@zag-js/carousel": "^1.46.0",
         "@zag-js/steps": "^1.46.0",
         "@zag-js/date-picker": "^1.46.0",

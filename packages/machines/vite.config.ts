@@ -33,6 +33,7 @@ export default createConfig({
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",
                     "tree-view": "src/tree-view/index.ts",
+                    paginator: "src/paginator/index.ts",
                     combobox: "src/combobox/index.ts",
                     "date-picker": "src/date-picker/index.ts",
                     "date-input": "src/date-input/index.ts",

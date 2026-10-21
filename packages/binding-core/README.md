@@ -321,6 +321,12 @@ timeMachineProps(props); timePickerSelection(props); timeInputSelection(props);
 toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
 overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
 watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);
+// Paginator (c6c): the generated paginatorAnatomy (root, pageSize, pageSizeLabel, pageSizeSelect, rangeLabel, actions, four triggers)
+interface PaginatorBehaviorProps          // page/defaultPage/onPageChange, pageSize/defaultPageSize/onPageSizeChange, count, pageSizeOptions, hidePageSize, showFirstLastButtons, disabled, translations, id
+interface PaginatorRootOwnProps           // + tokens, testId, unstyled
+PAGINATOR_ROOT_PROPS; paginatorSelection(props); paginatorMachineProps(props); paginatorTriggerProps(props, disabled);
+paginatorPageSizes(options, current); paginatorSizeItems(sizes); paginatorRange(page, pageSize, count); paginatorRangeLabel(range, translations);
+paginatorTotalPages(count, pageSize); paginatorClampPage(page, count, pageSize); paginatorPageAfterSize(page, pageSize, size); // the arithmetic React Native shares
 
 // Tabs: Zag's tabs; tabsCompositeAnatomy (root, list, tab, tabContent, icon, label, indicator,
 // content)

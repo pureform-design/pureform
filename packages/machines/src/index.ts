@@ -12,6 +12,7 @@ export * as dateInput from "./date-input";
 export * as dialog from "./dialog";
 export * as menu from "./menu";
 export * as navigation from "./navigation";
+export * as paginator from "./paginator";
 export * as presence from "./presence";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";

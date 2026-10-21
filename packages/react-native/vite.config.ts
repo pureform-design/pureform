@@ -40,6 +40,7 @@ export default createConfig({
                     "icon-button": "src/icon-button/index.ts",
                     "linear-progress": "src/linear-progress/index.ts",
                     "button-group": "src/button-group/index.ts",
+                    paginator: "src/paginator/index.ts",
                     list: "src/list/index.ts",
                     "list-item": "src/list-item/index.ts",
                     media: "src/media/index.ts",

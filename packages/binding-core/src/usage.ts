@@ -257,6 +257,16 @@ export const COMPONENT_USAGE = {
         entries: { timePicker: same("mode", "color"), ripple: {} },
     },
     "time-input": { entries: { timeInput: {}, ripple: {} } },
+    // The page-size field is a select (outlined, set here) and the triggers are icon buttons.
+    paginator: {
+        entries: {
+            paginator: {},
+            select: {},
+            menu: {},
+            iconButton: {},
+            ripple: {},
+        },
+    },
     "supporting-text": { entries: { supportingText: same("tone") } },
     stepper: {
         entries: { stepper: same("orientation", "density"), ripple: {} },

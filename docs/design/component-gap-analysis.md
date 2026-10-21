@@ -141,7 +141,7 @@ done (§7).
 | Search view (full-screen / docked / contained)               | ✅ `searchView`     | zag           | ✅                              | —             | —                                     | `combobox` + `dialog`      | Done (c3c): zag `dialog` + `combobox`; `variant` |
 | Menu                                                         | ✅ `menu`           | zag           | ✅                              | ✅ (sub-menu) | ✅ `mat-menu`                         | `menu` (+ nested, context) | §2                                               |
 | Stepper                                                      | ✅ `stepper`        | zag           | —                               | —             | ✅ `mat-stepper`                      | `steps`                    | Done (c6b): `orientation`; tabs keys             |
-| Paginator                                                    | ❌                  | —             | —                               | —             | ✅ `mat-paginator`                    | `pagination`               | **In scope** (§1.9)                              |
+| Paginator                                                    | ✅ `paginator`      | zag           | —                               | —             | ✅ `mat-paginator`                    | `pagination`               | Done (c6c): `paginator`; 0 variants              |
 | Tree                                                         | ✅ `tree`           | zag           | —                               | —             | ✅ `mat-tree`                         | `tree-view`                | Done (c6a): list-row nodes, groups indented      |
 | Navigation menu (mega menu)                                  | ❌                  | —             | —                               | —             | —                                     | `navigation-menu`          | Not M3                                           |
 
@@ -186,7 +186,7 @@ done (§7).
 
 |                                                  | Count                                                                                                                                                                             |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Our preset components                            | 60, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
+| Our preset components                            | 61, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
 | zag machines                                     | 54; 16 wrapped today (carousel, checkbox, combobox, date-input, date-picker, dialog, menu, presence, radio-group, select, switch, tabs, tags-input, toast, toggle-group, tooltip) |
 | Our own machines                                 | 7 (button, navigation, ripple, slider, snackbar, text-field, time-picker: the time picker and time input)                                                                         |
 | M3 Expressive components we're missing           | 1: selection list                                                                                                                                                                 |
@@ -208,7 +208,7 @@ zag's part lists, and a design call is recorded in the component's output contex
 | --------------------------- | ------------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Expansion panel / accordion | `accordion`   | zag `accordion`             | Done (c6a). Also the base for expandable list items (§2.3).                                               |
 | Stepper                     | `stepper`     | zag `steps`                 | Horizontal and vertical; step header, connector, content. Done (c6b).                                     |
-| Paginator                   | `paginator`   | zag `pagination`            | Range label, page-size select (reuses `select`), previous/next icon buttons.                              |
+| Paginator                   | `paginator`   | zag `pagination`            | Done (c6c): range label, page-size select, first/prev/next/last. 0 variants.                              |
 | Tree                        | `tree`        | zag `tree-view`             | Done (c6a). Nodes are list rows; expand icon trailing, groups indented.                                   |
 | Table, sort header          | `table`       | own (sort state, selection) | Header, row, cell, footer, sort arrow, optional selection column. No zag machine.                         |
 | Grid list                   | `gridList`    | none                        | Layout only: columns, gutter, tile aspect.                                                                |

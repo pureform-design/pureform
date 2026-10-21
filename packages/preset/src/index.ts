@@ -39,6 +39,7 @@ export * from "./components/loading-indicator";
 export * from "./components/shape-paths";
 export * from "./components/app-bar";
 export * from "./components/time-picker";
+export * from "./components/paginator";
 export * from "./components/time-input";
 export * from "./components/search-bar";
 export * from "./components/search-view";
