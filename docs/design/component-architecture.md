@@ -575,7 +575,8 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   (5 each), whose selected colors read the `color` group's tokens. The wavy progress adds 1: the
   circular spinner's wave while indeterminate (one group's clip, another's condition). c4a added
   4; r4-findings drew the wave clips from the `height`/`thickness` and `amplitude` tokens, which
-  dropped the three per thickness. 22 across the preset.
+  dropped the three per thickness. c5a's docked date picker and date input each add the
+  text field's one (fill with a leading icon). 24 across the preset.
 - **Flags for two groups (M3 Expressive):** when a value depends on two groups, one sets a
   literal token and the other a 0/1 flag token, and `blend(from, to, flag)` picks between
   them: the size sets `squareRadius` and `corner: square` sets `square`; `width` sets
