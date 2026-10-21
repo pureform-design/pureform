@@ -1755,6 +1755,110 @@ tagsInput[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline none
 tagsInput[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(0, 104, 124, 1)
     focused-checked: color rgba(0, 104, 124, 1)
+timePicker.hourSelector: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(214, 209, 214, 1)
+    focused: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(210, 205, 210, 1)
+    dragged: bg rgba(198, 193, 198, 1)
+    hovered-selected: bg rgba(221, 208, 246, 1) | color rgba(79, 55, 138, 1)
+    pressed-checked: bg rgba(210, 205, 210, 1)
+    focused-checked: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker.minuteSelector: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(214, 209, 214, 1)
+    focused: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(210, 205, 210, 1)
+    dragged: bg rgba(198, 193, 198, 1)
+    hovered-selected: bg rgba(221, 208, 246, 1) | color rgba(79, 55, 138, 1)
+    pressed-checked: bg rgba(210, 205, 210, 1)
+    focused-checked: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker.scrollItem: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1)
+timePicker.period: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker.dial: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker.dialLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+timePicker[mode=scroll].hourSelector: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(79, 55, 138, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[mode=scroll].minuteSelector: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08) | color rgba(79, 55, 138, 1)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[mode=scroll].scrollItem: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1)
+timePicker[mode=scroll].period: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[mode=scroll].dial: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[mode=scroll].dialLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+timePicker[color=vibrant].hourSelector: bg rgba(255, 255, 255, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(237, 237, 237, 1)
+    focused: bg rgba(232, 232, 233, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(232, 232, 233, 1)
+    dragged: bg rgba(219, 219, 219, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1) | color rgba(255, 255, 255, 1)
+    pressed-checked: bg rgba(232, 232, 233, 1)
+    focused-checked: bg rgba(232, 232, 233, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[color=vibrant].minuteSelector: bg rgba(255, 255, 255, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(237, 237, 237, 1)
+    focused: bg rgba(232, 232, 233, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(232, 232, 233, 1)
+    dragged: bg rgba(219, 219, 219, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1) | color rgba(255, 255, 255, 1)
+    pressed-checked: bg rgba(232, 232, 233, 1)
+    focused-checked: bg rgba(232, 232, 233, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[color=vibrant].scrollItem: bg none | color rgba(79, 55, 138, 1) | outline none
+    hovered-selected: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1)
+timePicker[color=vibrant].period: bg transparent | color rgba(79, 55, 138, 1) | outline none
+    hovered: bg rgba(79, 55, 138, 0.08)
+    focused: bg rgba(79, 55, 138, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(79, 55, 138, 0.1)
+    dragged: bg rgba(79, 55, 138, 0.16)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(79, 55, 138, 0.1)
+    focused-checked: bg rgba(79, 55, 138, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[color=vibrant].dial: bg rgba(255, 255, 255, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: outline solid 3 rgba(98, 91, 112, 1) offset 2
+    focused-checked: outline solid 3 rgba(98, 91, 112, 1) offset 2
+timePicker[color=vibrant].dialLabel: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(255, 255, 255, 1)
+timeInput.input: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1) | outline solid 2 rgba(103, 80, 164, 1) offset 0
+    focused-checked: bg rgba(233, 221, 255, 1) | color rgba(79, 55, 138, 1) | outline solid 2 rgba(103, 80, 164, 1) offset 0
+timeInput.period: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    hovered: bg rgba(73, 69, 78, 0.08)
+    focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(73, 69, 78, 0.1)
+    dragged: bg rgba(73, 69, 78, 0.16)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(73, 69, 78, 0.1)
+    focused-checked: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
 searchBar.root: bg rgba(236, 231, 235, 1) | color rgba(28, 27, 30, 1) | outline none
     hovered: bg rgba(219, 215, 219, 1)
     focused: bg rgba(215, 211, 215, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
