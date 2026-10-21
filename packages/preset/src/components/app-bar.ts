@@ -93,7 +93,8 @@ export const APP_BAR_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
 };
 
 // A part at the start or end of the first line: an icon, or icon buttons, which grow it past the
-// icon's size. It's the bar's height, so it makes the first line.
+// icon's size. It's the bar's height, so it makes the first line. Its icon buttons draw in its
+// color, as Material's leading and trailing icons do.
 const edge = (color: "leadingColor" | "trailingColor"): StyleMap => {
     const {
         width: _width,
@@ -106,6 +107,7 @@ const edge = (color: "leadingColor" | "trailingColor"): StyleMap => {
         flexShrink: unitless(0),
         height: ref("height"),
         color: ref(color),
+        providedTokens: { "components.iconButton.accent": ref(color) },
     };
 };
 

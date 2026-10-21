@@ -12,6 +12,7 @@ import {
     toolbarMenuSelect,
     toolbarOverflowTestId,
     toolbarSelection,
+    providedTokensFromPaths,
 } from "@pureform/binding-core";
 import type {
     ToolbarContentProps,
@@ -29,6 +30,7 @@ import { IconButton } from "../icon-button/icon-button";
 import { Menu } from "../menu";
 import type { MenuTriggerProps } from "../menu";
 import { testIdOf, withEngine } from "../parts";
+import { ProvidedTokens } from "../provided-tokens";
 import { useComponentSlots } from "../styles";
 
 export interface ToolbarProps
@@ -100,10 +102,11 @@ const element = (item: ToolbarItem<ReactNode>) => {
 };
 
 function ToolbarImpl(props: ToolbarProps): ReactNode {
-    const { styles: s, views: v } = useComponentSlots<ToolbarPart>(
-        "toolbar",
-        toolbarSelection(props),
-    );
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<ToolbarPart>("toolbar", toolbarSelection(props));
     const items = props.items ?? [];
     const vertical = props.orientation === "vertical";
     const overflow = !!props.overflow;
@@ -193,15 +196,21 @@ function ToolbarImpl(props: ToolbarProps): ReactNode {
             ) : null}
         </v.root.View>
     );
-    return overflow ? (
-        <View
-            style={vertical ? VERTICAL_ROOM : ROOM}
-            onLayout={(event) => setRoom(sizeOf(event))}
-        >
-            {bar}
-        </View>
-    ) : (
-        bar
+    // What the toolbar gives its icon buttons (a vibrant one's content color).
+    const provided = providedTokensFromPaths(selected.providedTokens.root);
+    return (
+        <ProvidedTokens tokens={provided}>
+            {overflow ? (
+                <View
+                    style={vertical ? VERTICAL_ROOM : ROOM}
+                    onLayout={(event) => setRoom(sizeOf(event))}
+                >
+                    {bar}
+                </View>
+            ) : (
+                bar
+            )}
+        </ProvidedTokens>
     );
 }
 

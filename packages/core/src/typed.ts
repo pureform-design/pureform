@@ -259,10 +259,15 @@ type Variants<V extends VariantValues, Style> = {
 /** A style whose `tokens` set the component's own tokens, by name. */
 export type TypedStyle<T extends string> = Omit<
     StyleMap,
-    "tokens" | "states"
+    "tokens" | "providedTokens" | "states"
 > & {
     /** Values for the component's own tokens where this style applies. */
     tokens?: { [K in T]?: ValueNode };
+    /** Values for other components' tokens, by component and token name, given to those
+     *  components inside this one (or by path, as `StyleMap` holds them). */
+    providedTokens?:
+        | Record<string, Record<string, ValueNode>>
+        | StyleMap["providedTokens"];
     states?: {
         [C in keyof NonNullable<StyleMap["states"]>]?: TypedStyle<T>;
     };
@@ -365,8 +370,24 @@ type SlotRecipe<S extends string, V extends VariantValues, T extends string> = {
 // and raw rules.
 const qualify = (style: StyleMap, component: string): StyleMap => {
     const { tokens, states, rawRules } = style;
-    if (!tokens && !states && !rawRules) return style;
+    const provided = style.providedTokens as
+        | Record<string, Record<string, ValueNode>>
+        | undefined;
+    if (!tokens && !provided && !states && !rawRules) return style;
     const out: StyleMap = { ...style };
+    if (provided) {
+        out.providedTokens = Object.fromEntries(
+            Object.entries(provided).flatMap(([target, values]) =>
+                // A value node is already keyed by path.
+                "type" in values
+                    ? [[target, values as unknown as ValueNode]]
+                    : Object.entries(values).map(([name, value]) => [
+                          ["components", target, name].join("."),
+                          value,
+                      ]),
+            ),
+        );
+    }
     if (tokens) {
         out.tokens = Object.fromEntries(
             Object.entries(tokens).map(([name, value]) => [
@@ -527,7 +548,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                 token: (name) => rawAlias("components", spec.name, name),
             });
             const own = (style: TypedStyle<Keys<T>>) =>
-                qualify(style as StyleMap, spec.name);
+                qualify(style as unknown as StyleMap, spec.name);
             return defineComponent(
                 definedOnly({
                     name: spec.name,

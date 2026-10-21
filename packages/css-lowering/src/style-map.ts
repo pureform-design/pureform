@@ -49,7 +49,8 @@ export const compileStyleMap = (
             key === "apply" ||
             key === "states" ||
             key === "rawRules" ||
-            key === "tokens"
+            key === "tokens" ||
+            key === "providedTokens"
         )
             continue;
         out[key] = compileValue(value as ValueNode, ctx);
@@ -59,6 +60,12 @@ export const compileStyleMap = (
     // element inside, follow.
     const tokens = m.tokens as Record<string, ValueNode> | undefined;
     for (const [path, value] of Object.entries(tokens ?? {})) {
+        out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
+    }
+    // A token provided to another component is that component's custom property, which it
+    // inherits from here. `var()` inside resolves on this element, so it reads this one's tokens.
+    const provided = m.providedTokens as Record<string, ValueNode> | undefined;
+    for (const [path, value] of Object.entries(provided ?? {})) {
         out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
     }
 

@@ -486,3 +486,21 @@ export const toolbarRegistry = () =>
             "itemTrailingText",
         ]),
     });
+
+/** An icon button whose factory writes its `accent` token to Root as `--accent`, for the
+ *  `ProvidedTokens` specs. */
+export const providedTokensRegistry = () =>
+    createRegistry({
+        iconButton: ((s) =>
+            withTokenStyle(
+                named("icon-button", [
+                    "root",
+                    "touchTarget",
+                    "container",
+                    "icon",
+                    "outline",
+                ])(s) as never,
+                s.tokens as never,
+                { accent: "--accent" },
+            )) as ClassFactory<ComponentShape>,
+    });

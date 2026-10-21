@@ -114,6 +114,11 @@ export const toolbar = pf.slotComponent({
                             container: sys("primaryContainer"),
                             content: on("primaryContainer"),
                         },
+                        // Its icon buttons draw in its content color, as Material's vibrant
+                        // toolbar does, unless they pick a color group of their own.
+                        providedTokens: {
+                            iconButton: { accent: ref("content") },
+                        },
                     },
                 },
             },

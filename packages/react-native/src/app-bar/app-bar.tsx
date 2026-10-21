@@ -12,6 +12,7 @@ import {
     appBarScrollState,
     appBarSelection,
     isPresent,
+    providedTokensFromPaths,
 } from "@pureform/binding-core";
 import type {
     AppBarContentProps,
@@ -30,6 +31,7 @@ import {
 import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 import { testIdOf, withEngine } from "../parts";
+import { ProvidedTokens } from "../provided-tokens";
 import { SearchBar } from "../search-bar";
 import type { SearchBarProps } from "../search-bar";
 import { useComponentSlots } from "../styles";
@@ -60,7 +62,11 @@ function useScrollState(props: AppBarProps): AppBarScrollState {
 function AppBarImpl(props: AppBarProps): ReactNode {
     const search = props.searchBar !== undefined;
     const state = useScrollState(props);
-    const { styles: s, views: v } = useComponentSlots<AppBarPart>(
+    const {
+        styles: s,
+        views: v,
+        selected,
+    } = useComponentSlots<AppBarPart>(
         "appBar",
         appBarSelection({ ...props, search }, state),
         props.mirrorLeading ? { mirrored: true } : {},
@@ -96,6 +102,9 @@ function AppBarImpl(props: AppBarProps): ReactNode {
             )}
         </v.content.View>
     );
+    // What the leading and trailing parts give their icon buttons: their own colors.
+    const provided = (part: "leading" | "trailing") =>
+        providedTokensFromPaths(selected.providedTokens[part]);
     const last = appBarContentLast({ size: props.size, search }, state);
     return (
         <v.root.View
@@ -104,11 +113,15 @@ function AppBarImpl(props: AppBarProps): ReactNode {
             testID={id("root")}
         >
             <v.leading.View style={s.leading} testID={id("leading")}>
-                {props.leading}
+                <ProvidedTokens tokens={provided("leading")}>
+                    {props.leading}
+                </ProvidedTokens>
             </v.leading.View>
             {last ? null : content}
             <v.trailing.View style={s.trailing} testID={id("trailing")}>
-                {props.trailing}
+                <ProvidedTokens tokens={provided("trailing")}>
+                    {props.trailing}
+                </ProvidedTokens>
             </v.trailing.View>
             {last ? content : null}
         </v.root.View>

@@ -5,7 +5,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
 import { Toolbar } from ".";
-import { PureformProvider } from "..";
+import { ProvidedTokens, PureformProvider, useTokens } from "..";
+import { AppBar } from "../app-bar";
+import { IconButton } from "../icon-button";
 import { presetRegistry } from "../testing/registry";
 import type { TestRegistry } from "../testing/registry";
 import { byTestId, interact, mount, settle, until } from "../testing/render";
@@ -14,6 +16,7 @@ let registry: TestRegistry;
 
 beforeAll(async () => {
     registry = await presetRegistry([
+        "appBar",
         "toolbar",
         "iconButton",
         "button",
@@ -99,5 +102,102 @@ describe("Toolbar", () => {
         await render(<Toolbar overflow items={ITEMS.slice(0, 3)} testId="x" />);
         await until(() => expect(shown()).toEqual(["a", "b", "c"]));
         expect(box(byTestId("x-overflow-root")).width).toBe(0);
+    });
+});
+
+describe("provided tokens", () => {
+    // The CSS color a token value draws in, as the browser computes it.
+    const css = (value: string) => {
+        const probe = document.createElement("div");
+        probe.style.color = value;
+        document.body.append(probe);
+        const out = getComputedStyle(probe).color;
+        probe.remove();
+        return out;
+    };
+    // The color an icon button's glyph draws in.
+    const glyph = (testId: string) => {
+        const icon = byTestId(`${testId}-icon`);
+        const text =
+            [...icon.querySelectorAll<HTMLElement>("*")].at(-1) ?? icon;
+        return getComputedStyle(text).color;
+    };
+    let onContainer = "";
+    let onSurface = "";
+    let onSurfaceVariant = "";
+    const Probe = () => {
+        const tokens = useTokens();
+        onContainer = String(tokens["colors.onPrimaryContainer"]);
+        onSurface = String(tokens["colors.onSurface"]);
+        onSurfaceVariant = String(tokens["colors.onSurfaceVariant"]);
+        return null;
+    };
+
+    it("draws a vibrant toolbar's icon buttons in its content color", async () => {
+        await render(
+            <>
+                <Probe />
+                <Toolbar
+                    aria-label="Edit"
+                    color="vibrant"
+                    items={ITEMS.slice(0, 1)}
+                />
+                <Toolbar
+                    aria-label="Standard"
+                    items={[{ ...ITEMS[1]!, testId: "standard" }]}
+                />
+            </>,
+        );
+        await settle();
+        expect(glyph("item-a")).toBe(css(onContainer));
+        expect(glyph("standard")).not.toBe(css(onContainer));
+    });
+
+    it("lets an icon button's own color group and tokens win over what's provided", async () => {
+        await render(
+            <ProvidedTokens tokens={{ iconButton: { accent: "#ff0000" } }}>
+                <IconButton aria-label="P" icon="P" testId="provided" />
+                <IconButton
+                    aria-label="S"
+                    icon="S"
+                    color="secondary"
+                    testId="own"
+                />
+                <IconButton
+                    aria-label="T"
+                    icon="T"
+                    tokens={{ accent: "#00ff00" }}
+                    testId="instance"
+                />
+                <ProvidedTokens tokens={{ iconButton: { accent: "#0000ff" } }}>
+                    <IconButton aria-label="N" icon="N" testId="nearest" />
+                </ProvidedTokens>
+            </ProvidedTokens>,
+        );
+        await settle();
+        expect(glyph("provided")).toBe(css("#ff0000"));
+        expect(glyph("own")).not.toBe(css("#ff0000"));
+        expect(glyph("instance")).toBe(css("#00ff00"));
+        expect(glyph("nearest")).toBe(css("#0000ff"));
+    });
+
+    it("draws an app bar's leading and trailing icon buttons in their parts' colors", async () => {
+        await render(
+            <>
+                <Probe />
+                <AppBar
+                    headline="Inbox"
+                    leading={
+                        <IconButton aria-label="Back" icon="←" testId="back" />
+                    }
+                    trailing={
+                        <IconButton aria-label="More" icon="⋮" testId="more" />
+                    }
+                />
+            </>,
+        );
+        await settle();
+        expect(glyph("back")).toBe(css(onSurface));
+        expect(glyph("more")).toBe(css(onSurfaceVariant));
     });
 });

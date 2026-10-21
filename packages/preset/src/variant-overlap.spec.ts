@@ -45,9 +45,9 @@ const settings = (config: CoreConfig, slot: string, style: Style) => {
     };
     const walk = (map: Style, conditions: string[]) => {
         for (const [key, v] of Object.entries(map)) {
-            if (key === "tokens" && isRecord(v)) {
+            if ((key === "tokens" || key === "providedTokens") && isRecord(v)) {
                 for (const [token, t] of Object.entries(v)) {
-                    value(`tokens.${token}`, t, conditions);
+                    value(`${key}.${token}`, t, conditions);
                 }
             } else if (key === "apply" && isRecord(v)) {
                 for (const [utility, level] of Object.entries(v)) {

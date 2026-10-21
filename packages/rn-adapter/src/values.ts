@@ -35,6 +35,9 @@ export interface Transition {
  *  everything reading it, rather than a style property; a style property of it sets the token
  *  where that style applies. */
 export const TOKEN = "--";
+/** A selected style's property naming a token it provides to the components inside it
+ *  (`providedTokens`), by path; selection takes it out. */
+export const PROVIDED = "provided:";
 
 /** A style's keyframe animation, which selection returns beside the style. */
 export const ANIMATION = "animation";

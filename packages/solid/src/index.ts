@@ -10,6 +10,7 @@ export type {
 export { useFieldsetDisabled, useFormReset } from "./form";
 export type { FormResetOptions } from "./form";
 export { IconPartContext, useIconStyle } from "./icon-style";
+export { ProvidedTokens, useProvidedTokens } from "./provided-tokens";
 export {
     createInteractionSource,
     useIndication,

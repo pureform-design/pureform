@@ -44,7 +44,22 @@ describe("toolbar", () => {
         expect(variants.color?.vibrant?.root).toEqual({
             "--components-toolbar-container": "token(colors.primaryContainer)",
             "--components-toolbar-content": "token(colors.onPrimaryContainer)",
+            // Its icon buttons' accent, resolved on the toolbar from its content color.
+            "--components-iconButton-accent":
+                "var(--components-toolbar-content, token(colors.onSurfaceVariant))",
         });
+    });
+
+    it("provides its content color to its icon buttons when vibrant", () => {
+        expect(
+            toolbar.recipe.variants?.color?.vibrant?.root?.providedTokens,
+        ).toEqual({
+            "components.iconButton.accent": {
+                type: "alias",
+                path: ["components", "toolbar", "content"],
+            },
+        });
+        expect(toolbar.recipe.variants?.color?.standard).toEqual({});
     });
 
     it("rounds a floating toolbar from the theme, and squares and spreads a docked one", () => {

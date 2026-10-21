@@ -226,6 +226,13 @@ export interface StyleMap {
      *  Native resolves the component again with them. Set them on a root slot, which every
      *  slot inherits from. A typed component takes its own tokens by name. */
     tokens?: Record<string, ValueNode>;
+    /** Values for another component's dynamic tokens, by dotted path
+     *  (`components.iconButton.accent`), given to every component of that kind inside this one
+     *  (component-architecture.md §5.5, provided tokens). Resolved here, so a value may read
+     *  this component's tokens. The web sets each as its custom property, which inherits; React
+     *  Native hands them down through the bindings, per slot. Any slot can provide, to what's
+     *  inside it. A typed component takes them by component and token name. */
+    providedTokens?: Record<string, ValueNode>;
 
     /** Escape hatch for nested rules with no portable form: arbitrary descendant selectors
      *  (`& svg`), pseudo-elements (`&::before`, `&::placeholder`), or platform widget parts.

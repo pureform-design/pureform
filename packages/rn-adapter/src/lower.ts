@@ -28,6 +28,7 @@ import {
     ICON_FILL,
     SHAPE,
     TINT,
+    PROVIDED,
     TOKEN,
     TRANSITION,
 } from "./values";
@@ -678,24 +679,29 @@ const lowerStyle = (
     when: string[] = [],
     specificity = 0,
 ) => {
-    const { states, tokens, ...own } = map as StyleMap & {
+    const { states, tokens, providedTokens, ...own } = map as StyleMap & {
         states?: Record<string, StyleMap>;
     };
     // A token set here is a property naming it, which selection takes out and resolves the
-    // component again with.
-    for (const [path, node] of Object.entries(tokens ?? {})) {
-        try {
-            for (const entry of lowerNode(node, ctx)) {
-                rules.add(
-                    [...new Set([...when, ...entry.when])],
-                    specificity + entry.specificity,
-                    `${TOKEN}${path}`,
-                    entry.value,
-                );
+    // component again with; a provided one, which selection hands to the bindings.
+    for (const [prefix, set] of [
+        [TOKEN, tokens],
+        [PROVIDED, providedTokens],
+    ] as const) {
+        for (const [path, node] of Object.entries(set ?? {})) {
+            try {
+                for (const entry of lowerNode(node, ctx)) {
+                    rules.add(
+                        [...new Set([...when, ...entry.when])],
+                        specificity + entry.specificity,
+                        `${prefix}${path}`,
+                        entry.value,
+                    );
+                }
+            } catch (error) {
+                if (!(error instanceof Unsupported)) throw error;
+                diagnostics.add(`${where}: token ${path}: ${error.message}`);
             }
-        } catch (error) {
-            if (!(error instanceof Unsupported)) throw error;
-            diagnostics.add(`${where}: token ${path}: ${error.message}`);
         }
     }
     for (const [property, node] of Object.entries(own)) {

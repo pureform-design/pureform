@@ -271,9 +271,32 @@ const validateSlotConditions = (config: CoreConfig): void => {
     );
 };
 
+/** Every `providedTokens` key must name a token of its component, as an alias would, when the
+ *  config has that component: one left out (or pruned) has nothing inside to provide to. */
+const validateProvided = (config: CoreConfig, value: unknown): void => {
+    if (Array.isArray(value)) {
+        for (const item of value) validateProvided(config, item);
+        return;
+    }
+    if (!isRecord(value)) return;
+    for (const [k, v] of Object.entries(value)) {
+        if (k === "$meta") continue;
+        if (k === "providedTokens" && isRecord(v)) {
+            for (const path of Object.keys(v)) {
+                const [, component] = path.split(".");
+                if (config.components?.[component as string] === undefined)
+                    continue;
+                getByPath(config, path.split("."));
+            }
+        }
+        validateProvided(config, v);
+    }
+};
+
 /** Run the hard-error pass. Throws on the first problem; returns normally when the config is
  *  valid. */
 export const validateConfig = (config: CoreConfig): void => {
+    validateProvided(config, config.components);
     walk(
         config,
         (node) => {
