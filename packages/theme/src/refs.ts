@@ -13,6 +13,7 @@ import type {
     ShapeRole,
     SizeRole,
     SpacingStep,
+    SpringRole,
     StackingRole,
     StateRole,
 } from "./contracts/foundations";
@@ -30,6 +31,7 @@ export const PATHS = {
     opacity: ["tokens", "opacity"],
     duration: ["durations"],
     easing: ["easings"],
+    spring: ["springs"],
     zIndex: ["zIndices"],
     fontSize: ["tokens", "fontSize"],
     lineHeight: ["tokens", "lineHeight"],
@@ -73,5 +75,7 @@ export const opacity = ref<StateRole | (string & {})>(PATHS.opacity);
 export const focusIndicator = ref<FocusIndicatorRole>(PATHS.size);
 export const duration = ref<DurationRole | (string & {})>(PATHS.duration);
 export const easing = ref<EasingRole | (string & {})>(PATHS.easing);
+/** A spring, for a transition's or animation's `spring`: `{ spring: spring("spatialFast") }`. */
+export const spring = ref<SpringRole | (string & {})>(PATHS.spring);
 /** A layer of the stacking scale, for `zIndex`: `zIndex("menu")`. */
 export const zIndex = ref<StackingRole | (string & {})>(PATHS.zIndex);

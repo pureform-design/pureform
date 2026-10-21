@@ -11,6 +11,7 @@ import type {
     KeywordNode,
     NumericScalarNode,
     ShadowNode,
+    SpringNode,
 } from "@pureform/core/ast";
 
 export const ELEVATION_LEVELS = [
@@ -221,9 +222,25 @@ export const EASING_ROLES = [
 
 export type EasingRole = (typeof EASING_ROLES)[number];
 
+/** The springs, as Material 3 Expressive names them: spatial springs move things (position,
+ *  size, shape) and may overshoot; effects springs change color and opacity and don't. Each in
+ *  three speeds. */
+export const SPRING_ROLES = [
+    "spatialFast",
+    "spatialDefault",
+    "spatialSlow",
+    "effectsFast",
+    "effectsDefault",
+    "effectsSlow",
+] as const;
+
+export type SpringRole = (typeof SPRING_ROLES)[number];
+
 export interface MotionContract {
     /** Durations, in `ms` or `s`. */
     durations: Record<DurationRole, NumericScalarNode> &
         Record<string, NumericScalarNode>;
     easings: Record<EasingRole, EasingNode> & Record<string, EasingNode>;
+    /** Springs, by their physics. */
+    springs: Record<SpringRole, SpringNode> & Record<string, SpringNode>;
 }

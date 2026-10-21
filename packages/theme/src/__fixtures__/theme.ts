@@ -2,6 +2,7 @@
 
 import {
     cubicBezier,
+    spring,
     fontFamily,
     hex,
     none,
@@ -19,6 +20,7 @@ import type { ColorContract } from "../contracts/color";
 import {
     DURATION_ROLES,
     EASING_ROLES,
+    SPRING_ROLES,
     ELEVATION_LEVELS,
     SHAPE_ROLES,
     SIZE_ROLES,
@@ -83,6 +85,9 @@ export const providers = () => ({
     motion: motionFromTokens({
         durations: fill(DURATION_ROLES, () => numeric(200, "ms")),
         easings: fill(EASING_ROLES, () => cubicBezier([0.2, 0, 0, 1])),
+        springs: fill(SPRING_ROLES, () =>
+            spring({ stiffness: 700, damping: 0.9 }),
+        ),
     }),
     elevation: elevationFromTokens({
         levels: fill(ELEVATION_LEVELS, () => ({
