@@ -57,6 +57,7 @@ type Open = {
     fonts: Record<string, unknown>;
     durations: Record<string, unknown>;
     easings: Record<string, unknown>;
+    springs: Record<string, unknown>;
     zIndices: Record<string, unknown>;
     textStyles: Record<string, unknown>;
     breakpoints: Record<string, unknown>;
@@ -106,13 +107,20 @@ export type AliasPath<C> =
     | OneLevel<"fonts", Field<C, "fonts">>
     | OneLevel<"durations", Field<C, "durations">>
     | OneLevel<"easings", Field<C, "easings">>
+    | OneLevel<"springs", Field<C, "springs">>
     | OneLevel<"zIndices", Field<C, "zIndices">>
     | OneLevel<"textStyles", Field<C, "textStyles">>
     | ComponentPaths<Field<C, "components">>;
 
 // The alias roots, by how many names follow them.
 type NestedRoot = "tokens" | "semanticTokens" | "components";
-type FlatRoot = "fonts" | "durations" | "easings" | "zIndices" | "textStyles";
+type FlatRoot =
+    | "fonts"
+    | "durations"
+    | "easings"
+    | "springs"
+    | "zIndices"
+    | "textStyles";
 
 /** The alias roots the config has. */
 export type AliasRoot<C> = Extract<NestedRoot | FlatRoot, Keys<C>>;

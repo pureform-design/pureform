@@ -8,7 +8,13 @@
 // utility, a key the scale tier contains). The adapter reuses the same guarded traversal
 // defensively.
 
-import type { AliasNode, ValueNode } from "./ast";
+import type {
+    AliasNode,
+    LinearEasingPoint,
+    SpringNode,
+    ValueNode,
+} from "./ast";
+import { linearPointsProblem, springProblem } from "./spring";
 import type { CoreConfig, Token, UtilityDef } from "./types";
 
 /** Thrown when a path does not resolve to a config entry. */
@@ -293,6 +299,45 @@ const validateProvided = (config: CoreConfig, value: unknown): void => {
     }
 };
 
+/** A motion value that can't run: a spring with stiffness or mass not above 0 or a negative
+ *  damping, a `linear()` easing with too few points or inputs out of order, or a transition or
+ *  animation timed by a spring that also gives a duration or an easing. */
+export class MotionConfigError extends Error {
+    override name = "MotionConfigError";
+}
+
+// A spring sets a motion's duration and curve, so a part with one can't have either.
+const checkTiming = (timing: Record<string, unknown>, where: string) => {
+    if (timing.spring === undefined) {
+        if (timing.duration === undefined)
+            throw new MotionConfigError(`${where} has no duration or spring`);
+        return;
+    }
+    for (const key of ["duration", "easing"]) {
+        if (timing[key] !== undefined) {
+            throw new MotionConfigError(
+                `${where} has a spring and a ${key}; a spring sets both`,
+            );
+        }
+    }
+};
+
+const validateMotion = (node: Record<string, unknown>): void => {
+    if (node.type === "spring") {
+        const problem = springProblem(node as unknown as SpringNode);
+        if (problem) throw new MotionConfigError(`spring: ${problem}`);
+    } else if (node.type === "easing" && node.kind === "linear") {
+        const problem = linearPointsProblem(node.points as LinearEasingPoint[]);
+        if (problem) throw new MotionConfigError(problem);
+    } else if (node.type === "transition" && Array.isArray(node.parts)) {
+        for (const part of node.parts as Record<string, unknown>[]) {
+            checkTiming(part, `transition of ${JSON.stringify(part.property)}`);
+        }
+    } else if (node.type === "animation") {
+        checkTiming(node, `animation "${String(node.name)}"`);
+    }
+};
+
 /** Run the hard-error pass. Throws on the first problem; returns normally when the config is
  *  valid. */
 export const validateConfig = (config: CoreConfig): void => {
@@ -303,6 +348,7 @@ export const validateConfig = (config: CoreConfig): void => {
             if (node.type === "alias" && Array.isArray(node.path)) {
                 resolveAlias(config, node as unknown as AliasNode);
             }
+            validateMotion(node);
         },
         (apply) => validateApply(config, apply),
     );
