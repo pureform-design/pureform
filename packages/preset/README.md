@@ -763,7 +763,10 @@ focus ring, no state layer.
 
 ```html
 <div class="{bottomSheet.root}" role="dialog" aria-label="Share">
-    <button class="{bottomSheet.dragHandle} {dragHandle.root}" aria-label="Close sheet">
+    <button
+        class="{bottomSheet.dragHandle} {dragHandle.root}"
+        aria-label="Close sheet"
+    >
         <span class="{dragHandle.handle}"></span>
     </button>
     <div class="{bottomSheet.content}">…</div>
@@ -877,6 +880,38 @@ Expressive has no equivalent.
   circle, 3 by default) under a ring drawn by two halves, each turning through its share of the
   value. The arcs draw from their own tokens, not the radius roles, so they stay round under
   a theme whose radii are all 0 (nothing to allow-list: the circle is `50%`, not a fixed px). Turn on `indeterminate` for a spinner, which needs only the root.
+- `shape: wavy` (M3 Expressive, both): the indicator is drawn as a wave and the track stays
+  flat. The linear bar grows by the `amplitude` token (3px) above and below, and its indicator is
+  clipped to a band along a sine wave of 40px waves (24 of them, so a bar wider than 960px ends
+  flat); each circular arc's ring widens by twice `amplitude` (1.5px) and is clipped to a ring of
+  nine waves, as is the spinner. A clip's points are drawn once, so the wave per thickness is a
+  compound (one on the linear, three on the circular). Where a target can't clip to a shape
+  (React Native without an SVG engine, a browser without CSS `shape()`), the indicator stays
+  flat; React Native draws the linear wave with an SVG engine, not the circular one.
+
+## Loading indicator
+
+`loadingIndicator` is M3 Expressive's indicator for a wait too short to measure: `root` (48px)
+holding a `container` holding the `indicator` (38px), which turns and morphs through seven of
+Material's shapes (`LOADING_INDICATOR_SHAPES`: soft burst, 9-sided cookie, pentagon, pill,
+sunny, 4-sided cookie, oval), two turns a cycle of seven `long2` steps on the standard curve.
+`variant: "contained"` fills the container (`containerColor`, the group's container colour) and
+draws the indicator in `containedIndicatorColor`; `color` takes a group. Under reduced motion it
+only turns (`loadingIndicatorSpin`), since the motion is the only sign of the wait.
+
+```html
+<div class="{root}" role="progressbar" aria-label="Loading">
+    <span class="{container}"><span class="{indicator}"></span></span>
+</div>
+```
+
+It's a **shape exception**: its geometry is the shape, so its container stays round under any
+shape theme and corner style (`containerRadius`, half its size, is on `radii.spec.ts`'s
+allow-list, and `pureform()` gives it no `cornerShape`). A theme that wants another shape sets
+`containerRadius`. The keyframes are `LOADING_INDICATOR_KEYFRAMES`, every shape redrawn by
+`morphSequence` (`shape-paths.ts`) to one structure so CSS `shape()` animates between them.
+Where a target can't clip, the indicator is a turning circle; React Native's keyframes carry no
+clip, so with an SVG engine it turns in its first shape without morphing.
 
 ```html
 <div

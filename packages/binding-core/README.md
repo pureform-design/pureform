@@ -360,13 +360,20 @@ listItemVariants(list, item);            // the item's own over the list's; read
 // Linear and circular progress (no machine)
 type ProgressComponent = "linearProgress" | "circularProgress";
 type LinearProgressPart; type CircularProgressPart;   // incl. track, stopIndicator, trackEnd/StartHalf/Arc
-interface ProgressRootOwnProps<C>        // indeterminate, color, tokens, value, min, max, testId,
+interface ProgressRootOwnProps<C>        // indeterminate, color, thickness, shape (flat, wavy),
+                                         // tokens, value, min, max, testId,
                                          // unstyled
 PROGRESS_ROOT_PROPS;
 isIndeterminate(props);                  // indeterminate, else no value (undefined or null)
 progressPercent(props);                  // the value as a clamped percentage of min to max
 progressSelection(props);                // the value token from the percentage, unless indeterminate
 progressRootProps(props);                // role progressbar, aria-valuemin/max, aria-valuenow
+
+// Loading indicator (no machine): a progressbar with no value
+type LoadingIndicatorPart;               // root, container, indicator
+interface LoadingIndicatorRootOwnProps   // variant (uncontained, contained), color, tokens, testId,
+                                         // unstyled
+LOADING_INDICATOR_ROOT_PROPS; loadingIndicatorSelection(props); loadingIndicatorRootProps();
 
 // Autocomplete: Zag's combobox; the select's field with an editable input. The list shows the
 // items `filter` keeps (labels containing the text by default; `false` keeps all).
