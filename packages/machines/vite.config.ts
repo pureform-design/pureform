@@ -21,6 +21,7 @@ export default createConfig({
                     presence: "src/presence.ts",
                     tabs: "src/tabs.ts",
                     "button-group": "src/button-group.ts",
+                    "selection-list": "src/selection-list.ts",
                     navigation: "src/navigation/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     stepper: "src/stepper/index.ts",

@@ -17,6 +17,7 @@ export * as presence from "./presence";
 export * as radioGroup from "./radio-group";
 export * as ripple from "./ripple";
 export * as select from "./select";
+export * as selectionList from "./selection-list";
 export * as slider from "./slider";
 export * as snackbar from "./snackbar";
 export * as stepper from "./stepper";

@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
+import { chipSet } from "./chip";
 import { dialog } from "./dialog";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { list } from "./list";
@@ -29,6 +30,7 @@ describe.each([
     ["listItem", listItem],
     ["menu", menu],
     ["tabs", tabs],
+    ["chipSet", chipSet],
     ["dialog", dialog],
     ["fullscreenDialog", fullscreenDialog],
     ["searchBar", searchBar],

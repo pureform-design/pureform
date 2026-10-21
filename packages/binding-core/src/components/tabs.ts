@@ -29,6 +29,9 @@ export interface TabsVariantProps {
     /** Set a primary tab's icon beside its label rather than over it, in a 48px tab. Secondary
      *  tabs always do. @default false */
     readonly inlineIcon?: boolean | undefined;
+    /** Tabs that size to their content (at least 90px) and scroll sideways, padded at the
+     *  list's edges, for more tabs than fit. The selected tab scrolls into view. @default false */
+    readonly scrollable?: boolean | undefined;
     readonly color?: VariantProp<"tabs", "color">;
     readonly tokens?: InstanceTokens<"tabs"> | undefined;
 }
@@ -74,6 +77,7 @@ export const TABS_ROOT_PROPS = [
     "variant",
     "icon",
     "inlineIcon",
+    "scrollable",
     "color",
     "tokens",
     "activationMode",
@@ -128,6 +132,7 @@ export const tabsSelection = (props: TabsVariantProps): Selection<"tabs"> => ({
     variant: props.variant,
     icon: props.icon,
     inlineIcon: props.inlineIcon,
+    scrollable: props.scrollable,
     color: props.color,
     tokens: props.tokens,
 });

@@ -57,7 +57,7 @@ import { card } from "./components/card";
 import { carousel } from "./components/carousel";
 import { gridList } from "./components/grid-list";
 import { createCheckbox } from "./components/checkbox";
-import { createChip } from "./components/chip";
+import { chipSet, createChip } from "./components/chip";
 import { createDateInput } from "./components/date-input";
 import { datePicker } from "./components/date-picker";
 import { dialog } from "./components/dialog";
@@ -308,6 +308,7 @@ const defaultComponents = <G extends string>(
         badge,
         media: createMedia(shapes),
         chip: createChip<G, Step>(theme.color.groups, densities),
+        chipSet,
         inputChip: createInputChip<G, Step>(theme.color.groups, densities),
         textField: createTextField<G, Step>(theme.color.groups, densities),
         textArea: createTextArea<G, Step>(theme.color.groups, densities),

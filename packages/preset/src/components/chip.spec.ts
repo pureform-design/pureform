@@ -2,7 +2,7 @@ import { compilePreset } from "@pureform/panda-adapter";
 import { describe, expect, it } from "vitest";
 
 import { configWith } from "../__fixtures__/config";
-import { chip } from "./chip";
+import { chip, chipSet } from "./chip";
 
 const compiled = () => compilePreset(configWith(chip)).theme?.slotRecipes?.chip;
 
@@ -82,5 +82,26 @@ describe("chip corners and trailing icon", () => {
         const slot = JSON.stringify(compiled()?.base?.trailingIcon);
         expect(slot).toContain("components-chip-trailingIconSize");
         expect(slot).toContain("components-chip-trailingIconSpacing");
+    });
+});
+
+describe("chip set", () => {
+    const set = () =>
+        compilePreset(configWith(chipSet)).theme?.slotRecipes?.chipSet;
+
+    it("wraps its chips 8px apart, or keeps them on one scrolling line", () => {
+        expect(set()?.base?.root).toMatchObject({
+            display: "flex",
+            flexDirection: "row",
+            gap: "var(--components-chipSet-gap, token(spacing.2))",
+        });
+        expect(set()?.variants?.singleLine?.false?.root).toEqual({
+            flexWrap: "wrap",
+        });
+        expect(set()?.variants?.singleLine?.true?.root).toEqual({
+            flexWrap: "nowrap",
+            overflow: "auto",
+        });
+        expect(chipSet.recipe.compoundVariants ?? []).toEqual([]);
     });
 });

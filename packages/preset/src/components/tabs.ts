@@ -18,6 +18,10 @@
 // A primary tab's indicator spans its content (at least 24px, centered under it); a secondary
 // tab's content spans the tab and pads itself, so its indicator spans the whole tab.
 //
+// `scrollable` tabs size to their content (at least 90px) rather than share the list's width,
+// and the list scrolls sideways, padded at its edges. React Native has no scrolling overflow, so
+// its binding wraps the list in a horizontal scroll view.
+//
 // The indicator slides from the tab selected before to the new one: the bindings start a
 // transform from the old indicator's box (FLIP), timed by the `transform` transition the
 // indicator declares here, so the motion tokens retime it and reduced motion turns it off.
@@ -25,6 +29,7 @@
 import { typed } from "@pureform/core";
 import {
     absolute,
+    auto,
     center,
     column,
     flex,
@@ -86,12 +91,18 @@ const { tokens, ref } = componentTokens("tabs", {
     // A primary indicator is as wide as the tab's content, and never narrower than this.
     indicatorMinWidth: px(24),
     // How the indicator slides to a newly selected tab, as Material's web tabs time it.
+    // Scrollable tabs: the inline padding before the first tab and after the last, and the
+    // narrowest a tab gets (Compose's `PrimaryScrollableTabRow` edge padding and minimum tab
+    // width, 52dp and 90dp).
+    edgePadding: px(52),
+    scrollableMinWidth: px(90),
     indicatorDuration: duration("medium1"),
     indicatorEasing: easing("emphasized"),
     ...INDICATION_TOKENS,
 });
 
 const pressable = pressableRoot(ref);
+
 
 const SELECTED = slot("tab", "selected");
 
@@ -123,7 +134,7 @@ export const createTabs = <const G extends string = ColorGroup>(
             name: "tabs",
             $meta: {
                 description:
-                    "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons, and inlineIcon to set a primary tab's icon beside its label.",
+                    "Material tabs, primary or secondary. Mark the current tab with aria-selected; turn on icon when the tabs have icons, inlineIcon to set a primary tab's icon beside its label, and scrollable for tabs that size to their content and scroll.",
             },
             tokens,
             slots: ["root", "tab", "tabContent", "icon", "label", "indicator"],
@@ -144,6 +155,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                 variant: ["primary", "secondary"],
                 icon: ["true", "false"],
                 inlineIcon: ["true", "false"],
+                scrollable: ["false", "true"],
                 color: groups as ColorGroups,
             },
             recipe: () => ({
@@ -157,7 +169,6 @@ export const createTabs = <const G extends string = ColorGroup>(
                         flexDirection: row,
                         backgroundColor: ref("container"),
                     },
-                    // Tabs share the list's width equally.
                     tab: {
                         ...pressable,
                         ...tabColors(ref("activeColor")),
@@ -167,9 +178,6 @@ export const createTabs = <const G extends string = ColorGroup>(
                         },
                         // The content fills the tab's height, so the indicator sits on its edge.
                         alignItems: stretch,
-                        flexBasis: px(0),
-                        flexGrow: unitless(1),
-                        minWidth: px(0),
                         height: ref("height"),
                         // The divider under the tabs: an inset shadow on each tab, so it takes no space
                         // and draws over the tab's state layer.
@@ -247,6 +255,30 @@ export const createTabs = <const G extends string = ColorGroup>(
                     },
                     icon: { true: {}, false: {} },
                     inlineIcon: { true: {}, false: {} },
+                    // Scrollable tabs size to their content, at least the minimum width, and the
+                    // list scrolls, padded at its edges.
+                    scrollable: {
+                        // Fixed tabs share the list's width equally.
+                        false: {
+                            tab: {
+                                flexBasis: px(0),
+                                flexGrow: unitless(1),
+                                minWidth: px(0),
+                            },
+                        },
+                        true: {
+                            root: {
+                                overflow: auto,
+                                paddingInlineStart: ref("edgePadding"),
+                                paddingInlineEnd: ref("edgePadding"),
+                            },
+                            tab: {
+                                flexGrow: unitless(0),
+                                flexShrink: unitless(0),
+                                minWidth: ref("scrollableMinWidth"),
+                            },
+                        },
+                    },
                     // A group points the active and indicator colors at its main color.
                     // Secondary tabs read their own active color, so they keep it.
                     color: colorVariant(groups, (g) => ({
@@ -277,6 +309,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                     variant: "primary",
                     icon: "false",
                     inlineIcon: "false",
+                    scrollable: "false",
                     color: DEFAULT_GROUP,
                 },
             }),

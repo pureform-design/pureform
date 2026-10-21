@@ -362,6 +362,7 @@
         "@zag-js/date-picker": "catalog:",
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
+        "@zag-js/listbox": "catalog:",
         "@zag-js/menu": "catalog:",
         "@zag-js/pagination": "catalog:",
         "@zag-js/presence": "catalog:",
@@ -926,6 +927,7 @@
     "@zag-js/date-picker": "^1.46.0",
     "@zag-js/dialog": "^1.46.0",
     "@zag-js/dom-query": "^1.46.0",
+    "@zag-js/listbox": "^1.46.0",
     "@zag-js/menu": "^1.46.0",
     "@zag-js/pagination": "^1.46.0",
     "@zag-js/presence": "^1.46.0",
@@ -1803,6 +1805,8 @@
     "@zag-js/focus-visible": ["@zag-js/focus-visible@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0" } }, "sha512-H/npFbU9yRLWhzPud/uuGKxwtsh/FcMaL5IisBJxo3txqotbfcgPNN9VvqQY2BuSbJi2gg01u9ngwBIZPVaUmQ=="],
 
     "@zag-js/interact-outside": ["@zag-js/interact-outside@1.46.0", "", { "dependencies": { "@zag-js/dom-query": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-gzOj8zNvZzrF8l7ikYcYmdOlhLXEBGm7Qsp++hE/in47Nhi1uHWlamW21orqYdNF8Y250qrK24vIr0ZW4xTPcw=="],
+
+    "@zag-js/listbox": ["@zag-js/listbox@1.46.0", "", { "dependencies": { "@zag-js/anatomy": "1.46.0", "@zag-js/collection": "1.46.0", "@zag-js/core": "1.46.0", "@zag-js/dom-query": "1.46.0", "@zag-js/focus-visible": "1.46.0", "@zag-js/types": "1.46.0", "@zag-js/utils": "1.46.0" } }, "sha512-hucxy+Ge5R2cHIsWv1lmVYkHAoezD3rWWTkFP1n24XUw69LXMp0v3+mtwpzDUsJWf2oEt8jziPtBCieGb9VwkA=="],
 
     "@zag-js/live-region": ["@zag-js/live-region@1.46.0", "", {}, "sha512-d7wjSUr8tyH+2kQicbv+InfrYOoDQkSsziLrQiHSLTZ0n1OPhgjM10N3PcewPnVIrmpS+FLyCX6dEyVrzQT1/g=="],
 

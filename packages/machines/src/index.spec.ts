@@ -5,6 +5,7 @@ import * as zagCombobox from "@zag-js/combobox";
 import * as zagDateInput from "@zag-js/date-input";
 import * as zagDatePicker from "@zag-js/date-picker";
 import * as zagDialog from "@zag-js/dialog";
+import * as zagListbox from "@zag-js/listbox";
 import * as zagMenu from "@zag-js/menu";
 import * as zagRadioGroup from "@zag-js/radio-group";
 import * as zagSelect from "@zag-js/select";
@@ -45,6 +46,7 @@ describe("@pureform/machines", () => {
             menu: zagMenu,
             radioGroup: zagRadioGroup,
             select: zagSelect,
+            selectionList: zagListbox,
             stepper: zagSteps,
             switchControl: zagSwitch,
             tabs: zagTabs,
@@ -63,6 +65,7 @@ describe("@pureform/machines", () => {
         }
         expect(machines.radioGroup.itemProps).toBe(zagRadioGroup.itemProps);
         expect(machines.select.collection).toBe(zagSelect.collection);
+        expect(machines.selectionList.collection).toBe(zagListbox.collection);
     });
 
     it("swaps the form rules of the switch, radio group, and select", () => {
@@ -97,6 +100,7 @@ describe("@pureform/machines", () => {
             "radioGroup",
             "ripple",
             "select",
+            "selectionList",
             "slider",
             "snackbar",
             "stepper",

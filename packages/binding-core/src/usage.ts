@@ -283,7 +283,10 @@ export const COMPONENT_USAGE = {
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.
     tabs: {
-        entries: { tabs: same("variant", "inlineIcon", "color"), ripple: {} },
+        entries: {
+            tabs: same("variant", "inlineIcon", "scrollable", "color"),
+            ripple: {},
+        },
     },
     // The icons follow their content, and the chips' groups come in one `chip` prop.
     "tags-input": {
