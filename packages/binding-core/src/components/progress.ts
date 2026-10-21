@@ -32,6 +32,9 @@ export interface ProgressVariantProps<C extends ProgressComponent> {
     readonly color?: VariantProp<C, "color">;
     /** M3 Expressive's thick track. */
     readonly thickness?: VariantProp<C, "thickness">;
+    /** M3 Expressive's `wavy` indicator, drawn as a wave; the track stays flat. Flat where a
+     *  target can't clip to a shape. @default "flat" */
+    readonly shape?: VariantProp<C, "shape">;
     readonly tokens?: InstanceTokens<C> | undefined;
 }
 
@@ -72,6 +75,7 @@ export const PROGRESS_ROOT_PROPS = [
     "indeterminate",
     "color",
     "thickness",
+    "shape",
     "tokens",
     "value",
     "min",
@@ -112,6 +116,7 @@ export const progressSelection = <C extends ProgressComponent>(
         indeterminate,
         color: props.color,
         thickness: props.thickness,
+        shape: props.shape,
         tokens: {
             ...(indeterminate ? {} : { value: progressPercent(props) }),
             ...tokens,

@@ -15,6 +15,7 @@ export const COMPONENT_NAMES = [
     "Checkbox",
     "Chip",
     "CircularProgress",
+    "LoadingIndicator",
     "Dialog",
     "DragHandle",
     "Fab",

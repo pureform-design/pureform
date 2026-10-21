@@ -68,7 +68,9 @@ export const COMPONENT_USAGE = {
         },
     },
     // `indeterminate` follows the value.
-    "circular-progress": { entries: { circularProgress: same("color") } },
+    "circular-progress": {
+        entries: { circularProgress: same("color", "shape") },
+    },
     // `icon` follows the icon content; the backdrop is a scrim, and the trigger a button.
     dialog: { entries: { dialog: {}, scrim: {}, button: {}, ripple: {} } },
     // The trigger is a button, the close trigger an icon button, and the confirm action a button.
@@ -106,7 +108,12 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
-    "linear-progress": { entries: { linearProgress: same("color") } },
+    "linear-progress": {
+        entries: { linearProgress: same("color", "shape") },
+    },
+    "loading-indicator": {
+        entries: { loadingIndicator: same("variant", "color") },
+    },
     // A `ul` around list items; the ready-made renders a list item per entry, in the list's
     // density, color, and leading type. A segmented list sets each item's position.
     list: {

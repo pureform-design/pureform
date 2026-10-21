@@ -14,6 +14,7 @@ import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
 import { iconButton } from "./icon-button";
 import { list, listItem } from "./list";
+import { loadingIndicator } from "./loading-indicator";
 import { menu } from "./menu";
 import { navigationBar, navigationRail } from "./navigation";
 import { circularProgress, linearProgress } from "./progress";
@@ -58,6 +59,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     checkbox,
     chip,
     circularProgress,
+    loadingIndicator,
     dialog,
     dragHandle,
     fab,

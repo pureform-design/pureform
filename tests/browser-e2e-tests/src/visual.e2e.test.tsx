@@ -47,6 +47,7 @@ const SECTIONS = [
     "select",
     "search-and-autocomplete",
     "progress",
+    "loading-and-wavy",
     "navigation",
     "badges",
 ];
