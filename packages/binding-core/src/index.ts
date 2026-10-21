@@ -495,6 +495,31 @@ export type {
     TimePickerView,
     TimeValueChangeDetails,
 } from "./components/time-picker";
+export {
+    DEFAULT_PAGE_SIZE,
+    DEFAULT_PAGE_SIZE_OPTIONS,
+    PAGINATOR_ROOT_PROPS,
+    paginatorClampPage,
+    paginatorMachineProps,
+    paginatorPageAfterSize,
+    paginatorPageSizes,
+    paginatorRange,
+    paginatorRangeLabel,
+    paginatorSelection,
+    paginatorSizeItems,
+    paginatorTotalPages,
+    paginatorTriggerProps,
+} from "./components/paginator";
+export type {
+    PaginatorBehaviorProps,
+    PaginatorPageDetails,
+    PaginatorPageSizeDetails,
+    PaginatorPart,
+    PaginatorRange,
+    PaginatorRootOwnProps,
+    PaginatorTranslations,
+    PaginatorVariantProps,
+} from "./components/paginator";
 export { overflowCount } from "./overflow";
 export type { OverflowLayout } from "./overflow";
 export {

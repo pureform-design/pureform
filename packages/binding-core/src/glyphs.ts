@@ -19,6 +19,12 @@ export const GLYPH_PATHS = {
     /** A chevron pointing toward the end: a calendar's next button (mirror it under right to
      *  left). */
     chevronEnd: "M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z",
+    /** A bar and a chevron toward the start: a paginator's first-page button (mirror it under
+     *  right to left). */
+    firstPage: "M18.41 16.59 13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z",
+    /** A bar and a chevron toward the end: a paginator's last-page button (mirror it under right
+     *  to left). */
+    lastPage: "M5.59 7.41 10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z",
     /** A calendar page: the docked date picker's button and the date input's mode toggle. */
     calendar:
         "M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V10h14zm0-12H5V6h14z",
