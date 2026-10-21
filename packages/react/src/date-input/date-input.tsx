@@ -29,13 +29,10 @@ import {
     Fragment,
     type ReactNode,
     useId,
-    useMemo,
-    useState,
 } from "react";
 
 import { Button } from "../button";
-import { parseIso } from "../calendar-parts";
-import { useControllable } from "../controllable";
+import { parseIso, useDateValue } from "../calendar-parts";
 import { CalendarIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { useMachine } from "../machine";
@@ -101,25 +98,13 @@ const context = createPartContext<DateInputContextValue>("DateInput");
 function Root(props: DateInputRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
-    const value = useControllable<
-        "value",
-        readonly string[],
-        { readonly value: readonly string[] }
-    >("DateInput", "value", props);
-    const valueKey = value.value?.join(",");
-    const zagValue = useMemo(() => value.value?.map(parseIso), [valueKey]);
-    const [zagDefault] = useState(() => value.defaultValue?.map(parseIso));
+    const value = useDateValue("DateInput", props);
     const service = useMachine(dateInput.machine, {
         id,
         dir,
         ...dateMachineProps(props, parseIso),
         invalid: props.invalid || isPresent(props.error) || undefined,
-        value: zagValue,
-        defaultValue: zagDefault,
-        onValueChange: (details) =>
-            value.machineProps.onValueChange({
-                value: details.value.filter(Boolean).map(toISO),
-            }),
+        ...value,
     });
     const api = dateInput.connect(service, normalizeProps);
     const iso = api.value.filter(Boolean).map(toISO);

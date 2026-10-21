@@ -29,12 +29,11 @@ import {
     type ReactNode,
     useId,
     useLayoutEffect,
-    useMemo,
     useRef,
     useState,
 } from "react";
 
-import { calendarParts, parseIso } from "../calendar-parts";
+import { calendarParts, parseIso, useDateValue } from "../calendar-parts";
 import type {
     CalendarCellProps,
     CalendarContext,
@@ -108,19 +107,12 @@ const context =
 function Root(props: DockedDatePickerRootProps): ReactNode {
     const id = useId();
     const dir = useDirection();
-    const value = useControllable<
-        "value",
-        readonly string[],
-        { readonly value: readonly string[] }
-    >("DockedDatePicker", "value", props);
+    const value = useDateValue("DockedDatePicker", props);
     const open = useControllable<"open", boolean>(
         "DockedDatePicker",
         "open",
         props,
     );
-    const valueKey = value.value?.join(",");
-    const zagValue = useMemo(() => value.value?.map(parseIso), [valueKey]);
-    const [zagDefault] = useState(() => value.defaultValue?.map(parseIso));
     const service = useMachine(datePicker.machine, {
         id,
         dir,
@@ -129,12 +121,7 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
         // The label stands in for the format, which the supporting text shows.
         placeholder: " ",
         closeOnSelect: props.closeOnSelect ?? true,
-        value: zagValue,
-        defaultValue: zagDefault,
-        onValueChange: (details) =>
-            value.machineProps.onValueChange({
-                value: details.value.map(datePicker.toISO),
-            }),
+        ...value,
         ...open.machineProps,
     });
     const picker = datePicker.connect(service, normalizeProps);

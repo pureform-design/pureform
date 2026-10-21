@@ -14,6 +14,7 @@ import type {
     CalendarCellPart,
     CalendarCellSelection,
     CalendarView,
+    Controllable,
     DateSelectionMode,
     Unstyled,
 } from "@pureform/binding-core";
@@ -21,7 +22,9 @@ import type { MutableInteractionSource } from "@pureform/binding-core/interactio
 import * as datePicker from "@pureform/machines/date-picker";
 import type { InstanceTokens } from "@pureform/styling";
 import type { PropTypes } from "@zag-js/react";
-import type { ElementType, ReactNode } from "react";
+import { type ElementType, type ReactNode, useMemo, useState } from "react";
+
+import { useControllable } from "./controllable";
 
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PartContext } from "./part-context";
@@ -87,6 +90,37 @@ type Dict = Readonly<Record<string, unknown>>;
 /** An ISO date as Zag's date value. */
 export const parseIso = (value: string): datePicker.DateValue =>
     datePicker.parse(value);
+
+/** A Root's controllable `value` (ISO dates) as the props of Zag's date picker or date input,
+ *  which take and give date values: `value`, `defaultValue` and `onValueChange`. A date input's
+ *  value may hold an empty place, which isn't a date. */
+export function useDateValue(
+    component: string,
+    props: Controllable<
+        "value",
+        readonly string[],
+        { readonly value: readonly string[] }
+    >,
+) {
+    const value = useControllable<
+        "value",
+        readonly string[],
+        { readonly value: readonly string[] }
+    >(component, "value", props);
+    const valueKey = value.value?.join(",");
+    const zagValue = useMemo(() => value.value?.map(parseIso), [valueKey]);
+    const [zagDefault] = useState(() => value.defaultValue?.map(parseIso));
+    return {
+        value: zagValue,
+        defaultValue: zagDefault,
+        onValueChange: (details: {
+            readonly value: readonly datePicker.DateValue[];
+        }) =>
+            value.machineProps.onValueChange({
+                value: details.value.filter(Boolean).map(datePicker.toISO),
+            }),
+    };
+}
 
 /** Builds the calendar's parts over a picker's context. */
 export function calendarParts(context: PartContext<CalendarContext>) {

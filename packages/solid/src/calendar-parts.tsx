@@ -10,12 +10,13 @@ import {
     calendarCellSelection,
     calendarCellSelectionOf,
 } from "@pureform/binding-core";
-import type { CalendarView } from "@pureform/binding-core";
+import type { CalendarView, Controllable } from "@pureform/binding-core";
 import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as datePicker from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, createMemo, For, merge, omit } from "solid-js";
 
+import { useControllable } from "./controllable";
 import { ChevronEndIcon, ChevronStartIcon } from "./glyphs";
 import { useInteractionHandlers, useOwnInteractionSource } from "./interaction";
 import type { PropTypes } from "./internal/zag";
@@ -64,6 +65,36 @@ export type CalendarCellProps = CalendarPartProps & {
 /** An ISO date as Zag's date value. */
 export const parseDate = (value: string): datePicker.DateValue =>
     datePicker.parse(value);
+
+/** A Root's controllable `value` (ISO dates) as the props of Zag's date picker or date input,
+ *  which take and give date values: `value`, `defaultValue` and `onValueChange`. */
+export function useDateValue(
+    component: string,
+    props: Controllable<
+        "value",
+        readonly string[],
+        { readonly value: readonly string[] }
+    >,
+) {
+    const value = useControllable<
+        "value",
+        readonly string[],
+        { readonly value: readonly string[] }
+    >(component, "value", props);
+    return () => {
+        const state = value.machineProps();
+        return {
+            value: state.value?.map(parseDate),
+            defaultValue: state.defaultValue?.map(parseDate),
+            onValueChange: (details: {
+                readonly value: readonly datePicker.DateValue[];
+            }) =>
+                state.onValueChange({
+                    value: details.value.map(datePicker.toISO),
+                }),
+        };
+    };
+}
 
 const MONTH_COLUMNS = 1;
 const YEAR_COLUMNS = 3;
