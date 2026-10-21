@@ -392,6 +392,16 @@ export const displayRegistry = () =>
             "mask",
             "content",
         ]),
+        gridList: named("grid-list", [
+            "root",
+            "tile",
+            "content",
+            "media",
+            "header",
+            "footer",
+            "headline",
+            "subhead",
+        ]),
         card: named("card", [
             "root",
             "touchTarget",
