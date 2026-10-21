@@ -29,6 +29,7 @@ import { MoreIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import type { IconButtonProps } from "../icon-button";
 import { Menu } from "../menu";
+import { MENU_TRIGGER_ATTRIBUTES } from "../menu/menu";
 import { useComponent } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
@@ -121,18 +122,11 @@ function Element(props: {
     );
 }
 
-// The menu's own attributes on its trigger, which the overflow button replaces with its own.
-const TRIGGER_ATTRIBUTES = [
-    "data-scope",
-    "data-pf-part",
-    "data-testid",
-] as const;
-
 // The overflow button the menu's trigger renders: an icon button keeping its own part.
 function OverflowButton(props: IconButtonProps): JSX.Element {
     const own = omit(
         props as IconButtonProps & Record<string, unknown>,
-        ...TRIGGER_ATTRIBUTES,
+        ...MENU_TRIGGER_ATTRIBUTES,
     );
     return <IconButton {...(own as IconButtonProps)} />;
 }
