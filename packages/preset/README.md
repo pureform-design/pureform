@@ -1084,3 +1084,22 @@ instead.
 `gap`, `padding`. The bindings size each item inline from Material's keylines
 (`carouselItemSizes` in `@pureform/binding-core`); only the widths and the mask's inline offset are
 set from script.
+
+## Accordion and tree
+
+Material 3 specifies neither; their parts come from Angular Material's token names and Zag's part
+lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
+
+- `accordion`: slots `root` (a column of tiles, `itemGap` apart), `item` (a tile on
+  `surfaceContainer`, `radius` from the theme's medium role), `trigger` (the header: an interactive
+  list row, `headerHeight` plus the density offset; its bottom corners square while
+  `aria-expanded`), `leading`, `text` around `title` (`titleMedium`) and `description`,
+  `indicator` (turns over while its header is expanded; reduced motion drops the turn) and
+  `content`. One group, `density`; 0 compounds.
+- `tree`: slots `root` (its container, around the label and the tree), `label`, `tree`, `branch`,
+  `node` (every row: an interactive list row, `nodeHeight` plus the density offset, `nodeRadius`
+  from the full role), `leading`, `text`, `indicator` (as the accordion's, while the row is
+  `aria-expanded`) and `group` (a branch's children, `indent` from the start; no display of its
+  own, so `hidden` hides it). Groups `density` and `color` (the selected row's container); 0
+  compounds.
+- `expandIndicator(trailing, expanded)` (in `accordion.ts`) is the turning indicator both use.
