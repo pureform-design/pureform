@@ -30,6 +30,7 @@ import {
     merge,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -335,7 +336,7 @@ function ReadyMade(props: TreeProps): JSX.Element {
 
     const RowContent = (rowProps: { readonly node: Node }) => {
         const LeadingPart = optionalPart(
-            rowProps.node,
+            untrack(() => rowProps.node),
             "leading",
             Leading,
             leading.Optional,
