@@ -96,8 +96,10 @@ export function calendarParts(context: PartContext<CalendarContext>) {
         const { scope, picker, locale, weekStart } = context.use("Weekdays");
         return scope.render(part("weekdays"), {
             element: "div",
+            // Zag's head, hidden from assistive technology as Zag's is: each day's name
+            // already says its weekday.
             machine: {
-                ...picker.getTableRowProps({ view: "day" }),
+                ...picker.getTableHeadProps({ view: "day" }),
                 role: "row",
             },
             unstyled,

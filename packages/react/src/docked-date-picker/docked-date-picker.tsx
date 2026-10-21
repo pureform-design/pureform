@@ -28,7 +28,9 @@ import {
     type FormEvent,
     type ReactNode,
     useId,
+    useLayoutEffect,
     useMemo,
+    useRef,
     useState,
 } from "react";
 
@@ -124,6 +126,8 @@ function Root(props: DockedDatePickerRootProps): ReactNode {
         dir,
         ...dateMachineProps(props, parseIso),
         invalid: props.invalid || isPresent(props.error) || undefined,
+        // The label stands in for the format, which the supporting text shows.
+        placeholder: " ",
         closeOnSelect: props.closeOnSelect ?? true,
         value: zagValue,
         defaultValue: zagDefault,
@@ -186,8 +190,20 @@ function Container({ unstyled, ...props }: CalendarPartProps): ReactNode {
  *  focus. */
 function Input({ unstyled, ...props }: CalendarPartProps): ReactNode {
     const { scope, picker, setTyped } = context.use("Input");
+    const input = useRef<HTMLInputElement | null>(null);
+    const text = picker.valueAsString[0] ?? "";
+    // Zag writes a new value's text into the input an effect later; a value set by its owner
+    // shows in the same commit, unless the user is typing.
+    useLayoutEffect(() => {
+        const element = input.current;
+        if (element && element.ownerDocument.activeElement !== element)
+            element.value = text;
+    }, [text]);
     return scope.render("input", {
         element: "input",
+        ref: (element: HTMLElement | null) => {
+            input.current = element as HTMLInputElement | null;
+        },
         machine: {
             ...picker.getInputProps(),
             onInput: (event: FormEvent<HTMLInputElement>) =>

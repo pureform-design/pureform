@@ -90,6 +90,12 @@ export type {
     CalendarTableProps as DatePickerTableProps,
 };
 
+/** The open picker's day in the tab order. */
+const openDay = (): HTMLElement | null =>
+    document.querySelector<HTMLElement>(
+        '[data-scope="date-picker"][data-pf-part="content"][data-state="open"] [data-scope="calendar-cell"][data-pf-part="trigger"][tabindex="0"]',
+    );
+
 const chrome = dialogParts({
     name: "DatePicker",
     anatomy: datePickerOverlayAnatomy,
@@ -100,6 +106,8 @@ const chrome = dialogParts({
         closeOnEscape: props.closeOnEscape,
         closeOnInteractOutside: props.closeOnInteractOutside,
         restoreFocus: props.restoreFocus,
+        // Focus goes to the chosen day (or today), the one in the tab order, as it opens.
+        initialFocusEl: openDay,
     }),
     positionerLayout: (present) => dialogPositionerLayout(present),
 });
@@ -301,6 +309,8 @@ function ViewTrigger(props: DatePickerPartProps): JSX.Element {
             const api = picker();
             return {
                 ...api.getViewTriggerProps({ view: api.view }),
+                // Its text, the month and year, names it.
+                "aria-label": undefined,
                 onClick: () =>
                     picker().setView(picker().view === "day" ? "year" : "day"),
             };

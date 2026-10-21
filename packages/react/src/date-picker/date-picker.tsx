@@ -107,6 +107,12 @@ interface DatePickerContextValue extends CalendarContext {
 
 const NONE: readonly string[] = [];
 
+/** The open picker's day in the tab order. */
+const openDay = (): HTMLElement | null =>
+    document.querySelector<HTMLElement>(
+        '[data-scope="date-picker"][data-pf-part="content"][data-state="open"] [data-scope="calendar-cell"][data-pf-part="trigger"][tabindex="0"]',
+    );
+
 const chrome = dialogParts({
     name: "DatePicker",
     anatomy: datePickerOverlayAnatomy,
@@ -117,6 +123,8 @@ const chrome = dialogParts({
         closeOnEscape: props.closeOnEscape,
         closeOnInteractOutside: props.closeOnInteractOutside,
         restoreFocus: props.restoreFocus,
+        // Focus goes to the chosen day (or today), the one in the tab order, as it opens.
+        initialFocusEl: openDay,
     }),
     positionerLayout: (present) => dialogPositionerLayout(present),
 });

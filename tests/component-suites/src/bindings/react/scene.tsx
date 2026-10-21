@@ -10,6 +10,9 @@ import {
 import type { Indication } from "@pureform/react";
 import { AppBar } from "@pureform/react/app-bar";
 import { Autocomplete } from "@pureform/react/autocomplete";
+import { DateInput } from "@pureform/react/date-input";
+import { DatePicker } from "@pureform/react/date-picker";
+import { DockedDatePicker } from "@pureform/react/docked-date-picker";
 import { Avatar } from "@pureform/react/avatar";
 import { Badge } from "@pureform/react/badge";
 import { BottomSheet } from "@pureform/react/bottom-sheet";
@@ -131,6 +134,9 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     SearchView,
     Select,
     Autocomplete,
+    DatePicker,
+    DockedDatePicker,
+    DateInput,
     Separator,
     SideSheet,
     Slider,
