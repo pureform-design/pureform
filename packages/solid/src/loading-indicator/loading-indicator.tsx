@@ -13,7 +13,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, useComponent, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -61,15 +61,7 @@ function Root(props: LoadingIndicatorRootProps): JSX.Element {
     );
 }
 
-const part = (name: "container" | "indicator", label: string) =>
-    function Part(props: LoadingIndicatorPartProps): JSX.Element {
-        const { scope } = context.use(label);
-        return scope.render(name, {
-            element: "span",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const part = plainParts(context.use, "span");
 
 /** The container: round and filled when `contained`, empty otherwise. Holds `Indicator`. */
 const Container = part("container", "Container");

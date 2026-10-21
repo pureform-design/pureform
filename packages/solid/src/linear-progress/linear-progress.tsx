@@ -14,7 +14,7 @@ import type { JSX, ValidComponent } from "@solidjs/web";
 import { omit } from "solid-js";
 
 import { createPartContext } from "../part-context";
-import { createSlotProps, useComponent } from "../parts";
+import { createSlotProps, useComponent, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 
@@ -62,15 +62,7 @@ function Root(props: LinearProgressRootProps): JSX.Element {
     );
 }
 
-const part = (name: "track" | "indicator" | "stopIndicator", label: string) =>
-    function Part(props: LinearProgressPartProps): JSX.Element {
-        const { scope } = context.use(label);
-        return scope.render(name, {
-            element: "div",
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const part = plainParts(context.use, "div");
 
 /** The track: the rest of the bar, after the indicator and a gap. Empty. */
 const Track = part("track", "Track");
