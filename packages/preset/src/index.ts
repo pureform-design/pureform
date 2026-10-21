@@ -52,6 +52,7 @@ export * from "./components/rich-tooltip";
 export * from "./components/toast";
 export * from "./components/toolbar";
 export * from "./components/tooltip";
+export * from "./components/table";
 export * from "./components/tabs";
 export * from "./components/tags-input";
 export * from "./components/touch-target";
