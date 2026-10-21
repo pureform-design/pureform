@@ -74,6 +74,8 @@ export interface NavigationApi<T extends PropTypes = PropTypes> {
     getRootProps: () => T["element"];
     /** The rail's header, above the destinations: its menu button and FAB. */
     getHeaderProps: () => T["element"];
+    /** A section label over a run of an expanded rail's destinations. */
+    getSectionLabelProps: () => T["element"];
     getItemProps: (props: ItemProps) => T["element"];
     getIconProps: () => T["element"];
     getLabelProps: () => T["element"];

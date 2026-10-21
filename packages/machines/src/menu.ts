@@ -2,7 +2,10 @@
 // control, so its form behavior is unchanged. Each item, and each toggleable (checkbox or radio)
 // item, emits to its own interaction source: the highlighted item hovers, the pointer presses an
 // item, and Enter or Space presses the highlighted one. Zag's item groups and their labels
-// (`getItemGroupProps`, `getItemGroupLabelProps`) pass through unchanged.
+// (`getItemGroupProps`, `getItemGroupLabelProps`) pass through unchanged. A submenu is another
+// menu: its trigger item (`getTriggerItemProps`) emits to the parent's source under the child's
+// trigger id, the value the parent highlights it by. A key a submenu's content handles stops
+// there (Zag's), so it presses nothing in the parent's around it.
 
 import type {
     Machine as AnyMachine,
@@ -57,6 +60,14 @@ export function connect<T extends PropTypes>(
                 api.getContentProps(),
                 emitters,
                 api.highlightedValue,
+                normalize,
+            ),
+        getTriggerItemProps: (childApi) =>
+            itemPressProps(
+                api.getTriggerItemProps(childApi),
+                emitters,
+                (childApi.getTriggerProps() as { id: string }).id,
+                false,
                 normalize,
             ),
         getItemProps: (props) =>

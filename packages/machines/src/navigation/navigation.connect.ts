@@ -45,6 +45,12 @@ export function connect<T extends PropTypes>(
                 dir: prop("dir"),
             });
         },
+        getSectionLabelProps() {
+            return normalize.element({
+                ...parts.sectionLabel.attrs,
+                dir: prop("dir"),
+            });
+        },
         // Each destination emits to its own interaction source.
         getItemProps(item) {
             const state = getItemState(item);
