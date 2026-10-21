@@ -13,6 +13,17 @@ export const GLYPH_PATHS = {
     dropDown: "M7 10l5 5 5-5z",
     /** Three dots in a column: a toolbar's overflow button. */
     more: "M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4m0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4",
+    /** A chevron pointing toward the start: a calendar's previous button (mirror it under right
+     *  to left). */
+    chevronStart: "M15.41 7.41 14 6l-6 6 6 6 1.41-1.41L10.83 12z",
+    /** A chevron pointing toward the end: a calendar's next button (mirror it under right to
+     *  left). */
+    chevronEnd: "M8.59 16.59 10 18l6-6-6-6-1.41 1.41L13.17 12z",
+    /** A calendar page: the docked date picker's button and the date input's mode toggle. */
+    calendar:
+        "M19 4h-1V2h-2v2H8V2H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2m0 16H5V10h14zm0-12H5V6h14z",
+    /** A pencil: the modal date picker's mode toggle to the date input. */
+    edit: "M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z",
 } as const;
 
 /** Each toast type's icon: a check, a warning triangle, an error or info disc, or a partial ring
