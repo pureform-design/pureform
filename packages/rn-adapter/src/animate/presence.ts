@@ -11,7 +11,7 @@ import type {
     PresenceStep,
     PresenceView,
 } from "../motion";
-import { NATIVE_DRIVER, curve } from "./curve";
+import { NATIVE_DRIVER, animate } from "./curve";
 
 const NO_PROPS = Object.freeze({});
 
@@ -65,12 +65,7 @@ export const animatedPresence = (): PresenceDriver => {
             // The other step starts from its first frame next time.
             progress[phase === "enter" ? "exit" : "enter"].setValue(0);
             progress[phase].setValue(0);
-            const animation = Animated.timing(progress[phase], {
-                toValue: 1,
-                duration: step.duration,
-                easing: curve(step.easing),
-                useNativeDriver: NATIVE_DRIVER,
-            });
+            const animation = animate(progress[phase], step, NATIVE_DRIVER);
             animation.start(({ finished }) => {
                 if (finished) done(phase);
             });
