@@ -122,7 +122,24 @@ export interface MenuItem<Node = unknown> extends InteractionSourceProps {
     /** Flip the icons under `rtl`, for icons that point. */
     readonly mirrorLeadingIcon?: boolean | undefined;
     readonly mirrorTrailingIcon?: boolean | undefined;
+    /** A submenu's items: the item opens them in a menu beside it, an arrow in its trailing
+     *  place, instead of being chosen. */
+    readonly items?: readonly MenuItem<Node>[] | undefined;
 }
+
+/** Whether a ready-made item opens a submenu. */
+export const hasSubmenu = (item: Pick<MenuItem, "items">): boolean =>
+    (item.items?.length ?? 0) > 0;
+
+/** Where a submenu opens: beside its trigger item, toward the end of the line. */
+export const submenuPositioning = (
+    dir: "ltr" | "rtl",
+    positioning?: OverlayPositioning,
+): OverlayPositioning => ({
+    placement: dir === "rtl" ? "left-start" : "right-start",
+    gutter: 0,
+    ...positioning,
+});
 
 /** A group of the ready-made menu's items, with an optional label. */
 export interface MenuGroup<Node = unknown> {
