@@ -3995,9 +3995,9 @@ export const carouselAnatomy = {
     ],
 } as const satisfies ComponentAnatomy;
 
-export const tableAnatomy = {
-    name: "table",
-    scope: "table",
+export const dataTableAnatomy = {
+    name: "dataTable",
+    scope: "data-table",
     root: "root",
     partNames: [
         "root",
@@ -4020,7 +4020,7 @@ export const tableAnatomy = {
         root: {
             name: "root",
             attribute: "root",
-            testId: "pf-table-root",
+            testId: "pf-data-table-root",
             parent: null,
             children: ["header", "body", "footer"],
             styled: true,
@@ -4029,7 +4029,7 @@ export const tableAnatomy = {
         header: {
             name: "header",
             attribute: "header",
-            testId: "pf-table-header",
+            testId: "pf-data-table-header",
             parent: "root",
             children: ["headerRow"],
             styled: true,
@@ -4038,7 +4038,7 @@ export const tableAnatomy = {
         body: {
             name: "body",
             attribute: "body",
-            testId: "pf-table-body",
+            testId: "pf-data-table-body",
             parent: "root",
             children: ["row", "alternateRow"],
             styled: true,
@@ -4047,7 +4047,7 @@ export const tableAnatomy = {
         footer: {
             name: "footer",
             attribute: "footer",
-            testId: "pf-table-footer",
+            testId: "pf-data-table-footer",
             parent: "root",
             children: ["footerRow"],
             styled: true,
@@ -4056,7 +4056,7 @@ export const tableAnatomy = {
         headerRow: {
             name: "headerRow",
             attribute: "header-row",
-            testId: "pf-table-header-row",
+            testId: "pf-data-table-header-row",
             parent: "header",
             children: ["headerCell"],
             styled: true,
@@ -4065,7 +4065,7 @@ export const tableAnatomy = {
         row: {
             name: "row",
             attribute: "row",
-            testId: "pf-table-row",
+            testId: "pf-data-table-row",
             parent: "body",
             children: ["selectionCell", "cell"],
             styled: true,
@@ -4074,7 +4074,7 @@ export const tableAnatomy = {
         alternateRow: {
             name: "alternateRow",
             attribute: "alternate-row",
-            testId: "pf-table-alternate-row",
+            testId: "pf-data-table-alternate-row",
             parent: "body",
             children: [],
             styled: true,
@@ -4083,7 +4083,7 @@ export const tableAnatomy = {
         footerRow: {
             name: "footerRow",
             attribute: "footer-row",
-            testId: "pf-table-footer-row",
+            testId: "pf-data-table-footer-row",
             parent: "footer",
             children: ["footerCell"],
             styled: true,
@@ -4092,7 +4092,7 @@ export const tableAnatomy = {
         headerCell: {
             name: "headerCell",
             attribute: "header-cell",
-            testId: "pf-table-header-cell",
+            testId: "pf-data-table-header-cell",
             parent: "headerRow",
             children: ["sortHeader"],
             styled: true,
@@ -4101,7 +4101,7 @@ export const tableAnatomy = {
         cell: {
             name: "cell",
             attribute: "cell",
-            testId: "pf-table-cell",
+            testId: "pf-data-table-cell",
             parent: "row",
             children: [],
             styled: true,
@@ -4110,7 +4110,7 @@ export const tableAnatomy = {
         footerCell: {
             name: "footerCell",
             attribute: "footer-cell",
-            testId: "pf-table-footer-cell",
+            testId: "pf-data-table-footer-cell",
             parent: "footerRow",
             children: [],
             styled: true,
@@ -4119,7 +4119,7 @@ export const tableAnatomy = {
         selectionCell: {
             name: "selectionCell",
             attribute: "selection-cell",
-            testId: "pf-table-selection-cell",
+            testId: "pf-data-table-selection-cell",
             parent: "row",
             children: [],
             styled: true,
@@ -4128,7 +4128,7 @@ export const tableAnatomy = {
         sortHeader: {
             name: "sortHeader",
             attribute: "sort-header",
-            testId: "pf-table-sort-header",
+            testId: "pf-data-table-sort-header",
             parent: "headerCell",
             children: ["sortLabel", "sortIndicator"],
             styled: true,
@@ -4137,7 +4137,7 @@ export const tableAnatomy = {
         sortLabel: {
             name: "sortLabel",
             attribute: "sort-label",
-            testId: "pf-table-sort-label",
+            testId: "pf-data-table-sort-label",
             parent: "sortHeader",
             children: [],
             styled: true,
@@ -4146,7 +4146,7 @@ export const tableAnatomy = {
         sortIndicator: {
             name: "sortIndicator",
             attribute: "sort-indicator",
-            testId: "pf-table-sort-indicator",
+            testId: "pf-data-table-sort-indicator",
             parent: "sortHeader",
             children: [],
             styled: true,
@@ -4316,7 +4316,7 @@ export const anatomy = {
     richTooltip: richTooltipAnatomy,
     card: cardAnatomy,
     carousel: carouselAnatomy,
-    table: tableAnatomy,
+    dataTable: dataTableAnatomy,
     scrim: scrimAnatomy,
     ripple: rippleAnatomy,
     icon: iconAnatomy,
@@ -4746,22 +4746,22 @@ export const testIds = {
         mask: "pf-carousel-mask",
         content: "pf-carousel-content",
     },
-    table: {
-        root: "pf-table-root",
-        header: "pf-table-header",
-        body: "pf-table-body",
-        footer: "pf-table-footer",
-        headerRow: "pf-table-header-row",
-        row: "pf-table-row",
-        alternateRow: "pf-table-alternate-row",
-        footerRow: "pf-table-footer-row",
-        headerCell: "pf-table-header-cell",
-        cell: "pf-table-cell",
-        footerCell: "pf-table-footer-cell",
-        selectionCell: "pf-table-selection-cell",
-        sortHeader: "pf-table-sort-header",
-        sortLabel: "pf-table-sort-label",
-        sortIndicator: "pf-table-sort-indicator",
+    dataTable: {
+        root: "pf-data-table-root",
+        header: "pf-data-table-header",
+        body: "pf-data-table-body",
+        footer: "pf-data-table-footer",
+        headerRow: "pf-data-table-header-row",
+        row: "pf-data-table-row",
+        alternateRow: "pf-data-table-alternate-row",
+        footerRow: "pf-data-table-footer-row",
+        headerCell: "pf-data-table-header-cell",
+        cell: "pf-data-table-cell",
+        footerCell: "pf-data-table-footer-cell",
+        selectionCell: "pf-data-table-selection-cell",
+        sortHeader: "pf-data-table-sort-header",
+        sortLabel: "pf-data-table-sort-label",
+        sortIndicator: "pf-data-table-sort-indicator",
     },
     scrim: { root: "pf-scrim-root" },
     ripple: { root: "pf-ripple-root", ripple: "pf-ripple-ripple" },

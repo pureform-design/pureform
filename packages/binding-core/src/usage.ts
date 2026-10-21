@@ -254,7 +254,7 @@ export const COMPONENT_USAGE = {
     // The selection column's checkboxes are checkboxes; `striped` picks the rows' part.
     table: {
         entries: {
-            table: same("stickyHeader", "density"),
+            dataTable: same("stickyHeader", "density"),
             checkbox: {},
             ripple: {},
         },

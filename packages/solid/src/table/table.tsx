@@ -5,7 +5,7 @@
 // ready-made Table, which renders and sorts its rows from data. Every element keeps its table
 // role, which the preset's flex layout would otherwise drop.
 
-import { tableAnatomy } from "@pureform/anatomy";
+import { dataTableAnatomy } from "@pureform/anatomy";
 import type { PartName } from "@pureform/anatomy";
 import {
     isPresent,
@@ -49,7 +49,7 @@ import type { ComponentScope, SlotKeyedProps } from "../parts";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
-type Anatomy = typeof tableAnatomy;
+type Anatomy = typeof dataTableAnatomy;
 type Api = table.Api<PropTypes>;
 
 /** What Root shares with its parts. */
@@ -109,7 +109,7 @@ function Root(props: TableRootProps): JSX.Element {
         } as table.Props;
     });
     const api = createMemo(() => table.connect(service, normalizeProps));
-    const scope = useComponent(tableAnatomy, {
+    const scope = useComponent(dataTableAnatomy, {
         selection: () => tableSelection(props),
         testId: () => props.testId,
         unstyled: () => props.unstyled,

@@ -12,7 +12,7 @@ import { byTestId, computed, mount, settle, until } from "../testing/render";
 let registry: TestRegistry;
 
 beforeAll(async () => {
-    registry = await presetRegistry(["table", "checkbox", "ripple"]);
+    registry = await presetRegistry(["dataTable", "checkbox", "ripple"]);
 });
 
 const render = (node: ReactNode) =>
@@ -38,20 +38,22 @@ const COLUMNS = [
 ];
 
 const names = () =>
-    all("pf-table-cell")
+    all("pf-data-table-cell")
         .filter((_, index) => index % 2 === 0)
         .map((cell) => cell.textContent);
 
 describe("table", () => {
     it("lays out its rows with their roles, a rule under each", async () => {
         await render(<Table columns={COLUMNS} rows={ELEMENTS} />);
-        expect(byTestId("pf-table-root").getAttribute("role")).toBe("table");
-        expect(all("pf-table-row")).toHaveLength(3);
+        expect(byTestId("pf-data-table-root").getAttribute("role")).toBe(
+            "table",
+        );
+        expect(all("pf-data-table-row")).toHaveLength(3);
         expect(names()).toEqual(["Hydrogen", "Helium", "Lithium"]);
-        expect(byTestId("pf-table-footer-row").textContent).toBe("Total");
-        expect(computed("pf-table-header-row").minHeight).toBe("56px");
-        expect(computed("pf-table-row").minHeight).toBe("52px");
-        expect(computed("pf-table-row").borderBottomWidth).toBe("1px");
+        expect(byTestId("pf-data-table-footer-row").textContent).toBe("Total");
+        expect(computed("pf-data-table-header-row").minHeight).toBe("56px");
+        expect(computed("pf-data-table-row").minHeight).toBe("52px");
+        expect(computed("pf-data-table-row").borderBottomWidth).toBe("1px");
     });
 
     it("sorts by a header's button and shows the arrow", async () => {
@@ -63,17 +65,17 @@ describe("table", () => {
                 onSortChange={onSortChange}
             />,
         );
-        expect(computed("pf-table-sort-indicator").opacity).toBe("0");
-        await userEvent.click(byTestId("pf-table-sort-header"));
+        expect(computed("pf-data-table-sort-indicator").opacity).toBe("0");
+        await userEvent.click(byTestId("pf-data-table-sort-header"));
         await settle();
         expect(names()).toEqual(["Helium", "Hydrogen", "Lithium"]);
         await until(() =>
-            expect(computed("pf-table-sort-indicator").opacity).toBe("1"),
+            expect(computed("pf-data-table-sort-indicator").opacity).toBe("1"),
         );
         expect(
-            byTestId("pf-table-sort-header").getAttribute("aria-label"),
+            byTestId("pf-data-table-sort-header").getAttribute("aria-label"),
         ).toBe("Name, sorted ascending");
-        await userEvent.click(byTestId("pf-table-sort-header"));
+        await userEvent.click(byTestId("pf-data-table-sort-header"));
         await settle();
         expect(names()).toEqual(["Lithium", "Hydrogen", "Helium"]);
         expect(onSortChange).toHaveBeenLastCalledWith({
@@ -91,7 +93,7 @@ describe("table", () => {
                 onSelectionChange={onSelectionChange}
             />,
         );
-        const rest = computed("pf-table-row").backgroundColor;
+        const rest = computed("pf-data-table-row").backgroundColor;
         const boxes = all("pf-checkbox-root");
         expect(boxes).toHaveLength(4);
         await userEvent.click(boxes[1]!);
@@ -99,12 +101,12 @@ describe("table", () => {
         expect(onSelectionChange).toHaveBeenLastCalledWith({
             selection: ["h"],
         });
-        expect(all("pf-table-row")[0]!.getAttribute("aria-selected")).toBe(
+        expect(all("pf-data-table-row")[0]!.getAttribute("aria-selected")).toBe(
             "true",
         );
         await until(() =>
             expect(
-                getComputedStyle(all("pf-table-row")[0]!).backgroundColor,
+                getComputedStyle(all("pf-data-table-row")[0]!).backgroundColor,
             ).not.toBe(rest),
         );
         await userEvent.click(boxes[0]!);
@@ -118,11 +120,11 @@ describe("table", () => {
         await render(
             <Table columns={COLUMNS} rows={ELEMENTS} striped density="-2" />,
         );
-        expect(all("pf-table-row")).toHaveLength(2);
-        expect(all("pf-table-alternate-row")).toHaveLength(1);
-        expect(computed("pf-table-alternate-row").backgroundColor).not.toBe(
-            computed("pf-table-row").backgroundColor,
-        );
-        expect(computed("pf-table-row").minHeight).toBe("44px");
+        expect(all("pf-data-table-row")).toHaveLength(2);
+        expect(all("pf-data-table-alternate-row")).toHaveLength(1);
+        expect(
+            computed("pf-data-table-alternate-row").backgroundColor,
+        ).not.toBe(computed("pf-data-table-row").backgroundColor);
+        expect(computed("pf-data-table-row").minHeight).toBe("44px");
     });
 });
