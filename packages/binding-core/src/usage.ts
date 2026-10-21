@@ -256,6 +256,9 @@ export const COMPONENT_USAGE = {
     },
     "time-input": { entries: { timeInput: {}, ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },
+    stepper: {
+        entries: { stepper: same("orientation", "density"), ripple: {} },
+    },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.
     tabs: {
