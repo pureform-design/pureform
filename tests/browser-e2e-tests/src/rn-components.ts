@@ -5,6 +5,8 @@ export const RN_COMPONENTS = [
     "button",
     "card",
     "carousel",
+    "accordion",
+    "tree",
     "chip",
     "inputChip",
     "checkbox",

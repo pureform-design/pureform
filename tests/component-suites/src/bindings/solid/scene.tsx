@@ -7,6 +7,7 @@ import {
     PureformProvider,
 } from "@pureform/solid";
 import type { Indication } from "@pureform/solid";
+import { Accordion } from "@pureform/solid/accordion";
 import { AppBar } from "@pureform/solid/app-bar";
 import { Autocomplete } from "@pureform/solid/autocomplete";
 import { Avatar } from "@pureform/solid/avatar";
@@ -63,6 +64,7 @@ import type { ToastData } from "@pureform/solid/toast";
 import { Toolbar } from "@pureform/solid/toolbar";
 import { Tooltip } from "@pureform/solid/tooltip";
 import { TouchTarget } from "@pureform/solid/touch-target";
+import { Tree } from "@pureform/solid/tree";
 import { Dynamic } from "@solidjs/web";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import { type Accessor, omit, untrack } from "solid-js";
@@ -101,6 +103,8 @@ export const components: Record<ComponentName, ValidComponent> = {
     ButtonGroup,
     Card,
     Carousel,
+    Accordion,
+    Tree,
     Checkbox,
     Chip,
     CircularProgress,
