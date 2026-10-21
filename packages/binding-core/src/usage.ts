@@ -50,7 +50,6 @@ export const COMPONENT_USAGE = {
         entries: {
             dockedDatePicker: same("variant", "color", "density"),
             calendarCell: {},
-            button: {},
             iconButton: {},
             ripple: {},
         },

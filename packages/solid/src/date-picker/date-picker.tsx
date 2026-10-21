@@ -405,8 +405,8 @@ function ReadyMadeContent(props: {
             <Controls {...slots("controls")}>
                 <ViewTrigger {...slots("viewTrigger")} />
                 <Show when={picker().view === "day"}>
-                    <Prev {...slots("prev")} />
-                    <Next {...slots("next")} />
+                    <Prev as={IconButton} {...slots("prev")} />
+                    <Next as={IconButton} {...slots("next")} />
                 </Show>
             </Controls>
             <Show

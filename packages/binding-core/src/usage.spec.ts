@@ -9,7 +9,7 @@ import type { ComponentSubpath } from "./usage";
 const SOURCES = import.meta.glob<string>(
     [
         "../../{solid,react,react-native}/src/*/*.{ts,tsx}",
-        "../../{solid,react,react-native}/src/{navigation,text-input,single-part,progress}.tsx",
+        "../../{solid,react,react-native}/src/{navigation,text-input,single-part,progress,calendar-parts,calendar}.tsx",
         "!../../{solid,react,react-native}/src/*/*.spec.*",
     ],
     { query: "?raw", import: "default", eager: true },
@@ -80,6 +80,7 @@ const SHARED: Readonly<Record<string, readonly string[]>> = {
         "text",
         "touch-target",
     ],
+    "calendar-parts.tsx": ["date-picker", "docked-date-picker"],
 };
 
 // React Native's shared files: its tabs share the navigation's, its progress indicators share one,
@@ -89,6 +90,7 @@ const NATIVE_SHARED: Readonly<Record<string, readonly string[]>> = {
     "navigation.tsx": ["tabs", "navigation-bar", "navigation-rail"],
     "text-input.tsx": ["text-field", "text-area", "select"],
     "progress.tsx": ["linear-progress", "circular-progress"],
+    "calendar.tsx": ["date-picker", "docked-date-picker"],
     "single-part.tsx": [
         "avatar",
         "badge",
@@ -255,7 +257,17 @@ describe("COMPONENT_USAGE", () => {
                 )) {
                     const drawn = drawnBy(
                         binding,
-                        sources(binding, subpath).join("\n"),
+                        [
+                            ...sources(binding, subpath),
+                            // The calendar's parts draw each picker's cells.
+                            ...(SHARED["calendar-parts.tsx"]!.includes(subpath)
+                                ? [
+                                      SOURCES[
+                                          `../../${binding}/src/calendar-parts.tsx`
+                                      ]!,
+                                  ]
+                                : []),
+                        ].join("\n"),
                     );
                     const own = Object.keys(entries);
                     expect(own.sort(), subpath).toEqual([...drawn].sort());
