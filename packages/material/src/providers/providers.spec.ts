@@ -1,5 +1,7 @@
+import { linearEasingAt } from "@pureform/core";
 import {
     cubicBezier,
+    spring,
     none,
     numeric,
     pct,
@@ -11,6 +13,7 @@ import { resolveTheme } from "@pureform/theme";
 import { describe, expect, it } from "vitest";
 
 import {
+    MATERIAL_EASINGS,
     materialColor,
     materialElevation,
     materialLayout,
@@ -126,6 +129,68 @@ describe("Material providers", () => {
         );
         expect(theme.motion.durations.medium2).toEqual(numeric(200, "ms"));
         expect(theme.motion.easings.bounce).toBeDefined();
+    });
+
+    it("gives M3's springs for each motion scheme, standard by default", () => {
+        const springs = (options?: Parameters<typeof materialMotion>[0]) =>
+            resolveTheme({ ...material(), motion: materialMotion(options) })
+                .motion.springs;
+        const physics = (s: { stiffness: number; damping: number }) => [
+            s.stiffness,
+            s.damping,
+        ];
+        expect(physics(springs().spatialFast)).toEqual([1400, 0.9]);
+        expect(physics(springs().spatialDefault)).toEqual([700, 0.9]);
+        expect(physics(springs().spatialSlow)).toEqual([300, 0.9]);
+        expect(physics(springs().effectsFast)).toEqual([3800, 1]);
+        expect(physics(springs().effectsDefault)).toEqual([1600, 1]);
+        expect(physics(springs().effectsSlow)).toEqual([800, 1]);
+        const expressive = springs({ scheme: "expressive" });
+        expect(physics(expressive.spatialFast)).toEqual([800, 0.6]);
+        expect(physics(expressive.spatialDefault)).toEqual([380, 0.8]);
+        expect(physics(expressive.spatialSlow)).toEqual([200, 0.8]);
+        expect(physics(expressive.effectsDefault)).toEqual([1600, 1]);
+        expect(
+            springs({
+                scheme: "expressive",
+                springs: { spatialFast: spring({ stiffness: 1, damping: 1 }) },
+            }).spatialFast.stiffness,
+        ).toBe(1);
+        expect(springs().spatialFast.mass).toBe(1);
+    });
+
+    it("draws emphasized along M3's two-segment path", () => {
+        const emphasized = MATERIAL_EASINGS.emphasized;
+        if (emphasized.kind !== "linear") throw new Error("not linear()");
+        // Points on the path, from each segment's parameter.
+        const cubic = (p: number[], t: number) =>
+            (1 - t) ** 3 * p[0]! +
+            3 * (1 - t) ** 2 * t * p[1]! +
+            3 * (1 - t) * t * t * p[2]! +
+            t ** 3 * p[3]!;
+        const segments = [
+            [
+                [0, 0.05, 0.133333, 0.166666],
+                [0, 0, 0.06, 0.4],
+            ],
+            [
+                [0.166666, 0.208333, 0.25, 1],
+                [0.4, 0.82, 1, 1],
+            ],
+        ];
+        for (const [xs, ys] of segments) {
+            for (let i = 0; i <= 50; i++) {
+                const t = i / 50;
+                expect(
+                    Math.abs(
+                        linearEasingAt(emphasized.points, cubic(xs!, t)) -
+                            cubic(ys!, t),
+                    ),
+                ).toBeLessThan(0.0012);
+            }
+        }
+        // It's no longer the standard curve.
+        expect(emphasized).not.toEqual(MATERIAL_EASINGS.standard);
     });
 
     it("draw the focus indicator inside the element for an inset focus ring", () => {

@@ -119,6 +119,9 @@ export const aliasTarget = (path: string[]): AliasTarget => {
             return { kind: "token", ref: `durations.${rest.join(".")}` };
         case "easings":
             return { kind: "token", ref: `easings.${rest.join(".")}` };
+        case "springs":
+            // A spring is two tokens on the web, `<name>.duration` and `<name>.easing`.
+            return { kind: "token", ref: `springs.${rest.join(".")}` };
         case "fonts":
             return { kind: "token", ref: `fonts.${rest.join(".")}` };
         case "textStyles":

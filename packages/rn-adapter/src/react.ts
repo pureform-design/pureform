@@ -14,7 +14,7 @@ import type { ReactNode } from "react";
 import { Animated, View } from "react-native";
 import type { StyleProp, ViewProps, ViewStyle } from "react-native";
 
-import { curve } from "./animate/curve";
+import { animate } from "./animate/curve";
 import { componentFactory } from "./factory";
 import type { Environment, NativeFactory } from "./factory";
 import { movingTokens, tokenTransitions, tokensAt } from "./motion";
@@ -22,7 +22,7 @@ import { overridesFor, themeKey, withDerived } from "./resolve";
 import type { Overrides, Styles } from "./resolve";
 import type { Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import type { ThemeValues, Transition } from "./values";
+import type { Spring, ThemeValues, Transition } from "./values";
 
 interface Context {
     factory: (name: string) => NativeFactory;
@@ -178,10 +178,26 @@ export const OverridesLayer = (props: {
 // A selection's motion, `by` times as long.
 const slowed = (selected: Selected, by: number): Selected => {
     if (by === 1) return selected;
-    const time = <T extends { duration: number; delay: number }>(t: T): T => ({
-        ...t,
+    // A spring `by` times as slow: its stiffness over by², its damping coefficient over by. At
+    // no time at all it's dropped, so the change is instant.
+    const time = <
+        T extends { duration: number; delay: number; spring?: Spring },
+    >({
+        spring,
+        ...t
+    }: T): T => ({
+        ...(t as T),
         duration: t.duration * by,
         delay: t.delay * by,
+        ...(spring && by > 0
+            ? {
+                  spring: {
+                      ...spring,
+                      stiffness: spring.stiffness / (by * by),
+                      damping: spring.damping / by,
+                  },
+              }
+            : {}),
     });
     const map = <T, U>(record: Record<string, T>, f: (value: T) => U) =>
         Object.fromEntries(Object.entries(record).map(([k, v]) => [k, f(v)]));
@@ -358,13 +374,7 @@ const useMovingTokens = (
             shown.current = next;
             setNow(next);
         });
-        Animated.timing(progress, {
-            toValue: 1,
-            duration: timing.duration,
-            delay: timing.delay,
-            easing: curve(timing.easing),
-            useNativeDriver: false,
-        }).start(({ finished }) => {
+        animate(progress, timing, false).start(({ finished }) => {
             if (!finished) return;
             shown.current = tokens;
             setNow(undefined);

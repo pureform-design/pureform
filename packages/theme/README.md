@@ -17,7 +17,7 @@ any provider in its place.
 | `shape`      | Radii `none`, `extraSmall`, `small`, `medium`, `large`, `extraLarge`, `full`                                                                                                                                                                                                       |
 | `layout`     | Spacing steps `0` through `16` and sizes `iconSmall` through `touchTarget`; optionally the density steps and the stacking scale (`zIndices`, every layer of `STACKING_ROLES`), Material's when left out                                                                            |
 | `state`      | Opacities `stateHover`, `stateFocus`, `statePressed`, `stateDragged`, `disabledContainer`, `disabledContent`, `scrim`; the focus indicator's `focusIndicatorThickness` and `focusIndicatorOuterOffset` (lengths, lowered beside the sizes and read through `focusIndicator(name)`) |
-| `motion`     | Durations `short1` through `extraLong4` and easings `standard` through `linear`                                                                                                                                                                                                    |
+| `motion`     | Durations `short1` through `extraLong4`, easings `standard` through `linear`, and springs `spatialFast`, `spatialDefault`, `spatialSlow`, `effectsFast`, `effectsDefault`, `effectsSlow` (`SPRING_ROLES`)                                                                          |
 | `elevation`  | A `{ shadow, tint }` pair for each of `level0` through `level5`                                                                                                                                                                                                                    |
 
 Each contract is a TypeScript type, so a missing name or a value of the wrong kind fails to
@@ -162,3 +162,9 @@ values refer to.
   `zIndex` tokens, Tailwind's `z-<name>`), so a named or runtime theme can change it too. Read a
   layer in a spec with `zIndex("menu")`, or in an app with the target's token
   (`css({ zIndex: "raised" })`).
+- **Springs:** the motion contract's `springs` are `SpringNode`s for each of `SPRING_ROLES`
+  (spatial springs move things and may bounce; effects springs fade and don't), lowered to
+  `config.springs`. Read one with `spring("spatialFast")`, as a transition's or animation's
+  timing: `tween("transform", { spring: spring("spatialFast") })`. Web targets write each as
+  `--springs-<name>-duration` and `--springs-<name>-easing` (a sampled `linear()` curve); React
+  Native runs it as a spring.

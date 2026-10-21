@@ -29,16 +29,17 @@ It depends on nothing else in the workspace.
 | `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                             |
 | `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                   |
 | `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops. |
+| `spring.ts`           | Springs and `linear()` curves: `springAt`, `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points.       |
 
 ## Public API
 
-| Entry                          | Exports                                                                                                         |
-| ------------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `@pureform/core`               | Builders, `typed`, path resolution, `STATE_ATTRIBUTES`, `MOTION_ATTRIBUTE`, `transitionMoves`, the schema types |
-| `@pureform/core/ast`           | Node types and every helper constructor                                                                         |
-| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                             |
-| `@pureform/core/types`         | The schema types alone                                                                                          |
-| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                                                        |
+| Entry                          | Exports                                                                                                                         |
+| ------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| `@pureform/core`               | Builders, `typed`, path resolution, `STATE_ATTRIBUTES`, `MOTION_ATTRIBUTE`, `transitionMoves`, `sampleSpring`, the schema types |
+| `@pureform/core/ast`           | Node types and every helper constructor                                                                                         |
+| `@pureform/core/ast/helpers/*` | One helper group per module (`keyword`, `color`, …)                                                                             |
+| `@pureform/core/types`         | The schema types alone                                                                                                          |
+| `@pureform/core/raw`           | The untyped builders, to opt out of `typed()` explicitly                                                                        |
 
 ```ts
 import { defineComponent } from "@pureform/core";
@@ -102,6 +103,33 @@ transitionMoves("backgroundColor"); // false
 transitionMoves("insetInlineStart"); // true
 MOTION_ATTRIBUTE; // "data-pf-motion", set to "reduce" or "full" by a provider
 ```
+
+Springs follow the same rule: a spring on a moving property is instant under reduced motion
+(its part drops out like any other), and a spring on a fade keeps running.
+
+### Springs and `linear()` easings
+
+`linearEasing(...points)` is CSS's `linear()`: each point an output and, optionally, where along
+the input it sits in percent. `spring({ stiffness, damping, mass? })` is a damped spring by its
+physics (`damping` is the ratio ζ, 1 critical); `spring({ duration, bounce })` converts a
+perceptual duration (ms) and bounce at build time. A spring isn't an easing: it times a whole
+motion, so a transition part or an animation takes a `Timing`, either `{ duration, easing?,
+delay? }` or `{ spring, delay? }`, never both (a type error, and `validateConfig` throws a
+`MotionConfigError` for an untyped config). `CoreConfig.springs` holds spring tokens, read with
+`alias("springs", name)`.
+
+```ts
+import { spring, transition, tween, alias } from "@pureform/core/ast";
+
+const springs = { spatialFast: spring({ stiffness: 1400, damping: 0.9 }) };
+transition(tween("transform", { spring: alias("springs", "spatialFast") }));
+```
+
+Web targets have no spring, so `sampleSpring(spring)` turns one into a duration and a `linear()`
+curve: the closed-form solution of the damped spring, run until it stays within `tolerance`
+(0.001) of its target, sampled densely and simplified to within `precision` (0.002), at most
+`maxPoints` (48). Every web adapter uses it, so they agree. `sampleCubicPath(segments)` does the
+same for an easing path of cubic segments (Android's path easings).
 
 ### Variable fonts
 

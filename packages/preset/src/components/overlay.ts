@@ -23,8 +23,8 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { StyleMap } from "@pureform/core/ast";
-import { duration, easing, spacing } from "@pureform/theme";
-import type { DurationRole, EasingRole } from "@pureform/theme";
+import { duration, easing, spacing, spring } from "@pureform/theme";
+import type { DurationRole, EasingRole, SpringRole } from "@pureform/theme";
 
 const FADE_IN = "overlayFadeIn";
 const FADE_OUT = "overlayFadeOut";
@@ -64,16 +64,28 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     },
 };
 
-/** One way in or out: the keyframes, and the theme's duration and easing for them. A fade
- *  moves nothing, so reduced motion keeps it as it is. */
-export interface OverlayMotionStep {
+/** How long a motion takes and how it eases, as the theme names them: a duration and easing
+ *  role, or a spring role, which sets both. */
+export type MotionTiming =
+    | {
+          readonly duration: DurationRole;
+          readonly easing: EasingRole;
+          readonly spring?: never;
+      }
+    | {
+          readonly spring: SpringRole;
+          readonly duration?: never;
+          readonly easing?: never;
+      };
+
+/** One way in or out: the keyframes, and the theme's duration and easing for them, or its
+ *  spring. A fade moves nothing, so reduced motion keeps it as it is. */
+export type OverlayMotionStep = {
     readonly keyframes: string;
     /** The keyframes under right to left, for a motion that moves sideways (translation is
      *  physical): a side sheet's slide. */
     readonly rtl?: string;
-    readonly duration: DurationRole;
-    readonly easing: EasingRole;
-}
+} & MotionTiming;
 
 /** How an overlay enters and leaves. */
 export interface OverlayMotion {
@@ -86,6 +98,24 @@ export interface OverlayMotion {
 
 const FADES = new Set([FADE_IN, FADE_OUT]);
 
+/** One run of a keyframes on a timing the theme names: a duration and easing role, or a spring
+ *  role. `forwards` holds the last frame (an exit that stays gone until the overlay hides). */
+export const timedAnimation = (
+    name: string,
+    timing: MotionTiming,
+    fillMode: "none" | "forwards" = "none",
+) =>
+    animation({
+        name,
+        ...(timing.spring
+            ? { spring: spring(timing.spring) }
+            : {
+                  duration: duration(timing.duration),
+                  easing: easing(timing.easing),
+              }),
+        ...(fillMode === "forwards" ? { fillMode } : {}),
+    });
+
 /** One run of a keyframes over the theme's duration and easing; `forwards` holds the last frame
  *  (an exit that stays gone until the overlay hides). Shared by every overlay's motion. */
 export const motionAnimation = (
@@ -93,20 +123,14 @@ export const motionAnimation = (
     time: DurationRole,
     curve: EasingRole,
     fillMode: "none" | "forwards" = "none",
-) =>
-    animation({
-        name,
-        duration: duration(time),
-        easing: easing(curve),
-        ...(fillMode === "forwards" ? { fillMode } : {}),
-    });
+) => timedAnimation(name, { duration: time, easing: curve }, fillMode);
 
 const step = (
-    { keyframes, rtl, duration: time, easing: curve }: OverlayMotionStep,
+    { keyframes, rtl, ...timing }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
-    const run = (name: string) => motionAnimation(name, time, curve, fillMode);
+    const run = (name: string) => timedAnimation(name, timing, fillMode);
     if (FADES.has(keyframes)) return run(keyframes);
     if (rtl) {
         return when()

@@ -3,7 +3,7 @@
 // same precedence as in Panda: base, then variants, then compound variants.
 
 import { inlineStyles, tokenValue, validateConfig } from "@pureform/core";
-import type { StyleMap, ValueNode } from "@pureform/core/ast";
+import type { SpringNode, StyleMap, ValueNode } from "@pureform/core/ast";
 import type {
     AnyComponentSpec,
     CoreConfig,
@@ -14,6 +14,7 @@ import {
     aliasTarget,
     compileConditional,
     compileNodeToCSS,
+    springTokenEntries,
     compileStyleMap,
     componentTokenVars,
     registeredProperties,
@@ -38,6 +39,7 @@ const tokenVars = (
         fonts?: Record<string, Token<ValueNode>>;
         durations?: Record<string, Token<ValueNode>>;
         easings?: Record<string, Token<ValueNode>>;
+        springs?: Record<string, Token<SpringNode>>;
         zIndices?: Record<string, Token<ValueNode>>;
     },
     ctx: LowerCtx,
@@ -64,6 +66,9 @@ const tokenVars = (
         for (const [name, entry] of Object.entries(parts[tier] ?? {})) {
             add([tier, name], entry);
         }
+    }
+    for (const [path, node] of springTokenEntries(parts.springs)) {
+        add(path, node);
     }
     return vars;
 };

@@ -55,7 +55,6 @@ import { buttonGroup } from "./components/button-group";
 import { calendarCell } from "./components/calendar";
 import { card } from "./components/card";
 import { carousel } from "./components/carousel";
-import { gridList } from "./components/grid-list";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { createDateInput } from "./components/date-input";
@@ -66,6 +65,7 @@ import { dragHandle } from "./components/drag-handle";
 import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
+import { gridList } from "./components/grid-list";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
@@ -219,11 +219,13 @@ const themeOverride = (
             fonts: base.fonts ?? {},
             durations: base.durations ?? {},
             easings: base.easings ?? {},
+            springs: base.springs ?? {},
         },
         {
             fonts: variant.fonts ?? {},
             durations: variant.durations ?? {},
             easings: variant.easings ?? {},
+            springs: variant.springs ?? {},
         },
     );
     const tokens = changed(base.tokens, variant.tokens);

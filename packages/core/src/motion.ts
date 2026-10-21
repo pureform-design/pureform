@@ -42,7 +42,14 @@ export const valueTypeMoves = (valueType: ValueType | undefined): boolean =>
 /** Whether a transition of this property moves, resizes, or reshapes something, so reduced
  *  motion stops it. Colors (any property ending in `Color`), opacity, shadows, and filters
  *  fade instead, and keep running. A dynamic value moves by its type; `"all"` counts as
- *  moving. */
+ *  moving.
+ *
+ *  Springs follow the same rule: a spring times a motion, it doesn't decide whether it moves. A
+ *  spring on a property that moves (a transform, a size, a moving token) is instant under
+ *  reduced motion, since the part is dropped whatever its timing; a spring on a fade keeps
+ *  running as it is. An overlay's moving keyframes give way to a fade on the same timing, spring
+ *  or not. So spatial springs never run under reduced motion, and effects springs (critically
+ *  damped) do. */
 export const transitionMoves = (property: string | DynamicNode): boolean =>
     typeof property === "string"
         ? !(FADES.has(property) || property.endsWith("Color"))

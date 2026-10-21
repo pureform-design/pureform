@@ -21,6 +21,7 @@ import type {
     RefNode,
     ShadowNode,
     ShapeNode,
+    SpringNode,
     TransformNode,
     TransitionNode,
 } from "./nodes";
@@ -44,6 +45,7 @@ export interface LeafNodeMap {
     transition: TransitionNode;
     animation: AnimationNode;
     easing: EasingNode;
+    spring: SpringNode;
     fontFamily: FontFamilyNode;
     fontVariation: FontVariationNode;
 }

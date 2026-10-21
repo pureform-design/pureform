@@ -38,6 +38,7 @@ import type {
     NumericValue,
     StyleMap,
     TransformOp,
+    Timing,
     TransitionPart,
     ValueType,
     ValueNode,
@@ -327,15 +328,34 @@ export const motionTransition = (
     );
 };
 
-/** A transition of the given properties over `short3` on the standard curve. Under reduced
- *  motion the moving ones change at once and the fades still run. For movement a component
- *  adds to its state colors. */
-export const tweens = (...properties: TransitionPart["property"][]) =>
-    motionTransition(
-        ...properties.map((property) =>
-            tween(property, duration("short3"), easing("standard")),
-        ),
+/** A transition of the given properties over `short3` on the standard curve, or on a timing
+ *  given first, which may be a spring (`tweens({ spring: spring("spatialFast") }, "width")`).
+ *  Under reduced motion the moving ones change at once and the fades still run. For movement a
+ *  component adds to its state colors. */
+export function tweens(
+    ...properties: TransitionPart["property"][]
+): NonNullable<StyleMap["transition"]>;
+export function tweens(
+    timing: Timing,
+    ...properties: TransitionPart["property"][]
+): NonNullable<StyleMap["transition"]>;
+export function tweens(
+    ...args: (Timing | TransitionPart["property"])[]
+): NonNullable<StyleMap["transition"]> {
+    const [first, ...rest] = args;
+    const given =
+        first !== undefined && typeof first !== "string" && !("type" in first)
+            ? first
+            : undefined;
+    const timing: Timing = given ?? {
+        duration: duration("short3"),
+        easing: easing("standard"),
+    };
+    const properties = (given ? rest : args) as TransitionPart["property"][];
+    return motionTransition(
+        ...properties.map((property) => tween(property, timing)),
     );
+}
 
 /** Material's focus indicator: a ring of the focus indicator's thickness and color, its outer
  *  offset outside the element (by default the theme's 3px, secondary, and 2px), shown while

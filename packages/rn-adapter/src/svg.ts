@@ -16,7 +16,7 @@ import { Animated } from "react-native";
 import { Circle } from "react-native-svg";
 import type { CircleProps } from "react-native-svg";
 
-import { curve } from "./animate/curve";
+import { animate } from "./animate/curve";
 import { DISCS, useRippleDrawn, useRippleMotion } from "./animate/ripple";
 import type { RippleOptions, Ripples } from "./animate/ripple";
 import { pathAt, shapeCoordinates, shapePath } from "./geometry";
@@ -72,13 +72,7 @@ const useTween = <T>(
         const listener = progress.addListener(({ value }) =>
             show(mix(from, target, value)),
         );
-        Animated.timing(progress, {
-            toValue: 1,
-            duration: transition.duration,
-            delay: transition.delay,
-            easing: curve(transition.easing),
-            useNativeDriver: false,
-        }).start();
+        animate(progress, transition, false).start();
         return () => {
             progress.removeListener(listener);
             progress.stopAnimation();

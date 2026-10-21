@@ -7,7 +7,7 @@
 // the slide resizes it between tabs whose labels differ; a secondary one spans the tab. The suites' browser asks for reduced motion, so these scenes set the provider's
 // `motion` to `"full"` unless they test reducing it.
 
-import { MATERIAL_DURATIONS } from "@pureform/material";
+import { MATERIAL_DURATIONS, MATERIAL_EASINGS } from "@pureform/material";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -20,6 +20,19 @@ import type { SceneProps, SceneProvider } from "./harness/scene";
 import { SERVER_START_TIMEOUT, startServer } from "./harness/server";
 
 const FULL: SceneProvider = { motion: "full" };
+
+// Material's emphasized curve, a `linear()` easing, as the browser serializes it: every stop with
+// its input, the first at 0% and the last at 100%.
+const EMPHASIZED = (() => {
+    const emphasized = MATERIAL_EASINGS.emphasized;
+    if (emphasized.kind !== "linear")
+        throw new Error("emphasized: not linear()");
+    const last = emphasized.points.length - 1;
+    const stops = emphasized.points.map(
+        ([output, input], i) => `${output} ${input ?? (i === last ? 100 : 0)}%`,
+    );
+    return `linear(${stops.join(", ")})`;
+})();
 
 // The hydration scene renders on the server.
 beforeAll(startServer, SERVER_START_TIMEOUT);
@@ -150,14 +163,16 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
             // Material's medium1, on the emphasized curve, from the tabs' tokens.
             const timing = slide.effect!.getComputedTiming();
             expect(timing.duration).toBe(MATERIAL_DURATIONS.medium1);
-            expect(timing.easing).toBe("cubic-bezier(0.2, 0, 0, 1)");
+            expect(timing.easing).toBe(EMPHASIZED);
 
             slide.currentTime = 0;
             const start = boxOf(indicator);
             expect(start.left).toBeCloseTo(from.left, 0);
             expect(start.width).toBeCloseTo(from.width, 0);
 
-            slide.currentTime = MATERIAL_DURATIONS.medium1 / 2;
+            // A sixth of the way in, the emphasized curve is about 40% of the way along; by half
+            // it's nearly there.
+            slide.currentTime = MATERIAL_DURATIONS.medium1 / 6;
             const middle = boxOf(indicator);
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);

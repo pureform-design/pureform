@@ -28,6 +28,7 @@ import {
     MIN_DENSITY,
     DURATION_ROLES,
     EASING_ROLES,
+    SPRING_ROLES,
     ELEVATION_LEVELS,
     FOCUS_INDICATOR_ROLES,
     SHAPE_ROLES,
@@ -160,6 +161,10 @@ const KINDS = {
     easing: {
         label: "an easing",
         test: (node: unknown) => nodeType(node) === "easing",
+    },
+    spring: {
+        label: "a spring",
+        test: (node: unknown) => nodeType(node) === "spring",
     },
     font: {
         label: "a font family",
@@ -471,6 +476,8 @@ export const resolveTheme = <
         requireNames(where, "easing", c.easings, EASING_ROLES);
         requireKind(where, "duration", c.durations, KINDS.duration);
         requireKind(where, "easing", c.easings, KINDS.easing);
+        requireNames(where, "spring", c.springs, SPRING_ROLES);
+        requireKind(where, "spring", c.springs, KINDS.spring);
     });
     const elevation = step("elevation", providers.elevation, (c, where) => {
         requireNames(where, "level", c.levels, ELEVATION_LEVELS);
@@ -491,6 +498,7 @@ export const resolveTheme = <
         semanticTokens: { colors: color.roles },
         durations: motion.durations,
         easings: motion.easings,
+        springs: motion.springs,
         zIndices: layout.zIndices,
     };
 

@@ -22,6 +22,7 @@ import {
     compileThemeTokens,
     compileUtilities,
     pandaCategory,
+    springsToPanda,
     tokenEntry,
 } from "./tokens";
 
@@ -100,7 +101,16 @@ const compileThemeOverride = (override: ThemeOverride, ctx: CompileCtx) => {
         ...(override.durations ? { durations: override.durations } : {}),
         ...(override.easings ? { easings: override.easings } : {}),
     };
-    const tokens = compileTokenGroups(tokenGroups, ctx);
+    const groups = compileTokenGroups(tokenGroups, ctx);
+    const tokens = override.springs
+        ? {
+              ...groups,
+              ...springsToPanda(override.springs, {
+                  ...ctx,
+                  tokenRef: tokenCurly,
+              }),
+          }
+        : groups;
     const semanticTokens = compileTokenGroups(override.semanticTokens, ctx);
     return {
         ...(tokens ? { tokens } : {}),

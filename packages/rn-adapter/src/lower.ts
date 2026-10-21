@@ -6,13 +6,23 @@
 // since in React Native the whole component has one state, but it outranks an element's own
 // condition, as its selector does in CSS.
 
-import { getByPath, inlineStyles, tokenValue } from "@pureform/core";
+import {
+    dampingCoefficient,
+    formatLinearEasing,
+    getByPath,
+    inlineStyles,
+    sampleSpring,
+    tokenValue,
+} from "@pureform/core";
 import type {
     Condition,
     ConditionalNode,
     NumericScalarNode,
     EasingNode,
+    SpringNode,
+    SpringValue,
     StyleMap,
+    Timing,
     ValueNode,
 } from "@pureform/core/ast";
 import type { AnyComponentSpec, CoreConfig } from "@pureform/core/types";
@@ -246,6 +256,7 @@ const REF_NAMESPACES = new Set([
     "fonts",
     "durations",
     "easings",
+    "springs",
     "zIndices",
 ]);
 
@@ -288,13 +299,108 @@ const EASINGS: Record<string, [number, number, number, number]> = {
     easeInOut: [0.42, 0, 0.58, 1],
 };
 
-/** An easing as `cubic-bezier(...)`, or `linear` for steps, which Animated has no curve for. */
+/** An easing as `cubic-bezier(...)` or `linear(...)`, or `linear` for steps, which Animated has
+ *  no curve for. */
 const easingCurve = (node: EasingNode): string => {
     if (node.kind === "steps") return "linear";
+    if (node.kind === "linear") return formatLinearEasing(node.points);
     const points =
         node.kind === "cubicBezier" ? node.points : EASINGS[node.name]!;
     return `cubic-bezier(${points.join(", ")})`;
 };
+
+/** What a spring is on React Native, beside its sampled duration and curve: its stiffness, mass,
+ *  and damping coefficient `c = 2ζ√(k·m)`, as Animated and Reanimated take them. A theme holds a
+ *  spring token as these five values (`springs.<name>.stiffness` and so on). */
+export const springTokenValues = (
+    spring: SpringNode,
+): Record<
+    "duration" | "easing" | "stiffness" | "damping" | "mass",
+    ValueNode
+> => {
+    const { duration, points } = sampleSpring(spring);
+    const number = (value: number): ValueNode => ({
+        type: "numeric",
+        value,
+        unit: "none",
+    });
+    return {
+        duration: { type: "numeric", value: duration, unit: "ms" },
+        easing: { type: "easing", kind: "linear", points },
+        stiffness: number(spring.stiffness),
+        damping: number(dampingCoefficient(spring)),
+        mass: number(spring.mass),
+    };
+};
+
+const SPRING_FIELDS = [
+    "duration",
+    "easing",
+    "stiffness",
+    "damping",
+    "mass",
+] as const;
+
+// A spring's five values as nodes: a spring token's, by reference, or a literal one's.
+const springNodes = (value: SpringValue, ctx: Ctx): ValueNode[] => {
+    switch (value.type) {
+        case "spring": {
+            const values = springTokenValues(value);
+            return SPRING_FIELDS.map((field) => values[field]);
+        }
+        case "alias":
+            if (value.path[0] === "springs") {
+                return SPRING_FIELDS.map((field) => ({
+                    type: "alias",
+                    path: [...value.path, field],
+                }));
+            }
+            return springNodes(
+                tokenValue(getByPath(ctx.config, value.path)) as SpringValue,
+                ctx,
+            );
+        case "platform":
+            return springNodes(
+                (value.values[ctx.target] ?? value.default) as SpringValue,
+                ctx,
+            );
+        default:
+            throw new Unsupported(`a ${value.type} value as a spring`);
+    }
+};
+
+const ZERO_MS = { type: "numeric", value: 0, unit: "ms" } as const;
+const EASE = { type: "easing", kind: "keyword", name: "ease" } as const;
+
+// A timing's fields as nodes, and how many: duration, easing, and delay, then a spring's
+// stiffness, damping, and mass.
+const timingNodes = (timing: Timing, ctx: Ctx): ValueNode[] =>
+    timing.spring
+        ? (() => {
+              const [duration, easing, ...physics] = springNodes(
+                  timing.spring,
+                  ctx,
+              );
+              return [duration!, easing!, timing.delay ?? ZERO_MS, ...physics];
+          })()
+        : [timing.duration, timing.easing ?? EASE, timing.delay ?? ZERO_MS];
+
+// The lowered fields of a timing, from its values in `timingNodes`' order.
+const timingOf = (values: Value[]): Record<string, Value> => ({
+    duration: values[0]!,
+    easing: values[1]!,
+    delay: values[2]!,
+    ...(values.length > 3
+        ? {
+              spring: {
+                  type: "spring",
+                  stiffness: values[3]!,
+                  damping: values[4]!,
+                  mass: values[5]!,
+              },
+          }
+        : {}),
+});
 
 // A keyframes entry's frames, each at its offset, with the values React Native can take. A
 // frame's values are its base values: keyframes have no states.
@@ -561,23 +667,12 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
         case "easing":
             return plain(easingCurve(node));
         case "animation": {
-            const zero = { type: "numeric", value: 0, unit: "ms" } as const;
             const frames = keyframes(node.name, ctx);
             return product(
-                [
-                    node.duration,
-                    node.easing ?? {
-                        type: "easing",
-                        kind: "keyword",
-                        name: "ease",
-                    },
-                    node.delay ?? zero,
-                ].map((n) => lowerNode(n as ValueNode, ctx)),
-                ([duration, easing, delay]) => ({
+                timingNodes(node, ctx).map((n) => lowerNode(n, ctx)),
+                (values) => ({
                     name: node.name,
-                    duration: duration!,
-                    easing: easing!,
-                    delay: delay!,
+                    ...timingOf(values),
                     iterations:
                         node.iterations === "infinite"
                             ? -1
@@ -599,31 +694,41 @@ export const lowerNode = (node: ValueNode, ctx: Ctx): Cased => {
                           : rnProperty(part.property);
                 return property ? [{ part, property }] : [];
             });
-            const zero = { type: "numeric", value: 0, unit: "ms" } as const;
-            const fields = parts.flatMap(({ part }) => [
-                part.duration,
-                part.easing ?? {
-                    type: "easing",
-                    kind: "keyword",
-                    name: "ease",
-                },
-                part.delay ?? zero,
-            ]);
+            const fields = parts.map(({ part }) => timingNodes(part, ctx));
             return product(
-                fields.map((n) => lowerNode(n as ValueNode, ctx)),
-                (values) =>
-                    parts.map(({ part, property }, i) => ({
-                        property,
-                        duration: values[i * 3]!,
-                        easing: values[i * 3 + 1]!,
-                        delay: values[i * 3 + 2]!,
-                        // A token's tween carries its type, so reduced motion can stop the
-                        // ones that move.
-                        ...(typeof part.property !== "string" &&
-                        part.property.valueType
-                            ? { valueType: part.property.valueType }
-                            : {}),
-                    })),
+                fields.flat().map((n) => lowerNode(n, ctx)),
+                (values) => {
+                    let at = 0;
+                    return parts.map(({ part, property }, i) => {
+                        const count = fields[i]!.length;
+                        const timing = timingOf(values.slice(at, at + count));
+                        at += count;
+                        return {
+                            property,
+                            ...timing,
+                            // A token's tween carries its type, so reduced motion can stop the
+                            // ones that move.
+                            ...(typeof part.property !== "string" &&
+                            part.property.valueType
+                                ? { valueType: part.property.valueType }
+                                : {}),
+                        };
+                    });
+                },
+            );
+        }
+        case "spring": {
+            const values = springTokenValues(node);
+            return product(
+                [values.stiffness, values.damping, values.mass].map((n) =>
+                    lowerNode(n, ctx),
+                ),
+                ([stiffness, damping, mass]) => ({
+                    type: "spring",
+                    stiffness: stiffness!,
+                    damping: damping!,
+                    mass: mass!,
+                }),
             );
         }
         default:

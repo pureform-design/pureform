@@ -8,7 +8,7 @@ import { Animated } from "react-native";
 import { animatable, blend, interpolates, sameUnits, stops } from "../motion";
 import type { Style } from "../select";
 import type { Concrete, Transition } from "../values";
-import { curve } from "./curve";
+import { animate } from "./curve";
 
 // One value in motion: where it's going from and to, and how far along it is.
 interface Track {
@@ -114,13 +114,7 @@ export const useTransitions = () => {
             previous?.stop();
             previousProgress?.removeAllListeners();
             // Colors and layout can't use the native driver, so transitions stay in JS.
-            track.animation = Animated.timing(track.progress, {
-                toValue: 1,
-                duration: transition.duration,
-                delay: transition.delay,
-                easing: curve(transition.easing),
-                useNativeDriver: false,
-            });
+            track.animation = animate(track.progress, transition, false);
             track.animation.start();
         }
     });

@@ -26,6 +26,7 @@ export type ValueNode =
     | TransitionNode
     | AnimationNode
     | EasingNode
+    | SpringNode
     | CalcNode
     | MathFnNode
     | UtilityArgNode;
@@ -88,6 +89,10 @@ export type ColorValue =
 /** A value resolving to a timing function: an `EasingNode` or a reference,
  *  for example `alias("easings", ...)`. */
 export type EasingValue = EasingNode | RefNode;
+
+/** A value resolving to a spring: a `SpringNode` or a reference, for example
+ *  `alias("springs", ...)`. */
+export type SpringValue = SpringNode | RefNode;
 
 /** Portable units with a deterministic build-time static lowering on every target.
  *  `px`, `%`, `ms`, and `s` are verbatim. `rem` resolves against a configured base. `em`
@@ -665,13 +670,14 @@ export interface ShapeNode {
 /* Motion: easing, transitions, animations. */
 
 /** A timing function, discriminated by `kind`. `keyword` is the portable preset set;
- *  `cubicBezier` and `steps` are the structured forms, universal across web and native
- *  animation engines. Usually stored as a token under `CoreConfig.easings` and referenced by
- *  alias. Leaf-kind "easing": every variant shares `type: "easing"`, and `kind` discriminates. */
+ *  `cubicBezier`, `steps`, and `linear` are the structured forms, universal across web and
+ *  native animation engines. Usually stored as a token under `CoreConfig.easings` and referenced
+ *  by alias. Leaf-kind "easing": every variant shares `type: "easing"`, and `kind` discriminates. */
 export type EasingNode =
     | KeywordEasingNode
     | CubicBezierEasingNode
-    | StepsEasingNode;
+    | StepsEasingNode
+    | LinearEasingNode;
 
 /** Portable keyword easing, for example `ease-in-out`. */
 export interface KeywordEasingNode {
@@ -694,42 +700,89 @@ export interface StepsEasingNode {
     steps: { count: number; jump?: "start" | "end" };
 }
 
-/** One or more transitions (lowering to CSS `transition`). `property` is a style-property
- *  name or `"all"`. `duration` and `delay` are `ms` or `s` numerics or an alias into
- *  `durations`. `easing` is an `EasingNode` or an alias into `easings`. Leaf-kind "transition". */
-export interface TransitionNode {
-    type: "transition";
-    parts: TransitionPart[];
+/** One stop of a `linear()` easing: the output, and where along the input it sits, in percent.
+ *  A stop without an input sits halfway between its neighbours, as CSS places it. */
+export type LinearEasingPoint = [output: number, inputPercent?: number];
+
+/** A piecewise-linear easing through `points`, as CSS's `linear()` writes it: a sampled curve
+ *  (a spring, a path) any target can run. At least two points; inputs, where given, between 0
+ *  and 100 and never decreasing. */
+export interface LinearEasingNode {
+    type: "easing";
+    kind: "linear";
+    points: LinearEasingPoint[];
 }
 
-export interface TransitionPart {
-    /** A style property, or a dynamic value with a `valueType`, which moves itself
-     *  and so everything reading it. */
-    property: string | DynamicNode;
+/** A damped spring, by its physics: `stiffness` (k), `damping` as a ratio of critical damping
+ *  (ζ: 1 settles without overshoot, less bounces), and `mass` (m). It is not an easing: a spring
+ *  has no fixed duration, so it stands in for a duration and an easing together (a transition's
+ *  or animation's `spring`). Web targets sample it at build time into a settle duration and a
+ *  `linear()` curve (`sampleSpring`); native engines run it as a spring. Usually stored as a
+ *  token under `CoreConfig.springs` and referenced by alias. Leaf-kind "spring". */
+export interface SpringNode {
+    type: "spring";
+    /** Stiffness k, above 0. */
+    stiffness: number;
+    /** Damping ratio ζ, 0 or more (1 is critical). */
+    damping: number;
+    /** Mass m, above 0. */
+    mass: number;
+}
+
+/** How long a motion takes and how it eases: a duration and an optional easing, or a spring,
+ *  which sets both and so may not carry either. Either may wait a `delay`. Durations and delays
+ *  are `ms` or `s` numerics or an alias into `durations`; an easing is an `EasingNode` or an
+ *  alias into `easings`; a spring is a `SpringNode` or an alias into `springs`. */
+export type Timing = TweenTiming | SpringTiming;
+
+/** A timed motion: a duration and an optional easing. */
+export interface TweenTiming {
     /** ms or s numeric, or `alias("durations", ...)`. */
     duration: NumericValue;
     /** EasingNode or `alias("easings", ...)`. */
     easing?: EasingValue;
     /** ms or s numeric, or `alias("durations", ...)`. */
     delay?: NumericValue;
+    spring?: never;
 }
 
-/** A keyframe-animation instance (lowering to CSS `animation`). `name` references a
- *  `CoreConfig.keyframes` entry; the rest are the usual longhands. `duration` and `delay`
- *  are `ms` or `s` numerics or an alias into `durations`. Leaf-kind "animation". */
-export interface AnimationNode {
-    type: "animation";
-    /** Keyframes key. */
-    name: string;
-    /** ms or s numeric, or `alias("durations", ...)`. */
-    duration: NumericValue;
-    easing?: EasingValue;
+/** A spring motion: its duration and curve come from the spring. */
+export interface SpringTiming {
+    /** SpringNode or `alias("springs", ...)`. */
+    spring: SpringValue;
     /** ms or s numeric, or `alias("durations", ...)`. */
     delay?: NumericValue;
+    duration?: never;
+    easing?: never;
+}
+
+/** One or more transitions (lowering to CSS `transition`). Each part names a property and its
+ *  `Timing`. Leaf-kind "transition". */
+export interface TransitionNode {
+    type: "transition";
+    parts: TransitionPart[];
+}
+
+/** One transition leg: a property and its timing. */
+export type TransitionPart = {
+    /** A style property, or a dynamic value with a `valueType`, which moves itself
+     *  and so everything reading it. */
+    property: string | DynamicNode;
+} & Timing;
+
+/** The longhands of a keyframe animation besides its timing. */
+export interface AnimationRun {
+    /** Keyframes key. */
+    name: string;
     iterations?: number | "infinite";
     direction?: "normal" | "reverse" | "alternate" | "alternateReverse";
     fillMode?: "none" | "forwards" | "backwards" | "both";
 }
+
+/** A keyframe-animation instance (lowering to CSS `animation`). `name` references a
+ *  `CoreConfig.keyframes` entry; its `Timing` is a duration and easing or a spring. Leaf-kind
+ *  "animation". */
+export type AnimationNode = { type: "animation" } & AnimationRun & Timing;
 
 /* Math. */
 

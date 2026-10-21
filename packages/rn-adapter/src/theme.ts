@@ -5,7 +5,7 @@ import { tokenValue } from "@pureform/core";
 import type { ValueNode } from "@pureform/core/ast";
 import type { CoreConfig, ThemeOverride, Token } from "@pureform/core/types";
 
-import { lowerToken, refKey } from "./lower";
+import { lowerToken, refKey, springTokenValues } from "./lower";
 import type { RnOptions } from "./lower";
 import { dependencies, evaluate } from "./values";
 import type { Concrete, ThemeValues, Value } from "./values";
@@ -54,6 +54,15 @@ const tokenNodes = (
         flat("fonts", source.fonts as Flat);
         flat("durations", source.durations as Flat);
         flat("easings", source.easings as Flat);
+        // A spring is five values on React Native: its sampled duration and curve, and its
+        // physics.
+        for (const [name, entry] of Object.entries(source.springs ?? {})) {
+            for (const [field, node] of Object.entries(
+                springTokenValues(tokenValue(entry)),
+            )) {
+                nodes.set(`springs.${name}.${field}`, node);
+            }
+        }
         flat("zIndices", (source as CoreConfig).zIndices as Flat);
     }
     for (const [component, { tokens = {} }] of Object.entries(

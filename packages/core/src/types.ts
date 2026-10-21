@@ -10,6 +10,7 @@ import type {
     FontFamilyNode,
     NumericScalarNode,
     ScalarNode,
+    SpringNode,
     StyleMap,
     ValueNode,
 } from "./ast";
@@ -145,6 +146,7 @@ export interface ThemeOverride {
     fonts?: Record<string, Token<FontFamilyNode>>;
     durations?: Record<string, Token<NumericScalarNode>>;
     easings?: Record<string, Token<EasingNode>>;
+    springs?: Record<string, Token<SpringNode>>;
     /** Per-component token rebinds, keyed by component name. */
     components?: Record<string, { tokens?: Record<string, Token<ValueNode>> }>;
 }
@@ -210,6 +212,10 @@ export interface CoreConfig {
     durations?: Record<string, Token<NumericScalarNode>>;
     /** Reusable timing functions. Referenced through `alias("easings", <name>)`. */
     easings?: Record<string, Token<EasingNode>>;
+    /** Reusable springs. Referenced through `alias("springs", <name>)` from a transition's or
+     *  animation's `spring`. Web targets write each as two vars, `<name>-duration` and
+     *  `<name>-easing` (a sampled `linear()`); native engines run it as a spring. */
+    springs?: Record<string, Token<SpringNode>>;
     /** Semantic stacking-order scale: name to unitless z-index (not CSS `@layer` or cascade
      *  layers, which are a separate concern). Build it with `stack([...])` so authors declare
      *  relative order, not magic numbers; hand entries are still allowed for one-offs.

@@ -157,12 +157,18 @@ interface Segment {
 const SEGMENTS = {
     startTrack: {
         from: px(0),
-        to: add(sub(pct(100), percent("activeStart")), mul(CLEARANCE, ref("startGap"))),
+        to: add(
+            sub(pct(100), percent("activeStart")),
+            mul(CLEARANCE, ref("startGap")),
+        ),
         ends: [OUTER, cornerAt("startGap")],
     },
     activeTrack: {
         from: add(percent("activeStart"), mul(CLEARANCE, ref("startGap"))),
-        to: add(sub(pct(100), percent("activeEnd")), mul(CLEARANCE, ref("endGap"))),
+        to: add(
+            sub(pct(100), percent("activeEnd")),
+            mul(CLEARANCE, ref("endGap")),
+        ),
         ends: [cornerAt("startGap"), cornerAt("endGap")],
     },
     track: {
@@ -174,7 +180,11 @@ const SEGMENTS = {
 
 const across = sub(pct(50), half(THICKNESS));
 
-const horizontalSegment = ({ from, to, ends: [start, end] }: Segment): StyleMap => ({
+const horizontalSegment = ({
+    from,
+    to,
+    ends: [start, end],
+}: Segment): StyleMap => ({
     insetInlineStart: from,
     insetInlineEnd: to,
     insetBlockStart: across,
@@ -186,7 +196,11 @@ const horizontalSegment = ({ from, to, ends: [start, end] }: Segment): StyleMap 
 });
 
 // Standing up, the range runs from the bottom (block end) to the top.
-const verticalSegment = ({ from, to, ends: [start, end] }: Segment): StyleMap => ({
+const verticalSegment = ({
+    from,
+    to,
+    ends: [start, end],
+}: Segment): StyleMap => ({
     insetBlockEnd: from,
     insetBlockStart: to,
     insetInlineStart: across,
@@ -199,14 +213,20 @@ const verticalSegment = ({ from, to, ends: [start, end] }: Segment): StyleMap =>
 
 /** A box `along` long on the range's axis and `acrossSize` across it, centred on the value and on
  *  the track. */
-const horizontalAt = (along: NumericValue, acrossSize: NumericValue): StyleMap => ({
+const horizontalAt = (
+    along: NumericValue,
+    acrossSize: NumericValue,
+): StyleMap => ({
     insetInlineStart: sub(percent("value"), half(along)),
     insetBlockStart: sub(pct(50), half(acrossSize)),
     width: along,
     height: acrossSize,
 });
 
-const verticalAt = (along: NumericValue, acrossSize: NumericValue): StyleMap => ({
+const verticalAt = (
+    along: NumericValue,
+    acrossSize: NumericValue,
+): StyleMap => ({
     insetBlockStart: sub(sub(pct(100), percent("value")), half(along)),
     insetInlineStart: sub(pct(50), half(acrossSize)),
     width: acrossSize,
@@ -223,7 +243,11 @@ const handleBox = (at: typeof horizontalAt): StyleMap => {
     for (const [key, value] of Object.entries(box)) {
         const other = pressed[key as keyof StyleMap];
         (out as Record<string, unknown>)[key] =
-            other === value ? value : when().on(PRESSED, other as never).else(value as never);
+            other === value
+                ? value
+                : when()
+                      .on(PRESSED, other as never)
+                      .else(value as never);
     }
     return out;
 };

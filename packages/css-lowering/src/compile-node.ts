@@ -4,8 +4,13 @@
 // conditional value object by the sibling compiler in `conditions.ts`; if one reaches
 // here (a string-only context) it falls back to its `base` value.
 
-import { getByPath, tokenValue } from "@pureform/core";
-import type { ValueNode } from "@pureform/core/ast";
+import {
+    formatLinearEasing,
+    getByPath,
+    sampleSpring,
+    tokenValue,
+} from "@pureform/core";
+import type { Timing, ValueNode } from "@pureform/core/ast";
 
 import type { LowerCtx } from "./context";
 import {
@@ -15,6 +20,18 @@ import {
     KEYWORD_CSS,
     varName,
 } from "./css";
+import { compileSpring } from "./spring";
+
+// A timing's duration and easing, either given or from its spring; then its delay.
+const compileTiming = (timing: Timing, ctx: LowerCtx): (string | null)[] => [
+    ...(timing.spring
+        ? compileSpring(timing.spring, ctx)
+        : [
+              compileNodeToCSS(timing.duration, ctx),
+              timing.easing ? compileNodeToCSS(timing.easing, ctx) : null,
+          ]),
+    timing.delay ? compileNodeToCSS(timing.delay, ctx) : null,
+];
 
 export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
     switch (node.type) {
@@ -131,9 +148,7 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
                         typeof p.property === "string"
                             ? hyphenate(p.property)
                             : varName(p.property.path, ctx.prefix),
-                        compileNodeToCSS(p.duration, ctx),
-                        p.easing ? compileNodeToCSS(p.easing, ctx) : null,
-                        p.delay ? compileNodeToCSS(p.delay, ctx) : null,
+                        ...compileTiming(p, ctx),
                     ]
                         .filter(Boolean)
                         .join(" "),
@@ -141,9 +156,7 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
                 .join(", ");
         case "animation":
             return [
-                compileNodeToCSS(node.duration, ctx),
-                node.easing ? compileNodeToCSS(node.easing, ctx) : null,
-                node.delay ? compileNodeToCSS(node.delay, ctx) : null,
+                ...compileTiming(node, ctx),
                 node.iterations != null ? String(node.iterations) : null,
                 node.direction ?? null,
                 node.fillMode ?? null,
@@ -156,7 +169,14 @@ export const compileNodeToCSS = (node: ValueNode, ctx: LowerCtx): string => {
                 ? `cubic-bezier(${node.points.join(", ")})`
                 : node.kind === "steps"
                   ? `steps(${node.steps.count}${node.steps.jump ? `, ${node.steps.jump}` : ""})`
-                  : hyphenate(node.name);
+                  : node.kind === "linear"
+                    ? formatLinearEasing(node.points)
+                    : hyphenate(node.name);
+        case "spring": {
+            // A spring on its own is its sampled duration and curve, as a timing shorthand.
+            const { duration, points } = sampleSpring(node);
+            return `${duration}ms ${formatLinearEasing(points)}`;
+        }
         case "calc":
             return `calc(${node.operands.map((o) => compileNodeToCSS(o, ctx)).join(` ${node.op} `)})`;
         case "mathFn":

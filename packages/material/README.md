@@ -49,7 +49,11 @@ pureform({
 Providers: `materialColor`, `materialTypescale`, `materialShape`, `materialLayout`,
 `materialState`, `materialMotion`, `materialElevation`, with Material's published values
 (`MATERIAL_RADII`, `MATERIAL_SIZES`, `MATERIAL_OPACITIES`, `MATERIAL_FOCUS_INDICATOR`,
-`MATERIAL_DURATIONS`, `MATERIAL_EASINGS`). `materialState(opacities, focusIndicator)` changes the
+`MATERIAL_DURATIONS`, `MATERIAL_EASINGS`, `MATERIAL_SPRINGS`). `materialMotion({ scheme })` picks
+M3's `standard` (default) or `expressive` motion scheme for the springs (Compose's
+`StandardMotionTokens` and `ExpressiveMotionTokens`), and takes `springs`, `durations`, and
+`easings` to change or add some. `emphasized` is M3's two-segment path easing, sampled into a
+`linear()` curve within 0.001 of the path. `materialState(opacities, focusIndicator)` changes the
 state opacities (percent) and the focus indicator's thickness and outer offset (px; 3 and 2 by
 default). A third argument, `{ focusRing: "inset" }`, draws every component's focus indicator
 inside it (Compose's inset ring) by setting the outer offset to minus the thickness; the default
