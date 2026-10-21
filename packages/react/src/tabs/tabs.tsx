@@ -1,7 +1,8 @@
 // The tabs: Root on Zag's tabs machine, an unstyled element around the tab list and the panels; the
 // tab list and its tabs (each a button around its content: an icon, a label, and the active
 // indicator), as the preset draws them; a panel per tab; and the ready-made Tabs over them. When
-// the selected tab changes, its indicator slides in from the one selected before.
+// the selected tab changes, its indicator slides in from the one selected before, and a scrollable
+// list scrolls it into view.
 
 import { tabsCompositeAnatomy } from "@pureform/anatomy";
 import {
@@ -20,7 +21,7 @@ import type {
     TabsContentProps,
     TabsRootOwnProps,
 } from "@pureform/binding-core";
-import { slideIndicator } from "@pureform/binding-core/dom";
+import { revealInRow, slideIndicator } from "@pureform/binding-core/dom";
 import * as tabs from "@pureform/machines/tabs";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -126,6 +127,7 @@ function Root(props: TabsRootProps): ReactNode {
     const [indicators] = useState(() => new Map<Element, string>());
     // The value whose indicator shows: none until mounted, so the first selection doesn't slide.
     const shown = useRef<string | null | undefined>(undefined);
+    const scrollable = !!props.scrollable;
     useLayoutEffect(() => {
         const previous = shown.current;
         const value = api.value;
@@ -138,7 +140,11 @@ function Root(props: TabsRootProps): ReactNode {
             return undefined;
         };
         slideIndicator(indicatorOf(previous), indicatorOf(value));
-    }, [api.value, indicators]);
+        // A scrollable list scrolls the newly selected tab into view.
+        if (scrollable) {
+            revealInRow(indicatorOf(value)?.closest('[role="tab"]'));
+        }
+    }, [api.value, indicators, scrollable]);
     const { as, ...rest } = omitProps(props, TABS_ROOT_PROPS);
     return (
         <context.Provider
