@@ -14,6 +14,8 @@ import {
     tagsInputAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
+    timeInputAnatomy,
+    timePickerAnatomy,
     toastAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
@@ -33,6 +35,10 @@ import {
     chipAnatomy as inputChip,
 } from "./tags-input/tags-input.anatomy";
 import { anatomy as textField } from "./text-field/text-field.anatomy";
+import {
+    anatomy as timePicker,
+    timeInputAnatomy as timeInput,
+} from "./time-picker/time-picker.anatomy";
 import { anatomy as toast } from "./toast";
 
 interface Pair {
@@ -54,6 +60,8 @@ const pairs: Record<string, Pair> = {
     inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },
     textArea: { machine: textField, preset: textAreaAnatomy },
+    timePicker: { machine: timePicker, preset: timePickerAnatomy },
+    timeInput: { machine: timeInput, preset: timeInputAnatomy },
     toast: { machine: toast, preset: toastAnatomy },
 };
 

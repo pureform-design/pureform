@@ -415,6 +415,28 @@ export type {
     ToolbarRootOwnProps,
     ToolbarVariantProps,
 } from "./components/toolbar";
+export {
+    TIME_CONTENT_PROPS,
+    TIME_INPUT_HEADLINE,
+    TIME_INPUT_ROOT_PROPS,
+    TIME_PICKER_HEADLINE,
+    TIME_PICKER_ROOT_PROPS,
+    timeInputSelection,
+    timeMachineProps,
+    timePickerSelection,
+} from "./components/time-picker";
+export type {
+    TimeBehaviorProps,
+    TimeContentProps,
+    TimeInputPart,
+    TimeInputRootOwnProps,
+    TimePickerHourCycle,
+    TimePickerPart,
+    TimePickerRootOwnProps,
+    TimePickerVariantProps,
+    TimePickerView,
+    TimeValueChangeDetails,
+} from "./components/time-picker";
 export { overflowCount } from "./overflow";
 export type { OverflowLayout } from "./overflow";
 export {

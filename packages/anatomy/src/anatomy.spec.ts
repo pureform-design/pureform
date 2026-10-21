@@ -87,6 +87,13 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     radio: [at("input", "root", true, "root")],
     switchControl: [at("input", "stateLayer", true, "root")],
     slider: [at("handle", "stateLayer", true, "handle")],
+    // The hour and minute selectors, and each period.
+    timePicker: [
+        at("hourSelector", "hourSelector", false),
+        at("minuteSelector", "minuteSelector", false),
+        at("period", "period", false),
+    ],
+    timeInput: [at("period", "period", false)],
 };
 
 describe("the written anatomy", () => {

@@ -45,7 +45,9 @@ const shaped = (
     corner: KeywordNode<CornerShapeKeyword> | RefNode,
     found: { rounds: boolean },
 ): StyleMap => {
-    const rounds = RADIUS_KEYS.some((key) => key in map);
+    // A style that sets its own corner shape keeps it: a geometry that must stay round.
+    const rounds =
+        RADIUS_KEYS.some((key) => key in map) && !("cornerShape" in map);
     if (rounds) found.rounds = true;
     const states = map.states
         ? Object.fromEntries(
