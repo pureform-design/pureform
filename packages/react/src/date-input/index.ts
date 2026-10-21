@@ -2,7 +2,7 @@
 
 // `@pureform/react/date-input`: the date input, ready-made and as compound parts.
 
-export { DateInput, useDateInput } from "./date-input";
+export { DateInput } from "./date-input";
 export type {
     DateInputIconProps,
     DateInputPartProps,

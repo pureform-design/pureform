@@ -267,7 +267,8 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   gets `{ value }`. The locale sets the weekdays, the format and the week's first day
   (`firstDayOfWeek` overrides it), the same on every target. `DatePicker` (from
   `@pureform/react/date-picker`) is a calendar in a dialog that holds a draft: OK commits it,
-  Cancel drops it (`useDatePicker()` gives composed parts the same actions). `DockedDatePicker`
+  Cancel drops it (composed, `ConfirmTrigger` and `CancelTrigger` run them; `DateInput` has the
+  same two parts). `DockedDatePicker`
   (`@pureform/react/docked-date-picker`) is a text field whose button opens the calendar under
   it; a typed date sets the value once the field loses focus, a chosen one at once.
   `DateInput` (`@pureform/react/date-input`) takes the date as segments and calls `onConfirm`
