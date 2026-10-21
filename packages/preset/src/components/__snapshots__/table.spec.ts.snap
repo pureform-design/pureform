@@ -148,8 +148,11 @@ exports[`table > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "row",
       "flexGrow": "0",
       "flexShrink": "0",
-      "paddingInlineEnd": "var(--components-dataTable-cellPaddingInline, token(spacing.4))",
-      "paddingInlineStart": "var(--components-dataTable-cellPaddingInline, token(spacing.4))",
+      "justifyContent": "center",
+      "minWidth": "var(--components-dataTable-selectionWidth, 72px)",
+      "paddingInlineEnd": "0px",
+      "paddingInlineStart": "0px",
+      "width": "var(--components-dataTable-selectionWidth, 72px)",
     },
     "sortHeader": {
       "alignItems": "center",

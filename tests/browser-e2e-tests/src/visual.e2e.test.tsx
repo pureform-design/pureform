@@ -55,6 +55,7 @@ const SECTIONS = [
     "app-bars",
     "date-pickers",
     "time-pickers",
+    "tables",
 ];
 
 let dispose: (() => void) | undefined;

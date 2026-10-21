@@ -88,6 +88,8 @@ const { tokens, ref } = componentTokens("dataTable", {
     rowHeight: px(52),
     footerHeight: px(52),
     cellPaddingInline: spacing("4"),
+    // The selection column: wide enough for a checkbox's 40px target and the cells' padding.
+    selectionWidth: px(72),
     arrowColor: sys("onSurface"),
     arrowSize: size("iconSmall"),
     arrowGap: spacing("1"),
@@ -239,15 +241,19 @@ export const createTable = <D extends string = MaterialDensity>(
                     headerCell: cellStyle("titleSmall"),
                     cell: cellStyle("bodyMedium"),
                     footerCell: cellStyle("bodyMedium"),
-                    // The checkbox column keeps its checkbox's width.
+                    // The checkbox column: one width in every row, so an empty footer cell keeps
+                    // the columns in line, with the checkbox in its middle.
                     selectionCell: {
                         display: flex,
                         flexDirection: row,
                         alignItems: center,
+                        justifyContent: center,
                         flexGrow: unitless(0),
                         flexShrink: unitless(0),
-                        paddingInlineStart: ref("cellPaddingInline"),
-                        paddingInlineEnd: ref("cellPaddingInline"),
+                        width: ref("selectionWidth"),
+                        minWidth: ref("selectionWidth"),
+                        paddingInlineStart: px(0),
+                        paddingInlineEnd: px(0),
                     },
                     // The button a sortable column's header holds: its label and the arrow.
                     sortHeader: {

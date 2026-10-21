@@ -60,6 +60,7 @@ import { createSignal, For } from "solid-js";
 
 import { DatePickerSection } from "./date-pickers";
 import { Ripple } from "./ripple";
+import { TableSection } from "./tables";
 
 const FILLS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
 // A wide picture, so the avatar shows it cropped to fill.
@@ -3257,6 +3258,7 @@ export function Page() {
                 </For>
                 <TimeInputExampleView />
             </section>
+            <TableSection />
         </main>
     );
 }
