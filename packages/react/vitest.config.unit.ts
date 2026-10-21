@@ -34,6 +34,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@pureform/machines > @zag-js/switch",
             "@pureform/machines > @zag-js/tabs",
             "@pureform/machines > @zag-js/carousel",
+            "@pureform/machines > @zag-js/steps",
             "@pureform/machines > @zag-js/date-picker",
             "@pureform/machines > @zag-js/date-input",
         ],

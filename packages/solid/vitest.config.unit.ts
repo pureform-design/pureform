@@ -28,6 +28,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/switch",
             "@zag-js/tabs",
             "@zag-js/carousel",
+            "@zag-js/steps",
             "@zag-js/date-picker",
             "@zag-js/date-input",
         ],
