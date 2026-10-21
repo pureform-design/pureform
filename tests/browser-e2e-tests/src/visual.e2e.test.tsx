@@ -58,6 +58,7 @@ const SECTIONS = [
     "date-pickers",
     "time-pickers",
     "paginators",
+    "tables",
 ];
 
 let dispose: (() => void) | undefined;

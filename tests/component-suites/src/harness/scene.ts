@@ -9,6 +9,7 @@ export const COMPONENT_NAMES = [
     "AppBar",
     "Paginator",
     "TimePicker",
+    "Table",
     "TimeInput",
     "Avatar",
     "Badge",

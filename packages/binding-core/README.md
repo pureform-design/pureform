@@ -318,6 +318,11 @@ interface TimeBehaviorProps                // value/defaultValue/onValueChange (
 interface TimePickerRootOwnProps          // + mode, color, tokens, view/defaultView/onViewChange, testId, unstyled
 TIME_PICKER_ROOT_PROPS; TIME_INPUT_ROOT_PROPS; TIME_CONTENT_PROPS; // headline, actions
 timeMachineProps(props); timePickerSelection(props); timeInputSelection(props);
+// Table (c6d): the generated dataTableAnatomy; the registry name is dataTable, the subpath table
+interface TableRootOwnProps               // stickyHeader, density, tokens, sort/defaultSort/onSortChange, sortStart, sortClearable, selectionMode, selection/defaultSelection/onSelectionChange, rowValues, translations, striped, id, testId, unstyled
+interface TableColumn<Row, Node>          // id, header?, footer?, sortable?, cell?(row), value?(row)
+TABLE_ROOT_PROPS; TABLE_CONTENT_PROPS;    // columns, rows, rowValue
+tableMachineProps(props); tableSelection(props); tableRowPart(index, striped); tableCellValue(column, row); tableRowValue(row, index, rowValue);
 toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
 overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
 watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);

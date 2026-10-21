@@ -50,6 +50,7 @@ import { tabsCase } from "./tabs";
 import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
+import { table } from "./table";
 import { timeInput, timePicker } from "./time-picker";
 import { toastCase } from "./toast";
 import { toolbar } from "./toolbar";
@@ -110,6 +111,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     supportingText,
     switchControl,
     tabsCase,
+    table,
     tagsInput,
     text,
     textArea,

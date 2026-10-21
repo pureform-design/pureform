@@ -253,6 +253,14 @@ export const COMPONENT_USAGE = {
         },
     },
     // The actions are the app's buttons.
+    // The selection column's checkboxes are checkboxes; `striped` picks the rows' part.
+    table: {
+        entries: {
+            dataTable: same("stickyHeader", "density"),
+            checkbox: {},
+            ripple: {},
+        },
+    },
     "time-picker": {
         entries: { timePicker: same("mode", "color"), ripple: {} },
     },

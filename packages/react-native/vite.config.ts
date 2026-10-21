@@ -50,6 +50,7 @@ export default createConfig({
                     "radio-group": "src/radio-group/index.ts",
                     scrim: "src/scrim/index.ts",
                     "app-bar": "src/app-bar/index.ts",
+                    table: "src/table/index.ts",
                     "time-picker": "src/time-picker/index.ts",
                     "time-input": "src/time-input/index.ts",
                     "search-bar": "src/search-bar/index.ts",

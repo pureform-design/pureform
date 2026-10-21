@@ -75,6 +75,7 @@ describe("pureform", () => {
             "accordion",
             "tree",
             "stepper",
+            "dataTable",
             "scrim",
             "ripple",
             "icon",
@@ -156,6 +157,7 @@ describe("pureform", () => {
             "accordion",
             "tree",
             "stepper",
+            "dataTable",
             "scrim",
             "ripple",
         ]);

@@ -35,6 +35,7 @@ const ICON_PARTS: Record<string, string[]> = {
     searchView: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],
     splitButton: ["trailingIcon"],
+    dataTable: ["sortIndicator"],
     tabs: ["icon"],
     tagsInput: ["leadingIcon", "trailingIcon"],
     textArea: ["leadingIcon", "trailingIcon"],
@@ -105,6 +106,7 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
         at("period", "period", false),
     ],
     timeInput: [at("period", "period", false)],
+    dataTable: [at("sortHeader", "sortHeader", false)],
 };
 
 describe("the written anatomy", () => {
