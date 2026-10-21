@@ -3250,6 +3250,167 @@ export function Page() {
             </section>
 
             <section
+                data-section="nested-rows"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                {(() => {
+                    const li = listItem({ interactive: true });
+                    const nested = listItem();
+                    return (
+                        <ul style={{ width: "280px", margin: 0, padding: 0 }}>
+                            <li style={{ "list-style": "none" }}>
+                                <button
+                                    class={li.root}
+                                    type="button"
+                                    aria-expanded="true"
+                                    aria-controls="nested-folders"
+                                    style={{ width: "100%" }}
+                                >
+                                    <span class={li.leading}>▤</span>
+                                    <div class={li.content}>
+                                        <span class={li.headline}>Folders</span>
+                                    </div>
+                                    <span class={li.indicator}>⌄</span>
+                                </button>
+                                <div
+                                    class={li.region}
+                                    id="nested-folders"
+                                    role="region"
+                                >
+                                    <div class={nested.root}>
+                                        <div class={nested.content}>
+                                            <span class={nested.headline}>
+                                                Work
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class={nested.root}>
+                                        <div class={nested.content}>
+                                            <span class={nested.headline}>
+                                                Personal
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li style={{ "list-style": "none" }}>
+                                <button
+                                    class={li.root}
+                                    type="button"
+                                    aria-expanded="false"
+                                    style={{ width: "100%" }}
+                                >
+                                    <span class={li.leading}>★</span>
+                                    <div class={li.content}>
+                                        <span class={li.headline}>Labels</span>
+                                    </div>
+                                    <span class={li.indicator}>⌄</span>
+                                </button>
+                                <div class={li.region} role="region" hidden>
+                                    Hidden
+                                </div>
+                            </li>
+                        </ul>
+                    );
+                })()}
+                {(() => {
+                    const m = menu();
+                    return (
+                        <div
+                            style={{
+                                display: "flex",
+                                gap: "4px",
+                                "align-items": "flex-start",
+                            }}
+                        >
+                            <div
+                                class={m.root}
+                                role="menu"
+                                style={{ width: "200px" }}
+                            >
+                                <button
+                                    class={m.item}
+                                    role="menuitem"
+                                    type="button"
+                                >
+                                    <span class={m.itemLabel}>Cut</span>
+                                </button>
+                                <button
+                                    class={m.item}
+                                    role="menuitem"
+                                    type="button"
+                                    aria-haspopup="menu"
+                                    aria-expanded="true"
+                                    data-pf-hover=""
+                                >
+                                    <span class={m.itemLabel}>Share</span>
+                                    <span
+                                        class={m.itemTrailing}
+                                        data-pf-mirror=""
+                                    >
+                                        ›
+                                    </span>
+                                </button>
+                            </div>
+                            <div
+                                class={m.root}
+                                role="menu"
+                                style={{ width: "160px", "margin-top": "56px" }}
+                            >
+                                <button
+                                    class={m.item}
+                                    role="menuitem"
+                                    type="button"
+                                >
+                                    <span class={m.itemLabel}>Mail</span>
+                                </button>
+                                <button
+                                    class={m.item}
+                                    role="menuitem"
+                                    type="button"
+                                >
+                                    <span class={m.itemLabel}>Copy link</span>
+                                </button>
+                            </div>
+                        </div>
+                    );
+                })()}
+                <For each={["true", "false"] as const}>
+                    {(expanded) => {
+                        const r = (
+                            navigationRail as unknown as (
+                                selection: object,
+                            ) => Record<string, string>
+                        )({ expanded });
+                        return (
+                            <nav class={r.root}>
+                                <div class={r.sectionLabel}>Mail</div>
+                                <a
+                                    class={r.item}
+                                    href="#inbox"
+                                    aria-current="page"
+                                >
+                                    <span class={r.indicator}>
+                                        <span class={r.activeIndicator} />
+                                        <span class={r.icon}>●</span>
+                                    </span>
+                                    <span class={r.label}>Inbox</span>
+                                </a>
+                                <div class={r.sectionLabel}>Labels</div>
+                                <a class={r.item} href="#work">
+                                    <span class={r.indicator}>
+                                        <span class={r.activeIndicator} />
+                                        <span class={r.icon}>★</span>
+                                    </span>
+                                    <span class={r.label}>Work</span>
+                                </a>
+                            </nav>
+                        );
+                    }}
+                </For>
+            </section>
+
+            <section
                 data-section="expandables"
                 style={{ ...row, "align-items": "flex-start" }}
             >
