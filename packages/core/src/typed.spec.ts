@@ -3,6 +3,7 @@ import { describe, expect, expectTypeOf, it } from "vitest";
 import { dynamic, hex, literal, px, viewportBreakpoint, when } from "./ast";
 import { alias as rawAlias } from "./ast/raw";
 import { defineConfig, defineStaticUtility } from "./define";
+import { validateConfig } from "./path";
 import { defineConfig as rawDefineConfig } from "./raw";
 import { typed } from "./typed";
 import type { AliasPath, AliasRoot, AliasSecond, AliasThird } from "./typed";
@@ -450,6 +451,76 @@ describe("typed variants and slots", () => {
             selected: "true" | "false";
         }>();
         expectTypeOf(chip.slots).toEqualTypeOf<("root" | "label")[]>();
+    });
+});
+
+describe("provided tokens", () => {
+    const accent = dynamic(["components", "chip", "accent"], hex("#6750a4"));
+    const bar = (slot: "root" | "label" = "root") =>
+        pf.slotComponent({
+            name: "bar",
+            slots: ["root", "label"],
+            structure: { root: ["label"] },
+            variants: { tone: ["brand", "plain"] },
+            recipe: () => ({
+                base: {},
+                variants: {
+                    tone: {
+                        brand: {
+                            [slot]: {
+                                providedTokens: {
+                                    chip: { accent: hex("#b3261e") },
+                                },
+                            },
+                        },
+                    },
+                },
+            }),
+        });
+
+    it("give another component's tokens by path", () => {
+        expect(
+            bar().recipe.variants!.tone!.brand!.root!.providedTokens,
+        ).toEqual({
+            "components.chip.accent": hex("#b3261e"),
+        });
+    });
+
+    it("may be set on any slot, for what's inside it", () => {
+        expect(
+            bar("label").recipe.variants!.tone!.brand!.label!.providedTokens,
+        ).toEqual({ "components.chip.accent": hex("#b3261e") });
+    });
+
+    it("name a token the component has", () => {
+        const chip = { kind: "component", name: "chip", tokens: { accent } };
+        const config = (component: object) =>
+            ({
+                tokens: {},
+                semanticTokens: {},
+                components: { chip, bar: component },
+            }) as never;
+        expect(() => validateConfig(config(bar()))).not.toThrow();
+        // A config without the chip has nothing to provide to.
+        expect(() =>
+            validateConfig({
+                tokens: {},
+                semanticTokens: {},
+                components: { bar: bar() },
+            } as never),
+        ).not.toThrow();
+        const wrong = pf.slotComponent({
+            name: "bar",
+            slots: ["root"],
+            recipe: () => ({
+                base: {
+                    root: { providedTokens: { chip: { other: hex("#000") } } },
+                },
+            }),
+        });
+        expect(() => validateConfig(config(wrong))).toThrow(
+            /components\.chip\.other not found/,
+        );
     });
 });
 

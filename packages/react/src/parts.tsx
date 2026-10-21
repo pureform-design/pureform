@@ -15,6 +15,7 @@ import {
     isIconPart,
     isUnstyled,
     partSources,
+    withProvidedTokens,
 } from "@pureform/binding-core";
 import type {
     ClassValue,
@@ -57,6 +58,7 @@ import {
 import type { IndicationScope, PartIndication } from "./indication";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
+import { useProvidedTokens } from "./provided-tokens";
 import { useComponentState } from "./provider";
 
 /** The registry name an anatomy's component is registered under. */
@@ -319,6 +321,11 @@ export function useComponent<A extends ComponentAnatomy>(
 ): ComponentScope<A> {
     const state = useComponentState();
     const entries = anatomy.indication;
+    // What the `ProvidedTokens` providers around give this component, under its own tokens.
+    const selection = withProvidedTokens(
+        options.selection,
+        useProvidedTokens(anatomy.name),
+    );
     // Hooks run in the same order every render: an anatomy's entries never change.
     const indication = entries?.length
         ? useIndicationScope(entries, {
@@ -341,10 +348,10 @@ export function useComponent<A extends ComponentAnatomy>(
         anatomy.name as ComponentOf<A>,
         tokens
             ? ({
-                  ...options.selection,
-                  tokens: { ...tokens, ...options.selection.tokens },
+                  ...selection,
+                  tokens: { ...tokens, ...selection.tokens },
               } as Selection<ComponentOf<A>>)
-            : options.selection,
+            : selection,
     );
     return {
         ...createPartScope(

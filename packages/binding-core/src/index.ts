@@ -628,6 +628,14 @@ export type {
     ThemeName,
     ThemeOverrides,
 } from "./provider";
+export {
+    mergeProvidedTokens,
+    providedTokenPaths,
+    providedTokensFor,
+    providedTokensFromPaths,
+    withProvidedTokens,
+} from "./provided-tokens";
+export type { ProvidedTokens } from "./provided-tokens";
 export { selectionSignature, withDefaults } from "./selection";
 export { trainVersionMismatch } from "./version";
 export { warnOnce } from "./warn";

@@ -19,6 +19,7 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "titleLarge",
     },
     "leading": {
+      "--components-iconButton-accent": "var(--components-appBar-leadingColor, token(colors.onSurface))",
       "_rtl": {
         "&[data-pf-mirror]": {
           "transform": "scaleX(-1)",
@@ -53,6 +54,7 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
       "textStyle": "labelMedium",
     },
     "trailing": {
+      "--components-iconButton-accent": "var(--components-appBar-trailingColor, token(colors.onSurfaceVariant))",
       "_rtl": {
         "&[data-pf-mirror]": {
           "transform": "scaleX(-1)",

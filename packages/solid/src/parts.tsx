@@ -16,6 +16,7 @@ import {
     isPresent,
     isUnstyled,
     partSources,
+    withProvidedTokens,
 } from "@pureform/binding-core";
 import type { PartStates, SlotKeyed, Unstyled } from "@pureform/binding-core";
 import {
@@ -50,6 +51,7 @@ import { createIndicationScope, usePartIndication } from "./indication";
 import type { IndicationScope } from "./indication";
 import { combinePartProps } from "./props";
 import type { PartProps } from "./props";
+import { useProvidedTokens } from "./provided-tokens";
 import { usePureform } from "./provider";
 
 type Dict = Readonly<Record<string, unknown>>;
@@ -265,6 +267,13 @@ export function useComponent<A extends ComponentAnatomy>(
 ): ComponentScope<A> {
     const name = anatomy.name as ComponentOf<A>;
     const entries = anatomy.indication;
+    // What the `ProvidedTokens` providers around give this component, under its own tokens.
+    const provided = useProvidedTokens(name);
+    const own = options.selection;
+    options = {
+        ...options,
+        selection: () => withProvidedTokens(own(), provided()),
+    };
     if (!entries?.length) {
         const classes = useClasses(name, options.selection);
         return { ...createPartScope(anatomy, options, classes), classes };

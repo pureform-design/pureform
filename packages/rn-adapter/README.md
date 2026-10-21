@@ -189,6 +189,12 @@ moves out beside the style, as `Selected.iconFills[slot]` and `NativeSlot.iconFi
 `src/icon-fill.spec.ts`). Other axes drop. `@pureform/react-native`'s `useIconStyle()` returns it
 as `filled`, for apps that swap a filled icon in.
 
+Provided tokens (`providedTokens` on a slot, component-architecture.md §5.5) lower to private
+keys that selection moves out per slot, as `Selected.providedTokens[slot]` (by theme key,
+resolved with the container's tokens). `OverridesLayer` (from `./react`) lays values over the
+provider's overrides for a subtree, which is how `@pureform/react-native`'s `ProvidedTokens`
+hands them to nested components under their own variant and instance tokens.
+
 ## Build and test
 
 Through the omni MCP (or `omni run`):

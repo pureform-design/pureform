@@ -37,6 +37,7 @@ export { dismissTopOverlay, placeOverlay, useDismiss } from "./overlay";
 export type { PlaceOptions, Placed } from "./overlay";
 export { testIdOf, unselectable, useControllable, withEngine } from "./parts";
 export { Portal } from "./portal";
+export { ProvidedTokens, useProvidedTokens } from "./provided-tokens";
 export type { PortalProps } from "./portal";
 export { PortalHost } from "./portal-host";
 export type { OverlayInsets, PortalHostProps, WindowRect } from "./portal-host";

@@ -151,6 +151,30 @@ export const PureformProvider = ({
     return createElement(StylesProvider, { ...props, source });
 };
 
+/** Token values over the provider's overrides for the components inside, by key
+ *  (`components.iconButton.accent`): what a container provides them (component-architecture.md
+ *  §5.5). Each component resolves its own variants' tokens and its instance tokens over them,
+ *  as the web's cascade does. The nearest layer wins, per key. */
+export const OverridesLayer = (props: {
+    overrides: ThemeValues | undefined;
+    children?: ReactNode;
+}) => {
+    const context = useContextOrThrow("OverridesLayer");
+    const added = props.overrides ?? {};
+    const key = JSON.stringify(added);
+    const value = useMemo(
+        () =>
+            Object.keys(added).length === 0
+                ? context
+                : {
+                      ...context,
+                      overrides: { ...context.overrides, ...added },
+                  },
+        [context, key],
+    );
+    return createElement(PureformContext.Provider, { value }, props.children);
+};
+
 // A selection's motion, `by` times as long.
 const slowed = (selected: Selected, by: number): Selected => {
     if (by === 1) return selected;
