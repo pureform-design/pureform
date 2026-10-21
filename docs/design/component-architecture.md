@@ -570,13 +570,15 @@ variant: { filled: { root: { backgroundColor: token("accent"), color: token("onA
   targets. Built CSS is about 28% smaller raw (7% gzipped) on the CSS target and 34% (9%)
   on Tailwind; React Native's precomputed styles are 12% smaller.
 - **What stays compound:** cases that need both conditions at once: the FAB's size with
-  its shape, each text input's fill with a leading icon, primary tabs with an icon,
+  its shape (4), the anchored badge's offset per size (2), each text input's fill with a leading icon, primary tabs with an icon,
   interactive cards per fill (3), and each fill's toggle colors on the button and icon button
   (5 each), whose selected colors read the `color` group's tokens. The wavy progress adds 1: the
   circular spinner's wave while indeterminate (one group's clip, another's condition). c4a added
   4; r4-findings drew the wave clips from the `height`/`thickness` and `amplitude` tokens, which
   dropped the three per thickness. c5a's docked date picker and date input each add the
-  text field's one (fill with a leading icon). 24 across the preset.
+  text field's one (fill with a leading icon). 28 across the preset, counting every
+  `compoundVariants` entry of every component in `pureform()` (`packages/preset/src/doc-counts.spec.ts`
+  checks this number against the code).
 - **Flags for two groups (M3 Expressive):** when a value depends on two groups, one sets a
   literal token and the other a 0/1 flag token, and `blend(from, to, flag)` picks between
   them: the size sets `squareRadius` and `corner: square` sets `square`; `width` sets

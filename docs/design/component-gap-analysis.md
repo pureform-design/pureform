@@ -186,7 +186,7 @@ done (§7).
 
 |                                                  | Count                                                                                                                                                                             |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Our preset components                            | 56 (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
+| Our preset components                            | 57, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
 | zag machines                                     | 54; 16 wrapped today (carousel, checkbox, combobox, date-input, date-picker, dialog, menu, presence, radio-group, select, switch, tabs, tags-input, toast, toggle-group, tooltip) |
 | Our own machines                                 | 7 (button, navigation, ripple, slider, snackbar, text-field, time-picker: the time picker and time input)                                                                         |
 | M3 Expressive components we're missing           | 1: selection list                                                                                                                                                                 |
