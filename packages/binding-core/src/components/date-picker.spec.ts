@@ -9,9 +9,11 @@ import {
     dateMachineProps,
     dayOfWeek,
     dockedDatePickerSelection,
+    formatDateText,
     formatIsoDate,
     isSelectableDate,
     monthWeeks,
+    parseDateText,
     parseIsoDate,
     selectedDateText,
     weekdayLabels,
@@ -156,5 +158,13 @@ describe("text", () => {
 
     it("always selects the docked picker's trailing icon", () => {
         expect(dockedDatePickerSelection({}).trailingIcon).toBe(true);
+    });
+
+    it("reads and writes a typed date in the locale's order", () => {
+        expect(parseDateText("08/17/2026", "en-US")).toBe("2026-08-17");
+        expect(parseDateText("17/08/2026", "en-GB")).toBe("2026-08-17");
+        expect(parseDateText("02/30/2026", "en-US")).toBeNull();
+        expect(parseDateText("08/17", "en-US")).toBeNull();
+        expect(formatDateText("2026-08-17", "en-US")).toBe("08/17/2026");
     });
 });
