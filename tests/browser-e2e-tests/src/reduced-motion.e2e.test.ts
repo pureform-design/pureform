@@ -36,6 +36,8 @@ const FIXTURES = [
         selection: { shape: "wavy" },
         slot: "indicator",
     },
+    // The time picker's hand turns to a new value (c5b).
+    { name: "timePicker", slot: "dialTrack" },
 ] as const;
 
 type Fixture = {
@@ -74,6 +76,7 @@ const EXPECTED: Record<
     linearProgress: { full: "width", reduced: "none" },
     calendarCell: { full: STATE, reduced: STATE },
     wavyLinearProgress: { full: "width", reduced: "none" },
+    timePicker: { full: "transform", reduced: "none" },
 };
 
 const classOf = (

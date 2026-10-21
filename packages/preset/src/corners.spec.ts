@@ -27,8 +27,13 @@ describe("corner shape", () => {
     });
 
     it("adds nothing for round corners", () => {
-        const plain = compilePreset(pureform()).theme?.slotRecipes;
+        const { timePicker, ...plain } =
+            compilePreset(pureform()).theme?.slotRecipes ?? {};
         expect(JSON.stringify(plain)).not.toContain("cornerShape");
+        // The time picker's dial keeps its own round corner whatever the theme's.
+        expect(JSON.stringify(timePicker?.base?.root)).not.toContain(
+            "cornerShape",
+        );
     });
 
     it("rejects an unknown corner", () => {

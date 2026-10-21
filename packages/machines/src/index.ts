@@ -21,6 +21,7 @@ export * as switchControl from "./switch";
 export * as tabs from "./tabs";
 export * as tagsInput from "./tags-input";
 export * as textField from "./text-field";
+export * as timePicker from "./time-picker";
 export * as toast from "./toast";
 export * as tooltip from "./tooltip";
 

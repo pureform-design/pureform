@@ -47,6 +47,7 @@ import { tabsCase } from "./tabs";
 import { tagsInput } from "./tags-input";
 import { textArea } from "./text-area";
 import { textField } from "./text-field";
+import { timeInput, timePicker } from "./time-picker";
 import { toastCase } from "./toast";
 import { toolbar } from "./toolbar";
 import { tooltip } from "./tooltip";
@@ -85,6 +86,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     ripple,
     scrim,
     appBar,
+    timePicker,
+    timeInput,
     searchBar,
     searchView,
     select,

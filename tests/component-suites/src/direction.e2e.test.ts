@@ -49,10 +49,17 @@ const measure = async (
         animation.currentTime = 300;
     }
     // A part the CSS hides (an icon button's outline unless outlined) has no box to mirror.
-    const parts = Object.fromEntries(
+    const fixedNames = new Set(component.fixed ?? []);
+    const shown = Object.fromEntries(
         [...root.querySelectorAll<HTMLElement>("[data-pf-part]")]
             .filter((part) => part.getClientRects().length > 0)
             .map((part) => [part.dataset.pfPart!, part]),
+    );
+    const parts = Object.fromEntries(
+        Object.entries(shown).filter(([name]) => !fixedNames.has(name)),
+    );
+    const fixedParts = Object.fromEntries(
+        Object.entries(shown).filter(([name]) => fixedNames.has(name)),
     );
     // A component with no parts inside its root (an avatar, a separator) is measured in its host
     // instead: its own box mirrors there. The host takes the direction too, as an app's page
@@ -76,6 +83,7 @@ const measure = async (
         drawn,
         width: frame.getBoundingClientRect().width,
         boxes: boxesWithin(frame, alone ? { root } : parts),
+        fixed: boxesWithin(frame, fixedParts),
         dirs: [...scene.host.querySelectorAll("[dir]")].map((element) =>
             element.getAttribute("dir"),
         ),
@@ -100,6 +108,19 @@ describe.each(COMPONENTS)("$component", (component) => {
             );
             // Parts that don't point (a check mark) draw the same both ways.
             expect(rtl.drawn).toEqual(ltr.drawn);
+            // Parts that keep their place (a clock's numbers) are where they were.
+            expect(
+                mirrorMismatches(
+                    ltr.fixed,
+                    Object.fromEntries(
+                        Object.entries(rtl.fixed).map(([name, box]) => [
+                            name,
+                            { ...box, x: ltr.width - box.x - box.width },
+                        ]),
+                    ),
+                    ltr.width,
+                ),
+            ).toEqual([]);
         },
     );
 });

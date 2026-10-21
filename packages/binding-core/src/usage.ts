@@ -250,6 +250,11 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
+    // The actions are the app's buttons.
+    "time-picker": {
+        entries: { timePicker: same("mode", "color"), ripple: {} },
+    },
+    "time-input": { entries: { timeInput: {}, ripple: {} } },
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.

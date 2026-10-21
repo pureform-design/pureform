@@ -57,6 +57,8 @@ import { TagsInput } from "@pureform/react/tags-input";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
+import { TimeInput } from "@pureform/react/time-input";
+import { TimePicker } from "@pureform/react/time-picker";
 import { createToaster, Toaster } from "@pureform/react/toast";
 import type { ToastData } from "@pureform/react/toast";
 import { Toolbar } from "@pureform/react/toolbar";
@@ -130,6 +132,8 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     RichTooltip,
     Scrim,
     AppBar,
+    TimePicker,
+    TimeInput,
     SearchBar,
     SearchView,
     Select,
