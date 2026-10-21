@@ -228,7 +228,9 @@ function SelectionCell({
 }: TablePartProps): ReactNode {
     const { scope, api } = context.use("SelectionCell");
     const { value } = use(RowContext);
-    const header = value === undefined;
+    // An empty header cell is a plain cell: the header has no select-all checkbox in a table
+    // choosing one row.
+    const header = value === undefined && api.selectionMode === "multiple";
     const box =
         value === undefined ? (
             api.selectionMode === "multiple" ? (

@@ -280,7 +280,11 @@ function TableImpl<Row>(props: TableProps<Row>): ReactNode {
                 >
                     {selectable ? (
                         <v.selectionCell.View
-                            role="columnheader"
+                            role={
+                                props.selectionMode === "multiple"
+                                    ? "columnheader"
+                                    : "cell"
+                            }
                             style={s.selectionCell}
                             testID={id("selectionCell")}
                         >

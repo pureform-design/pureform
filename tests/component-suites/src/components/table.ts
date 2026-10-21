@@ -7,7 +7,6 @@ import { dataTableAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
 
 import type { ActOptions, ComponentCase } from "./types";
-import { byTestId } from "./types";
 
 const ids = testIds.dataTable;
 
@@ -65,7 +64,11 @@ export const table: ComponentCase = {
         read,
     },
     keyboard: {
-        focusable: (host) => byTestId(host, ids.sortHeader),
+        // The first control in the header: the select-all checkbox when there's one.
+        focusable: (host) =>
+            host.querySelector<HTMLElement>(
+                `[data-testid="${ids.headerRow}"] input, [data-testid="${ids.sortHeader}"]`,
+            )!,
         disables: false,
         keys: [
             { key: "{Enter}", does: "click" },

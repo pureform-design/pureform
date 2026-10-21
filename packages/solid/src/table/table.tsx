@@ -34,6 +34,7 @@ import {
     merge,
     omit,
     Show,
+    untrack,
     useContext,
 } from "solid-js";
 
@@ -225,7 +226,10 @@ function HeaderCell(props: TableHeaderCellProps): JSX.Element {
 function SelectionCell(props: TablePartProps): JSX.Element {
     const { scope, api } = context.use("SelectionCell");
     const row = useContext(RowContext);
-    const header = row.value === undefined;
+    // An empty header cell is a plain cell: the header has no select-all checkbox in a table
+    // choosing one row.
+    const header = () =>
+        row.value === undefined && api().selectionMode === "multiple";
     const box = () => {
         const value = row.value?.();
         if (value === undefined) {
@@ -246,8 +250,8 @@ function SelectionCell(props: TablePartProps): JSX.Element {
         );
     };
     return scope.render("selectionCell", {
-        element: header ? "th" : "td",
-        machine: () => api().getSelectionCellProps({ header }),
+        element: untrack(header) ? "th" : "td",
+        machine: () => api().getSelectionCellProps({ header: header() }),
         unstyled: () => props.unstyled,
         props: merge(omit(props, "unstyled"), {
             get children() {
