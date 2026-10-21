@@ -67,6 +67,35 @@ export type {
     ChipRootOwnProps,
     ChipVariantProps,
 } from "./components/chip";
+export {
+    CHIP_SET_CONTENT_PROPS,
+    CHIP_SET_ROOT_PROPS,
+    chipSetChipVariants,
+    chipSetMachineProps,
+    chipSetSelection,
+} from "./components/chip-set";
+export type {
+    ChipSetBehaviorProps,
+    ChipSetChipVariantProps,
+    ChipSetContentProps,
+    ChipSetItem,
+    ChipSetPart,
+    ChipSetRootOwnProps,
+    ChipSetVariantProps,
+} from "./components/chip-set";
+export {
+    SELECTION_LIST_CONTENT_PROPS,
+    SELECTION_LIST_ROOT_PROPS,
+    selectionListMachineProps,
+    selectionListOptions,
+} from "./components/selection-list";
+export type {
+    SelectionListBehaviorProps,
+    SelectionListContentProps,
+    SelectionListItem,
+    SelectionListOption,
+    SelectionListRootOwnProps,
+} from "./components/selection-list";
 export { inputChipSelection } from "./components/input-chip";
 export type {
     InputChipPart,

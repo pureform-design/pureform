@@ -188,6 +188,7 @@ export {
     SHEET_DISMISS_SHARE,
     SHEET_FLICK_SPEED,
 } from "./sheet-drag";
+export { revealInRow } from "./reveal";
 export { slideIndicator, slideTransform, transformTiming } from "./slide";
 export { moveToolbarFocus, watchOverflow } from "./toolbar-dom";
 export type { OverflowWatch } from "./toolbar-dom";

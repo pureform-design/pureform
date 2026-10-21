@@ -36,6 +36,7 @@ const select = (
             return core.cardSelection(p, "div");
         case "list-item:listItem":
         case "list:listItem":
+        case "selection-list:listItem":
             return core.listItemSelection(p, "div");
         case "circular-progress:circularProgress":
         case "linear-progress:linearProgress":

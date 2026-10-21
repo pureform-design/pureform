@@ -296,3 +296,38 @@ describe("Tabs, the indicator's slide", () => {
         expect(byTestId(ids.indicator).getAnimations()).toEqual([]);
     });
 });
+
+describe("Tabs, scrollable", () => {
+    it("passes scrollable to the tab list, and scrolls a newly selected tab into view", async () => {
+        const many = Array.from({ length: 8 }, (_, i) => ({
+            value: `tab${i}`,
+            label: `Tab ${i}`,
+        }));
+        const [value, setValue] = createSignal<string | null>("tab0");
+        withRegistry(() => (
+            <Tabs
+                scrollable
+                value={value()}
+                onValueChange={(details) => setValue(details.value)}
+                items={many}
+                slotProps={{
+                    list: {
+                        style: "display: flex; width: 200px; overflow: auto",
+                    },
+                    tab: { style: "flex: 0 0 120px" },
+                }}
+            />
+        ));
+        await settle();
+        const list = byTestId(ids.list);
+        expect(list.className).toContain("tabs--scrollable-true");
+        expect(list.scrollLeft).toBe(0);
+        setValue("tab6");
+        await frames();
+        const box = tabs()[6]!.getBoundingClientRect();
+        const view = list.getBoundingClientRect();
+        expect(list.scrollLeft).toBeGreaterThan(0);
+        expect(box.right).toBeLessThanOrEqual(view.right + 1);
+        expect(box.left).toBeGreaterThanOrEqual(view.left - 1);
+    });
+});

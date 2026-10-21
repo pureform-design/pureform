@@ -29,6 +29,8 @@ export default createConfig({
                     "split-button": "src/split-button/index.ts",
                     "icon-button": "src/icon-button/index.ts",
                     "button-group": "src/button-group/index.ts",
+                    "chip-set": "src/chip-set/index.ts",
+                    "selection-list": "src/selection-list/index.ts",
                     paginator: "src/paginator/index.ts",
                     "radio-group": "src/radio-group/index.ts",
                     select: "src/select/index.ts",
