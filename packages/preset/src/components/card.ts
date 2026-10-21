@@ -58,11 +58,11 @@ import type { ColorValue, StyleMap } from "@pureform/core/ast";
 import { opacity, radius, spacing, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
+import { tint } from "./shaped";
 import {
     componentTokens,
     disabledColor,
     slotStateLayer,
-    surface,
     sys,
     touchTarget,
     stateTransition,
@@ -128,10 +128,11 @@ const dimmed = (fill: CardFill | "any") =>
         opacity("disabledContainer"),
     );
 
+// A fill sets the tokens the container's colors and shadow read (`interactive` reads them, so the
+// two groups never set the same property), and draws its resting tint and outline.
 const fillVariant = (fill: CardFill): { root: StyleMap } => ({
     root: {
-        ...surface(CONTAINER[fill], content, RESTING[fill]),
-        // What the container shows while its action area acts, in the base styles.
+        backgroundImage: tint(RESTING[fill]),
         tokens: {
             container: CONTAINER[fill],
             restingShadow: shadow(RESTING[fill]),
@@ -141,7 +142,11 @@ const fillVariant = (fill: CardFill): { root: StyleMap } => ({
             ? {
                   borderWidth: ref("outlineWidth"),
                   borderStyle: solid,
-                  borderColor: ref("outlineColor"),
+                  borderColor: when(
+                      ACTION_AREA_DISABLED,
+                      disabledColor("disabledContainer"),
+                      ref("outlineColor"),
+                  ),
               }
             : {}),
     },
@@ -161,11 +166,6 @@ const followsActionArea: StyleMap = {
         ACTION_AREA_DISABLED,
         disabledColor("disabledContent"),
         content,
-    ),
-    borderColor: when(
-        ACTION_AREA_DISABLED,
-        disabledColor("disabledContainer"),
-        ref("outlineColor"),
     ),
     boxShadow: when()
         .on(ACTION_AREA_DISABLED, shadow("level0"))
@@ -363,12 +363,13 @@ export const card = pf.slotComponent({
             interactive: {
                 true: {
                     root: {
+                        boxShadow: ref("restingShadow"),
                         cursor: pointer,
                         states: { disabled: { pointerEvents: none } },
                     },
                 },
-                // Root doesn't act, so it follows its action area, if it has one: beside the
-                // fill's colors, so each case outranks them on every target.
+                // Root doesn't act, so it follows its action area, if it has one, from the
+                // tokens the fill sets.
                 false: {
                     root: {
                         ...followsActionArea,

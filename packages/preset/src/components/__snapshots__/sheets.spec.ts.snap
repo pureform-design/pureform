@@ -214,6 +214,7 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
       "minHeight": "0px",
       "shadowElevation": "level0",
       "width": "var(--components-sideSheet-width, 360px)",
+      "zIndex": "calc(var(--components-sideSheet-layer, token(zIndex.dialog)) + calc(calc(token(zIndex.base) - var(--components-sideSheet-layer, token(zIndex.dialog))) * var(--components-sideSheet-coplanar, 0)))",
     },
   },
   "className": "sideSheet",
@@ -239,14 +240,14 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
       "false": {},
       "true": {
         "root": {
-          "zIndex": "token(zIndex.base)",
+          "--components-sideSheet-coplanar": "1",
         },
       },
     },
     "modal": {
       "false": {
         "root": {
-          "zIndex": "token(zIndex.raised)",
+          "--components-sideSheet-layer": "token(zIndex.raised)",
         },
       },
       "true": {
@@ -257,7 +258,6 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
           "borderStartEndRadius": "0px",
           "borderStartStartRadius": "var(--components-sideSheet-radius, token(radii.large))",
           "shadowElevation": "level1",
-          "zIndex": "token(zIndex.dialog)",
         },
       },
     },

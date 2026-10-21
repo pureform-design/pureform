@@ -11,11 +11,14 @@ describe("card", () => {
     });
 
     it("only gives interactive cards a state layer", () => {
+        // The fill sets the container token; the static card's root reads it.
         expect(
-            card.recipe.variants?.variant?.filled?.root?.backgroundColor,
-        ).toEqual({
-            type: "alias",
-            path: ["components", "card", "filledContainer"],
+            card.recipe.variants?.variant?.filled?.root?.tokens,
+        ).toMatchObject({
+            "components.card.container": {
+                type: "alias",
+                path: ["components", "card", "filledContainer"],
+            },
         });
         const interactiveFilled = card.recipe.compoundVariants?.find(
             (c) =>

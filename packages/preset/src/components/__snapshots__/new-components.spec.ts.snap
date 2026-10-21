@@ -192,136 +192,40 @@ exports[`circularProgress > compiles to a stable Panda slot recipe 1`] = `
   "variants": {
     "color": {
       "error": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.error)",
-          "borderInlineEndColor": "token(colors.error)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.error)",
-          "borderInlineEndColor": "token(colors.error)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.error)",
-          "borderInlineEndColor": "token(colors.error)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.errorContainer)",
-          "borderInlineEndColor": "token(colors.errorContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.errorContainer)",
-          "borderInlineEndColor": "token(colors.errorContainer)",
+          "--components-circularProgress-activeColor": "token(colors.error)",
+          "--components-circularProgress-trackColor": "token(colors.errorContainer)",
         },
       },
       "info": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.info)",
-          "borderInlineEndColor": "token(colors.info)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.info)",
-          "borderInlineEndColor": "token(colors.info)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.info)",
-          "borderInlineEndColor": "token(colors.info)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.infoContainer)",
-          "borderInlineEndColor": "token(colors.infoContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.infoContainer)",
-          "borderInlineEndColor": "token(colors.infoContainer)",
+          "--components-circularProgress-activeColor": "token(colors.info)",
+          "--components-circularProgress-trackColor": "token(colors.infoContainer)",
         },
       },
       "primary": {},
       "secondary": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.secondary)",
-          "borderInlineEndColor": "token(colors.secondary)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.secondary)",
-          "borderInlineEndColor": "token(colors.secondary)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.secondary)",
-          "borderInlineEndColor": "token(colors.secondary)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.secondaryContainer)",
-          "borderInlineEndColor": "token(colors.secondaryContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.secondaryContainer)",
-          "borderInlineEndColor": "token(colors.secondaryContainer)",
+          "--components-circularProgress-activeColor": "token(colors.secondary)",
+          "--components-circularProgress-trackColor": "token(colors.secondaryContainer)",
         },
       },
       "success": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.success)",
-          "borderInlineEndColor": "token(colors.success)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.success)",
-          "borderInlineEndColor": "token(colors.success)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.success)",
-          "borderInlineEndColor": "token(colors.success)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.successContainer)",
-          "borderInlineEndColor": "token(colors.successContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.successContainer)",
-          "borderInlineEndColor": "token(colors.successContainer)",
+          "--components-circularProgress-activeColor": "token(colors.success)",
+          "--components-circularProgress-trackColor": "token(colors.successContainer)",
         },
       },
       "tertiary": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.tertiary)",
-          "borderInlineEndColor": "token(colors.tertiary)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.tertiary)",
-          "borderInlineEndColor": "token(colors.tertiary)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.tertiary)",
-          "borderInlineEndColor": "token(colors.tertiary)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.tertiaryContainer)",
-          "borderInlineEndColor": "token(colors.tertiaryContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.tertiaryContainer)",
-          "borderInlineEndColor": "token(colors.tertiaryContainer)",
+          "--components-circularProgress-activeColor": "token(colors.tertiary)",
+          "--components-circularProgress-trackColor": "token(colors.tertiaryContainer)",
         },
       },
       "warning": {
-        "endArc": {
-          "borderBlockStartColor": "token(colors.warning)",
-          "borderInlineEndColor": "token(colors.warning)",
-        },
         "root": {
-          "borderBlockStartColor": "token(colors.warning)",
-          "borderInlineEndColor": "token(colors.warning)",
-        },
-        "startArc": {
-          "borderBlockStartColor": "token(colors.warning)",
-          "borderInlineEndColor": "token(colors.warning)",
-        },
-        "trackEndArc": {
-          "borderBlockStartColor": "token(colors.warningContainer)",
-          "borderInlineEndColor": "token(colors.warningContainer)",
-        },
-        "trackStartArc": {
-          "borderBlockStartColor": "token(colors.warningContainer)",
-          "borderInlineEndColor": "token(colors.warningContainer)",
+          "--components-circularProgress-activeColor": "token(colors.warning)",
+          "--components-circularProgress-trackColor": "token(colors.warningContainer)",
         },
       },
     },

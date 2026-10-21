@@ -506,23 +506,16 @@ export const createCircularProgress = <const G extends string = ColorGroup>(
                         startArc: wavyArc(circularWave(4)),
                     },
                 },
-                color: colorVariant(groups, (g) => {
-                    const sides = {
-                        borderBlockStartColor: g.main,
-                        borderInlineEndColor: g.main,
-                    };
-                    const track = {
-                        borderBlockStartColor: g.container,
-                        borderInlineEndColor: g.container,
-                    };
-                    return {
-                        root: sides,
-                        endArc: sides,
-                        startArc: sides,
-                        trackEndArc: track,
-                        trackStartArc: track,
-                    };
-                }),
+                // The arcs and the spinning ring read these, so the color doesn't set the
+                // ring's sides itself (which would overlap `indeterminate`'s).
+                color: colorVariant(groups, (g) => ({
+                    root: {
+                        tokens: {
+                            activeColor: g.main,
+                            trackColor: g.container,
+                        },
+                    },
+                })),
             },
             // The wave per thickness, and on the spinning ring while indeterminate.
             compoundVariants: [

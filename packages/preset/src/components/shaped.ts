@@ -47,6 +47,7 @@ import { MATERIAL_SHAPES } from "../shapes";
 import type { IndicationRef } from "../state-layer";
 import {
     STATE_TWEENS,
+    blend,
     disabledColor,
     motionTransition,
     slotStateLayer,
@@ -99,13 +100,19 @@ export const shapedOutline = (radius: NumericValue): StyleMap => ({
     display: none,
 });
 
-/** An outlined style's outline layer: the stroke as a border, until a shape clips it. */
+/** An outlined style's outline layer: the stroke as a border, until a shape clips it. The
+ *  `shaped` flag (1 under a shape, set by `shapeVariant`) picks the shape's stroke: none where
+ *  the clip draws the ring, a 1px border where a target can't clip. */
 export const shapedOutlineStroke = (
-    ref: (token: OutlineTokens) => AliasNode,
+    ref: (token: OutlineTokens | "shaped") => AliasNode,
 ): StyleMap => ({
     display: flex,
     borderStyle: solid,
-    borderWidth: ref("outlineWidth"),
+    borderWidth: when(
+        "clipShape",
+        blend(ref("outlineWidth"), px(0), ref("shaped")),
+        blend(ref("outlineWidth"), px(1), ref("shaped")),
+    ),
     borderColor: when(
         DISABLED,
         disabledColor("disabledContainer"),
@@ -160,7 +167,8 @@ export const shapedColors = (
     } satisfies Record<string, StyleMap>;
 };
 
-const tint = (level: string) => {
+/** An elevation level's tint, as the elevation utility draws it over a surface. */
+export const tint = (level: string) => {
     const color = elevationTint(level);
     return linearGradient([stop(color), stop(color)]);
 };
@@ -236,7 +244,8 @@ export const clipVariant = (
 
 /** The `shape` variant: `none` keeps the rounded corners, and each shape clips the container
  *  to itself, and the outline layer to a ring `outlineWidth` wide along it, filled with the
- *  outline color, when the component has one. Where a target can't clip to a shape, the
+ *  outline color, when the component has one, and sets the root's `shaped` flag, which
+ *  `shapedOutlineStroke` reads for the border. Where a target can't clip to a shape, the
  *  container keeps `radius` and the outline its border. The ring's width is a plain length, since each of its points restates
  *  it. */
 export const shapeVariant = (
@@ -261,6 +270,7 @@ export const shapeVariant = (
                 ]!,
                 ...(outlineColor
                     ? {
+                          root: { tokens: { shaped: unitless(1) } },
                           outline: {
                               clipPath: isMorph(shape)
                                   ? when(
@@ -272,11 +282,6 @@ export const shapeVariant = (
                               ...(isMorph(shape)
                                   ? { transition: morphTransition }
                                   : {}),
-                              borderWidth: when(
-                                  "clipShape",
-                                  px(0),
-                                  outlineWidth,
-                              ),
                               backgroundColor: when(
                                   "clipShape",
                                   when(

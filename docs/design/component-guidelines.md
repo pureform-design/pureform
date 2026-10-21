@@ -83,6 +83,14 @@ Every new variant group follows `component-architecture.md` §5.5:
 - **Never chain variant-set tokens** (a variant setting `a: ref("b")` where another variant
   sets `b`): CSS resolves it, React Native resolves `b` from the theme default, so the two
   targets disagree.
+- **Two variant groups must not set the same property on the same slot** (a token counts as a
+  property, and so does what an `apply` utility sets). The CSS and Tailwind targets emit the
+  groups' rules in definition order, but Panda orders a slot recipe's variant classes by its own
+  sort (mostly by class name), so the later group wins on one target and the earlier on another.
+  Set a token or a 0/1 flag in one group and read it in the base or the other group.
+  `packages/preset/src/variant-overlap.spec.ts` fails on any overlap, compared per condition
+  (each `when` case and state); a pair that can't meet in practice goes on its allow-list with
+  the reason.
 - What stays a compound needs a token value from one group _and_ a colour role from another.
 - Count compounds before and after, and note the number in the gap analysis.
 

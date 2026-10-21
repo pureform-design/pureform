@@ -42,6 +42,7 @@ import { size as sizeToken, spacing, textStyle } from "@pureform/theme";
 
 import { motionAnimation } from "./overlay";
 import {
+    blend,
     componentTokens,
     iconBox,
     iconFill,
@@ -71,6 +72,10 @@ const { tokens, ref } = componentTokens("appBar", {
     expandedPaddingBlockEnd: spacing("3"),
     iconSize: sizeToken("iconMedium"),
     iconFill: unitless(0),
+    // Flags the content's inset reads: 1 on a flexible bar (set by `size`), and 1 with a search
+    // bar (set by `search`), which wins.
+    expanded: unitless(0),
+    search: unitless(0),
 });
 
 const pf = typed();
@@ -104,16 +109,27 @@ const edge = (color: "leadingColor" | "trailingColor"): StyleMap => {
     };
 };
 
-// A flexible bar's content: a line of its own under the actions, its headline at the bottom.
+// A flexible bar's content: a line of its own under the actions, its headline at the bottom,
+// inset from the edges by the `expanded` flag.
 const expanded = (minHeight: NonNullable<StyleMap["minHeight"]>): StyleMap => ({
     flexBasis: pct(100),
     flexGrow: unitless(1),
     justifyContent: end,
     minHeight,
-    paddingInlineStart: ref("expandedPaddingInline"),
-    paddingInlineEnd: ref("expandedPaddingInline"),
     paddingBlockEnd: ref("expandedPaddingBlockEnd"),
 });
+
+// The content's inline inset: from the leading and trailing parts, from the edges on a flexible
+// bar, and the bar's own padding around a search bar.
+const contentInset = blend(
+    blend(
+        ref("contentPaddingInline"),
+        ref("expandedPaddingInline"),
+        ref("expanded"),
+    ),
+    ref("paddingInline"),
+    ref("search"),
+);
 
 export const appBar = pf.slotComponent({
     name: "appBar",
@@ -155,8 +171,8 @@ export const appBar = pf.slotComponent({
                 flexGrow: unitless(1),
                 flexBasis: px(0),
                 minWidth: px(0),
-                paddingInlineStart: ref("contentPaddingInline"),
-                paddingInlineEnd: ref("contentPaddingInline"),
+                paddingInlineStart: contentInset,
+                paddingInlineEnd: contentInset,
             },
             headline: {
                 textStyle: textStyle("titleLarge"),
@@ -179,11 +195,13 @@ export const appBar = pf.slotComponent({
                 small: {},
                 // M3 Expressive's flexible bars replace the medium and large ones.
                 mediumFlexible: {
+                    root: { tokens: { expanded: unitless(1) } },
                     content: expanded(ref("mediumContentHeight")),
                     headline: { textStyle: textStyle("headlineMedium") },
                     subtitle: { textStyle: textStyle("labelLarge") },
                 },
                 largeFlexible: {
+                    root: { tokens: { expanded: unitless(1) } },
                     content: expanded(ref("largeContentHeight")),
                     headline: { textStyle: textStyle("displaySmall") },
                     subtitle: { textStyle: textStyle("titleMedium") },
@@ -196,12 +214,7 @@ export const appBar = pf.slotComponent({
             // A search bar fills the content, between the navigation button and the actions.
             search: {
                 false: {},
-                true: {
-                    content: {
-                        paddingInlineStart: ref("paddingInline"),
-                        paddingInlineEnd: ref("paddingInline"),
-                    },
-                },
+                true: { root: { tokens: { search: unitless(1) } } },
             },
             // The page has scrolled under the bar.
             scrolled: {

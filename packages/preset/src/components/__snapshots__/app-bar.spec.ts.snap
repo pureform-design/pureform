@@ -10,8 +10,8 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
       "flexDirection": "column",
       "flexGrow": "1",
       "minWidth": "0px",
-      "paddingInlineEnd": "var(--components-appBar-contentPaddingInline, token(spacing.3))",
-      "paddingInlineStart": "var(--components-appBar-contentPaddingInline, token(spacing.3))",
+      "paddingInlineEnd": "calc(calc(var(--components-appBar-contentPaddingInline, token(spacing.3)) + calc(calc(var(--components-appBar-expandedPaddingInline, token(spacing.4)) - var(--components-appBar-contentPaddingInline, token(spacing.3))) * var(--components-appBar-expanded, 0))) + calc(calc(var(--components-appBar-paddingInline, token(spacing.1)) - calc(var(--components-appBar-contentPaddingInline, token(spacing.3)) + calc(calc(var(--components-appBar-expandedPaddingInline, token(spacing.4)) - var(--components-appBar-contentPaddingInline, token(spacing.3))) * var(--components-appBar-expanded, 0)))) * var(--components-appBar-search, 0)))",
+      "paddingInlineStart": "calc(calc(var(--components-appBar-contentPaddingInline, token(spacing.3)) + calc(calc(var(--components-appBar-expandedPaddingInline, token(spacing.4)) - var(--components-appBar-contentPaddingInline, token(spacing.3))) * var(--components-appBar-expanded, 0))) + calc(calc(var(--components-appBar-paddingInline, token(spacing.1)) - calc(var(--components-appBar-contentPaddingInline, token(spacing.3)) + calc(calc(var(--components-appBar-expandedPaddingInline, token(spacing.4)) - var(--components-appBar-contentPaddingInline, token(spacing.3))) * var(--components-appBar-expanded, 0)))) * var(--components-appBar-search, 0)))",
     },
     "headline": {
       "color": "var(--components-appBar-headlineColor, token(colors.onSurface))",
@@ -121,9 +121,8 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
     "search": {
       "false": {},
       "true": {
-        "content": {
-          "paddingInlineEnd": "var(--components-appBar-paddingInline, token(spacing.1))",
-          "paddingInlineStart": "var(--components-appBar-paddingInline, token(spacing.1))",
+        "root": {
+          "--components-appBar-search": "1",
         },
       },
     },
@@ -135,11 +134,12 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
           "justifyContent": "end",
           "minHeight": "var(--components-appBar-largeContentHeight, 56px)",
           "paddingBlockEnd": "var(--components-appBar-expandedPaddingBlockEnd, token(spacing.3))",
-          "paddingInlineEnd": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
-          "paddingInlineStart": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
         },
         "headline": {
           "textStyle": "displaySmall",
+        },
+        "root": {
+          "--components-appBar-expanded": "1",
         },
         "subtitle": {
           "textStyle": "titleMedium",
@@ -152,11 +152,12 @@ exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
           "justifyContent": "end",
           "minHeight": "var(--components-appBar-mediumContentHeight, 48px)",
           "paddingBlockEnd": "var(--components-appBar-expandedPaddingBlockEnd, token(spacing.3))",
-          "paddingInlineEnd": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
-          "paddingInlineStart": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
         },
         "headline": {
           "textStyle": "headlineMedium",
+        },
+        "root": {
+          "--components-appBar-expanded": "1",
         },
         "subtitle": {
           "textStyle": "labelLarge",
