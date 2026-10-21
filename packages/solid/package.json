@@ -214,6 +214,28 @@
                 "default": "./dist/carousel.jsx"
             }
         },
+        "./accordion": {
+            "types": "./dist/accordion/index.d.ts",
+            "solid": {
+                "development": "./src/accordion/index.ts",
+                "default": "./dist/accordion.jsx"
+            },
+            "import": {
+                "development": "./src/accordion/index.ts",
+                "default": "./dist/accordion.jsx"
+            }
+        },
+        "./tree": {
+            "types": "./dist/tree/index.d.ts",
+            "solid": {
+                "development": "./src/tree/index.ts",
+                "default": "./dist/tree.jsx"
+            },
+            "import": {
+                "development": "./src/tree/index.ts",
+                "default": "./dist/tree.jsx"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "solid": {
