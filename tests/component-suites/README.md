@@ -233,6 +233,9 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 "search"`). The list item's case renders it as a button (`as: "button"`, plain data), so it
   has a focusable element and a disabled state; the list's case is a list of links (Enter clicks
   the first, `keyboard.disables: false`). Neither has state.
+- **App bar** (`app-bar.ts`): no state; examples by size, subtitle, centered, scrolled,
+  collapsed by its offset, pinned, and holding a search bar, for markup, server rendering,
+  direction (a mirrored back arrow) and themes.
 - **Display** (`progress.ts`, `slider.ts`, `card.ts`, `search-bar.ts`, `static.ts`): the slider's
   `value` moves from 40 to 50 with a click in the middle of its range input (`read` checks the
   root's `value` token against the input), Home and End go to 0 and 100, and the arrows step by

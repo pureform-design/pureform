@@ -1,5 +1,6 @@
 // Every component the shared suites run over. Add a component's case here.
 
+import { appBar } from "./app-bar";
 import { autocomplete } from "./autocomplete";
 import { bottomSheet } from "./bottom-sheet";
 import { button } from "./button";
@@ -79,6 +80,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     richTooltip,
     ripple,
     scrim,
+    appBar,
     searchBar,
     searchView,
     select,

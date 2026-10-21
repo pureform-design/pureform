@@ -403,6 +403,14 @@ export const displayRegistry = () =>
             "actions",
             "footer",
         ]),
+        appBar: named("app-bar", [
+            "root",
+            "leading",
+            "content",
+            "headline",
+            "subtitle",
+            "trailing",
+        ]),
         searchBar: named("search-bar", [
             "root",
             "leading",

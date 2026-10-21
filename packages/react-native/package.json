@@ -229,6 +229,13 @@
                 "default": "./dist/scrim.mjs"
             }
         },
+        "./app-bar": {
+            "types": "./dist/app-bar/index.d.ts",
+            "import": {
+                "development": "./src/app-bar/index.ts",
+                "default": "./dist/app-bar.mjs"
+            }
+        },
         "./search-bar": {
             "types": "./dist/search-bar/index.d.ts",
             "import": {

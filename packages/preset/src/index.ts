@@ -33,6 +33,7 @@ export * from "./components/overlay";
 export * from "./components/progress";
 export * from "./components/loading-indicator";
 export * from "./components/shape-paths";
+export * from "./components/app-bar";
 export * from "./components/search-bar";
 export * from "./components/search-view";
 export * from "./components/select";
