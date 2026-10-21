@@ -101,6 +101,7 @@ import { snackbar } from "./components/snackbar";
 import { createSplitButton } from "./components/split-button";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
+import { createTable } from "./components/table";
 import { createTabs } from "./components/tabs";
 import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
@@ -350,6 +351,7 @@ const defaultComponents = <G extends string>(
         richTooltip,
         card,
         carousel,
+        table: createTable<Step>(densities),
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),
