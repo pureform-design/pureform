@@ -28,6 +28,8 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/switch",
             "@zag-js/tabs",
             "@zag-js/carousel",
+            "@zag-js/date-picker",
+            "@zag-js/date-input",
         ],
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },

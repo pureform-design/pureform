@@ -446,6 +446,33 @@ The search bar's `scrolled` variant takes the app bar's scrolled container colou
 combobox input: no pointer cursor, the arrow turns while the suggestions are open. The
 suggestions are the `menu` component's items and groups.
 
+## Date pickers
+
+Three components share a calendar (`calendar.ts`): `CALENDAR_TOKENS`, `calendarParts(ref)`
+(`controls`, `prev`, `next`, `weekdays`, `weekday`, `grid`, `week`, `yearList`, every row a flex
+row of `cellSize` cells), and `pickerChrome(ref)` (the dialog-like pickers' `root`, `header`,
+`headline`, `selectedDate`, `modeToggle`, `divider` and `actions`, over `PICKER_TOKENS`, named apart
+from a text field's own tokens).
+
+- `calendarCell`: one day, month or year, its own component as a list item is the list's, since
+  a slot's variants would be the picker's. `root` is the cell (it draws a chosen range's band),
+  `trigger` the circle or pill. `view` (day, month, year) sets the sizes; `selection` (`none`,
+  `selected`, `rangeStart`, `rangeMiddle`, `rangeEnd`), `today` and `outside` set tokens only: the
+  0%/100% flags `selected`, `ranged` and `today`, which the trigger's colours mix in through
+  `colorMix`, and today's outline width. No two groups set one property (Panda orders variant
+  classes by name), and there are no compounds. Days outside the month are hidden
+  (`outsideOpacity`, 0).
+- `datePicker`: the modal picker's surface (the dialog's content): header, divider, controls
+  (`viewTrigger`, `prev`, `next`), weekdays and grid, `yearList`, actions. Extra-large corners,
+  level 3, the dialog's layer and motion. No variants.
+- `dockedDatePicker`: the text field (built with `affixField`, outlined with the trailing icon by
+  default; 1 compound, the field's) and the calendar's popup `content` (large corners, level 3,
+  the menu's layer and motion) with `monthButton`, `yearButton`, `prev`, `next`, the grid,
+  `monthList` and `yearList`.
+- `dateInput`: the modal date input: the header and actions of `pickerChrome`, and the text field
+  under a `field` wrapper whose `input` is a group of `segment`s. The field variants' root tokens
+  stay on the surface's root; the outlined label's notch takes the picker's container.
+
 ## Input chip and tags input
 
 `inputChip` is Material's input chip, split from `chip` (it adds `avatar` and an interactive

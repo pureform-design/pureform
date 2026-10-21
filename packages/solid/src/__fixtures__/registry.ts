@@ -504,3 +504,67 @@ export const providedTokensRegistry = () =>
                 { accent: "--accent" },
             )) as ClassFactory<ComponentShape>,
     });
+
+/** The date pickers' fake factories, all static: the modal and docked date pickers, the date
+ *  input, the calendar cell, and the scrim and buttons the ready-made pickers draw. */
+export const datePickersRegistry = () =>
+    createRegistry({
+        datePicker: named("date-picker", [
+            "root",
+            "header",
+            "headline",
+            "selectedDate",
+            "modeToggle",
+            "divider",
+            "controls",
+            "viewTrigger",
+            "prev",
+            "next",
+            "weekdays",
+            "weekday",
+            "grid",
+            "week",
+            "yearList",
+            "actions",
+        ]),
+        dockedDatePicker: named("docked-date-picker", [
+            ...FIELD_SLOTS.filter((slot) => slot !== "counter"),
+            "content",
+            "controls",
+            "prev",
+            "monthButton",
+            "next",
+            "yearButton",
+            "weekdays",
+            "weekday",
+            "grid",
+            "week",
+            "monthList",
+            "yearList",
+            "actions",
+        ]),
+        dateInput: named("date-input", [
+            "root",
+            "header",
+            "headline",
+            "selectedDate",
+            "modeToggle",
+            "divider",
+            "field",
+            ...FIELD_SLOTS.filter(
+                (slot) => slot !== "root" && slot !== "counter",
+            ),
+            "segment",
+            "actions",
+        ]),
+        calendarCell: named("calendar-cell", ["root", "trigger"]),
+        scrim: named("scrim", ["root"]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        button: named("button", ["root", "touchTarget", "icon", "label"]),
+    });

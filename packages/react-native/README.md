@@ -290,6 +290,18 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       it, through the portal host rather than a `Modal`, so the input keeps the keyboard; the
       trailing arrow opens or closes it. Choosing one sets `value` and the text (`inputValue`) to
       its label; a press outside, Escape, and back close it.
+    - **The date pickers** have no date machine: their state and calendar come from
+      binding-core's ISO-date helpers (`monthWeeks`, `weekdayLabels`, `chooseDate`, …), so the
+      weeks match the web's for a locale. Each day is its own `calendarCell`. The modal
+      **date picker** (`@pureform/react-native/date-picker`) opens from `trigger` in a `Modal`
+      as the dialog does, its calendar holding a draft that OK commits and Cancel drops; the
+      view trigger switches to a year list. The **docked date picker**
+      (`@pureform/react-native/docked-date-picker`) is a field (the date as `formatDateText`
+      writes it; typed text is read with `parseDateText` on blur or submit) whose calendar
+      button opens the calendar under it through the portal host, with month and year lists.
+      The **date input** (`@pureform/react-native/date-input`) is the picker's surface with a
+      text field: `value` follows the text when it's a whole date. Arrow keys don't move
+      between days.
     - **The search view** (`@pureform/react-native/search-view`) opens from its `trigger` (a
       read-only `SearchBar` showing the query, by default) in a `Modal`: a header (back, the
       query's input, clear), a divider, and the suggestions as menu items, or `children`.

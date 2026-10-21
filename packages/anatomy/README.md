@@ -203,6 +203,14 @@ the preset's `root` slot) holding `header` (with `closeTrigger`, `headline` and 
 `body`. Unlike the basic dialog's, its `closeTrigger` is a styled slot. Test ids are in
 `compositeTestIds.fullscreenDialog`.
 
+**The date pickers:** `datePickerOverlayAnatomy` (scope `date-picker`) is the modal picker in the
+dialog's shape: unstyled `root`, `trigger` and `positioner`, then the surface (`content`, the
+preset's `root` slot) holding the header, controls, calendar and actions; its backdrop is
+`datePickerBackdropAnatomy`. `dockedDatePickerOverlayAnatomy` is the docked picker's own parts
+with Zag's `positioner` (unstyled) between the field's root and the popup (`content`). Each
+calendar cell is a `calendarCell` (generated). Test ids are in `compositeTestIds.datePicker`,
+`.datePickerBackdrop` and `.dockedDatePicker`.
+
 **The sheets** (`bottomSheetOverlayAnatomy`, `sideSheetOverlayAnatomy`) are the same shape:
 unstyled `root`, `trigger` and `positioner`, then the surface (`content`, the preset's `root` slot).
 The preset's own `content` slot is the `body` part (`slot: "content"`), so the surface can keep the

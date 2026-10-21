@@ -27,6 +27,8 @@ const FIXTURES = [
     { name: "radio", slot: "dot" },
     { name: "textField", slot: "label" },
     { name: "linearProgress", slot: "indicator" },
+    // A date picker's day (c5a) only fades its colors, so reduced motion keeps them all.
+    { name: "calendarCell", slot: "trigger" },
     // The wavy indicator (c4a) is clipped to a wave but moves as the flat one does.
     {
         name: "linearProgress",
@@ -70,6 +72,7 @@ const EXPECTED: Record<
         reduced: "background-color, color",
     },
     linearProgress: { full: "width", reduced: "none" },
+    calendarCell: { full: STATE, reduced: STATE },
     wavyLinearProgress: { full: "width", reduced: "none" },
 };
 
