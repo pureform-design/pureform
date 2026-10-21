@@ -166,6 +166,13 @@
                 "default": "./dist/tags-input.mjs"
             }
         },
+        "./paginator": {
+            "types": "./dist/paginator/index.d.ts",
+            "import": {
+                "development": "./src/paginator/index.ts",
+                "default": "./dist/paginator.mjs"
+            }
+        },
         "./carousel": {
             "types": "./dist/carousel/index.d.ts",
             "import": {
@@ -225,6 +232,7 @@
         "@zag-js/dialog": "catalog:",
         "@zag-js/dom-query": "catalog:",
         "@zag-js/menu": "catalog:",
+        "@zag-js/pagination": "catalog:",
         "@zag-js/presence": "catalog:",
         "@zag-js/radio-group": "catalog:",
         "@zag-js/select": "catalog:",
