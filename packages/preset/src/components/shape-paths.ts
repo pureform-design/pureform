@@ -1,142 +1,16 @@
 // Paths for the indicators that draw a shape rather than a box: a run of shapes redrawn so each
-// can animate into the next (the loading indicator's morph), and wave bands to clip a progress
-// indicator to (the wavy linear and circular progress).
-//
-// Shape morphs in CSS (`shape()`) and on React Native's SVG need every shape of a run to have
-// the same structure: the same number of cubic curves, running the same way, starting at
-// matching points. Core's `morph()` does that for two shapes; `morphSequence` does it for a
-// cycle of them.
+// can animate into the next (the loading indicator's morph, core's `morphSequence`), and wave
+// bands to clip a progress indicator to (the wavy linear and circular progress).
 
 import { clipShape, pct, px, min } from "@pureform/core/ast";
 import type {
-    ShapeGeometry,
     ShapeNode,
     ShapePoint,
     UnitContour,
     Vec,
 } from "@pureform/core/ast";
 
-type Curve = { from: Vec; c1: Vec; c2: Vec; to: Vec };
-
-const lerp = (a: Vec, b: Vec, t: number): Vec => [
-    a[0] + (b[0] - a[0]) * t,
-    a[1] + (b[1] - a[1]) * t,
-];
-const distance = (a: Vec, b: Vec) => Math.hypot(a[0] - b[0], a[1] - b[1]);
-
-// A line as a cubic with its handles on the line.
-const straight = (from: Vec, to: Vec): Curve => ({
-    from,
-    c1: lerp(from, to, 1 / 3),
-    c2: lerp(from, to, 2 / 3),
-    to,
-});
-
-// Every segment as a cubic, the closing line included.
-const toCurves = (contour: UnitContour): Curve[] => {
-    let last = contour.from;
-    const curves = contour.segments.map((segment) => {
-        const curve =
-            segment.op === "curve"
-                ? { from: last, c1: segment.c1, c2: segment.c2, to: segment.to }
-                : straight(last, segment.to);
-        last = segment.to;
-        return curve;
-    });
-    return distance(last, contour.from) > 1e-9
-        ? [...curves, straight(last, contour.from)]
-        : curves;
-};
-
-// Split a cubic at its middle (de Casteljau).
-const halve = ({ from, c1, c2, to }: Curve): [Curve, Curve] => {
-    const ab = lerp(from, c1, 0.5);
-    const bc = lerp(c1, c2, 0.5);
-    const cd = lerp(c2, to, 0.5);
-    const abc = lerp(ab, bc, 0.5);
-    const bcd = lerp(bc, cd, 0.5);
-    const mid = lerp(abc, bcd, 0.5);
-    return [
-        { from, c1: ab, c2: abc, to: mid },
-        { from: mid, c1: bcd, c2: cd, to },
-    ];
-};
-
-const span = ({ from, c1, c2, to }: Curve) =>
-    distance(c1, from) + distance(c2, c1) + distance(to, c2);
-
-// Split the longest curves until there are `count`.
-const splitTo = (curves: Curve[], count: number): Curve[] => {
-    const result = [...curves];
-    while (result.length < count) {
-        let longest = 0;
-        result.forEach((curve, i) => {
-            if (span(curve) > span(result[longest]!)) longest = i;
-        });
-        result.splice(longest, 1, ...halve(result[longest]!));
-    }
-    return result;
-};
-
-// Twice the signed area: its sign is the way the contour runs.
-const area = (curves: Curve[]) =>
-    curves.reduce(
-        (sum, { from, to }) => sum + from[0] * to[1] - to[0] * from[1],
-        0,
-    );
-
-const reversed = (curves: Curve[]): Curve[] =>
-    [...curves].reverse().map(({ from, c1, c2, to }) => ({
-        from: to,
-        c1: c2,
-        c2: c1,
-        to: from,
-    }));
-
-const fromCurves = (curves: Curve[]): UnitContour => ({
-    from: curves[0]!.from,
-    segments: curves.map(({ c1, c2, to }) => ({ op: "curve", c1, c2, to })),
-});
-
-/** Shapes redrawn so each animates into the next, and the last back into the first: all as the
- *  same number of cubic curves, running the same way, each starting at the point closest to
- *  where the one before it starts. Only single-contour shapes morph. Each keeps its own fit. */
-export const morphSequence = (
-    shapes: readonly ShapeGeometry[],
-): ShapeGeometry[] => {
-    const runs = shapes.map((shape) => {
-        if (shape.contours.length !== 1) {
-            throw new Error(
-                "morphSequence() takes shapes with one contour each",
-            );
-        }
-        return toCurves(shape.contours[0]!);
-    });
-    const count = Math.max(...runs.map((run) => run.length));
-    const sign = Math.sign(area(runs[0]!));
-    let previous: Curve[] | undefined;
-    return runs.map((run, i) => {
-        let curves = splitTo(
-            Math.sign(area(run)) === sign ? run : reversed(run),
-            count,
-        );
-        if (previous) {
-            const start = previous[0]!.from;
-            let offset = 0;
-            curves.forEach((curve, j) => {
-                if (
-                    distance(curve.from, start) <
-                    distance(curves[offset]!.from, start)
-                ) {
-                    offset = j;
-                }
-            });
-            curves = [...curves.slice(offset), ...curves.slice(0, offset)];
-        }
-        previous = curves;
-        return { ...shapes[i]!, contours: [fromCurves(curves)] };
-    });
-};
+export { morphSequence } from "@pureform/core/ast";
 
 // A quarter of a sine wave as a cubic, from its zero to its crest: the handles follow the
 // curve's slope at each end (Hermite), which keeps it within 2% of the sine.

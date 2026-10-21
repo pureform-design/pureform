@@ -460,30 +460,54 @@ export interface ShapeMorph {
     to: ShapeGeometry;
 }
 
+/** Shapes redrawn so each animates into the next, and the last back into the first: all as the
+ *  same number of cubic curves, running the same way, each starting at the point closest to
+ *  where the one before it starts. Only single-contour shapes morph. Each keeps its own fit. */
+export const morphSequence = (
+    shapes: readonly ShapeGeometry[],
+): ShapeGeometry[] => {
+    const runs = shapes.map((shape) => {
+        if (shape.contours.length !== 1) {
+            throw new Error(
+                "morphSequence() takes shapes with one contour each",
+            );
+        }
+        return toCurves(shape.contours[0]!);
+    });
+    const count = Math.max(...runs.map((run) => run.length));
+    const sign = Math.sign(area(runs[0]!));
+    let previous: Curve[] | undefined;
+    return runs.map((run, i) => {
+        let curves = splitTo(
+            Math.sign(area(run)) === sign ? run : reversed(run),
+            count,
+        );
+        if (previous) {
+            // Start at the point closest to the previous shape's start.
+            const start = previous[0]!.from;
+            const distance = (c: Curve) => length(minus(c.from, start));
+            let offset = 0;
+            curves.forEach((curve, j) => {
+                if (distance(curve) < distance(curves[offset]!)) offset = j;
+            });
+            curves = [...curves.slice(offset), ...curves.slice(0, offset)];
+        }
+        previous = curves;
+        return { ...shapes[i]!, contours: [fromCurves(curves)] };
+    });
+};
+
 /** Two shapes redrawn so one can animate into the other: both as the same number of cubic
  *  curves, running the same direction, from the closest pair of starting points. A target that
  *  animates between shapes (CSS `shape()` among them) needs that match. Each shape keeps its
  *  own fit. Only single-contour shapes morph. */
 export const morph = (from: ShapeGeometry, to: ShapeGeometry): ShapeMorph => {
-    const [a, b] = [from.contours, to.contours];
-    if (a.length !== 1 || b.length !== 1) {
+    if (from.contours.length !== 1 || to.contours.length !== 1) {
         throw new Error("morph() takes shapes with one contour each");
     }
-    let start = toCurves(a[0]!);
-    let end = toCurves(b[0]!);
-    if (Math.sign(area(start)) !== Math.sign(area(end))) end = reversed(end);
-    const count = Math.max(start.length, end.length);
-    start = splitTo(start, count);
-    end = splitTo(end, count);
-    // Start the target at the point closest to the source's start.
-    let offset = 0;
-    end.forEach((curve, i) => {
-        const distance = (c: Curve) => length(minus(c.from, start[0]!.from));
-        if (distance(curve) < distance(end[offset]!)) offset = i;
-    });
-    end = [...end.slice(offset), ...end.slice(0, offset)];
-    return {
-        from: { ...from, contours: [fromCurves(start)] },
-        to: { ...to, contours: [fromCurves(end)] },
-    };
+    const [start, end] = morphSequence([from, to]) as [
+        ShapeGeometry,
+        ShapeGeometry,
+    ];
+    return { from: start, to: end };
 };

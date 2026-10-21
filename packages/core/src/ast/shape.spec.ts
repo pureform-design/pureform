@@ -5,6 +5,7 @@ import {
     clipShape,
     defineShape,
     morph,
+    morphSequence,
     normalize,
     outlineShape,
     px,
@@ -125,6 +126,11 @@ describe("morph", () => {
         expect(a.segments.length).toBe(b.segments.length);
         expect(a.segments.every((s) => s.op === "curve")).toBe(true);
         expect(b.segments.every((s) => s.op === "curve")).toBe(true);
+    });
+
+    it("is morphSequence of the two shapes", () => {
+        const { from, to } = morph(square, star5);
+        expect([from, to]).toEqual(morphSequence([square, star5]));
     });
 
     it("keeps each contour closed", () => {
