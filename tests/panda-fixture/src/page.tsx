@@ -56,6 +56,7 @@ import { MATERIAL_SHAPES } from "@pureform/preset";
 import type { MaterialShape } from "@pureform/preset";
 import { createSignal, For } from "solid-js";
 
+import { DatePickerSection } from "./date-pickers";
 import { Ripple } from "./ripple";
 
 const FILLS = ["filled", "tonal", "outlined", "text", "elevated"] as const;
@@ -3036,6 +3037,7 @@ export function Page() {
                     {(example) => <AppBarExampleView example={example} />}
                 </For>
             </section>
+            <DatePickerSection />
         </main>
     );
 }
