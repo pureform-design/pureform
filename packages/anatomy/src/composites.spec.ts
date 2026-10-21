@@ -6,8 +6,11 @@ import {
     bottomSheetBackdropAnatomy,
     bottomSheetOverlayAnatomy,
     compositeTestIds,
+    datePickerBackdropAnatomy,
+    datePickerOverlayAnatomy,
     dialogBackdropAnatomy,
     dialogOverlayAnatomy,
+    dockedDatePickerOverlayAnatomy,
     fullscreenDialogOverlayAnatomy,
     menuOverlayAnatomy,
     radioGroupAnatomy,
@@ -23,6 +26,8 @@ import {
 import {
     anatomy,
     bottomSheetAnatomy,
+    datePickerAnatomy,
+    dockedDatePickerAnatomy,
     dialogAnatomy,
     fullscreenDialogAnatomy,
     menuAnatomy,
@@ -99,6 +104,12 @@ describe("composites", () => {
             dialogOverlayAnatomy,
             dialogAnatomy,
             compositeTestIds.dialog,
+        ],
+        [
+            "datePicker",
+            datePickerOverlayAnatomy,
+            datePickerAnatomy,
+            compositeTestIds.datePicker,
         ],
         [
             "fullscreenDialog",
@@ -184,6 +195,30 @@ describe("composites", () => {
                 menuAnatomy.parts[part].mirror,
             );
         }
+    });
+
+    it("the docked date picker adds Zag's positioner, unstyled, around its popup", () => {
+        const parts =
+            dockedDatePickerOverlayAnatomy.parts as ComponentAnatomy["parts"];
+        expect(
+            dockedDatePickerOverlayAnatomy.partNames.filter(
+                (name) => name !== "positioner",
+            ),
+        ).toEqual([...dockedDatePickerAnatomy.partNames]);
+        expect(parts.positioner!.styled).toBe(false);
+        expect(parts.content!.parent).toBe("positioner");
+        for (const name of dockedDatePickerOverlayAnatomy.partNames)
+            expect(parts[name]!.testId).toBe(
+                compositeTestIds.dockedDatePicker[name],
+            );
+    });
+
+    it("the date picker's backdrop is drawn by the scrim, under the picker's scope", () => {
+        expect(partAttributes(datePickerBackdropAnatomy, "root")).toEqual({
+            "data-scope": "date-picker",
+            "data-pf-part": "backdrop",
+            "data-testid": compositeTestIds.datePickerBackdrop.root,
+        });
     });
 
     it("the dialog's backdrop is drawn by the scrim, under the dialog's scope", () => {

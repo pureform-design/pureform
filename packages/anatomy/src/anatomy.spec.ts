@@ -15,6 +15,9 @@ const REFRESH = "the preset changed: run @pureform/anatomy's generate task";
 const ICON_PARTS: Record<string, string[]> = {
     button: ["icon", "secondaryIcon"],
     autocomplete: ["leadingIcon", "trailingIcon"],
+    datePicker: ["modeToggle", "prev", "next"],
+    dockedDatePicker: ["leadingIcon", "trailingIcon", "prev", "next"],
+    dateInput: ["modeToggle", "leadingIcon", "trailingIcon"],
     chip: ["icon", "trailingIcon"],
     dialog: ["icon"],
     fab: ["icon"],
@@ -60,6 +63,8 @@ const INDICATION: Record<string, IndicationAnatomy[]> = {
     // Each item's mask.
     carousel: [at("mask", "mask", false)],
     listItem: [at("root", "root", false)],
+    // Each day, month or year of a date picker's calendar.
+    calendarCell: [at("trigger", "trigger", true)],
     tabs: [at("tab", "tab", false)],
     // Its items, and the select's options, which the menu draws.
     menu: [at("item", "item", false)],
