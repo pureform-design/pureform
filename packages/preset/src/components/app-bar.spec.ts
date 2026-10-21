@@ -73,15 +73,14 @@ describe("appBar", () => {
         expect(transition).not.toContain("reducedMotion");
     });
 
-    it("raises the headline into a collapsed bar, and only fades it under reduced motion", () => {
+    it("raises the headline into a collapsed bar, and not under reduced motion", () => {
         const content = json(appBar.recipe.variants?.collapsed?.true?.content);
         expect(content).toContain('"on":"reducedMotion"');
-        expect(content).toContain("appBarCollapseFadeIn");
         expect(content).toContain("appBarCollapseIn");
-        expect(json(APP_BAR_KEYFRAMES.appBarCollapseFadeIn)).not.toContain(
-            "transform",
-        );
         expect(json(APP_BAR_KEYFRAMES.appBarCollapseIn)).toContain("transform");
+        expect(json(APP_BAR_KEYFRAMES.appBarCollapseIn)).not.toContain(
+            "opacity",
+        );
     });
 
     it("has no radius: the bar is square under every shape theme", () => {

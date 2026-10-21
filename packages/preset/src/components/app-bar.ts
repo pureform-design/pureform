@@ -26,6 +26,7 @@ import {
     end,
     flex,
     hidden,
+    none,
     pct,
     px,
     row,
@@ -77,19 +78,12 @@ const pf = typed();
 // How far the headline rises as it moves into a collapsed bar.
 const COLLAPSE_TRAVEL = spacing("2");
 
-/** The keyframes the headline enters a collapsed bar with; `pureform()` adds them to the config.
- *  Under reduced motion it only fades. */
+/** The keyframes the headline rises into a collapsed bar with; `pureform()` adds them to the
+ *  config. Reduced motion drops them. */
 export const APP_BAR_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
     appBarCollapseIn: {
-        from: {
-            opacity: unitless(0),
-            transform: transform(translateY(COLLAPSE_TRAVEL)),
-        },
-        to: { opacity: unitless(1), transform: transform(translateY(px(0))) },
-    },
-    appBarCollapseFadeIn: {
-        from: { opacity: unitless(0) },
-        to: { opacity: unitless(1) },
+        from: { transform: transform(translateY(COLLAPSE_TRAVEL)) },
+        to: { transform: transform(translateY(px(0))) },
     },
 };
 
@@ -216,25 +210,15 @@ export const appBar = pf.slotComponent({
                     root: { tokens: { container: ref("scrolledContainer") } },
                 },
             },
-            // A flexible bar scrolled past its headline draws as the small bar, its headline
-            // rising into the first line.
+            // A flexible bar scrolled past its headline: the bindings select the small size
+            // with it, and its headline rises into the first line.
             collapsed: {
                 false: {},
                 true: {
                     content: {
-                        flexBasis: px(0),
-                        justifyContent: center,
-                        minHeight: px(0),
-                        paddingInlineStart: ref("contentPaddingInline"),
-                        paddingInlineEnd: ref("contentPaddingInline"),
-                        paddingBlockEnd: px(0),
                         animation: when(
                             "reducedMotion",
-                            motionAnimation(
-                                "appBarCollapseFadeIn",
-                                "short4",
-                                "emphasizedDecelerate",
-                            ),
+                            none,
                             motionAnimation(
                                 "appBarCollapseIn",
                                 "short4",
@@ -242,8 +226,6 @@ export const appBar = pf.slotComponent({
                             ),
                         ),
                     },
-                    headline: { textStyle: textStyle("titleLarge") },
-                    subtitle: { textStyle: textStyle("labelMedium") },
                 },
             },
         },

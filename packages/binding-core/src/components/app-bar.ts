@@ -178,12 +178,13 @@ export const appBarContentLast = (
 ): boolean => isFlexibleAppBar(props.size) && !props.search && !state.collapsed;
 
 /** The registry selection from Root's props and its drawn scroll state. A search bar keeps the
- *  small bar's layout. */
+ *  small bar's layout, and a collapsed flexible bar takes it (`collapsed` only raises its
+ *  headline into place). */
 export const appBarSelection = (
     props: AppBarRootOwnProps,
     state: AppBarScrollState,
 ): Selection<"appBar"> => ({
-    size: props.search ? "small" : props.size,
+    size: props.search || state.collapsed ? "small" : props.size,
     centered: props.centered,
     search: props.search,
     scrolled: state.scrolled,

@@ -78,6 +78,15 @@ describe("the drawn app bar", () => {
         expect(appBarContentLast({ size: "small" }, rest)).toBe(false);
     });
 
+    it("selects the small layout for a collapsed flexible bar", () => {
+        expect(
+            appBarSelection(
+                { size: "largeFlexible" },
+                { scrolled: true, collapsed: true },
+            ),
+        ).toMatchObject({ size: "small", collapsed: true });
+    });
+
     it("selects the small layout for a search bar", () => {
         expect(
             appBarSelection(
