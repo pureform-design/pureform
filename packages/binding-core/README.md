@@ -420,6 +420,18 @@ cardLayout(props, element);              // { sections, actionArea, headerOutsid
                                          //   area only beside actions or a header action
 cardEntryActive(rootInteractive)(entry); // the root's entry while Root acts, the action area's else
 
+// App bar: no machine; it follows the scroll offset under it
+type AppBarPart; type AppBarSize; type AppBarScrollBehavior; // "pinned" | "collapse"
+interface AppBarRootOwnProps             // size, centered, tokens, scrollBehavior, scrollOffset,
+                                         // scrolled, collapsed, search, testId, unstyled
+APP_BAR_ROOT_PROPS; APP_BAR_CONTENT_PROPS; // leading, headline, subtitle, trailing, searchBar, mirrorLeading
+appBarScrollState(offset, { size, behavior, previous }); // { scrolled, collapsed }, with hysteresis
+appBarDrawnState(props, fromOffset);     // the owner's scrolled/collapsed win
+appBarContentLast(props, state);         // an expanded flexible bar renders its content last
+appBarSelection(props, state);           // collapsed and search select the small size
+isFlexibleAppBar(size); APP_BAR_COLLAPSE_OFFSET; APP_BAR_AT_REST;
+// dom: subscribeScroll(target, onOffset); scrollOffsetOf(target); type ScrollTarget
+
 // Search bar: the text field machine
 type SearchBarPart; interface SearchBarRootOwnProps // tokens, disabled, required, readOnly,
                                          // placeholder, name, form, id, ids, value, …
