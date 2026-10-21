@@ -12,7 +12,6 @@ import {
     dateFormatHint,
     dateInputSelection,
     dateMachineProps,
-    isoDate,
     isPresent,
     pickerLocale,
     selectedDateText,
@@ -22,6 +21,7 @@ import type {
     DateInputRootOwnProps,
 } from "@pureform/binding-core";
 import * as dateInput from "@pureform/machines/date-input";
+import { toISO } from "@pureform/machines/date-picker";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
@@ -34,7 +34,7 @@ import {
 } from "solid-js";
 
 import { Button } from "../button";
-import { useControllable } from "../controllable";
+import { parseDate, useDateValue } from "../calendar-parts";
 import { CalendarIcon } from "../glyphs";
 import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
@@ -48,12 +48,6 @@ import type { PartProps } from "../props";
 import { useDirection } from "../provider";
 
 type Anatomy = typeof dateInputAnatomy;
-
-const toIso = (value: dateInput.DateValue) =>
-    isoDate({ year: value.year, month: value.month, day: value.day });
-
-const parseIso = (value: string): dateInput.DateValue =>
-    dateInput.parse(value) as dateInput.DateValue;
 
 /** What Root shares with its parts. */
 interface DateInputContextValue {
@@ -112,26 +106,16 @@ export interface DateInputTriggerProps extends DateInputPartProps {
 function Root(props: DateInputRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
-    const value = useControllable<
-        "value",
-        readonly string[],
-        { readonly value: readonly string[] }
-    >("DateInput", "value", props);
-    const service = useMachine(dateInput.machine, () => {
-        const state = value.machineProps();
-        return {
-            id,
-            dir: dir(),
-            ...dateMachineProps(props, parseIso),
-            invalid: props.invalid || props.error !== undefined,
-            value: state.value?.map(parseIso),
-            defaultValue: state.defaultValue?.map(parseIso),
-            onValueChange: (details: dateInput.ValueChangeDetails) =>
-                state.onValueChange({ value: details.value.map(toIso) }),
-        };
-    });
+    const value = useDateValue("DateInput", props);
+    const service = useMachine(dateInput.machine, () => ({
+        id,
+        dir: dir(),
+        ...dateMachineProps(props, parseDate),
+        invalid: props.invalid || props.error !== undefined,
+        ...value(),
+    }));
     const api = createMemo(() => dateInput.connect(service, normalizeProps));
-    const dates = createMemo(() => api().value.map(toIso));
+    const dates = createMemo(() => api().value.map(toISO));
     const scope = useComponent(dateInputAnatomy, {
         selection: () => dateInputSelection(props),
         testId: () => props.testId,

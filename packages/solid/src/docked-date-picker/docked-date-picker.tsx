@@ -34,7 +34,7 @@ import {
     Switch,
 } from "solid-js";
 
-import { calendarParts, parseDate } from "../calendar-parts";
+import { calendarParts, parseDate, useDateValue } from "../calendar-parts";
 import type {
     CalendarCellProps,
     CalendarContext,
@@ -105,11 +105,7 @@ export type {
 function Root(props: DockedDatePickerRootProps): JSX.Element {
     const id = createUniqueId();
     const dir = useDirection();
-    const value = useControllable<
-        "value",
-        readonly string[],
-        { readonly value: readonly string[] }
-    >("DockedDatePicker", "value", props);
+    const value = useDateValue("DockedDatePicker", props);
     const open = useControllable<"open", boolean>(
         "DockedDatePicker",
         "open",
@@ -119,7 +115,6 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
     // Material's docked picker goes from the years straight back to the days.
     let lastView: datePicker.DateView = "day";
     const service = useMachine(datePicker.machine, () => {
-        const state = value.machineProps();
         return {
             id,
             dir: dir(),
@@ -128,12 +123,7 @@ function Root(props: DockedDatePickerRootProps): JSX.Element {
             // The label stands in for the format, which the supporting text shows.
             placeholder: " ",
             closeOnSelect: props.closeOnSelect ?? true,
-            value: state.value?.map(parseDate),
-            defaultValue: state.defaultValue?.map(parseDate),
-            onValueChange: (details: datePicker.ValueChangeDetails) =>
-                state.onValueChange({
-                    value: details.value.map(datePicker.toISO),
-                }),
+            ...value(),
             onViewChange: (details: datePicker.ViewChangeDetails) => {
                 const from = lastView;
                 lastView = details.view;
