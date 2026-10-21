@@ -34,8 +34,8 @@ import { useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
-import { SearchBar } from "../search-bar";
-import type { SearchBarProps } from "../search-bar";
+import { SearchBar } from "../search-bar/search-bar";
+import type { SearchBarProps } from "../search-bar/search-bar";
 
 type Anatomy = typeof appBarAnatomy;
 
