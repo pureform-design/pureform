@@ -6,6 +6,7 @@
 /** The ready-made components every binding renders. Add a component's name here and to each
  *  binding's `components` map in `src/bindings/<binding>/scene.tsx`. */
 export const COMPONENT_NAMES = [
+    "AppBar",
     "Avatar",
     "Badge",
     "BottomSheet",

@@ -685,6 +685,27 @@ export type {
     ScrimVariantProps,
 } from "./components/scrim";
 export {
+    APP_BAR_AT_REST,
+    APP_BAR_COLLAPSE_OFFSET,
+    APP_BAR_CONTENT_PROPS,
+    APP_BAR_ROOT_PROPS,
+    appBarContentLast,
+    appBarDrawnState,
+    appBarScrollState,
+    appBarSelection,
+    isFlexibleAppBar,
+} from "./components/app-bar";
+export type {
+    AppBarContentProps,
+    AppBarPart,
+    AppBarRootOwnProps,
+    AppBarScrollBehavior,
+    AppBarScrollProps,
+    AppBarScrollState,
+    AppBarSize,
+    AppBarVariantProps,
+} from "./components/app-bar";
+export {
     SEARCH_BAR_CONTENT_PROPS,
     SEARCH_BAR_INPUT_PROPS,
     SEARCH_BAR_ROOT_PROPS,

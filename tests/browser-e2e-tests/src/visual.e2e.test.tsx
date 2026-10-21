@@ -50,6 +50,7 @@ const SECTIONS = [
     "loading-and-wavy",
     "navigation",
     "badges",
+    "app-bars",
 ];
 
 let dispose: (() => void) | undefined;

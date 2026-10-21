@@ -26,6 +26,7 @@ const ICON_PARTS: Record<string, string[]> = {
     menu: ["itemLeading", "itemTrailing"],
     navigationBar: ["icon"],
     navigationRail: ["icon"],
+    appBar: ["leading", "trailing"],
     searchBar: ["leading", "trailing"],
     searchView: ["leading", "trailing"],
     select: ["leadingIcon", "trailingIcon"],

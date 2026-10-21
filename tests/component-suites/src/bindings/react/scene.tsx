@@ -8,6 +8,7 @@ import {
     PureformProvider,
 } from "@pureform/react";
 import type { Indication } from "@pureform/react";
+import { AppBar } from "@pureform/react/app-bar";
 import { Autocomplete } from "@pureform/react/autocomplete";
 import { Avatar } from "@pureform/react/avatar";
 import { Badge } from "@pureform/react/badge";
@@ -122,6 +123,7 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Ripple,
     RichTooltip,
     Scrim,
+    AppBar,
     SearchBar,
     SearchView,
     Select,

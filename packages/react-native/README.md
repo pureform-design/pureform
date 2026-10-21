@@ -467,6 +467,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   moves the thumb nearest the press, and the keys move the last one dragged; `centered`, `stops`,
   `valueIndicator` and `orientation: "vertical"` match the web. Each thumb and stop resolves its
   own styles with its own `value` token.
+- **The app bar** takes `scrollOffset` from the app: `useAppBarScroll()` returns it with an
+  `onScroll` for the scroll view under the bar. The colours, collapse and search bar match the
+  web; the headline's rise into a collapsed bar is web only (keyframes), so it changes at once.
 - **The search bar** hears its root's hover and press and its input's focus (always visible, as a
   text field's), but has no indication entry, so no ripple.
 - **A component's states are one set:** a component with two icons mirrors both when either is

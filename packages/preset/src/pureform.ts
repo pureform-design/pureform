@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { APP_BAR_KEYFRAMES, appBar } from "./components/app-bar";
 import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
@@ -319,6 +320,7 @@ const defaultComponents = <G extends string>(
         tabs: createTabs(theme.color.groups),
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
+        appBar,
         dialog,
         fullscreenDialog,
         bottomSheet,
@@ -485,6 +487,7 @@ export const pureform = <
                     ...OVERLAY_KEYFRAMES,
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
+                    ...APP_BAR_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),

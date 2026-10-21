@@ -1,0 +1,169 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`appBar > compiles to a stable Panda slot recipe 1`] = `
+{
+  "base": {
+    "content": {
+      "alignItems": "stretch",
+      "display": "flex",
+      "flexBasis": "0px",
+      "flexDirection": "column",
+      "flexGrow": "1",
+      "minWidth": "0px",
+      "paddingInlineEnd": "var(--components-appBar-contentPaddingInline, token(spacing.3))",
+      "paddingInlineStart": "var(--components-appBar-contentPaddingInline, token(spacing.3))",
+    },
+    "headline": {
+      "color": "var(--components-appBar-headlineColor, token(colors.onSurface))",
+      "overflow": "hidden",
+      "textStyle": "titleLarge",
+    },
+    "leading": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-appBar-leadingColor, token(colors.onSurface))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-appBar-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-appBar-iconFill, 0)",
+      "height": "var(--components-appBar-height, 64px)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+    },
+    "root": {
+      "alignItems": "center",
+      "backgroundColor": "var(--components-appBar-container, token(colors.surface))",
+      "color": "var(--components-appBar-headlineColor, token(colors.onSurface))",
+      "display": "flex",
+      "flexDirection": "row",
+      "flexWrap": "wrap",
+      "paddingInlineEnd": "var(--components-appBar-paddingInline, token(spacing.1))",
+      "paddingInlineStart": "var(--components-appBar-paddingInline, token(spacing.1))",
+      "shadowElevation": "level0",
+      "transition": "background-color token(durations.short3) token(easings.standard), color token(durations.short3) token(easings.standard), border-color token(durations.short3) token(easings.standard), outline-color token(durations.short3) token(easings.standard), box-shadow token(durations.medium1) token(easings.standard)",
+      "width": "100%",
+    },
+    "subtitle": {
+      "color": "var(--components-appBar-subtitleColor, token(colors.onSurfaceVariant))",
+      "overflow": "hidden",
+      "textStyle": "labelMedium",
+    },
+    "trailing": {
+      "_rtl": {
+        "&[data-pf-mirror]": {
+          "transform": "scaleX(-1)",
+        },
+      },
+      "alignItems": "center",
+      "color": "var(--components-appBar-trailingColor, token(colors.onSurfaceVariant))",
+      "display": "inline-flex",
+      "flexShrink": "0",
+      "fontSize": "var(--components-appBar-iconSize, token(sizes.iconMedium))",
+      "fontVariationSettings": ""FILL" var(--components-appBar-iconFill, 0)",
+      "height": "var(--components-appBar-height, 64px)",
+      "justifyContent": "center",
+      "lineHeight": "1",
+      "marginInlineStart": "auto",
+    },
+  },
+  "className": "appBar",
+  "compoundVariants": [],
+  "defaultVariants": {
+    "centered": false,
+    "collapsed": false,
+    "scrolled": false,
+    "search": false,
+    "size": "small",
+  },
+  "jsx": [
+    "AppBar",
+  ],
+  "slots": [
+    "root",
+    "leading",
+    "content",
+    "headline",
+    "subtitle",
+    "trailing",
+  ],
+  "variants": {
+    "centered": {
+      "false": {},
+      "true": {
+        "content": {
+          "alignItems": "center",
+        },
+      },
+    },
+    "collapsed": {
+      "false": {},
+      "true": {
+        "content": {
+          "animation": {
+            "_motionReduce": "none",
+            "base": "token(durations.short4) token(easings.emphasizedDecelerate) appBarCollapseIn",
+          },
+        },
+      },
+    },
+    "scrolled": {
+      "false": {},
+      "true": {
+        "root": {
+          "--components-appBar-container": "var(--components-appBar-scrolledContainer, token(colors.surfaceContainer))",
+        },
+      },
+    },
+    "search": {
+      "false": {},
+      "true": {
+        "content": {
+          "paddingInlineEnd": "var(--components-appBar-paddingInline, token(spacing.1))",
+          "paddingInlineStart": "var(--components-appBar-paddingInline, token(spacing.1))",
+        },
+      },
+    },
+    "size": {
+      "largeFlexible": {
+        "content": {
+          "flexBasis": "100%",
+          "flexGrow": "1",
+          "justifyContent": "end",
+          "minHeight": "var(--components-appBar-largeContentHeight, 56px)",
+          "paddingBlockEnd": "var(--components-appBar-expandedPaddingBlockEnd, token(spacing.3))",
+          "paddingInlineEnd": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
+          "paddingInlineStart": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
+        },
+        "headline": {
+          "textStyle": "displaySmall",
+        },
+        "subtitle": {
+          "textStyle": "titleMedium",
+        },
+      },
+      "mediumFlexible": {
+        "content": {
+          "flexBasis": "100%",
+          "flexGrow": "1",
+          "justifyContent": "end",
+          "minHeight": "var(--components-appBar-mediumContentHeight, 48px)",
+          "paddingBlockEnd": "var(--components-appBar-expandedPaddingBlockEnd, token(spacing.3))",
+          "paddingInlineEnd": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
+          "paddingInlineStart": "var(--components-appBar-expandedPaddingInline, token(spacing.4))",
+        },
+        "headline": {
+          "textStyle": "headlineMedium",
+        },
+        "subtitle": {
+          "textStyle": "labelLarge",
+        },
+      },
+      "small": {},
+    },
+  },
+}
+`;
