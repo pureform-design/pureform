@@ -1,7 +1,8 @@
 // Zag's listbox, re-exported so bindings take every machine from one package, behind the selection
 // list. Focus stays on the list while the arrow keys move a highlight across its options; the
 // highlighted option hovers (on its own interaction source), the pointer presses an option, and
-// Enter or Space presses the highlighted one. Everything ends when the list loses focus.
+// Enter or Space presses the highlighted one. Everything ends, and the highlight clears, when the
+// list loses focus; a disabled list leaves the tab order.
 
 import type {
     Machine as AnyMachine,
@@ -39,9 +40,14 @@ export type Service = AnyService<Schema>;
 export const machine: Machine = withInteraction(
     zagMachine as unknown as AnyMachine<SchemaOf<ZagMachine>>,
     (params, emitters) => {
-        trackHighlight(params, emitters, () =>
-            Boolean(params.context.get("focused")),
-        );
+        const { context, track } = params;
+        const focused = () => Boolean(context.get("focused"));
+        trackHighlight(params, emitters, focused);
+        // The highlight goes with focus, so focus coming back highlights afresh (the selected
+        // option, else the first) rather than where the pointer last was.
+        track([focused], () => {
+            if (!focused()) context.set("highlightedValue", null);
+        });
     },
 );
 
@@ -56,7 +62,11 @@ export function connect<T extends PropTypes>(
         ...api,
         getContentProps: () =>
             highlightedPressProps(
-                api.getContentProps(),
+                {
+                    ...api.getContentProps(),
+                    // A disabled list is out of the tab order.
+                    ...normalize.element({ tabIndex: api.disabled ? -1 : 0 }),
+                },
                 emitters,
                 api.highlightedValue,
                 normalize,

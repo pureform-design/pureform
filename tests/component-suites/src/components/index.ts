@@ -9,6 +9,7 @@ import { card, cardActionArea } from "./card";
 import { carouselCase } from "./carousel";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
+import { chipSet } from "./chip-set";
 import { dateInput, datePicker, dockedDatePicker } from "./date-pickers";
 import { dialog } from "./dialog";
 import { dragHandle } from "./drag-handle";
@@ -29,6 +30,7 @@ import { richTooltip } from "./rich-tooltip";
 import { searchBar } from "./search-bar";
 import { searchView } from "./search-view";
 import { select } from "./select";
+import { selectionList } from "./selection-list";
 import { sideSheet } from "./side-sheet";
 import { slider } from "./slider";
 import { snackbar } from "./snackbar";
@@ -71,6 +73,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     treeCase,
     checkbox,
     chip,
+    chipSet,
     circularProgress,
     loadingIndicator,
     dialog,
@@ -100,6 +103,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     searchBar,
     searchView,
     select,
+    selectionList,
     autocomplete,
     datePicker,
     dockedDatePicker,

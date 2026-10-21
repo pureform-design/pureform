@@ -117,17 +117,21 @@ export function SelectionList(props: SelectionListProps): JSX.Element {
                         () => item().interactionSource,
                     );
                     const row = merge(
-                        omit(
-                            item(),
-                            "value",
-                            "textValue",
-                            "disabled",
-                            "interactionSource",
-                        ),
+                        () =>
+                            omit(
+                                item(),
+                                "value",
+                                "textValue",
+                                "disabled",
+                                "interactionSource",
+                            ),
                         shared,
                         () => api().getItemProps({ item: option() }),
                         {
                             interactive: true,
+                            get disabled() {
+                                return !!(item().disabled || props.disabled);
+                            },
                             get interactionSource() {
                                 return source();
                             },

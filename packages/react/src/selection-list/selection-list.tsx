@@ -96,7 +96,7 @@ export function SelectionList(props: SelectionListProps): ReactNode {
                 ({
                     value,
                     textValue: _text,
-                    disabled: _disabled,
+                    disabled,
                     interactionSource,
                     ...item
                 }) => (
@@ -111,6 +111,7 @@ export function SelectionList(props: SelectionListProps): ReactNode {
                                 item: collection.find(value)!,
                             }) as object)}
                             interactive
+                            disabled={!!(disabled || props.disabled)}
                             interactionSource={sources.item(
                                 value,
                                 interactionSource,

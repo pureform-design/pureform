@@ -65,6 +65,7 @@ const machines = (from: string): string[] =>
         "accordion",
         "tree-view",
         "toggle-group",
+        "listbox",
         "tooltip",
         "types",
         "utils",

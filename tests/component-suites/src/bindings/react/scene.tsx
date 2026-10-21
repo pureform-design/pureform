@@ -20,6 +20,7 @@ import { Card } from "@pureform/react/card";
 import { Carousel } from "@pureform/react/carousel";
 import { Checkbox } from "@pureform/react/checkbox";
 import { Chip } from "@pureform/react/chip";
+import { ChipSet } from "@pureform/react/chip-set";
 import { CircularProgress } from "@pureform/react/circular-progress";
 import { DateInput } from "@pureform/react/date-input";
 import { DatePicker } from "@pureform/react/date-picker";
@@ -48,6 +49,7 @@ import { Scrim } from "@pureform/react/scrim";
 import { SearchBar } from "@pureform/react/search-bar";
 import { SearchView } from "@pureform/react/search-view";
 import { Select } from "@pureform/react/select";
+import { SelectionList } from "@pureform/react/selection-list";
 import { Separator } from "@pureform/react/separator";
 import { SideSheet } from "@pureform/react/side-sheet";
 import { Slider } from "@pureform/react/slider";
@@ -56,13 +58,13 @@ import { SplitButton } from "@pureform/react/split-button";
 import { Stepper } from "@pureform/react/stepper";
 import { SupportingText } from "@pureform/react/supporting-text";
 import { Switch } from "@pureform/react/switch";
+import { Table } from "@pureform/react/table";
 import { Tabs } from "@pureform/react/tabs";
 import { TagsInput } from "@pureform/react/tags-input";
 import { Text } from "@pureform/react/text";
 import { TextArea } from "@pureform/react/text-area";
 import { TextField } from "@pureform/react/text-field";
 import { TimeInput } from "@pureform/react/time-input";
-import { Table } from "@pureform/react/table";
 import { TimePicker } from "@pureform/react/time-picker";
 import { createToaster, Toaster } from "@pureform/react/toast";
 import type { ToastData } from "@pureform/react/toast";
@@ -167,6 +169,8 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     Tree,
     Checkbox,
     Chip,
+    ChipSet,
+    SelectionList,
     CircularProgress,
     LoadingIndicator,
     Dialog,
