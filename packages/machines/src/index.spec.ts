@@ -1,3 +1,4 @@
+import * as zagAccordion from "@zag-js/accordion";
 import * as zagCarousel from "@zag-js/carousel";
 import * as zagCheckbox from "@zag-js/checkbox";
 import * as zagCombobox from "@zag-js/combobox";
@@ -11,6 +12,7 @@ import * as zagSwitch from "@zag-js/switch";
 import * as zagTabs from "@zag-js/tabs";
 import * as zagTagsInput from "@zag-js/tags-input";
 import * as zagTooltip from "@zag-js/tooltip";
+import * as zagTreeView from "@zag-js/tree-view";
 import { describe, expect, it } from "vitest";
 
 import * as machines from ".";
@@ -35,6 +37,7 @@ describe("@pureform/machines", () => {
 
     it("keeps Zag's states and transitions for the machines that emit to an interaction source", () => {
         const zag = {
+            accordion: zagAccordion,
             carousel: zagCarousel,
             checkbox: zagCheckbox,
             combobox: zagCombobox,
@@ -44,6 +47,7 @@ describe("@pureform/machines", () => {
             switchControl: zagSwitch,
             tabs: zagTabs,
             tagsInput: zagTagsInput,
+            treeView: zagTreeView,
         };
         for (const [name, own] of Object.entries(zag)) {
             const ours = machines[name as keyof typeof zag];
