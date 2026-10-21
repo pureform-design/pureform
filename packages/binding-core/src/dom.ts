@@ -179,6 +179,11 @@ const stackNow = (positioner: HTMLElement, surface: HTMLElement): void => {
 };
 
 export {
+    carouselRowPadding,
+    measureCarouselRow,
+    observeCarouselRow,
+} from "./carousel-row";
+export {
     dragToDismiss,
     SHEET_DISMISS_SHARE,
     SHEET_FLICK_SPEED,

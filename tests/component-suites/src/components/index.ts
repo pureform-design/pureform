@@ -6,6 +6,7 @@ import { bottomSheet } from "./bottom-sheet";
 import { button } from "./button";
 import { buttonGroup } from "./button-group";
 import { card, cardActionArea } from "./card";
+import { carouselCase } from "./carousel";
 import { checkbox } from "./checkbox";
 import { chip } from "./chip";
 import { dialog } from "./dialog";
@@ -58,6 +59,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     buttonGroup,
     card,
     cardActionArea,
+    carouselCase,
     checkbox,
     chip,
     circularProgress,

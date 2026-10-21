@@ -9,6 +9,7 @@ import {
     button,
     buttonGroup,
     card,
+    carousel,
     checkbox,
     chip,
     circularProgress,
@@ -190,6 +191,32 @@ const TOOLBAR_ICONS: readonly (readonly [
         undefined,
     ],
 ];
+// Carousels in a 360px row (328px inside its padding, 8px gaps), sized at rest as the bindings
+// size them: each item's slot, its mask, and the mask's offset in the slot.
+const CAROUSELS = [
+    {
+        layout: "multiBrowse",
+        masks: [
+            [186, 186, 0],
+            [186, 70, 0],
+            [186, 56, -116],
+        ],
+    },
+    {
+        layout: "hero",
+        masks: [
+            [264, 264, 0],
+            [264, 56, 0],
+        ],
+    },
+    {
+        layout: "uncontained",
+        masks: [
+            [186, 186, 0],
+            [186, 186, 0],
+        ],
+    },
+] as const;
 
 const TOAST_TYPES = ["info", "success", "warning", "error", "loading"] as const;
 // Plain glyphs: the bundled Roboto draws them the same on every machine.
@@ -2898,6 +2925,69 @@ export function Page() {
                 </div>
             </section>
 
+            <section
+                data-section="carousels"
+                style={{ display: "grid", gap: "16px", width: "360px" }}
+            >
+                <For each={["teal", "sharp", undefined] as const}>
+                    {(theme) => (
+                        <For each={CAROUSELS}>
+                            {({ layout, masks }) => {
+                                const c = carousel({ layout });
+                                return (
+                                    <div
+                                        class={c.root}
+                                        data-panda-theme={theme}
+                                        role="region"
+                                        aria-label={`${theme ?? "base"} ${layout}`}
+                                        style={{ height: "96px" }}
+                                    >
+                                        <div
+                                            class={c.itemGroup}
+                                            style={{
+                                                height: "96px",
+                                                overflow: "hidden",
+                                            }}
+                                        >
+                                            <For each={masks}>
+                                                {([slot, mask, offset]) => (
+                                                    <div
+                                                        class={c.item}
+                                                        style={{
+                                                            width: `${slot}px`,
+                                                        }}
+                                                    >
+                                                        <div
+                                                            class={c.mask}
+                                                            style={{
+                                                                width: `${mask}px`,
+                                                                "margin-inline-start": `${offset}px`,
+                                                            }}
+                                                        >
+                                                            <img
+                                                                class={
+                                                                    c.content
+                                                                }
+                                                                style={{
+                                                                    width: `${slot}px`,
+                                                                    "object-fit":
+                                                                        "cover",
+                                                                }}
+                                                                src={PORTRAIT}
+                                                                alt=""
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </For>
+                                        </div>
+                                    </div>
+                                );
+                            }}
+                        </For>
+                    )}
+                </For>
+            </section>
             <section
                 data-section="media"
                 style={{ ...row, "align-items": "flex-start" }}
