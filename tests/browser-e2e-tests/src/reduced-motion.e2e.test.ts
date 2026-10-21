@@ -38,6 +38,8 @@ const FIXTURES = [
     },
     // The time picker's hand turns to a new value (c5b).
     { name: "timePicker", slot: "dialTrack" },
+    // A table's sort arrow (c6d) only fades in, so reduced motion keeps it.
+    { name: "dataTable", slot: "sortIndicator" },
 ] as const;
 
 type Fixture = {
@@ -77,6 +79,7 @@ const EXPECTED: Record<
     calendarCell: { full: STATE, reduced: STATE },
     wavyLinearProgress: { full: "width", reduced: "none" },
     timePicker: { full: "transform", reduced: "none" },
+    dataTable: { full: "opacity", reduced: "opacity" },
 };
 
 const classOf = (

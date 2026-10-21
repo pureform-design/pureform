@@ -2974,3 +2974,29 @@ carousel.mask: bg oklch(0.9151 0.0086 325.879) | color oklch(0.2245 0.0059 301.1
     hovered-selected: bg color(srgb 0.8385 0.8203 0.8392)
     pressed-checked: bg color(srgb 0.8227 0.8047 0.8235)
     focused-checked: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+dataTable.sortHeader: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    dragged: bg color(srgb 0.1098 0.1059 0.1176 / 0.16)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+dataTable.row: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047)
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    hovered-selected: bg color(srgb 0.8602 0.8223 0.9223) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047)
+dataTable.selectionCell: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+dataTable.cell: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+dataTable.alternateRow: bg oklch(0.9664 0.0085 325.891) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.8999 0.8816 0.9005)
+    focused: bg color(srgb 0.8827 0.8647 0.8835)
+    pressed: bg color(srgb 0.8827 0.8647 0.8835)
+    hovered-selected: bg color(srgb 0.8602 0.8223 0.9223) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.8827 0.8647 0.8835)
+    focused-checked: bg color(srgb 0.8827 0.8647 0.8835)
