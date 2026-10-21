@@ -30,6 +30,7 @@ export default createConfig({
                     "tags-input": "src/tags-input/index.ts",
                     toast: "src/toast/index.ts",
                     carousel: "src/carousel/index.ts",
+                    paginator: "src/paginator/index.ts",
                     combobox: "src/combobox/index.ts",
                     "date-picker": "src/date-picker/index.ts",
                     "date-input": "src/date-input/index.ts",

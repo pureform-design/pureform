@@ -12,6 +12,7 @@ import {
     inputChipAnatomy,
     navigationBarAnatomy,
     navigationRailAnatomy,
+    paginatorAnatomy,
     searchViewAnatomy,
     sliderAnatomy,
     snackbarAnatomy,
@@ -38,6 +39,7 @@ import {
     dockedAnatomy as dockedDatePicker,
 } from "./date-picker/date-picker.anatomy";
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
+import { anatomy as paginator } from "./paginator/paginator.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
 import {
@@ -70,6 +72,7 @@ const pairs: Record<string, Pair> = {
     dateInput: { machine: dateInput, preset: dateInputAnatomy },
     navigationBar: { machine: navigation, preset: navigationBarAnatomy },
     navigationRail: { machine: navigation, preset: navigationRailAnatomy },
+    paginator: { machine: paginator, preset: paginatorAnatomy },
     searchView: { machine: searchView, preset: searchViewAnatomy },
     slider: { machine: slider, preset: sliderAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
