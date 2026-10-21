@@ -49,10 +49,9 @@ export const observeCarouselRow = (
         if (!row.isConnected) return;
         onChange(measureCarouselRow(row));
     };
-    // Not now: measuring forces the page's styles before it has them all (a runtime theme's block
-    // comes in as the component mounts), so its colors would then tween from the old ones. The
-    // resize observer first calls once the row is laid out.
-    if (typeof ResizeObserver === "undefined") update();
+    // Once it's in the page (a binding may hand it over before inserting it); the resize observer
+    // calls again once it's laid out.
+    queueMicrotask(update);
     row.addEventListener("scroll", update, { passive: true });
     const resize =
         typeof ResizeObserver === "undefined"
