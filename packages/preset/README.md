@@ -788,9 +788,10 @@ page's layout. `modal` (default) moves it to the `dialog` layer on `surfaceConta
 1, with its start corners on the `large` role. `coplanar` is meant for a standard sheet; the
 bindings never set both.
 
-Both slide in from their edge on `data-state` (`sheetMotion`, with `SHEET_KEYFRAMES` added to the
-config); the side sheet's keyframes run the other way under right to left, and reduced motion
-fades. Neither has compounds.
+Both slide in from their edge on `data-state` (`overlayMotion` with `BOTTOM_SHEET_MOTION` and
+`SIDE_SHEET_MOTION`, and `SHEET_KEYFRAMES` added to the config); the side sheet's keyframes run the
+other way under right to left (the motion step's `rtl` keyframes), and reduced motion fades with
+the other overlays' `overlayFadeIn`/`overlayFadeOut`. Neither has compounds.
 
 `dragHandle` is a touch-sized button holding the `handle` pill (32 by 4 in `onSurfaceVariant`);
 `orientation: "vertical"` stands the pill up (4 by 48) for a pane divider. It draws only the

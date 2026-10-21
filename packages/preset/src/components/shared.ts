@@ -489,6 +489,22 @@ export const pressableRoot = (token: IndicationRef) =>
         states: { disabled: { pointerEvents: none } },
     }) satisfies StyleMap;
 
+/** A notification's text action (the snackbar's and the toast's): a full-round text button in
+ *  `color`, `actionHeight` tall, with its state layer from the component's indication tokens. */
+export const notificationAction = (
+    token: IndicationRef & ((name: "actionHeight") => AliasNode),
+    color: ColorValue,
+) =>
+    ({
+        ...pressableRoot(token),
+        ...interactiveColors(token, transparent, color),
+        textStyle: textStyle("labelLarge"),
+        height: token("actionHeight"),
+        paddingInlineStart: spacing("3"),
+        paddingInlineEnd: spacing("3"),
+        borderRadius: radius("full"),
+    }) satisfies StyleMap;
+
 /** A Material surface: a container color, the content color drawn on it, and an elevation
  *  level. Card, menu, and dialog are surfaces. */
 export const surface = (

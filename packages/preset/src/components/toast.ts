@@ -33,7 +33,6 @@ import {
     hidden,
     px,
     relative,
-    row,
     start,
     transparent,
     unitless,
@@ -51,6 +50,7 @@ import {
     componentTokens,
     INDICATION_ROOT,
     interactiveColors,
+    notificationAction,
     pressableRoot,
     surface,
     sys,
@@ -177,16 +177,7 @@ export const toast = pf.slotComponent({
                 color: ref("content"),
             },
             // A text button in the primary color, below the text.
-            actionTrigger: {
-                ...pressableRoot(ref),
-                ...interactiveColors(ref, transparent, ref("actionColor")),
-                flexDirection: row,
-                textStyle: textStyle("labelLarge"),
-                height: ref("actionHeight"),
-                paddingInlineStart: spacing("3"),
-                paddingInlineEnd: spacing("3"),
-                borderRadius: radius("full"),
-            },
+            actionTrigger: notificationAction(ref, ref("actionColor")),
             // An icon button at the top end.
             closeTrigger: {
                 ...pressableRoot(ref),

@@ -34,8 +34,9 @@ import {
 } from "@pureform/core/ast";
 import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
+import { overlayMotion } from "./overlay";
 import { blend, componentTokens, surface, sys } from "./shared";
-import { sheetMotion } from "./sheet";
+import { SIDE_SHEET_MOTION } from "./sheet";
 import { runCorners } from "./tiles";
 
 const { tokens, ref } = componentTokens("sideSheet", {
@@ -84,7 +85,7 @@ export const sideSheet = pf.slotComponent({
         base: {
             root: {
                 ...surface(ref("container"), ref("content"), "level0"),
-                ...sheetMotion("end"),
+                ...overlayMotion(SIDE_SHEET_MOTION),
                 display: flex,
                 flexDirection: column,
                 width: ref("width"),
