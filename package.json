@@ -11,6 +11,7 @@
         "access": "restricted"
     },
     "dependencies": {
+        "@pureform/oxfmt-config": "workspace:^",
         "@typescript/typescript6": "catalog:",
         "oxfmt": "catalog:",
         "oxlint": "catalog:",

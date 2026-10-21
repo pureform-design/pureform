@@ -5,6 +5,7 @@
     "": {
       "name": "@pureform/root",
       "dependencies": {
+        "@pureform/oxfmt-config": "workspace:^",
         "@typescript/typescript6": "catalog:",
         "oxfmt": "catalog:",
         "oxlint": "catalog:",
