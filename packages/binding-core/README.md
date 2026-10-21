@@ -733,3 +733,9 @@ slot, mask width and mask offset at a scroll position; the keylines turn round n
 last item ends large). `CAROUSEL_SIZES` holds the fixed small (40 to 56) and large (186) widths.
 The `dom` subpath adds `observeCarouselRow`, `measureCarouselRow` and `carouselRowPadding` (the
 `padding` token's var, for Zag's `padding` prop, so the scroll padding renders on the server).
+
+## Grid list
+
+`components/grid-list.ts`: `GridListRootOwnProps`, `GRID_LIST_ROOT_PROPS`, `gridListSelection`
+(`columns`, `gutter`, `aspect`, `tokens`), `gridListRootProps` (`role="list"`) and
+`gridListTileProps` (`role="listitem"`). No machine and no state.
