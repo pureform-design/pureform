@@ -643,6 +643,40 @@ focus ring on the whole bar.
 </label>
 ```
 
+## App bar
+
+`appBar` is the strip at the top of a screen: `leading` (the navigation button), `content`
+(`headline` and `subtitle`, or a search bar) and `trailing` actions, in one wrapping row. The
+leading and trailing parts are the bar's 64px `height`, so they make the first line.
+
+- `size`: `small` (the default) keeps the content between them, the headline in `titleLarge`.
+  M3 Expressive's `mediumFlexible` and `largeFlexible` replace the deprecated medium and large
+  bars: render the content after `trailing` and it takes a line of its own under the actions,
+  at least `mediumContentHeight`/`largeContentHeight` tall, the headline in `headlineMedium` or
+  `displaySmall` and the subtitle in `labelLarge` or `titleMedium`.
+- `centered` centers the headline; `search` makes room for a search bar (use the search bar's
+  `centered` and `scrolled` with it).
+- `scrolled` takes `scrolledContainer` (`surfaceContainer`), once the page scrolls under the bar;
+  the colour fades with the state tween, which reduced motion keeps.
+- `collapsed`, for a flexible bar the page has scrolled past: select it with the `small` size
+  (the bindings do) and the headline rises into the first line (`appBarCollapseIn`, added by
+  `pureform()`; nothing moves under reduced motion).
+
+No radius (the bar is square under every shape theme), no indication of its own, and no
+compounds. Nothing deprecated was kept: the non-flexible medium and large bars aren't built,
+since the flexible sizes replace them.
+
+```html
+<header class="{root}">
+    <div class="{leading}"><button aria-label="Back">←</button></div>
+    <div class="{trailing}"><button aria-label="More">⋮</button></div>
+    <div class="{content}">
+        <h1 class="{headline}">Inbox</h1>
+        <p class="{subtitle}">12 unread</p>
+    </div>
+</header>
+```
+
 ## Navigation
 
 `navigationBar` (bottom, destinations side by side) and `navigationRail` (a narrow column)
