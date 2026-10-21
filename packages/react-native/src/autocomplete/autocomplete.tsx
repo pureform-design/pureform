@@ -21,31 +21,16 @@ import type {
     IndicationProps,
     TextFieldAffixProps,
 } from "@pureform/binding-core";
-import { useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
 import { Menu } from "../menu/menu";
-import { Anchored, useDismiss } from "../overlay";
-import { useControllable, useStableCallback } from "../parts";
+import { Anchored, useFieldPopup } from "../overlay";
+import { useControllable } from "../parts";
 import { Portal } from "../portal";
-import type { WindowRect } from "../portal-host";
-import { usePresence } from "../presence";
 import { useEngine } from "../provider";
 import { Field, partId } from "../text-input";
 import type { FieldProps } from "../text-input";
-
-// A view, read for where it sits on screen.
-interface Measurable {
-    measureInWindow: (
-        done: (
-            left: number,
-            top: number,
-            width: number,
-            height: number,
-        ) => void,
-    ) => void;
-}
 
 export interface AutocompleteProps
     extends
@@ -140,19 +125,8 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
         false,
     );
     const engine = useEngine();
-    const presence = usePresence(open, "popup");
-    const container = useRef<Measurable>(null);
-    const [anchor, setAnchor] = useState<WindowRect>();
-    const [height, setHeight] = useState(0);
-    const show = () =>
-        container.current?.measureInWindow((x, y, width, h) => {
-            setAnchor({ x, y, width, height: h });
-            if (!open) setOpen(true);
-        });
-    const close = useStableCallback(() => {
-        if (open) setOpen(false);
-    });
-    useDismiss(open, close);
+    const { presence, container, anchor, show, close, trigger } =
+        useFieldPopup(open, setOpen);
     const matches = autocompleteMatches(items, text, filter);
     const disabled = props.disabled || props.readOnly;
     return (
@@ -190,19 +164,9 @@ export function Autocomplete(props: AutocompleteProps): ReactNode {
                 aria-label={toggleLabel ?? "Show suggestions"}
                 aria-expanded={open}
                 disabled={disabled}
-                onLayout={() =>
-                    container.current?.measureInWindow((_x, _y, _w, h) =>
-                        setHeight(h),
-                    )
-                }
+                onLayout={trigger.onLayout}
                 onPress={() => (open ? close() : show())}
-                style={{
-                    position: "absolute",
-                    top: 0,
-                    end: 0,
-                    width: 48,
-                    height: height || 56,
-                }}
+                style={trigger.style}
             />
             {presence.present && anchor ? (
                 <Portal layer="menu">
