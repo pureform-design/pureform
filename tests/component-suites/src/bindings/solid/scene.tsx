@@ -14,6 +14,7 @@ import { BottomSheet } from "@pureform/solid/bottom-sheet";
 import { Button } from "@pureform/solid/button";
 import { ButtonGroup } from "@pureform/solid/button-group";
 import { Card } from "@pureform/solid/card";
+import { Carousel } from "@pureform/solid/carousel";
 import { Checkbox } from "@pureform/solid/checkbox";
 import { Chip } from "@pureform/solid/chip";
 import { CircularProgress } from "@pureform/solid/circular-progress";
@@ -91,6 +92,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     Button,
     ButtonGroup,
     Card,
+    Carousel,
     Checkbox,
     Chip,
     CircularProgress,

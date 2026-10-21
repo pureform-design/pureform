@@ -12,6 +12,7 @@ export const COMPONENT_NAMES = [
     "Button",
     "ButtonGroup",
     "Card",
+    "Carousel",
     "Checkbox",
     "Chip",
     "CircularProgress",
