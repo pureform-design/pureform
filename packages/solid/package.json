@@ -104,6 +104,17 @@
                 "default": "./dist/button-group.jsx"
             }
         },
+        "./paginator": {
+            "types": "./dist/paginator/index.d.ts",
+            "solid": {
+                "development": "./src/paginator/index.ts",
+                "default": "./dist/paginator.jsx"
+            },
+            "import": {
+                "development": "./src/paginator/index.ts",
+                "default": "./dist/paginator.jsx"
+            }
+        },
         "./radio-group": {
             "types": "./dist/radio-group/index.d.ts",
             "solid": {

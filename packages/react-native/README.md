@@ -63,6 +63,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `toast/`                                                                | `createToaster` (Zag's toast store) and `Toaster`, which shows its toasts in a column at its placement and times them itself; `useSnackbar`'s queue is the machines' `createQueue`, and each snackbar takes an `offset` |
 | `toolbar/`                                                              | `Toolbar`: icon buttons and buttons in a bar, the elements that don't fit in a `Menu` behind an overflow button                                                                                                         |
 | `time-picker/`, `time-input/`                                           | `TimePicker` (a dial on the responder system, `adjustable` for assistive technology, or scroll fields) and `TimeInput` (number-pad fields): the time in state, through `@pureform/machines/time-picker`'s arithmetic    |
+| `paginator/`                                                            | `Paginator`: the page-size `Select`, the range label and icon buttons for first (optional), previous, next and last (optional) page, over the page and page size it keeps                                               |
 | `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                           |
 
 ```
