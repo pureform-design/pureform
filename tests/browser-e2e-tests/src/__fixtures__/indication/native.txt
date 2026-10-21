@@ -1829,6 +1829,196 @@ autocomplete[color=error].label: bg none | color rgba(73, 69, 78, 1) | outline n
 autocomplete[color=info].label: bg none | color rgba(73, 69, 78, 1) | outline none
     focused: color rgba(0, 104, 124, 1)
     focused-checked: color rgba(0, 104, 124, 1)
+calendarCell.trigger: bg rgba(0, 0, 0, 0) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(28, 27, 30, 0.08)
+    focused: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(28, 27, 30, 0.1)
+    dragged: bg rgba(28, 27, 30, 0.16)
+    hovered-selected: bg rgba(28, 27, 30, 0.08)
+    pressed-checked: bg rgba(28, 27, 30, 0.1)
+    focused-checked: bg rgba(28, 27, 30, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+calendarCell[selection=selected].trigger: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(118, 98, 173, 1)
+    dragged: bg rgba(127, 108, 179, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+calendarCell[selection=rangeStart].trigger: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(118, 98, 173, 1)
+    dragged: bg rgba(127, 108, 179, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+calendarCell[selection=rangeMiddle].trigger: bg rgba(0, 0, 0, 0) | color rgba(74, 68, 88, 1) | outline none
+    hovered: bg rgba(74, 68, 88, 0.08)
+    focused: bg rgba(74, 68, 88, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(74, 68, 88, 0.1)
+    dragged: bg rgba(74, 68, 88, 0.16)
+    hovered-selected: bg rgba(74, 68, 88, 0.08)
+    pressed-checked: bg rgba(74, 68, 88, 0.1)
+    focused-checked: bg rgba(74, 68, 88, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+calendarCell[selection=rangeEnd].trigger: bg rgba(103, 80, 164, 1) | color rgba(255, 255, 255, 1) | outline none
+    hovered: bg rgba(115, 94, 171, 1)
+    focused: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(118, 98, 173, 1)
+    dragged: bg rgba(127, 108, 179, 1)
+    hovered-selected: bg rgba(115, 94, 171, 1)
+    pressed-checked: bg rgba(118, 98, 173, 1)
+    focused-checked: bg rgba(118, 98, 173, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+calendarCell[today=true].trigger: bg rgba(0, 0, 0, 0) | color rgba(103, 80, 164, 1) | outline none
+    hovered: bg rgba(103, 80, 164, 0.08)
+    focused: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(103, 80, 164, 0.1)
+    dragged: bg rgba(103, 80, 164, 0.16)
+    hovered-selected: bg rgba(103, 80, 164, 0.08)
+    pressed-checked: bg rgba(103, 80, 164, 0.1)
+    focused-checked: bg rgba(103, 80, 164, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+dockedDatePicker.container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+dockedDatePicker.label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(103, 80, 164, 1)
+dockedDatePicker[variant=filled].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+dockedDatePicker[color=secondary].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(98, 91, 112, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(98, 91, 112, 1) offset -2
+dockedDatePicker[color=secondary].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(98, 91, 112, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(98, 91, 112, 1)
+dockedDatePicker[color=tertiary].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(125, 82, 96, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(125, 82, 96, 1) offset -2
+dockedDatePicker[color=tertiary].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(125, 82, 96, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(125, 82, 96, 1)
+dockedDatePicker[color=success].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(0, 110, 33, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(0, 110, 33, 1) offset -2
+dockedDatePicker[color=success].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(0, 110, 33, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(0, 110, 33, 1)
+dockedDatePicker[color=warning].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(116, 91, 0, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(116, 91, 0, 1) offset -2
+dockedDatePicker[color=warning].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(116, 91, 0, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(116, 91, 0, 1)
+dockedDatePicker[color=error].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(186, 26, 26, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(186, 26, 26, 1) offset -2
+dockedDatePicker[color=error].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(186, 26, 26, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(186, 26, 26, 1)
+dockedDatePicker[color=info].container: bg none | color none | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(0, 104, 124, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(0, 104, 124, 1) offset -2
+dockedDatePicker[color=info].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(253, 248, 253, 1) | color rgba(0, 104, 124, 1)
+    focused-checked: bg rgba(253, 248, 253, 1) | color rgba(0, 104, 124, 1)
+dateInput.container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(103, 80, 164, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(103, 80, 164, 1) offset -2
+dateInput.label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(103, 80, 164, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(103, 80, 164, 1)
+dateInput.segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(103, 80, 164, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(103, 80, 164, 1) | color rgba(236, 231, 235, 1)
+dateInput[variant=filled].label: bg none | color rgba(73, 69, 78, 1) | outline none
+    focused: color rgba(103, 80, 164, 1)
+    focused-checked: color rgba(103, 80, 164, 1)
+dateInput[variant=filled].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(103, 80, 164, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(103, 80, 164, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=secondary].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(98, 91, 112, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(98, 91, 112, 1) offset -2
+dateInput[color=secondary].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(98, 91, 112, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(98, 91, 112, 1)
+dateInput[color=secondary].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(98, 91, 112, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(98, 91, 112, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=tertiary].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(125, 82, 96, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(125, 82, 96, 1) offset -2
+dateInput[color=tertiary].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(125, 82, 96, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(125, 82, 96, 1)
+dateInput[color=tertiary].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(125, 82, 96, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(125, 82, 96, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=success].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(0, 110, 33, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(0, 110, 33, 1) offset -2
+dateInput[color=success].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(0, 110, 33, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(0, 110, 33, 1)
+dateInput[color=success].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(0, 110, 33, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(0, 110, 33, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=warning].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(116, 91, 0, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(116, 91, 0, 1) offset -2
+dateInput[color=warning].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(116, 91, 0, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(116, 91, 0, 1)
+dateInput[color=warning].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(116, 91, 0, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(116, 91, 0, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=error].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(186, 26, 26, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(186, 26, 26, 1) offset -2
+dateInput[color=error].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(186, 26, 26, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(186, 26, 26, 1)
+dateInput[color=error].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(186, 26, 26, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(186, 26, 26, 1) | color rgba(236, 231, 235, 1)
+dateInput[color=info].container: bg none | color rgba(28, 27, 30, 1) | outline solid 1 rgba(122, 117, 127, 1) offset -1
+    hovered: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused: outline solid 2 rgba(0, 104, 124, 1) offset -2
+    hovered-selected: outline solid 1 rgba(28, 27, 30, 1) offset -1
+    focused-checked: outline solid 2 rgba(0, 104, 124, 1) offset -2
+dateInput[color=info].label: bg transparent | color rgba(73, 69, 78, 1) | outline none
+    focused: bg rgba(236, 231, 235, 1) | color rgba(0, 104, 124, 1)
+    focused-checked: bg rgba(236, 231, 235, 1) | color rgba(0, 104, 124, 1)
+dateInput[color=info].segment: bg transparent | color rgba(28, 27, 30, 1) | outline none
+    focused: bg rgba(0, 104, 124, 1) | color rgba(236, 231, 235, 1)
+    focused-checked: bg rgba(0, 104, 124, 1) | color rgba(236, 231, 235, 1)
 slider.stateLayer: bg transparent | color none | outline none
     hovered: bg rgba(103, 80, 164, 0.08)
     focused: bg rgba(103, 80, 164, 0.1)

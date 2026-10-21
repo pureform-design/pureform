@@ -1366,6 +1366,196 @@ autocomplete[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158
 autocomplete[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
     focused: color oklch(0.4771 0.0852 217.083)
     focused-checked: color oklch(0.4771 0.0852 217.083)
+calendarCell.trigger: bg color(srgb 0 0 0 / 0) | color color(srgb 0.1098 0.1059 0.1176) | outline none
+    hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    dragged: bg color(srgb 0.1098 0.1059 0.1176 / 0.16)
+    hovered-selected: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
+    pressed-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1)
+    focused-checked: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+calendarCell[selection=selected].trigger: bg color(srgb 0.4039 0.3137 0.6431) | color color(srgb 1 1 1.0001) | outline none
+    hovered: bg color(srgb 0.4516 0.3686 0.6717)
+    focused: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4635 0.3824 0.6788)
+    dragged: bg color(srgb 0.4993 0.4236 0.7002)
+    hovered-selected: bg color(srgb 0.4516 0.3686 0.6717)
+    pressed-checked: bg color(srgb 0.4635 0.3824 0.6788)
+    focused-checked: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+calendarCell[selection=rangeStart].trigger: bg color(srgb 0.4039 0.3137 0.6431) | color color(srgb 1 1 1.0001) | outline none
+    hovered: bg color(srgb 0.4516 0.3686 0.6717)
+    focused: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4635 0.3824 0.6788)
+    dragged: bg color(srgb 0.4993 0.4236 0.7002)
+    hovered-selected: bg color(srgb 0.4516 0.3686 0.6717)
+    pressed-checked: bg color(srgb 0.4635 0.3824 0.6788)
+    focused-checked: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+calendarCell[selection=rangeMiddle].trigger: bg color(srgb 0 0 0 / 0) | color color(srgb 0.2902 0.2667 0.3451) | outline none
+    hovered: bg color(srgb 0.2902 0.2667 0.3451 / 0.08)
+    focused: bg color(srgb 0.2902 0.2667 0.3451 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.2902 0.2667 0.3451 / 0.1)
+    dragged: bg color(srgb 0.2902 0.2667 0.3451 / 0.16)
+    hovered-selected: bg color(srgb 0.2902 0.2667 0.3451 / 0.08)
+    pressed-checked: bg color(srgb 0.2902 0.2667 0.3451 / 0.1)
+    focused-checked: bg color(srgb 0.2902 0.2667 0.3451 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+calendarCell[selection=rangeEnd].trigger: bg color(srgb 0.4039 0.3137 0.6431) | color color(srgb 1 1 1.0001) | outline none
+    hovered: bg color(srgb 0.4516 0.3686 0.6717)
+    focused: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4635 0.3824 0.6788)
+    dragged: bg color(srgb 0.4993 0.4236 0.7002)
+    hovered-selected: bg color(srgb 0.4516 0.3686 0.6717)
+    pressed-checked: bg color(srgb 0.4635 0.3824 0.6788)
+    focused-checked: bg color(srgb 0.4635 0.3824 0.6788) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+calendarCell[today=true].trigger: bg color(srgb 0 0 0 / 0) | color color(srgb 0.4039 0.3137 0.6431) | outline none
+    hovered: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    focused: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    dragged: bg color(srgb 0.4039 0.3137 0.6431 / 0.16)
+    hovered-selected: bg color(srgb 0.4039 0.3137 0.6431 / 0.08)
+    pressed-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1)
+    focused-checked: bg color(srgb 0.4039 0.3137 0.6431 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+dockedDatePicker.container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+dockedDatePicker.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4955 0.1304 293.718)
+dockedDatePicker[variant=filled].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4955 0.1304 293.718)
+    focused-checked: color oklch(0.4955 0.1304 293.718)
+dockedDatePicker[color=secondary].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4855 0.0342 300.379) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4855 0.0342 300.379) offset -2px
+dockedDatePicker[color=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4855 0.0342 300.379)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4855 0.0342 300.379)
+dockedDatePicker[color=tertiary].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4904 0.0605 358.465) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4904 0.0605 358.465) offset -2px
+dockedDatePicker[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4904 0.0605 358.465)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4904 0.0605 358.465)
+dockedDatePicker[color=success].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4685 0.1423 146.207) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4685 0.1423 146.207) offset -2px
+dockedDatePicker[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4685 0.1423 146.207)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4685 0.1423 146.207)
+dockedDatePicker[color=warning].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4828 0.0987 90.0339) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4828 0.0987 90.0339) offset -2px
+dockedDatePicker[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4828 0.0987 90.0339)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4828 0.0987 90.0339)
+dockedDatePicker[color=error].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.506 0.1927 27.7028) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.506 0.1927 27.7028) offset -2px
+dockedDatePicker[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.506 0.1927 27.7028)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.506 0.1927 27.7028)
+dockedDatePicker[color=info].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4771 0.0852 217.083) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4771 0.0852 217.083) offset -2px
+dockedDatePicker[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4771 0.0852 217.083)
+    focused-checked: bg oklch(0.9844 0.0084 325.895) | color oklch(0.4771 0.0852 217.083)
+dateInput.container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4955 0.1304 293.718) offset -2px
+dateInput.segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4955 0.1304 293.718) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4955 0.1304 293.718) | color oklch(0.933 0.0075 332.402)
+dateInput.label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4955 0.1304 293.718)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4955 0.1304 293.718)
+dateInput[variant=filled].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4955 0.1304 293.718) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4955 0.1304 293.718) | color oklch(0.933 0.0075 332.402)
+dateInput[variant=filled].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: color oklch(0.4955 0.1304 293.718)
+    focused-checked: color oklch(0.4955 0.1304 293.718)
+dateInput[color=secondary].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4855 0.0342 300.379) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4855 0.0342 300.379) offset -2px
+dateInput[color=secondary].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4855 0.0342 300.379) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4855 0.0342 300.379) | color oklch(0.933 0.0075 332.402)
+dateInput[color=secondary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4855 0.0342 300.379)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4855 0.0342 300.379)
+dateInput[color=tertiary].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4904 0.0605 358.465) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4904 0.0605 358.465) offset -2px
+dateInput[color=tertiary].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4904 0.0605 358.465) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4904 0.0605 358.465) | color oklch(0.933 0.0075 332.402)
+dateInput[color=tertiary].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4904 0.0605 358.465)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4904 0.0605 358.465)
+dateInput[color=success].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4685 0.1423 146.207) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4685 0.1423 146.207) offset -2px
+dateInput[color=success].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4685 0.1423 146.207) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4685 0.1423 146.207) | color oklch(0.933 0.0075 332.402)
+dateInput[color=success].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4685 0.1423 146.207)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4685 0.1423 146.207)
+dateInput[color=warning].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4828 0.0987 90.0339) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4828 0.0987 90.0339) offset -2px
+dateInput[color=warning].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4828 0.0987 90.0339) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4828 0.0987 90.0339) | color oklch(0.933 0.0075 332.402)
+dateInput[color=warning].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4828 0.0987 90.0339)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4828 0.0987 90.0339)
+dateInput[color=error].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.506 0.1927 27.7028) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.506 0.1927 27.7028) offset -2px
+dateInput[color=error].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.506 0.1927 27.7028) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.506 0.1927 27.7028) | color oklch(0.933 0.0075 332.402)
+dateInput[color=error].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.506 0.1927 27.7028)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.506 0.1927 27.7028)
+dateInput[color=info].container: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline solid 1px oklch(0.5702 0.0162 308.213) offset -1px
+    hovered: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused: outline solid 2px oklch(0.4771 0.0852 217.083) offset -2px
+    hovered-selected: outline solid 1px oklch(0.2245 0.0059 301.135) offset -1px
+    focused-checked: outline solid 2px oklch(0.4771 0.0852 217.083) offset -2px
+dateInput[color=info].segment: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    focused: bg oklch(0.4771 0.0852 217.083) | color oklch(0.933 0.0075 332.402)
+    focused-checked: bg oklch(0.4771 0.0852 217.083) | color oklch(0.933 0.0075 332.402)
+dateInput[color=info].label: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    focused: bg oklch(0.933 0.0075 332.402) | color oklch(0.4771 0.0852 217.083)
+    focused-checked: bg oklch(0.933 0.0075 332.402) | color oklch(0.4771 0.0852 217.083)
 checkbox.root: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
     hovered: bg color(srgb 0.1098 0.1059 0.1176 / 0.08)
     focused: bg color(srgb 0.1098 0.1059 0.1176 / 0.1) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
