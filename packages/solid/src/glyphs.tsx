@@ -48,6 +48,18 @@ export const ChevronEndIcon = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.chevronEnd} />
 );
 
+/** A bar and a chevron toward the start: a paginator's first-page button. Mirror it under right to
+ *  left. */
+export const FirstPageIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.firstPage} />
+);
+
+/** A bar and a chevron toward the end: a paginator's last-page button. Mirror it under right to
+ *  left. */
+export const LastPageIcon = (): JSX.Element => (
+    <Glyph path={GLYPH_PATHS.lastPage} />
+);
+
 /** A calendar page: the docked date picker's button and the date input's mode toggle. */
 export const CalendarIcon = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.calendar} />

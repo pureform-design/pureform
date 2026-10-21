@@ -201,6 +201,13 @@
                 "default": "./dist/button-group.mjs"
             }
         },
+        "./paginator": {
+            "types": "./dist/paginator/index.d.ts",
+            "import": {
+                "development": "./src/paginator/index.ts",
+                "default": "./dist/paginator.mjs"
+            }
+        },
         "./list": {
             "types": "./dist/list/index.d.ts",
             "import": {

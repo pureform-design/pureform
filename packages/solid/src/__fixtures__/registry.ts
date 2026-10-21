@@ -598,3 +598,36 @@ export const datePickersRegistry = () =>
         ]),
         button: named("button", ["root", "touchTarget", "icon", "label"]),
     });
+
+/** The paginator's fake factories: the row, its icon-button triggers, and the select with its
+ *  menu. */
+export const paginatorRegistry = () =>
+    createRegistry({
+        paginator: named("paginator", [
+            "root",
+            "pageSize",
+            "pageSizeLabel",
+            "pageSizeSelect",
+            "rangeLabel",
+            "actions",
+            "firstTrigger",
+            "prevTrigger",
+            "nextTrigger",
+            "lastTrigger",
+        ]),
+        iconButton: named("icon-button", [
+            "root",
+            "touchTarget",
+            "container",
+            "icon",
+            "outline",
+        ]),
+        select: named("select", FIELD_SLOTS),
+        menu: named("menu", [
+            "root",
+            "itemGroup",
+            "itemGroupLabel",
+            "item",
+            "itemLabel",
+        ]),
+    });

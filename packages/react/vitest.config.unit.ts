@@ -27,6 +27,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@pureform/machines > @zag-js/radio-group",
             "@pureform/machines > @zag-js/select",
             "@pureform/machines > @zag-js/menu",
+            "@pureform/machines > @zag-js/pagination",
             "@pureform/machines > @zag-js/presence",
             "@pureform/machines > @zag-js/dialog",
             "@pureform/machines > @zag-js/toast",
