@@ -17,6 +17,7 @@ import {
     tree,
     checkbox,
     chip,
+    chipSet,
     circularProgress,
     linearProgress,
     loadingIndicator,
@@ -2110,6 +2111,96 @@ export function Page() {
                         );
                     }}
                 </For>
+            </section>
+            <section
+                data-section="chip-sets-and-scrollable-tabs"
+                style={{ display: "grid", gap: "16px", width: "480px" }}
+            >
+                {(() => {
+                    const set = chipSet();
+                    return (
+                        <div class={set.root} role="group">
+                            <For
+                                each={["Vegan", "Nut free", "Local", "Organic"]}
+                            >
+                                {(label, i) => {
+                                    const c = chip({ toggle: true });
+                                    return (
+                                        <button
+                                            class={c.root}
+                                            type="button"
+                                            aria-pressed={
+                                                i() === 1 ? "true" : "false"
+                                            }
+                                        >
+                                            <span class={c.touchTarget} />
+                                            <span class={c.label}>{label}</span>
+                                        </button>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    );
+                })()}
+                {(() => {
+                    const set = chipSet({ singleLine: true });
+                    return (
+                        <div class={set.root} role="group">
+                            <For
+                                each={[
+                                    "Reply",
+                                    "Forward",
+                                    "Archive",
+                                    "Snooze",
+                                    "Label",
+                                    "Move",
+                                ]}
+                            >
+                                {(label) => {
+                                    const c = chip({ variant: "elevated" });
+                                    return (
+                                        <button class={c.root} type="button">
+                                            <span class={c.touchTarget} />
+                                            <span class={c.label}>{label}</span>
+                                        </button>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    );
+                })()}
+                {(() => {
+                    const t = tabs({ scrollable: true });
+                    return (
+                        <div class={t.root} role="tablist">
+                            <For
+                                each={[
+                                    "Flights",
+                                    "Trips",
+                                    "Explore",
+                                    "Hotels",
+                                    "Cars",
+                                ]}
+                            >
+                                {(label, i) => (
+                                    <button
+                                        class={t.tab}
+                                        role="tab"
+                                        type="button"
+                                        aria-selected={
+                                            i() === 0 ? "true" : "false"
+                                        }
+                                    >
+                                        <span class={t.tabContent}>
+                                            <span class={t.label}>{label}</span>
+                                            <span class={t.indicator} />
+                                        </span>
+                                    </button>
+                                )}
+                            </For>
+                        </div>
+                    );
+                })()}
             </section>
             <section
                 data-section="row-colors"
