@@ -43,6 +43,7 @@ import {
     text,
     touchTarget,
 } from "./static";
+import { stepper } from "./stepper";
 import { switchControl } from "./switch";
 import { tabsCase } from "./tabs";
 import { tagsInput } from "./tags-input";
@@ -102,6 +103,7 @@ export const COMPONENTS: readonly ComponentCase[] = [
     sideSheet,
     slider,
     snackbar,
+    stepper,
     splitButton,
     supportingText,
     switchControl,

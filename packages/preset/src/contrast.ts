@@ -126,6 +126,27 @@ export const COMPONENT_CONTRAST: Record<string, ContrastPair[]> = {
         pair(token("contentColor"), token("container"), TEXT_CONTRAST),
     ],
     tree: ROW_PAIRS,
+    stepper: [
+        pair(token("content"), token("container"), TEXT_CONTRAST),
+        pair(token("activeContent"), token("container"), TEXT_CONTRAST),
+        pair(token("errorContent"), token("container"), TEXT_CONTRAST),
+        pair(token("captionColor"), token("container"), TEXT_CONTRAST),
+        pair(
+            token("indicatorContent"),
+            token("indicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(
+            token("activeIndicatorContent"),
+            token("activeIndicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+        pair(
+            token("errorIndicatorContent"),
+            token("errorIndicatorContainer"),
+            TEXT_CONTRAST,
+        ),
+    ],
     dragHandle: [
         pair(token("color"), role("surfaceContainerLow"), UI_CONTRAST),
     ],

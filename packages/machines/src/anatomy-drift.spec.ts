@@ -16,6 +16,7 @@ import {
     searchViewAnatomy,
     sliderAnatomy,
     snackbarAnatomy,
+    stepperAnatomy,
     tagsInputAnatomy,
     textAreaAnatomy,
     textFieldAnatomy,
@@ -43,6 +44,7 @@ import {
 import { anatomy as navigation } from "./navigation/navigation.anatomy";
 import { anatomy as slider } from "./slider/slider.anatomy";
 import { anatomy as snackbar } from "./snackbar/snackbar.anatomy";
+import { anatomy as stepper } from "./stepper/stepper.anatomy";
 import {
     anatomy as tagsInput,
     chipAnatomy as inputChip,
@@ -78,6 +80,7 @@ const pairs: Record<string, Pair> = {
     searchView: { machine: searchView, preset: searchViewAnatomy },
     slider: { machine: slider, preset: sliderAnatomy },
     snackbar: { machine: snackbar, preset: snackbarAnatomy },
+    stepper: { machine: stepper, preset: stepperAnatomy },
     tagsInput: { machine: tagsInput, preset: tagsInputAnatomy },
     inputChip: { machine: inputChip, preset: inputChipAnatomy },
     textField: { machine: textField, preset: textFieldAnatomy },

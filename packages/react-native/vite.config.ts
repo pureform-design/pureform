@@ -32,6 +32,7 @@ export default createConfig({
                     carousel: "src/carousel/index.ts",
                     accordion: "src/accordion/index.ts",
                     tree: "src/tree/index.ts",
+                    stepper: "src/stepper/index.ts",
                     fab: "src/fab/index.ts",
                     "fab-menu": "src/fab-menu/index.ts",
                     "split-button": "src/split-button/index.ts",

@@ -337,8 +337,8 @@ describe("scanUsage", () => {
         ],
         [
             "a component it doesn't know",
-            `import { Stepper } from "@pureform/solid/stepper";`,
-            "imports @pureform/solid/stepper, which pruning doesn't know",
+            `import { Hologram } from "@pureform/solid/hologram";`,
+            "imports @pureform/solid/hologram, which pruning doesn't know",
         ],
         [
             "an anatomy it can't name",

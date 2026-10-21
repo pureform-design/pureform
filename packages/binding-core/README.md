@@ -724,6 +724,15 @@ items), and that no Solid or React source sets a listed group from anything but 
 - Design doc: §5.3 (hooks), §5.6 and §5.7 (themes, runtime themes), §5.8 (motion), §5.9 (direction), §9.2 to §9.6 (parts, controllable
   state, forms, icons).
 
+## Stepper
+
+`components/stepper.ts`: `StepperRootOwnProps`, `STEPPER_ROOT_PROPS`, `stepperSelection`,
+`stepperMachineProps` (Zag's `count`, `linear`, `isStepValid`, `orientation`, ids), `StepperItem`
+(the ready-made's steps as data: `label`, `caption`, `icon`, `content`, `error`, `editable`,
+`disabled`), `stepperTriggerProps` (no `aria-controls` for a step with no content),
+`stepperTriggerDisabled` (disabled, or done and not `editable`) and `stepperIndicator` (what the
+indicator shows: an error, a check, the icon or the number).
+
 ## Carousel
 
 `components/carousel.ts`: `CarouselRootOwnProps`, `CAROUSEL_ROOT_PROPS`, `carouselSelection`,

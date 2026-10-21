@@ -100,6 +100,7 @@ import { sideSheet } from "./components/side-sheet";
 import { createSlider } from "./components/slider";
 import { snackbar } from "./components/snackbar";
 import { createSplitButton } from "./components/split-button";
+import { createStepper } from "./components/stepper";
 import { createSupportingText } from "./components/supporting-text";
 import { createSwitch } from "./components/switch";
 import { createTabs } from "./components/tabs";
@@ -354,6 +355,7 @@ const defaultComponents = <G extends string>(
         carousel,
         accordion: createAccordion<Step>(densities),
         tree: createTree<G, Step>(theme.color.groups, densities),
+        stepper: createStepper<Step>(densities),
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),
