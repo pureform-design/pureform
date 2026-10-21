@@ -61,6 +61,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)                                                                                                 |
 | `toast/`                                                                | `createToaster` (Zag's toast store) and `Toaster`, which shows its toasts in a column at its placement and times them itself; `useSnackbar`'s queue is the machines' `createQueue`, and each snackbar takes an `offset` |
 | `toolbar/`                                                              | `Toolbar`: icon buttons and buttons in a bar, the elements that don't fit in a `Menu` behind an overflow button                                                                                                         |
+| `time-picker/`, `time-input/`                                           | `TimePicker` (a dial on the responder system, `adjustable` for assistive technology, or scroll fields) and `TimeInput` (number-pad fields): the time in state, through `@pureform/machines/time-picker`'s arithmetic    |
 | `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                           |
 
 ```
@@ -475,6 +476,10 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   moves the thumb nearest the press, and the keys move the last one dragged; `centered`, `stops`,
   `valueIndicator` and `orientation: "vertical"` match the web. Each thumb and stop resolves its
   own styles with its own `value` token.
+- **The time picker and time input** keep the time in state and step it with the web machine's
+  arithmetic (`@pureform/machines/time-picker`), so 12/24-hour, periods and the dial's geometry
+  match. The dial places its labels in percent of its box and doesn't mirror; touches pick the
+  value under them. There is no keyboard on the dial beyond `accessibilityActions`.
 - **The app bar** takes `scrollOffset` from the app: `useAppBarScroll()` returns it with an
   `onScroll` for the scroll view under the bar. The colours, collapse and search bar match the
   web; the headline's rise into a collapsed bar is web only (keyframes), so it changes at once.
