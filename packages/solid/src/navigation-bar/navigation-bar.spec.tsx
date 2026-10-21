@@ -198,6 +198,26 @@ describe("NavigationRail", () => {
         expect(header.textContent).toBe("Menu");
     });
 
+    it("composes a section label over a run of destinations", async () => {
+        withRegistry(() => (
+            <NavigationRail.Root aria-label="Main" expanded>
+                <NavigationRail.SectionLabel>Mail</NavigationRail.SectionLabel>
+                <NavigationRail.Item value="inbox">
+                    <NavigationRail.Label>Inbox</NavigationRail.Label>
+                </NavigationRail.Item>
+            </NavigationRail.Root>
+        ));
+        await settle();
+        const root = byTestId(testIds.navigationRail.root);
+        const label = root.firstElementChild!;
+        expect(label.getAttribute("data-testid")).toBe(
+            testIds.navigationRail.sectionLabel,
+        );
+        expect(label.getAttribute("data-part")).toBe("section-label");
+        expect(label.className).toBe("navigation-rail__sectionLabel");
+        expect(label.textContent).toBe("Mail");
+    });
+
     it("selects expanded, and a modal rail is expanded too", async () => {
         withRegistry(() => (
             <NavigationRail aria-label="Main" items={ITEMS} expanded />

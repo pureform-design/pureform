@@ -290,6 +290,19 @@ export function createNavigation<C extends NavigationComponent>(config: {
         });
     }
 
+    /** The rail's section label, over a run of destinations: shown while the rail is expanded. */
+    function SectionLabel(props: NavigationPartProps): JSX.Element {
+        const { scope, api } = context.use("SectionLabel");
+        return (
+            scope as unknown as ComponentScope<typeof navigationRailAnatomy>
+        ).render("sectionLabel", {
+            element: "div",
+            machine: () => api().getSectionLabelProps(),
+            unstyled: () => props.unstyled,
+            props: omit(props, "unstyled"),
+        });
+    }
+
     /** The pill behind the icon, which takes the state layer. */
     function Indicator(props: NavigationPartProps): JSX.Element {
         const { scope } = context.use("Indicator");
@@ -399,6 +412,15 @@ export function createNavigation<C extends NavigationComponent>(config: {
 
     return {
         ReadyMade,
-        parts: { Root, Header, Item, Indicator, ActiveIndicator, Icon, Label },
+        parts: {
+            Root,
+            Header,
+            SectionLabel,
+            Item,
+            Indicator,
+            ActiveIndicator,
+            Icon,
+            Label,
+        },
     };
 }
