@@ -12,6 +12,7 @@ import { chip } from "./chip";
 import { dateInput, datePicker, dockedDatePicker } from "./date-pickers";
 import { dialog } from "./dialog";
 import { dragHandle } from "./drag-handle";
+import { accordionCase, treeCase } from "./expandable";
 import { fab } from "./fab";
 import { fabMenu, fabMenuItems } from "./fab-menu";
 import { fullscreenDialog } from "./fullscreen-dialog";
@@ -62,6 +63,8 @@ export const COMPONENTS: readonly ComponentCase[] = [
     card,
     cardActionArea,
     carouselCase,
+    accordionCase,
+    treeCase,
     checkbox,
     chip,
     circularProgress,

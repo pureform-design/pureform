@@ -42,7 +42,7 @@ import {
     untrack,
 } from "solid-js";
 
-import { createBindable } from "./bindable";
+import { createBindable, readingLatest } from "./bindable";
 import { createRefs } from "./refs";
 import { createTracker } from "./track";
 
@@ -306,7 +306,10 @@ export function useMachine<T extends MachineSchema>(
         previousEvent = event;
         event = sent;
 
-        const current = untrack(() => state.get());
+        // The last state written, not the one Solid shows until its next flush: an event sent
+        // while another's transition is unflushed (a blur, then the focus it moves to) starts
+        // from the state that transition went to.
+        const current = untrack(() => readingLatest(() => state.get()));
         const { transitions, source } = findTransition(
             machine,
             current,

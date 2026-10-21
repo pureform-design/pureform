@@ -138,6 +138,108 @@ carousel.mask: bg rgba(230, 225, 230, 1) | color rgba(28, 27, 30, 1) | outline n
     hovered-selected: bg rgba(214, 209, 214, 1)
     pressed-checked: bg rgba(210, 205, 210, 1)
     focused-checked: bg rgba(210, 205, 210, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+accordion.trigger: bg rgba(242, 236, 241, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(225, 219, 224, 1)
+    focused: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(221, 215, 220, 1)
+    dragged: bg rgba(208, 203, 207, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(221, 215, 220, 1)
+    focused-checked: bg rgba(221, 215, 220, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+accordion.leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+accordion.text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+accordion.title: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+accordion.description: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+accordion.indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+tree.node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(219, 210, 235, 1) | color rgba(74, 68, 88, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree.leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+tree.text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+tree.indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(74, 68, 88, 1)
+tree[color=tertiary].node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(243, 204, 215, 1) | color rgba(99, 59, 72, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree[color=tertiary].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+tree[color=tertiary].text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+tree[color=tertiary].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(99, 59, 72, 1)
+tree[color=success].node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(107, 240, 120, 1) | color rgba(0, 83, 23, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree[color=success].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+tree[color=success].text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+tree[color=success].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 83, 23, 1)
+tree[color=warning].node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(242, 212, 127, 1) | color rgba(87, 68, 0, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree[color=warning].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+tree[color=warning].text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+tree[color=warning].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(87, 68, 0, 1)
+tree[color=error].node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(246, 201, 198, 1) | color rgba(147, 0, 10, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree[color=error].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+tree[color=error].text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+tree[color=error].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(147, 0, 10, 1)
+tree[color=info].node: bg rgba(253, 248, 253, 1) | color rgba(28, 27, 30, 1) | outline none
+    hovered: bg rgba(235, 230, 235, 1)
+    focused: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+    pressed: bg rgba(231, 226, 231, 1)
+    dragged: bg rgba(217, 213, 217, 1)
+    hovered-selected: bg rgba(162, 223, 242, 1) | color rgba(0, 78, 94, 1)
+    pressed-checked: bg rgba(231, 226, 231, 1)
+    focused-checked: bg rgba(231, 226, 231, 1) | outline solid 3 rgba(98, 91, 112, 1) offset 2
+tree[color=info].leading: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+tree[color=info].text: bg none | color rgba(28, 27, 30, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
+tree[color=info].indicator: bg none | color rgba(73, 69, 78, 1) | outline none
+    hovered-selected: color rgba(0, 78, 94, 1)
 chip.root: bg transparent | color rgba(73, 69, 78, 1) | outline none
     hovered: bg rgba(73, 69, 78, 0.08)
     focused: bg rgba(73, 69, 78, 0.1) | outline solid 3 rgba(98, 91, 112, 1) offset 2

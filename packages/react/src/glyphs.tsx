@@ -37,6 +37,10 @@ export const DropDownArrow = (): ReactNode => (
     <Glyph path={GLYPH_PATHS.dropDown} />
 );
 
+/** A chevron pointing down, which an expand indicator turns over: an accordion's headers and a
+ *  tree's branches. */
+export const ExpandIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.expand} />;
+
 /** Three dots in a column: the toolbar's overflow button. */
 export const MoreIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.more} />;
 
