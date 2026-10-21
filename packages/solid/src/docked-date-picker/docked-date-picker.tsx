@@ -48,7 +48,6 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import type { PartContext } from "../part-context";
 import { createSlotProps, plainParts, useComponent } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
@@ -56,8 +55,7 @@ import type { Presence } from "../presence";
 import { combinePartProps } from "../props";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
-import { selectFieldParts } from "../select-field-parts";
-import type { SelectFieldContext } from "../select-field-parts";
+import { affixFieldParts } from "../select-field-parts";
 
 type Anatomy = typeof dockedDatePickerOverlayAnatomy;
 
@@ -197,13 +195,7 @@ function Input(props: DockedDatePickerPartProps): JSX.Element {
     });
 }
 
-const field = selectFieldParts(
-    context as unknown as PartContext<SelectFieldContext>,
-    createPartContext<{ readonly item: Accessor<never> }>(
-        "DockedDatePicker",
-        "Item",
-    ),
-);
+const field = affixFieldParts(context.use);
 
 /** The floating label. */
 const Label: (props: DockedDatePickerPartProps) => JSX.Element = field.Label;

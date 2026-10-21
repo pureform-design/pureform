@@ -53,6 +53,7 @@ import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
 import type { PartContext } from "../part-context";
 import { plainParts, useComponent, useSlotProps } from "../parts";
+import { affixFieldParts } from "../select-field-parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { usePresence } from "../presence";
 import type { Presence } from "../presence";
@@ -201,41 +202,20 @@ function Input({ unstyled, ...props }: CalendarPartProps): ReactNode {
     });
 }
 
+const field = affixFieldParts((name) => {
+    const { picker, ...rest } = context.use(name);
+    return { ...rest, api: picker };
+});
+
 /** The floating label. */
-function Label({ unstyled, ...props }: CalendarPartProps): ReactNode {
-    const { scope, picker } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: picker.getLabelProps(),
-        unstyled,
-        props,
-    });
-}
-
-const icon = (part: "leadingIcon", name: string) =>
-    function Icon({
-        unstyled,
-        mirror,
-        ...props
-    }: DockedDatePickerIconProps): ReactNode {
-        const { scope } = context.use(name);
-        return scope.render(part, {
-            element: "span",
-            machine: { "aria-hidden": "true" },
-            states: { mirrored: mirror },
-            unstyled,
-            props,
-        });
-    };
-
+const Label: (props: CalendarPartProps) => ReactNode = field.Label;
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-const LeadingIcon = icon("leadingIcon", "LeadingIcon");
-
-const plain = plainParts<Anatomy>(context.use, "span");
+const LeadingIcon: (props: DockedDatePickerIconProps) => ReactNode =
+    field.LeadingIcon;
 /** Text before the input's. Turn on Root's `prefixText` with it. */
-const PrefixText = plain("prefixText", "PrefixText");
+const PrefixText: (props: CalendarPartProps) => ReactNode = field.PrefixText;
 /** Text after the input's. Turn on Root's `suffixText` with it. */
-const SuffixText = plain("suffixText", "SuffixText");
+const SuffixText: (props: CalendarPartProps) => ReactNode = field.SuffixText;
 
 const block = plainParts<Anatomy>(context.use, "div");
 /** The popup's row of month and year controls. */
@@ -260,16 +240,8 @@ function TrailingIcon({
 }
 
 /** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText({ unstyled, ...props }: CalendarPartProps): ReactNode {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        machine: { id: supportingTextId },
-        unstyled,
-        props: { ...props, children: errorText ?? props.children },
-    });
-}
+const SupportingText: (props: CalendarPartProps) => ReactNode =
+    field.SupportingText;
 
 /** Places the popup under the field; hidden once it's closed and its exit animation is over. The
  *  registry doesn't style it. */

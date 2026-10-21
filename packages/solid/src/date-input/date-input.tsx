@@ -46,6 +46,7 @@ import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { affixFieldParts } from "../select-field-parts";
 
 type Anatomy = typeof dateInputAnatomy;
 
@@ -171,17 +172,7 @@ function Root(props: DateInputRootProps): JSX.Element {
 const block = plainParts<Anatomy>(context.use, "div");
 const inline = plainParts<Anatomy>(context.use, "span");
 
-const icon = (name: "leadingIcon" | "trailingIcon", display: string) =>
-    function Icon(props: DateInputIconProps): JSX.Element {
-        const { scope } = context.use(display);
-        return scope.render(name, {
-            element: "span",
-            machine: () => ({ "aria-hidden": "true" }),
-            states: () => ({ mirrored: props.mirror }),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled", "mirror"),
-        });
-    };
+const field = affixFieldParts(context.use);
 
 /** The header: the headline, the selected date, and the mode toggle. */
 const Header = block<DateInputPartProps>("header", "Header");
@@ -228,9 +219,11 @@ function Container(props: DateInputPartProps): JSX.Element {
 }
 
 /** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-const LeadingIcon = icon("leadingIcon", "LeadingIcon");
+const LeadingIcon: (props: DateInputIconProps) => JSX.Element =
+    field.LeadingIcon;
 /** Text before the segments. Turn on Root's `prefixText` with it. */
-const PrefixText = inline<DateInputPartProps>("prefixText", "PrefixText");
+const PrefixText: (props: DateInputPartProps) => JSX.Element =
+    field.PrefixText;
 
 /** The group of segments, named by the label. */
 function Input(props: DateInputInputProps): JSX.Element {
@@ -268,38 +261,27 @@ function Segment(props: DateInputSegmentProps): JSX.Element {
 }
 
 /** Text after the segments. Turn on Root's `suffixText` with it. */
-const SuffixText = inline<DateInputPartProps>("suffixText", "SuffixText");
+const SuffixText: (props: DateInputPartProps) => JSX.Element =
+    field.SuffixText;
 
 /** The floating label, which names the segments. */
-function Label(props: DateInputPartProps): JSX.Element {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: () => api().getLabelProps(),
-        unstyled: () => props.unstyled,
-        props: omit(props, "unstyled"),
-    });
-}
+const Label: (props: DateInputPartProps) => JSX.Element = field.Label;
 
 /** An icon at the end of the field. Turn on Root's `trailingIcon` with it. */
-const TrailingIcon = icon("trailingIcon", "TrailingIcon");
-
-/** Helper text under the field (the date's format, say). With an `error`, it shows the error. */
-function SupportingText(props: DateInputPartProps): JSX.Element {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    const children = {
-        get children() {
-            return errorText() ?? props.children;
-        },
-    };
-    return scope.render("supportingText", {
+function TrailingIcon(props: DateInputIconProps): JSX.Element {
+    const { scope } = context.use("TrailingIcon");
+    return scope.render("trailingIcon", {
         element: "span",
-        machine: () => ({ id: supportingTextId() }),
+        machine: () => ({ "aria-hidden": "true" }),
+        states: () => ({ mirrored: props.mirror }),
         unstyled: () => props.unstyled,
-        props: merge(omit(props, "unstyled"), children),
+        props: omit(props, "unstyled", "mirror"),
     });
 }
+
+/** Helper text under the field (the date's format, say). With an `error`, it shows the error. */
+const SupportingText: (props: DateInputPartProps) => JSX.Element =
+    field.SupportingText;
 
 /** The buttons at the end. */
 const Actions = block<DateInputPartProps>("actions", "Actions");
