@@ -54,6 +54,7 @@ import { TextArea } from "@pureform/solid/text-area";
 import { TextField } from "@pureform/solid/text-field";
 import { createToaster, Toaster } from "@pureform/solid/toast";
 import type { ToastData } from "@pureform/solid/toast";
+import { Toolbar } from "@pureform/solid/toolbar";
 import { Tooltip } from "@pureform/solid/tooltip";
 import { TouchTarget } from "@pureform/solid/touch-target";
 import { Dynamic } from "@solidjs/web";
@@ -133,6 +134,7 @@ export const components: Record<ComponentName, ValidComponent> = {
     TextArea,
     TextField,
     Toast: ToastScene,
+    Toolbar,
     Tooltip,
     TouchTarget,
 };

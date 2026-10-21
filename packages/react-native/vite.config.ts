@@ -50,6 +50,7 @@ export default createConfig({
                     slider: "src/slider/index.ts",
                     snackbar: "src/snackbar/index.ts",
                     toast: "src/toast/index.ts",
+                    toolbar: "src/toolbar/index.ts",
                     "supporting-text": "src/supporting-text/index.ts",
                     switch: "src/switch/index.ts",
                     tabs: "src/tabs/index.ts",

@@ -11,6 +11,8 @@ export const GLYPH_PATHS = {
     back: "M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z",
     /** Material's drop-down arrow: a select's, an autocomplete's, a split button's. */
     dropDown: "M7 10l5 5 5-5z",
+    /** Three dots in a column: a toolbar's overflow button. */
+    more: "M12 8a2 2 0 1 0 0-4 2 2 0 0 0 0 4m0 2a2 2 0 1 0 0 4 2 2 0 0 0 0-4m0 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4",
 } as const;
 
 /** Each toast type's icon: a check, a warning triangle, an error or info disc, or a partial ring

@@ -291,6 +291,17 @@
                 "default": "./dist/toast.jsx"
             }
         },
+        "./toolbar": {
+            "types": "./dist/toolbar/index.d.ts",
+            "solid": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.jsx"
+            },
+            "import": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.jsx"
+            }
+        },
         "./select": {
             "types": "./dist/select/index.d.ts",
             "solid": {

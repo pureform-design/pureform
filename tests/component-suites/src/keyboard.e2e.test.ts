@@ -34,7 +34,7 @@ const focusWithTab = async (
  *  component without its state (a plain button); a change or nothing, with its state. */
 const pressAndCheck = async (
     component: Keyed,
-    { key, does, to, props = {} }: KeyCase,
+    { key, does, to, props = {}, focuses }: KeyCase,
     dir: "ltr" | "rtl" = "ltr",
 ) => {
     const state = does === "click" ? undefined : component.state;
@@ -82,7 +82,9 @@ const pressAndCheck = async (
         );
         expect(onChange).toHaveBeenCalledTimes(does === "change" ? 1 : 0);
     }
-    expect(document.activeElement).toBe(component.keyboard.focusable(host));
+    expect(document.activeElement).toBe(
+        (focuses ?? component.keyboard.focusable)(host),
+    );
 };
 
 /** A component with a keyboard case. */

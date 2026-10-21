@@ -102,6 +102,7 @@ import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
 import { toast } from "./components/toast";
+import { toolbar } from "./components/toolbar";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
@@ -328,6 +329,7 @@ const defaultComponents = <G extends string>(
         dragHandle,
         snackbar,
         toast,
+        toolbar,
         tooltip,
         richTooltip,
         card,

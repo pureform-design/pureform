@@ -865,6 +865,27 @@ icon from the theme's color groups (`loading` takes `primary`); every Material p
 each toast with Zag's stacking variables, and the root transitions its transform, opacity and
 height (the movement drops out under reduced motion).
 
+## Toolbar
+
+M3 Expressive's docked and floating toolbars are one component, `toolbar`, with one part, `root`,
+holding icon buttons and buttons:
+
+```html
+<div class="{toolbar.root}" role="toolbar" aria-label="Formatting">
+    <button class="{iconButton.root}" aria-label="Bold">…</button>
+</div>
+```
+
+`placement: floating` (the default) is a pill at level 3 that hugs its elements, 8px from its
+ends and 4px apart; `docked` fills its row with square corners and no shadow, spreads its
+elements out and pads its ends 16px (it replaces the deprecated bottom app bar, which was never
+built). The bar is 64px thick (plus the theme's density offset); `orientation: vertical` stands it
+up, padding its block ends instead. `color: vibrant` takes `primaryContainer` and
+`onPrimaryContainer` for `surfaceContainer` and `onSurfaceVariant`. `overflow: true` clips the
+bar so it never grows past its parent, for the bindings that move what doesn't fit into a menu.
+Where the bar sits (16dp off the screen's edge when floating) is the page's layout. No compounds.
+The bar has no motion of its own.
+
 ## Slider and progress
 
 The slider (on Zag's slider machine in the bindings) and the linear progress indicators read

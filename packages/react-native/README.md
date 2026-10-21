@@ -60,6 +60,7 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `loading-indicator/`                                                    | `LoadingIndicator`: turns, drawn in its first shape with an SVG engine (React Native's keyframes carry no clip, so it doesn't morph) and as a circle without one                                                        |
 | `tags-input/`                                                           | `TagsInput`: input chips in a text field (submit or the delimiter adds one, Backspace or its remove button removes one)                                                                                                 |
 | `toast/`                                                                | `createToaster` (Zag's toast store) and `Toaster`, which shows its toasts in a column at its placement and times them itself; `useSnackbar`'s queue is the machines' `createQueue`, and each snackbar takes an `offset` |
+| `toolbar/`                                                              | `Toolbar`: icon buttons and buttons in a bar, the elements that don't fit in a `Menu` behind an overflow button                                                                                                         |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory
@@ -276,6 +277,12 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       surface, which the app places. The drag handle is a component of its own, a pressable
       pill. Import them from `@pureform/react-native/bottom-sheet`, `/side-sheet`, and
       `/drag-handle`.
+    - **The toolbar** (`@pureform/react-native/toolbar`) takes its elements as `items`, as on
+      the web: an icon button per element with an icon, a text button per element without.
+      With `overflow`, it sits in a row as wide as its parent (centered in it: React Native
+      can't measure the room a bar that hugs its content has otherwise), measures its elements
+      by their layouts, and moves those that don't fit into the menu behind an overflow button
+      ("⋮" unless given `overflowIcon`). It has no arrow-key focus moves.
     - **The autocomplete** (`@pureform/react-native/autocomplete`) is the select's field with an
       editable input: typing opens the suggestions `filter` keeps (`autocompleteMatches`) under
       it, through the portal host rather than a `Modal`, so the input keeps the keyboard; the

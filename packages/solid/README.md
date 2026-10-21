@@ -190,6 +190,7 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
 | `DragHandle`                      | `button` holding the `handle` `span`; `orientation`                                                                                                                                                                                                                                                              | none                                                                     |
 | `Snackbar`                        | `Root` (`div`, `role="status"`), `SupportingText` (`span`), `Actions` (`span`, wraps the buttons), `Action`, `Close` (`button`); `layout`: `oneLine`, `twoLine`, `longAction`                                                                                                                                    | `@pureform/machines/snackbar`                                            |
 | `Toast`                           | `Group` (`div`, the region; children render each toast), `Root` (`div`, `role="status"`), `Icon` (`span`), `Title`, `Description` (`div`), `ActionTrigger`, `CloseTrigger` (`button`); `Toaster` is the ready-made                                                                                               | Zag's toast (`@pureform/machines/toast`)                                 |
+| `Toolbar`                         | `Root` (`div`, `role="toolbar"`); the ready-made renders `IconButton`s, `Button`s and a `Menu` for its overflow                                                                                                                                                                                                  | none (arrow keys move focus)                                             |
 | `Tabs`                            | `Root` (`div`, unstyled), `List` (`div`, the tabs' `root` slot), per tab `Tab` (`button`, around its content, a `span` it renders), `Icon`, `Label`, `Indicator` (`span`), per panel `Content` (`div`, unstyled)                                                                                                 | Zag's tabs (`@pureform/machines/tabs`)                                   |
 | `NavigationBar`, `NavigationRail` | `Root` (`nav`), per destination `Item` (`a` with an `href`, else `button`), `Indicator`, `ActiveIndicator`, `Icon`, `Label` (`span`)                                                                                                                                                                             | `@pureform/machines/navigation`                                          |
 | `ListItem`                        | `Root` (`div`, `a` with an `href`, or `as`), `Leading` (`span`), `Content` (`div`), `Overline`, `Headline`, `SupportingText`, `Trailing`, `TrailingText` (`span`)                                                                                                                                                | none                                                                     |
@@ -332,6 +333,14 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   focus) and stacks them; the region sits at the theme's snackbar layer. Compose with
   `Toast.Group` (children: `(toast, index) => …`) and `Toast.Root` and its parts. Import from
   `@pureform/solid/toast`.
+- **The toolbar** (`@pureform/solid/toolbar`) renders its `items` as an icon button per element
+  with an icon (named by its label) and a text button per element without; `selected` makes an element a toggle. `placement` (`floating`, `docked`),
+  `orientation` and `color` (`standard`, `vibrant`) pick the bar. With `overflow`, it measures
+  its elements and the room its parent gives it, and moves those that don't fit, from the end,
+  into the menu behind an overflow button (`overflowLabel`, "More options"; `overflowIcon`); the
+  server renders them all, and the browser hides the rest once mounted. The arrow keys along the
+  bar (mirrored under `rtl`), Home and End move focus among its elements. `Toolbar.Root` is the
+  bar alone, for your own buttons (no overflow then).
 - **The tabs** are an unstyled `Root` (Zag's root, `pf-tabs-root`) around the tab list (`List`,
   `data-pf-part="list"`, drawn by the tabs' `root` slot) and the panels (`Content`, unstyled, one
   per tab, `hidden` while its tab isn't selected). Only the selected tab takes focus from Tab; the

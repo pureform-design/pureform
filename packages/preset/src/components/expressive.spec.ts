@@ -12,6 +12,7 @@ import { searchBar } from "./search-bar";
 import { separator } from "./separator";
 import { slider } from "./slider";
 import { switchControl } from "./switch";
+import { toolbar } from "./toolbar";
 
 // What the components take from M3 Expressive, kept beside what it deprecates.
 const slotRecipe = (
@@ -132,6 +133,20 @@ describe("M3 Expressive", () => {
         expect(searchBar.recipe.variants?.centered?.true?.input).toHaveProperty(
             "textAlign",
         );
+    });
+
+    it("docks or floats one toolbar, standing it up and taking the vibrant colors", () => {
+        expect(Object.keys(toolbar.recipe.variants?.placement ?? {})).toEqual([
+            "floating",
+            "docked",
+        ]);
+        expect(toolbar.recipe.variants?.orientation?.vertical).toHaveProperty(
+            "root.flexDirection",
+        );
+        expect(toolbar.recipe.variants?.color?.vibrant).toHaveProperty(
+            "root.tokens",
+        );
+        expect(toolbar.recipe.compoundVariants ?? []).toHaveLength(0);
     });
 
     it("swaps corners only on a toggle: selected also matches aria-current", () => {
