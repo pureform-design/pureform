@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
     LIST_ITEM_CONTENT_PROPS,
     listItemExpandIds,
+    listItemExpandMachineProps,
     listItemExpandRowProps,
     listItemRegionProps,
 } from "./list-item";
@@ -34,6 +35,33 @@ describe("expandable list item", () => {
 
     it("takes the region as content, kept off Root", () => {
         expect(LIST_ITEM_CONTENT_PROPS).toContain("region");
+    });
+});
+
+describe("expandable list item on Zag's accordion", () => {
+    it("is one collapsible item, controlled while expanded is given", () => {
+        expect(listItemExpandMachineProps({})).toMatchObject({
+            collapsible: true,
+            multiple: false,
+            value: undefined,
+            defaultValue: [],
+        });
+        expect(listItemExpandMachineProps({ expanded: true }).value).toEqual([
+            "item",
+        ]);
+        expect(
+            listItemExpandMachineProps({ defaultExpanded: true }).defaultValue,
+        ).toEqual(["item"]);
+    });
+
+    it("reports whether it expanded", () => {
+        const seen: boolean[] = [];
+        const props = listItemExpandMachineProps({
+            onExpandedChange: ({ expanded }) => seen.push(expanded),
+        });
+        props.onValueChange({ value: ["item"] });
+        props.onValueChange({ value: [] });
+        expect(seen).toEqual([true, false]);
     });
 });
 

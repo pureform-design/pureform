@@ -239,10 +239,12 @@ export type {
 export {
     LIST_ITEM_CONTENT_PROPS,
     LIST_ITEM_EXPAND_PROPS,
+    LIST_ITEM_EXPAND_VALUE,
     isInteractiveListItem,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
     listItemExpandIds,
+    listItemExpandMachineProps,
     listItemExpandRowProps,
     listItemLines,
     listItemRegionProps,

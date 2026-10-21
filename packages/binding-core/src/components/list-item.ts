@@ -213,3 +213,24 @@ export const listItemRegionProps = (
     "aria-labelledby": ids.row,
     hidden: expanded ? undefined : true,
 });
+
+/** The value of an expandable item's single accordion item, on the web bindings. */
+export const LIST_ITEM_EXPAND_VALUE = "item";
+
+/** Zag's accordion props for an expandable item, one item that opens and closes, from the item's
+ *  `expanded`, `defaultExpanded` and `onExpandedChange`. */
+export const listItemExpandMachineProps = (props: ListItemExpandProps) => ({
+    collapsible: true,
+    multiple: false,
+    value:
+        props.expanded === undefined
+            ? undefined
+            : props.expanded
+              ? [LIST_ITEM_EXPAND_VALUE]
+              : [],
+    defaultValue: props.defaultExpanded ? [LIST_ITEM_EXPAND_VALUE] : [],
+    onValueChange: (details: { value: string[] }) =>
+        props.onExpandedChange?.({
+            expanded: details.value.includes(LIST_ITEM_EXPAND_VALUE),
+        }),
+});
