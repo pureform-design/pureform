@@ -109,14 +109,21 @@ function StepImpl({
                 : String(index + 1);
     return (
         <v.item.View
-            aria-current={current ? "step" : undefined}
+            role={vertical ? "listitem" : "presentation"}
             style={s.item}
             testID={id("item")}
         >
             <v.trigger.Pressable
                 {...indication.handlers}
-                role="tab"
-                aria-selected={current}
+                {...(vertical
+                    ? {
+                          role: "button" as const,
+                          "aria-expanded": current,
+                          "aria-current": current
+                              ? ("step" as const)
+                              : undefined,
+                      }
+                    : { role: "tab" as const, "aria-selected": current })}
                 {...(item["aria-label"] === undefined
                     ? {}
                     : { "aria-label": item["aria-label"] })}
@@ -195,7 +202,7 @@ function StepperImpl(props: StepperProps): ReactNode {
     return (
         <v.root.View style={s.root} testID={id("root")}>
             <v.list.View
-                role="tablist"
+                role={vertical ? "list" : "tablist"}
                 {...(props["aria-label"] === undefined
                     ? {}
                     : { "aria-label": props["aria-label"] })}

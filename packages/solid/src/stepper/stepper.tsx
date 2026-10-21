@@ -31,6 +31,7 @@ import {
     For,
     omit,
     Show,
+    untrack,
 } from "solid-js";
 
 import { useControllable } from "../controllable";
@@ -242,10 +243,9 @@ function Separator(props: StepperPartProps): JSX.Element {
  *  a row, after the list, with the step's `index`. */
 function Content(props: StepperContentPartProps): JSX.Element {
     const { scope, api } = context.use("Content");
-    const index =
-        props.index === undefined
-            ? itemContext.use("Content").index
-            : () => props.index!;
+    // Whether it names its step is fixed: a row's content is outside the items.
+    const named = untrack(() => props.index !== undefined);
+    const index = named ? () => props.index! : itemContext.use("Content").index;
     return scope.render("content", {
         element: "div",
         machine: () => api().getContentProps({ index: index() }),

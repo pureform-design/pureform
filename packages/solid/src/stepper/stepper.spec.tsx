@@ -52,7 +52,7 @@ describe("Stepper, ready-made", () => {
                 trigger.getAttribute("aria-selected"),
             ),
         ).toEqual(["true", "false", "false"]);
-        expect(all(ids.item)[0]!.getAttribute("aria-current")).toBe("step");
+        expect(all(ids.item)[0]!.getAttribute("role")).toBe("presentation");
         expect(all(ids.indicator).map((part) => part.textContent)).toEqual([
             "1",
             "2",
