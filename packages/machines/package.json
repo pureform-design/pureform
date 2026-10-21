@@ -110,6 +110,13 @@
                 "default": "./dist/ripple.mjs"
             }
         },
+        "./time-picker": {
+            "types": "./dist/time-picker/index.d.ts",
+            "import": {
+                "development": "./src/time-picker/index.ts",
+                "default": "./dist/time-picker.mjs"
+            }
+        },
         "./text-field": {
             "types": "./dist/text-field/index.d.ts",
             "import": {
