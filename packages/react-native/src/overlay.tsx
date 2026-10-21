@@ -417,6 +417,51 @@ export function useAnchoredOverlay(
     return { open, source, measured, presence, close, toggle };
 }
 
+/** A text field's popup opened by a button over its trailing icon (the autocomplete's
+ *  suggestions, the docked date picker's calendar): the popup's presence, the `container` ref
+ *  for the field (`Field`'s `container`), the field's box when the popup last opened, `show`
+ *  (which measures it, then opens) and `close`, and the button's `onLayout` and `style`, which
+ *  cover the trailing icon at the field's height. The back button or Escape closes it. Render
+ *  the popup while `presence.present && anchor`. */
+export function useFieldPopup(
+    open: boolean,
+    setOpen: (open: boolean) => void,
+) {
+    const presence = usePresence(open, "popup");
+    const container = useRef<Measurable>(null);
+    const [anchor, setAnchor] = useState<WindowRect>();
+    const [height, setHeight] = useState(0);
+    const show = () =>
+        container.current?.measureInWindow((x, y, width, h) => {
+            setAnchor({ x, y, width, height: h });
+            if (!open) setOpen(true);
+        });
+    const close = useStableCallback(() => {
+        if (open) setOpen(false);
+    });
+    useDismiss(open, close);
+    return {
+        presence,
+        container,
+        anchor,
+        show,
+        close,
+        trigger: {
+            onLayout: () =>
+                container.current?.measureInWindow((_x, _y, _w, h) =>
+                    setHeight(h),
+                ),
+            style: {
+                position: "absolute",
+                top: 0,
+                end: 0,
+                width: 48,
+                height: height || 56,
+            },
+        },
+    } as const;
+}
+
 /** A notification's timer (the snackbar's, a toast's): while `open`, `onTimeout` runs once
  *  `duration` ms pass, unless the pointer hovers it or a press holds it, which starts the time
  *  over. An infinite or `null` duration never runs out. Spread `holdProps` on a `Pressable` around
