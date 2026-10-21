@@ -90,7 +90,8 @@ describe("stepper machine", () => {
         expect($('[data-indicator="1"]').hasAttribute("aria-checked")).toBe(
             false,
         );
-        expect($('[data-item="1"]').getAttribute("aria-current")).toBe("step");
+        expect($('[data-item="1"]').getAttribute("role")).toBe("presentation");
+        expect($('[data-item="1"]').hasAttribute("aria-current")).toBe(false);
         expect(api().value).toBe(1);
     });
 
@@ -185,6 +186,34 @@ describe("stepper machine", () => {
         $("[data-prev]").click();
         await settle();
         expect(api().value).toBe(0);
+    });
+
+    it("is a list of disclosure buttons in a column, a tab list in a row", async () => {
+        const column = render({ orientation: "vertical", defaultStep: 1 });
+        await settle();
+        expect(column.$("[data-list]").getAttribute("role")).toBe("list");
+        expect(column.$('[data-item="0"]').getAttribute("role")).toBe(
+            "listitem",
+        );
+        const header = column.trigger(1);
+        expect(header.hasAttribute("role")).toBe(false);
+        expect(header.getAttribute("aria-expanded")).toBe("true");
+        expect(header.getAttribute("aria-current")).toBe("step");
+        expect(column.trigger(0).getAttribute("aria-expanded")).toBe("false");
+        expect(column.trigger(0).hasAttribute("aria-current")).toBe(false);
+        expect(column.$('[data-content="1"]').getAttribute("role")).toBe(
+            "region",
+        );
+        // Each header is a tab stop, as an accordion's are.
+        expect(column.trigger(0).tabIndex).toBe(0);
+        column.stop();
+        document.body.innerHTML = "";
+        const row = render({ defaultStep: 1 });
+        await settle();
+        expect(row.$("[data-list]").getAttribute("role")).toBe("tablist");
+        expect(row.$('[data-content="1"]').getAttribute("role")).toBe(
+            "tabpanel",
+        );
     });
 
     it("shows only the current step's content", async () => {

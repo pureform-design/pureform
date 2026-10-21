@@ -39,6 +39,7 @@ import {
     relative,
     row,
     slot,
+    start,
     stretch,
     sub,
     unitless,
@@ -56,8 +57,8 @@ import {
     densityTokenVariant,
     disabledColor,
     INDICATION_ROOT,
-    motionTransition,
     pressableRoot,
+    stateTransition,
     sys,
     variantsOf,
 } from "./shared";
@@ -168,6 +169,7 @@ export const createStepper = <D extends string = MaterialDensity>(
                     item: { position: relative, display: flex },
                     trigger: {
                         ...pressable,
+                        justifyContent: start,
                         flexShrink: unitless(0),
                         gap: ref("gap"),
                         minHeight: headerHeight,
@@ -196,11 +198,9 @@ export const createStepper = <D extends string = MaterialDensity>(
                         flexShrink: unitless(0),
                         width: ref("indicatorSize"),
                         height: ref("indicatorSize"),
-                        fontSize: ref("indicatorSize"),
-                        lineHeight: unitless(1),
                         borderRadius: radius("full"),
                         textStyle: textStyle("labelMedium"),
-                        transition: motionTransition(),
+                        transition: stateTransition,
                         backgroundColor: when()
                             .on(
                                 TRIGGER_SELECTED,
