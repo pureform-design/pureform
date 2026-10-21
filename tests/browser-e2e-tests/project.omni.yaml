@@ -26,6 +26,7 @@ cache:
       append:
         - "src/__screenshots__/**/*"
         - "src/__fixtures__/**/*"
+        - "fonts.conf"
         - "../panda-fixture/src/**/*"
         - "../panda-fixture/.pureform/**/*"
         - "../panda-fixture/panda.config.ts"

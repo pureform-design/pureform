@@ -1,5 +1,9 @@
-// Browser tests in Chromium through Vitest's browser mode. Set CHROMIUM_PATH to use a system
-// Chromium instead of Playwright's download.
+// Browser tests in Chromium through Vitest's browser mode. Always Playwright's own Chromium, with
+// the repo's fontconfig (`fonts.conf`) and flags that turn off hinting, subpixel text, and the GPU,
+// so the screenshots draw text the same on every machine whatever its font settings.
+// CHROMIUM_PATH is ignored here: a system Chromium draws text differently.
+
+import { fileURLToPath } from "node:url";
 
 import e2eTestConfig from "@pureform/vitest-config/e2e";
 import { playwright } from "@vitest/browser-playwright";
@@ -8,7 +12,23 @@ import { mergeConfig, type UserWorkspaceConfig } from "vitest/config";
 import { commands } from "./src/commands";
 import baseConfig from "./vite.config";
 
-const executablePath = process.env.CHROMIUM_PATH;
+if (process.env.CHROMIUM_PATH) {
+    console.warn(
+        "\n⚠ browser-e2e-tests ignores CHROMIUM_PATH: its screenshots need Playwright's own Chromium.\n" +
+            "  Install it with `bun x playwright install chromium`.\n",
+    );
+}
+
+const FONTCONFIG_FILE = fileURLToPath(new URL("./fonts.conf", import.meta.url));
+
+// Text antialiased in grayscale, unhinted, at whole-pixel positions, in sRGB, drawn by the CPU.
+const DETERMINISTIC_TEXT_ARGS = [
+    "--font-render-hinting=none",
+    "--disable-lcd-text",
+    "--disable-font-subpixel-positioning",
+    "--force-color-profile=srgb",
+    "--disable-gpu",
+];
 
 export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), {
     test: {
@@ -21,7 +41,10 @@ export default mergeConfig(mergeConfig(baseConfig, e2eTestConfig), {
             enabled: true,
             headless: true,
             provider: playwright({
-                launchOptions: executablePath ? { executablePath } : {},
+                launchOptions: {
+                    args: DETERMINISTIC_TEXT_ARGS,
+                    env: { ...process.env, FONTCONFIG_FILE },
+                },
                 contextOptions: { reducedMotion: "reduce" },
             }),
             instances: [

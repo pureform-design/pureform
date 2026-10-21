@@ -38,8 +38,15 @@ prepare?)` renders markup with a `[data-root]` and `[data-part]` elements under 
 ## Running
 
 Through the omni MCP (or `omni run`): `test:e2e`, which first runs the Panda fixture's `prepare`
-(`pureform generate`, then Panda's codegen). `.env.local` at the repo root sets `CHROMIUM_PATH` to use a system Chromium instead of
-Playwright's download.
+(`pureform generate`, then Panda's codegen). It always runs Playwright's own Chromium
+(`bun x playwright install chromium`) and ignores `CHROMIUM_PATH`, with a warning: a system
+Chromium draws text differently, and the screenshots would differ.
+
+Text in the screenshots draws the same on every machine: Chromium starts with the repo's
+fontconfig (`fonts.conf`, through `FONTCONFIG_FILE`), which reads the system fonts but no user
+config (`~/.config/fontconfig`) and turns hinting and subpixel rendering off, and with flags that
+do the same in Chromium (`--font-render-hinting=none`, `--disable-lcd-text`,
+`--disable-font-subpixel-positioning`), plus `--force-color-profile=srgb` and `--disable-gpu`.
 
 ## Worth knowing
 
