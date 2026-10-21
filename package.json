@@ -108,6 +108,8 @@
         "@zag-js/carousel": "^1.46.0",
         "@zag-js/date-picker": "^1.46.0",
         "@zag-js/date-input": "^1.46.0",
+        "@zag-js/accordion": "^1.46.0",
+        "@zag-js/tree-view": "^1.46.0",
         "@internationalized/date": "^3.12.4",
         "@zag-js/react": "^1.46.0",
         "axe-core": "^4.14.0"

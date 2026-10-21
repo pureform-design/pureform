@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { createAccordion } from "./components/accordion";
 import { APP_BAR_KEYFRAMES, appBar } from "./components/app-bar";
 import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
@@ -112,6 +113,7 @@ import { toast } from "./components/toast";
 import { toolbar } from "./components/toolbar";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
+import { createTree } from "./components/tree";
 import { componentContrastFailures } from "./contrast";
 import {
     CORNER_TOKEN,
@@ -350,6 +352,8 @@ const defaultComponents = <G extends string>(
         richTooltip,
         card,
         carousel,
+        accordion: createAccordion<Step>(densities),
+        tree: createTree<G, Step>(theme.color.groups, densities),
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),

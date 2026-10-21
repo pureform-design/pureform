@@ -38,6 +38,9 @@ const FIXTURES = [
     },
     // The time picker's hand turns to a new value (c5b).
     { name: "timePicker", slot: "dialTrack" },
+    // An expand indicator turns over (c6a); reduced motion keeps its color fade.
+    { name: "accordion", slot: "indicator" },
+    { name: "tree", slot: "indicator" },
 ] as const;
 
 type Fixture = {
@@ -77,6 +80,8 @@ const EXPECTED: Record<
     calendarCell: { full: STATE, reduced: STATE },
     wavyLinearProgress: { full: "width", reduced: "none" },
     timePicker: { full: "transform", reduced: "none" },
+    accordion: { full: "transform, color", reduced: "color" },
+    tree: { full: "transform, color", reduced: "color" },
 };
 
 const classOf = (

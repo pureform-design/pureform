@@ -12,6 +12,8 @@ import {
     buttonGroup,
     card,
     carousel,
+    accordion,
+    tree,
     checkbox,
     chip,
     circularProgress,
@@ -3130,6 +3132,154 @@ export function Page() {
                 </div>
             </section>
 
+            <section
+                data-section="expandables"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={[undefined, "teal", "sharp"] as const}>
+                    {(theme) => {
+                        const a = accordion();
+                        const t = tree({
+                            color: theme ? "secondary" : undefined,
+                        });
+                        return (
+                            <div
+                                data-panda-theme={theme}
+                                style={{
+                                    display: "grid",
+                                    gap: "16px",
+                                    width: "300px",
+                                }}
+                            >
+                                <div class={a.root}>
+                                    <div class={a.item}>
+                                        <button
+                                            class={a.trigger}
+                                            type="button"
+                                            aria-expanded="true"
+                                        >
+                                            <span class={a.leading}>★</span>
+                                            <span class={a.text}>
+                                                <span class={a.title}>
+                                                    Shipping
+                                                </span>
+                                                <span class={a.description}>
+                                                    2 to 4 days
+                                                </span>
+                                            </span>
+                                            <span class={a.indicator}>⌄</span>
+                                        </button>
+                                        <div class={a.content}>
+                                            Free over 50, tracked to your door.
+                                        </div>
+                                    </div>
+                                    <div class={a.item}>
+                                        <button
+                                            class={a.trigger}
+                                            type="button"
+                                            aria-expanded="false"
+                                        >
+                                            <span class={a.text}>
+                                                <span class={a.title}>
+                                                    Returns
+                                                </span>
+                                            </span>
+                                            <span class={a.indicator}>⌄</span>
+                                        </button>
+                                        <div class={a.content} hidden>
+                                            30 days
+                                        </div>
+                                    </div>
+                                    <div class={a.item}>
+                                        <button
+                                            class={a.trigger}
+                                            type="button"
+                                            aria-expanded="false"
+                                            disabled
+                                        >
+                                            <span class={a.text}>
+                                                <span class={a.title}>
+                                                    Gifts
+                                                </span>
+                                            </span>
+                                            <span class={a.indicator}>⌄</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class={t.root}>
+                                    <span class={t.label}>Files</span>
+                                    <div class={t.tree} role="tree">
+                                        <div
+                                            class={t.branch}
+                                            role="treeitem"
+                                            aria-expanded="true"
+                                        >
+                                            <div
+                                                class={t.node}
+                                                tabindex="0"
+                                                aria-expanded="true"
+                                            >
+                                                <span class={t.leading}>▤</span>
+                                                <span class={t.text}>src</span>
+                                                <span class={t.indicator}>
+                                                    ⌄
+                                                </span>
+                                            </div>
+                                            <div class={t.group} role="group">
+                                                <div
+                                                    class={t.node}
+                                                    role="treeitem"
+                                                    aria-selected="true"
+                                                    tabindex="-1"
+                                                >
+                                                    <span class={t.text}>
+                                                        index.ts
+                                                    </span>
+                                                </div>
+                                                <div
+                                                    class={t.node}
+                                                    role="treeitem"
+                                                    aria-selected="false"
+                                                    tabindex="-1"
+                                                >
+                                                    <span class={t.text}>
+                                                        util.ts
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class={t.branch}
+                                            role="treeitem"
+                                            aria-expanded="false"
+                                        >
+                                            <div
+                                                class={t.node}
+                                                tabindex="-1"
+                                                aria-expanded="false"
+                                            >
+                                                <span class={t.leading}>▤</span>
+                                                <span class={t.text}>docs</span>
+                                                <span class={t.indicator}>
+                                                    ⌄
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div
+                                            class={t.node}
+                                            role="treeitem"
+                                            aria-disabled="true"
+                                            tabindex="-1"
+                                        >
+                                            <span class={t.text}>LICENSE</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    }}
+                </For>
+            </section>
             <section
                 data-section="carousels"
                 style={{ display: "grid", gap: "16px", width: "360px" }}

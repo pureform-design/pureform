@@ -2974,3 +2974,105 @@ carousel.mask: bg oklch(0.9151 0.0086 325.879) | color oklch(0.2245 0.0059 301.1
     hovered-selected: bg color(srgb 0.8385 0.8203 0.8392)
     pressed-checked: bg color(srgb 0.8227 0.8047 0.8235)
     focused-checked: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+accordion.trigger: bg oklch(0.9492 0.0092 331.182) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.8818 0.86 0.8789)
+    focused: bg color(srgb 0.865 0.8436 0.8623) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.865 0.8436 0.8623)
+    dragged: bg color(srgb 0.8147 0.7944 0.8127)
+    hovered-selected: bg color(srgb 0.8602 0.8223 0.9223) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.865 0.8436 0.8623)
+    focused-checked: bg color(srgb 0.865 0.8436 0.8623) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+accordion.leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+accordion.text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+accordion.title: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+accordion.description: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+accordion.indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+tree.node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.8602 0.8223 0.9223) | color oklch(0.4005 0.034 298.613)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree.leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+tree.text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+tree.indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4005 0.034 298.613)
+tree[color=tertiary].node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.951 0.8014 0.8415) | color oklch(0.4044 0.0591 359.127)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree[color=tertiary].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+tree[color=tertiary].text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+tree[color=tertiary].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4044 0.0591 359.127)
+tree[color=success].node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.4183 0.9425 0.469) | color oklch(0.3849 0.1167 146.268)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree[color=success].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+tree[color=success].text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+tree[color=success].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3849 0.1167 146.268)
+tree[color=warning].node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.9473 0.8295 0.4979) | color oklch(0.3956 0.0809 90.5623)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree[color=warning].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+tree[color=warning].text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+tree[color=warning].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3956 0.0809 90.5623)
+tree[color=error].node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.9661 0.7866 0.7752) | color oklch(0.4171 0.1702 27.3795)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree[color=error].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+tree[color=error].text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+tree[color=error].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.4171 0.1702 27.3795)
+tree[color=info].node: bg oklch(0.9844 0.0084 325.895) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.9215 0.9033 0.9222)
+    focused: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.9039 0.8859 0.9047)
+    dragged: bg color(srgb 0.8509 0.8339 0.8522)
+    hovered-selected: bg color(srgb 0.6349 0.876 0.9495) | color oklch(0.3911 0.0701 217.604)
+    pressed-checked: bg color(srgb 0.9039 0.8859 0.9047)
+    focused-checked: bg color(srgb 0.9039 0.8859 0.9047) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+tree[color=info].leading: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+tree[color=info].text: bg rgba(0, 0, 0, 0) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)
+tree[color=info].indicator: bg rgba(0, 0, 0, 0) | color oklch(0.3977 0.0158 305.735) | outline none
+    hovered-selected: color oklch(0.3911 0.0701 217.604)

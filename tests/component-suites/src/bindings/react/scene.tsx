@@ -8,6 +8,7 @@ import {
     PureformProvider,
 } from "@pureform/react";
 import type { Indication } from "@pureform/react";
+import { Accordion } from "@pureform/react/accordion";
 import { AppBar } from "@pureform/react/app-bar";
 import { Autocomplete } from "@pureform/react/autocomplete";
 import { Avatar } from "@pureform/react/avatar";
@@ -64,6 +65,7 @@ import type { ToastData } from "@pureform/react/toast";
 import { Toolbar } from "@pureform/react/toolbar";
 import { Tooltip } from "@pureform/react/tooltip";
 import { TouchTarget } from "@pureform/react/touch-target";
+import { Tree } from "@pureform/react/tree";
 import {
     createElement,
     type ComponentType,
@@ -109,6 +111,8 @@ export const components: Record<ComponentName, ComponentType<never>> = {
     ButtonGroup,
     Card,
     Carousel,
+    Accordion,
+    Tree,
     Checkbox,
     Chip,
     CircularProgress,

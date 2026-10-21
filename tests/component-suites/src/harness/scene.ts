@@ -16,6 +16,8 @@ export const COMPONENT_NAMES = [
     "ButtonGroup",
     "Card",
     "Carousel",
+    "Accordion",
+    "Tree",
     "Checkbox",
     "Chip",
     "CircularProgress",
