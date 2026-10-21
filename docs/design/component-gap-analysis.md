@@ -121,7 +121,7 @@ done (§7).
 | List (standard / segmented)                                | ✅ `list`, `listItem` | none            | ✅ segmented is new                   | ✅           | ✅ list, nav, action, selection   | `listbox`                  | §2                                                                   |
 | Carousel (multi-browse / uncontained / hero / full-screen) | ✅ `carousel`         | zag `carousel`  | ✅                                    | —            | —                                 | `carousel`                 | Done (c4d): `layout` incl. multi-aspect; keyline masks               |
 | Expansion panel / accordion                                | ❌                    | —               | (expandable list items)               | —            | ✅ `mat-accordion`                | `accordion`, `collapsible` | **In scope** as `accordion` (§1.9); also backs expandable list items |
-| Grid / image list                                          | ❌                    | —               | — (M2 only; Android's page is a stub) | —            | ✅ `mat-grid-list`                | —                          | **In scope** as `gridList` (§1.9); layout CSS only                   |
+| Grid / image list                                          | ✅ `gridList`         | none            | — (M2 only; Android's page is a stub) | —            | ✅ `mat-grid-list`                | —                          | Done (c6e): wrapping row; `columns`, `gutter`, `aspect`; 0 compounds |
 | Scroll area, splitter / pane                               | ❌                    | —               | (panes: layout guidance)              | —            | —                                 | `scroll-area`, `splitter`  | Optional                                                             |
 | Scrim                                                      | ✅ `scrim`            | none (presence) | ✅ (part of dialogs, sheets)          | —            | (CDK backdrop)                    | `dialog.backdrop`          |                                                                      |
 
@@ -211,7 +211,7 @@ zag's part lists, and a design call is recorded in the component's output contex
 | Paginator                   | `paginator`   | zag `pagination`            | Range label, page-size select (reuses `select`), previous/next icon buttons.                              |
 | Tree                        | `tree`        | zag `tree-view`             | Nodes use `listItem` parts; expand icon in `trailing`, nested group indented.                             |
 | Table, sort header          | `table`       | own (sort state, selection) | Header, row, cell, footer, sort arrow, optional selection column. No zag machine.                         |
-| Grid list                   | `gridList`    | none                        | Layout only: columns, gutter, tile aspect.                                                                |
+| Grid list                   | `gridList`    | none                        | Done (c6e): wrapping row, tile (cell), content, media, header, footer; no spans                           |
 | Button toggle (group)       | `buttonGroup` | zag `toggle-group`          | Already planned (§4.0); Angular's `mat-button-toggle-group` is the connected, selectable form.            |
 | Sidenav (drawer container)  | —             | —                           | Not a separate component: a side sheet or expanded rail (`modal`, `coplanar`) plus the page's own layout. |
 
