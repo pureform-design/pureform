@@ -181,39 +181,6 @@ export const LIST_ITEM_EXPAND_PROPS = [
     "onExpandedChange",
 ] as const satisfies readonly (keyof ListItemExpandProps)[];
 
-/** The ids an expandable item's row and region name each other by. */
-export interface ListItemExpandIds {
-    readonly row: string;
-    readonly region: string;
-}
-
-/** The ids of an expandable item's row and region, from an id unique to it. */
-export const listItemExpandIds = (id: string): ListItemExpandIds => ({
-    row: `${id}-row`,
-    region: `${id}-region`,
-});
-
-/** An expandable item's row: a button that says whether its region shows, and names it. */
-export const listItemExpandRowProps = (
-    ids: ListItemExpandIds,
-    expanded: boolean,
-) => ({
-    id: ids.row,
-    "aria-expanded": expanded ? ("true" as const) : ("false" as const),
-    "aria-controls": ids.region,
-});
-
-/** An expandable item's region: named by its row, hidden while collapsed. */
-export const listItemRegionProps = (
-    ids: ListItemExpandIds,
-    expanded: boolean,
-) => ({
-    id: ids.region,
-    role: "region" as const,
-    "aria-labelledby": ids.row,
-    hidden: expanded ? undefined : true,
-});
-
 /** The value of an expandable item's single accordion item, on the web bindings. */
 export const LIST_ITEM_EXPAND_VALUE = "item";
 

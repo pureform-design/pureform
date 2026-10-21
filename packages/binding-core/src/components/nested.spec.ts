@@ -2,37 +2,11 @@ import { describe, expect, it } from "vitest";
 
 import {
     LIST_ITEM_CONTENT_PROPS,
-    listItemExpandIds,
     listItemExpandMachineProps,
-    listItemExpandRowProps,
-    listItemRegionProps,
 } from "./list-item";
 import { hasSubmenu, submenuPositioning } from "./menu";
 
 describe("expandable list item", () => {
-    const ids = listItemExpandIds("mail");
-
-    it("names the region from the row and the row from the region", () => {
-        expect(listItemExpandRowProps(ids, true)).toEqual({
-            id: "mail-row",
-            "aria-expanded": "true",
-            "aria-controls": "mail-region",
-        });
-        expect(listItemRegionProps(ids, true)).toEqual({
-            id: "mail-region",
-            role: "region",
-            "aria-labelledby": "mail-row",
-            hidden: undefined,
-        });
-    });
-
-    it("hides the region while collapsed", () => {
-        expect(listItemExpandRowProps(ids, false)["aria-expanded"]).toBe(
-            "false",
-        );
-        expect(listItemRegionProps(ids, false).hidden).toBe(true);
-    });
-
     it("takes the region as content, kept off Root", () => {
         expect(LIST_ITEM_CONTENT_PROPS).toContain("region");
     });

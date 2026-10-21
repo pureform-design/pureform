@@ -243,17 +243,13 @@ export {
     isInteractiveListItem,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
-    listItemExpandIds,
     listItemExpandMachineProps,
-    listItemExpandRowProps,
     listItemLines,
-    listItemRegionProps,
     listItemRootProps,
     listItemSelection,
 } from "./components/list-item";
 export type {
     ListItemContentProps,
-    ListItemExpandIds,
     ListItemExpandProps,
     ListItemPart,
     ListItemRootOwnProps,
