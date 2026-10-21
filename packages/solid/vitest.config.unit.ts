@@ -50,6 +50,8 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             headless: true,
             provider: playwright({
                 launchOptions: executablePath ? { executablePath } : {},
+                // Not UTC, so a date computed in UTC instead of locally shows up (the date pickers' "today").
+                contextOptions: { timezoneId: "Asia/Manila" },
             }),
             instances: [{ browser: "chromium" }],
             commands,

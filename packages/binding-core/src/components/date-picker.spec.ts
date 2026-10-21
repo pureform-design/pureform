@@ -7,6 +7,7 @@ import {
     chooseDate,
     dateFormatHint,
     dateMachineProps,
+    localTimeZone,
     dayOfWeek,
     dockedDatePickerSelection,
     formatDateText,
@@ -15,6 +16,7 @@ import {
     monthWeeks,
     parseDateText,
     parseIsoDate,
+    todayIso,
     selectedDateText,
     weekdayLabels,
     weekStartOf,
@@ -166,5 +168,16 @@ describe("text", () => {
         expect(parseDateText("02/30/2026", "en-US")).toBeNull();
         expect(parseDateText("08/17", "en-US")).toBeNull();
         expect(formatDateText("2026-08-17", "en-US")).toBe("08/17/2026");
+    });
+});
+
+// The unit config runs the browser in Asia/Manila (UTC+8), where UTC's date is the day before
+// until 08:00.
+describe("the local date", () => {
+    it("is today's date as the user sees it, not the UTC one", () => {
+        expect(localTimeZone()).toBe("Asia/Manila");
+        // 00:30 on the 15th in Manila is still the 14th in UTC.
+        expect(todayIso(new Date("2026-08-14T16:30:00Z"))).toBe("2026-08-15");
+        expect(dateMachineProps({}, (v) => v).timeZone).toBe("Asia/Manila");
     });
 });

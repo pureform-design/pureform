@@ -392,6 +392,7 @@ export {
     dateFormatHint,
     dateInputSelection,
     dateMachineProps,
+    localTimeZone,
     datePickerSelection,
     dayOfWeek,
     daysInMonth,
