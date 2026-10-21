@@ -141,7 +141,7 @@ done (§7).
 | Search view (full-screen / docked / contained)               | ✅ `searchView`     | zag           | ✅                              | —             | —                                     | `combobox` + `dialog`      | Done (c3c): zag `dialog` + `combobox`; `variant` |
 | Menu                                                         | ✅ `menu`           | zag           | ✅                              | ✅ (sub-menu) | ✅ `mat-menu`                         | `menu` (+ nested, context) | §2                                               |
 | Stepper                                                      | ❌                  | —             | —                               | —             | ✅ `mat-stepper`                      | `steps`                    | **In scope** (§1.9)                              |
-| Paginator                                                    | ❌                  | —             | —                               | —             | ✅ `mat-paginator`                    | `pagination`               | **In scope** (§1.9)                              |
+| Paginator                                                    | ✅ `paginator`      | zag           | —                               | —             | ✅ `mat-paginator`                    | `pagination`               | Done (c6c): `paginator`; 0 variants              |
 | Tree                                                         | ❌                  | —             | —                               | —             | ✅ `mat-tree`                         | `tree-view`                | **In scope** (§1.9)                              |
 | Navigation menu (mega menu)                                  | ❌                  | —             | —                               | —             | —                                     | `navigation-menu`          | Not M3                                           |
 
@@ -208,7 +208,7 @@ zag's part lists, and a design call is recorded in the component's output contex
 | --------------------------- | ------------- | --------------------------- | --------------------------------------------------------------------------------------------------------- |
 | Expansion panel / accordion | `accordion`   | zag `accordion`             | Also the base for expandable list items (§2.3).                                                           |
 | Stepper                     | `stepper`     | zag `steps`                 | Horizontal and vertical; step header, connector, content.                                                 |
-| Paginator                   | `paginator`   | zag `pagination`            | Range label, page-size select (reuses `select`), previous/next icon buttons.                              |
+| Paginator                   | `paginator`   | zag `pagination`            | Done (c6c): range label, page-size select, first/prev/next/last. 0 variants.                              |
 | Tree                        | `tree`        | zag `tree-view`             | Nodes use `listItem` parts; expand icon in `trailing`, nested group indented.                             |
 | Table, sort header          | `table`       | own (sort state, selection) | Header, row, cell, footer, sort arrow, optional selection column. No zag machine.                         |
 | Grid list                   | `gridList`    | none                        | Layout only: columns, gutter, tile aspect.                                                                |
