@@ -111,12 +111,62 @@ function trackKeyboardScroll({ scope, send, prop }: ZagParams) {
     return () => group.removeEventListener("keydown", onKeyDown);
 }
 
+// Zag's, without its tab index sync: the row's tab index is set with its props (a tab stop only
+// without items), and the sync reads the page's styles as the machine starts, before a runtime
+// theme's block is in, so the items' colors would then tween from the old theme's.
+function trackSlideMutation({ scope, send, prop }: ZagParams) {
+    const group = scope.getById(
+        prop("ids")?.itemGroup ?? `carousel:${scope.id}:item-group`,
+    );
+    if (!group) return;
+    const observer = new (scope.getWin().MutationObserver)(() =>
+        send({ type: "SNAP.REFRESH", src: "slide.mutation" }),
+    );
+    observer.observe(group, { childList: true, subtree: true });
+    return () => observer.disconnect();
+}
+
 const zag = zagMachine as unknown as AnyMachine<SchemaOf<ZagMachine>>;
+
+type Action = (params: ZagParams) => void;
+const zagActions = zag.implementations?.actions as Record<string, Action>;
+
+// The page an item is on, measuring the snap points first (an item can be reached before their
+// first measure, so soon after the machine starts): the page that scrolls the item to the row's
+// start, or the closest one for an item past the last (Zag's gives those no page, -1).
+function setMatchingPage(params: ZagParams) {
+    const { context, scope, prop, event } = params;
+    zagActions["setSnapPoints"]!(params);
+    const group = scope.getById(
+        prop("ids")?.itemGroup ?? `carousel:${scope.id}:item-group`,
+    );
+    const items = group ? [...group.querySelectorAll<HTMLElement>(ITEM)] : [];
+    const item = items[Number(event["index"])];
+    const points = context.get("pageSnapPoints");
+    if (!item || !items[0] || points.length === 0) return;
+    const distance = Math.abs(
+        item.getBoundingClientRect().left -
+            items[0].getBoundingClientRect().left,
+    );
+    const off = (index: number) =>
+        Math.abs(Math.abs(points[index]! - points[0]!) - distance);
+    const page = points.reduce(
+        (closest, _, index) => (off(index) < off(closest) ? index : closest),
+        0,
+    );
+    if (page !== context.get("page")) context.set("page", page);
+}
 
 /** Zag's carousel machine: items that size themselves and each snap, the keys by direction, and an
  *  interaction emitter per mask. */
 export const machine: Machine = withInteraction({
     ...zag,
+    // Zag measures the snap points as it starts, which reads the page's styles before a runtime
+    // theme's block is in (the items' colors would then tween from the old theme's). Its resize
+    // tracking measures them on the next frame anyway.
+    entry: (zag.entry as string[]).filter(
+        (action) => action !== "setSnapPoints",
+    ),
     props: (params) =>
         zag.props!({
             ...params,
@@ -129,9 +179,14 @@ export const machine: Machine = withInteraction({
         }),
     implementations: {
         ...zag.implementations,
+        actions: {
+            ...zag.implementations?.actions,
+            setMatchingPage: setMatchingPage as never,
+        },
         effects: {
             ...zag.implementations?.effects,
             trackKeyboardScroll: trackKeyboardScroll as never,
+            trackSlideMutation: trackSlideMutation as never,
         },
     },
 });
@@ -156,7 +211,14 @@ export function connect<T extends PropTypes>(
                 style?: Record<string, unknown>;
             };
             const { gap: _gap, ...style } = props.style ?? {};
-            return { ...props, style } as T["element"];
+            // Zag sets it once mounted (the row is a tab stop only when nothing in it is); the
+            // masks are, so the server renders it as the client will.
+            const tabIndex = service.prop("slideCount") > 0 ? -1 : 0;
+            return {
+                ...props,
+                ...normalize.element({ tabIndex }),
+                style,
+            } as T["element"];
         },
         getMaskProps: ({ index, disabled = false }) =>
             pressableItemProps(
