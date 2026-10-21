@@ -42,6 +42,7 @@ import {
     dragHandle,
     fabMenu,
     splitButton,
+    stepper,
     icon,
     iconButton,
     inputChip,
@@ -3191,6 +3192,127 @@ export function Page() {
                             }}
                         </For>
                     )}
+                </For>
+            </section>
+            <section
+                data-section="steppers"
+                style={{ display: "grid", gap: "24px", width: "640px" }}
+            >
+                <For
+                    each={
+                        [
+                            { theme: undefined, orientation: "horizontal" },
+                            { theme: "teal", orientation: "horizontal" },
+                            { theme: "sharp", orientation: "horizontal" },
+                            { theme: undefined, orientation: "vertical" },
+                        ] as const
+                    }
+                >
+                    {({ theme, orientation }) => {
+                        const s = stepper({ orientation });
+                        const vertical = orientation === "vertical";
+                        // A done step, the current one, one in error, and one still to come.
+                        const steps = [
+                            { label: "Address", state: "done" },
+                            {
+                                label: "Payment",
+                                caption: "Optional",
+                                state: "current",
+                            },
+                            { label: "Review", state: "error" },
+                            { label: "Confirm", state: "todo" },
+                        ] as const;
+                        return (
+                            <div
+                                class={s.root}
+                                data-panda-theme={theme}
+                                style={{ padding: "8px" }}
+                            >
+                                <div
+                                    class={s.list}
+                                    role={vertical ? "list" : "tablist"}
+                                    aria-label={`${theme ?? "base"} ${orientation}`}
+                                >
+                                    <For each={steps}>
+                                        {(step, i) => (
+                                            <div
+                                                class={s.item}
+                                                role={
+                                                    vertical
+                                                        ? "listitem"
+                                                        : "presentation"
+                                                }
+                                            >
+                                                <button
+                                                    class={s.trigger}
+                                                    type="button"
+                                                    role={
+                                                        vertical
+                                                            ? undefined
+                                                            : "tab"
+                                                    }
+                                                    aria-selected={
+                                                        vertical
+                                                            ? undefined
+                                                            : step.state ===
+                                                                "current"
+                                                              ? "true"
+                                                              : "false"
+                                                    }
+                                                    aria-current={
+                                                        vertical &&
+                                                        step.state === "current"
+                                                            ? "step"
+                                                            : undefined
+                                                    }
+                                                    aria-invalid={
+                                                        step.state === "error"
+                                                            ? "true"
+                                                            : undefined
+                                                    }
+                                                >
+                                                    <span
+                                                        class={s.indicator}
+                                                        aria-checked={
+                                                            step.state ===
+                                                            "done"
+                                                                ? "true"
+                                                                : undefined
+                                                        }
+                                                    >
+                                                        {step.state === "done"
+                                                            ? "✓"
+                                                            : step.state ===
+                                                                "error"
+                                                              ? "!"
+                                                              : i() + 1}
+                                                    </span>
+                                                    <span class={s.label}>
+                                                        {step.label}
+                                                    </span>
+                                                    {"caption" in step && (
+                                                        <span class={s.caption}>
+                                                            {step.caption}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                                {i() < steps.length - 1 && (
+                                                    <div class={s.separator} />
+                                                )}
+                                                {vertical &&
+                                                    step.state ===
+                                                        "current" && (
+                                                        <div class={s.content}>
+                                                            Payment details
+                                                        </div>
+                                                    )}
+                                            </div>
+                                        )}
+                                    </For>
+                                </div>
+                            </div>
+                        );
+                    }}
                 </For>
             </section>
             <section
