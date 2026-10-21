@@ -866,6 +866,26 @@ icon from the theme's color groups (`loading` takes `primary`); every Material p
 each toast with Zag's stacking variables, and the root transitions its transform, opacity and
 height (the movement drops out under reduced motion).
 
+## Time picker and time input
+
+`timePicker` is Material's time picker: the `headline`, a `body` row with the `hourSelector`,
+`separator`, `minuteSelector` and the `periodSelector` (AM over PM, each a `period`), the `dial`
+(`dialTrack`, `dialHandle`, `dialCenter`, `dialLabel`s) and the `actions`. `mode: "dial"` (the
+default) draws the clock; `mode: "scroll"` turns the selectors into columns of `scrollItem`s (M3
+Expressive's scroll mode) and hides the dial. `color: "vibrant"` sets the surface and fields from
+the primary container (M3 Expressive's vibrant set; values unconfirmed). `timeInput` has the same
+headline, separator, period selector and actions, with `hourField`/`minuteField` (an `input` over
+its `fieldLabel`) in place of the selectors and dial. Both read the tokens `time.ts` declares
+(`timeTokens`, `timeSlots`), each under its own name. No compounds; the `mode` and `color` groups
+touch different properties (`color` only sets root tokens).
+
+The dial is a **shape exception** by geometry: the dial, its handle and its centre are circles
+(`circle`, 50%) with `cornerShape: round`, so a sharp, bevelled or squircle theme leaves them round
+(a style that sets its own `cornerShape` keeps it; see `corners.ts`). The bindings place the
+labels, handle and track from the time in physical coordinates, since a clock doesn't mirror; the
+direction spec allows the translate that centres them. The hand turns with a `transform`
+transition that reduced motion drops.
+
 ## Toolbar
 
 M3 Expressive's docked and floating toolbars are one component, `toolbar`, with one part, `root`,

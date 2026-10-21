@@ -313,6 +313,11 @@ TOOLBAR_ROOT_PROPS; toolbarSelection(props); toolbarRootProps(props); // role, a
 interface ToolbarItem<Node>              // value, label, icon?, disabled?, selected?, onClick?, …
 TOOLBAR_CONTENT_PROPS; TOOLBAR_OVERFLOW_LABEL; toolbarOverflowTestId(testId);
 toolbarMenuItems(items, count); toolbarMenuSelect(items, value); toolbarMenuPositioning(o);
+// Time picker and time input (c5b): the generated timePickerAnatomy and timeInputAnatomy
+interface TimeBehaviorProps                // value/defaultValue/onValueChange (HH:mm), hourCycle, locale, translations, disabled, readOnly, name, form, id
+interface TimePickerRootOwnProps          // + mode, color, tokens, view/defaultView/onViewChange, testId, unstyled
+TIME_PICKER_ROOT_PROPS; TIME_INPUT_ROOT_PROPS; TIME_CONTENT_PROPS; // headline, actions
+timeMachineProps(props); timePickerSelection(props); timeInputSelection(props);
 toolbarKeyTarget(key, index, count, orientation, dir); // arrows along the bar, Home, End
 overflowCount({ sizes, available, gap, trigger }); // how many elements stay in the row
 watchOverflow({ root, elements, trigger, vertical, onCount }); moveToolbarFocus(root, key, o, dir);

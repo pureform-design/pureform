@@ -236,6 +236,11 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 "search"`). The list item's case renders it as a button (`as: "button"`, plain data), so it
   has a focusable element and a disabled state; the list's case is a list of links (Enter clicks
   the first, `keyboard.disables: false`). Neither has state.
+- **Time picker and time input** (`time-picker.ts`): `value` from 09:30 to 21:30 with a click on
+  PM (`read` is the hidden input's value); Tab reaches the hour, whose arrows step it (the left
+  arrow forward under `rtl`); 12 and 24-hour, minutes, scroll, vibrant and disabled examples. The
+  dial's track, handle, centre and labels are `fixed`: under `rtl` they keep their boxes rather
+  than mirror (a clock doesn't), which the direction suite checks.
 - **App bar** (`app-bar.ts`): no state; examples by size, subtitle, centered, scrolled,
   collapsed by its offset, pinned, and holding a search bar, for markup, server rendering,
   direction (a mirrored back arrow) and themes.
