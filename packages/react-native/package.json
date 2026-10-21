@@ -138,6 +138,13 @@
                 "default": "./dist/carousel.mjs"
             }
         },
+        "./grid-list": {
+            "types": "./dist/grid-list/index.d.ts",
+            "import": {
+                "development": "./src/grid-list/index.ts",
+                "default": "./dist/grid-list.mjs"
+            }
+        },
         "./drag-handle": {
             "types": "./dist/drag-handle/index.d.ts",
             "import": {
