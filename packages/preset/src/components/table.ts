@@ -146,11 +146,11 @@ const cellStyle = (style: string): StyleMap => ({
 });
 
 // The arrow shows in full on a sorted column, faintly while an unsorted one's header is hovered
-// or focused, and not at all otherwise.
+// or focused, and not at all otherwise. A later case wins where several hold.
 const arrowOpacity = when()
-    .on(slot("sortHeader", "filled"), unitless(1))
     .on(slot("sortHeader", "hover"), ref("arrowHintOpacity"))
     .on(slot("sortHeader", "focusVisibleWithin"), ref("arrowHintOpacity"))
+    .on(slot("sortHeader", "filled"), unitless(1))
     .else(unitless(0));
 
 /** Build the table with a `density` step per entry of `densities`. */
