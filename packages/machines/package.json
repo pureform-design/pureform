@@ -166,6 +166,20 @@
                 "default": "./dist/carousel.mjs"
             }
         },
+        "./accordion": {
+            "types": "./dist/accordion/index.d.ts",
+            "import": {
+                "development": "./src/accordion/index.ts",
+                "default": "./dist/accordion.mjs"
+            }
+        },
+        "./tree-view": {
+            "types": "./dist/tree-view/index.d.ts",
+            "import": {
+                "development": "./src/tree-view/index.ts",
+                "default": "./dist/tree-view.mjs"
+            }
+        },
         "./toast": {
             "types": "./dist/toast/index.d.ts",
             "import": {
@@ -192,6 +206,7 @@
         "@internationalized/date": "catalog:",
         "@pureform/binding-core": "workspace:^",
         "@pureform/js-effects": "workspace:^",
+        "@zag-js/accordion": "catalog:",
         "@zag-js/anatomy": "catalog:",
         "@zag-js/carousel": "catalog:",
         "@zag-js/checkbox": "catalog:",
@@ -213,6 +228,7 @@
         "@zag-js/toast": "catalog:",
         "@zag-js/toggle-group": "catalog:",
         "@zag-js/tooltip": "catalog:",
+        "@zag-js/tree-view": "catalog:",
         "@zag-js/types": "catalog:",
         "@zag-js/utils": "catalog:"
     },

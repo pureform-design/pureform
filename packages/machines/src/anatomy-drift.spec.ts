@@ -1,6 +1,7 @@
 // Each own machine's anatomy has every part of the preset's anatomy for its component, so a
 // part added to the preset fails here until the machine has it too.
 import {
+    accordionAnatomy,
     autocompleteAnatomy,
     buttonAnatomy,
     buttonGroupAnatomy,
@@ -21,9 +22,11 @@ import {
     timeInputAnatomy,
     timePickerAnatomy,
     toastAnatomy,
+    treeAnatomy,
 } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
+import { anatomy as accordion } from "./accordion/accordion.anatomy";
 import { anatomy as buttonGroup } from "./button-group";
 import { anatomy as button } from "./button/button.anatomy";
 import { anatomy as carousel } from "./carousel/carousel.anatomy";
@@ -50,6 +53,7 @@ import {
     timeInputAnatomy as timeInput,
 } from "./time-picker/time-picker.anatomy";
 import { anatomy as toast } from "./toast";
+import { anatomy as tree } from "./tree-view/tree-view.anatomy";
 
 interface Pair {
     machine: { keys(): string[] };
@@ -57,6 +61,7 @@ interface Pair {
 }
 
 const pairs: Record<string, Pair> = {
+    accordion: { machine: accordion, preset: accordionAnatomy },
     autocomplete: { machine: autocomplete, preset: autocompleteAnatomy },
     button: { machine: button, preset: buttonAnatomy },
     buttonGroup: { machine: buttonGroup, preset: buttonGroupAnatomy },
@@ -80,6 +85,7 @@ const pairs: Record<string, Pair> = {
     timePicker: { machine: timePicker, preset: timePickerAnatomy },
     timeInput: { machine: timeInput, preset: timeInputAnatomy },
     toast: { machine: toast, preset: toastAnatomy },
+    tree: { machine: tree, preset: treeAnatomy },
 };
 
 const missing = ({ machine, preset }: Pair) =>

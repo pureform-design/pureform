@@ -1,6 +1,7 @@
 // Framework-free behavior. Each machine is a namespace in Zag's shape (`machine`, `connect`,
 // `anatomy`, `props`, and its types), also importable from its own subpath.
 
+export * as accordion from "./accordion";
 export * as button from "./button";
 export * as buttonGroup from "./button-group";
 export * as carousel from "./carousel";
@@ -24,6 +25,7 @@ export * as textField from "./text-field";
 export * as timePicker from "./time-picker";
 export * as toast from "./toast";
 export * as tooltip from "./tooltip";
+export * as treeView from "./tree-view";
 
 export * from "./form";
 
