@@ -64,6 +64,8 @@ See the [design doc](../../docs/design/component-architecture.md), §5.1, §5.3,
 | `toolbar/`                                                              | `Toolbar`: icon buttons and buttons in a bar, the elements that don't fit in a `Menu` behind an overflow button                                                                                                         |
 | `time-picker/`, `time-input/`                                           | `TimePicker` (a dial on the responder system, `adjustable` for assistive technology, or scroll fields) and `TimeInput` (number-pad fields): the time in state, through `@pureform/machines/time-picker`'s arithmetic    |
 | `carousel/`                                                             | `Carousel`: a horizontal `ScrollView` snapping to each item, masks sized by `carouselItemSizes` as it scrolls, `page` scrolled to at once under reduced motion; no arrow keys                                           |
+| `accordion/`                                                            | `Accordion`: a column of item tiles, each a pressable header (`aria-expanded`) over its content while expanded; the expanded items are React state, as there's no Zag machine                                           |
+| `tree/`                                                                 | `Tree`: rows (`role="treeitem"`) with a branch's children indented under it while expanded; the expanded and selected nodes are React state                                                                             |
 
 ```
 PureformProvider ── StylesProvider (rn-adapter) ── source: registry.entry(name).factory
