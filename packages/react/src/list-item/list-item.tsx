@@ -26,6 +26,7 @@ import type {
     ListItemRootOwnProps,
     ListVariantProps,
 } from "@pureform/binding-core";
+import type { MutableInteractionSource } from "@pureform/binding-core/interaction";
 import * as accordion from "@pureform/machines/accordion";
 import { normalizeProps } from "@zag-js/react";
 import type { PropTypes } from "@zag-js/react";
@@ -35,8 +36,10 @@ import {
     type ReactNode,
     use,
     useId,
+    useRef,
 } from "react";
 
+import { useControllable } from "../controllable";
 import { ExpandIcon } from "../glyphs";
 import {
     useInteractionHandlers,
@@ -59,17 +62,22 @@ interface ListItemContextValue {
 
 const context = createPartContext<ListItemContextValue>("ListItem");
 
-/** What `Expandable` shares with Root and Region. */
+/** What `Expandable` shares with Root and Region. Root gives it its interaction source, which the
+ *  machine's header emits to, as an accordion header's. */
 interface ExpandContextValue {
     readonly scope: ComponentScope<Anatomy>;
     readonly api: accordion.Api<PropTypes>;
+    readonly root: { current: MutableInteractionSource | undefined };
 }
 
 const expandContext = createPartContext<ExpandContextValue>(
     "ListItem",
     "Expandable",
 );
-const EXPAND_ITEM = { value: LIST_ITEM_EXPAND_VALUE };
+const expandItem = (disabled: boolean | undefined) => ({
+    value: LIST_ITEM_EXPAND_VALUE,
+    disabled,
+});
 
 /** The variants of the list around a list item: its defaults. Internal to the list. */
 export const ListDefaults = createContext<ListVariantProps | null>(null);
@@ -105,13 +113,13 @@ function Root(props: ListItemRootProps): ReactNode {
         href: props.href,
         as: props.as ?? (expand ? "button" : undefined),
     });
+    // An expandable item's header: the accordion machine's, emitting to Root's source.
     const own = expand
         ? combinePartProps([
-              expand.api.getItemTriggerProps(EXPAND_ITEM) as Record<
-                  string,
-                  unknown
-              >,
               listItemRootProps(props, element),
+              expand.api.getItemTriggerProps(
+                  expandItem(props.disabled),
+              ) as Record<string, unknown>,
           ])
         : listItemRootProps(props, element);
     const interactive = isInteractiveListItem(
@@ -119,9 +127,10 @@ function Root(props: ListItemRootProps): ReactNode {
         element,
     );
     const source = useOwnInteractionSource(props.interactionSource);
+    if (expand) expand.root.current = source;
     const handlers = useInteractionHandlers(
         source,
-        !interactive || !!props.disabled,
+        !!expand || !interactive || !!props.disabled,
     );
     const scope = useComponent(listItemAnatomy, {
         selection: listItemSelection(listItemVariants(list, props), element),
@@ -136,7 +145,10 @@ function Root(props: ListItemRootProps): ReactNode {
         <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element,
-                machine: interactive ? combinePartProps([own, handlers]) : own,
+                machine:
+                    interactive && !expand
+                        ? combinePartProps([own, handlers])
+                        : own,
                 props: rest,
             })}
         </context.Provider>
@@ -220,10 +232,17 @@ function Expandable(props: ListItemExpandableProps): ReactNode {
     const id = useId();
     const dir = useDirection();
     const list = use(ListDefaults);
+    const root = useRef<MutableInteractionSource | undefined>(undefined);
+    const controllable = useControllable<"expanded", boolean>(
+        "ListItem",
+        "expanded",
+        props,
+    );
     const service = useMachine(accordion.machine, {
         id,
         dir,
-        ...listItemExpandMachineProps(props),
+        itemInteractionSource: () => root.current as MutableInteractionSource,
+        ...listItemExpandMachineProps(controllable.machineProps),
     });
     const api = accordion.connect(service, normalizeProps);
     const scope = useComponent(listItemAnatomy, {
@@ -231,7 +250,7 @@ function Expandable(props: ListItemExpandableProps): ReactNode {
         testId: props.testId,
     });
     return (
-        <expandContext.Provider value={{ scope, api }}>
+        <expandContext.Provider value={{ scope, api, root }}>
             {props.children}
         </expandContext.Provider>
     );
@@ -247,7 +266,7 @@ function Region({
     const { scope, api } = expandContext.use("Region");
     return scope.render("region", {
         element: "div",
-        machine: api.getItemContentProps(EXPAND_ITEM),
+        machine: api.getItemContentProps(expandItem(undefined)),
         unstyled,
         // The items inside are its content, not more headers.
         props: {
