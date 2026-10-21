@@ -44,6 +44,7 @@ import { pickerAction } from "../picker-actions";
 import type { PickerActionProps } from "../picker-actions";
 import type { PartProps } from "../props";
 import { useDirection } from "../provider";
+import { affixFieldParts } from "../select-field-parts";
 
 type Anatomy = typeof dateInputAnatomy;
 
@@ -156,10 +157,12 @@ const Field = block("field", "Field");
 const Actions = block("actions", "Actions");
 /** The date typed so far, as the header writes it. */
 const SelectedDate = inline("selectedDate", "SelectedDate");
+const field = affixFieldParts(context.use);
+
 /** Text before the segments. Turn on Root's `prefixText` with it. */
-const PrefixText = inline("prefixText", "PrefixText");
+const PrefixText: (props: DateInputPartProps) => ReactNode = field.PrefixText;
 /** Text after the segments. Turn on Root's `suffixText` with it. */
-const SuffixText = inline("suffixText", "SuffixText");
+const SuffixText: (props: DateInputPartProps) => ReactNode = field.SuffixText;
 
 /** The title, which names the group. */
 function Headline({ unstyled, ...props }: DateInputPartProps): ReactNode {
@@ -251,48 +254,30 @@ function Segment({
 }
 
 /** The floating label. */
-function Label({ unstyled, ...props }: DateInputPartProps): ReactNode {
-    const { scope, api } = context.use("Label");
-    return scope.render("label", {
-        element: "label",
-        machine: api.getLabelProps(),
+const Label: (props: DateInputPartProps) => ReactNode = field.Label;
+
+/** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
+const LeadingIcon: (props: DateInputIconProps) => ReactNode = field.LeadingIcon;
+
+/** An icon at the end of the field. Turn on Root's `trailingIcon` with it. */
+function TrailingIcon({
+    unstyled,
+    mirror,
+    ...props
+}: DateInputIconProps): ReactNode {
+    const { scope } = context.use("TrailingIcon");
+    return scope.render("trailingIcon", {
+        element: "span",
+        machine: { "aria-hidden": "true" },
+        states: { mirrored: mirror },
         unstyled,
         props,
     });
 }
 
-const icon = (part: "leadingIcon" | "trailingIcon", name: string) =>
-    function Icon({
-        unstyled,
-        mirror,
-        ...props
-    }: DateInputIconProps): ReactNode {
-        const { scope } = context.use(name);
-        return scope.render(part, {
-            element: "span",
-            machine: { "aria-hidden": "true" },
-            states: { mirrored: mirror },
-            unstyled,
-            props,
-        });
-    };
-
-/** An icon at the start of the field. Turn on Root's `leadingIcon` with it. */
-const LeadingIcon = icon("leadingIcon", "LeadingIcon");
-/** An icon at the end of the field. Turn on Root's `trailingIcon` with it. */
-const TrailingIcon = icon("trailingIcon", "TrailingIcon");
-
 /** Helper text under the field. With an `error`, it shows the error instead. */
-function SupportingText({ unstyled, ...props }: DateInputPartProps): ReactNode {
-    const { scope, supportingTextId, errorText } =
-        context.use("SupportingText");
-    return scope.render("supportingText", {
-        element: "span",
-        machine: { id: supportingTextId },
-        unstyled,
-        props: { ...props, children: errorText ?? props.children },
-    });
-}
+const SupportingText: (props: DateInputPartProps) => ReactNode =
+    field.SupportingText;
 
 /** Calls `onConfirm` with the date: `as={Button}` draws it as a button. */
 const ConfirmTrigger: (props: PickerActionProps) => ReactNode = pickerAction(

@@ -1,7 +1,7 @@
 // The parts a select-like field shares (the select, the autocomplete): the label, the icons and
-// affixes, the supporting text, and the list drawn as a menu with its groups, items and item
-// labels. Each component passes its contexts; their machines' APIs (Zag's select and combobox)
-// name these parts' props alike.
+// affixes, the supporting text (which the date pickers' fields share too, `affixFieldParts`), and
+// the list drawn as a menu with its groups, items and item labels. Each component passes its
+// contexts; their machines' APIs (Zag's select and combobox) name these parts' props alike.
 
 import type { ComponentAnatomy } from "@pureform/anatomy";
 import { presentProps } from "@pureform/binding-core";
@@ -53,13 +53,21 @@ export interface SelectFieldIconProps extends SelectFieldPartProps {
     readonly mirror?: boolean | undefined;
 }
 
-/** Builds the shared parts of a select-like field over its Root's and items' contexts. */
-export function selectFieldParts<I extends SelectFieldItem>(
-    context: PartContext<SelectFieldContext>,
-    itemContext: PartContext<{ readonly item: I }>,
-) {
+/** What an affix field's Root shares with its field parts: its scope, the machine's label props,
+ *  the supporting text's id and the error shown in its place. */
+export interface AffixFieldContext {
+    readonly scope: ComponentScope<ComponentAnatomy>;
+    readonly api: { getLabelProps(): object };
+    readonly supportingTextId: string;
+    readonly errorText: string | undefined;
+}
+
+/** Builds the field parts an affix text field over a Zag machine shares (the select, the
+ *  autocomplete, the docked date picker, the date input): the label, the leading icon, the
+ *  affixes and the supporting text. `use` reads Root's context, naming the part. */
+export function affixFieldParts(use: (name: string) => AffixFieldContext) {
     function Label({ unstyled, ...props }: SelectFieldPartProps): ReactNode {
-        const { scope, api } = context.use("Label");
+        const { scope, api } = use("Label");
         return scope.render("label", {
             element: "label",
             machine: api.getLabelProps(),
@@ -73,7 +81,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
         mirror,
         ...props
     }: SelectFieldIconProps): ReactNode {
-        const { scope } = context.use("LeadingIcon");
+        const { scope } = use("LeadingIcon");
         return scope.render("leadingIcon", {
             element: "span",
             machine: { "aria-hidden": "true" },
@@ -88,7 +96,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
             unstyled,
             ...props
         }: SelectFieldPartProps): ReactNode {
-            const { scope } = context.use(name);
+            const { scope } = use(name);
             return scope.render(part, { element: "span", unstyled, props });
         };
 
@@ -97,7 +105,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
         ...props
     }: SelectFieldPartProps): ReactNode {
         const { scope, supportingTextId, errorText } =
-            context.use("SupportingText");
+            use("SupportingText");
         return scope.render("supportingText", {
             element: "span",
             machine: { id: supportingTextId },
@@ -105,6 +113,22 @@ export function selectFieldParts<I extends SelectFieldItem>(
             props: { ...props, children: errorText ?? props.children },
         });
     }
+
+    return {
+        Label,
+        LeadingIcon,
+        PrefixText: affix("prefixText", "PrefixText"),
+        SuffixText: affix("suffixText", "SuffixText"),
+        SupportingText,
+    };
+}
+
+/** Builds the shared parts of a select-like field over its Root's and items' contexts. */
+export function selectFieldParts<I extends SelectFieldItem>(
+    context: PartContext<SelectFieldContext>,
+    itemContext: PartContext<{ readonly item: I }>,
+) {
+    const field = affixFieldParts(context.use);
 
     function Positioner({
         unstyled,
@@ -199,11 +223,7 @@ export function selectFieldParts<I extends SelectFieldItem>(
     }
 
     return {
-        Label,
-        LeadingIcon,
-        PrefixText: affix("prefixText", "PrefixText"),
-        SuffixText: affix("suffixText", "SuffixText"),
-        SupportingText,
+        ...field,
         Positioner,
         Content,
         ItemGroup,
