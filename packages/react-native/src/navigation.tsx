@@ -28,7 +28,7 @@ import type {
 import type { Indication } from "@pureform/binding-core/indication";
 import type { SlideMotion } from "@pureform/rn-adapter/animated";
 import type { Selection } from "@pureform/styling";
-import { memo } from "react";
+import { Fragment, memo } from "react";
 import type { ReactNode } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import type { LayoutChangeEvent } from "react-native";
@@ -53,7 +53,10 @@ import { useIndicatorSlides } from "./tab-indicator";
 import type { IndicatorSlides } from "./tab-indicator";
 
 type TabsPart = PartName<typeof tabsAnatomy>;
-type NavigationPart = PartName<typeof navigationBarAnatomy> | "header";
+type NavigationPart =
+    | PartName<typeof navigationBarAnatomy>
+    | "header"
+    | "sectionLabel";
 type RailPart = PartName<typeof navigationRailAnatomy>;
 
 const [TAB_INDICATION] = tabsAnatomy.indication!;
@@ -377,17 +380,32 @@ function NavigationImpl<C extends NavigationComponent>(
                 </v.header.View>
             ) : null}
             {props.items.map((item) => (
-                <Destination
-                    key={item.value}
-                    name={props.name}
-                    item={item}
-                    selection={selection}
-                    indication={props.indication}
-                    testId={props.testId as TestIdOverride<NavigationPart>}
-                    disabled={props.disabled === true}
-                    selected={value === item.value}
-                    onPick={pick}
-                />
+                <Fragment key={item.value}>
+                    {props.name === "navigationRail" &&
+                    isPresent(item.sectionLabel) ? (
+                        <v.sectionLabel.Text
+                            selectable={false}
+                            style={s.sectionLabel}
+                            testID={testIdOf(
+                                navigationRailAnatomy,
+                                "sectionLabel",
+                                props.testId as TestIdOverride<RailPart>,
+                            )}
+                        >
+                            {item.sectionLabel}
+                        </v.sectionLabel.Text>
+                    ) : null}
+                    <Destination
+                        name={props.name}
+                        item={item}
+                        selection={selection}
+                        indication={props.indication}
+                        testId={props.testId as TestIdOverride<NavigationPart>}
+                        disabled={props.disabled === true}
+                        selected={value === item.value}
+                        onPick={pick}
+                    />
+                </Fragment>
             ))}
         </v.root.View>
     );
