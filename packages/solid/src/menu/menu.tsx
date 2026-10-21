@@ -152,8 +152,9 @@ function useMenu(
         ...sources.machineProps,
         dir: dir(),
         ...menuMachineProps({
-            ...props,
             ...behavior(),
+            "aria-label": props["aria-label"],
+            ids: props.ids,
             positioning: parent
                 ? submenuPositioning(dir(), props.positioning)
                 : props.positioning,
