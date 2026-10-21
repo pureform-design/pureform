@@ -103,11 +103,24 @@ describe.each([animated, reanimated])("the carousel with $name", (engine) => {
                 motion,
             );
             await frames();
+            // The scroll's behaviour, not how far it got after a frame: a slow frame can end a
+            // smooth scroll.
+            const group = byTestId("pf-carousel-item-group");
+            const scrolls: ScrollToOptions[] = [];
+            const scroll = group.scroll.bind(group);
+            group.scroll = ((options: ScrollToOptions) => {
+                scrolls.push(options);
+                scroll(options);
+            }) as typeof group.scroll;
             await page.set(2);
             await frames(1);
-            const scrolled = byTestId("pf-carousel-item-group").scrollLeft;
-            if (motion === "reduce") expect(scrolled).toBe(2 * (100 + GAP));
-            else expect(scrolled).toBeLessThan(2 * (100 + GAP));
+            expect(scrolls.at(-1)).toMatchObject({
+                left: 2 * (100 + GAP),
+                behavior: motion === "reduce" ? "auto" : "smooth",
+            });
+            if (motion === "reduce") {
+                expect(group.scrollLeft).toBe(2 * (100 + GAP));
+            }
             document.body.innerHTML = "";
         }
     });
