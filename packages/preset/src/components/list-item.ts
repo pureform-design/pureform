@@ -181,10 +181,12 @@ export const createListItem = <
                         paddingBlockEnd: spacing("2"),
                     },
                     leading: parts.leading,
+                    // Its text starts at the line's start, in a button too.
                     content: {
                         display: flex,
                         flexDirection: column,
                         width: pct(100),
+                        textAlign: start,
                     },
                     overline: {
                         textStyle: textStyle("labelSmall"),

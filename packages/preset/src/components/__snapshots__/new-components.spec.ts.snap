@@ -680,6 +680,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
     "content": {
       "display": "flex",
       "flexDirection": "column",
+      "textAlign": "start",
       "width": "100%",
     },
     "headline": {
