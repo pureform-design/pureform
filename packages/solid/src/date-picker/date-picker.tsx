@@ -55,7 +55,7 @@ import { IconButton } from "../icon-button";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
 import { createPartContext } from "../part-context";
-import { createSlotProps } from "../parts";
+import { createSlotProps, plainParts } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { pickerAction } from "../picker-actions";
 import type { PartProps } from "../props";
@@ -234,23 +234,11 @@ const Positioner: (props: DatePickerPartProps) => JSX.Element =
 /** The picker's surface, the dialog. It stays while its exit animation runs. */
 const Content: (props: DatePickerPartProps) => JSX.Element = chrome.Content;
 
-const plain =
-    (
-        part: "header" | "selectedDate" | "controls" | "actions",
-        display: string,
-        element: "div" | "span",
-    ) =>
-    (props: DatePickerPartProps): JSX.Element => {
-        const { scope } = pickerContext.use(display);
-        return scope.render(part, {
-            element,
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    };
+const block = plainParts<Anatomy>(pickerContext.use, "div");
+const inline = plainParts<Anatomy>(pickerContext.use, "span");
 
 /** The header: the headline, the selected date, and the mode toggle. */
-const Header = plain("header", "Header", "div");
+const Header = block<DatePickerPartProps>("header", "Header");
 
 /** The title, an `<h2>`, which names the dialog. */
 const Headline: (props: DatePickerPartProps) => JSX.Element = chrome.part(
@@ -261,7 +249,7 @@ const Headline: (props: DatePickerPartProps) => JSX.Element = chrome.part(
 );
 
 /** The chosen date, or a placeholder. */
-const SelectedDate = plain("selectedDate", "SelectedDate", "span");
+const SelectedDate = inline<DatePickerPartProps>("selectedDate", "SelectedDate");
 
 /** The button that switches to the date input: `as={IconButton}` draws it as one. */
 const ModeToggle: (props: DatePickerTriggerProps) => JSX.Element =
@@ -278,7 +266,7 @@ function Divider(props: DatePickerPartProps): JSX.Element {
 }
 
 /** The row of the view trigger and the previous and next buttons. */
-const Controls = plain("controls", "Controls", "div");
+const Controls = block<DatePickerPartProps>("controls", "Controls");
 
 /** Switches between the days and the years; shows the month and year shown, and an arrow. */
 function ViewTrigger(props: DatePickerPartProps): JSX.Element {
@@ -347,7 +335,7 @@ const Cell: (props: CalendarCellProps) => JSX.Element = calendar.Cell;
 const YearList: (props: CalendarTableProps) => JSX.Element = calendar.YearList;
 
 /** The buttons at the end. */
-const Actions = plain("actions", "Actions", "div");
+const Actions = block<DatePickerPartProps>("actions", "Actions");
 
 /** Commits the chosen dates and closes the dialog: `as={Button}` draws it as a button. */
 const ConfirmTrigger = pickerAction(

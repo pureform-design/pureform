@@ -22,11 +22,11 @@ import type { ElementType, ReactNode } from "react";
 
 import { useMachineButton } from "../interaction";
 import { createPartContext } from "../part-context";
-import { useComponent, useSlotProps } from "../parts";
+import { machinePart, useComponent, useSlotProps } from "../parts";
 import type { ComponentScope, SlotKeyedProps } from "../parts";
 import { omitProps } from "../props";
 import type { PartProps } from "../props";
-import { machinePart, useTimeMachine } from "../time";
+import { useTimeMachine } from "../time";
 import type { TimeApi } from "../time";
 
 type Anatomy = typeof timePickerAnatomy;
