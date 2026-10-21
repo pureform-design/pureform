@@ -1145,3 +1145,16 @@ lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
   own, so `hidden` hides it). Groups `density` and `color` (the selected row's container); 0
   compounds.
 - `expandIndicator(trailing, expanded)` (in `accordion.ts`) is the turning indicator both use.
+
+## Grid list
+
+`gridList` (c6e, Angular parity: M3 doesn't specify it): slots `root` (a wrapping row), `tile` (a grid
+cell: its share of the row, padded by half the gutter), `content` (what you see: rounded, clipped,
+at the aspect ratio), `media`, `header`, `footer` (bands laid over the content's top and bottom
+edges, in the inverse surface colours) and `headline`/`subhead` (their lines). No machine, no CSS
+grid, and no `calc` with a percentage: React Native can't subtract a gutter from a percentage, so
+the gutter is padding on the cell and the root pulls it back with a negative margin. Variants,
+each setting one token on the root (0 compounds): `columns` 1 to 6, `gutter` none, small, medium,
+large, `aspect` square, landscape, portrait, wide. Tokens `columns`, `gutter`, `aspect`, `radius`,
+`container` and the caption's (`captionContainer`, `captionContent`, `captionOpacity`,
+`captionSize`, `captionPadding`) take any value. Spanning a tile over several columns is not built.

@@ -857,6 +857,17 @@ export type {
     CardVariantProps,
 } from "./components/card";
 export {
+    GRID_LIST_ROOT_PROPS,
+    gridListRootProps,
+    gridListSelection,
+    gridListTileProps,
+} from "./components/grid-list";
+export type {
+    GridListPart,
+    GridListRootOwnProps,
+    GridListVariantProps,
+} from "./components/grid-list";
+export {
     ICON_ROOT_PROPS,
     iconRootProps,
     iconSelection,

@@ -132,6 +132,7 @@ export const COMPONENT_USAGE = {
     },
     // The FAB's colour and size; the items are its own.
     "fab-menu": { entries: { fabMenu: same("color", "size"), ripple: {} } },
+    "grid-list": { entries: { gridList: same("columns", "gutter", "aspect") } },
     icon: { entries: { icon: same("size", "color", "filled") } },
     // `toggle` follows `selected`.
     "icon-button": {

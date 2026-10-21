@@ -121,7 +121,7 @@ done (§7).
 | List (standard / segmented)                                | ✅ `list`, `listItem` | none            | ✅ segmented is new                   | ✅           | ✅ list, nav, action, selection   | `listbox`                  | §2                                                                   |
 | Carousel (multi-browse / uncontained / hero / full-screen) | ✅ `carousel`         | zag `carousel`  | ✅                                    | —            | —                                 | `carousel`                 | Done (c4d): `layout` incl. multi-aspect; keyline masks               |
 | Expansion panel / accordion                                | ✅ `accordion`        | zag `accordion` | (expandable list items)               | —            | ✅ `mat-accordion`                | `accordion`, `collapsible` | Done (c6a): list-row headers on tiles; base of expandable items      |
-| Grid / image list                                          | ❌                    | —               | — (M2 only; Android's page is a stub) | —            | ✅ `mat-grid-list`                | —                          | **In scope** as `gridList` (§1.9); layout CSS only                   |
+| Grid / image list                                          | ✅ `gridList`         | none            | — (M2 only; Android's page is a stub) | —            | ✅ `mat-grid-list`                | —                          | Done (c6e): wrapping row; `columns`, `gutter`, `aspect`; 0 compounds |
 | Scroll area, splitter / pane                               | ❌                    | —               | (panes: layout guidance)              | —            | —                                 | `scroll-area`, `splitter`  | Optional                                                             |
 | Scrim                                                      | ✅ `scrim`            | none (presence) | ✅ (part of dialogs, sheets)          | —            | (CDK backdrop)                    | `dialog.backdrop`          |                                                                      |
 
@@ -186,7 +186,7 @@ done (§7).
 
 |                                                  | Count                                                                                                                                                                             |
 | ------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Our preset components                            | 62, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
+| Our preset components                            | 63, every entry of `pureform().components` (`packages/preset/src/doc-counts.spec.ts` checks it) (c4 added loadingIndicator, appBar, toolbar, carousel; progress gained `shape: wavy`; c5 added calendarCell, datePicker, dockedDatePicker, dateInput, timePicker, timeInput)   |
 | zag machines                                     | 54; 16 wrapped today (carousel, checkbox, combobox, date-input, date-picker, dialog, menu, presence, radio-group, select, switch, tabs, tags-input, toast, toggle-group, tooltip) |
 | Our own machines                                 | 7 (button, navigation, ripple, slider, snackbar, text-field, time-picker: the time picker and time input)                                                                         |
 | M3 Expressive components we're missing           | 1: selection list                                                                                                                                                                 |
@@ -211,7 +211,7 @@ zag's part lists, and a design call is recorded in the component's output contex
 | Paginator                   | `paginator`   | zag `pagination`            | Done (c6c): range label, page-size select, first/prev/next/last. 0 variants.                              |
 | Tree                        | `tree`        | zag `tree-view`             | Done (c6a). Nodes are list rows; expand icon trailing, groups indented.                                   |
 | Table, sort header          | `dataTable`   | own (sort state, selection) | Done (c6d): header, body, footer rows and cells, selection column, sort header; own machine.              |
-| Grid list                   | `gridList`    | none                        | Layout only: columns, gutter, tile aspect.                                                                |
+| Grid list                   | `gridList`    | none                        | Done (c6e): wrapping row, tile (cell), content, media, header, footer; no spans                           |
 | Button toggle (group)       | `buttonGroup` | zag `toggle-group`          | Already planned (§4.0); Angular's `mat-button-toggle-group` is the connected, selectable form.            |
 | Sidenav (drawer container)  | —             | —                           | Not a separate component: a side sheet or expanded rail (`modal`, `coplanar`) plus the page's own layout. |
 

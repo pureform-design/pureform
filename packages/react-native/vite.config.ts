@@ -33,6 +33,7 @@ export default createConfig({
                     accordion: "src/accordion/index.ts",
                     tree: "src/tree/index.ts",
                     stepper: "src/stepper/index.ts",
+                    "grid-list": "src/grid-list/index.ts",
                     fab: "src/fab/index.ts",
                     "fab-menu": "src/fab-menu/index.ts",
                     "split-button": "src/split-button/index.ts",

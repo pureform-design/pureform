@@ -40,6 +40,7 @@ import {
     separator,
     fab,
     fullscreenDialog,
+    gridList,
     bottomSheet,
     sideSheet,
     dragHandle,
@@ -439,6 +440,59 @@ function TimeInputExampleView() {
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
 
 const grouped = menu({ grouped: true, vibrant: true });
+
+// A grid list: its tiles' pictures, with a header on the first and a footer on the second.
+const GRID_LISTS = [
+    { columns: "3", gutter: "medium", aspect: "square", width: 320 },
+    { columns: "2", gutter: "large", aspect: "landscape", width: 240 },
+    { columns: "4", gutter: "none", aspect: "portrait", width: 400 },
+] as const;
+
+function GridListExampleView(props: {
+    readonly example: (typeof GRID_LISTS)[number];
+}) {
+    const grid = gridList({
+        columns: props.example.columns,
+        gutter: props.example.gutter,
+        aspect: props.example.aspect,
+    });
+    return (
+        <div
+            data-grid-list
+            style={{
+                width: `${props.example.width}px`,
+                padding: "8px",
+            }}
+        >
+            <div class={grid.root} role="list" aria-label="Photos">
+                <For each={[0, 1, 2, 3, 4, 5, 6]}>
+                    {(index) => (
+                        <div class={grid.tile} role="listitem">
+                            <div class={grid.content} data-part="content">
+                                <img class={grid.media} src={PORTRAIT} alt="" />
+                                {index === 0 && (
+                                    <div class={grid.header} data-part="header">
+                                        <div class={grid.headline}>
+                                            Hills at dusk
+                                        </div>
+                                    </div>
+                                )}
+                                {index === 1 && (
+                                    <div class={grid.footer} data-part="footer">
+                                        <div class={grid.headline}>Sunrise</div>
+                                        <div class={grid.subhead}>
+                                            Photo by Ana
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </For>
+            </div>
+        </div>
+    );
+}
 
 // Named themes from pureform.config.ts, each applied to a subtree by `data-panda-theme`.
 const THEMES = [undefined, "teal", "sharp", "dense"] as const;
@@ -3572,6 +3626,14 @@ export function Page() {
                         </p>
                     </div>
                 </article>
+            </section>
+            <section
+                data-section="grid-lists"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={GRID_LISTS}>
+                    {(example) => <GridListExampleView example={example} />}
+                </For>
             </section>
             <section
                 data-section="app-bars"
