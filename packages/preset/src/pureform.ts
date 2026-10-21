@@ -78,6 +78,7 @@ import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
 import { createNavigationRail } from "./components/navigation-rail";
 import { OVERLAY_KEYFRAMES } from "./components/overlay";
+import { paginator } from "./components/paginator";
 import {
     PROGRESS_KEYFRAMES,
     createCircularProgress,
@@ -348,6 +349,7 @@ const defaultComponents = <G extends string>(
         toolbar,
         tooltip,
         richTooltip,
+        paginator,
         card,
         carousel,
         scrim,
