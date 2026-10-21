@@ -59,6 +59,7 @@ export const COMPONENT_USAGE = {
     },
     // `interactive` follows the element, and `padded` the sections the ready-made shows.
     card: { entries: { card: same("variant", "actionsAlign"), ripple: {} } },
+    carousel: { entries: { carousel: same("layout"), ripple: {} } },
     checkbox: { entries: { checkbox: same("color", "density"), ripple: {} } },
     // `toggle` follows `selected`.
     chip: {
@@ -68,7 +69,9 @@ export const COMPONENT_USAGE = {
         },
     },
     // `indeterminate` follows the value.
-    "circular-progress": { entries: { circularProgress: same("color") } },
+    "circular-progress": {
+        entries: { circularProgress: same("color", "shape") },
+    },
     // `icon` follows the icon content; the backdrop is a scrim, and the trigger a button.
     dialog: { entries: { dialog: {}, scrim: {}, button: {}, ripple: {} } },
     // The trigger is a button, the close trigger an icon button, and the confirm action a button.
@@ -106,7 +109,12 @@ export const COMPONENT_USAGE = {
             ripple: {},
         },
     },
-    "linear-progress": { entries: { linearProgress: same("color") } },
+    "linear-progress": {
+        entries: { linearProgress: same("color", "shape") },
+    },
+    "loading-indicator": {
+        entries: { loadingIndicator: same("variant", "color") },
+    },
     // A `ul` around list items; the ready-made renders a list item per entry, in the list's
     // density, color, and leading type. A segmented list sets each item's position.
     list: {
@@ -151,6 +159,11 @@ export const COMPONENT_USAGE = {
     },
     ripple: { entries: { ripple: {} } },
     scrim: { entries: { scrim: {} } },
+    // The scroll state sets `scrolled` and `collapsed`, and `search` follows the search bar; the
+    // search bar is drawn scrolled and centered.
+    "app-bar": {
+        entries: { appBar: same("size", "centered"), searchBar: {} },
+    },
     "search-bar": { entries: { searchBar: {} } },
     // The ready-made trigger is a search bar; the suggestions are menu items in the menu's
     // default colors; the leading and clear buttons are icon buttons.
@@ -197,6 +210,17 @@ export const COMPONENT_USAGE = {
     snackbar: { entries: { snackbar: same("layout"), ripple: {} } },
     // Each toast's `type` comes with the toast, not a prop.
     toast: { entries: { toast: {}, ripple: {} } },
+    // `overflow` is set only when on; the elements are icon buttons and buttons, and the
+    // overflow button opens the menu.
+    toolbar: {
+        entries: {
+            toolbar: same("placement", "orientation", "color"),
+            iconButton: {},
+            button: {},
+            menu: {},
+            ripple: {},
+        },
+    },
     "supporting-text": { entries: { supportingText: same("tone") } },
     switch: { entries: { switchControl: same("color"), ripple: {} } },
     // `icon` follows the tabs' icons.

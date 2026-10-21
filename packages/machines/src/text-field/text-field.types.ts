@@ -123,8 +123,6 @@ export interface TextFieldApi<T extends PropTypes = PropTypes> {
     getInputProps: () => T["input"];
     getTextAreaProps: () => T["textarea"];
     getSupportingTextProps: () => T["element"];
-    /** The row holding the supporting text and the counter. */
-    getSupportingRowProps: () => T["element"];
     getCounterProps: () => T["element"];
     getPrefixTextProps: () => T["element"];
     getSuffixTextProps: () => T["element"];

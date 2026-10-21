@@ -14,20 +14,19 @@
 //   </div>
 //
 // `layout` is `oneLine` (default), `twoLine` (taller, for two lines of text), or `longAction`
-// (the actions wrap below the text, at the end). The style AST has no `flexWrap`, so the
-// layout moves the `actions` wrapper rather than letting the row wrap.
+// (the actions wrap below the text, at the end: the row wraps, and the text takes a whole line).
 
 import { typed } from "@pureform/core";
 import {
+    auto,
     center,
-    column,
-    end,
     flex,
+    pct,
     px,
     row,
-    stretch,
     transparent,
     unitless,
+    wrap,
 } from "@pureform/core/ast";
 import {
     radius,
@@ -112,7 +111,7 @@ export const snackbar = pf.slotComponent({
                 paddingBlockStart: spacing("3"),
                 paddingBlockEnd: spacing("3"),
             },
-            // The action and the close button; they move below the text in `longAction`.
+            // The action and the close button; they wrap below the text in `longAction`.
             actions: {
                 display: flex,
                 flexDirection: row,
@@ -148,14 +147,16 @@ export const snackbar = pf.slotComponent({
                 twoLine: { root: { minHeight: ref("twoLineMinHeight") } },
                 longAction: {
                     root: {
-                        flexDirection: column,
-                        alignItems: stretch,
+                        flexWrap: wrap,
                         gap: px(0),
                         paddingBlockEnd: spacing("2"),
                         paddingInlineEnd: ref("paddingInline"),
                     },
-                    supportingText: { paddingBlockEnd: spacing("1") },
-                    actions: { justifyContent: end },
+                    supportingText: {
+                        flexBasis: pct(100),
+                        paddingBlockEnd: spacing("1"),
+                    },
+                    actions: { marginInlineStart: auto },
                 },
             },
         },

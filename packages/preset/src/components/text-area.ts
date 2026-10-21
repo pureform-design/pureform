@@ -10,13 +10,12 @@
 //       <textarea class={input} id="bio" placeholder=" " rows={3} />
 //       <label class={label} for="bio">Bio</label>
 //     </div>
-//     <div class={supportingRow}>
-//       <span class={supportingText}>Helper or error text</span>
-//       <span class={counter}>12 / 200</span>
-//     </div>
+//     <span class={supportingText}>Helper or error text</span>
+//     <span class={counter}>12 / 200</span>
 //   </div>
 //
-// The supporting row is only needed with a counter; supporting text alone can sit in the root.
+// The root is a wrapping row: the container takes the first line, and the supporting text and
+// the optional counter share the next.
 
 import { typed } from "@pureform/core";
 import {
@@ -113,7 +112,7 @@ export const createTextArea = <
             name: "textArea",
             $meta: {
                 description:
-                    "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one. A counter sits beside the supporting text in supportingRow.",
+                    "Material text area, filled or outlined. Give the textarea a placeholder (a space works) and rows, and put the label after it; mark errors with aria-invalid. autoGrow grows it with the text. Turn on leadingIcon or trailingIcon when you render one. A counter sits after the supporting text, on its line.",
             },
             tokens,
             slots: [...FIELD_SLOTS, ...COUNTER_SLOTS],
@@ -131,12 +130,14 @@ export const createTextArea = <
                     ...base,
                     ...icons.base,
                     ...counter,
+                    root: { ...base.root, ...counter.root },
                     supportingText: {
                         ...base.supportingText,
                         ...counter.supportingText,
                     },
                     container: {
                         ...base.container,
+                        ...counter.container,
                         display: flex,
                     },
                     input: { ...base.input, resize: vertical },

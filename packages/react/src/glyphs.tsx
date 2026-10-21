@@ -36,3 +36,6 @@ export const BackIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.back} />;
 export const DropDownArrow = (): ReactNode => (
     <Glyph path={GLYPH_PATHS.dropDown} />
 );
+
+/** Three dots in a column: the toolbar's overflow button. */
+export const MoreIcon = (): ReactNode => <Glyph path={GLYPH_PATHS.more} />;

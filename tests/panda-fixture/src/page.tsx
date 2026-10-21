@@ -2,16 +2,19 @@
 // visual suite in `tests/browser-e2e-tests` screenshots each section.
 
 import {
+    appBar,
     avatar,
     badge,
     media,
     button,
     buttonGroup,
     card,
+    carousel,
     checkbox,
     chip,
     circularProgress,
     linearProgress,
+    loadingIndicator,
     navigationBar,
     navigationRail,
     searchBar,
@@ -47,6 +50,7 @@ import {
     text,
     textArea,
     textField,
+    toolbar,
 } from "$recipes";
 import { MATERIAL_SHAPES } from "@pureform/preset";
 import type { MaterialShape } from "@pureform/preset";
@@ -69,12 +73,150 @@ const ICON_FILLS = [
 ] as const;
 const CARD_FILLS = ["elevated", "filled", "outlined"] as const;
 
+// An app bar's icon button: the standard icon button around a glyph.
+function BarButton(props: { readonly label: string; readonly glyph: string }) {
+    const b = iconButton({ variant: "standard" });
+    return (
+        <button class={b.root} type="button" aria-label={props.label}>
+            <span class={b.touchTarget} />
+            <span class={b.container}>
+                <span class={b.icon}>{props.glyph}</span>
+            </span>
+        </button>
+    );
+}
+
+type AppBarExample = {
+    readonly label: string;
+    readonly size?: "small" | "mediumFlexible" | "largeFlexible";
+    readonly centered?: boolean;
+    readonly scrolled?: boolean;
+    readonly collapsed?: boolean;
+    readonly search?: boolean;
+    readonly subtitle?: string;
+};
+
+const APP_BARS: readonly AppBarExample[] = [
+    { label: "Small" },
+    { label: "Centered", centered: true },
+    { label: "Scrolled", scrolled: true, subtitle: "12 unread" },
+    { label: "Medium flexible", size: "mediumFlexible", subtitle: "12 unread" },
+    { label: "Large flexible", size: "largeFlexible" },
+    {
+        label: "Collapsed",
+        size: "largeFlexible",
+        scrolled: true,
+        collapsed: true,
+    },
+    { label: "Search", search: true, scrolled: true },
+];
+
+// An app bar drawn from the recipe: the content after the actions while a flexible bar is
+// expanded, as the bindings render it.
+function AppBarExampleView(props: { readonly example: AppBarExample }) {
+    const e = props.example;
+    // A collapsed flexible bar draws as the small one, as the bindings select it.
+    const a = appBar({
+        size: e.collapsed ? "small" : e.size,
+        centered: e.centered,
+        scrolled: e.scrolled,
+        collapsed: e.collapsed,
+        search: e.search,
+    });
+    const last = e.size !== undefined && e.size !== "small" && !e.collapsed;
+    const content = (
+        <div class={a.content}>
+            {e.search ? (
+                <label
+                    class={
+                        searchBar({ centered: true, scrolled: e.scrolled }).root
+                    }
+                >
+                    <input
+                        class={searchBar({ centered: true }).input}
+                        type="search"
+                        placeholder="Search mail"
+                    />
+                </label>
+            ) : (
+                <>
+                    <h2 class={a.headline}>{e.label}</h2>
+                    {e.subtitle ? <p class={a.subtitle}>{e.subtitle}</p> : null}
+                </>
+            )}
+        </div>
+    );
+    return (
+        <header class={a.root} style={{ width: "360px" }}>
+            <div class={a.leading} data-pf-mirror="">
+                <BarButton label="Back" glyph="←" />
+            </div>
+            {last ? null : content}
+            <div class={a.trailing}>
+                <BarButton label="More" glyph="⋮" />
+            </div>
+            {last ? content : null}
+        </header>
+    );
+}
+
 const row = { display: "flex", gap: "16px", "flex-wrap": "wrap" } as const;
 
 const grouped = menu({ grouped: true, vibrant: true });
 
 // Named themes from pureform.config.ts, each applied to a subtree by `data-panda-theme`.
 const THEMES = [undefined, "teal", "sharp", "dense"] as const;
+
+// A toolbar's icons, and whether each is a toggle that's on: bold, italic (on) and underline
+// toggles, and a link button.
+const TOOLBAR_ICONS: readonly (readonly [
+    string,
+    string,
+    "true" | "false" | undefined,
+])[] = [
+    [
+        "Bold",
+        "M8 4h5a4 4 0 0 1 2.5 7.1A4 4 0 0 1 14 19H8zm3 3v3h2a1.5 1.5 0 0 0 0-3zm0 6v3h3a1.5 1.5 0 0 0 0-3z",
+        "false",
+    ],
+    ["Italic", "M10 4h8v3h-2.7l-3 10H15v3H7v-3h2.7l3-10H10z", "true"],
+    [
+        "Underline",
+        "M6 21h12v-2H6zM12 17a6 6 0 0 0 6-6V3h-2.5v8a3.5 3.5 0 0 1-7 0V3H6v8a6 6 0 0 0 6 6",
+        "false",
+    ],
+    [
+        "Link",
+        "M17 7h-4v2h4a3 3 0 0 1 0 6h-4v2h4a5 5 0 0 0 0-10m-6 8H7a3 3 0 0 1 0-6h4V7H7a5 5 0 0 0 0 10h4zm-3-4h8v2H8z",
+        undefined,
+    ],
+];
+// Carousels in a 360px row (328px inside its padding, 8px gaps), sized at rest as the bindings
+// size them: each item's slot, its mask, and the mask's offset in the slot.
+const CAROUSELS = [
+    {
+        layout: "multiBrowse",
+        masks: [
+            [186, 186, 0],
+            [186, 70, 0],
+            [186, 56, -116],
+        ],
+    },
+    {
+        layout: "hero",
+        masks: [
+            [264, 264, 0],
+            [264, 56, 0],
+        ],
+    },
+    {
+        layout: "uncontained",
+        masks: [
+            [186, 186, 0],
+            [186, 186, 0],
+        ],
+    },
+] as const;
 
 const TOAST_TYPES = ["info", "success", "warning", "error", "loading"] as const;
 // Plain glyphs: the bundled Roboto draws them the same on every machine.
@@ -318,12 +460,8 @@ export function Page() {
                                         Price
                                     </label>
                                 </div>
-                                <div class={t.supportingRow}>
-                                    <span class={t.supportingText}>
-                                        Before tax
-                                    </span>
-                                    <span class={t.counter}>2 / 8</span>
-                                </div>
+                                <span class={t.supportingText}>Before tax</span>
+                                <span class={t.counter}>2 / 8</span>
                             </div>
                         );
                     }}
@@ -359,9 +497,7 @@ export function Page() {
                                         ◉
                                     </button>
                                 </div>
-                                <div class={t.supportingRow}>
-                                    <span class={t.counter}>7 / 6</span>
-                                </div>
+                                <span class={t.counter}>7 / 6</span>
                             </div>
                         );
                     }}
@@ -945,6 +1081,127 @@ export function Page() {
                     <span class={button().touchTarget} />
                     <span class={button().label}>DISABLED</span>
                 </button>
+            </section>
+
+            <section
+                data-section="toolbars"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={[undefined, "teal", "sharp"] as const}>
+                    {(theme) => (
+                        <div
+                            data-panda-theme={theme}
+                            style={{
+                                display: "grid",
+                                gap: "12px",
+                                width: "280px",
+                                "justify-items": "center",
+                            }}
+                        >
+                            <For
+                                each={
+                                    [
+                                        { placement: "floating" },
+                                        {
+                                            placement: "floating",
+                                            color: "vibrant",
+                                        },
+                                        { placement: "docked" },
+                                        {
+                                            placement: "docked",
+                                            color: "vibrant",
+                                        },
+                                    ] as const
+                                }
+                            >
+                                {(variants) => (
+                                    <div
+                                        class={toolbar(variants).root}
+                                        role="toolbar"
+                                        aria-label={`${theme ?? "base"} ${variants.placement}`}
+                                    >
+                                        <For each={TOOLBAR_ICONS}>
+                                            {([label, path, pressed]) => {
+                                                const b = iconButton({
+                                                    toggle:
+                                                        pressed !== undefined,
+                                                });
+                                                return (
+                                                    <button
+                                                        class={b.root}
+                                                        type="button"
+                                                        aria-label={label}
+                                                        aria-pressed={pressed}
+                                                    >
+                                                        <span
+                                                            class={
+                                                                b.touchTarget
+                                                            }
+                                                        />
+                                                        <span
+                                                            class={b.container}
+                                                        >
+                                                            <svg
+                                                                class={b.icon}
+                                                                viewBox="0 0 24 24"
+                                                            >
+                                                                <path
+                                                                    fill="currentColor"
+                                                                    d={path}
+                                                                />
+                                                            </svg>
+                                                        </span>
+                                                        <span
+                                                            class={b.outline}
+                                                        />
+                                                    </button>
+                                                );
+                                            }}
+                                        </For>
+                                    </div>
+                                )}
+                            </For>
+                            <div
+                                class={
+                                    toolbar({
+                                        orientation: "vertical",
+                                        color: "vibrant",
+                                    }).root
+                                }
+                                role="toolbar"
+                                aria-orientation="vertical"
+                                aria-label={`${theme ?? "base"} vertical`}
+                            >
+                                <For each={TOOLBAR_ICONS.slice(0, 3)}>
+                                    {([label, path]) => {
+                                        const b = iconButton();
+                                        return (
+                                            <button
+                                                class={b.root}
+                                                type="button"
+                                                aria-label={label}
+                                            >
+                                                <span class={b.touchTarget} />
+                                                <span class={b.container}>
+                                                    <svg
+                                                        class={b.icon}
+                                                        viewBox="0 0 24 24"
+                                                    >
+                                                        <path
+                                                            fill="currentColor"
+                                                            d={path}
+                                                        />
+                                                    </svg>
+                                                </span>
+                                                <span class={b.outline} />
+                                            </button>
+                                        );
+                                    }}
+                                </For>
+                            </div>
+                        </div>
+                    )}
+                </For>
             </section>
 
             <section data-section="shapes">
@@ -2236,6 +2493,123 @@ export function Page() {
                     );
                 })()}
             </section>
+            {/* M3 Expressive's loading indicator (c4a), uncontained and contained, in the base
+                and a named theme, and the wavy progress indicators beside the flat track. */}
+            <section
+                data-section="loading-and-wavy"
+                style={{ display: "grid", gap: "16px", width: "480px" }}
+            >
+                <For each={[undefined, "teal"] as const}>
+                    {(theme) => (
+                        <div data-panda-theme={theme} style={row}>
+                            <For
+                                each={
+                                    [
+                                        {},
+                                        { variant: "contained" },
+                                        { color: "tertiary" },
+                                        {
+                                            variant: "contained",
+                                            color: "error",
+                                        },
+                                    ] as const
+                                }
+                            >
+                                {(selection) => {
+                                    const l = loadingIndicator(selection);
+                                    return (
+                                        <div
+                                            class={l.root}
+                                            role="progressbar"
+                                            aria-label="Loading"
+                                        >
+                                            <span class={l.container}>
+                                                <span class={l.indicator} />
+                                            </span>
+                                        </div>
+                                    );
+                                }}
+                            </For>
+                        </div>
+                    )}
+                </For>
+                <For
+                    each={
+                        [
+                            { value: 40 },
+                            { value: 70, thickness: "thick" },
+                            { value: 100 },
+                        ] as const
+                    }
+                >
+                    {({ value, ...selection }) => {
+                        const p = linearProgress({
+                            shape: "wavy",
+                            ...selection,
+                        });
+                        return (
+                            <div
+                                class={p.root}
+                                role="progressbar"
+                                aria-valuenow={value}
+                                aria-label="Wavy progress"
+                                style={{
+                                    "--pf-components-linearProgress-value": `${value}`,
+                                }}
+                            >
+                                <div class={p.track} />
+                                <div class={p.indicator} />
+                                <div class={p.stopIndicator} />
+                            </div>
+                        );
+                    }}
+                </For>
+                <div style={row}>
+                    <For
+                        each={
+                            [
+                                { value: 30 },
+                                { value: 65 },
+                                { value: 80, thickness: "thick" },
+                                { value: 65, color: "secondary" },
+                            ] as const
+                        }
+                    >
+                        {({ value, ...selection }) => {
+                            const c = circularProgress({
+                                shape: "wavy",
+                                ...selection,
+                            });
+                            return (
+                                <div
+                                    class={c.root}
+                                    role="progressbar"
+                                    aria-valuenow={value}
+                                    aria-label="Wavy progress"
+                                    style={{
+                                        "--pf-components-circularProgress-value": `${value}`,
+                                    }}
+                                >
+                                    <span class={c.track}>
+                                        <span class={c.trackEndHalf}>
+                                            <span class={c.trackEndArc} />
+                                        </span>
+                                        <span class={c.trackStartHalf}>
+                                            <span class={c.trackStartArc} />
+                                        </span>
+                                    </span>
+                                    <span class={c.endHalf}>
+                                        <span class={c.endArc} />
+                                    </span>
+                                    <span class={c.startHalf}>
+                                        <span class={c.startArc} />
+                                    </span>
+                                </div>
+                            );
+                        }}
+                    </For>
+                </div>
+            </section>
             <section
                 data-section="navigation"
                 style={{ ...row, "align-items": "flex-start" }}
@@ -2546,6 +2920,69 @@ export function Page() {
             </section>
 
             <section
+                data-section="carousels"
+                style={{ display: "grid", gap: "16px", width: "360px" }}
+            >
+                <For each={["teal", "sharp", undefined] as const}>
+                    {(theme) => (
+                        <For each={CAROUSELS}>
+                            {({ layout, masks }) => {
+                                const c = carousel({ layout });
+                                return (
+                                    <div
+                                        class={c.root}
+                                        data-panda-theme={theme}
+                                        role="region"
+                                        aria-label={`${theme ?? "base"} ${layout}`}
+                                        style={{ height: "96px" }}
+                                    >
+                                        <div
+                                            class={c.itemGroup}
+                                            style={{
+                                                height: "96px",
+                                                overflow: "hidden",
+                                            }}
+                                        >
+                                            <For each={masks}>
+                                                {([slot, mask, offset]) => (
+                                                    <div
+                                                        class={c.item}
+                                                        style={{
+                                                            width: `${slot}px`,
+                                                        }}
+                                                    >
+                                                        <div
+                                                            class={c.mask}
+                                                            style={{
+                                                                width: `${mask}px`,
+                                                                "margin-inline-start": `${offset}px`,
+                                                            }}
+                                                        >
+                                                            <img
+                                                                class={
+                                                                    c.content
+                                                                }
+                                                                style={{
+                                                                    width: `${slot}px`,
+                                                                    "object-fit":
+                                                                        "cover",
+                                                                }}
+                                                                src={PORTRAIT}
+                                                                alt=""
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </For>
+                                        </div>
+                                    </div>
+                                );
+                            }}
+                        </For>
+                    )}
+                </For>
+            </section>
+            <section
                 data-section="media"
                 style={{ ...row, "align-items": "flex-start" }}
             >
@@ -2590,6 +3027,14 @@ export function Page() {
                         </p>
                     </div>
                 </article>
+            </section>
+            <section
+                data-section="app-bars"
+                style={{ ...row, "align-items": "flex-start" }}
+            >
+                <For each={APP_BARS}>
+                    {(example) => <AppBarExampleView example={example} />}
+                </For>
             </section>
         </main>
     );

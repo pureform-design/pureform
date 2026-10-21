@@ -283,19 +283,8 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
     /** Text after the input, shown once the label floats. Turn on Root's `suffixText` with it. */
     const SuffixText = affix("suffixText", "SuffixText");
 
-    /** The row holding the supporting text and the counter. */
-    function SupportingRow(props: TextInputPartProps): JSX.Element {
-        const { scope, api } = context.use("SupportingRow");
-        return scope.render("supportingRow", {
-            element: "div",
-            machine: () => api().getSupportingRowProps(),
-            unstyled: () => props.unstyled,
-            props: omit(props, "unstyled"),
-        });
-    }
-
     /** The character count, `3 / 20` under Root's `counterMax`, at the end of the supporting
-     *  row. It turns to the error color once the value is longer. */
+     *  text's line. It turns to the error color once the value is longer. */
     function Counter(props: TextInputPartProps): JSX.Element {
         const { scope, api } = context.use("Counter");
         const children = {
@@ -347,7 +336,6 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
         const leadingIcon = props.slots("leadingIcon");
         const prefixText = props.slots("prefixText");
         const suffixText = props.slots("suffixText");
-        const supportingRow = props.slots("supportingRow");
         const counter = props.slots("counter");
         const input = props.slots("input");
         const label = props.slots("label");
@@ -408,14 +396,9 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
                         </TrailingIcon>
                     </Show>
                 </Container>
-                <Show
-                    when={api().counterText !== undefined}
-                    fallback={supporting()}
-                >
-                    <SupportingRow {...supportingRow}>
-                        {supporting()}
-                        <Counter {...counter} />
-                    </SupportingRow>
+                {supporting()}
+                <Show when={api().counterText !== undefined}>
+                    <Counter {...counter} />
                 </Show>
             </>
         );
@@ -462,7 +445,6 @@ export function createTextInput<A extends Anatomy>(config: TextInputConfig<A>) {
             SuffixText,
             Label,
             TrailingIcon,
-            SupportingRow,
             SupportingText,
             Counter,
         },

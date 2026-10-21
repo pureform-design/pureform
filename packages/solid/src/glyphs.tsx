@@ -36,3 +36,6 @@ export const BackIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.back} />;
 export const DropDownArrow = (): JSX.Element => (
     <Glyph path={GLYPH_PATHS.dropDown} />
 );
+
+/** Three dots in a column: the toolbar's overflow button. */
+export const MoreIcon = (): JSX.Element => <Glyph path={GLYPH_PATHS.more} />;

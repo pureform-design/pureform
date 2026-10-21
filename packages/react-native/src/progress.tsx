@@ -17,6 +17,7 @@ import type {
 import type { ReactNode } from "react";
 
 import { testIdOf, withEngine } from "./parts";
+import { useEngine } from "./provider";
 import { useComponentSlots } from "./styles";
 
 export interface LinearProgressProps
@@ -44,7 +45,12 @@ const valueProps = (
 });
 
 function LinearProgressImpl(props: LinearProgressProps): ReactNode {
-    const { styles: s, views: v } = useComponentSlots<LinearProgressPart>(
+    const engine = useEngine();
+    const {
+        styles: s,
+        selected,
+        views: v,
+    } = useComponentSlots<LinearProgressPart>(
         "linearProgress",
         progressSelection(props) as Record<string, unknown>,
     );
@@ -53,7 +59,12 @@ function LinearProgressImpl(props: LinearProgressProps): ReactNode {
     return (
         <v.root.View {...valueProps(props)} style={s.root} testID={id("root")}>
             <v.track.View style={s.track} testID={id("track")} />
-            <v.indicator.View style={s.indicator} testID={id("indicator")} />
+            <v.indicator.View style={s.indicator} testID={id("indicator")}>
+                {/* A wavy indicator is drawn in its wave with an SVG engine. */}
+                {engine.Drawing ? (
+                    <engine.Drawing drawing={selected.drawings.indicator} />
+                ) : null}
+            </v.indicator.View>
             <v.stopIndicator.View
                 style={s.stopIndicator}
                 testID={id("stopIndicator")}

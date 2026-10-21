@@ -1,0 +1,183 @@
+import { compilePreset } from "@pureform/panda-adapter";
+import { describe, expect, it } from "vitest";
+
+import { configWith } from "../__fixtures__/config";
+import { MATERIAL_SHAPES } from "../shapes";
+import {
+    LOADING_INDICATOR_KEYFRAMES,
+    LOADING_INDICATOR_SHAPES,
+    loadingIndicator,
+} from "./loading-indicator";
+import { circularProgress, linearProgress } from "./progress";
+import { morphSequence, waveBand, wavyRing } from "./shape-paths";
+
+const slotRecipe = (
+    component: Parameters<typeof configWith>[0],
+    name: string,
+) => compilePreset(configWith(component)).theme?.slotRecipes?.[name];
+
+// A shape node's structure: each contour's segment ops, which a morph needs to match.
+const structure = (shape: unknown) =>
+    (shape as { contours: { segments: { op: string }[] }[] }).contours.map(
+        (contour) => contour.segments.map((s) => s.op).join(),
+    );
+
+describe("morphSequence", () => {
+    it("redraws a cycle of shapes with one structure, keeping their fit", () => {
+        const shapes = [
+            MATERIAL_SHAPES.circle,
+            MATERIAL_SHAPES.pentagon,
+            MATERIAL_SHAPES.sunny,
+        ];
+        const morphs = morphSequence(shapes);
+        const lengths = morphs.map((m) => m.contours[0]!.segments.length);
+        expect(new Set(lengths).size).toBe(1);
+        expect(lengths[0]).toBeGreaterThanOrEqual(
+            Math.max(...shapes.map((s) => s.contours[0]!.segments.length)),
+        );
+        for (const [i, m] of morphs.entries()) {
+            expect(m.fit).toEqual(shapes[i]!.fit);
+            expect(m.contours[0]!.segments.every((s) => s.op === "curve")).toBe(
+                true,
+            );
+        }
+    });
+
+    it("rejects a shape with more than one contour", () => {
+        const two = {
+            ...MATERIAL_SHAPES.circle,
+            contours: [
+                MATERIAL_SHAPES.circle.contours[0]!,
+                MATERIAL_SHAPES.circle.contours[0]!,
+            ],
+        };
+        expect(() => morphSequence([two])).toThrow(/one contour/);
+    });
+});
+
+describe("wave paths", () => {
+    it("bands a wave from the box's start, folding past its end", () => {
+        const band = waveBand({
+            waves: 2,
+            wavelength: 40,
+            top: 30,
+            bottom: 70,
+            amplitude: 30,
+        });
+        expect(band.contours).toHaveLength(1);
+        // Four quarter curves a wave, along each edge, and the flat end.
+        expect(
+            structure(band)[0]!
+                .split(",")
+                .filter((op) => op === "curve"),
+        ).toHaveLength(16);
+        expect(JSON.stringify(band)).toContain('"fn":"min"');
+    });
+
+    it("rings a circle with an inner and outer wavy edge, as a hole", () => {
+        const ring = wavyRing({ waves: 9, thickness: 0.1, amplitude: 0.05 });
+        expect(ring.fillRule).toBe("evenodd");
+        expect(ring.contours).toHaveLength(2);
+    });
+});
+
+describe("loadingIndicator", () => {
+    it("has the M3 parts: root, container, indicator", () => {
+        expect(loadingIndicator.slots).toEqual([
+            "root",
+            "container",
+            "indicator",
+        ]);
+        expect(
+            Object.keys(loadingIndicator.recipe.variants?.variant ?? {}),
+        ).toEqual(["uncontained", "contained"]);
+        expect(loadingIndicator.recipe.compoundVariants ?? []).toHaveLength(0);
+    });
+
+    it("morphs through Material's seven shapes and back, two turns a cycle", () => {
+        const frames = LOADING_INDICATOR_KEYFRAMES.loadingIndicatorMorph!;
+        const keys = Object.keys(frames);
+        expect(keys).toHaveLength(LOADING_INDICATOR_SHAPES.length + 1);
+        expect(keys[0]).toBe("0%");
+        expect(keys.at(-1)).toBe("100%");
+        const shapes = keys.map((k) => frames[k]!.clipPath);
+        // Every frame has one structure, so each animates into the next.
+        expect(
+            new Set(shapes.map((s) => JSON.stringify(structure(s)))).size,
+        ).toBe(1);
+        expect(shapes.at(-1)).toEqual(shapes[0]);
+        expect(JSON.stringify(frames["100%"]!.transform)).toContain(
+            '"value":720',
+        );
+    });
+
+    it("keeps turning under reduced motion, without reshaping", () => {
+        const animation = loadingIndicator.recipe.base?.indicator?.animation;
+        const json = JSON.stringify(animation);
+        expect(json).toContain('"reducedMotion"');
+        expect(json).toContain("loadingIndicatorSpin");
+        expect(json).toContain("loadingIndicatorMorph");
+        expect(
+            Object.keys(LOADING_INDICATOR_KEYFRAMES.loadingIndicatorSpin!),
+        ).toEqual(["from", "to"]);
+        for (const frame of Object.values(
+            LOADING_INDICATOR_KEYFRAMES.loadingIndicatorSpin!,
+        )) {
+            expect(frame).not.toHaveProperty("clipPath");
+        }
+    });
+
+    it("is a circle where a target can't clip to a shape", () => {
+        const recipe = slotRecipe(loadingIndicator, "loadingIndicator");
+        expect(JSON.stringify(recipe?.base?.indicator)).toContain("@supports");
+        expect(recipe?.base?.indicator?.clipPath).toMatch(/^shape\(/);
+    });
+
+    it("colours the contained container and indicator from the group's tokens", () => {
+        const recipe = slotRecipe(loadingIndicator, "loadingIndicator");
+        expect(recipe?.variants?.variant?.contained?.container).toEqual({
+            backgroundColor:
+                "var(--components-loadingIndicator-containerColor, token(colors.primaryContainer))",
+        });
+        expect(recipe?.variants?.color?.tertiary?.root).toMatchObject({
+            "--components-loadingIndicator-indicatorColor":
+                "token(colors.tertiary)",
+            "--components-loadingIndicator-containedIndicatorColor":
+                "token(colors.onTertiaryContainer)",
+        });
+    });
+});
+
+describe("wavy progress", () => {
+    it("adds shape flat and wavy, flat by default, to both indicators", () => {
+        for (const progress of [linearProgress, circularProgress]) {
+            expect(Object.keys(progress.recipe.variants?.shape ?? {})).toEqual([
+                "flat",
+                "wavy",
+            ]);
+            expect(progress.recipe.defaultVariants?.shape).toBe("flat");
+        }
+    });
+
+    it("clips the linear indicator to a wave, flat where clipping isn't drawn", () => {
+        const wavy = linearProgress.recipe.variants?.shape?.wavy;
+        expect(wavy?.indicator?.clipPath).toMatchObject({ type: "shape" });
+        expect(JSON.stringify(wavy?.indicator?.top)).toContain("clipShape");
+        expect(linearProgress.recipe.compoundVariants).toEqual([
+            expect.objectContaining({
+                match: { shape: "wavy", thickness: "thick" },
+            }),
+        ]);
+    });
+
+    it("clips the circular arcs to a wavy ring, the spinner too, per thickness", () => {
+        const wavy = circularProgress.recipe.variants?.shape?.wavy;
+        expect(wavy?.endArc?.clipPath).toMatchObject({
+            type: "shape",
+            fillRule: "evenodd",
+        });
+        expect(wavy?.startArc?.clipPath).toEqual(wavy?.endArc?.clipPath);
+        // Thick, indeterminate, and both: three compounds.
+        expect(circularProgress.recipe.compoundVariants).toHaveLength(3);
+    });
+});

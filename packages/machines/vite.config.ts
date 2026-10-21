@@ -28,6 +28,7 @@ export default createConfig({
                     slider: "src/slider/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     toast: "src/toast/index.ts",
+                    carousel: "src/carousel/index.ts",
                     combobox: "src/combobox/index.ts",
                     form: "src/form/index.ts",
                     interaction: "src/interaction/index.ts",

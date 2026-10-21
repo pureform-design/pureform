@@ -15,13 +15,12 @@
 //       <span class={suffixText}>.00</span>
 //       <label class={label} for="price">Price</label>
 //     </div>
-//     <div class={supportingRow}>
-//       <span class={supportingText}>Helper or error text</span>
-//       <span class={counter}>3 / 20</span>
-//     </div>
+//     <span class={supportingText}>Helper or error text</span>
+//     <span class={counter}>3 / 20</span>
 //   </div>
 //
-// The supporting row is only needed with a counter; supporting text alone can sit in the root.
+// The root is a wrapping row: the container takes the first line, and the supporting text and
+// the optional counter share the next.
 // Mark an error with `aria-invalid="true"` on the input, and a count over the limit too. The
 // container reads its state from the input, and the label, icons, supporting text and counter
 // follow it. `secure` is the password field: the trailing icon is a button that shows or hides
@@ -92,7 +91,7 @@ export const createTextField = <
             name: "textField",
             $meta: {
                 description:
-                    "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon, trailingIcon, prefixText or suffixText when you render one. A counter sits beside the supporting text in supportingRow. secure makes the trailing icon a show/hide button for a password.",
+                    "Material text field, filled or outlined. Give the input a placeholder (a space works) and put the label after it; mark errors with aria-invalid. Turn on leadingIcon, trailingIcon, prefixText or suffixText when you render one. A counter sits after the supporting text, on its line. secure makes the trailing icon a show/hide button for a password.",
             },
             tokens,
             slots: [...AFFIX_FIELD_SLOTS, ...COUNTER_SLOTS],
@@ -111,6 +110,11 @@ export const createTextField = <
                 base: {
                     ...parts.base,
                     ...counter,
+                    root: { ...parts.base.root, ...counter.root },
+                    container: {
+                        ...parts.base.container,
+                        ...counter.container,
+                    },
                     supportingText: {
                         ...field.base.supportingText,
                         ...counter.supportingText,

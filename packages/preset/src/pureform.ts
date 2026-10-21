@@ -44,6 +44,7 @@ import type {
     TypographyProvider,
 } from "@pureform/theme";
 
+import { APP_BAR_KEYFRAMES, appBar } from "./components/app-bar";
 import { createAutocomplete } from "./components/autocomplete";
 import { createAvatar } from "./components/avatar";
 import { badge } from "./components/badge";
@@ -51,6 +52,7 @@ import { bottomSheet } from "./components/bottom-sheet";
 import { createButton } from "./components/button";
 import { buttonGroup } from "./components/button-group";
 import { card } from "./components/card";
+import { carousel } from "./components/carousel";
 import { createCheckbox } from "./components/checkbox";
 import { createChip } from "./components/chip";
 import { dialog } from "./components/dialog";
@@ -63,6 +65,10 @@ import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
 import { list } from "./components/list";
 import { createListItem } from "./components/list-item";
+import {
+    LOADING_INDICATOR_KEYFRAMES,
+    createLoadingIndicator,
+} from "./components/loading-indicator";
 import { createMedia } from "./components/media";
 import { createMenu } from "./components/menu";
 import { createNavigationBar } from "./components/navigation-bar";
@@ -75,7 +81,6 @@ import {
 } from "./components/progress";
 import { createRadio } from "./components/radio";
 import { richTooltip } from "./components/rich-tooltip";
-import { toast } from "./components/toast";
 import { ripple } from "./components/ripple";
 import { scrim } from "./components/scrim";
 import { searchBar } from "./components/search-bar";
@@ -97,6 +102,8 @@ import { createTagsInput } from "./components/tags-input";
 import { createText } from "./components/text";
 import { createTextArea } from "./components/text-area";
 import { createTextField } from "./components/text-field";
+import { toast } from "./components/toast";
+import { toolbar } from "./components/toolbar";
 import { tooltip } from "./components/tooltip";
 import { touchTarget } from "./components/touch-target";
 import { componentContrastFailures } from "./contrast";
@@ -307,6 +314,7 @@ const defaultComponents = <G extends string>(
         slider: createSlider(theme.color.groups),
         linearProgress: createLinearProgress(theme.color.groups),
         circularProgress: createCircularProgress(theme.color.groups),
+        loadingIndicator: createLoadingIndicator(theme.color.groups),
         separator,
         list,
         listItem: createListItem<G, Step>(theme.color.groups, densities),
@@ -314,6 +322,7 @@ const defaultComponents = <G extends string>(
         tabs: createTabs(theme.color.groups),
         navigationBar: createNavigationBar(theme.color.groups),
         navigationRail: createNavigationRail(theme.color.groups),
+        appBar,
         dialog,
         fullscreenDialog,
         bottomSheet,
@@ -321,9 +330,11 @@ const defaultComponents = <G extends string>(
         dragHandle,
         snackbar,
         toast,
+        toolbar,
         tooltip,
         richTooltip,
         card,
+        carousel,
         scrim,
         ripple,
         icon: createIcon(theme.color.groups),
@@ -331,6 +342,8 @@ const defaultComponents = <G extends string>(
         text: createText(Object.keys(theme.typography.styles)),
     };
     for (const [name, spec] of Object.entries(components)) {
+        // Its geometry is the shape, so the theme's corner leaves it round.
+        if (name === "loadingIndicator") continue;
         (components as Record<string, AnyComponentSpec>)[name] = (
             cornerToken ? withCornerToken : withCorner
         )(spec, theme.shape.corner);
@@ -474,9 +487,11 @@ export const pureform = <
                 componentBaseStyles: { fontFamily: fontRole("plain") },
                 keyframes: {
                     ...PROGRESS_KEYFRAMES,
+                    ...LOADING_INDICATOR_KEYFRAMES,
                     ...OVERLAY_KEYFRAMES,
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
+                    ...APP_BAR_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),

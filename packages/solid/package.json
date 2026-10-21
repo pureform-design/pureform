@@ -203,6 +203,17 @@
                 "default": "./dist/rich-tooltip.jsx"
             }
         },
+        "./carousel": {
+            "types": "./dist/carousel/index.d.ts",
+            "solid": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.jsx"
+            },
+            "import": {
+                "development": "./src/carousel/index.ts",
+                "default": "./dist/carousel.jsx"
+            }
+        },
         "./tabs": {
             "types": "./dist/tabs/index.d.ts",
             "solid": {
@@ -289,6 +300,17 @@
             "import": {
                 "development": "./src/toast/index.ts",
                 "default": "./dist/toast.jsx"
+            }
+        },
+        "./toolbar": {
+            "types": "./dist/toolbar/index.d.ts",
+            "solid": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.jsx"
+            },
+            "import": {
+                "development": "./src/toolbar/index.ts",
+                "default": "./dist/toolbar.jsx"
             }
         },
         "./select": {
@@ -390,6 +412,17 @@
                 "default": "./dist/circular-progress.jsx"
             }
         },
+        "./loading-indicator": {
+            "types": "./dist/loading-indicator/index.d.ts",
+            "solid": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.jsx"
+            },
+            "import": {
+                "development": "./src/loading-indicator/index.ts",
+                "default": "./dist/loading-indicator.jsx"
+            }
+        },
         "./icon": {
             "types": "./dist/icon/index.d.ts",
             "solid": {
@@ -443,6 +476,17 @@
             "import": {
                 "development": "./src/scrim/index.ts",
                 "default": "./dist/scrim.jsx"
+            }
+        },
+        "./app-bar": {
+            "types": "./dist/app-bar/index.d.ts",
+            "solid": {
+                "development": "./src/app-bar/index.ts",
+                "default": "./dist/app-bar.jsx"
+            },
+            "import": {
+                "development": "./src/app-bar/index.ts",
+                "default": "./dist/app-bar.jsx"
             }
         },
         "./search-bar": {

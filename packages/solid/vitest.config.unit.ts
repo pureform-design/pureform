@@ -27,6 +27,7 @@ export default mergeConfig(mergeConfig(baseConfig, unitTestConfig), {
             "@zag-js/tooltip",
             "@zag-js/switch",
             "@zag-js/tabs",
+            "@zag-js/carousel",
         ],
     },
     resolve: { dedupe: ["solid-js", "@solidjs/web"] },
