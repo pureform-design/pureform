@@ -121,6 +121,7 @@ export const createTree = <
                         display: flex,
                         flexDirection: column,
                         gap: spacing("2"),
+                        backgroundColor: ref("container"),
                         color: ref("content"),
                     },
                     label: {
