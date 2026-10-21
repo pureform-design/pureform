@@ -7,6 +7,7 @@ import {
     hex,
     numeric,
     px,
+    spring,
     when,
 } from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
@@ -314,5 +315,34 @@ describe("compilePreset (typed component tokens)", () => {
         expect(obj(obj(recipe.variants).full).yes).toEqual({
             "--components-meter-value": "1",
         });
+    });
+});
+
+describe("compilePreset (springs)", () => {
+    const preset = compilePreset({
+        ...buttonConfig,
+        springs: { spatialFast: spring({ stiffness: 800, damping: 0.6 }) },
+        themes: {
+            stiff: {
+                springs: {
+                    spatialFast: spring({ stiffness: 1400, damping: 0.9 }),
+                },
+            },
+        },
+    });
+    const tokens = obj(obj(preset.theme).tokens);
+
+    it("nests each spring's duration and linear() easing under springs", () => {
+        const fast = obj(obj(tokens.springs).spatialFast);
+        expect(obj(fast.duration).value).toMatch(/^\d+ms$/);
+        expect(obj(fast.easing).value).toMatch(/^linear\(0, .*, 1\)$/);
+        expect(obj(tokens.springs)).toMatchSnapshot();
+    });
+
+    it("carries a theme's springs", () => {
+        const stiff = (preset.themes as Record<string, any>).stiff;
+        expect(stiff.tokens.springs.spatialFast.duration.value).toMatch(
+            /^\d+ms$/,
+        );
     });
 });

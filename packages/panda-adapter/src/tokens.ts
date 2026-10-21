@@ -2,13 +2,14 @@
 // styles, keyframes, and utilities.
 
 import { tokenValue } from "@pureform/core";
-import type { ValueNode } from "@pureform/core/ast";
+import type { SpringNode, ValueNode } from "@pureform/core/ast";
 import type { Token, UtilityDef } from "@pureform/core/types";
 import {
     compileConditional,
     compileNodeToCSS,
     compileStyleMap,
     compileTemplate,
+    springTokenGroups,
 } from "@pureform/css-lowering";
 import type { CondObject } from "@pureform/css-lowering";
 
@@ -58,6 +59,20 @@ const groupToPanda = (
         ]),
     );
 
+/** A spring's two web tokens, nested under `springs.<name>` as `duration` and `easing`, so
+ *  Panda writes `--springs-<name>-duration` and `--springs-<name>-easing`. */
+export const springsToPanda = (
+    springs: Record<string, Token<SpringNode>>,
+    ctx: CompileCtx,
+): { springs: Record<string, PandaTokenGroup> } => ({
+    springs: Object.fromEntries(
+        Object.entries(springTokenGroups(springs)).map(([name, group]) => [
+            name,
+            groupToPanda(group, ctx),
+        ]),
+    ),
+});
+
 /** `theme.tokens`: primitive color/space/radius groups plus the motion, stacking, and font
  *  tiers, each remapped to its Panda category. */
 export const compileThemeTokens = (
@@ -72,6 +87,8 @@ export const compileThemeTokens = (
     }
     if (config.durations) out.durations = groupToPanda(config.durations, tctx);
     if (config.easings) out.easings = groupToPanda(config.easings, tctx);
+    if (config.springs)
+        Object.assign(out, springsToPanda(config.springs, tctx));
     if (config.zIndices) out.zIndex = groupToPanda(config.zIndices, tctx);
     if (config.fonts) out.fonts = groupToPanda(config.fonts, tctx);
     return out;
