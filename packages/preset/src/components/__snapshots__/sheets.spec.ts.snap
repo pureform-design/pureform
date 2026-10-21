@@ -20,13 +20,13 @@ exports[`bottomSheet > compiles to a stable Panda slot recipe 1`] = `
     "root": {
       "&[data-state=closed]": {
         "animation": {
-          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sheetFadeOut",
+          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
           "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards bottomSheetOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
-          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) sheetFadeIn",
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
           "base": "token(durations.long2) token(easings.emphasizedDecelerate) bottomSheetIn",
         },
       },
@@ -192,14 +192,14 @@ exports[`sideSheet > compiles to a stable Panda slot recipe 1`] = `
     "root": {
       "&[data-state=closed]": {
         "animation": {
-          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sheetFadeOut",
+          "_motionReduce": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards overlayFadeOut",
           "_rtl": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOutRtl",
           "base": "token(durations.medium1) token(easings.emphasizedAccelerate) forwards sideSheetOut",
         },
       },
       "&[data-state=open]": {
         "animation": {
-          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) sheetFadeIn",
+          "_motionReduce": "token(durations.long2) token(easings.emphasizedDecelerate) overlayFadeIn",
           "_rtl": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetInRtl",
           "base": "token(durations.long2) token(easings.emphasizedDecelerate) sideSheetIn",
         },

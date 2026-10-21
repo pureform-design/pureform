@@ -16,8 +16,9 @@ import { typed } from "@pureform/core";
 import { auto, column, flex, pct, px, unitless } from "@pureform/core/ast";
 import { radius, spacing, textStyle, zIndex } from "@pureform/theme";
 
+import { overlayMotion } from "./overlay";
 import { componentTokens, surface, sys } from "./shared";
-import { sheetMotion } from "./sheet";
+import { BOTTOM_SHEET_MOTION } from "./sheet";
 import { runCorners } from "./tiles";
 
 const { tokens, ref } = componentTokens("bottomSheet", {
@@ -45,7 +46,7 @@ export const bottomSheet = pf.slotComponent({
         base: {
             root: {
                 ...surface(ref("container"), ref("content"), "level1"),
-                ...sheetMotion("bottom"),
+                ...overlayMotion(BOTTOM_SHEET_MOTION),
                 ...runCorners(ref("radius"), px(0)),
                 display: flex,
                 flexDirection: column,

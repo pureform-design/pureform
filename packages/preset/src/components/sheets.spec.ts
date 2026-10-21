@@ -5,7 +5,12 @@ import { configWith } from "../__fixtures__/config";
 import { pureform } from "../pureform";
 import { bottomSheet } from "./bottom-sheet";
 import { dragHandle } from "./drag-handle";
-import { SHEET_KEYFRAMES } from "./sheet";
+import { overlayMotion } from "./overlay";
+import {
+    BOTTOM_SHEET_MOTION,
+    SHEET_KEYFRAMES,
+    SIDE_SHEET_MOTION,
+} from "./sheet";
 import { sideSheet } from "./side-sheet";
 
 describe.each([
@@ -119,5 +124,18 @@ describe("sheet motion", () => {
         const root = json(sideSheet.recipe.base!.root);
         expect(root).toContain("sideSheetInRtl");
         expect(root).toContain("reducedMotion");
+    });
+
+    it("are overlay motions, fading with the other overlays under reduced motion", () => {
+        expect(sideSheet.recipe.base!.root!.rawRules).toEqual(
+            overlayMotion(SIDE_SHEET_MOTION).rawRules,
+        );
+        expect(bottomSheet.recipe.base!.root!.rawRules).toEqual(
+            overlayMotion(BOTTOM_SHEET_MOTION).rawRules,
+        );
+        const bottom = json(bottomSheet.recipe.base!.root);
+        expect(bottom).toContain("overlayFadeIn");
+        expect(bottom).not.toContain("sheetFade");
+        expect(Object.keys(SHEET_KEYFRAMES)).not.toContain("sheetFadeIn");
     });
 });

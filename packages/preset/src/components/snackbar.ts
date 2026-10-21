@@ -42,6 +42,7 @@ import {
     componentTokens,
     INDICATION_ROOT,
     interactiveColors,
+    notificationAction,
     pressableRoot,
     surface,
     sys,
@@ -120,15 +121,7 @@ export const snackbar = pf.slotComponent({
                 gap: ref("gap"),
             },
             // A text button in the inverse primary color.
-            action: {
-                ...pressableRoot(ref),
-                ...interactiveColors(ref, transparent, ref("actionColor")),
-                textStyle: textStyle("labelLarge"),
-                height: ref("actionHeight"),
-                paddingInlineStart: spacing("3"),
-                paddingInlineEnd: spacing("3"),
-                borderRadius: radius("full"),
-            },
+            action: notificationAction(ref, ref("actionColor")),
             // An icon button in the content color.
             close: {
                 ...pressableRoot(ref),

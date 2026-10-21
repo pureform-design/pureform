@@ -68,6 +68,9 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
  *  moves nothing, so reduced motion keeps it as it is. */
 export interface OverlayMotionStep {
     readonly keyframes: string;
+    /** The keyframes under right to left, for a motion that moves sideways (translation is
+     *  physical): a side sheet's slide. */
+    readonly rtl?: string;
     readonly duration: DurationRole;
     readonly easing: EasingRole;
 }
@@ -99,12 +102,18 @@ export const motionAnimation = (
     });
 
 const step = (
-    { keyframes, duration: time, easing: curve }: OverlayMotionStep,
+    { keyframes, rtl, duration: time, easing: curve }: OverlayMotionStep,
     fade: string,
     fillMode: "none" | "forwards",
 ) => {
     const run = (name: string) => motionAnimation(name, time, curve, fillMode);
     if (FADES.has(keyframes)) return run(keyframes);
+    if (rtl) {
+        return when()
+            .on("rtl", run(rtl))
+            .on("reducedMotion", run(fade))
+            .else(run(keyframes));
+    }
     return when("reducedMotion", run(fade), run(keyframes));
 };
 
