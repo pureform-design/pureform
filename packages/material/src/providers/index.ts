@@ -4,12 +4,15 @@
 // published values (the shape scale, state opacities, motion tokens), so a theme can take
 // Material for some domains and its own providers for others.
 
-import { cubicBezier, numeric, pct, px } from "@pureform/core/ast";
+import { sampleCubicPath } from "@pureform/core";
+import type { CubicSegment } from "@pureform/core";
+import { cubicBezier, numeric, pct, px, spring } from "@pureform/core/ast";
 import type {
     ColorNode,
     CornerShapeKeyword,
     EasingNode,
     NumericScalarNode,
+    SpringNode,
 } from "@pureform/core/ast";
 import { defineProvider, gridLayout } from "@pureform/theme";
 import type {
@@ -26,6 +29,7 @@ import type {
     ShapeProvider,
     ShapeRole,
     SizeRole,
+    SpringRole,
     StateProvider,
     StateRole,
     TypographyProvider,
@@ -257,19 +261,84 @@ export const MATERIAL_DURATIONS: Record<DurationRole, number> = {
     extraLong4: 1000,
 };
 
-/** Material's easing tokens. CSS has no path easing, so `emphasized` uses the standard curve,
- *  as Material's web components do. */
+// M3's emphasized easing is a path of two cubic segments, not one cubic Bézier (Android's
+// `PathInterpolator`), from material-components-android's motion tokens
+// (`m3_sys_motion_easing_emphasized_path_data`):
+// https://github.com/material-components/material-components-android/blob/master/lib/java/com/google/android/material/motion/res/values/tokens.xml
+const EMPHASIZED_PATH: CubicSegment[] = [
+    [
+        [0, 0],
+        [0.05, 0],
+        [0.133333, 0.06],
+        [0.166666, 0.4],
+    ],
+    [
+        [0.166666, 0.4],
+        [0.208333, 0.82],
+        [0.25, 1],
+        [1, 1],
+    ],
+];
+
+/** Material's easing tokens, from Compose's `MotionTokens` (which m3.material.io lists too):
+ *  https://github.com/androidx/androidx/blob/androidx-main/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/MotionTokens.kt
+ *
+ *  `emphasized` is M3's two-segment path, which CSS can now write as `linear()`: each segment
+ *  is sampled densely along its parameter and the points simplified to the fewest that stay
+ *  within 0.001 of the path (`sampleCubicPath`), about 45 stops. (Material's web components
+ *  use the standard curve in its place.) The emphasized accelerate and decelerate curves are
+ *  Compose's and m3.material.io's; material-components-android rounds them differently,
+ *  `(0.3, 0, 0.8, 0.2)` and `(0.1, 0.7, 0.1, 1)`. */
 export const MATERIAL_EASINGS: Record<EasingRole, EasingNode> = {
     standard: cubicBezier([0.2, 0, 0, 1]),
     standardAccelerate: cubicBezier([0.3, 0, 1, 1]),
     standardDecelerate: cubicBezier([0, 0, 0, 1]),
-    emphasized: cubicBezier([0.2, 0, 0, 1]),
+    emphasized: sampleCubicPath(EMPHASIZED_PATH, { precision: 0.001 }),
     emphasizedAccelerate: cubicBezier([0.3, 0, 0.8, 0.15]),
     emphasizedDecelerate: cubicBezier([0.05, 0.7, 0.1, 1]),
     linear: cubicBezier([0, 0, 1, 1]),
 };
 
+/** Material's two motion schemes: `standard`, for most apps, and `expressive`, whose spatial
+ *  springs are softer and bounce. */
+export type MaterialMotionScheme = "standard" | "expressive";
+
+const springOf = (stiffness: number, damping: number): SpringNode =>
+    spring({ stiffness, damping });
+
+/** Material 3 Expressive's springs per motion scheme: stiffness and damping ratio (mass 1), from
+ *  Compose's `StandardMotionTokens` and `ExpressiveMotionTokens`:
+ *  https://github.com/androidx/androidx/blob/androidx-main/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/StandardMotionTokens.kt
+ *  https://github.com/androidx/androidx/blob/androidx-main/compose/material3/material3/src/commonMain/kotlin/androidx/compose/material3/tokens/ExpressiveMotionTokens.kt
+ *  (material-components-android's `m3_sys_motion_{standard,expressive}_spring_*` agree). */
+export const MATERIAL_SPRINGS: Record<
+    MaterialMotionScheme,
+    Record<SpringRole, SpringNode>
+> = {
+    standard: {
+        spatialFast: springOf(1400, 0.9),
+        spatialDefault: springOf(700, 0.9),
+        spatialSlow: springOf(300, 0.9),
+        effectsFast: springOf(3800, 1),
+        effectsDefault: springOf(1600, 1),
+        effectsSlow: springOf(800, 1),
+    },
+    expressive: {
+        spatialFast: springOf(800, 0.6),
+        spatialDefault: springOf(380, 0.8),
+        spatialSlow: springOf(200, 0.8),
+        effectsFast: springOf(3800, 1),
+        effectsDefault: springOf(1600, 1),
+        effectsSlow: springOf(800, 1),
+    },
+};
+
 export interface MaterialMotionOptions {
+    /** The motion scheme whose springs to use. Default `standard`. */
+    scheme?: MaterialMotionScheme;
+    /** Change or add springs. */
+    springs?: Partial<Record<SpringRole, SpringNode>> &
+        Record<string, SpringNode>;
     /** Change or add durations, in ms. */
     durations?: Partial<Record<DurationRole, number>> & Record<string, number>;
     /** Change or add easings. */
@@ -292,5 +361,9 @@ export const materialMotion = (
                 }).map(([name, value]) => [name, numeric(value, "ms")]),
             ) as Record<DurationRole, NumericScalarNode>,
             easings: { ...MATERIAL_EASINGS, ...options.easings },
+            springs: {
+                ...MATERIAL_SPRINGS[options.scheme ?? "standard"],
+                ...options.springs,
+            },
         }),
     });
