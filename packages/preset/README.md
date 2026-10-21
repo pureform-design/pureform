@@ -894,6 +894,17 @@ icon from the theme's color groups (`loading` takes `primary`); every Material p
 each toast with Zag's stacking variables, and the root transitions its transform, opacity and
 height (the movement drops out under reduced motion).
 
+## Paginator
+
+`paginator` (Angular Material parity; M3 has none) is the row under a table or list: `pageSize`
+(its `pageSizeLabel` and the `pageSizeSelect` box around the library's select), the `rangeLabel`
+("1 – 10 of 100") and the `actions` row of the `firstTrigger`, `prevTrigger`, `nextTrigger` and
+`lastTrigger` (the library's icon buttons; the part's class goes on the button). No variants and
+no compounds: the row follows the theme's density (`minHeight` is `dense(56)`), ends at the inline
+end, and `pageSizeSelect` hands the select a shorter field through `providedTokens`
+(`pageSizeFieldHeight`, 40). Tokens: `container` (surface), `content`, `height`, `padding`, `gap`,
+`pageSizeGap`, `pageSizeWidth`, `rangeStart` and `rangeEnd`.
+
 ## Time picker and time input
 
 `timePicker` is Material's time picker: the `headline`, a `body` row with the `hourSelector`,
