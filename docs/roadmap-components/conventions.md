@@ -105,7 +105,11 @@ hints split cleanly).
 2. Search for duplication the hints missed: components' token blocks, structural builders,
    shape and state-layer helpers, binding wrappers, tests' setup. Compare the sibling files
    side by side.
-3. Extract shared code to the suggested homes. Prefer the preset's shared helpers
+3. Before each extraction, check that it makes sense logically, the duplication is obvious, and
+   the shared code is flexible enough for future changes
+   ([guidelines §4](../design/component-guidelines.md#4-variants-without-explosion)). If any
+   check fails, leave it and say why in the context. Otherwise extract shared code to the
+   suggested homes. Prefer the preset's shared helpers
    (`shared.ts`, `shaped.ts`, `list.ts`) and binding-core's component helpers over new
    packages.
 4. **Output must not change:** run the equivalence checks (React Native resolved styles and

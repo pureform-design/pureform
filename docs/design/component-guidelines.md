@@ -86,6 +86,17 @@ Every new variant group follows `component-architecture.md` §5.5:
 - What stays a compound needs a token value from one group _and_ a colour role from another.
 - Count compounds before and after, and note the number in the gap analysis.
 
+**Before extracting shared code**, check all three, and leave the code where it is if any fails:
+
+1. **It makes sense logically.** The pieces are the same concept, not two things that happen to
+   look alike today (the same values by coincidence don't count).
+2. **The duplication is obvious.** Someone reading the copies side by side would call them the
+   same; a helper that needs flags or branches to cover each caller isn't sharing one thing.
+3. **The shared code can take future changes.** It can grow the variations the roadmap or the
+   spec already points to without breaking its other users or turning into a pile of options.
+
+Record a skipped extraction and the failing check in the context's refactoring hints.
+
 ## 5. Theme conformance
 
 A component conforms to the theme **whether the theme is static or dynamic**:
