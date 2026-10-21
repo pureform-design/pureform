@@ -1,12 +1,14 @@
 // Zag's steps, re-exported so bindings take every machine from one package, with the parts the
-// preset draws (a header's `label` and `caption`). The headers follow the tabs pattern: Zag's list
-// is a `tablist` and each header a `tab`, so only the current one is a tab stop (every one in
-// Zag's non-linear mode), and the arrow keys of the stepper's orientation (flipped under `rtl` for
-// a row), Home and End move focus between the headers, wrapping; Enter and Space press the focused
-// one, as the button does. A header can be marked invalid (`aria-invalid`, the error state) and
-// disabled (a completed step that isn't editable). A completed step's indicator is marked
-// `aria-checked`, which the preset reads. Each header emits to its own interaction source, keyed by
-// its index.
+// preset draws (a header's `label` and `caption`). A row follows the tabs pattern: Zag's list is a
+// `tablist` and each header a `tab`, so only the current one is a tab stop (every one in Zag's
+// non-linear mode). A column isn't a tab list, since its content sits among the headers: its list
+// is a `list` of steps, each header a button that discloses its content (`aria-expanded`, and
+// `aria-current` on the current one), and the content a `region`. In both, the arrow keys of the
+// orientation (a row's flip under `rtl`), Home and End move focus between the headers, wrapping;
+// Enter and Space press the focused one, as the button does. A header can be marked invalid
+// (`aria-invalid`, the error state) and disabled (a completed step that isn't editable). A
+// completed step's indicator is marked `aria-checked`, which the preset reads. Each header emits
+// to its own interaction source, keyed by its index.
 
 import type {
     Machine as AnyMachine,
@@ -53,7 +55,8 @@ export interface Api<T extends PropTypes = PropTypes> extends Omit<
     StepsApi<T>,
     "getTriggerProps"
 > {
-    /** A step's header: a `tab` that is a tab stop only when current, with the arrow keys. */
+    /** A step's header: a `tab` that is a tab stop only when current (a column's is a button that
+     *  discloses its content), with the arrow keys. */
     getTriggerProps(props: TriggerProps): T["button"];
     /** A step's label, the header's text. */
     getLabelProps(): T["element"];
@@ -107,7 +110,20 @@ export function connect<T extends PropTypes>(
             const props = normalize.button({
                 ...zag,
                 disabled,
-                tabIndex: stop ? 0 : -1,
+                tabIndex: vertical
+                    ? (zag["tabIndex"] as number)
+                    : stop
+                      ? 0
+                      : -1,
+                // A column's headers disclose their content, rather than switch tabs.
+                ...(vertical
+                    ? {
+                          role: undefined,
+                          "aria-selected": undefined,
+                          "aria-expanded": state.current,
+                          "aria-current": state.current ? "step" : undefined,
+                      }
+                    : {}),
                 "aria-invalid": invalid || undefined,
                 "data-invalid": invalid ? "" : undefined,
                 "data-disabled": disabled ? "" : undefined,
@@ -151,6 +167,39 @@ export function connect<T extends PropTypes>(
                 disabled,
                 normalize,
             ) as T["button"];
+        },
+        // A row is a tab list, whose children are the headers: an item is presentational, and a
+        // step is current by its header's `aria-selected`. A column is a list of steps.
+        getListProps() {
+            const list = api.getListProps() as Record<string, unknown>;
+            return normalize.element(
+                vertical
+                    ? {
+                          ...list,
+                          role: "list",
+                          "aria-owns": undefined,
+                          "aria-orientation": undefined,
+                      }
+                    : list,
+            );
+        },
+        getItemProps(props) {
+            const { "aria-current": _current, ...item } = api.getItemProps(
+                props,
+            ) as Record<string, unknown>;
+            return normalize.element({
+                ...item,
+                role: vertical ? "listitem" : "presentation",
+            });
+        },
+        getContentProps(props) {
+            const content = api.getContentProps(props) as Record<
+                string,
+                unknown
+            >;
+            return normalize.element(
+                vertical ? { ...content, role: "region" } : content,
+            );
         },
         getIndicatorProps(props) {
             const state = api.getItemState(props);
