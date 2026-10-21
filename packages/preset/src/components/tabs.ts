@@ -103,7 +103,6 @@ const { tokens, ref } = componentTokens("tabs", {
 
 const pressable = pressableRoot(ref);
 
-
 const SELECTED = slot("tab", "selected");
 
 // The tab's colors, with the active content color given: it tints the state layer too.

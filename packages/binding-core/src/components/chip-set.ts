@@ -47,10 +47,7 @@ export interface ChipSetBehaviorProps extends Controllable<"value", string[]> {
 
 /** Everything Root takes for itself, besides the element's own props and `as`. */
 export interface ChipSetRootOwnProps
-    extends
-        ChipSetVariantProps,
-        ChipSetChipVariantProps,
-        ChipSetBehaviorProps {
+    extends ChipSetVariantProps, ChipSetChipVariantProps, ChipSetBehaviorProps {
     /** The set element's test id: a prefix (`filters` → `filters-root`), or by part. */
     readonly testId?: TestIdOverride<ChipSetPart> | undefined;
 }
