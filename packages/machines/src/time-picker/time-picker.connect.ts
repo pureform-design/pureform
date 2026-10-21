@@ -81,7 +81,14 @@ export function connect<T extends PropTypes>(
 
     // Moves `of`'s value by a key; true when the key was one.
     const onKey = (of: TimeView, event: KeyEventLike) => {
-        const step = keyStep(event.key, of);
+        // Right to left, the left arrow moves forward, as on a slider.
+        const key =
+            dir === "rtl" && event.key === "ArrowLeft"
+                ? "ArrowRight"
+                : dir === "rtl" && event.key === "ArrowRight"
+                  ? "ArrowLeft"
+                  : event.key;
+        const step = keyStep(key, of);
         if (step === undefined) return false;
         event.preventDefault();
         if (!interactive) return true;
@@ -176,7 +183,8 @@ export function connect<T extends PropTypes>(
                 dir,
                 type: "button",
                 disabled,
-                "aria-label": translations[of],
+                // The name holds the shown value, so it reads as the button's text does.
+                "aria-label": `${translations[of]} ${displayValue(time, of, cycle)}`,
                 "aria-pressed": view === of,
                 "aria-controls": dom.getDialId(scope),
                 "data-view": of,

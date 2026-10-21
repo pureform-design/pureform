@@ -29,6 +29,7 @@ import {
     flex,
     none,
     px,
+    relative,
     solid,
     start,
     unitless,
@@ -105,6 +106,7 @@ export const timeInput = pf.slotComponent({
                 minuteField: field,
                 input: {
                     transition: stateTransition,
+                    position: relative,
                     width: ref("fieldWidth"),
                     height: ref("fieldHeight"),
                     borderRadius: ref("fieldRadius"),

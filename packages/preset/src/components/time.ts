@@ -10,6 +10,7 @@ import {
     hidden,
     pointer,
     px,
+    relative,
     row,
     solid,
     stretch,
@@ -117,6 +118,8 @@ export const timeSlots = (ref: TimeRef, fieldHeight: AliasNode) =>
         period: {
             ...focusRing(ref),
             transition: stateTransition,
+            // Positioned, so it stays over anything positioned behind it (a card's touch target).
+            position: relative,
             display: flex,
             alignItems: center,
             justifyContent: center,

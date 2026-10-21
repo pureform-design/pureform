@@ -158,6 +158,9 @@ export interface ComponentCase {
      *  mark: their physical borders, corners, and transform must match between `ltr` and `rtl`.
      *  The mirrored-box check can't see this, since their boxes are symmetric. */
     readonly unmirrored?: readonly string[] | undefined;
+    /** Parts that keep their place in both directions, such as a clock dial's numbers: their
+     *  boxes in `rtl` match their `ltr` boxes rather than mirror them. */
+    readonly fixed?: readonly string[] | undefined;
     /** Renderings with an overlay open. Zag places a floating overlay, and hides the page around a
      *  modal one, only in the browser, so the server rendering suite can't hydrate them unchanged:
      *  the accessibility and direction suites run these in the browser alone. */
