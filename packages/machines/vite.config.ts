@@ -26,6 +26,7 @@ export default createConfig({
                     ripple: "src/ripple/index.ts",
                     "text-field": "src/text-field/index.ts",
                     "time-picker": "src/time-picker/index.ts",
+                    table: "src/table/index.ts",
                     slider: "src/slider/index.ts",
                     "tags-input": "src/tags-input/index.ts",
                     toast: "src/toast/index.ts",

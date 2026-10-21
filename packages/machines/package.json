@@ -117,6 +117,13 @@
                 "default": "./dist/time-picker.mjs"
             }
         },
+        "./table": {
+            "types": "./dist/table/index.d.ts",
+            "import": {
+                "development": "./src/table/index.ts",
+                "default": "./dist/table.mjs"
+            }
+        },
         "./text-field": {
             "types": "./dist/text-field/index.d.ts",
             "import": {
