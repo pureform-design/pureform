@@ -2672,3 +2672,11 @@ card[interactive=true].root: bg oklch(0.9664 0.0085 325.891) | color oklch(0.224
     hovered-selected: bg color(srgb 0.8999 0.8816 0.9005)
     pressed-checked: bg color(srgb 0.8827 0.8647 0.8835)
     focused-checked: bg color(srgb 0.8827 0.8647 0.8835) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+carousel.mask: bg oklch(0.9151 0.0086 325.879) | color oklch(0.2245 0.0059 301.135) | outline none
+    hovered: bg color(srgb 0.8385 0.8203 0.8392)
+    focused: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
+    pressed: bg color(srgb 0.8227 0.8047 0.8235)
+    dragged: bg color(srgb 0.7752 0.7582 0.7764)
+    hovered-selected: bg color(srgb 0.8385 0.8203 0.8392)
+    pressed-checked: bg color(srgb 0.8227 0.8047 0.8235)
+    focused-checked: bg color(srgb 0.8227 0.8047 0.8235) | outline solid 3px oklch(0.4855 0.0342 300.379) offset 2px
