@@ -1,5 +1,18 @@
-import { defineConfig, defineStaticUtility } from "@pureform/core";
-import { alias, arg, hex, px, when } from "@pureform/core/ast";
+import {
+    defineComponent,
+    defineConfig,
+    defineStaticUtility,
+} from "@pureform/core";
+import {
+    alias,
+    arg,
+    hex,
+    px,
+    spring,
+    transition,
+    tween,
+    when,
+} from "@pureform/core/ast";
 import { buttonConfig } from "@pureform/core/fixtures/button";
 import type { CoreConfig } from "@pureform/core/types";
 import { materialShape } from "@pureform/material";
@@ -181,5 +194,55 @@ describe("compileCss (typed component tokens)", () => {
             css.indexOf("@layer pureform.tokens {"),
         );
         expect(css).toMatch(/transition: --components-circularProgress-value /);
+    });
+});
+
+describe("compileCss (springs)", () => {
+    const config: CoreConfig = {
+        tokens: {},
+        semanticTokens: {},
+        springs: {
+            spatialFast: spring({ stiffness: 800, damping: 0.6 }),
+        },
+        themes: {
+            stiff: {
+                springs: {
+                    spatialFast: spring({ stiffness: 1400, damping: 0.9 }),
+                },
+            },
+        },
+        components: {
+            box: defineComponent({
+                name: "box",
+                recipe: {
+                    base: {
+                        transition: transition(
+                            tween("transform", {
+                                spring: alias("springs", "spatialFast"),
+                            }),
+                        ),
+                    },
+                },
+            }),
+        },
+    };
+    const css = compileCss(config);
+
+    it("writes each spring as a duration var and a linear() easing var", () => {
+        const root = ruleOf(css, ":root");
+        expect(root).toMatch(/--springs-spatial-fast-duration: \d+ms;/);
+        expect(root).toMatch(
+            /--springs-spatial-fast-easing: linear\(0, [^;]*, 1\);/,
+        );
+        expect(ruleOf(css, '[data-theme="stiff"]')).toMatch(
+            /--springs-spatial-fast-duration: \d+ms;/,
+        );
+    });
+
+    it("reads the vars in a transition", () => {
+        expect(css).toContain(
+            "transition: transform var(--springs-spatial-fast-duration) var(--springs-spatial-fast-easing);",
+        );
+        expect(css).toMatchSnapshot();
     });
 });
