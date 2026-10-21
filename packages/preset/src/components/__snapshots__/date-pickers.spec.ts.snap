@@ -337,6 +337,7 @@ exports[`dateInput > compiles to a stable Panda slot recipe 1`] = `
       "paddingInlineEnd": "1px",
       "paddingInlineStart": "1px",
       "textAlign": "center",
+      "textStyle": "bodyLarge",
     },
     "selectedDate": {
       "color": "var(--components-dateInput-selectedDateColor, token(colors.onSurface))",
