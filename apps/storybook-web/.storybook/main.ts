@@ -21,9 +21,15 @@ import config from "../pureform.config.ts";
 const require = createRequire(import.meta.url);
 const RN_WEB = dirname(require.resolve("react-native-web/package.json"));
 
-/** Files Solid's plugin compiles: the Solid folder, and the Solid binding's sources (in dev,
- *  through its `development` export) or built JSX. */
-const SOLID = [/\/src\/solid\/.*\.[jt]sx?$/, /\/packages\/solid\/.*\.[jt]sx?$/];
+/** Files Solid's plugin compiles: the Solid folder, and every package that ships Solid JSX, which
+ *  is the Solid binding with its `storybook` hook. Its sources (in dev, through its
+ *  `development` export) or built JSX, by the workspace's path (Bun links it) and an installed
+ *  package's. */
+const SOLID = [
+    /\/src\/solid\/.*\.[jt]sx?$/,
+    /\/packages\/solid\/.*\.[jt]sx?$/,
+    /\/node_modules\/@pureform\/solid\/.*\.[jt]sx?$/,
+];
 
 const WEB_EXTENSIONS = [
     ...[".mjs", ".js", ".mts", ".ts", ".jsx", ".tsx"].map(
@@ -63,6 +69,7 @@ const pureformRn = (): Plugin => ({
 
 export default {
     framework: "@storybook/html-vite",
+    addons: ["@storybook/addon-vitest", "@storybook/addon-a11y"],
     stories: ["../src/**/*.stories.ts"],
     core: { disableTelemetry: true },
     viteFinal: (base) =>

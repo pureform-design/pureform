@@ -29,6 +29,7 @@ cache:
         - panda.pureform.ts
         - pureform.config.ts
         - pureform.codegen.ts
+        - stories.config.ts
         - ".storybook/**/*"
 
 tasks:
@@ -43,6 +44,9 @@ tasks:
 
   dev:
     exec: bun x storybook dev -p 6006 --no-open
+    dependencies:
+      - generate:stories
+      - prepare
 
   # Writes `.pureform/` (ignored) from `pureform.config.ts` with the built Panda adapter's codegen.
   generate:
@@ -50,6 +54,21 @@ tasks:
     exec: node node_modules/@pureform/cli/dist/pureform.mjs generate
     dependencies:
       - ^build
+
+  # Writes `src/stories/generated/` (ignored) from `stories.config.ts`. Node runs the script.
+  generate:stories:
+    exec: node scripts/generate-stories.ts
+    dependencies:
+      - ^build
+    cache:
+      key:
+        files:
+          append:
+            - scripts/**/*
+            - src/**/*.ts
+      output:
+        files:
+          - src/stories/generated/**/*
 
   prepare:
     exec: bun x panda codegen
@@ -61,6 +80,7 @@ tasks:
     exec: bun x storybook build
     dependencies:
       append:
+        - generate:stories
         - prepare
     cache:
       output:

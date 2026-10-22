@@ -6,9 +6,11 @@
     "type": "module",
     "scripts": {
         "dev": "storybook dev -p 6006 --no-open",
-        "build": "storybook build"
+        "build": "storybook build",
+        "generate": "node scripts/generate-stories.ts"
     },
     "dependencies": {
+        "@pureform/binding-core": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
@@ -38,15 +40,19 @@
         "@pureform/theme": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
+        "@storybook/addon-a11y": "catalog:",
+        "@storybook/addon-vitest": "catalog:",
         "@storybook/html-vite": "catalog:",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
         "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "react-native": "catalog:",
         "storybook": "catalog:",
         "typescript": "catalog:",
-        "vite": "catalog:"
+        "vite": "catalog:",
+        "vitest": "catalog:"
     }
 }

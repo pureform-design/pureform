@@ -8,8 +8,15 @@ import type { PandaCodegenOptions } from "@pureform/panda-adapter/codegen";
 /** The var prefix the preset names component vars with; `.pureform/`'s factories use it too. */
 export const PREFIX = "pf";
 
-/** The components the stories draw, and the ripple their indication draws with. */
-export const COMPONENTS = ["button", "ripple"];
+/** The components the stories draw (by their anatomy names), and the ripple their indication
+ *  draws with. Both registries, Panda's and React Native's runtime one, take this list. */
+export const COMPONENTS = [
+    "button",
+    "switchControl",
+    "textField",
+    "supportingText",
+    "ripple",
+];
 
 export const codegen = {
     target: "panda",

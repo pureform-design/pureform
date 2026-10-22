@@ -2,3 +2,4 @@ styled-system
 .pureform
 storybook-static
 *.log
+src/stories/generated
