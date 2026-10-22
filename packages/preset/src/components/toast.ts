@@ -23,7 +23,8 @@
 // its root; the bindings apply them as a transform, and the root transitions the transform and
 // height on the fast spatial spring, as Compose's snackbar host scales its snackbar in
 // (`SnackbarHost.kt`, `FastSpatial`), and the opacity on the fast effects spring (`FastEffects`;
-// the movement drops out under reduced motion).
+// the movement drops out under reduced motion). Leaving, it shrinks to 80% on the same spatial
+// spring as it fades, as the snackbar and the other popups do (`overlayShrinkOut`).
 
 import { typed } from "@pureform/core";
 import {
@@ -39,6 +40,7 @@ import {
     transparent,
     tween,
     unitless,
+    when,
 } from "@pureform/core/ast";
 import {
     radius,
@@ -164,9 +166,24 @@ export const toast = pf.slotComponent({
                 overflow: hidden,
                 transition: motionTransition(
                     tween("transform", MOVE),
+                    tween("scale", MOVE),
                     tween("height", MOVE),
                     tween("opacity", FADE),
                 ),
+                // Leaving, it shrinks to 80% as it fades, as Compose's snackbar host does
+                // (`FadeInFadeOutWithScale`); `scale` composes with Zag's transform. Under
+                // reduced motion it only fades.
+                rawRules: {
+                    css: {
+                        "&[data-state=closed]": {
+                            scale: when(
+                                "reducedMotion",
+                                unitless(1),
+                                unitless(0.8),
+                            ),
+                        },
+                    },
+                },
             },
             icon: {
                 position: absolute,

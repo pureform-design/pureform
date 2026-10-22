@@ -853,6 +853,67 @@ describe("the sheets", () => {
         ).toBeNull();
     });
 
+    it("lays a standalone bottom sheet out as its surface would be, whatever its parent's layout", async () => {
+        for (const layout of [
+            { alignItems: "center" },
+            { flexDirection: "row" },
+            {},
+        ] as const) {
+            await render(
+                <View style={{ width: 600, height: 400, ...layout }}>
+                    <BottomSheet modal={false}>Share to</BottomSheet>
+                </View>,
+            );
+            const root = sheet("bottom-sheet")!;
+            const parent = root.parentElement!.parentElement!;
+            expect(box(root).width).toBe(box(parent).width);
+            expect(box(root).left).toBe(box(parent).left);
+            expect(box(root).height).toBeGreaterThan(0);
+            // Its layer (`raised`, as a standard sheet) orders it among its parent's children.
+            expect(["auto", "0"]).not.toContain(
+                getComputedStyle(root.parentElement!).zIndex,
+            );
+        }
+    });
+
+    it("settles a dragged bottom sheet back when the app keeps it open", async () => {
+        const asked: boolean[] = [];
+        await render(
+            <BottomSheet
+                modal={false}
+                open
+                onOpenChange={(details) => asked.push(details.open)}
+            >
+                Share to
+            </BottomSheet>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const handle = document.querySelector<HTMLElement>(
+            '[data-testid="pf-bottom-sheet-drag-handle"]',
+        )!;
+        const start = box(root).top;
+        const at = (dy: number) => ({
+            bubbles: true,
+            button: 0,
+            buttons: 1,
+            clientX: box(handle).left + 4,
+            clientY: box(handle).top + 4 + dy,
+        });
+        await interact(async () => {
+            handle.dispatchEvent(new MouseEvent("mousedown", at(0)));
+            for (const dy of [20, 100, 200, 300]) {
+                handle.dispatchEvent(new MouseEvent("mousemove", at(dy)));
+            }
+        });
+        expect(box(root).top).toBeGreaterThan(start + 100);
+        await interact(async () => {
+            handle.dispatchEvent(new MouseEvent("mouseup", at(300)));
+        });
+        expect(asked).toEqual([false]);
+        await until(() => box(root).top === start);
+        expect(box(root).top).toBe(start);
+    });
+
     it("closes a modal side sheet from its close button, and its back button calls onBack", async () => {
         const backs: number[] = [];
         await render(

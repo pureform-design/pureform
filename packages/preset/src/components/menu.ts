@@ -30,6 +30,8 @@ import {
     column,
     flex,
     hidden,
+    platform,
+    visible,
     pct,
     px,
     start,
@@ -229,14 +231,16 @@ export const createMenu = <
                         },
                         false: {},
                     },
-                    // Each group a tile of the surface, apart from the next: the menu clips
-                    // the run's outside corners round, so a group needs no position.
+                    // Each group a tile of the surface, apart from the next, the run's outside
+                    // corners round. On the web the first and last groups round them, so the
+                    // menu doesn't clip, and a submenu drawn inside it shows whole; React Native
+                    // (whose submenus drill in) clips them.
                     grouped: {
                         true: {
                             root: {
                                 backgroundColor: transparent,
                                 borderRadius: ref("outerRadius"),
-                                overflow: hidden,
+                                overflow: platform({ css: visible }, hidden),
                                 gap: ref("groupGap"),
                                 paddingBlockStart: px(0),
                                 paddingBlockEnd: px(0),
@@ -246,6 +250,22 @@ export const createMenu = <
                                 borderRadius: ref("innerRadius"),
                                 paddingBlockStart: ref("paddingBlock"),
                                 paddingBlockEnd: ref("paddingBlock"),
+                                rawRules: {
+                                    css: {
+                                        "&:first-child": {
+                                            borderStartStartRadius:
+                                                ref("outerRadius"),
+                                            borderStartEndRadius:
+                                                ref("outerRadius"),
+                                        },
+                                        "&:last-child": {
+                                            borderEndStartRadius:
+                                                ref("outerRadius"),
+                                            borderEndEndRadius:
+                                                ref("outerRadius"),
+                                        },
+                                    },
+                                },
                             },
                         },
                         false: {},

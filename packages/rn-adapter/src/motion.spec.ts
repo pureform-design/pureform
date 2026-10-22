@@ -247,6 +247,30 @@ describe("presenceFrames", () => {
         ]);
     });
 
+    it("moves across only where either end does", () => {
+        expect(
+            presenceFrames({
+                from: { opacity: 0, translateX: 320 },
+                to: { opacity: 1, translateX: 0 },
+                duration: 150,
+                easing: "linear",
+            }),
+        ).toEqual([
+            {
+                opacity: 0,
+                transform: [
+                    { translateX: 320 },
+                    { translateY: 0 },
+                    { scale: 1 },
+                ],
+            },
+            {
+                opacity: 1,
+                transform: [{ translateX: 0 }, { translateY: 0 }, { scale: 1 }],
+            },
+        ]);
+    });
+
     it("leaves the transform out of a fade", () => {
         expect(
             presenceFrames({

@@ -128,8 +128,11 @@ The springs are Compose's: its menu, tooltip and snackbar host scale between 80%
 its sheets and drawers show on `DefaultSpatial` and hide on `FastEffects`, and its modal bottom
 sheet fades the scrim on `DefaultEffects` (the dialog, which has no motion of its own in Compose,
 follows the sheets). A bottom sheet let go of after a drag settles back on `spatialDefault`
-(`SHEET_SETTLE`, a transition of the `translate` the drag sets). A toast moves and resizes in its
-stack on `spatialFast` and fades on `effectsFast`. Under reduced motion only the fades run, on
+(`SHEET_SETTLE`, a transition of the `translate` the drag sets); a drag that closes it holds its
+`translate`, so the exit slides out from where it was let go, and a close the app refuses settles
+it back. A toast moves and resizes in its stack on `spatialFast` and fades on `effectsFast`;
+leaving, it shrinks to 80% on `spatialFast` as it fades, like the snackbar (its `scale`, apart from
+the transform Zag stacks it with). Under reduced motion only the fades run, on
 their springs.
 
 The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
@@ -662,8 +665,10 @@ with `aria-checked="true"`).
   builds those corners for any run of tiles.
 - `menu`: items are always interactive. Put items in `itemGroup`s with an optional
   `itemGroupLabel` (a select's option groups use the same parts), or separate them with the
-  `separator` component. `grouped` draws each group as its own tile, 2px apart; the menu clips
-  the run's outside corners to its `large` radius, so a group needs no position. `vibrant`
+  `separator` component. `grouped` draws each group as its own tile, 2px apart; on the web the
+  first and last groups round the run's outside corners to its `large` radius, so the menu
+  doesn't clip and a submenu inside it shows whole (React Native, whose submenus drill in, clips
+  them at the menu). `vibrant`
   swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The
   label always sits in `itemContent`, with `itemSupportingText` under it when there is some.
 - `buttonGroup` (`button-group.ts`): a row of buttons or icon buttons, spaced by its `size`

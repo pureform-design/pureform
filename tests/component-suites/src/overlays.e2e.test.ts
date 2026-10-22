@@ -2,10 +2,13 @@
 // the theme's stacking scale; it animates in as it opens, and as it closes it stays until its exit
 // animations end, then hides; under reduced motion it fades without moving (design doc §5.8).
 
+import { testIds } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
 import { COMPONENTS } from "./components";
 import type { ComponentCase, OverlayCase } from "./components";
+import { menu as menuCase } from "./components/menu";
+import { toastCase } from "./components/toast";
 import { animationsDone } from "./harness/animations";
 import { hostIn, mountCase, settlePlaced } from "./harness/page";
 import type { SceneProps, SceneProvider } from "./harness/scene";
@@ -122,5 +125,122 @@ describe.each(overlays)("$component", (component) => {
         await animationsDone();
         await frames(3);
         expect(shows(scene.host)).toBe(false);
+    });
+});
+
+// A toast isn't an overlay case (Zag adds it after hydration), but it leaves as the snackbar
+// does: shrinking to 80% on the fast spatial spring as it fades.
+describe("Toast", () => {
+    const leave = async (motion: "full" | "reduce") => {
+        const host = hostIn("<div data-host></div>");
+        mountCase(
+            toastCase,
+            { toasts: [{ type: "info", title: "Synced" }] },
+            { host, provider: { motion } },
+        );
+        let root: HTMLElement | null = null;
+        for (let i = 0; i < 100 && !root; i++) {
+            await frame();
+            root = document.querySelector<HTMLElement>(
+                `[data-testid="${testIds.toast.root}"]`,
+            );
+        }
+        if (!root) throw new Error("no toast");
+        await animationsDone();
+        expect(getComputedStyle(root).scale).not.toBe("0.8");
+        root.querySelector<HTMLElement>(
+            `[data-testid="${testIds.toast.closeTrigger}"]`,
+        )!.click();
+        await frames(2);
+        expect(root.dataset.state).toBe("closed");
+        return root;
+    };
+    const transitioned = (element: HTMLElement) =>
+        element
+            .getAnimations()
+            .map(
+                (animation) => (animation as CSSTransition).transitionProperty,
+            );
+
+    it("shrinks to 80% as it fades out", async () => {
+        const root = await leave("full");
+        expect(transitioned(root)).toContain("scale");
+        expect(getComputedStyle(root).scale).not.toBe("1");
+    });
+
+    it("only fades under reduced motion", async () => {
+        const root = await leave("reduce");
+        expect(transitioned(root)).not.toContain("scale");
+        expect(["1", "none"]).toContain(getComputedStyle(root).scale);
+    });
+});
+
+// A grouped menu rounds its run's outside corners without clipping, so a submenu, drawn inside
+// it, shows whole.
+describe("Menu", () => {
+    it("shows a submenu whole inside a grouped menu", async () => {
+        const host = hostIn("<div data-host></div>");
+        mountCase(
+            menuCase,
+            {
+                open: true,
+                items: [],
+                groups: [
+                    {
+                        id: "edit",
+                        label: "Edit",
+                        items: [
+                            { value: "cut", label: "Cut" },
+                            {
+                                value: "share",
+                                label: "Share",
+                                items: [
+                                    { value: "mail", label: "Mail" },
+                                    { value: "link", label: "Copy link" },
+                                ],
+                            },
+                        ],
+                    },
+                ],
+            },
+            { host },
+        );
+        await settlePlaced();
+        const menus = () => [
+            ...document.querySelectorAll<HTMLElement>('[role="menu"]'),
+        ];
+        const share = [
+            ...document.querySelectorAll<HTMLElement>('[role="menuitem"]'),
+        ].find((item) => item.textContent?.includes("Share"))!;
+        share.click();
+        for (let i = 0; i < 60 && !menus()[1]?.checkVisibility(); i++) {
+            await frame();
+        }
+        await animationsDone();
+        await settlePlaced();
+        const [parent, submenu] = menus();
+        const outer = parent!.getBoundingClientRect();
+        const inner = submenu!.getBoundingClientRect();
+        // It sits beside its parent, outside the parent's box.
+        expect(inner.left).toBeGreaterThanOrEqual(outer.right - 1);
+        const hit = document.elementFromPoint(
+            inner.left + inner.width / 2,
+            inner.top + inner.height / 2,
+        );
+        expect(submenu!.contains(hit)).toBe(true);
+        // Nothing between it and its parent's surface clips it, whatever contains it (a
+        // transform while the parent grows in makes the parent its containing block).
+        for (
+            let element = submenu!.parentElement;
+            element && element !== parent!.parentElement;
+            element = element.parentElement
+        ) {
+            expect(getComputedStyle(element).overflow).toBe("visible");
+        }
+        // The group still rounds the run's outside corners.
+        const group = parent!.querySelector<HTMLElement>('[role="group"]')!;
+        expect(getComputedStyle(group).borderTopLeftRadius).toBe(
+            getComputedStyle(parent!).borderTopLeftRadius,
+        );
     });
 });

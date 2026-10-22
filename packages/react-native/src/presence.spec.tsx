@@ -118,10 +118,13 @@ describe("the overlay motions", () => {
         const preset = await commands.overlayMotions();
         expect(OVERLAY_MOTIONS).toEqual(preset.motions);
         const used = new Set(
-            Object.values(OVERLAY_MOTIONS).flatMap((motion) => [
-                motion.enter.keyframes,
-                motion.exit.keyframes,
-            ]),
+            Object.values(OVERLAY_MOTIONS).flatMap((motion) =>
+                [motion.enter, motion.exit].flatMap((step) =>
+                    "rtl" in step
+                        ? [step.keyframes, step.rtl]
+                        : [step.keyframes],
+                ),
+            ),
         );
         expect(
             Object.fromEntries(
@@ -189,6 +192,37 @@ describe("the overlay motions", () => {
                 duration: Number(tokens["springs.effectsFast.duration"]) * 2,
             },
         });
+        // The sheets slide in from their edge, out of sight past it (the window's size), and
+        // back out; a side sheet from the left under right to left.
+        const window = { width: 400, height: 800 };
+        const bottom = overlayMotion("bottomSheet", tokens, false, 1, window);
+        expect(bottom.enter).toMatchObject({
+            from: { opacity: 0, translateY: 800 },
+            to: { opacity: 1, translateY: 0 },
+            duration: Number(tokens["springs.spatialDefault.duration"]),
+            fade: { duration: Number(tokens["springs.effectsFast.duration"]) },
+        });
+        expect(bottom.exit).toMatchObject({
+            from: { translateY: 0 },
+            to: { opacity: 0, translateY: 800 },
+            duration: Number(tokens["springs.effectsFast.duration"]),
+        });
+        const side = (rtl: boolean) =>
+            overlayMotion("sideSheet", tokens, false, 1, window, rtl);
+        expect(side(false).enter).toMatchObject({
+            from: { translateX: 400 },
+            to: { translateX: 0 },
+        });
+        expect(side(true).exit).toMatchObject({
+            from: { translateX: 0 },
+            to: { translateX: -400 },
+        });
+        expect(
+            overlayMotion("sideSheet", tokens, true, 1, window).enter,
+        ).toMatchObject({ from: { opacity: 0 }, to: { opacity: 1 } });
+        expect(
+            overlayMotion("sideSheet", tokens, true, 1, window).enter.from,
+        ).not.toHaveProperty("translateX");
         const reduced = overlayMotion("dialog", tokens, true);
         expect(reduced.enter.spring).toMatchObject({
             stiffness: Number(tokens["springs.effectsFast.stiffness"]),
@@ -371,7 +405,10 @@ it("shows and hides at once on an engine without presence", async () => {
     }
     await render(
         <open.Holder>{(value) => <Probe open={value} />}</open.Holder>,
-        { ...still, name: "still" },
+        {
+            ...still,
+            name: "still",
+        },
     );
     expect(present.at(-1)).toBe(true);
     present = [];

@@ -73,14 +73,18 @@ export interface BottomSheetProps extends BottomSheetVariantProps {
 const NEEDS_CLOSE: () => void = () => {};
 
 function BottomSheetImpl(
-    props: BottomSheetProps & { readonly close?: (() => void) | undefined },
+    props: BottomSheetProps & {
+        readonly close?: (() => void) | undefined;
+        /** Whether the modal sheet holding it is open. */
+        readonly shown?: boolean | undefined;
+    },
 ): ReactNode {
     const engine = useEngine();
     const { styles: s, views: v } = useComponentSlots<Part>(
         "bottomSheet",
         bottomSheetSelection(props),
     );
-    const presence = useOverlayPresence(props.open, "dialog");
+    const presence = useOverlayPresence(props.open, "bottomSheet");
     const height = useRef(0);
     // A standard sheet asks to close through `onOpenChange`; showing it is the app's.
     const close =
@@ -104,11 +108,21 @@ function BottomSheetImpl(
                 : themeSpring("spatialDefault", tokens, timeScale),
         );
     });
+    // Whether it's still open: the modal's state, or as a surface, its `open`.
+    const shown = useRef(true);
+    shown.current = (props.shown ?? props.open) !== false;
     // Each time it opens, it starts where it rests.
     useEffect(() => {
-        if (props.open !== false) drag.setValue(0);
-    }, [props.open, drag]);
-    useEffect(() => () => stopSettle.current(), []);
+        if (shown.current) drag.setValue(0);
+    }, [props.shown, props.open, drag]);
+    const checking = useRef(0);
+    useEffect(
+        () => () => {
+            stopSettle.current();
+            cancelAnimationFrame(checking.current);
+        },
+        [],
+    );
     // A drag down on the handle past a quarter of the sheet's height closes it; it leaves from
     // where the drag left it.
     const pan = useMemo(
@@ -123,12 +137,11 @@ function BottomSheetImpl(
                 onPanResponderRelease: (_, gesture) => {
                     if (height.current > 0 && gesture.dy > height.current / 4) {
                         latestClose();
-                        // A sheet that stays (one the app keeps open) settles back.
-                        if (
-                            props.close === undefined &&
-                            props.onOpenChange === undefined
-                        )
-                            latestSettle(gesture.vy);
+                        // A sheet that stays (one the app keeps open, or one that can't
+                        // close) settles back once the close has had its render.
+                        checking.current = requestAnimationFrame(() => {
+                            if (shown.current) latestSettle(gesture.vy);
+                        });
                         return;
                     }
                     latestSettle(gesture.vy);
@@ -142,11 +155,11 @@ function BottomSheetImpl(
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
     // The drag moves a plain Animated view around the surface, apart from the engine's enter
-    // and exit on the surface itself.
+    // and exit on the surface itself. The view takes the surface's place in its parent's layout
+    // (its size, margins, position and layer), and the surface fills it.
+    const [placed, own] = placement(s.root ?? {});
     return (
-        <Animated.View
-            style={[styles.dragged, { transform: [{ translateY: drag }] }]}
-        >
+        <Animated.View style={[placed, { transform: [{ translateY: drag }] }]}>
             <Root.View
                 {...presence.props}
                 role="dialog"
@@ -158,7 +171,7 @@ function BottomSheetImpl(
                 }) => {
                     height.current = event.nativeEvent.layout.height;
                 }}
-                style={{ ...s.root, ...presence.style }}
+                style={{ ...own, ...presence.style }}
                 testID={id("root")}
             >
                 {props.dragHandle === false ? null : (
@@ -201,6 +214,7 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
     const { open, presence, close, show } = useModalOverlay(
         "BottomSheet",
         props,
+        "bottomSheet",
     );
     const given: BottomSheetTriggerProps = {
         onPress: show,
@@ -220,23 +234,61 @@ function ModalBottomSheet(props: BottomSheetProps): ReactNode {
                     onPressOutside={close}
                     positionerStyle={styles.positioner}
                 >
-                    <Surface {...surface} close={close} />
+                    <Surface {...surface} close={close} shown={open} />
                 </ModalScrimLayer>
             </ModalWindow>
         </>
     );
 }
 
+// The surface's style that places it in its parent, which the drag's view takes.
+const PLACEMENT = new Set([
+    "position",
+    "top",
+    "right",
+    "bottom",
+    "left",
+    "start",
+    "end",
+    "zIndex",
+    "alignSelf",
+    "flex",
+    "flexGrow",
+    "flexShrink",
+    "flexBasis",
+    "width",
+    "minWidth",
+    "maxWidth",
+    "height",
+    "minHeight",
+    "maxHeight",
+]);
+
+const placement = (
+    style: Record<string, unknown>,
+): [placed: Record<string, unknown>, own: Record<string, unknown>] => {
+    const placed: Record<string, unknown> = {};
+    // The surface fills the drag's view, and shrinks with it.
+    const own: Record<string, unknown> = {
+        flexGrow: 1,
+        flexShrink: 1,
+        minHeight: 0,
+    };
+    for (const [key, value] of Object.entries(style)) {
+        if (
+            PLACEMENT.has(key) ||
+            key.startsWith("margin") ||
+            key.startsWith("inset")
+        )
+            placed[key] = value;
+        else own[key] = value;
+    }
+    return [placed, own];
+};
+
 // Against the bottom edge, leaving room at the top, as the web's positioner does
 // (`bottomSheetPositionerLayout`).
 const styles = StyleSheet.create({
-    // Passes the surface's layout through: as wide as where it's placed, and no taller.
-    dragged: {
-        alignSelf: "stretch",
-        flexShrink: 1,
-        maxHeight: "100%",
-        minHeight: 0,
-    },
     positioner: {
         position: "absolute",
         top: 0,

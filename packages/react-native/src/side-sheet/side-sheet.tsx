@@ -90,7 +90,7 @@ function SideSheetImpl(
         "sideSheet",
         sideSheetSelection(props),
     );
-    const presence = useOverlayPresence(props.open, "dialog");
+    const presence = useOverlayPresence(props.open, "sideSheet");
     const id = (part: Part) => testIdOf(sideSheetAnatomy, part, props.testId);
     if (!presence.present) return null;
     const Root = props.open === undefined ? v.root : engine;
@@ -172,7 +172,11 @@ function ModalSideSheet(props: SideSheetProps): ReactNode {
         closeOnEscape: _closeOnEscape,
         ...surface
     } = props;
-    const { open, presence, close, show } = useModalOverlay("SideSheet", props);
+    const { open, presence, close, show } = useModalOverlay(
+        "SideSheet",
+        props,
+        "sideSheet",
+    );
     const given: SideSheetTriggerProps = {
         onPress: show,
         "aria-haspopup": "dialog",

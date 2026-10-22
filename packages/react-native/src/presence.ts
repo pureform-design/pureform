@@ -1,6 +1,7 @@
 // Overlays' enter and exit, as the preset's keyframes run them on the web: a menu, select list,
 // tooltip, or snackbar grows from 80% as it fades in and shrinks back to 80% as it fades out; a
-// dialog comes down 48px as it fades in and goes back up as it fades out; a scrim fades. A step
+// dialog comes down 48px as it fades in and goes back up as it fades out; a bottom or side sheet
+// slides in from its edge and back out; a scrim fades. A step
 // that moves runs its movement on the theme's spatial spring and its fade alongside on its own
 // (an effects spring). Each is the theme's motion token, so a theme that changes them changes these too.
 // Under reduced motion each moving step gives way to its fade, as the web's rule does.
@@ -22,17 +23,24 @@ import type {
 import type { ThemeValues } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
 import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useWindowDimensions } from "react-native";
 
-import { useEngine, usePureform } from "./provider";
+import { useDirection, useEngine, usePureform } from "./provider";
 
-/** A frame as the theme gives it: a move down in pixels, or by a token's length times a
- *  factor. */
+/** A move as the theme gives it: pixels, a token's length times a factor, or a share of the
+ *  window's size along the move (`{ share: 1 }` for the web's `100%` of a sheet against that
+ *  edge: out of sight past it, whatever the sheet's own size). */
+export type OverlayMove =
+    | number
+    | { readonly token: string; readonly times: number }
+    | { readonly share: number };
+
+/** A frame as the theme gives it: its opacity and scale, and its moves across and down. */
 export interface OverlayFrame {
     readonly opacity?: number;
     readonly scale?: number;
-    readonly translateY?:
-        | number
-        | { readonly token: string; readonly times: number };
+    readonly translateX?: OverlayMove;
+    readonly translateY?: OverlayMove;
 }
 
 /** The preset's overlay keyframes (`OVERLAY_KEYFRAMES`), by name. */
@@ -54,6 +62,30 @@ export const OVERLAY_KEYFRAMES = {
     dialogSlideOut: {
         from: { translateY: 0 },
         to: { translateY: { token: "spacing.12", times: -1 } },
+    },
+    bottomSheetIn: {
+        from: { translateY: { share: 1 } },
+        to: { translateY: 0 },
+    },
+    bottomSheetOut: {
+        from: { translateY: 0 },
+        to: { translateY: { share: 1 } },
+    },
+    sideSheetIn: {
+        from: { translateX: { share: 1 } },
+        to: { translateX: 0 },
+    },
+    sideSheetOut: {
+        from: { translateX: 0 },
+        to: { translateX: { share: 1 } },
+    },
+    sideSheetInRtl: {
+        from: { translateX: { share: -1 } },
+        to: { translateX: 0 },
+    },
+    sideSheetOutRtl: {
+        from: { translateX: 0 },
+        to: { translateX: { share: -1 } },
     },
 } as const satisfies Record<
     string,
@@ -80,6 +112,8 @@ export type OverlayTiming =
  *  that only move, the fade's own timing alongside. */
 export type OverlayMotionStep = {
     readonly keyframes: KeyframesName;
+    /** The keyframes under right to left, where they differ (translation is physical). */
+    readonly rtl?: KeyframesName;
     readonly fade?: OverlayTiming;
 } & OverlayTiming;
 
@@ -110,6 +144,34 @@ export const OVERLAY_MOTIONS = {
             fade: { spring: "effectsFast" },
         },
     },
+    /** A bottom sheet: rises from the bottom edge, and goes back down. */
+    bottomSheet: {
+        enter: {
+            keyframes: "bottomSheetIn",
+            spring: "spatialDefault",
+            fade: { spring: "effectsFast" },
+        },
+        exit: {
+            keyframes: "bottomSheetOut",
+            spring: "effectsFast",
+            fade: { spring: "effectsFast" },
+        },
+    },
+    /** A side sheet: comes in from the end edge, and goes back out. */
+    sideSheet: {
+        enter: {
+            keyframes: "sideSheetIn",
+            rtl: "sideSheetInRtl",
+            spring: "spatialDefault",
+            fade: { spring: "effectsFast" },
+        },
+        exit: {
+            keyframes: "sideSheetOut",
+            rtl: "sideSheetOutRtl",
+            spring: "effectsFast",
+            fade: { spring: "effectsFast" },
+        },
+    },
     /** The scrim behind a dialog. */
     scrim: {
         enter: { keyframes: "overlayFadeIn", spring: "effectsDefault" },
@@ -121,7 +183,7 @@ export const OVERLAY_MOTIONS = {
 >;
 
 /** How an overlay enters and leaves: `popup` (a menu, select list, tooltip, or snackbar),
- *  `dialog`, or `scrim`. */
+ *  `dialog`, `bottomSheet`, `sideSheet`, or `scrim`. */
 export type OverlayMotionName = keyof typeof OVERLAY_MOTIONS;
 
 const FADES = {
@@ -134,6 +196,12 @@ const MOVES = new Set<KeyframesName>([
     "overlayShrinkOut",
     "dialogSlideIn",
     "dialogSlideOut",
+    "bottomSheetIn",
+    "bottomSheetOut",
+    "sideSheetIn",
+    "sideSheetOut",
+    "sideSheetInRtl",
+    "sideSheetOutRtl",
 ]);
 
 const numberOf = (value: unknown, fallback: number): number => {
@@ -142,25 +210,38 @@ const numberOf = (value: unknown, fallback: number): number => {
     return Number.isFinite(n) ? n : fallback;
 };
 
+/** The window's size, which a move by a share of it reads. */
+export interface OverlaySize {
+    readonly width: number;
+    readonly height: number;
+}
+
+const moveOf = (
+    move: OverlayMove,
+    tokens: ThemeValues,
+    length: number,
+): number =>
+    typeof move === "number"
+        ? move
+        : "share" in move
+          ? move.share * length
+          : numberOf(tokens[move.token], 0) * move.times;
+
 const frameOf = (
     frame: OverlayFrame,
     opacity: number,
     tokens: ThemeValues,
-): PresenceFrame => {
-    const move = frame.translateY;
-    return {
-        opacity: frame.opacity ?? opacity,
-        ...(frame.scale === undefined ? {} : { scale: frame.scale }),
-        ...(move === undefined
-            ? {}
-            : {
-                  translateY:
-                      typeof move === "number"
-                          ? move
-                          : numberOf(tokens[move.token], 0) * move.times,
-              }),
-    };
-};
+    size: OverlaySize,
+): PresenceFrame => ({
+    opacity: frame.opacity ?? opacity,
+    ...(frame.scale === undefined ? {} : { scale: frame.scale }),
+    ...(frame.translateX === undefined
+        ? {}
+        : { translateX: moveOf(frame.translateX, tokens, size.width) }),
+    ...(frame.translateY === undefined
+        ? {}
+        : { translateY: moveOf(frame.translateY, tokens, size.height) }),
+});
 
 /** A spring role's physics in a theme (its stiffness, damping coefficient, and mass), slowed
  *  `timeScale` times (`slowSpring`): none at no time at all. */
@@ -207,29 +288,34 @@ const timingOf = (
     };
 };
 
-/** An overlay's motion in a theme: its frames, its durations (`timeScale` times as long),
- *  curves and springs from the theme's tokens, and under `reducedMotion` its fade alone in
- *  place of each step that moves. */
+/** An overlay's motion in a theme: its frames (a move by a share of the window's `size`, and
+ *  under `rtl` its right-to-left keyframes), its durations (`timeScale` times as long), curves
+ *  and springs from the theme's tokens, and under `reducedMotion` its fade alone in place of
+ *  each step that moves. */
 export const overlayMotion = (
     name: OverlayMotionName,
     tokens: ThemeValues,
     reducedMotion: boolean,
     timeScale = 1,
+    size: OverlaySize = { width: 0, height: 0 },
+    rtl = false,
 ): PresenceMotion => {
     const step = (phase: PresencePhase): PresenceStep => {
         const {
-            keyframes: given,
+            keyframes: ltr,
+            rtl: mirrored,
             fade,
             ...timing
         } = OVERLAY_MOTIONS[name][phase] as OverlayMotionStep;
+        const given = rtl && mirrored ? mirrored : ltr;
         const moving = MOVES.has(given);
         const keyframes = reducedMotion && moving ? FADES[phase] : given;
         const frames: { from: OverlayFrame; to: OverlayFrame } =
             OVERLAY_KEYFRAMES[keyframes];
         const faded = OVERLAY_KEYFRAMES[FADES[phase]];
         const ends = {
-            from: frameOf(frames.from, faded.from.opacity, tokens),
-            to: frameOf(frames.to, faded.to.opacity, tokens),
+            from: frameOf(frames.from, faded.from.opacity, tokens, size),
+            to: frameOf(frames.to, faded.to.opacity, tokens, size),
         };
         // Reduced motion leaves the fade, on its own timing.
         if (reducedMotion && moving) {
@@ -286,7 +372,16 @@ export function useOverlayPresence(
     const tokens = useTokens();
     const reducedMotion = useReducedMotion();
     const { timeScale } = usePureform();
-    const computed = overlayMotion(motion, tokens, reducedMotion, timeScale);
+    const window = useWindowDimensions();
+    const rtl = useDirection() === "rtl";
+    const computed = overlayMotion(
+        motion,
+        tokens,
+        reducedMotion,
+        timeScale,
+        window,
+        rtl,
+    );
     // Kept while it's the same, so a render doesn't start a step over.
     const resolved = useMemo(() => computed, [JSON.stringify(computed)]);
     const moves = open !== undefined;
