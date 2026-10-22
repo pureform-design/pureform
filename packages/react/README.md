@@ -49,6 +49,7 @@ binding share one copy. See the [design doc](../../docs/design/component-archite
 | `tabs/`, `navigation-bar/`, `navigation-rail/`                                                                           | Navigation, in the same layout                                                                                                                                                                 |
 | `list/`, `list-item/`                                                                                                    | The list and list item, in the same layout                                                                                                                                                     |
 | `linear-progress/`, `circular-progress/`, `loading-indicator/`, `slider/`, `card/`, `search-bar/`, `app-bar/`, `ripple/` | Display components, in the same layout                                                                                                                                                         |
+| `fade-through/`                                                                                                          | The fade through, in the same layout                                                                                                                                                           |
 | `avatar/`, `media/`, `separator/`, `scrim/`, `supporting-text/`, `text/`, `icon/`, `touch-target/`                       | Single-part components: the export is Root itself                                                                                                                                              |
 | `single-part.tsx`                                                                                                        | `createSinglePart` (internal): a single-part component's Root                                                                                                                                  |
 | `navigation.tsx`                                                                                                         | `createNavigation` (internal): the navigation bar's and rail's parts and ready-made component                                                                                                  |
@@ -477,6 +478,8 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   takes a `header` (a `Header` part: menu button, FAB) and `modal`: it then renders in Zag's
   dialog over the scrim, along the viewport's start edge, open while `open` (controllable; Escape
   and a click on the scrim close it). `modal` is read once, when Root mounts.
+  The page content they switch isn't theirs: wrap it in a `FadeThrough` given the same `value`
+  for Material's transition between destinations.
   `aria-label`) of destinations, each a link when it has an `href` and a button otherwise, reached
   in turn with Tab (arrow keys do nothing). `value` (the current destination, controllable) marks
   its item with `aria-current` (`"page"` on a link, `"true"` on a button), which draws its pill and
@@ -551,6 +554,15 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   the input, and so do the ready-made's `aria-label`, `aria-labelledby`, `aria-describedby`,
   `list`, and autocomplete ARIA. Content: `leading`, `trailing`, `mirrorLeading`, `mirrorTrailing`.
   `scrolled` takes the scrolled container colour, for a bar in an app bar scrolled under.
+- **The fade through** (`@pureform/react/fade-through`, m3a) is Material's transition between content
+  that isn't spatially related: `<FadeThrough value={destination}>…</FadeThrough>` around the page
+  content, with the navigation bar's or rail's `value`. A new `value` fades the shown page out (it
+  grows to 105%), then the new one in as it grows from 80% on the theme's `spatialDefault` spring;
+  the fades are linear, `short2` out and `short4` in after `short2`, as Compose's 90 and 210ms.
+  Reduced motion keeps the fades only. The first page doesn't animate; the leaving page
+  (`data-state="closed"`) leaves the flow, is `aria-hidden` and `inert`, and goes once its
+  animations end (at once unstyled). Children are the content or a function of the value,
+  `{(value) => <Page of={value} />}`. Props: `value`, `testId`, `unstyled`, `as`, and the element's own.
 - **The ripple** is the layer a press ripple draws in: put `<Ripple />` inside a positioned
   surface. It runs pureform's ripple machine with `useReducedMotion()` (no ripples while motion is
   reduced) and the `ripple` slot's class for each ripple. Props: `disabled`, `effect`
