@@ -1064,7 +1064,9 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   spring and the fade alongside on its own duration and curve (`fade` on `OverlayMotionStep`;
   `animations(...)` in `@pureform/core` puts several keyframe animations in one `animation`
   value, CSS's comma list, through `AnimationNode.alongside`). The movement keyframes
-  (`overlayGrowIn`, `dialogSlideIn`/`Out`, the sheets') set only `transform`. Roles follow
+  (`dialogSlideIn`/`Out`, the sheets') set only `transform`; `overlayGrowIn`/`overlayShrinkOut`
+  set only the `scale` property, which composes with an overlay's own transform (f2c: a toast's
+  stacking, so the toast exits with `overlayShrinkOut` too). Roles follow
   Compose: the menu, select list, tooltip and snackbar grow on `spatialFast` (`Menu.kt`,
   `Tooltip.kt`, `SnackbarHost.kt`, `FastSpatial`); the sheets slide in on `spatialDefault` and out
   on `effectsFast` (`BottomSheet.kt`, `NavigationDrawer.kt`), and the dialog follows them. Decided

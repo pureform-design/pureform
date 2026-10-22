@@ -131,9 +131,10 @@ follows the sheets). A bottom sheet let go of after a drag settles back on `spat
 (`SHEET_SETTLE`, a transition of the `translate` the drag sets); a drag that closes it holds its
 `translate`, so the exit slides out from where it was let go, and a close the app refuses settles
 it back. A toast moves and resizes in its stack on `spatialFast` and fades on `effectsFast`;
-leaving, it shrinks to 80% on `spatialFast` as it fades, like the snackbar (its `scale`, apart from
-the transform Zag stacks it with). Under reduced motion only the fades run, on
-their springs.
+leaving, it shrinks to 80% on `spatialFast` as it fades, with the popups' `overlayShrinkOut`.
+`overlayGrowIn` and `overlayShrinkOut` animate the CSS `scale` property, not `transform`, so they
+compose with a transform of the overlay's own (the one Zag stacks a toast with). Under reduced
+motion only the fades run, on their springs.
 
 The menu follows Compose's `DropdownMenu` (scale and fade) rather than material-web's height
 reveal: a transform and opacity need no layout, and reduced motion keeps the fade alone. Under
@@ -668,7 +669,8 @@ with `aria-checked="true"`).
 - `menu`: items are always interactive. Put items in `itemGroup`s with an optional
   `itemGroupLabel` (a select's option groups use the same parts), or separate them with the
   `separator` component. `grouped` draws each group as its own tile, 2px apart; on the web the
-  first and last groups round the run's outside corners to its `large` radius, so the menu
+  first and last groups (marked `data-first`/`data-last` by the machine) round the run's outside
+  corners to its `large` radius, so the menu
   doesn't clip and a submenu inside it shows whole (React Native, whose submenus drill in, clips
   them at the menu). `vibrant`
   swaps the menu to the tertiary container's colors, and a chosen item to the tertiary's. The

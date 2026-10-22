@@ -34,6 +34,7 @@ import {
     column,
     flex,
     hidden,
+    literal,
     px,
     relative,
     start,
@@ -52,6 +53,7 @@ import {
 } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import { POPUP_MOTION, timedAnimation } from "./overlay";
 import {
     componentTokens,
     INDICATION_ROOT,
@@ -166,20 +168,23 @@ export const toast = pf.slotComponent({
                 overflow: hidden,
                 transition: motionTransition(
                     tween("transform", MOVE),
-                    tween("scale", MOVE),
                     tween("height", MOVE),
                     tween("opacity", FADE),
                 ),
                 // Leaving, it shrinks to 80% as it fades, as Compose's snackbar host does
-                // (`FadeInFadeOutWithScale`); `scale` composes with Zag's transform. Under
-                // reduced motion it only fades.
+                // (`FadeInFadeOutWithScale`): the popups' `overlayShrinkOut`, whose `scale`
+                // composes with Zag's transform. Under reduced motion it only fades.
                 rawRules: {
                     css: {
                         "&[data-state=closed]": {
-                            scale: when(
+                            animation: when(
                                 "reducedMotion",
-                                unitless(1),
-                                unitless(0.8),
+                                literal("none"),
+                                timedAnimation(
+                                    POPUP_MOTION.exit.keyframes,
+                                    { spring: POPUP_MOTION.exit.spring },
+                                    "forwards",
+                                ),
                             ),
                         },
                     },

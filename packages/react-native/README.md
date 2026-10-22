@@ -143,8 +143,8 @@ import { registry } from "./.pureform";
   turns false until the exit has run to its end, so render the overlay (or a `Modal`'s
   `visible`) from `present`, and give `style` and `props` to the engine's view that moves.
   `overlayMotion(name, tokens, reducedMotion, timeScale, size, rtl)` gives the frames and
-  timings; a sheet's slide is the window's `size` along its edge (the web's `100%` of the sheet:
-  out of sight either way), and the side sheet's runs from the left under `rtl`.
+  timings; a sheet slides by its own measured size along its edge (the web's `100%`), its enter
+  waiting, unseen, for its first layout, and the side sheet's runs from the left under `rtl`.
 - **Portals:** `Portal` renders its children at the nearest `PortalHost`, in a layer over the
   page, sorted by the theme's z-index for its `layer` and then by the order each opened (a portal
   inside another sorts over it), keeping the provider it was declared under. The root
@@ -285,7 +285,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
       the bottom sheet's drag handle (`dragHandleLabel`, "Close sheet"), on a press or a drag
       down past a quarter of its height, and the side sheet's close icon button (`closeLabel`).
       A drag that closes it lets it leave from where it was let go; a close the app refuses
-      (it keeps `open`) springs it back to rest. The drag moves a view around the surface that
+      (it keeps `open`) springs it back to rest. Given `onClose`, a dismissing drag asks it
+      first: `true` closes, `false` springs back, and a promise holds the sheet where it was let
+      go until it settles. The drag moves a view around the surface that
       takes the surface's place in its parent (size, margins, position, layer).
       The side sheet's header takes a back button when given `onBack`, and an `actions` row
       under the content. With `modal={false}` (and, for the side sheet, `coplanar`) each is its

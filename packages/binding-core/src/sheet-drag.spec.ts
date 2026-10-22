@@ -26,7 +26,7 @@ describe("dragToDismiss", () => {
         document.body.replaceChildren();
     });
 
-    const setup = () => {
+    const setup = (onClose?: () => boolean | Promise<boolean>) => {
         const sheet = document.createElement("div");
         sheet.style.height = "400px";
         const handle = document.createElement("button");
@@ -35,7 +35,7 @@ describe("dragToDismiss", () => {
         const dismiss = vi.fn();
         const click = vi.fn();
         document.addEventListener("click", click);
-        stop = dragToDismiss(handle, () => sheet, dismiss);
+        stop = dragToDismiss(handle, () => sheet, dismiss, onClose);
         return { sheet, handle, dismiss, click };
     };
 
@@ -96,6 +96,68 @@ describe("dragToDismiss", () => {
         await frame();
         expect(sheet.style.translate).toBe("");
         expect(sheet.style.transition).toBe("");
+    });
+
+    it("asks onClose first: false settles it back without closing", () => {
+        const onClose = vi.fn(() => false);
+        const { sheet, handle, dismiss } = setup(onClose);
+        handle.dispatchEvent(pointer("pointerdown", 100, 0));
+        handle.dispatchEvent(pointer("pointermove", 250, 1000));
+        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        expect(onClose).toHaveBeenCalledTimes(1);
+        expect(dismiss).not.toHaveBeenCalled();
+        expect(sheet.style.translate).toBe("");
+    });
+
+    it("holds where it was let go until onClose's promise settles, then leaves or settles back", async () => {
+        let answer: (yes: boolean) => void = () => {};
+        const { sheet, handle, dismiss } = setup(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    answer = resolve;
+                }),
+        );
+        const release = () => {
+            handle.dispatchEvent(pointer("pointerdown", 100, 0));
+            handle.dispatchEvent(pointer("pointermove", 250, 1000));
+            handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        };
+        release();
+        await frame();
+        expect(sheet.style.translate).toBe("0px 150px");
+        answer(false);
+        await nextChange();
+        expect(dismiss).not.toHaveBeenCalled();
+        expect(sheet.style.translate).toBe("");
+
+        sheet.setAttribute("data-state", "open");
+        dismiss.mockImplementation(() =>
+            sheet.setAttribute("data-state", "closed"),
+        );
+        release();
+        answer(true);
+        await nextChange();
+        expect(dismiss).toHaveBeenCalledTimes(1);
+        await frame();
+        // Closed: it leaves from where it was let go.
+        expect(sheet.style.translate).toBe("0px 150px");
+    });
+
+    it("ignores an answer that comes after another drag", async () => {
+        let answer: (yes: boolean) => void = () => {};
+        const { handle, dismiss } = setup(
+            () =>
+                new Promise<boolean>((resolve) => {
+                    answer = resolve;
+                }),
+        );
+        handle.dispatchEvent(pointer("pointerdown", 100, 0));
+        handle.dispatchEvent(pointer("pointermove", 250, 1000));
+        handle.dispatchEvent(pointer("pointerup", 250, 2000));
+        handle.dispatchEvent(pointer("pointerdown", 250, 3000));
+        answer(true);
+        await nextChange();
+        expect(dismiss).not.toHaveBeenCalled();
     });
 
     it("closes on a quick flick however short", () => {

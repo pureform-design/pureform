@@ -103,7 +103,7 @@ const Content: (props: BottomSheetPartProps) => JSX.Element = chrome.Content;
  *  quarter of its height. Name it with `aria-label`. It renders the drag handle component; give
  *  `as` to render another. */
 function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
-    const { scope, api, surface } = context.use("DragHandle");
+    const { scope, api, surface, props: root } = context.use("DragHandle");
     let stop: (() => void) | undefined;
     onCleanup(() => stop?.());
     return scope.render("dragHandle", {
@@ -111,7 +111,12 @@ function DragHandle(props: BottomSheetTriggerProps): JSX.Element {
         as: () => props.as ?? DragHandleComponent,
         ref: (element: HTMLElement) => {
             stop?.();
-            stop = dragToDismiss(element, surface, () => api().setOpen(false));
+            stop = dragToDismiss(
+                element,
+                surface,
+                () => api().setOpen(false),
+                () => root.onClose?.() ?? true,
+            );
         },
         machine: () =>
             mergeProps(

@@ -10,6 +10,7 @@ import {
     usePresence,
     useTokens,
 } from ".";
+import { BottomSheet } from "./bottom-sheet";
 import { Dialog } from "./dialog";
 import { animated } from "./engine";
 import type { MotionEngine } from "./engine";
@@ -34,6 +35,8 @@ beforeAll(async () => {
         "tooltip",
         "scrim",
         "ripple",
+        "bottomSheet",
+        "dragHandle",
     ]);
 });
 
@@ -351,6 +354,31 @@ describe.each(ENGINES)("with $name", (engine) => {
         const going = leaving.partway();
         expect(going).toBeDefined();
         expect(going!.translateY).toBeLessThan(0);
+    });
+
+    it("slides a bottom sheet by its own height, not the window's", async () => {
+        const open = outside(false);
+        await render(
+            <open.Holder>
+                {(value) => (
+                    <BottomSheet modal={false} open={value}>
+                        Share to
+                    </BottomSheet>
+                )}
+            </open.Holder>,
+            engine,
+        );
+        const root = () => byId("pf-bottom-sheet-root");
+        const entering = record(root);
+        await open.set(true);
+        await until(() => expect(frame(root()!)).toEqual(REST));
+        entering.stop();
+        const height = root()!.getBoundingClientRect().height;
+        expect(height).toBeLessThan(window.innerHeight / 2);
+        const coming = entering.partway();
+        expect(coming).toBeDefined();
+        expect(coming!.translateY).toBeGreaterThan(0);
+        expect(coming!.translateY).toBeLessThanOrEqual(height);
     });
 
     it("shows and hides a snackbar and a tooltip", async () => {

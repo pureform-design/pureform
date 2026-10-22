@@ -18,7 +18,6 @@ import {
     literal,
     mul,
     px,
-    scale,
     transform,
     translateY,
     unitless,
@@ -41,15 +40,16 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
         from: { opacity: unitless(1) },
         to: { opacity: unitless(0) },
     },
-    // A menu, tooltip, or snackbar grows from its anchor (fading in alongside).
+    // A menu, tooltip, or snackbar grows from its anchor (fading in alongside). It's the `scale`
+    // property, so it composes with a transform of the overlay's own (a toast's stacking).
     overlayGrowIn: {
-        from: { transform: transform(scale(unitless(0.8))) },
-        to: { transform: transform(scale(unitless(1))) },
+        from: { scale: unitless(0.8) },
+        to: { scale: unitless(1) },
     },
     // ...and shrinks back to it as it leaves (fading out alongside).
     overlayShrinkOut: {
-        from: { transform: transform(scale(unitless(1))) },
-        to: { transform: transform(scale(unitless(0.8))) },
+        from: { scale: unitless(1) },
+        to: { scale: unitless(0.8) },
     },
     // A dialog comes down into place, and goes back up.
     dialogSlideIn: {

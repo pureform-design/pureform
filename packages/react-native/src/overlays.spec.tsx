@@ -22,6 +22,7 @@ import type { TestRegistry } from "./testing/registry";
 import {
     byTestId,
     interact,
+    laidOut,
     mount,
     outside,
     pointerAway,
@@ -791,6 +792,34 @@ describe.each([animated, reanimated])(
 );
 
 describe("the sheets", () => {
+    // Drags the handle down by each of `moves` in turn, from where it rests now. Each move is
+    // its own task: the pan responder takes a move's distance over the time since the last, so
+    // moves dispatched within one tick (one timestamp) would be dropped.
+    const dragDown = async (handle: HTMLElement, moves: readonly number[]) => {
+        const left = handle.getBoundingClientRect().left + 4;
+        const top = handle.getBoundingClientRect().top + 4;
+        const at = (dy: number) => ({
+            bubbles: true,
+            button: 0,
+            buttons: 1,
+            clientX: left,
+            clientY: top + dy,
+        });
+        await interact(async () => {
+            handle.dispatchEvent(new MouseEvent("mousedown", at(0)));
+        });
+        for (const dy of moves) {
+            await interact(async () => {
+                handle.dispatchEvent(new MouseEvent("mousemove", at(dy)));
+            });
+        }
+        return () =>
+            interact(async () => {
+                handle.dispatchEvent(
+                    new MouseEvent("mouseup", at(moves.at(-1) ?? 0)),
+                );
+            });
+    };
     const sheet = (scope: string) =>
         document.querySelector<HTMLElement>(`[data-testid="pf-${scope}-root"]`);
     const press = (name: string) =>
@@ -891,24 +920,59 @@ describe("the sheets", () => {
         const handle = document.querySelector<HTMLElement>(
             '[data-testid="pf-bottom-sheet-drag-handle"]',
         )!;
+        // A drag closes it past a quarter of its height, which it knows once laid out.
+        await laidOut(root);
         const start = box(root).top;
-        const at = (dy: number) => ({
-            bubbles: true,
-            button: 0,
-            buttons: 1,
-            clientX: box(handle).left + 4,
-            clientY: box(handle).top + 4 + dy,
-        });
-        await interact(async () => {
-            handle.dispatchEvent(new MouseEvent("mousedown", at(0)));
-            for (const dy of [20, 100, 200, 300]) {
-                handle.dispatchEvent(new MouseEvent("mousemove", at(dy)));
-            }
-        });
+        const release = await dragDown(handle, [20, 100, 200, 300]);
         expect(box(root).top).toBeGreaterThan(start + 100);
-        await interact(async () => {
-            handle.dispatchEvent(new MouseEvent("mouseup", at(300)));
-        });
+        await release();
+        expect(asked).toEqual([false]);
+        await until(() => box(root).top === start);
+        expect(box(root).top).toBe(start);
+    });
+
+    it("holds a dragged bottom sheet until onClose answers, then springs back or leaves", async () => {
+        const asked: boolean[] = [];
+        let answer: (yes: boolean) => void = () => {};
+        await render(
+            <BottomSheet
+                modal={false}
+                open
+                onOpenChange={(details) => asked.push(details.open)}
+                onClose={() =>
+                    new Promise<boolean>((resolve) => {
+                        answer = resolve;
+                    })
+                }
+            >
+                Share to
+            </BottomSheet>,
+        );
+        const root = sheet("bottom-sheet")!;
+        const handle = document.querySelector<HTMLElement>(
+            '[data-testid="pf-bottom-sheet-drag-handle"]',
+        )!;
+        await laidOut(root);
+        const start = box(root).top;
+        const drag = async () =>
+            (await dragDown(handle, [20, 100, 200, 300]))();
+
+        // It holds where it was let go while the app thinks, then springs back on false.
+        await drag();
+        const held = box(root).top;
+        expect(held).toBeGreaterThan(start + 100);
+        await settle(100);
+        expect(box(root).top).toBe(held);
+        expect(asked).toEqual([]);
+        await interact(async () => answer(false));
+        await until(() => box(root).top === start);
+        expect(box(root).top).toBe(start);
+        expect(asked).toEqual([]);
+
+        // On true, it asks to close (and, kept open here, settles back).
+        await drag();
+        expect(box(root).top).toBeGreaterThan(start + 100);
+        await interact(async () => answer(true));
         expect(asked).toEqual([false]);
         await until(() => box(root).top === start);
         expect(box(root).top).toBe(start);

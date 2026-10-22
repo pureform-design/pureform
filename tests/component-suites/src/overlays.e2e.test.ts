@@ -155,22 +155,20 @@ describe("Toast", () => {
         expect(root.dataset.state).toBe("closed");
         return root;
     };
-    const transitioned = (element: HTMLElement) =>
+    const animationNames = (element: HTMLElement) =>
         element
             .getAnimations()
-            .map(
-                (animation) => (animation as CSSTransition).transitionProperty,
-            );
+            .map((animation) => (animation as CSSAnimation).animationName);
 
-    it("shrinks to 80% as it fades out", async () => {
+    it("shrinks to 80% as it fades out, with the popups' overlayShrinkOut", async () => {
         const root = await leave("full");
-        expect(transitioned(root)).toContain("scale");
+        expect(animationNames(root)).toContain("overlayShrinkOut");
         expect(getComputedStyle(root).scale).not.toBe("1");
     });
 
     it("only fades under reduced motion", async () => {
         const root = await leave("reduce");
-        expect(transitioned(root)).not.toContain("scale");
+        expect(animationNames(root)).not.toContain("overlayShrinkOut");
         expect(["1", "none"]).toContain(getComputedStyle(root).scale);
     });
 });
@@ -237,10 +235,15 @@ describe("Menu", () => {
         ) {
             expect(getComputedStyle(element).overflow).toBe("visible");
         }
-        // The group still rounds the run's outside corners.
+        // The group still rounds the run's outside corners, marked as the first and last.
         const group = parent!.querySelector<HTMLElement>('[role="group"]')!;
+        expect(group.hasAttribute("data-first")).toBe(true);
+        expect(group.hasAttribute("data-last")).toBe(true);
         expect(getComputedStyle(group).borderTopLeftRadius).toBe(
             getComputedStyle(parent!).borderTopLeftRadius,
+        );
+        expect(getComputedStyle(group).borderBottomRightRadius).toBe(
+            getComputedStyle(parent!).borderBottomRightRadius,
         );
     });
 });
