@@ -79,6 +79,7 @@ describe("pureform", () => {
             "dataTable",
             "gridList",
             "scrim",
+            "fadeThrough",
             "ripple",
             "icon",
             "touchTarget",
@@ -164,6 +165,7 @@ describe("pureform", () => {
             "dataTable",
             "gridList",
             "scrim",
+            "fadeThrough",
             "ripple",
         ]);
     });

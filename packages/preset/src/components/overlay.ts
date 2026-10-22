@@ -67,8 +67,9 @@ export const OVERLAY_KEYFRAMES: Record<string, Record<string, StyleMap>> = {
 };
 
 /** How long a motion takes and how it eases, as the theme names them: a duration and easing
- *  role, or a spring role, which sets both. */
-export type MotionTiming =
+ *  role, or a spring role, which sets both. Either may wait a duration role's `delay` first,
+ *  showing its first frame meanwhile. */
+export type MotionTiming = (
     | {
           readonly duration: DurationRole;
           readonly easing: EasingRole;
@@ -78,7 +79,8 @@ export type MotionTiming =
           readonly spring: SpringRole;
           readonly duration?: never;
           readonly easing?: never;
-      };
+      }
+) & { readonly delay?: DurationRole };
 
 /** One way in or out: the keyframes, and the theme's duration and easing for them, or its
  *  spring. A fade moves nothing, so reduced motion keeps it as it is. */
@@ -105,13 +107,19 @@ export interface OverlayMotion {
 const FADES = new Set([FADE_IN, FADE_OUT]);
 
 /** One run of a keyframes on a timing the theme names: a duration and easing role, or a spring
- *  role. `forwards` holds the last frame (an exit that stays gone until the overlay hides). */
+ *  role. `forwards` holds the last frame (an exit that stays gone until the overlay hides); a
+ *  delayed run also holds its first frame through the delay. */
 export const timedAnimation = (
     name: string,
     timing: MotionTiming,
     fillMode: "none" | "forwards" = "none",
-) =>
-    animation({
+) => {
+    const fill = timing.delay
+        ? fillMode === "forwards"
+            ? "both"
+            : "backwards"
+        : fillMode;
+    return animation({
         name,
         ...(timing.spring
             ? { spring: spring(timing.spring) }
@@ -119,8 +127,10 @@ export const timedAnimation = (
                   duration: duration(timing.duration),
                   easing: easing(timing.easing),
               }),
-        ...(fillMode === "forwards" ? { fillMode } : {}),
+        ...(timing.delay ? { delay: duration(timing.delay) } : {}),
+        ...(fill === "none" ? {} : { fillMode: fill }),
     });
+};
 
 /** One run of a keyframes over the theme's duration and easing; `forwards` holds the last frame
  *  (an exit that stays gone until the overlay hides). Shared by every overlay's motion. */
