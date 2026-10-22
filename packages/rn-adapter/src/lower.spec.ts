@@ -42,6 +42,8 @@ import { describe, expect, it } from "vitest";
 import { lowerRn } from "./lower";
 import { select } from "./select";
 import { resolveTheme } from "./theme";
+import { evaluate } from "./values";
+import type { Value } from "./values";
 
 const configWith = (root: StyleMap, extra: Partial<CoreConfig> = {}) =>
     ({
@@ -460,6 +462,93 @@ describe("lowerRn springs", () => {
             "springs.spatialFast.damping": dampingCoefficient(fast),
             "springs.spatialFast.mass": 1,
         });
+    });
+});
+
+describe("lowerRn spring component tokens", () => {
+    const fast = spring({ stiffness: 800, damping: 0.6 });
+    const slow = spring({ stiffness: 200, damping: 0.9 });
+    const config = {
+        tokens: {},
+        semanticTokens: {},
+        springs: { spatialFast: fast, spatialSlow: slow },
+        components: {
+            box: defineComponent({
+                name: "box",
+                tokens: {
+                    move: dynamic(
+                        ["components", "box", "move"],
+                        alias("springs", "spatialFast"),
+                    ),
+                },
+                recipe: {
+                    base: {
+                        transition: transition(
+                            tween("transform", {
+                                spring: alias("components", "box", "move"),
+                            }),
+                        ),
+                    },
+                },
+            }),
+        },
+        themes: {
+            slow: {
+                components: {
+                    box: {
+                        tokens: { move: alias("springs", "spatialSlow") },
+                    },
+                },
+            },
+            literal: {
+                components: { box: { tokens: { move: slow } } },
+            },
+        },
+    } as unknown as CoreConfig;
+    const [timing] = lowerRn(config).components.box!.entries[0]!.rules[0]!.style
+        .transition as Value[];
+
+    it("reads each of the spring's values through the token, falling back to the role's", () => {
+        const field = (name: string) => ({
+            $dyn: `components.box.move.${name}`,
+            default: { $ref: `springs.spatialFast.${name}` },
+        });
+        expect(timing).toMatchObject({
+            duration: field("duration"),
+            spring: {
+                type: "spring",
+                stiffness: field("stiffness"),
+                damping: field("damping"),
+                mass: field("mass"),
+            },
+        });
+    });
+
+    it("resolves to the role's real spring, and to a theme's override of the token", () => {
+        const spring = (theme?: string) =>
+            (
+                evaluate(
+                    timing!,
+                    resolveTheme(config, {
+                        scheme: "light",
+                        ...(theme ? { theme } : {}),
+                    }),
+                ) as { spring: unknown }
+            ).spring;
+        expect(spring()).toEqual({
+            type: "spring",
+            stiffness: 800,
+            damping: dampingCoefficient(fast),
+            mass: 1,
+        });
+        const slowSpring = {
+            type: "spring",
+            stiffness: 200,
+            damping: dampingCoefficient(slow),
+            mass: 1,
+        };
+        expect(spring("slow")).toEqual(slowSpring);
+        expect(spring("literal")).toEqual(slowSpring);
     });
 });
 

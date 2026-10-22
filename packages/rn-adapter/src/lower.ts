@@ -333,7 +333,7 @@ export const springTokenValues = (
     };
 };
 
-const SPRING_FIELDS = [
+export const SPRING_FIELDS = [
     "duration",
     "easing",
     "stiffness",
@@ -359,6 +359,18 @@ const springNodes = (value: SpringValue, ctx: Ctx): ValueNode[] => {
                 tokenValue(getByPath(ctx.config, value.path)) as SpringValue,
                 ctx,
             );
+        case "dynamic": {
+            // A component token holding a spring: each of its five values is its own key,
+            // which a theme override sets, falling back to its default's.
+            const defaults = value.default
+                ? springNodes(value.default as SpringValue, ctx)
+                : [];
+            return SPRING_FIELDS.map((field, i) => ({
+                type: "dynamic",
+                path: [...value.path, field],
+                ...(defaults[i] ? { default: defaults[i] } : {}),
+            }));
+        }
         case "platform":
             return springNodes(
                 (value.values[ctx.target] ?? value.default) as SpringValue,
