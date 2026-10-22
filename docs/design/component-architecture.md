@@ -1084,6 +1084,19 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
 - **Table sort arrow (f1d).** The arrow is always ↑ and turns over on `spatialFast` while its
   header cell is sorted descending (the `descending` state: `aria-sort` on the web, a state the
   React Native binding passes), its opacity on its tween; reduced motion keeps only the fade.
+- **Shared helpers (r7).** In the preset's `components/shared.ts`: `springTweens(role, moving,
+fades)` for a spring with tweened colors, `chevronTransition` (its `spatialFast` turn with the
+  color tween), `turnedOver(condition)` for the 180° turn itself (the expand indicator, the split
+  button's chevron and the sort arrow; the select's arrow also moves by `translateY`, so it
+  writes its own), and `shapeTransition(role, property)` for the corner (`cornerTransition`,
+  `spatialCornerTransition`) and clip-path morphs. The spring's closed-form motion is core's
+  `springState(spring, velocity, t)` (position and speed; `springAt` is its motion from rest);
+  rn-adapter's `springProgress` is the same for a spring whose damping is the coefficient. On
+  React Native, `springTo` (`animate/curve.ts`) starts every `Animated.spring` (`animate()` in
+  progress units resting within 0.001, `settle()` in pixels resting within 0.5), and
+  `springFieldNodes` gives a spring value's five per-field nodes for the theme and lowering.
+  On the web, `swallowNextClick(element)` (`@pureform/binding-core/dom`) drops the click a drag
+  ends with (the sheet's handle, the list item's swipe in both bindings).
 - **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
   draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
   material-components-android's tokens with `sampleCubicPath` (each segment densely along its

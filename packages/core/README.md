@@ -18,18 +18,18 @@ It depends on nothing else in the workspace.
 
 ## Architecture
 
-| Module                | What it holds                                                                                                                                |
-| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ast/nodes.ts`        | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes).   |
-| `ast/helpers/`        | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                                 |
-| `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                         |
-| `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                            |
-| `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                  |
-| `path.ts`             | Path resolution (`getByPath`, `resolveAlias`) and `validateConfig`, which `defineConfig` runs.                                               |
-| `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                             |
-| `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                   |
-| `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops. |
-| `spring.ts`           | Springs and `linear()` curves: `springAt`, `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points.       |
+| Module                | What it holds                                                                                                                                                                    |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `ast/nodes.ts`        | The node types: values (`literal`, `alias`, `dynamic`, `conditional`, `platform`, …) and conditions (portable states, slot states, sizes).                                       |
+| `ast/helpers/`        | Constructors for every node (`px`, `hex`, `alias`, `when`, `slot`, …), one module per group.                                                                                     |
+| `types.ts`            | The config schema: `CoreConfig`, component specs, utilities, themes.                                                                                                             |
+| `define.ts`           | Builders: `defineConfig`, `defineComponent`, `defineSlotComponent`, the utility builders, `mergeConfigs`, `meta`.                                                                |
+| `typed.ts`            | `typed()`: helpers typed from a registered config, so aliases and breakpoints autocomplete.                                                                                      |
+| `path.ts`             | Path resolution (`getByPath`, `resolveAlias`) and `validateConfig`, which `defineConfig` runs.                                                                                   |
+| `inline.ts`           | `inlineStyles` and `mergeStyles` for style maps.                                                                                                                                 |
+| `state-attributes.ts` | `STATE_ATTRIBUTES`: the `data-pf-*` names the web bindings set and the web adapters match.                                                                                       |
+| `motion.ts`           | `MOTION_ATTRIBUTE` and `MotionSetting` for the provider's motion setting, and `transitionMoves`/`valueTypeMoves`: what reduced motion stops.                                     |
+| `spring.ts`           | Springs and `linear()` curves: `springAt`, `springState` (with a starting velocity), `settleTime`, `sampleSpring`, `sampleCubicPath`, and reading and writing `linear()` points. |
 
 ## Public API
 

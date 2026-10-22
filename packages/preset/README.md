@@ -342,7 +342,8 @@ components unless you show every shape.
 
 `morph(from, to)` makes a shape that changes into another while pressed, settling on the
 `effectsDefault` spring (Compose's buttons and icon buttons morph without bounce); under reduced motion the shape changes at once and the colors still
-fade. It redraws both as the same number
+fade (`shapeTransition(role, "clipPath")` in `components/shared.ts`, the same helper the corner
+morphs use for `borderRadius`). It redraws both as the same number
 of curves, running the same direction from the closest starting points, which is what lets
 the browser animate between them.
 
@@ -1176,7 +1177,9 @@ lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
   `aria-expanded`) and `group` (a branch's children, `indent` from the start; no display of its
   own, so `hidden` hides it). Groups `density` and `color` (the selected row's container); 0
   compounds.
-- `expandIndicator(trailing, expanded)` (in `list.ts`) is the turning indicator both use.
+- `expandIndicator(trailing, expanded)` (in `list.ts`) is the turning indicator both use. Its turn
+  is `turnedOver(condition)` from `components/shared.ts`, which the split button's chevron and the
+  table's sort arrow use too.
 
 ## Grid list
 
