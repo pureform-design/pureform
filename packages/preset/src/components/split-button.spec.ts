@@ -32,11 +32,10 @@ describe("split button", () => {
         const base = recipe()?.base;
         expect(
             (
-                base?.trailingButton?.borderStartStartRadius as Record<
-                    string,
-                    string
-                >
-            )[EXPANDED],
+                base?.trailingButton?.borderStartStartRadius as
+                    | Record<string, string>
+                    | undefined
+            )?.[EXPANDED],
         ).toContain("splitButton-radius");
         expect(JSON.stringify(base?.trailingIcon?.transform)).toContain(
             "rotate(180deg)",
@@ -68,13 +67,16 @@ describe("FAB menu", () => {
     it("turns the FAB into a round close button in the main color while open", () => {
         const close = fab()?.base?.closeTrigger;
         expect(
-            (close?.backgroundColor as Record<string, string>)[EXPANDED],
+            (close?.backgroundColor as Record<string, string> | undefined)?.[
+                EXPANDED
+            ],
         ).toContain("fabMenu-accent,");
         expect(
             (
-                fab()?.variants?.size?.default?.closeTrigger
-                    ?.borderRadius as Record<string, string>
-            )[EXPANDED],
+                fab()?.variants?.size?.default?.closeTrigger?.borderRadius as
+                    | Record<string, string>
+                    | undefined
+            )?.[EXPANDED],
         ).toContain("fabMenu-closeRadius");
     });
 

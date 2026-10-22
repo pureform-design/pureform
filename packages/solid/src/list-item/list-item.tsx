@@ -391,7 +391,7 @@ function ReadyMade(props: ListItemProps): JSX.Element {
     );
 }
 
-const NoPart = (_: ListItemPartProps): JSX.Element => undefined;
+const NoPart: (props: ListItemPartProps) => JSX.Element = () => undefined;
 
 /** The ready-made item's row: Root and its parts, the indicator last when expandable. */
 function row(

@@ -154,10 +154,14 @@ describe("progress", () => {
     it("turns each half of the circular arc through its share of the value", () => {
         const base = compilePreset(configWith(circularProgress)).theme
             ?.slotRecipes?.circularProgress?.base;
-        expect((base?.endArc?.transform as { base: string }).base).toBe(
+        expect(
+            (base?.endArc?.transform as { base: string } | undefined)?.base,
+        ).toBe(
             "rotate(calc(-135deg + calc(min(var(--components-circularProgress-value, 0), 50) * 3.6deg)))",
         );
-        expect((base?.startArc?.transform as { base: string }).base).toBe(
+        expect(
+            (base?.startArc?.transform as { base: string } | undefined)?.base,
+        ).toBe(
             "rotate(calc(45deg + calc(max(calc(var(--components-circularProgress-value, 0) - 50), 0) * 3.6deg)))",
         );
     });

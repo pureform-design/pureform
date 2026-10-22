@@ -348,11 +348,10 @@ function SliderImpl(props: SliderProps): ReactNode {
                 // At once from the DOM on the web, so the first moves don't wait on measure,
                 // which answers a turn later; through measure on a device.
                 const rect = root.current?.getBoundingClientRect?.();
-                if (rect)
-                    vertical
-                        ? start(rect.top + window.scrollY, rect.height)
-                        : start(rect.left + window.scrollX, rect.width);
-                else
+                if (rect) {
+                    if (vertical) start(rect.top + window.scrollY, rect.height);
+                    else start(rect.left + window.scrollX, rect.width);
+                } else
                     root.current?.measure((_x, _y, width, height, left, top) =>
                         vertical ? start(top, height) : start(left, width),
                     );

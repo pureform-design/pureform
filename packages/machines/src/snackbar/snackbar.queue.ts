@@ -46,6 +46,8 @@ export function createQueue<T extends QueueOptions>(
     const listeners = new Set<() => void>();
     const set = (next: readonly QueueItem<T>[]) => {
         items = next;
+        // A copy, so a listener can unsubscribe while the queue notifies.
+        // oxlint-disable-next-line unicorn/no-useless-spread
         for (const listener of [...listeners]) listener();
     };
     const dismiss = (id?: string, reason: OpenChangeReason = "close") => {

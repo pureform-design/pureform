@@ -5,7 +5,7 @@
 
 import { searchBarAnatomy } from "@pureform/anatomy";
 import type { TestIdOverride } from "@pureform/anatomy";
-import { isPresent, searchBarSelection } from "@pureform/binding-core";
+import { searchBarSelection } from "@pureform/binding-core";
 import type {
     ChangeDetails,
     SearchBarContentProps,

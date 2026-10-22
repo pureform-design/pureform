@@ -41,8 +41,6 @@ export interface FullscreenDialogTriggerProps {
     readonly "aria-haspopup": "dialog";
 }
 
-const NO_ACTIONS: FullscreenDialogActions = { close: () => {} };
-
 export interface FullscreenDialogProps extends FullscreenDialogVariantProps {
     readonly headline?: ReactNode;
     /** The content, in the scrolling body. */

@@ -24,7 +24,7 @@ import * as toast from "@pureform/machines/toast";
 import { useTokens } from "@pureform/rn-adapter/react";
 import { useEffect, useLayoutEffect, useState } from "react";
 import type { ReactNode } from "react";
-import { Pressable, View } from "react-native";
+import { Pressable } from "react-native";
 
 import { useHeldTimeout } from "../overlay";
 import { testIdOf, withEngine } from "../parts";

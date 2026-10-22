@@ -375,8 +375,7 @@ export function createNavigation<C extends NavigationComponent>(config: {
                   </SectionLabel>
               </Show>
           )
-        : (_: NavigationPartProps & { readonly label: JSX.Element }) =>
-              undefined;
+        : (): JSX.Element => undefined;
 
     /** The ready-made component: a destination per item, each with every part in the preset's
      *  structure, the icon only when given. */
