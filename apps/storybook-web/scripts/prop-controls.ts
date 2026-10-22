@@ -152,7 +152,7 @@ const variantOf = (checker: ts.TypeChecker, property: ts.Symbol) => {
 export const controlOfType = (
     checker: ts.TypeChecker,
     type: ts.Type,
-): Pick<PropControl, "control" | "options"> => {
+): Pick<PropControl, "control" | "options" | "mapping"> => {
     const t = checker.getNonNullableType(type);
     if (t.flags & ts.TypeFlags.Boolean) return { control: "boolean" };
     if (t.flags & ts.TypeFlags.String) return { control: "text" };
