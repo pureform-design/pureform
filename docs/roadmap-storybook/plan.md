@@ -70,19 +70,29 @@ JSX is the hard part: Solid's and React's plugins both claim `.tsx`.
 - Renderer-specific code lives in separate folders: `src/solid/**` compiled by the Solid plugin
   (`include`), `src/react/**` and `src/native/**` by the React plugin (`exclude` the Solid
   folder). Each folder has its own `tsconfig.json` with its `jsxImportSource`.
-- `@pureform/solid` ships JSX, so the Solid plugin must include it (as `ssr.noExternal` does in
-  solid-demo).
+- **Solid's `include` (and React's `exclude`) names every package that ships Solid JSX:**
+  `@pureform/solid`, including its `storybook` export, by its workspace path
+  (`/packages/solid/`) and by its `node_modules` path (`/node_modules/@pureform/solid/`).
+- **Adapters and everything the generated stories import are JSX-free** (Solid through
+  `createComponent`, React through `createElement`), or a TypeScript project reference: the
+  root type check uses React's JSX, and a per-folder `tsconfig.json` doesn't stop it from
+  reading Solid's JSX it imports. Hooks with JSX are type-checked by their own package.
+- `.storybook/main.ts` runs under Node's TypeScript loading: relative imports need `.ts`.
 
-Spike this first (step 1): if the two plugins can't coexist cleanly, fall back to composition
-(one Storybook per renderer, joined with `refs`) and keep the same codegen.
+The spike (step 1, [spike.md](spike.md)) showed both plugins coexist in one build, so there's
+no composition fallback.
 
 ### Styling
 
 - Solid and React use the Panda target, like solid-demo and react-demo, with one shared
   `pureform.config.ts`.
-- React Native web uses `rn-adapter`'s runtime styles, like rn-web-demo.
-- One `theme` toolbar global (light, dark, and the named themes) applied by each adapter's
-  provider.
+- React Native web uses `rn-adapter`'s runtime styles from a virtual module
+  (`virtual:pureform-rn`, rn-web-demo's `pureformRn()`), not a second generated registry: the
+  bundler plugin writes one `.pureform/`, the Panda one. The component list
+  (`pureform.codegen.ts`'s `COMPONENTS`) serves both.
+- One `theme` toolbar global (light, dark, and the named themes), mapped to each renderer's
+  provider prop: Solid and React take `theme` (and dark is the `.dark` class Panda reads),
+  React Native takes `scheme` and `theme`.
 
 ## Codegen
 
@@ -147,8 +157,8 @@ codegen hooks (`transformSource`) run in the script.
 
 ## Steps
 
-1. **Spike:** `html-vite` host with one Solid and one React component on one page, both
-   plugins in one Vite config. Decide host vs composition.
+1. **Spike (done, [spike.md](spike.md)):** one `html-vite` host for every renderer; no
+   composition.
 2. **App skeleton:** `apps/storybook-web` with `package.json`, `project.omni.yaml` (extending
    `ts-vite-app`), `.storybook/main.ts` and `preview.ts`, Panda and pureform config copied from
    solid-demo.
