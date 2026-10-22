@@ -145,6 +145,11 @@ export const deriveAnatomy = (
             ]),
         ]),
         ...(indication ? { indication } : {}),
+        variants: Object.fromEntries(
+            Object.entries(spec.recipe.variants ?? {}).map(
+                ([variant, values]) => [variant, Object.keys(values)],
+            ),
+        ),
     };
 };
 

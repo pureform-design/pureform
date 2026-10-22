@@ -1,0 +1,90 @@
+// What `scripts/generate-stories.ts` needs besides the anatomy and the component cases: the
+// renderers, the shared hooks, and overrides (skips, args, schemes). Every component with an
+// anatomy and a case is drawn. See the README for adding to each.
+
+import { defineStories } from "./src/renderers/config";
+
+/** The fields' affixes: content in the ready-made components, flags in their variant props. */
+const AFFIXES = ["leadingIcon", "trailingIcon", "prefixText", "suffixText"];
+
+export default defineStories({
+    renderers: {
+        solid: {
+            package: "@pureform/solid",
+            adapter: "./src/solid/adapter.ts",
+            export: "solidAdapter",
+            hooks: "@pureform/solid/storybook",
+        },
+        react: {
+            package: "@pureform/react",
+            adapter: "./src/react/adapter.ts",
+            export: "reactAdapter",
+            hooks: "@pureform/react/storybook",
+        },
+        native: {
+            package: "@pureform/react-native",
+            adapter: "./src/native/adapter.ts",
+            export: "nativeAdapter",
+            hooks: "@pureform/react-native/storybook",
+            // React Native skipped for now; needs renderer-neutral readers. The cases read the
+            // web bindings' DOM (a button's `aria-pressed`, the switch's native input, the
+            // field's `data-pf-filled`), which React Native Web doesn't draw, so its stories
+            // run without the generated plays and stay out of the story tests. They still draw
+            // in Storybook.
+            casePlays: false,
+            tests: false,
+        },
+    },
+    skip: {
+        // Its case renders a toaster from `toasts` data (`createToaster` + `Toaster`, the
+        // suites' `ToastScene`); the binding exports no `Toast` that takes it.
+        Toast: "needs a toaster scene: the case's `toasts` aren't props of an export",
+        // Its case's `tiles` are data the suites' `GridListScene` turns into
+        // `GridList.Tile` children; `GridList` itself takes children, not `tiles`.
+        GridList:
+            "needs a tiles scene: the case's `tiles` aren't props of `GridList`",
+    },
+    schemes: ["light", "dark"],
+    // Floating and modal overlays open into the canvas; this keeps room for them.
+    overlayHeight: 480,
+    components: {
+        // Components whose variant props interface isn't `<Component>VariantProps`.
+        CircularProgress: { variantProps: "ProgressVariantProps" },
+        LinearProgress: { variantProps: "ProgressVariantProps" },
+        NavigationBar: { variantProps: "NavigationVariantProps" },
+        NavigationRail: { variantProps: "NavigationVariantProps" },
+        SelectionList: { variantProps: "ListVariantProps" },
+        // `ListVariantProps` is the items' defaults; the list's own `variant` is here.
+        List: { variantProps: "ListOwnVariantProps" },
+        // The ready-made fields take these as content (`leadingIcon: "@"`), which the variant
+        // props declare as the root's flags: a boolean control would draw "true".
+        TextArea: { controls: { exclude: AFFIXES } },
+        TagsInput: { controls: { exclude: AFFIXES } },
+        Select: { controls: { exclude: AFFIXES } },
+        Autocomplete: { controls: { exclude: AFFIXES } },
+        DateInput: { controls: { exclude: AFFIXES } },
+        DockedDatePicker: { controls: { exclude: AFFIXES } },
+        // The ready-made dialog's `icon` is the icon itself, not the variant's flag.
+        Dialog: { controls: { exclude: ["icon"] } },
+        TextField: {
+            controls: { exclude: AFFIXES },
+            // React Native Web: the disabled field's input is `disabled` now (not `readonly`)
+            // and passes, but its label is a plain text element, not the input's `<label>`, so
+            // axe holds its disabled color to the contrast ratio (React Native only; parameters
+            // can't vary by renderer).
+            stories: { Disabled: { parameters: { a11y: { test: "todo" } } } },
+        },
+        Carousel: {
+            // In the story tests axe finds focusable masks inside the items Zag hides
+            // (`aria-hidden-focus`), and the pinned copies' state play reads page 2 for 1: the
+            // items are sized from the row's width once mounted (the case's `measured`), which
+            // the Storybook canvas gives differently from the component suites' page.
+            parameters: { a11y: { test: "todo" } },
+            stories: {
+                Light: { tags: ["!test"] },
+                Dark: { tags: ["!test"] },
+            },
+        },
+    },
+    hooks: ["./src/hooks.ts"],
+});

@@ -28,8 +28,8 @@ when the list below looks out of date.
    bindings' `optimizeDeps.include` (`@pureform/machines > @zag-js/…`).
 7. **Adapters:** nothing by hand. Rebuild so the Panda, Tailwind, CSS and React Native
    codegen produce it, and extend the sampled codegen tests if the variant space grows.
-8. **Suites:** `tests/component-suites/src/components/<name>.ts` (renders and checks it on
-   every binding and target, including direction and indication), the browser suite's
+8. **Suites:** `packages/component-cases/src/cases/<name>.ts` (the case; `tests/component-suites` renders and checks it on
+   every binding and target, including direction and indication, and Storybook draws it), the browser suite's
    screenshots and Panda factory sampling, and the rn-web demo and Solid demo where a
    component belongs in a screen.
 9. **Docs:** the gap analysis (matrix row, verdicts, totals, §7), package READMEs, and the

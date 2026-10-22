@@ -14,7 +14,7 @@ import { userEvent } from "vitest/browser";
 
 import { harness } from "#binding";
 
-import { tabsCase } from "./components/tabs";
+import { tabsCase } from "./components";
 import { hydrate } from "./harness/hydration";
 import { mountCase, settlePlaced } from "./harness/page";
 import type { SceneProps, SceneProvider } from "./harness/scene";

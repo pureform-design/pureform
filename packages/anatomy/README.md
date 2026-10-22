@@ -46,6 +46,7 @@ interface ComponentAnatomy<
     readonly partNames: readonly P[]; // the AST's slots in order, then extra parts
     readonly parts: { readonly [K in P]: PartAnatomy<P> };
     readonly indication?: readonly IndicationAnatomy<P>[]; // one per interactive surface
+    readonly variants?: { readonly [variant: string]: readonly string[] }; // { variant: ["filled", …] }
 }
 
 interface IndicationAnatomy<P extends string = string> {
@@ -75,6 +76,10 @@ interface PartAnatomy<P extends string = string> {
   `mirrored` state, which every icon slot built with the preset's `iconBox` does.
 - Extra parts come after the slots, with `styled: false`. The select's `hiddenSelect` (Zag's
   hidden native `<select>`, §9.5) sits in `root`.
+- `variants` lists each of the recipe's variants with its values, in the recipe's order, as plain
+  data (`buttonAnatomy.variants.variant` is `["filled", "tonal", "outlined", "text", "elevated"]`;
+  a boolean variant's values are `"true"`/`"false"`, as the recipe keys them). Storybook's
+  controls read it. Every generated anatomy has it; the hand-written composites leave it out.
 - Names in attribute values and test ids are kebab case: `touchTarget` is
   `data-pf-part="touch-target"` and `pf-<scope>-touch-target`.
 - `indication` comes from the component spec's `indication`, which the preset declares beside

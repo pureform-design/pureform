@@ -5,10 +5,8 @@
 import { testIds } from "@pureform/anatomy";
 import { describe, expect, it } from "vitest";
 
-import { COMPONENTS } from "./components";
+import { COMPONENTS, menu as menuCase, toastCase } from "./components";
 import type { ComponentCase, OverlayCase } from "./components";
-import { menu as menuCase } from "./components/menu";
-import { toastCase } from "./components/toast";
 import { animationsDone } from "./harness/animations";
 import { hostIn, mountCase, settlePlaced } from "./harness/page";
 import type { SceneProps, SceneProvider } from "./harness/scene";

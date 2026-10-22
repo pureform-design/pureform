@@ -1,15 +1,35 @@
 // A story's `render` over every renderer: it mounts the toolbar's renderer into one element the
-// story keeps, updates it in place when only the args change, and remounts when the renderer does.
+// story keeps, updates it in place when only the args or the theme change, and remounts when the
+// renderer does. A renderer without the component shows so in the canvas.
 
 import type { StoryContext } from "@storybook/html-vite";
 
-import type { Args, MountHandle, RendererAdapter } from "./types";
+import { rendererArgs, type RendererHooks } from "./hooks";
+import type {
+    Args,
+    MountContext,
+    MountHandle,
+    RendererAdapter,
+    StoryTheme,
+} from "./types";
 
-/** Each renderer's adapter and component, by the `renderer` global's value. */
-export type Impls = Record<
-    string,
-    { adapter: RendererAdapter<any>; component: unknown }
->;
+/** A renderer's adapter, its hook, and its component (`undefined` where it has none). */
+export interface Impl {
+    readonly adapter: RendererAdapter<any>;
+    readonly hooks: RendererHooks;
+    readonly component: unknown;
+    /** `false`: the case's play tests are skipped in this renderer. */
+    readonly casePlays?: boolean;
+}
+
+/** Each renderer's implementation, by the `renderer` global's value. */
+export type Impls = Readonly<Record<string, Impl>>;
+
+/** The args each level gave, which a renderer's own args sit between. */
+export interface ArgLevels {
+    readonly shared: Args;
+    readonly component: Args;
+}
 
 let current:
     | { story: string; renderer: string; el: HTMLElement; handle: MountHandle }
@@ -19,20 +39,52 @@ let current:
 export const stats = { mounts: 0, updates: 0 };
 (globalThis as { __sbStats?: typeof stats }).__sbStats = stats;
 
+/** The `scheme` global (`system`, `light`, `dark`) and the `theme` global (`default` or a named
+ *  theme from the config). `system` forces nothing, so every renderer follows the OS. */
+export const storyTheme = (
+    globals: Readonly<Record<string, unknown>>,
+): StoryTheme => {
+    const scheme = globals["scheme"];
+    const theme = globals["theme"];
+    return {
+        scheme: scheme === "light" || scheme === "dark" ? scheme : undefined,
+        name:
+            theme === undefined || theme === "default"
+                ? undefined
+                : String(theme),
+    };
+};
+
 export const multiRender =
-    (impls: Impls) =>
+    (impls: Impls, levels: ArgLevels) =>
     (args: Args, context: StoryContext): HTMLElement => {
         const renderer = String(context.globals["renderer"] ?? "solid");
+        const impl = impls[renderer] ?? Object.values(impls)[0]!;
+        const props = rendererArgs(
+            impl.hooks,
+            args,
+            levels.shared,
+            levels.component,
+        );
+        const mount: MountContext = {
+            theme: storyTheme(context.globals),
+            globals: context.globals,
+            decorators: impl.hooks.decorators ?? [],
+        };
         if (current?.story === context.id && current.renderer === renderer) {
-            current.handle.update(args);
+            current.handle.update(props, mount);
             stats.updates++;
             return current.el;
         }
         current?.handle.unmount();
-        const impl = impls[renderer] ?? Object.values(impls)[0]!;
+        current = undefined;
         const el = document.createElement("div");
         el.dataset["renderer"] = renderer;
-        const handle = impl.adapter.mount(el, impl.component, args);
+        if (impl.component === undefined) {
+            el.textContent = `${context.title} isn't implemented in ${impl.adapter.title}.`;
+            return el;
+        }
+        const handle = impl.adapter.mount(el, impl.component, props, mount);
         stats.mounts++;
         current = { story: context.id, renderer, el, handle };
         return el;

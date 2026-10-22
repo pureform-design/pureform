@@ -1,0 +1,30 @@
+{
+    "name": "@pureform/component-cases",
+    "version": "0.0.0-semantically-released",
+    "description": "Each component's framework-neutral cases: props, examples, state, form and keyboard, for the shared suites and Storybook",
+    "type": "module",
+    "sideEffects": false,
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            },
+            "require": {
+                "development": "./src/index.ts",
+                "default": "./dist/index.mjs"
+            }
+        }
+    },
+    "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^"
+    },
+    "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "typescript": "catalog:",
+        "vite": "catalog:"
+    }
+}

@@ -70,55 +70,82 @@ JSX is the hard part: Solid's and React's plugins both claim `.tsx`.
 - Renderer-specific code lives in separate folders: `src/solid/**` compiled by the Solid plugin
   (`include`), `src/react/**` and `src/native/**` by the React plugin (`exclude` the Solid
   folder). Each folder has its own `tsconfig.json` with its `jsxImportSource`.
-- `@pureform/solid` ships JSX, so the Solid plugin must include it (as `ssr.noExternal` does in
-  solid-demo).
+- **Solid's `include` (and React's `exclude`) names every package that ships Solid JSX:**
+  `@pureform/solid`, including its `storybook` export, by its workspace path
+  (`/packages/solid/`) and by its `node_modules` path (`/node_modules/@pureform/solid/`).
+- **Adapters and everything the generated stories import are JSX-free** (Solid through
+  `createComponent`, React through `createElement`), or a TypeScript project reference: the
+  root type check uses React's JSX, and a per-folder `tsconfig.json` doesn't stop it from
+  reading Solid's JSX it imports. Hooks with JSX are type-checked by their own package.
+- `.storybook/main.ts` runs under Node's TypeScript loading: relative imports need `.ts`.
 
-Spike this first (step 1): if the two plugins can't coexist cleanly, fall back to composition
-(one Storybook per renderer, joined with `refs`) and keep the same codegen.
+The spike (step 1, [spike.md](spike.md)) showed both plugins coexist in one build, so there's
+no composition fallback.
 
 ### Styling
 
 - Solid and React use the Panda target, like solid-demo and react-demo, with one shared
   `pureform.config.ts`.
-- React Native web uses `rn-adapter`'s runtime styles, like rn-web-demo.
-- One `theme` toolbar global (light, dark, and the named themes) applied by each adapter's
-  provider.
+- React Native web uses `rn-adapter`'s runtime styles from a virtual module
+  (`virtual:pureform-rn`, rn-web-demo's `pureformRn()`), not a second generated registry: the
+  bundler plugin writes one `.pureform/`, the Panda one. The component list
+  (`pureform.codegen.ts`'s `COMPONENTS`) serves both.
+- **The scheme follows the system by default.** A `scheme` global (System, the default; Light;
+  Dark) and a `theme` global (Default and the named themes), mapped to each renderer's provider:
+    - **System forces nothing.** The web targets (Panda, css, tailwind) already write dark under
+      `@media (prefers-color-scheme: dark)`, which `.light`/`.dark` on the root only override,
+      so no class is set; React Native's provider defaults `scheme` to `useColorScheme()`, which
+      React Native Web reads from `prefers-color-scheme`, so no `scheme` prop is passed.
+    - **Light/Dark** set the root's class (web) or the provider's `scheme` (React Native);
+      switching back to System removes them.
+    - Changing the OS scheme updates every renderer live, without a reload (checked with
+      Playwright's `emulateMedia({ colorScheme })` for all three).
+    - Named themes go to the provider's `theme` in every renderer.
+    - **A story can pin its scheme** with Storybook's story-level globals
+      (`globals: { scheme: "dark" }`, on a story or a component's meta), which overrides the
+      toolbar for that story and locks its item. No pin: the toolbar decides (System by
+      default). `stories.config.ts` asks for pinned copies per component
+      (`schemes: ["light", "dark"]` → `Light` and `Dark` stories next to `Default`) or pins the
+      whole component (`scheme`); a hook's `extendStory` can set `globals` too. The shared
+      `play` tests and the a11y checks run on the pinned stories, so contrast is checked in both
+      schemes.
+- **Storybook's own UI follows the system:** `.storybook/manager.ts` picks `themes.dark` or
+  `themes.light` from `matchMedia("(prefers-color-scheme: dark)")` and switches live on a
+  change; docs pages read it once when they load.
+- **The canvas is the theme's surface** (`canvas`, in the current scheme), not Storybook's white.
 
 ## Codegen
 
 `scripts/generate-stories.ts`, run by an omni `generate` task (before `build` and `dev`, as in
 the demos):
 
-1. **Input:** `stories.config.ts`:
-    ```ts
-    export default defineStories({
-        renderers: {
-            solid: {
-                package: "@pureform/solid",
-                adapter: "./src/solid/adapter.ts",
-            },
-            react: {
-                package: "@pureform/react",
-                adapter: "./src/react/adapter.ts",
-            },
-            native: {
-                package: "@pureform/react-native",
-                adapter: "./src/native/adapter.ts",
-            },
-        },
-        components: {
-            Button: {
-                args: { children: "Save" },
-                variants: ["filled", "outlined", "text"],
-            },
-            Switch: {},
-            TextField: { args: { label: "Name" } },
-        },
-        hooks: ["./src/hooks.ts"], // shared, applies to every renderer
-    });
-    ```
-    Component names and their variants could later come from `@pureform/anatomy` (its generated
-    list), so no component is listed by hand.
+1. **Inputs:** the data the components already have, so nothing is listed by hand:
+    - **`@pureform/anatomy`** gives the component list and each component's variants with their
+      values (`variants`, plain data generated next to the parts from the recipe's variants;
+      `generated.ts` is regenerated, never edited, and the drift spec covers it). The controls
+      (`argTypes`, a select or a boolean per variant) come from it, so no preset runs in the
+      browser. Composite anatomies (the radio group's) pair too, without controls.
+    - **`@pureform/binding-core`'s built declarations** say which variants are props: the
+      codegen reads each `<Component>VariantProps`'s property names with the TypeScript
+      compiler API (the checker resolves `extends`). A recipe variant that isn't one (a
+      button's `toggle`) gets no control; `density` and `position` are props and keep theirs.
+      A missing interface fails the codegen; `variantProps` in the config names another.
+    - **`@pureform/component-cases`** (the framework-neutral cases moved out of
+      `tests/component-suites`, which now imports them) gives each component's stories and play
+      tests: `props` is `Default`'s args, each of `examples` and `opened` is a story, `state` gives a play
+      (read gives `from`, one `act`, read gives `to`), and each `keyboard` key a story with its
+      play. Cases take `userEvent` as a parameter (`createCases(userEvent)`), so Storybook passes
+      `storybook/test`'s and the suites Vitest's. A component is drawn when an anatomy and a case
+      share its root test id.
+    - **`stories.config.ts` holds overrides only:** the renderers, `skip` (with reasons),
+      `schemes` and `overlayHeight` for every component, and per component extra
+      `args`/`argTypes`/`parameters`, `controls.exclude`, `variantProps`, `schemes`, `height`, hooks, and story fields by export
+      name. A renderer whose DOM the cases can't read sets `casePlays: false`, and `tests: false`
+      leaves it out of the story tests (React Native Web, for now: **skipped until the cases get
+      renderer-neutral readers**).
+    - **Overlays** get room rather than hand-written stories: their `opened` renderings are
+      stories, and a component whose case has `overlay` or `opened` gets a canvas at least
+      `overlayHeight` (480px) tall from the shared hook.
 2. **Output:** `src/stories/generated/<Component>.stories.ts` (ignored by git), one per
    component, importing each renderer's implementation and calling `multiRender`. A renderer
    without that component shows "not implemented" in the canvas.
@@ -140,15 +167,18 @@ Resolution order, later wins:
 
 1. the **shared** hook in `apps/storybook-web/src/hooks.ts`;
 2. the **per-renderer** hook, the binding package's `storybook` export;
-3. a **per-component** override in `stories.config.ts`.
+3. a **per-component** override in `stories.config.ts` (its `hooks` modules and `args`).
+
+The play tests come from the cases, not from hooks; a hook's `extendStory` can still add or
+replace one.
 
 Runtime hooks (`decorators`, `args`, `extendStory`) are imported by the generated files;
 codegen hooks (`transformSource`) run in the script.
 
 ## Steps
 
-1. **Spike:** `html-vite` host with one Solid and one React component on one page, both
-   plugins in one Vite config. Decide host vs composition.
+1. **Spike (done, [spike.md](spike.md)):** one `html-vite` host for every renderer; no
+   composition.
 2. **App skeleton:** `apps/storybook-web` with `package.json`, `project.omni.yaml` (extending
    `ts-vite-app`), `.storybook/main.ts` and `preview.ts`, Panda and pureform config copied from
    solid-demo.
@@ -162,7 +192,11 @@ codegen hooks (`transformSource`) run in the script.
 
 ## Decisions
 
-- **Components:** Button, Switch, TextField.
+- **Components:** every one with an anatomy and a case (round 2; the first slice was Button,
+  Switch and TextField). Toast and GridList are skipped: their cases need a scene (a toaster,
+  tiles as children) that props can't give.
+- **React Native:** skipped for now in the story tests and plays; needs renderer-neutral
+  readers.
 - **Host:** `@storybook/html-vite`, renderer-neutral; each renderer mounts through its adapter.
 - **Per-renderer hooks** live in the binding packages, as a `storybook` export
   (`@pureform/solid/storybook`, `@pureform/react/storybook`, `@pureform/react-native/storybook`).

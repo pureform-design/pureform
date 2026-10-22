@@ -26,7 +26,7 @@ what both must agree on, on every target.
 ```
 src/*.e2e.test.ts            one suite per rule, written once, framework-free
       │  imports
-      ├── src/components/    one case per component: props, examples, state, form, keyboard
+      ├── src/components.ts  the cases (@pureform/component-cases) with Vitest's userEvent
       ├── src/harness/       Scene, Harness, page helpers, the server-render client
       └── #binding ────────► src/bindings/solid/harness.tsx   (projects "solid/<target>")
                              src/bindings/react/harness.tsx   (projects "react/<target>")
@@ -105,10 +105,10 @@ VITE_PUREFORM_BENCH=1 bun x vitest --config vitest.config.e2e.ts run src/indicat
 
 ## Adding a component
 
-1. Add its name to `COMPONENT_NAMES` in `src/harness/scene.ts`.
+1. Add its name to `COMPONENT_NAMES` in `packages/component-cases/src/scene.ts`.
 2. Import it into each binding's `components` map: `src/bindings/solid/scene.tsx` and
    `src/bindings/react/scene.tsx`.
-3. Write `src/components/<name>.ts`, a `ComponentCase` (`src/components/types.ts`):
+3. Write `packages/component-cases/src/cases/<name>.ts`, a `ComponentCase` (`packages/component-cases/src/types.ts`):
     - `props`: what every scene gets (an accessible name), and `root`, the root's test id;
     - `examples`: plain-data props covering its variants and states (axe, direction, and server
       rendering run each);
@@ -149,7 +149,7 @@ VITE_PUREFORM_BENCH=1 bun x vitest --config vitest.config.e2e.ts run src/indicat
       and go with it (its positioner, a dialog's backdrop), props it's mounted with, and `place`
       where placing it is the app's (the snackbar, fixed at the bottom). `overlayParts(ids).overlay()`
       builds it for a trigger-and-positioner overlay.
-4. Add the case to `COMPONENTS` in `src/components/index.ts`.
+4. Add the case to `COMPONENTS` in `packages/component-cases/src/cases.ts`.
 
 Every target's registry must have the component: each is generated with every component of the
 Panda fixture's config (`tests/panda-fixture/pureform.config.ts`), so a component the config has
@@ -193,7 +193,7 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
   and `:active` match as for a user, and lets go away from everything so a press clicks nothing.
   It compares colors as 8-bit RGBA through a canvas: a `color-mix()` computes to `color(srgb …)`
   where the theme's color is `oklch(…)`.
-- **Overlays** (`src/components/overlay.ts`) are read by their trigger and surface agreeing, and
+- **Overlays** (`packages/component-cases/src/cases/overlay.ts`) are read by their trigger and surface agreeing, and
   acted on by clicking the trigger and waiting a few frames: Zag places a floating overlay a frame
   or two after it opens. They animate in and out, so the waits also wait out every animation that
   ends (`animationsDone`, `src/harness/animations.ts`), and one closing reads as closed (its
@@ -220,8 +220,8 @@ Type-check with `bun x tsc --noEmit -p tsconfig.json` (the React files carry a
 - **Components so far:** button, checkbox, chip, FAB, icon button, radio group (its `root` is the
   unstyled group element, `compositeTestIds.radioGroup.root`; its radios repeat the radio's test
   ids, so cases find them by value), select (opened with a click and chosen from its list, which
-  takes focus while open; `src/components/select.ts`), switch, text area, and text field (one
-  shared case, `src/components/text-input.ts`: `value` from `""` to `"a"`, typed), and the
+  takes focus while open; `packages/component-cases/src/cases/select.ts`), switch, text area, and text field (one
+  shared case, `packages/component-cases/src/cases/text-input.ts`: `value` from `""` to `"a"`, typed), and the
   overlays (menu, tooltip, dialog, snackbar). The tags input (`tags-input.ts`) goes from `["red"]`
   to `["red", "blue"]` by typing and Enter; its indication case highlights the chip with the left
   arrow (shown as hover) and focuses the remove button by script, since Zag keeps it out of the tab

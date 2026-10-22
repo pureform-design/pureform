@@ -159,6 +159,9 @@
       "name": "@pureform/storybook-web",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+        "@pureform/component-cases": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
@@ -188,16 +191,21 @@
         "@pureform/theme": "workspace:^",
         "@pureform/tsconfig": "workspace:^",
         "@solidjs/vite-plugin": "catalog:",
+        "@storybook/addon-a11y": "catalog:",
+        "@storybook/addon-vitest": "catalog:",
         "@storybook/html-vite": "catalog:",
         "@types/node": "catalog:",
         "@types/react": "catalog:",
         "@types/react-dom": "catalog:",
+        "@typescript/typescript6": "catalog:",
         "@vitejs/plugin-react": "catalog:",
+        "@vitest/browser-playwright": "catalog:",
         "playwright": "catalog:",
         "react-native": "catalog:",
         "storybook": "catalog:",
         "typescript": "catalog:",
         "vite": "catalog:",
+        "vitest": "catalog:",
       },
     },
     "apps/tailwind-demo": {
@@ -307,6 +315,20 @@
         "typescript": "catalog:",
         "vite": "catalog:",
         "vitest": "catalog:",
+      },
+    },
+    "packages/component-cases": {
+      "name": "@pureform/component-cases",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "typescript": "catalog:",
+        "vite": "catalog:",
       },
     },
     "packages/core": {
@@ -872,6 +894,7 @@
       "devDependencies": {
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
+        "@pureform/component-cases": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/generate": "workspace:^",
@@ -956,6 +979,8 @@
     "@solidjs/testing-library": "^1.0.0-beta.3",
     "@solidjs/vite-plugin": "^3.0.0-next.46",
     "@solidjs/web": "^2.0.0-rc.13",
+    "@storybook/addon-a11y": "^10.6.3",
+    "@storybook/addon-vitest": "^10.6.3",
     "@storybook/html-vite": "^10.6.3",
     "@tailwindcss/node": "^4.3.3",
     "@tailwindcss/vite": "^4.3.3",
@@ -1556,6 +1581,8 @@
 
     "@pureform/cli": ["@pureform/cli@workspace:packages/cli"],
 
+    "@pureform/component-cases": ["@pureform/component-cases@workspace:packages/component-cases"],
+
     "@pureform/component-suites": ["@pureform/component-suites@workspace:tests/component-suites"],
 
     "@pureform/core": ["@pureform/core@workspace:packages/core"],
@@ -1745,6 +1772,10 @@
     "@solidjs/vite-plugin": ["@solidjs/vite-plugin@3.0.0-next.50", "", { "dependencies": { "@ampproject/remapping": "^2.3.0", "@babel/core": "^7.23.3", "@solidjs/babel-plugin": "^2.0.0-rc.14", "@solidjs/compiler": "^2.0.0-rc.14", "@types/babel__core": "^7.20.4", "merge-anything": "^5.1.7", "vitefu": "^1.0.4" }, "peerDependencies": { "@solidjs/start-devtools": "^1.0.0-next.2", "@solidjs/web": "^2.0.0-rc.14", "@testing-library/jest-dom": "^5.16.6 || ^5.17.0 || ^6.0.0 || ^7.0.0", "solid-js": "^2.0.0-rc.14", "vite": "^8.0.0 || ^9.0.0" }, "optionalPeers": ["@solidjs/start-devtools", "@testing-library/jest-dom"] }, "sha512-eCtI4SwZOCnhwFist0WpUtAf/HPQ26z74XOtzm3z41FFJdKprHEMEVKw8NKfViwp9mecMK4FLZSm6k6OY4yBsA=="],
 
     "@solidjs/web": ["@solidjs/web@2.0.0-rc.15", "", { "dependencies": { "seroval": "1.6.7", "seroval-plugins": "1.6.7" }, "peerDependencies": { "solid-js": "^2.0.0-rc.15" } }, "sha512-xwt4rNZ9CXTdMraFqmVn/AXuHIXQJ3jnrKyzEZ4ZFdRCBml0VxL8pA5D3YZHSjHoF7okNAmiVtyRCMNz15jQCg=="],
+
+    "@storybook/addon-a11y": ["@storybook/addon-a11y@10.6.3", "", { "dependencies": { "@storybook/global": "^5.0.0", "axe-core": "^4.2.0" }, "peerDependencies": { "storybook": "^10.6.3" } }, "sha512-nqvjpmu5g+PPtEKwgE0qAi4wfuQ9yngOb/1Gm24pBBZOuRsd3UMEBjKORSuAGrIAz9X3LCFfQi7sCcBFXvFbwg=="],
+
+    "@storybook/addon-vitest": ["@storybook/addon-vitest@10.6.3", "", { "dependencies": { "@storybook/global": "^5.0.0", "@storybook/icons": "^2.0.2" }, "peerDependencies": { "@vitest/browser": "^4.0.0 || ^5.0.0", "@vitest/browser-playwright": "^4.0.0 || ^5.0.0", "storybook": "^10.6.3", "vitest": "^4.0.0 || ^5.0.0" }, "optionalPeers": ["@vitest/browser", "@vitest/browser-playwright", "vitest"] }, "sha512-ANz0SHAi9OTtrZt+YmcQvP7tcUZrTSm8Gq/nI7p9ZRyHAUOTdGoCex2cPyLc3mEqZTCBnaYXR6ZhURlpGsh9dQ=="],
 
     "@storybook/builder-vite": ["@storybook/builder-vite@10.6.3", "", { "dependencies": { "ts-dedent": "^2.0.0" }, "peerDependencies": { "storybook": "^10.6.3", "vite": "^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0" } }, "sha512-1+WCZZg/fPxxyHDB5sFKniFt9/4RFUIzoNqMujv+BLRROM+gQeyUHvdvoyZOZ51+P8ee+/PgnNKHjsTupV+nOA=="],
 
