@@ -57,6 +57,8 @@ export interface FactoryModuleInput {
     styles: PrecomputedStyles;
     /** `instanceTokenKeys`. */
     tokens: Readonly<Record<string, string>>;
+    /** The spring tokens, the shape's `springs`. Default none. */
+    springs?: readonly string[];
 }
 
 /** `native/<name>.ts`: the component's `NativeFactory` over its own templates and values,
@@ -65,6 +67,7 @@ export const factoryModule = ({
     name,
     styles,
     tokens,
+    springs = [],
 }: FactoryModuleInput): string => {
     const named = Object.entries(tokens);
     return [
@@ -97,7 +100,12 @@ export const factoryModule = ({
         `export const ${name}: NativeFactory<${JSON.stringify(name)}> = nativeFactory(`,
         `    ${JSON.stringify(name)},`,
         '    { mode: "precomputed", themes, formulas, ...data },',
-        ...(named.length > 0 ? ["    tokens,"] : []),
+        ...(named.length > 0 || springs.length > 0
+            ? [named.length > 0 ? "    tokens," : "    {},"]
+            : []),
+        ...(springs.length > 0
+            ? [`    ${JSON.stringify(springs)},`]
+            : []),
         ");",
         "",
     ].join("\n");
@@ -142,6 +150,7 @@ export const codegen = defineCodegen<RnCodegenOptions>({
                     name,
                     context.config.components[name]!,
                 ),
+                springs: context.shape(name).springs ?? [],
             }),
             shape: {
                 ...context.shape(name),

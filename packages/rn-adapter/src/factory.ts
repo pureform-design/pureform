@@ -303,11 +303,13 @@ const isPerScheme = (tokens: object) =>
 
 /** A component's `StyleFactory` over styles from `precompute` or `runtimeStyles`. `tokens`
  *  names the theme key each instance token sets (`value` → `components.circularProgress.value`);
- *  a token it doesn't name is taken as a theme key itself. */
+ *  a token it doesn't name is taken as a theme key itself. `springs` lists the spring tokens
+ *  (the shape's `springs`), the only ones a spring role's name sets. */
 export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     component: string,
     styles: Styles,
     tokens: Readonly<Record<string, string>> = {},
+    springs: readonly string[] = [],
 ): NativeFactory<C> => {
     const template = styles.templates[component];
     if (!template) throw new Error(`no styles for component "${component}"`);
@@ -315,9 +317,10 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     const moving = movingSlots(template);
     const groups = new Set(order.variants);
 
-    // An instance's tokens by theme key, per scheme where it gives them so. A spring role's
-    // name (a string naming one of the theme's `springs`) takes that role's five values from
-    // `theme`, the environment's; the types allow it only on a spring token.
+    // An instance's tokens by theme key, per scheme where it gives them so. On a spring token, a
+    // spring role's name (a string naming one of the theme's `springs`) takes that role's five
+    // values from `theme`, the environment's; any other string stays a string.
+    const springTokens = new Set(springs);
     const tokenKeys = (
         given: object,
         theme: (key: string) => Concrete | undefined,
@@ -333,6 +336,7 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
                         );
                     if (
                         typeof value === "string" &&
+                        springTokens.has(token) &&
                         theme(`springs.${value}.stiffness`) !== undefined
                     )
                         return SPRING_FIELDS.map((field) => [

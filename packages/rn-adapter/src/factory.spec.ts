@@ -18,6 +18,7 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
+import { componentShape } from "@pureform/generate";
 import { pureform } from "@pureform/preset";
 import { describe, expect, expectTypeOf, it } from "vitest";
 
@@ -425,6 +426,7 @@ describe("nativeFactory", () => {
             "tabs",
             styles,
             instanceTokenKeys("tabs", preset.components.tabs!),
+            componentShape(preset.components.tabs!, preset).springs,
         );
         const theme = styles.themes[themeKey(undefined, "light")]!;
         const [moved] = tabs.selected({
@@ -442,6 +444,24 @@ describe("nativeFactory", () => {
         expect(theme["springs.spatialSlow.stiffness"]).not.toBe(
             theme["springs.spatialDefault.stiffness"],
         );
+    });
+
+    it("takes a role's name only on a spring token", () => {
+        const preset = pureform();
+        const styles = precompute(preset, { components: ["tabs"] });
+        const keys = instanceTokenKeys("tabs", preset.components.tabs!);
+        const theme = styles.themes[themeKey(undefined, "light")]!;
+        const transitionOf = (springs: readonly string[]) =>
+            nativeFactory("tabs", styles, keys, springs).selected({
+                tokens: { indicatorSpring: "spatialSlow" },
+            } as never).transitions.indicator![0];
+        // Without the spring-token list, the name stays a string: no role's values are set.
+        expect(transitionOf([])).not.toMatchObject({
+            duration: theme["springs.spatialSlow.duration"],
+        });
+        expect(transitionOf(["indicatorSpring"])).toMatchObject({
+            duration: theme["springs.spatialSlow.duration"],
+        });
     });
 
     it("gives a component without slots its root", () => {
