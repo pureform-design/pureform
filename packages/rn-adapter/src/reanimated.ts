@@ -171,6 +171,7 @@ export const reanimatedPresence = (): PresenceDriver => {
                       },
                   ],
                   animationDuration: [step.duration, fade.duration],
+                  animationDelay: [step.delay ?? 0, fade.delay ?? 0],
                   animationTimingFunction: [
                       cssEasing(step.easing),
                       cssEasing(fade.easing),
@@ -180,6 +181,7 @@ export const reanimatedPresence = (): PresenceDriver => {
             : {
                   animationName: { from, to },
                   animationDuration: step.duration,
+                  animationDelay: step.delay ?? 0,
                   animationTimingFunction: cssEasing(step.easing),
                   animationFillMode: fillMode,
               };

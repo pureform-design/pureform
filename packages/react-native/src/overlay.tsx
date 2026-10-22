@@ -28,7 +28,7 @@ import { useControllable, useStableCallback } from "./parts";
 import { useHostBounds, usePortalHost } from "./portal-host";
 import type { EdgeInsets, WindowRect } from "./portal-host";
 import { usePresence } from "./presence";
-import type { Presence } from "./presence";
+import type { OverlayDelay, OverlayMotionName, Presence } from "./presence";
 import { useDirection } from "./provider";
 
 /** Where an overlay went: its top left corner in the host's layer, the side of the trigger it
@@ -372,6 +372,8 @@ export interface AnchoredOverlayProps {
 export function useAnchoredOverlay(
     component: string,
     props: AnchoredOverlayProps,
+    motion: OverlayMotionName = "popup",
+    delay?: OverlayDelay,
 ): {
     readonly open: boolean;
     readonly source: MutableInteractionSource;
@@ -393,7 +395,7 @@ export function useAnchoredOverlay(
     const [measured, setMeasured] = useState<
         { readonly rect: WindowRect | undefined } | undefined
     >();
-    const presence = usePresence(open, "popup");
+    const presence = usePresence(open, motion, delay);
     useLayoutEffect(() => {
         if (!open) return;
         let current = true;

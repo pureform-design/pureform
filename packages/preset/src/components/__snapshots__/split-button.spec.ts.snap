@@ -101,14 +101,110 @@ exports[`FAB menu > compiles to a stable Panda slot recipe 1`] = `
     "list": {
       "&[data-state=closed]": {
         "animation": {
+          "_motionReduce": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 7) forwards overlayHold",
+        },
+      },
+      "&[data-state=closed] > :nth-child(1)": {
+        "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
           "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
         },
       },
+      "&[data-state=closed] > :nth-child(2)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 1) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 1) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(3)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 2) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 2) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(4)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 3) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 3) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(5)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 4) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 4) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(6)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 5) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 5) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(7)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 6) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 6) forwards overlayFadeOut",
+        },
+      },
+      "&[data-state=closed] > :nth-child(n+8)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) forwards overlayFadeOut",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 7) forwards overlayShrinkOut, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 7) forwards overlayFadeOut",
+        },
+      },
       "&[data-state=open]": {
+        "animation": {
+          "_motionReduce": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayHold",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(1)": {
         "animation": {
           "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
           "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(2)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 1) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 1) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(3)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 2) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 2) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(4)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 3) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 3) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(5)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 4) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 4) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(6)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 5) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 5) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(7)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 6) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 6) overlayFadeIn",
+        },
+      },
+      "&[data-state=open] > :nth-last-child(n+8)": {
+        "animation": {
+          "_motionReduce": "token(springs.effectsFast.duration) token(springs.effectsFast.easing) overlayFadeIn",
+          "base": "token(springs.spatialFast.duration) token(springs.spatialFast.easing) calc(token(durations.short1) * 7) overlayGrowIn, token(springs.effectsFast.duration) token(springs.effectsFast.easing) calc(token(durations.short1) * 7) overlayFadeIn",
         },
       },
       "alignItems": "end",

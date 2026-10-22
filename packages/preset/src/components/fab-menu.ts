@@ -45,6 +45,7 @@ import {
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
+import type { OverlayMotion } from "./overlay";
 import { spatialCornerTransition } from "./shared";
 import {
     DEFAULT_GROUP,
@@ -116,8 +117,11 @@ const staggered = (): Record<string, StyleMap> => {
         const last = index === FAB_MENU_STAGGERED - 1;
         const delay = wait(index);
         const motion = overlayMotion({
-            enter: { ...POPUP_MOTION.enter, ...(delay ? { delay } : {}) },
-            exit: { ...POPUP_MOTION.exit, ...(delay ? { delay } : {}) },
+            enter: {
+                ...FAB_MENU_ITEM_MOTION.enter,
+                ...(delay ? { delay } : {}),
+            },
+            exit: { ...FAB_MENU_ITEM_MOTION.exit, ...(delay ? { delay } : {}) },
         }).rawRules!.css as Record<string, StyleMap>;
         rules[
             `${OPEN} > :nth-last-child(${last ? `n+${index + 1}` : index + 1})`
@@ -129,12 +133,20 @@ const staggered = (): Record<string, StyleMap> => {
     return rules;
 };
 
-// The list itself only holds still, until the last item has left.
-const LIST_MOTION = overlayMotion({
+/** The list itself only holds still: its presence waits for the items, which move. */
+export const FAB_MENU_LIST_MOTION = {
     enter: { keyframes: "overlayHold", spring: "spatialFast" },
+    exit: { keyframes: "overlayHold", spring: "spatialFast" },
+} as const satisfies OverlayMotion;
+
+/** Each item grows and fades in as a popup does (and shrinks as it leaves), after its wait. */
+export const FAB_MENU_ITEM_MOTION = POPUP_MOTION;
+
+// The list leaves once the last staggered item has.
+const LIST_MOTION = overlayMotion({
+    ...FAB_MENU_LIST_MOTION,
     exit: {
-        keyframes: "overlayHold",
-        spring: "spatialFast",
+        ...FAB_MENU_LIST_MOTION.exit,
         delay: mul(FAB_MENU_STAGGER, unitless(FAB_MENU_STAGGERED - 1)),
     },
 });

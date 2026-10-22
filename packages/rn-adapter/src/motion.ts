@@ -294,6 +294,8 @@ export interface PresenceTiming {
     readonly duration: number;
     readonly easing: string;
     readonly spring?: Spring | undefined;
+    /** How long to wait before it starts, in ms. */
+    readonly delay?: number | undefined;
 }
 
 /** One way in or out: from one frame to another on a timing. With `fade`, the opacity runs on
