@@ -15,7 +15,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { IconSlot, iconSlot, ownText } from "../icon-style";
+import { iconParts, ownText } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
@@ -48,11 +48,7 @@ function Item(props: ItemProps): ReactNode {
         interactionSource: item.interactionSource,
         disabled: props.disabled,
     });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<AccordionPart>(
+    const slots = useComponentSlots<AccordionPart>(
         "accordion",
         indication.select(accordionSelection(props.selection)),
         indication.states({
@@ -61,18 +57,10 @@ function Item(props: ItemProps): ReactNode {
             ...(item.mirrorLeading ? { mirrored: true } : {}),
         }),
     );
+    const { styles: s, selected, views: v } = slots;
     const id = (part: AccordionPart) =>
         testIdOf(accordionAnatomy, part, props.testId);
-    const icon = (part: "leading" | "indicator", value: ReactNode) => {
-        const Slot = v[part];
-        return (
-            <Slot.View style={s[part]} testID={id(part)}>
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {value}
-                </IconSlot>
-            </Slot.View>
-        );
-    };
+    const icon = iconParts(slots, id);
     return (
         <v.item.View style={s.item} testID={id("item")}>
             <v.trigger.Pressable
@@ -84,7 +72,7 @@ function Item(props: ItemProps): ReactNode {
                 style={{ ...s.trigger, ...unselectable }}
                 testID={id("trigger")}
             >
-                {isPresent(item.leading) ? icon("leading", item.leading) : null}
+                {icon("leading", item.leading)}
                 <v.text.View style={s.text} testID={id("text")}>
                     <v.title.Text
                         selectable={false}

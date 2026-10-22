@@ -5,12 +5,14 @@
 // icon, moving with the slot's color: an animated text where the slot's style moves, plain text
 // elsewhere.
 
-import { DEFAULT_ICON_STYLE } from "@pureform/binding-core";
+import { DEFAULT_ICON_STYLE, isPresent } from "@pureform/binding-core";
 import type { IconStyle } from "@pureform/binding-core";
 import type { Selected, Style } from "@pureform/rn-adapter/factory";
 import { createContext, useContext, useMemo } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Animated, Text } from "react-native";
+
+import type { ComponentSlots } from "./styles";
 
 interface IconPart {
     readonly icon: IconStyle;
@@ -92,6 +94,24 @@ export const iconSlot = (selected: Selected, slot: string) => ({
     style: selected.styles[slot],
     iconFill: selected.iconFills[slot],
 });
+
+/** A component's icon parts: `(part, node)` gives the part's view, in its style and test id,
+ *  holding `node` in its icon slot, or nothing without a node. A row's leading, trailing and
+ *  expand icons. */
+export const iconParts =
+    <P extends string>(slots: ComponentSlots<P>, id: (part: P) => string) =>
+    (part: P, node: ReactNode): ReactNode => {
+        if (!isPresent(node)) return null;
+        const Slot = slots.views[part];
+        const style = slots.styles[part];
+        return (
+            <Slot.View style={style} testID={id(part)}>
+                <IconSlot {...iconSlot(slots.selected, part)} motion={style}>
+                    {node}
+                </IconSlot>
+            </Slot.View>
+        );
+    };
 
 /** The nearest icon slot's size in pixels, color, and whether it asks for a filled icon;
  *  `DEFAULT_ICON_STYLE` outside one. */

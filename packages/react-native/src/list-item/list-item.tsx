@@ -31,7 +31,7 @@ import { createContext, use, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { PanResponder } from "react-native";
 
-import { IconSlot, iconSlot } from "../icon-style";
+import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useDirection } from "../provider";
@@ -131,11 +131,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
         disabled: props.disabled,
         interactive,
     });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<ListItemPart>(
+    const slots = useComponentSlots<ListItemPart>(
         "listItem",
         indication.select(
             listItemSelection(
@@ -168,6 +164,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
               ? { pressed: true }
               : {},
     );
+    const { styles: s, selected, views: v } = slots;
     const id = (part: ListItemPart) =>
         testIdOf(listItemAnatomy, part, props.testId);
     const line = (part: ListItemPart, value: ReactNode) => {
@@ -178,19 +175,7 @@ function ListItemImpl(props: ListItemProps): ReactNode {
             </Slot.Text>
         ) : null;
     };
-    const icon = (
-        part: "leading" | "trailing" | "indicator",
-        value: ReactNode,
-    ) => {
-        const Slot = v[part];
-        return isPresent(value) ? (
-            <Slot.View style={s[part]} testID={id(part)}>
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {value}
-                </IconSlot>
-            </Slot.View>
-        ) : null;
-    };
+    const icon = iconParts(slots, id);
     const action = isPresent(props.swipeAction) ? (
         <v.action.View
             aria-hidden={revealed ? undefined : true}

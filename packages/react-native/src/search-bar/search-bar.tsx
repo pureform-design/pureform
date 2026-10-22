@@ -15,7 +15,7 @@ import type {
 import type { ReactNode } from "react";
 import type { TextInputProps } from "react-native";
 
-import { IconSlot, iconSlot } from "../icon-style";
+import { iconParts } from "../icon-style";
 import { interactionStates, useInteraction } from "../interaction";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
@@ -45,11 +45,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
         "",
     );
     const { interaction, state } = useInteraction(undefined, props.disabled);
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<SearchBarPart>(
+    const slots = useComponentSlots<SearchBarPart>(
         "searchBar",
         searchBarSelection(props),
         {
@@ -62,6 +58,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
             filled: value !== "",
         },
     );
+    const { styles: s, selected, views: v } = slots;
     const {
         onFocus: _focus,
         onBlur: _blur,
@@ -70,16 +67,7 @@ function SearchBarImpl(props: SearchBarProps): ReactNode {
     const placeholder = props.placeholder ?? "Search";
     const id = (part: SearchBarPart) =>
         testIdOf(searchBarAnatomy, part, props.testId);
-    const icon = (part: "leading" | "trailing", node: ReactNode) => {
-        const Slot = v[part];
-        return isPresent(node) ? (
-            <Slot.View style={s[part]} testID={id(part)}>
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {node}
-                </IconSlot>
-            </Slot.View>
-        ) : null;
-    };
+    const icon = iconParts(slots, id);
     return (
         <v.root.Pressable
             {...handlers}

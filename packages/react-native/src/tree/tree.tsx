@@ -16,7 +16,7 @@ import type {
 } from "@pureform/binding-core";
 import type { ReactNode } from "react";
 
-import { IconSlot, iconSlot } from "../icon-style";
+import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { testIdOf, unselectable, useControllable, withEngine } from "../parts";
 import { useComponentSlots } from "../styles";
@@ -60,11 +60,7 @@ function Row(props: {
         interactionSource: node.interactionSource,
         disabled,
     });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<TreePart>(
+    const slots = useComponentSlots<TreePart>(
         "tree",
         indication.select(treeSelection(tree.props)),
         indication.states({
@@ -74,18 +70,10 @@ function Row(props: {
             ...(node.mirrorLeading ? { mirrored: true } : {}),
         }),
     );
+    const { styles: s, selected, views: v } = slots;
     const id = (part: TreePart) =>
         testIdOf(treeAnatomy, part, tree.props.testId);
-    const icon = (part: "leading" | "indicator", value: ReactNode) => {
-        const Slot = v[part];
-        return (
-            <Slot.View style={s[part]} testID={id(part)}>
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {value}
-                </IconSlot>
-            </Slot.View>
-        );
-    };
+    const icon = iconParts(slots, id);
     const row = (
         <v.node.Pressable
             {...indication.handlers}
@@ -101,7 +89,7 @@ function Row(props: {
             style={{ ...s.node, ...unselectable }}
             testID={id("node")}
         >
-            {isPresent(node.leading) ? icon("leading", node.leading) : null}
+            {icon("leading", node.leading)}
             <v.text.Text selectable={false} style={s.text} testID={id("text")}>
                 {node.label}
             </v.text.Text>

@@ -32,7 +32,7 @@ import type { ComponentRef, ReactNode } from "react";
 import { Platform, View } from "react-native";
 
 import { Button } from "../button/button";
-import { IconSlot, iconSlot } from "../icon-style";
+import { iconParts } from "../icon-style";
 import { useSurfaceIndication } from "../indication";
 import { Anchored, useAnchoredOverlay } from "../overlay";
 import {
@@ -121,11 +121,7 @@ function MenuItemImpl(props: ItemProps): ReactNode {
         interactionSource: item.interactionSource,
         disabled: item.disabled,
     });
-    const {
-        styles: s,
-        selected,
-        views: v,
-    } = useComponentSlots<Part>(
+    const slots = useComponentSlots<Part>(
         "menu",
         indication.select(props.selection),
         indication.states({
@@ -141,17 +137,9 @@ function MenuItemImpl(props: ItemProps): ReactNode {
                 : {}),
         }),
     );
+    const { styles: s, selected, views: v } = slots;
     const id = (part: Part) => testIdOf(menuAnatomy, part, props.testId);
-    const icon = (part: "itemLeading" | "itemTrailing", node: ReactNode) => {
-        const Slot = v[part];
-        return isPresent(node) ? (
-            <Slot.View style={s[part]} testID={id(part)}>
-                <IconSlot {...iconSlot(selected, part)} motion={s[part]}>
-                    {node}
-                </IconSlot>
-            </Slot.View>
-        ) : null;
-    };
+    const icon = iconParts(slots, id);
     return (
         <v.item.Pressable
             {...indication.handlers}
