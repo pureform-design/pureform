@@ -11,7 +11,8 @@ open. Nothing here is applied yet. m2 (spring components) is planned separately 
 Answers to the questions below and to the orchestrator's follow-ups. Each applies in the
 phase named.
 
-- **m2** runs next, after r6, starting with groups A (spatial) and B (overlays), plus the
+- **m2** runs next, after r6, with groups A (spatial), B (overlays) and C (containers, with
+  the list's and select's chevrons), plus the
   extras in [m2](phases/m2-spring-components.md) (swipe snap-back, sheet drag release,
   snackbar enter and stacking, split button chevron).
 - **A transitions phase** after the small fix phase: Compose's `FadeThrough` and
@@ -31,6 +32,20 @@ phase named.
     - Vibrant toolbar: an unstyled one recolours its icon buttons.
     - Submenus clipped in grouped menus, the slider cut-off following the theme (§2), and
       chips' expressive corners (§1 #2).
+
+- **Never drive native scrolling** with springs or our own scroll code, on any platform (the
+  carousel's snapping stays the browser's and `ScrollView`'s).
+
+### Parked motion
+
+Revisit after m2's group B:
+
+- **App bar headline** (`app-bar.ts`, the keyframes it rises into a collapsed bar with) and
+  **search view icons** (`search-view.ts`, the keyframes they travel outward with, on
+  `medium2`/`emphasizedDecelerate`). Both are keyframe animations; springing them depends on
+  m1's open question about keyframes on `Animated.spring`, and the search view's icons move as
+  part of its `DIALOG_MOTION` opening, which group B splits. Check first whether Compose's
+  current search bar and top app bar spring these.
 
 ## 1. Spec recheck (2026-10-22)
 

@@ -21,13 +21,22 @@ their tween. Decided 2026-10-22 ([next.md §0](../next.md)).
     - Snackbar enter and stacking (`toast.ts`): movement springs, the fade stays.
     - Split button chevron (`split-button.ts`): its turn and morph spring.
 
+- **C, containers:** accordion, tree, field label, table sort arrow, and the list's and
+  select's chevrons, so every chevron turns the same way.
+
 ## Later
 
-- **C, containers:** accordion, tree, field label, table sort arrow (and the list's and
-  select's chevrons with them).
 - **D, state fades:** `tweens`.
+- **Parked:** the app bar's headline and the search view's icons (keyframes); see
+  [next.md](../next.md#parked-motion).
 
 ## Staying on easings
 
-Progress, the loading indicator, the ripple, the radio dot, the carousel, and the app bar's
-and search view's keyframes.
+Progress, the loading indicator, the ripple, the radio dot (Compose uses a 100ms tween) and
+the carousel.
+
+## Rule
+
+Never replace or drive native scrolling with springs, on any platform: the browser's scroll
+snapping and React Native's `ScrollView` snapping stay as they are. Only motion pureform
+animates itself moves to springs.

@@ -89,6 +89,12 @@ gap analysis updated. Also:
   equivalent for (name the replacement in the gap analysis and READMEs, and update their tests
   and fixtures); those without one still work, and a test says so.
 
+## Native scrolling
+
+Never replace or drive native scrolling, on any platform: no springs, no custom scroll or snap
+code in place of the browser's scroll snapping or React Native's `ScrollView`. Motion that
+follows the scroll position reads it; it doesn't set it.
+
 ## Output context
 
 Write `docs/roadmap-components/context/<id>.md` before the final commit of a subphase, in
