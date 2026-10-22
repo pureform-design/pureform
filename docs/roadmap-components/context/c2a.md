@@ -19,7 +19,7 @@ Commits: see `git log 8dc8065..c2a-tooltip-split`.
 - **Machine:** none new. Both tooltips run on Zag's tooltip, unchanged (`@pureform/machines/tooltip`).
 - **binding-core:** `TooltipVariantProps` is only `tokens`; `isRichTooltip` removed;
   `isInteractiveTooltip(props, byDefault = false)` and `tooltipMachineProps(props,
-  interactiveByDefault = false)`; `CARET_STYLE` (`--arrow-background: currentColor`);
+interactiveByDefault = false)`; `CARET_STYLE` (`--arrow-background: currentColor`);
   `TooltipContentProps` has `caret` instead of `subhead` and `actions`. New
   `components/rich-tooltip.ts`: `RichTooltip*` types, `RICH_TOOLTIP_ROOT_PROPS`,
   `RICH_TOOLTIP_CONTENT_PROPS`, `richTooltipSelection`, `isInteractiveRichTooltip`,
@@ -28,7 +28,7 @@ Commits: see `git log 8dc8065..c2a-tooltip-split`.
 - **Solid and React:** `Tooltip` has `Root`, `Trigger`, `Positioner`, `Content`, `SupportingText`,
   `Caret`; new `rich-tooltip/` subpath with `RichTooltip` (+ `Subhead`, `Actions`). The ready-made
   takes `caret`. `Caret` renders Zag's arrow wrapper as the `caret` part (with `--arrow-background:
-  currentColor`, and the part's `color` set to the surface's) with Zag's arrow tip inside.
+currentColor`, and the part's `color` set to the surface's) with Zag's arrow tip inside.
   Package exports, vite entries, registry fixtures and specs added.
 - **React Native:** the trigger overlay moved to `src/tooltip-overlay.tsx` (`TooltipHost`,
   `LONG_PRESS_TOOLTIP_MS`, `TooltipTriggerProps`, `TooltipBehaviorProps`). `Tooltip` and the new

@@ -37,7 +37,7 @@ Branch `m2b-overlays`, from main `79f27b1e`. Commits are listed by
   a drag's release velocity (px/ms, converted to Animated's px/s), instant without a spring.
 - **react-native**: `OVERLAY_KEYFRAMES`/`OVERLAY_MOTIONS` mirror the preset's (the spec that
   compares them passes); `overlayMotion` resolves the fade's timing; `themeSpring(role, tokens,
-  timeScale)` exported from `presence.ts`. The bottom sheet now follows a drag on its handle (a
+timeScale)` exported from `presence.ts`. The bottom sheet now follows a drag on its handle (a
   plain `Animated.View` around the surface carries the offset, so it works under every engine)
   and, when not closed, settles back with `settle` on `spatialDefault` carrying `gesture.vy`;
   under reduced motion it's back at once. A drag that closes it leaves the offset in place for
@@ -50,7 +50,7 @@ Branch `m2b-overlays`, from main `79f27b1e`. Commits are listed by
     - `Tooltip.kt`: scale `FastSpatial`, alpha `FastEffects`.
     - `SnackbarHost.kt` (`FadeInFadeOutWithScale`): scale `FastSpatial`, opacity `FastEffects`.
     - `BottomSheet.kt`: `showMotionSpec = defaultSpatialSpec`, `hideMotionSpec =
-      fastEffectsSpec`, `anchoredDraggableMotionSpec = defaultSpatialSpec` (settle after drag);
+fastEffectsSpec`, `anchoredDraggableMotionSpec = defaultSpatialSpec` (settle after drag);
       `ModalBottomSheet.kt`: scrim alpha `DefaultEffects`.
     - `NavigationDrawer.kt` (the side sheet's nearest): open `DefaultSpatial`, close
       `FastEffects`, drag `DefaultSpatial`.

@@ -27,14 +27,14 @@ Commits: see `git log 38e43e0..c1g-slider` (machines, preset, binding-core, bind
       `input`, `valueIndicator`. In c0b's drift test (`pairs.slider`); the todo and pin test are
       gone.
 - **Preset** (`packages/preset/src/components/slider.ts`): parts `root, startTrack, track,
-  activeTrack, markerGroup, marker, stateLayer, handle, valueIndicator, input`; structure
+activeTrack, markerGroup, marker, stateLayer, handle, valueIndicator, input`; structure
   `handle: [stateLayer]` (the state layer now sits inside the handle), `markerGroup: [marker]`.
   Variants `color`, `handleShape` (bar, round), `size` (xsmall–xlarge), new `orientation`
   (horizontal, vertical). New tokens: `activeStart`, `activeEnd`, `startGap`, `endGap`,
   `stopActive`, `bar` (flag set by `handleShape`), `stopColor`, `stopActiveColor`, `stopSize`,
   `valueIndicator{Color,Content,Width,Height,Gap}`. Geometry is one set of logical insets per
   orientation, and bar vs round is `blend(…, bar)` (radii included: `blend(full, barRadius,
-  bar)`), so **no compounds** (21 across the preset, unchanged). Indication entry: trigger
+bar)`), so **no compounds** (21 across the preset, unchanged). Indication entry: trigger
   `handle`, surface `stateLayer`, focus `handle`.
 - **binding-core** (`components/slider.ts`): `SliderValue = number | readonly number[]`;
   `SliderBehaviorProps<V>`/`SliderRootOwnProps<V>` add `largeStep`, `minStepsBetweenThumbs`,

@@ -16,6 +16,9 @@ React, Solid and React Native, on the css, panda and tailwind targets.
   drawer machine doesn't fit the dialog-based Root; record the choice.
 - The settle between snap points uses m2b's sheet springs (`SHEET_SETTLE`, React Native's
   `settle()` with the release velocity).
+- On the web, start the settle at the release velocity: sample the spring with the drag's
+  velocity (core's sampler gains an initial velocity) and set the `linear()` curve inline for
+  that settle; the list item swipe uses the same helper (m2 open question).
 - Scrolling content inside a fully open sheet scrolls natively; the sheet doesn't take over the
   scroll.
 - Own files: `sheet.ts`, `bottom-sheet.ts`, the bottom sheet machine and bindings.

@@ -92,7 +92,7 @@ Commits: see `git log 8dc8065..c2f-split-button-fab-menu`.
 - `cd tests/component-suites && bunx vitest run -c vitest.config.e2e.ts -t "SplitButton|FabMenu"`
   (run `omni run prepare -p @pureform/panda-fixture` first).
 - `cd tests/browser-e2e-tests && bunx vitest run -c vitest.config.e2e.ts src/visual.e2e.test.tsx
-  src/indication.e2e.test.ts src/rn-parity.e2e.test.ts src/panda-factories.e2e.test.ts`.
+src/indication.e2e.test.ts src/rn-parity.e2e.test.ts src/panda-factories.e2e.test.ts`.
 - The bindings' `src/split-button` specs: `bunx vitest run -c vitest.config.unit.ts src/split-button`.
 
 ## Notes for the next phases
@@ -112,7 +112,7 @@ Commits: see `git log 8dc8065..c2f-split-button-fab-menu`.
     - Inline-run corners: the split button writes its own start/end corners per button
       (`split-button.ts`); `tiles.ts`' `positionCorners` is block-direction only. c2e's
       connected button group needs the inline version too: a `positionCorners(outer, inner,
-      "inline")` would serve both.
+"inline")` would serve both.
     - A pressed-or-rest corner (`when(slot(part, "pressed"), pressed).else(rest)`) is `cornerRadius`
       without the toggle swap; `shared.ts` could offer it per corner.
 - **Code that looks like a sibling's / the existing menu:**
