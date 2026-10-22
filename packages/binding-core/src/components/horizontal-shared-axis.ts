@@ -71,6 +71,14 @@ export const PAGE_TRANSITION_PROPS = [
     "transitionScrim",
 ] as const satisfies readonly (keyof PageTransitionProps)[];
 
+/** How far a page slides, as a share of its width (Compose's `SlideFraction`), for a target
+ *  that moves it in code (React Native); the web's keyframes say the same. */
+export const SHARED_AXIS_SLIDE_FRACTION = 0.2;
+
+/** The pages' fade in ms (Compose's `FadeAnimationSpec`: linear, 90ms after 50ms), for a target
+ *  that moves them in code; the web reads the preset's `fadeDuration` and `fadeDelay`. */
+export const SHARED_AXIS_FADE = { duration: 90, delay: 50 } as const;
+
 /** Which way a change from page `from` to page `to` goes. */
 export const sharedAxisDirection = (
     from: number,

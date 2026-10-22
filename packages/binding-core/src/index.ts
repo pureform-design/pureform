@@ -985,6 +985,8 @@ export {
     HORIZONTAL_SHARED_AXIS_ROOT_PROPS,
     horizontalSharedAxisSelection,
     PAGE_TRANSITION_PROPS,
+    SHARED_AXIS_FADE,
+    SHARED_AXIS_SLIDE_FRACTION,
     sharedAxisChange,
     sharedAxisDirection,
     sharedAxisMoving,

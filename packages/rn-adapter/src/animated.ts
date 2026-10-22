@@ -3,7 +3,8 @@
 // indicator's slide.
 
 export { useAnimatedComponentStyles } from "./animate/styles";
-export { curve } from "./animate/curve";
+export { animate, curve, NATIVE_DRIVER } from "./animate/curve";
+export type { AnimatedTiming } from "./animate/curve";
 export { animatedPresence } from "./animate/presence";
 export { settle } from "./animate/settle";
 export type { Spring } from "./values";
