@@ -243,6 +243,7 @@ slot-state table the preset mostly uses):
 | `indeterminate` | `:indeterminate`                           | `aria-checked=mixed`                            |                    | Drop `data-indeterminate`                                                                 |
 | `selected`      |                                            | `aria-selected`, `aria-pressed`, `aria-current` |                    | Drop `data-selected`                                                                      |
 | `expanded`      |                                            | `aria-expanded`                                 |                    | Drop `data-expanded`                                                                      |
+| `descending`    |                                            | `aria-sort=descending`                          |                    | New (f1d): the machine's `data-direction` isn't matched                                    |
 | `invalid`       | `:invalid` (condition only; not on fields) | `aria-invalid=true`                             |                    | Drop `data-invalid`                                                                       |
 | `disabled`      | `:disabled`                                | `aria-disabled=true`                            |                    | Drop `data-disabled` and `[disabled]`; the slot state gains `aria-disabled`               |
 | `readOnly`      | `:read-only`                               | `aria-readonly=true`                            |                    | Drop `data-read-only`                                                                     |
@@ -1071,6 +1072,9 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   `TextFieldImpl.kt`), its colors on their tween. A swipeable list item's `swipeOffset` follows
   the drag at once and settles on `spatialFast` after release; on React Native the spring starts
   at the release velocity (`useComponentSlots`' `velocities`, `Animated.spring`'s `velocity`).
+- **Table sort arrow (f1d).** The arrow is always ↑ and turns over on `spatialFast` while its
+  header cell is sorted descending (the `descending` state: `aria-sort` on the web, a state the
+  React Native binding passes), its opacity on its tween; reduced motion keeps only the fade.
 - **Emphasized.** M3's emphasized easing is a two-segment path, which `cubic-bezier()` can't
   draw; with `linear()` it can. `MATERIAL_EASINGS.emphasized` samples the path from
   material-components-android's tokens with `sampleCubicPath` (each segment densely along its

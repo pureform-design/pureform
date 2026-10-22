@@ -54,6 +54,8 @@ const CONDITION_SELECTOR: Record<string, string> = {
     filled: `&:is(${HAS_VALUE}, [${filled}])`,
     // A control whose popup is open.
     expanded: "&[aria-expanded=true]",
+    // A column header sorted descending.
+    descending: "&[aria-sort=descending]",
     // An element that flips under rtl, such as an icon that points; only pureform marks it.
     mirrored: `&[${mirrored}]`,
     // A part that doesn't fit where it usually sits; only pureform marks it.
@@ -78,7 +80,7 @@ const MEDIA_RULE: Record<string, string> = {
 
 // What each slot state matches on the slot's element, and how many times its selector repeats.
 // Repeating raises specificity, so a later state wins wherever the rules are ordered: hover,
-// filled, selected, checked, and expanded, then indeterminate and focus, then pressed, then
+// filled, selected, checked, expanded, and descending, then indeterminate and focus, then pressed, then
 // invalid, then disabled. Selected combines with the later states through an AND case rather
 // than outranking them. The matches follow the conditions above: native, then ARIA, then
 // `data-pf-*`, each on the slot or, for a state of a control inside it, through `:has()`.
@@ -94,6 +96,7 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
         match: "[aria-expanded=true], :has([aria-expanded=true])",
         rank: 1,
     },
+    descending: { match: "[aria-sort=descending]", rank: 1 },
     // Above checked, so a box that is both shows the dash.
     indeterminate: {
         match: ":indeterminate, :has(:indeterminate), [aria-checked=mixed]",

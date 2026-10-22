@@ -43,7 +43,8 @@ const FIXTURES = [
     { name: "tree", slot: "indicator" },
     // An expandable list item's indicator (c7b), the accordion's.
     { name: "listItem", slot: "indicator" },
-    // A table's sort arrow (c6d) only fades in, so reduced motion keeps it.
+    // A table's sort arrow (c6d) fades in and turns over while sorted descending (f1d); reduced
+    // motion keeps its fade.
     { name: "dataTable", slot: "sortIndicator" },
 ] as const;
 
@@ -87,7 +88,7 @@ const EXPECTED: Record<
     accordion: { full: "transform, color", reduced: "color" },
     tree: { full: "transform, color", reduced: "color" },
     listItem: { full: "transform, color", reduced: "color" },
-    dataTable: { full: "opacity", reduced: "opacity" },
+    dataTable: { full: "transform, opacity", reduced: "opacity" },
 };
 
 const classOf = (

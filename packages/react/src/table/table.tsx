@@ -36,7 +36,7 @@ import {
 
 import { Checkbox } from "../checkbox";
 import { useControllable } from "../controllable";
-import { ArrowDownwardIcon, ArrowUpwardIcon } from "../glyphs";
+import { ArrowUpwardIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
 import { useMachine } from "../machine";
 import { createPartContext } from "../part-context";
@@ -264,7 +264,6 @@ function SortHeader({
         api.getSortHeaderProps({ column }) as Readonly<Record<string, unknown>>,
     ]);
     const sorted = api.sort?.column === column;
-    const descending = sorted && api.sort?.direction === "descending";
     return scope.render("sortHeader", {
         ...button,
         states: { filled: sorted },
@@ -280,13 +279,7 @@ function SortHeader({
                     {scope.render("sortIndicator", {
                         element: "span",
                         machine: api.getSortIndicatorProps({ column }),
-                        props: {
-                            children: descending ? (
-                                <ArrowDownwardIcon />
-                            ) : (
-                                <ArrowUpwardIcon />
-                            ),
-                        },
+                        props: { children: <ArrowUpwardIcon /> },
                     })}
                 </>
             ),

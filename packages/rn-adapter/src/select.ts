@@ -45,6 +45,8 @@ export interface State {
     readOnly?: boolean;
     filled?: boolean;
     expanded?: boolean;
+    /** A column header sorted descending. */
+    descending?: boolean;
     /** An icon that points, which flips under `rtl`. */
     mirrored?: boolean;
     /** A part that doesn't fit where it usually sits (a slider's inset icon on a short track). */

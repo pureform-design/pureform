@@ -12,7 +12,7 @@
 //         <th class={headerCell} role="columnheader" aria-sort="ascending">
 //           <button class={sortHeader} data-pf-filled>
 //             <span class={sortLabel}>Name</span>
-//             <span class={sortIndicator} aria-hidden="true">↑</span>
+//             <span class={sortIndicator} aria-hidden="true"><ArrowUpward /></span>
 //           </button>
 //         </th>
 //       </tr>
@@ -30,7 +30,8 @@
 //   </table>
 //
 // A striped table renders every other body row as `alternateRow`. A sorted column's sort header
-// is marked `filled`; the binding shows the arrow for the direction.
+// is marked `filled`. The arrow always points up and turns over, on the chevrons' spring, while
+// its header cell is sorted descending (`aria-sort`).
 
 import { typed } from "@pureform/core";
 import {
@@ -39,14 +40,17 @@ import {
     column,
     flex,
     literal,
+    numeric,
     platform,
     pointer,
     px,
     relative,
+    rotate,
     row,
     slot,
     solid,
     start,
+    transform,
     transparent,
     unitless,
     when,
@@ -66,9 +70,9 @@ import {
     iconBox,
     INDICATION_ROOT,
     slotStateLayer,
+    springTweens,
     stateTransition,
     sys,
-    tweens,
     variantsOf,
 } from "./shared";
 import type { Densities } from "./shared";
@@ -154,6 +158,11 @@ const arrowOpacity = when()
     .on(slot("sortHeader", "focusVisibleWithin"), ref("arrowHintOpacity"))
     .on(slot("sortHeader", "filled"), unitless(1))
     .else(unitless(0));
+
+// The arrow turns over while its column is sorted descending.
+const arrowTurn = when()
+    .on(slot("headerCell", "descending"), transform(rotate(numeric(180, "deg"))))
+    .else(transform(rotate(numeric(0, "deg"))));
 
 /** Build the table with a `density` step per entry of `densities`. */
 export const createTable = <D extends string = MaterialDensity>(
@@ -280,9 +289,14 @@ export const createTable = <D extends string = MaterialDensity>(
                     sortLabel: { textStyle: textStyle("titleSmall") },
                     sortIndicator: {
                         ...iconBox(ref("arrowSize")),
-                        transition: tweens("opacity"),
+                        transition: springTweens(
+                            "spatialFast",
+                            ["transform"],
+                            ["opacity"],
+                        ),
                         color: ref("arrowColor"),
                         opacity: arrowOpacity,
+                        transform: arrowTurn,
                     },
                 },
                 variants: {

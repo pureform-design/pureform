@@ -394,14 +394,16 @@ export type InteractionCondition =
 
 /** Form / selectable-control states. `filled` is a text input holding a value, or an element
  *  containing one, for example to float a text field's label. `expanded` is a control whose
- *  popup is open, such as a select showing its menu. */
+ *  popup is open, such as a select showing its menu. `descending` is a column header sorted
+ *  descending (`aria-sort="descending"`), for example to turn a table's sort arrow. */
 export type FormCondition =
     | "selected"
     | "checked"
     | "invalid"
     | "readOnly"
     | "filled"
-    | "expanded";
+    | "expanded"
+    | "descending";
 
 /** Color-scheme states (lower to `prefers-color-scheme` or `[data-theme]`). */
 export type ColorSchemeCondition = "dark" | "light";
@@ -527,8 +529,9 @@ export interface SlotCondition {
  *  `focusWithin` is focus on it or inside it, `filled` is a text input inside holding a value,
  *  `invalid` an input inside marked invalid, `disabled` a disabled control inside, `checked`
  *  and `indeterminate` a checkbox, radio, or switch inside in that state, `expanded` a control
- *  inside whose popup is open. `selected` and
- *  `pressed` describe the slot's element only: selected (or toggled on) and pressed. */
+ *  inside whose popup is open. `selected`,
+ *  `pressed` and `descending` describe the slot's element only: selected (or toggled on),
+ *  pressed, and a column header sorted descending. */
 export type SlotState =
     | "hover"
     | "selected"
@@ -539,6 +542,7 @@ export type SlotState =
     | "focusVisibleWithin"
     | "filled"
     | "expanded"
+    | "descending"
     | "invalid"
     | "disabled";
 
