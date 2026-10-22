@@ -5,6 +5,12 @@
 // `.pureform/native/<name>.ts` modules are one of these each, over that component's
 // precomputed styles. Free of React and of the lowering.
 
+import {
+    dampingCoefficient,
+    formatLinearEasing,
+    sampleSpring,
+} from "@pureform/core";
+import type { SpringNode } from "@pureform/core/ast";
 import { deepFreeze, selectionCache, selectionKey } from "@pureform/styling";
 import type {
     ComponentRef,
@@ -262,6 +268,24 @@ const slotsOf = (selected: Selected): Record<string, NativeSlot> => {
 const ENVIRONMENTS = 64;
 const WITH_TOKENS = 64;
 
+const isSpring = (value: unknown): value is SpringNode =>
+    typeof value === "object" &&
+    value !== null &&
+    (value as { type?: unknown }).type === "spring";
+
+// A spring's five theme values: its sampled duration (ms) and curve, and its physics, with the
+// damping as Animated's coefficient.
+const springValues = (spring: SpringNode): Record<string, number | string> => {
+    const { duration, points } = sampleSpring(spring);
+    return {
+        duration,
+        easing: formatLinearEasing(points),
+        stiffness: spring.stiffness,
+        damping: dampingCoefficient(spring),
+        mass: spring.mass,
+    };
+};
+
 const isPerScheme = (tokens: object) =>
     Object.entries(tokens).every(
         ([key, value]) =>
@@ -286,10 +310,15 @@ export const nativeFactory = <C extends ComponentRef = AnyComponent>(
     const tokenKeys = (given: object): Overrides => {
         const rename = (values: object) =>
             Object.fromEntries(
-                Object.entries(values).map(([token, value]) => [
-                    tokens[token] ?? token,
-                    value,
-                ]),
+                Object.entries(values).flatMap(([token, value]) => {
+                    const key = tokens[token] ?? token;
+                    // A spring is its five values, each a key of its own, as a theme's.
+                    return isSpring(value)
+                        ? Object.entries(springValues(value)).map(
+                              ([field, v]) => [`${key}.${field}`, v],
+                          )
+                        : [[key, value]];
+                }),
             );
         return Object.keys(given).length > 0 && isPerScheme(given)
             ? (Object.fromEntries(

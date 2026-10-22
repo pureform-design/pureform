@@ -1,4 +1,8 @@
-import { defineSlotComponent } from "@pureform/core";
+import {
+    dampingCoefficient,
+    defineSlotComponent,
+    sampleSpring,
+} from "@pureform/core";
 import {
     alias,
     colorMix,
@@ -8,6 +12,7 @@ import {
     px,
     rgb,
     slot,
+    spring,
     unitless,
     viewportSize,
     when,
@@ -388,6 +393,29 @@ describe("nativeFactory", () => {
         expect(button({ tokens: {} })).toBe(button({}));
         expect(button({ tokens: { container: "#00ff00" } })).toBe(named);
         expect(Object.isFrozen(named.root.style)).toBe(true);
+    });
+
+    it("sets a spring instance token as the spring's five values", () => {
+        const preset = pureform();
+        const tabs = nativeFactory(
+            "tabs",
+            precompute(preset, { components: ["tabs"] }),
+            instanceTokenKeys("tabs", preset.components.tabs!),
+        );
+        const slow = spring({ stiffness: 200, damping: 0.9 });
+        const [moved] = tabs.selected({
+            tokens: { indicatorSpring: slow },
+        } as never).transitions.indicator!;
+        expect(moved).toMatchObject({
+            property: "transform",
+            duration: sampleSpring(slow).duration,
+            spring: {
+                type: "spring",
+                stiffness: 200,
+                damping: dampingCoefficient(slow),
+                mass: 1,
+            },
+        });
     });
 
     it("gives a component without slots its root", () => {

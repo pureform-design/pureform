@@ -6,6 +6,7 @@ import type {
     FormCondition,
     InteractionCondition,
     MarkCondition,
+    SpringNode,
 } from "@pureform/core/ast";
 
 /** The boolean states a React Native selection carries. The web marks them on the element
@@ -124,9 +125,13 @@ export type TokenOf<C extends ComponentRef> =
 /** A token's value on an instance: a CSS value on the web, a number or string on native. */
 export type TokenValue = string | number;
 
+/** A token's value on an instance: a `TokenValue`, or a spring (core's `spring({ ... })`)
+ *  for a spring-valued token, such as tabs' `indicatorSpring`. */
+export type InstanceTokenValue = TokenValue | SpringNode;
+
 /** The `dynamic` tokens an instance sets, such as a circular progress's `value`. */
 export type InstanceTokens<C extends ComponentRef> = {
-    [T in TokenOf<C>]?: TokenValue | undefined;
+    [T in TokenOf<C>]?: InstanceTokenValue | undefined;
 };
 
 /** What a factory takes: variants, plus the instance's tokens. */

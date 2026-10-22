@@ -341,52 +341,79 @@ export const SPRING_FIELDS = [
     "mass",
 ] as const;
 
-/** A spring's five values as nodes, by field: a literal spring's own, or an alias to a spring
- *  role's, each by reference (`springs.<name>.<field>`), so a theme's change of the role still
- *  reaches them. `undefined` for any other value. */
-export const springFieldNodes = (
-    value: ValueNode,
-): Record<(typeof SPRING_FIELDS)[number], ValueNode> | undefined => {
-    if (value.type === "spring") return springTokenValues(value);
-    if (value.type !== "alias" || value.path[0] !== "springs") return undefined;
-    return Object.fromEntries(
+type SpringFields = Record<(typeof SPRING_FIELDS)[number], ValueNode>;
+
+// A spring-valued component token's five keys, `<token>.<field>`, each falling back to its
+// default's field.
+const dynamicSpringFields = (
+    path: string[],
+    defaults?: SpringFields,
+): SpringFields =>
+    Object.fromEntries(
         SPRING_FIELDS.map((field) => [
             field,
-            { type: "alias", path: [...value.path, field] },
+            {
+                type: "dynamic",
+                path: [...path, field],
+                ...(defaults ? { default: defaults[field] } : {}),
+            },
         ]),
-    ) as Record<(typeof SPRING_FIELDS)[number], ValueNode>;
+    ) as SpringFields;
+
+/** A spring's five values as nodes, by field: a literal spring's own, or an alias to a spring
+ *  role's, each by reference (`springs.<name>.<field>`), so a theme's change of the role still
+ *  reaches them. With the config, also a component token holding a spring, or an alias to one
+ *  (another component's): each field its own key, falling back to its default's. `undefined`
+ *  for any other value. */
+export const springFieldNodes = (
+    value: ValueNode,
+    ctx?: Pick<Ctx, "config" | "target">,
+): SpringFields | undefined => {
+    if (value.type === "spring") return springTokenValues(value);
+    if (value.type === "alias" && value.path[0] === "springs")
+        return Object.fromEntries(
+            SPRING_FIELDS.map((field) => [
+                field,
+                { type: "alias", path: [...value.path, field] },
+            ]),
+        ) as SpringFields;
+    if (!ctx) return undefined;
+    switch (value.type) {
+        case "alias": {
+            let target: ValueNode;
+            try {
+                target = tokenValue(
+                    getByPath(ctx.config, value.path),
+                ) as ValueNode;
+            } catch {
+                return undefined;
+            }
+            return springFieldNodes(target, ctx);
+        }
+        case "dynamic": {
+            // Without a default, nothing says the token is a spring.
+            const defaults =
+                value.default && springFieldNodes(value.default, ctx);
+            return defaults && dynamicSpringFields(value.path, defaults);
+        }
+        case "platform":
+            return springFieldNodes(
+                value.values[ctx.target] ?? value.default,
+                ctx,
+            );
+        default:
+            return undefined;
+    }
 };
 
 // A spring's five values as nodes: a spring token's, by reference, or a literal one's.
 const springNodes = (value: SpringValue, ctx: Ctx): ValueNode[] => {
-    const fields = springFieldNodes(value as ValueNode);
-    if (fields) return SPRING_FIELDS.map((field) => fields[field]);
-    switch (value.type) {
-        case "alias":
-            return springNodes(
-                tokenValue(getByPath(ctx.config, value.path)) as SpringValue,
-                ctx,
-            );
-        case "dynamic": {
-            // A component token holding a spring: each of its five values is its own key,
-            // which a theme override sets, falling back to its default's.
-            const defaults = value.default
-                ? springNodes(value.default as SpringValue, ctx)
-                : [];
-            return SPRING_FIELDS.map((field, i) => ({
-                type: "dynamic",
-                path: [...value.path, field],
-                ...(defaults[i] ? { default: defaults[i] } : {}),
-            }));
-        }
-        case "platform":
-            return springNodes(
-                (value.values[ctx.target] ?? value.default) as SpringValue,
-                ctx,
-            );
-        default:
-            throw new Unsupported(`a ${value.type} value as a spring`);
-    }
+    const fields =
+        value.type === "dynamic" && !value.default
+            ? dynamicSpringFields(value.path)
+            : springFieldNodes(value as ValueNode, ctx);
+    if (!fields) throw new Unsupported(`a ${value.type} value as a spring`);
+    return SPRING_FIELDS.map((field) => fields[field]);
 };
 
 const ZERO_MS = { type: "numeric", value: 0, unit: "ms" } as const;

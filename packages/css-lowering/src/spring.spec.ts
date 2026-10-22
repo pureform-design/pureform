@@ -15,7 +15,7 @@ import type { CoreConfig } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
 import { compileNodeToCSS } from "./compile-node";
-import { componentTokenVars } from "./config";
+import { componentTokenVars, registeredProperties } from "./config";
 import type { LowerCtx } from "./context";
 import { varTokenRef } from "./css";
 import { themeVars } from "./runtime";
@@ -136,8 +136,25 @@ describe("spring component tokens on the web", () => {
                 },
                 recipe: {},
             } as never,
+            card: {
+                name: "card",
+                tokens: {
+                    lift: dynamic(
+                        ["components", "card", "lift"],
+                        alias("springs", "spatialFast"),
+                    ),
+                },
+                recipe: {},
+            } as never,
         },
         themes: {
+            aliased: {
+                components: {
+                    box: {
+                        tokens: { move: alias("components", "card", "lift") },
+                    },
+                },
+            },
             slow: {
                 components: {
                     box: {
@@ -202,6 +219,25 @@ describe("spring component tokens on the web", () => {
             "--components-box-move-duration",
             "--components-box-move-easing",
         ]);
+    });
+
+    it("writes a theme's alias to another component's spring token as the two vars, reading that token's", () => {
+        const aliased = withMove(fast);
+        expect(
+            componentTokenVars(aliased.themes!.aliased!, {
+                ...ctx,
+                config: aliased,
+            }),
+        ).toEqual({
+            "--components-box-move-duration":
+                "var(--components-card-lift-duration, var(--springs-spatial-fast-duration))",
+            "--components-box-move-easing":
+                "var(--components-card-lift-easing, var(--springs-spatial-fast-easing))",
+        });
+    });
+
+    it("leaves spring tokens unregistered with @property", () => {
+        expect(registeredProperties(withMove(fast), ctx)).toEqual([]);
     });
 
     it("sets a spring token in a style as its two vars", () => {

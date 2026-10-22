@@ -491,8 +491,33 @@ describe("lowerRn spring component tokens", () => {
                     },
                 },
             }),
+            card: defineComponent({
+                name: "card",
+                tokens: {
+                    lift: dynamic(
+                        ["components", "card", "lift"],
+                        alias("springs", "spatialFast"),
+                    ),
+                },
+                recipe: { base: {} },
+            }),
         },
         themes: {
+            aliased: {
+                components: {
+                    box: {
+                        tokens: { move: alias("components", "card", "lift") },
+                    },
+                },
+            },
+            followed: {
+                components: {
+                    card: { tokens: { lift: alias("springs", "spatialSlow") } },
+                    box: {
+                        tokens: { move: alias("components", "card", "lift") },
+                    },
+                },
+            },
             slow: {
                 components: {
                     box: {
@@ -549,6 +574,28 @@ describe("lowerRn spring component tokens", () => {
         };
         expect(spring("slow")).toEqual(slowSpring);
         expect(spring("literal")).toEqual(slowSpring);
+    });
+
+    it("resolves a theme's alias to another component's spring token as that token's spring", () => {
+        const spring = (theme: string) =>
+            (
+                evaluate(
+                    timing!,
+                    resolveTheme(config, { scheme: "light", theme }),
+                ) as { spring: unknown }
+            ).spring;
+        expect(spring("aliased")).toEqual({
+            type: "spring",
+            stiffness: 800,
+            damping: dampingCoefficient(fast),
+            mass: 1,
+        });
+        expect(spring("followed")).toEqual({
+            type: "spring",
+            stiffness: 200,
+            damping: dampingCoefficient(slow),
+            mass: 1,
+        });
     });
 });
 
