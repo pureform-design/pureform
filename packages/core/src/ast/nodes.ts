@@ -394,8 +394,8 @@ export type InteractionCondition =
 
 /** Form / selectable-control states. `filled` is a text input holding a value, or an element
  *  containing one, for example to float a text field's label. `expanded` is a control whose
- *  popup is open, such as a select showing its menu. `descending` is a column header sorted
- *  descending (`aria-sort="descending"`), for example to turn a table's sort arrow. */
+ *  popup is open, such as a select showing its menu. `descending` is an element pointing the way
+ *  a sort runs, descending (`data-pf-descending`), for example to turn a table's sort arrow. */
 export type FormCondition =
     | "selected"
     | "checked"
@@ -531,7 +531,7 @@ export interface SlotCondition {
  *  and `indeterminate` a checkbox, radio, or switch inside in that state, `expanded` a control
  *  inside whose popup is open. `selected`,
  *  `pressed` and `descending` describe the slot's element only: selected (or toggled on),
- *  pressed, and a column header sorted descending. */
+ *  pressed, and an element marked descending (a table's sort arrow). */
 export type SlotState =
     | "hover"
     | "selected"

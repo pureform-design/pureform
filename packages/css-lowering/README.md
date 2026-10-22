@@ -83,7 +83,7 @@ Conditions (`when("hover", …)`), on the styled element:
 | `checked`          | `&:is(:checked, [aria-checked=true])`                                                       |
 | `selected`         | `&:is([aria-selected=true], [aria-pressed=true], [aria-current]:not([aria-current=false]))` |
 | `expanded`         | `&[aria-expanded=true]`                                                                     |
-| `descending`       | `&[aria-sort=descending]`                                                                   |
+| `descending`       | `&[data-pf-descending]` (a marking: an element pointing descending, a sort arrow)           |
 | `invalid`          | `&:is(:invalid, [aria-invalid=true])`                                                       |
 | `disabled`         | `&:is(:disabled, [aria-disabled=true])`                                                     |
 | `readOnly`         | `&:is(:read-only, [aria-readonly=true])`                                                    |
@@ -106,7 +106,7 @@ disabled.
 | `checked`            | `:checked, :has(:checked), [aria-checked=true]`                                                     |
 | `indeterminate`      | `:indeterminate, :has(:indeterminate), [aria-checked=mixed]`                                        |
 | `expanded`           | `[aria-expanded=true], :has([aria-expanded=true])`                                                  |
-| `descending`         | `[aria-sort=descending]`                                                                            |
+| `descending`         | `[data-pf-descending]`                                                                              |
 | `focusWithin`        | `:focus-within`                                                                                     |
 | `focusVisibleWithin` | `:focus-visible, :has(:focus-visible)`                                                              |
 | `invalid`            | `[aria-invalid=true], :has([aria-invalid=true])` (not `:invalid`, so an empty required field waits) |

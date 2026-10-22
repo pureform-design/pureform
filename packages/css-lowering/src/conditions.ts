@@ -22,7 +22,7 @@ import { aliasTarget } from "./css";
 // pseudo-class first, then an ARIA attribute, and only where neither covers it a `data-pf-*`
 // attribute the bindings set. A behavior library's own attributes (`data-state`, `data-hover`)
 // are never matched, so swapping it can't change styling.
-const { hover, pressed, dragged, filled, mirrored, overflowing } =
+const { hover, pressed, dragged, filled, mirrored, overflowing, descending } =
     STATE_ATTRIBUTES;
 
 // A text input holding a value, or an element containing one. CSS sees a value through
@@ -54,8 +54,8 @@ const CONDITION_SELECTOR: Record<string, string> = {
     filled: `&:is(${HAS_VALUE}, [${filled}])`,
     // A control whose popup is open.
     expanded: "&[aria-expanded=true]",
-    // A column header sorted descending.
-    descending: "&[aria-sort=descending]",
+    // An element pointing the way a sort runs, descending; only pureform marks it.
+    descending: `&[${descending}]`,
     // An element that flips under rtl, such as an icon that points; only pureform marks it.
     mirrored: `&[${mirrored}]`,
     // A part that doesn't fit where it usually sits; only pureform marks it.
@@ -96,7 +96,7 @@ const SLOT_STATE: Record<SlotState, { match: string; rank: number }> = {
         match: "[aria-expanded=true], :has([aria-expanded=true])",
         rank: 1,
     },
-    descending: { match: "[aria-sort=descending]", rank: 1 },
+    descending: { match: `[${descending}]`, rank: 1 },
     // Above checked, so a box that is both shows the dash.
     indeterminate: {
         match: ":indeterminate, :has(:indeterminate), [aria-checked=mixed]",
