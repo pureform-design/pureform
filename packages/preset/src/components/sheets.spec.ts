@@ -138,4 +138,24 @@ describe("sheet motion", () => {
         expect(bottom).not.toContain("sheetFade");
         expect(Object.keys(SHEET_KEYFRAMES)).not.toContain("sheetFadeIn");
     });
+
+    it("slides on springs, fades on tweens, and settles after a drag on a spring", () => {
+        for (const motion of [BOTTOM_SHEET_MOTION, SIDE_SHEET_MOTION]) {
+            expect(motion.enter.spring).toBe("spatialDefault");
+            expect(motion.exit.spring).toBe("effectsFast");
+            expect(motion.enter.fade).toEqual({
+                duration: "long2",
+                easing: "emphasizedDecelerate",
+            });
+        }
+        for (const stops of Object.values(SHEET_KEYFRAMES)) {
+            for (const stop of Object.values(stops)) {
+                expect(Object.keys(stop)).toEqual(["transform"]);
+            }
+        }
+        const root = json(bottomSheet.recipe.base!.root!.transition);
+        expect(root).toContain("translate");
+        expect(root).toContain("spatialDefault");
+        expect(root).toContain("reducedMotion");
+    });
 });

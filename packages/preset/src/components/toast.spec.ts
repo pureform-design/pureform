@@ -44,6 +44,16 @@ describe("toast", () => {
         );
     });
 
+    it("moves and resizes in the stack on a spring, and fades on a tween", () => {
+        expect(recipe().base.root!.transition).toEqual({
+            base:
+                "transform token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
+                "height token(springs.spatialFast.duration) token(springs.spatialFast.easing), " +
+                "opacity token(durations.short3) token(easings.standard)",
+            _motionReduce: "opacity token(durations.short3) token(easings.standard)",
+        });
+    });
+
     it("stacks its region at the snackbar's layer", () => {
         expect(recipe().base.group?.zIndex).toBe("token(zIndex.snackbar)");
     });
