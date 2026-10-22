@@ -739,6 +739,7 @@ exports[`listItem > compiles to a stable Panda slot recipe 1`] = `
       "width": "100%",
     },
     "frame": {
+      "isolation": "isolate",
       "overflow": "hidden",
       "position": "relative",
     },

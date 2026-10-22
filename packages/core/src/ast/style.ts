@@ -19,6 +19,7 @@ import type {
     OverflowKeyword,
     CornerShapeKeyword,
     ObjectFitKeyword,
+    IsolationKeyword,
     PointerEventsKeyword,
     PortableCondition,
     PositionKeyword,
@@ -156,6 +157,7 @@ export interface StyleMap {
     opacity?: Dimension;
     // prefer alias("zIndices", <name>) over magic numbers
     zIndex?: Dimension;
+    isolation?: Keyword<IsolationKeyword>;
     fontWeight?: Dimension;
     lineHeight?: Dimension;
     // typography
