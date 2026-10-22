@@ -74,9 +74,11 @@ const scrimOpacityOf = (
     };
     const light = at("light");
     const dark = at("dark");
+    // A share of the scrim color, as `colorMix` takes it.
+    const share = (opacity: number) => pct(Math.round(opacity * 100));
     return light === dark
-        ? unitless(light)
-        : when("dark", unitless(dark), unitless(light));
+        ? share(light)
+        : when("dark", share(dark), share(light));
 };
 
 const FADE_IN = "overlayFadeIn";
