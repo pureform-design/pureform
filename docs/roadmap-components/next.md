@@ -22,6 +22,9 @@ phase named.
 - **Alongside m2:** a fresh-build `tsc` check on main, and formatting the unformatted files.
 - **Gate:** the fixing agent reruns with `-f failed` only ([conventions](conventions.md)).
 - **Small fix phase after m2:**
+    - React Native sheets: slide in from their edge instead of the dialog's motion; a refused
+      close after a drag springs back to rest; check the extra drag `Animated.View` doesn't
+      change a standalone sheet's layout (m2b).
     - Selection list: single selection by default; multiple stays an option.
     - Rail: replace a destination's `sectionLabel` with a `section` tag on every destination.
       Runs of the same `section` share one heading (grouped like Select's `group`, through

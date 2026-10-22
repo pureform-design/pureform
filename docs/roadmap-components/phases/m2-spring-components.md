@@ -24,6 +24,13 @@ their tween. Decided 2026-10-22 ([next.md §0](../next.md)).
 - **C, containers:** accordion, tree, field label, table sort arrow, and the list's and
   select's chevrons, so every chevron turns the same way.
 
+## Decided at the merge (2026-10-22)
+
+- Overlay fades move to effects springs as Compose has them (`effectsFast`, `effectsDefault`
+  for the scrim), replacing m2b's tweens.
+- The menu, tooltip and snackbar shrink back to 80% as they fade out, as in Compose.
+- The dialog keeps the sheets' springs (`spatialDefault` in, `effectsFast` out).
+
 ## Later
 
 - **D, state fades:** `tweens`.
