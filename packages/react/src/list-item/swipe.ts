@@ -12,7 +12,8 @@ import {
     swipeTokens,
 } from "@pureform/binding-core";
 import type { ListItemSwipeProps } from "@pureform/binding-core";
-import type { KeyboardEvent, MouseEvent, PointerEvent } from "react";
+import { swallowNextClick } from "@pureform/binding-core/dom";
+import type { KeyboardEvent, PointerEvent } from "react";
 import { useRef, useState } from "react";
 
 import { useDirection } from "../provider";
@@ -51,7 +52,9 @@ export function useSwipe(
         offset: number;
         moved: boolean;
     }>(undefined);
-    const dragged = useRef(false);
+    // The click that ends a drag isn't a press on the row, nor on its own handlers (an
+    // expandable row's); the next press takes the listener back if no click came.
+    const swallow = useRef<() => void>(undefined);
     if (!swipeable) return undefined;
     const setRevealed = (next: boolean) => {
         if (next === revealed) return;
@@ -66,6 +69,7 @@ export function useSwipe(
             style: { touchAction: "pan-y" },
             tabIndex: interactive ? undefined : 0,
             onPointerDown: (event: PointerEvent<HTMLElement>) => {
+                swallow.current?.();
                 if (event.pointerType === "mouse" && event.button !== 0) return;
                 const target = (event.target as Element).closest(OWN_GESTURES);
                 if (target && target !== event.currentTarget) return;
@@ -97,24 +101,19 @@ export function useSwipe(
                 );
                 setDrag(held.offset);
             },
-            onPointerUp: () => {
+            onPointerUp: (event: PointerEvent<HTMLElement>) => {
                 const held = gesture.current;
                 gesture.current = undefined;
                 if (!held?.moved) return;
-                dragged.current = true;
+                swallow.current = swallowNextClick(
+                    event.currentTarget as Element,
+                );
                 setRevealed(swipeSettlesOpen(held.offset, width));
                 setDrag(undefined);
             },
             onPointerCancel: () => {
                 gesture.current = undefined;
                 setDrag(undefined);
-            },
-            // A drag isn't a click on the row.
-            onClickCapture: (event: MouseEvent<HTMLElement>) => {
-                if (!dragged.current) return;
-                dragged.current = false;
-                event.preventDefault();
-                event.stopPropagation();
             },
             onKeyDown: (event: KeyboardEvent<HTMLElement>) => {
                 if (event.target !== event.currentTarget) return;

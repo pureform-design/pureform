@@ -185,6 +185,7 @@ export {
     measureCarouselRow,
     observeCarouselRow,
 } from "./carousel-row";
+export { swallowNextClick } from "./drag-click";
 export {
     dragToDismiss,
     SHEET_DISMISS_SHARE,
