@@ -47,6 +47,7 @@ flowchart LR
     c6 --> m1[m1 springs foundation]
     r6 --> m2[m2 spring components]
     m1 --> m2
+    m2 --> c8[c8 Material gaps from Zag]
 ```
 
 A phase depends on the one before it unless its file says it needs only a specific earlier
@@ -74,6 +75,7 @@ contexts exist.
 | [x]  | [r6 Final refactor and doc sync](phases/r6-final.md) ([r6](context/r6.md), [next](next.md))                                                                                                                        | r6a                                                                                                                   | Whole-library duplication pass; docs match the code                |                  |
 | [x]  | [m1 Springs foundation](phases/m1-springs-foundation.md) ([m1](context/m1.md))                                                                                                                                     | m1                                                                                                                    | Spring and `linear()` motion plumbing; M3 springs; emphasized path |                  |
 | [ ]  | [m2 Spring components](phases/m2-spring-components.md)                                                                                                                                                             | TBD                                                                                                                   | Components moved to springs                                        |                  |
+| [ ]  | [c8 Material gaps from Zag](phases/c8-zag-gaps.md)                                                                                                                                                                 | c8a bottom sheet partly open, c8b context menu trigger, c8c resizable panes                                           | M3 behaviours a Zag machine can back                               |                  |
 
 ## Rules that apply to every phase
 
