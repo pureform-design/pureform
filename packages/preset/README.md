@@ -1155,7 +1155,7 @@ lists (c6a), drawn with the list's row parts (`rowParts`, `rowTokens`).
   `aria-expanded`) and `group` (a branch's children, `indent` from the start; no display of its
   own, so `hidden` hides it). Groups `density` and `color` (the selected row's container); 0
   compounds.
-- `expandIndicator(trailing, expanded)` (in `accordion.ts`) is the turning indicator both use.
+- `expandIndicator(trailing, expanded)` (in `list.ts`) is the turning indicator both use.
 
 ## Grid list
 

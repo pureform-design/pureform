@@ -54,7 +54,7 @@ config ──► codegen.ts ──► .pureform/native/<name>.ts (a factory over
 | --------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `@pureform/rn-adapter`                        | `precompute`, `runtimeStyles`, `lowerRn`, `select`, `selectWithTransitions`, …                                                                            |
 | `@pureform/rn-adapter/react`                  | `StylesProvider`, `PureformProvider`, `useComponentStyles`, `useComponentState`, `useTokens`, `useStyleEnvironment`, `useReducedMotion`, `pressableState` |
-| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, `animatedPresence`, and `useAnimatedSlide`, through React Native's Animated                                    |
+| `@pureform/rn-adapter/animated`               | `useAnimatedComponentStyles`, `useRipple`, `animatedPresence`, `useAnimatedSlide`, and `slowSpring`, through React Native's Animated                      |
 | `@pureform/rn-adapter/reanimated`             | `useReanimatedComponentStyles`, `cssMotion`, `reanimatedPresence`, and `useReanimatedSlide`, through Reanimated 4                                         |
 | `@pureform/rn-adapter/svg`, `/reanimated-svg` | `SvgDrawing`, `ReanimatedSvgDrawing`, and their ripples                                                                                                   |
 | `@pureform/rn-adapter/metro`                  | `withPureform` for `metro.config.js`                                                                                                                      |
