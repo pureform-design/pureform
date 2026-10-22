@@ -22,7 +22,8 @@ import type { VariantProp } from "./variants";
 
 /** The list item's parts: `"root" | "leading" | "content" | "overline" | "headline" |
  *  "supportingText" | "trailing" | "trailingText" | "indicator"` (an expandable item's) `|
- *  "region"` (what it expands, after the row). */
+ *  "region"` (what it expands, after the row) `| "frame" | "action"` (a swipeable item's: the
+ *  frame around the row and its action). */
 export type ListItemPart = PartName<typeof listItemAnatomy>;
 
 /** The list item's variant groups and instance tokens. `interactive` gives it the state layer and
@@ -36,8 +37,8 @@ export interface ListItemVariantProps {
     /** Its place among a segmented list's tiles, which rounds its corners. A segmented `List`
      *  sets it. @default "none" */
     readonly position?: VariantProp<"listItem", "position">;
-    /** The row slides to uncover an action (`swipeAction` on the ready-made item). Set by the
-     *  ready-made item when it has one. @default false */
+    /** The row slides to uncover an action. Set by the frame around a swipeable row (on the
+     *  web) or by `swipeAction`. @default false */
     readonly swipeable?: boolean | undefined;
     /** The swipe action's colours: the secondary container, or the error container for a
      *  destructive action. @default "secondary" */
@@ -59,12 +60,12 @@ export interface ListItemStateProps {
  *  ready-made one given a `region`) takes them. */
 export type ListItemExpandProps = Controllable<"expanded", boolean>;
 
-/** Everything Root takes for itself, besides the element's own props and `as`. */
+/** Everything Root takes for itself, besides the element's own props and `as`. Whether it
+ *  swipes, and the action's colours, are the frame's (`ListItemFrameOwnProps`). */
 export interface ListItemRootOwnProps
     extends
-        ListItemVariantProps,
+        Omit<ListItemVariantProps, "swipeable" | "actionColor">,
         ListItemStateProps,
-        ListItemSwipeProps,
         InteractiveProps {
     /** A prefix for every part's test id (`inbox` → `inbox-headline`), or ids by part. */
     readonly testId?: TestIdOverride<ListItemPart> | undefined;
@@ -78,12 +79,9 @@ export const LIST_ITEM_ROOT_PROPS = [
     "interactive",
     "leadingType",
     "position",
-    "swipeable",
-    "actionColor",
     "density",
     "color",
     "tokens",
-    ...LIST_ITEM_SWIPE_PROPS,
     "selected",
     "disabled",
     "testId",
@@ -91,6 +89,20 @@ export const LIST_ITEM_ROOT_PROPS = [
     "indication",
     "interactionSource",
 ] as const satisfies readonly (keyof ListItemRootOwnProps)[];
+
+/** What a swipeable item's frame takes: whether its action is revealed and how wide it is, and
+ *  the action's colours. The row in it swipes. */
+export interface ListItemFrameOwnProps extends ListItemSwipeProps {
+    /** The action's colours: the secondary container, or the error container for a destructive
+     *  action. @default "secondary" */
+    readonly actionColor?: VariantProp<"listItem", "actionColor">;
+}
+
+/** The keys of `ListItemFrameOwnProps`. */
+export const LIST_ITEM_FRAME_PROPS = [
+    ...LIST_ITEM_SWIPE_PROPS,
+    "actionColor",
+] as const satisfies readonly (keyof ListItemFrameOwnProps)[];
 
 /** What the ready-made list item renders inside Root, in the framework's node type. Each part
  *  renders only when given, but the headline. */
@@ -105,9 +117,8 @@ export interface ListItemContentProps<Node> {
     readonly trailing?: Node;
     /** Text after the text, such as a count. */
     readonly trailingText?: Node;
-    /** The action the row slides to uncover: a button. Makes the item swipeable. Don't put it in
-     *  a link or button item; the action is a button of its own. An item with a `region` (a
-     *  button) ignores it. */
+    /** The action the row slides to uncover: a button. Makes the item swipeable: the action sits
+     *  beside the row, in a frame, so a link, a button, or an expandable item swipes too. */
     readonly swipeAction?: Node;
     /** Flip the leading or trailing icon under `rtl`, for an icon that points. */
     readonly mirrorLeading?: boolean | undefined;

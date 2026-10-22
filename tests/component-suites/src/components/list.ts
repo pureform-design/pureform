@@ -53,6 +53,13 @@ export const listItem: ComponentCase = {
             swipeAction: "Delete",
             defaultRevealed: true,
         },
+        "swipeable, destructive, revealed": {
+            as: undefined,
+            leading: "✉",
+            swipeAction: "Delete",
+            actionColor: "error",
+            defaultRevealed: true,
+        },
         disabled: { disabled: true, leading: "✉" },
     },
     keyboard: {
@@ -92,6 +99,10 @@ export const expandableListItem: ComponentCase = {
             defaultExpanded: true,
             supportingText: "2 folders",
             leading: "▤",
+        },
+        "swipeable, revealed": {
+            swipeAction: "Delete",
+            defaultRevealed: true,
         },
     },
     state: {

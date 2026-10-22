@@ -148,17 +148,15 @@ describe("M3 Expressive", () => {
         expect(slider.recipe.base.insetIcon).toHaveProperty("opacity");
     });
 
-    it("slides a swipeable list item's parts over its action, and clips them", () => {
+    it("slides a swipeable list item's row over its action, in a frame that clips them", () => {
         const swipeable = slotRecipe(listItem, "listItem")?.variants?.swipeable;
         expect(swipeable?.false).toEqual({});
-        expect(Object.keys(swipeable?.true ?? {}).sort()).toEqual([
-            "content",
-            "leading",
-            "root",
-            "trailing",
-            "trailingText",
-        ]);
-        expect(swipeable?.true?.root).toMatchObject({ overflow: "hidden" });
+        expect(Object.keys(swipeable?.true ?? {})).toEqual(["root"]);
+        expect(swipeable?.true?.root).toHaveProperty("transform");
+        expect(listItem.recipe.base.frame).toMatchObject({
+            position: { value: "relative" },
+            overflow: { value: "hidden" },
+        });
         expect(listItem.recipe.base.action).toMatchObject({
             position: { value: "absolute" },
         });
@@ -170,7 +168,9 @@ describe("M3 Expressive", () => {
     it("colours a list item's swipe action secondary by default, or error for a destructive one", () => {
         const colors = slotRecipe(listItem, "listItem")?.variants?.actionColor;
         expect(colors?.secondary).toEqual({});
-        expect(JSON.stringify(colors?.error?.root)).toContain("errorContainer");
+        expect(JSON.stringify(colors?.error?.action)).toContain(
+            "errorContainer",
+        );
         expect(listItem.recipe.defaultVariants).toMatchObject({
             actionColor: "secondary",
         });

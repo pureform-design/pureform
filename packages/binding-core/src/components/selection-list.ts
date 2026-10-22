@@ -13,8 +13,8 @@ export interface SelectionListBehaviorProps extends Controllable<
     "value",
     string[]
 > {
-    /** `multiple` selects any number of options, as Angular's selection list does; `single` one
-     *  at a time. @default "multiple" */
+    /** `single` selects one option at a time, as M3 lists mostly do; `multiple` any number, as
+     *  Angular's selection list does. @default "single" */
     readonly selectionMode?: "single" | "multiple" | undefined;
     /** Whether a single-select list lets its one option go off again. @default false */
     readonly deselectable?: boolean | undefined;
@@ -102,7 +102,7 @@ export const selectionListOptions = (
 export const selectionListMachineProps = (
     props: SelectionListBehaviorProps,
 ) => ({
-    selectionMode: props.selectionMode ?? ("multiple" as const),
+    selectionMode: props.selectionMode ?? ("single" as const),
     deselectable: props.deselectable,
     loopFocus: props.loopFocus,
     disabled: props.disabled,

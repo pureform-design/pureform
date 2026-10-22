@@ -95,9 +95,15 @@ describe("SelectionList", () => {
         { value: "y", headline: "Y", testId: "y" },
     ];
 
-    it("selects any number of options by default", async () => {
+    it("selects any number of options in a multiple-select list", async () => {
         const change = vi.fn();
-        await render(<SelectionList onValueChange={change} items={items} />);
+        await render(
+            <SelectionList
+                selectionMode="multiple"
+                onValueChange={change}
+                items={items}
+            />,
+        );
         expect(byTestId("pf-list-root").getAttribute("role")).toBe("listbox");
         expect(byTestId("x-root").getAttribute("role")).toBe("option");
         await interact(() => userEvent.click(byTestId("x-root")));
@@ -106,11 +112,10 @@ describe("SelectionList", () => {
         expect(byTestId("y-root").getAttribute("aria-selected")).toBe("true");
     });
 
-    it("selects one option at a time in a single-select list", async () => {
+    it("selects one option at a time by default", async () => {
         const change = vi.fn();
         await render(
             <SelectionList
-                selectionMode="single"
                 defaultValue={["x"]}
                 onValueChange={change}
                 items={items}

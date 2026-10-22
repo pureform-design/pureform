@@ -328,6 +328,7 @@ export const navigationRegistry = () =>
             "trailingText",
             "indicator",
             "region",
+            "frame",
             "action",
         ]),
     });

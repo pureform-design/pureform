@@ -1033,13 +1033,13 @@ describe("nested rows", () => {
         expect(labels()).toEqual(["Cut", "Share›"]);
     });
 
-    it("shows an expanded rail's section labels", async () => {
+    it("shows an expanded rail's section headings", async () => {
         await render(
             <NavigationRail
-                items={[
-                    { ...DESTINATIONS[0]!, sectionLabel: "Mail" },
-                    ...DESTINATIONS.slice(1),
-                ]}
+                items={DESTINATIONS.map((item) => ({
+                    ...item,
+                    section: "Mail",
+                }))}
                 expanded
                 testId="s"
             />,
@@ -1048,7 +1048,7 @@ describe("nested rows", () => {
         expect(computed("s-section-label").display).toBe("flex");
     });
 
-    it("keeps an item with both a region and a swipe action expandable, without the action", async () => {
+    it("swipes an expandable item too: its action beside the button, in a frame", async () => {
         await render(
             <ListItem
                 headline="Folders"
@@ -1057,13 +1057,14 @@ describe("nested rows", () => {
                 testId="both"
             />,
         );
-        expect(byTestId("both-root").getAttribute("role")).toBe("button");
-        expect(byTestId("both-root").getAttribute("aria-expanded")).toBe(
-            "false",
-        );
-        expect(document.querySelector('[data-testid="both-action"]')).toBe(
-            null,
-        );
+        const root = byTestId("both-root");
+        expect(root.getAttribute("role")).toBe("button");
+        expect(root.getAttribute("aria-expanded")).toBe("false");
+        const frame = byTestId("both-frame");
+        expect([...frame.children]).toEqual([byTestId("both-action"), root]);
+        await interact(() => userEvent.click(root));
+        expect(root.getAttribute("aria-expanded")).toBe("true");
+        expect(byTestId("both-region")).toBeTruthy();
     });
 });
 
@@ -1096,6 +1097,25 @@ describe("c7c: avatar picture, swipe, inset icon, search bar width", () => {
         ).toBeNull();
         await until(() =>
             expect(byTestId("broken-fallback").textContent).toBe("BO"),
+        );
+    });
+
+    it("names an avatar as an image by its label, and hides one without", async () => {
+        await render(
+            <>
+                <Avatar label="Ada" testId="named">
+                    AL
+                </Avatar>
+                <Avatar testId="decorative">AL</Avatar>
+            </>,
+        );
+        const named = byTestId("named-root");
+        expect(named.tagName).not.toBe("IMG");
+        expect(named.getAttribute("role")).toBe("img");
+        expect(named.getAttribute("aria-label")).toBe("Ada");
+        expect(byTestId("decorative-root").getAttribute("role")).toBe(null);
+        expect(byTestId("decorative-root").getAttribute("aria-hidden")).toBe(
+            "true",
         );
     });
 

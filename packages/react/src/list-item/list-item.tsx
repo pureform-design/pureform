@@ -3,7 +3,8 @@
 // draws them; and the ready-made ListItem over them. It has no machine: the app marks it selected
 // or disabled. Inside a List, it takes the list's variants as its defaults. An expandable item sits
 // in `Expandable`, Zag's accordion with one item: Root is its header (a button, with an
-// `Indicator`), and `Region`, after Root, its content.
+// `Indicator`), and `Region`, after Root, its content. A swipeable item sits in a `Frame`, with
+// its `Action` beside Root rather than in it, so a link, a button, or an expandable item swipes.
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -11,6 +12,7 @@ import {
     isInteractiveListItem,
     isPresent,
     LIST_ITEM_EXPAND_VALUE,
+    LIST_ITEM_FRAME_PROPS,
     listItemExpandMachineProps,
     LIST_ITEM_ROOT_PROPS,
     listItemElement,
@@ -22,6 +24,7 @@ import {
 import type {
     ListItemContentProps,
     ListItemExpandProps,
+    ListItemFrameOwnProps,
     ListItemPart,
     ListItemRootOwnProps,
     ListVariantProps,
@@ -60,11 +63,17 @@ type Anatomy = typeof listItemAnatomy;
 /** What Root shares with its parts. */
 interface ListItemContextValue {
     readonly scope: ComponentScope<Anatomy>;
-    /** A swipeable item's state; `undefined` for any other. */
-    readonly swipe: Swipe | undefined;
 }
 
 const context = createPartContext<ListItemContextValue>("ListItem");
+
+/** What `Frame` shares with Root and Action: the swipe's state. */
+interface FrameContextValue {
+    readonly scope: ComponentScope<Anatomy>;
+    readonly swipe: Swipe;
+}
+
+const frameContext = createPartContext<FrameContextValue>("ListItem", "Frame");
 
 /** What `Expandable` shares with Root and Region. Root gives it its interaction source, which the
  *  machine's header emits to, as an accordion header's. */
@@ -112,6 +121,7 @@ export interface ListItemIconProps extends ListItemPartProps {
 function Root(props: ListItemRootProps): ReactNode {
     const list = use(ListDefaults);
     const expand = use(expandContext.Provider);
+    const frame = use(frameContext.Provider);
     // An expandable item's header is a button, unless told otherwise.
     const element = listItemElement<ElementType>({
         href: props.href,
@@ -136,12 +146,12 @@ function Root(props: ListItemRootProps): ReactNode {
         source,
         !!expand || !interactive || !!props.disabled,
     );
-    // An expandable item's header is a button: it doesn't also swipe (its action would be a
-    // button in a button).
-    const variants = expand
-        ? { ...listItemVariants(list, props), swipeable: false }
-        : listItemVariants(list, props);
-    const swipe = useSwipe(props, !!variants.swipeable);
+    // In a frame, the row swipes.
+    const variants = {
+        ...listItemVariants(list, props),
+        swipeable: frame ? true : undefined,
+    };
+    const swipe = frame?.swipe;
     const scope = useComponent(listItemAnatomy, {
         selection: listItemSelection(
             swipe
@@ -160,7 +170,7 @@ function Root(props: ListItemRootProps): ReactNode {
     });
     const { as: _as, ...rest } = omitProps(props, LIST_ITEM_ROOT_PROPS);
     return (
-        <context.Provider value={{ scope, swipe }}>
+        <context.Provider value={{ scope }}>
             {scope.render("root", {
                 element,
                 machine:
@@ -303,13 +313,60 @@ function Region({
     });
 }
 
-/** The action a swipeable row uncovers as it slides: put a button in it. It is out of reach of
- *  assistive technology and the keyboard until it's revealed. */
+/** `Frame`'s props: whether the action is revealed (controllable) and how wide it is, its
+ *  colours, test ids by part, and Root and Action as children. */
+export interface ListItemFrameProps
+    extends
+        Omit<ListItemPartProps, keyof ListItemFrameOwnProps>,
+        ListItemFrameOwnProps,
+        Pick<ListItemRootOwnProps, "position"> {
+    /** A prefix for its parts' test ids, or ids by part (Frame's and Action's). */
+    readonly testId?: TestIdOverride<ListItemPart> | undefined;
+}
+
+/** A swipeable item: its Action and Root, side by side. The row slides toward the start to
+ *  uncover the action under it, by a drag or the arrow keys. */
+function Frame({
+    unstyled,
+    position,
+    testId,
+    ...props
+}: ListItemFrameProps): ReactNode {
+    const list = use(ListDefaults);
+    const swipe = useSwipe(props, true)!;
+    const scope = useComponent(listItemAnatomy, {
+        selection: listItemSelection(
+            {
+                ...listItemVariants(list, { position }),
+                swipeable: true,
+                actionColor: props.actionColor,
+                tokens: swipe.tokens,
+            },
+            "div",
+        ),
+        testId,
+    });
+    const rest = omitProps(props, LIST_ITEM_FRAME_PROPS);
+    // The swipe's tokens go on the frame, which Root and Action inherit.
+    return (
+        <frameContext.Provider value={{ scope, swipe }}>
+            {scope.render("frame", {
+                element: "div",
+                machine: { style: scope.classes.root?.style },
+                unstyled,
+                props: rest,
+            })}
+        </frameContext.Provider>
+    );
+}
+
+/** The action a swipeable row uncovers as it slides, in its `Frame`: put a button in it. It is
+ *  out of reach of assistive technology and the keyboard until it's revealed. */
 function Action({ unstyled, ...props }: ListItemPartProps): ReactNode {
-    const { scope, swipe } = context.use("Action");
+    const { scope, swipe } = frameContext.use("Action");
     return scope.render("action", {
         element: "div",
-        machine: { inert: swipe ? !swipe.revealed : true },
+        machine: { inert: !swipe.revealed },
         unstyled,
         props,
     });
@@ -322,13 +379,34 @@ export interface ListItemProps
         Omit<ListItemRootProps, keyof SlotKeyedProps<Anatomy> | "children">,
         SlotKeyedProps<Anatomy>,
         ListItemContentProps<ReactNode>,
-        ListItemExpandProps {}
+        ListItemExpandProps,
+        ListItemFrameOwnProps {}
 
 /** The ready-made list item: every part in the preset's structure that has content; given a
- *  `region`, an expandable item showing it under the row. */
+ *  `region`, an expandable item showing it under the row; given a `swipeAction`, in a frame
+ *  with it. */
 function ReadyMade(props: ListItemProps): ReactNode {
     const slot = useSlotProps(props);
-    if (!isPresent(props.region)) return <Row props={props} slot={slot} />;
+    const expandable = isPresent(props.region);
+    const row = <Row props={props} slot={slot} expandable={expandable} />;
+    const framed = isPresent(props.swipeAction) ? (
+        <Frame
+            revealed={props.revealed}
+            defaultRevealed={props.defaultRevealed}
+            onRevealedChange={props.onRevealedChange}
+            swipeWidth={props.swipeWidth}
+            actionColor={props.actionColor}
+            position={props.position}
+            testId={props.testId}
+            {...slot("frame")}
+        >
+            <Action {...slot("action")}>{props.swipeAction}</Action>
+            {row}
+        </Frame>
+    ) : (
+        row
+    );
+    if (!expandable) return framed;
     return (
         <Expandable
             expanded={props.expanded}
@@ -336,7 +414,7 @@ function ReadyMade(props: ListItemProps): ReactNode {
             onExpandedChange={props.onExpandedChange}
             testId={props.testId}
         >
-            <Row props={props} slot={slot} expandable />
+            {framed}
             <Region {...slot("region")}>{props.region}</Region>
         </Expandable>
     );
@@ -362,7 +440,12 @@ function Row({
         leading,
         trailing,
         trailingText,
-        swipeAction,
+        swipeAction: _swipeAction,
+        revealed: _revealed,
+        defaultRevealed: _defaultRevealed,
+        onRevealedChange: _onRevealedChange,
+        swipeWidth: _swipeWidth,
+        actionColor: _actionColor,
         mirrorLeading,
         mirrorTrailing,
         region: _region,
@@ -371,15 +454,10 @@ function Row({
         onExpandedChange: _onExpandedChange,
         ...rootProps
     } = props;
-    // An expandable row doesn't swipe: Root, a button, would hold the action's button.
-    const swipeable = !expandable && isPresent(swipeAction);
     return (
         <Root
             {...rootProps}
             lines={props.lines ?? listItemLines(props)}
-            swipeable={
-                expandable ? false : (props.swipeable ?? (swipeable || undefined))
-            }
             {...(slot("root") as object)}
         >
             {isPresent(leading) ? (
@@ -409,9 +487,6 @@ function Row({
                 </TrailingText>
             ) : null}
             {expandable ? <Indicator {...slot("indicator")} /> : null}
-            {swipeable ? (
-                <Action {...slot("action")}>{swipeAction}</Action>
-            ) : null}
         </Root>
     );
 }
@@ -421,11 +496,13 @@ function Row({
  *  `Overline`, `Headline`, and `SupportingText`, then `Trailing` and `TrailingText`. Put it in a
  *  `List`, or give it the element a list item needs (`as="li"`). An expandable item takes a
  *  `region` (ready-made), or composes `Expandable` around `Root` (holding an `Indicator` last) and
- *  `Region`. */
+ *  `Region`. A swipeable item takes a `swipeAction` (ready-made), or composes `Frame` around
+ *  `Action` and `Root`. */
 export const ListItem = Object.assign(ReadyMade, {
     Root,
     Expandable,
     Region,
+    Frame,
     Indicator,
     Leading,
     Content,

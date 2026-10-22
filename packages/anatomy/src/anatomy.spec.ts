@@ -139,10 +139,15 @@ describe("the written anatomy", () => {
             // The toast's outermost part is the region its toasts stack in, as Zag's.
             expect(root, name).toBe(name === "toast" ? "group" : "root");
             for (const part of Object.values(parts)) {
-                // An expandable list item's region is its row's sibling: the row is a button.
+                // An expandable list item's region is its row's sibling: the row is a button. A
+                // swipeable one's frame holds its row and its action, side by side.
                 if (
                     part.name === root ||
-                    `${name}.${part.name}` === "listItem.region"
+                    [
+                        "listItem.region",
+                        "listItem.frame",
+                        "listItem.action",
+                    ].includes(`${name}.${part.name}`)
                 ) {
                     expect(part.parent, `${name}.${part.name}`).toBeNull();
                 } else {

@@ -276,8 +276,8 @@ import { RichTooltip } from "@pureform/solid/rich-tooltip";
   chips (`aria-pressed`). `ChipSet.Root` and `ChipSet.Chip` compose it.
 - **The selection list** (`@pureform/solid/selection-list`) is a `List` that is Zag's listbox:
   each option is a `ListItem` with `role="option"` and `aria-selected` (the list item's selected
-  colors), in an `li` with `role="presentation"`. `selectionMode` is `multiple` by default, as
-  Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
+  colors), in an `li` with `role="presentation"`. `selectionMode` is `single` by default, as
+  M3 lists mostly select one; `multiple` selects any number, as Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
   shown as hover, and Enter, Space or a press select.
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
   (`revealInRow` from `@pureform/binding-core/dom`).
@@ -478,12 +478,15 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   two with an overline or supporting text, three with both) unless given. `Leading` and `Trailing`
   are `aria-hidden` (give `aria-hidden={false}` to one that says something). `leadingType` sizes
   the leading part for an icon, avatar, thumbnail, or video, and `position` places a segmented
-  list's tile. `swipeAction` (or `ListItem.Action`) makes the row `swipeable`: dragging it toward
-  the inline start (or the arrow keys on the focused row; Escape closes) slides its parts over the
-  action, which is `inert` until revealed. `revealed`, `defaultRevealed`, `onRevealedChange` and
-  `swipeWidth` (px, 80; the preset's `actionWidth` token) control it; `actionColor="error"`
-  colours a destructive action with the error container. Not for a link or button item: the
-  action is a button. An item with a `region` doesn't swipe.
+  list's tile. `swipeAction` puts the item in a `frame` with its `action`
+  (composed: `ListItem.Frame` around `ListItem.Action` and `ListItem.Root`): the action sits
+  under the row, beside it rather than in it, and dragging the row toward the inline start (or
+  the arrow keys on the focused row; Escape closes) slides it over the action, which is `inert`
+  until revealed. `revealed`, `defaultRevealed`, `onRevealedChange` and `swipeWidth` (px, 80;
+  the preset's `actionWidth` token) control it, on the ready-made item or on `Frame`;
+  `actionColor="error"` colours a destructive action with the error container. Since the action
+  isn't inside the row, a link, a button, or an expandable item (with a `region`) swipes too.
+  `Root` no longer takes `swipeable` or the swipe props: `Frame` replaces them.
 - **The list** is a `<ul>` (`listAnatomy`, `pf-list-root`) with each list item in an `<li>`
   (`List.Item`, `pf-list-item`). `variant="segmented"` sets the items apart as tiles, and
   `listTokens` are the list's own tokens. Its `density`, `color`, `leadingType` (`icon`, `avatar`,

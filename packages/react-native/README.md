@@ -423,9 +423,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
   accordion. A `swipeAction`
   makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`; `actionColor="error"` for a destructive action): the
-  row takes the drag (a `PanResponder`), so it isn't also pressable; the action is hidden from
-  assistive technology until revealed. An item with a `region` doesn't swipe (it's a button, and
-  ignores `swipeAction`). `Avatar` takes a `src` that shows once loaded
+  item sits in a `frame` with the action under the row, and the frame takes the drag (a
+  `PanResponder`), so the row isn't also pressable, but for an expandable one (with a `region`),
+  which swipes and expands; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.
 - **Button groups:** `ButtonGroup` renders a `Button` per labelled entry of `items` and an
   `IconButton` per icon-only one, in its `size` and the buttons' `color`, `variant`, `corner` and
@@ -437,8 +437,8 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   by default) makes them filter chips, with `value`, `defaultValue` and `onValueChange`.
   `singleLine` puts the row in a horizontal `ScrollView`, since `overflow: auto` is dropped.
 - **Selection lists:** `SelectionList` is a `List` (`role="listbox"`) whose `items` are options:
-  interactive `ListItem`s with `role="option"` and `aria-selected`. `selectionMode` is `multiple`
-  by default, or `single` (`deselectable` lets its option go off). There's no keyboard highlight
+  interactive `ListItem`s with `role="option"` and `aria-selected`. `selectionMode` is `single`
+  by default (`deselectable` lets its option go off), or `multiple`. There's no keyboard highlight
   or typeahead, as there's no Zag machine on React Native.
 - **Scrollable tabs:** `Tabs scrollable` sizes its tabs to their content and puts the row in a
   horizontal `ScrollView`, which scrolls the selected tab into view (centered where it can be)
@@ -450,8 +450,9 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   `group` sit together under its label, in the order each group first appears. An item with
   `items` opens a submenu, an arrow (`›`) at its end: React Native drills into it in place, under a
   row that goes back, where the web cascades it beside the item.
-- **Navigation rail:** a destination's `sectionLabel` heads it and the ones after, shown only while
-  the rail is `expanded`.
+- **Navigation rail:** destinations with the same `section` sit together under one heading with
+  its text, shown only while the rail is `expanded`, in the order the sections first appear (like
+  a select's `group`). The bar ignores `section`. It replaces the removed `sectionLabel`.
 - **Split button and FAB menu:** `SplitButton` renders its two buttons as the `Menu`'s trigger
   (`trigger` as a function), so the menu opens over the page under the trailing button, at its
   end. `FabMenu` opens its items in the portal above the FAB, at its end; the `list` slot's

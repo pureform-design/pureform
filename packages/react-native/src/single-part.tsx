@@ -120,10 +120,10 @@ function AvatarImpl(props: AvatarProps): ReactNode {
     };
     return (
         <View
-            role="img"
+            // Named by `label` as an image, like the web's root; without one it's decorative.
             {...(props.label === undefined
-                ? {}
-                : { "aria-label": props.label })}
+                ? { "aria-hidden": true }
+                : { role: "img" as const, "aria-label": props.label })}
             style={style as ViewStyle}
             testID={testIdOf(avatarAnatomy, "root", props.testId)}
         >
