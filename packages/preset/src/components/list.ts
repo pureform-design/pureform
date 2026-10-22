@@ -12,11 +12,14 @@ import {
     column,
     flex,
     none,
+    numeric,
     pointer,
     px,
     relative,
+    rotate,
     row,
     slot,
+    transform,
     transparent,
     unitless,
     when,
@@ -24,6 +27,7 @@ import {
 import type {
     AliasNode,
     ColorValue,
+    Condition,
     StyleMap,
     ValueNode,
     ValueType,
@@ -39,6 +43,7 @@ import {
     iconFill,
     stateTransition,
     sys,
+    tweens,
 } from "./shared";
 
 /** The tokens every row has. */
@@ -163,6 +168,19 @@ export const rowParts = (
         } satisfies StyleMap,
     };
 };
+
+/** An expand indicator: a row's trailing icon that turns over while `expanded` holds, through a
+ *  moving tween that reduced motion drops. The accordion's, the tree's and an expandable list item's. */
+export const expandIndicator = (
+    trailing: StyleMap,
+    expanded: Condition,
+): StyleMap => ({
+    ...trailing,
+    transform: when()
+        .on(expanded, transform(rotate(numeric(180, "deg"))))
+        .else(transform(rotate(numeric(0, "deg")))),
+    transition: tweens("transform", "color"),
+});
 
 /** A row's colors in a color group: the selected container and content, on the row and its
  *  parts. */

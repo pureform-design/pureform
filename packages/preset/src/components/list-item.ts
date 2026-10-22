@@ -49,8 +49,7 @@ import type { StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { expandIndicator } from "./accordion";
-import { rowParts, rowTokens } from "./list";
+import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
     DEFAULT_GROUP,
     colorVariant,

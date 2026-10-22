@@ -27,20 +27,16 @@ import {
     add,
     column,
     flex,
-    numeric,
     px,
-    rotate,
     slot,
     start,
-    transform,
     unitless,
     when,
 } from "@pureform/core/ast";
-import type { Condition, StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
 
-import { rowParts, rowTokens } from "./list";
+import { expandIndicator, rowParts, rowTokens } from "./list";
 import {
     defaultDensities,
     DENSITY_TOKEN,
@@ -48,7 +44,6 @@ import {
     densityTokenVariant,
     INDICATION_ROOT,
     sys,
-    tweens,
     variantsOf,
 } from "./shared";
 import type { Densities } from "./shared";
@@ -66,19 +61,6 @@ const { tokens, ref } = rowTokens("accordion", {
     contentPaddingBlockEnd: spacing("4"),
     contentColor: sys("onSurfaceVariant"),
     ...DENSITY_TOKEN,
-});
-
-/** An expand indicator: a row's trailing icon that turns over while `expanded` holds, through a
- *  moving tween that reduced motion drops. The accordion's and the tree's. */
-export const expandIndicator = (
-    trailing: StyleMap,
-    expanded: Condition,
-): StyleMap => ({
-    ...trailing,
-    transform: when()
-        .on(expanded, transform(rotate(numeric(180, "deg"))))
-        .else(transform(rotate(numeric(0, "deg")))),
-    transition: tweens("transform", "color"),
 });
 
 const parts = rowParts(ref, "trigger");
