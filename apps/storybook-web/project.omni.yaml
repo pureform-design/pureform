@@ -12,6 +12,8 @@ dependencies:
     - "@pureform/react-native"
     - "@pureform/rn-adapter"
     - "@pureform/styling"
+    - "@pureform/anatomy"
+    - "@pureform/component-cases"
     - "@pureform/panda-adapter"
     - "@pureform/preset"
     - "@pureform/material"

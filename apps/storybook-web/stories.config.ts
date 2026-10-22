@@ -1,5 +1,5 @@
-// What `scripts/generate-stories.ts` writes stories from: the renderers, the components, and the
-// shared hooks. See the README for adding to each.
+// What `scripts/generate-stories.ts` needs besides the anatomy and the component cases: the
+// renderers, the shared hooks, and overrides (which components, skips, args, schemes). See the README for adding to each.
 
 import { defineStories } from "./src/renderers/config";
 
@@ -22,25 +22,38 @@ export default defineStories({
             adapter: "./src/native/adapter.ts",
             export: "nativeAdapter",
             hooks: "@pureform/react-native/storybook",
+            // The cases read the web bindings' DOM (a button's `aria-pressed`, the switch's
+            // native input, the field's `data-pf-filled`), which React Native Web doesn't draw.
+            casePlays: false,
         },
     },
+    // The first slice; drop `include` to draw every component with an anatomy and a case.
+    include: ["Button", "Switch", "TextField"],
     components: {
         Button: {
-            args: { label: "Save", disabled: false },
-            variants: ["filled", "tonal", "elevated", "outlined", "text"],
+            // Variants the binding derives (from `selected`, a group, the provider).
+            controls: { exclude: ["toggle", "position", "density"] },
             schemes: ["light", "dark"],
-            hooks: ["./src/components/button.ts"],
         },
         Switch: {
-            args: { "aria-label": "Wi-Fi", disabled: false },
+            controls: { exclude: ["icons"] },
             schemes: ["light", "dark"],
-            hooks: ["./src/components/switch.ts"],
         },
         TextField: {
-            args: { label: "Name", disabled: false },
-            variants: ["filled", "outlined"],
+            // Derived from the icons and affixes given, and the provider's density.
+            controls: {
+                exclude: [
+                    "leadingIcon",
+                    "trailingIcon",
+                    "prefixText",
+                    "suffixText",
+                    "density",
+                ],
+            },
+            // React Native Web draws a disabled field as `readonly`, which axe holds to the
+            // contrast ratio a disabled one is exempt from.
+            stories: { Disabled: { parameters: { a11y: { test: "todo" } } } },
             schemes: ["light", "dark"],
-            hooks: ["./src/components/text-field.ts"],
         },
     },
     hooks: ["./src/hooks.ts"],

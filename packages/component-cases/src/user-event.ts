@@ -4,9 +4,9 @@
 
 /** The part of a `userEvent` the cases use. Vitest's and Testing Library's both fit. */
 export interface UserEvent {
-    click(element: Element, options?: any): Promise<void>;
-    keyboard(text: string): Promise<void>;
-    type(element: Element, text: string, options?: any): Promise<void>;
+    click(element: Element, options?: any): Promise<unknown>;
+    keyboard(text: string): Promise<unknown>;
+    type(element: Element, text: string, options?: any): Promise<unknown>;
 }
 
 let current: UserEvent | undefined;
@@ -26,8 +26,18 @@ const user = (): UserEvent => {
 };
 
 /** What the cases call: the `userEvent` given to `createCases`. */
-export const userEvent: UserEvent = {
-    click: (element, options) => user().click(element, options),
-    keyboard: (text) => user().keyboard(text),
-    type: (element, text, options) => user().type(element, text, options),
+export const userEvent = {
+    click: async (element: Element, options?: unknown): Promise<void> => {
+        await user().click(element, options);
+    },
+    keyboard: async (text: string): Promise<void> => {
+        await user().keyboard(text);
+    },
+    type: async (
+        element: Element,
+        text: string,
+        options?: unknown,
+    ): Promise<void> => {
+        await user().type(element, text, options);
+    },
 };

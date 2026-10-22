@@ -18,6 +18,8 @@ export interface Impl {
     readonly adapter: RendererAdapter<any>;
     readonly hooks: RendererHooks;
     readonly component: unknown;
+    /** `false`: the case's play tests are skipped in this renderer. */
+    readonly casePlays?: boolean;
 }
 
 /** Each renderer's implementation, by the `renderer` global's value. */

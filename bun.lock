@@ -159,7 +159,9 @@
       "name": "@pureform/storybook-web",
       "version": "0.0.0-semantically-released",
       "dependencies": {
+        "@pureform/anatomy": "workspace:^",
         "@pureform/binding-core": "workspace:^",
+        "@pureform/component-cases": "workspace:^",
         "@pureform/react": "workspace:^",
         "@pureform/react-native": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
