@@ -1,0 +1,32 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/omni-oss/json-schemas/refs/heads/main/project.json
+name: "@pureform/component-cases"
+
+extends:
+  - "@workspace/omni/presets/ts-vite-lib.omni.yaml"
+
+dependencies:
+  append:
+    - "@pureform/tsconfig"
+    - "@pureform/vite-config"
+    - "@pureform/anatomy"
+    - "@pureform/binding-core"
+
+tasks:
+  # The cases are tested where they run: tests/component-suites and apps/storybook-web.
+  test:unit:
+    enabled: false
+
+  test:integration:
+    enabled: false
+
+  test:
+    enabled: true
+
+  build:
+    enabled: true
+
+  publish:
+    enabled: false
+
+meta:
+  publish: false

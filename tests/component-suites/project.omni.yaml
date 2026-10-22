@@ -10,6 +10,7 @@ dependencies:
     - "@pureform/vite-config"
     - "@pureform/vitest-config"
     - "@pureform/anatomy"
+    - "@pureform/component-cases"
     - "@pureform/styling"
     - "@pureform/material"
     - "@pureform/solid"
@@ -34,6 +35,7 @@ cache:
         - "../../packages/solid/src/**/*"
         - "../../packages/react/src/**/*"
         - "../../packages/machines/src/**/*"
+        - "../../packages/component-cases/src/**/*"
 
 tasks:
   test:e2e:

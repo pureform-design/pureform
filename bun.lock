@@ -314,6 +314,20 @@
         "vitest": "catalog:",
       },
     },
+    "packages/component-cases": {
+      "name": "@pureform/component-cases",
+      "version": "0.0.0-semantically-released",
+      "dependencies": {
+        "@pureform/anatomy": "workspace:^",
+        "@pureform/binding-core": "workspace:^",
+      },
+      "devDependencies": {
+        "@pureform/tsconfig": "workspace:^",
+        "@pureform/vite-config": "workspace:^",
+        "typescript": "catalog:",
+        "vite": "catalog:",
+      },
+    },
     "packages/core": {
       "name": "@pureform/core",
       "version": "0.0.0-semantically-released",
@@ -877,6 +891,7 @@
       "devDependencies": {
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
+        "@pureform/component-cases": "workspace:^",
         "@pureform/core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/generate": "workspace:^",
@@ -1562,6 +1577,8 @@
     "@pureform/bundler": ["@pureform/bundler@workspace:packages/bundler"],
 
     "@pureform/cli": ["@pureform/cli@workspace:packages/cli"],
+
+    "@pureform/component-cases": ["@pureform/component-cases@workspace:packages/component-cases"],
 
     "@pureform/component-suites": ["@pureform/component-suites@workspace:tests/component-suites"],
 

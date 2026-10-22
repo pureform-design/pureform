@@ -3,79 +3,11 @@
 // binding has a view of it (`src/bindings/<binding>/scene.tsx`) that renders it in the browser and
 // on the server.
 
-/** The ready-made components every binding renders. Add a component's name here and to each
- *  binding's `components` map in `src/bindings/<binding>/scene.tsx`. */
-export const COMPONENT_NAMES = [
-    "AppBar",
-    "Paginator",
-    "TimePicker",
-    "Table",
-    "TimeInput",
-    "Avatar",
-    "Badge",
-    "BottomSheet",
-    "Button",
-    "ButtonGroup",
-    "Card",
-    "Carousel",
-    "Accordion",
-    "Tree",
-    "Checkbox",
-    "Chip",
-    "ChipSet",
-    "SelectionList",
-    "CircularProgress",
-    "LoadingIndicator",
-    "Dialog",
-    "DragHandle",
-    "Fab",
-    "FullscreenDialog",
-    "GridList",
-    "FabMenu",
-    "Icon",
-    "IconButton",
-    "LinearProgress",
-    "List",
-    "ListItem",
-    "Media",
-    "Menu",
-    "NavigationBar",
-    "NavigationRail",
-    "RadioGroup",
-    "Ripple",
-    "RichTooltip",
-    "Scrim",
-    "SearchBar",
-    "SearchView",
-    "Select",
-    "Autocomplete",
-    "DatePicker",
-    "DockedDatePicker",
-    "DateInput",
-    "Separator",
-    "SideSheet",
-    "Slider",
-    "Snackbar",
-    "SplitButton",
-    "Stepper",
-    "SupportingText",
-    "Switch",
-    "Tabs",
-    "TagsInput",
-    "Text",
-    "TextArea",
-    "TextField",
-    "Toast",
-    "Toolbar",
-    "Tooltip",
-    "TouchTarget",
-] as const;
+import type { ComponentName, SceneProps } from "@pureform/component-cases";
 
-export type ComponentName = (typeof COMPONENT_NAMES)[number];
-
-/** A component's props, as both bindings take them: `aria-*`, `data-*`, and the shared contract's
- *  names. Use `className`-free props here; per-binding names (`class`, `className`) differ. */
-export type SceneProps = Readonly<Record<string, unknown>>;
+// The component names and props live with the cases.
+export { COMPONENT_NAMES } from "@pureform/component-cases";
+export type { ComponentName, SceneProps } from "@pureform/component-cases";
 
 /** An indication by name, so a scene stays plain data the server can take: Material's (with
  *  the ink well, the sparkle, or no ripple), none, the suites' own (`harness/indications.ts`), or
