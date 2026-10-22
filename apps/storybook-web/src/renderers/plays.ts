@@ -6,7 +6,9 @@
 import { createCases } from "@pureform/component-cases";
 import type { ComponentCase, KeyCase } from "@pureform/component-cases";
 import type { StoryObj } from "@storybook/html-vite";
-import { expect, userEvent, waitFor } from "storybook/test";
+import { expect, waitFor } from "storybook/test";
+
+import { userEvent } from "#user-event";
 
 const CASES = createCases(userEvent);
 

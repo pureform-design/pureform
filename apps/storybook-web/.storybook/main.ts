@@ -4,7 +4,8 @@
 // ships JSX), and React's everything else.
 
 import { createRequire } from "node:module";
-import { dirname } from "node:path";
+import { dirname, resolve as resolvePath } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import { pandacss } from "@pandacss/vite";
 import pureform from "@pureform/bundler/vite";
@@ -19,6 +20,7 @@ import { codegen, COMPONENTS } from "../pureform.codegen.ts";
 import config from "../pureform.config.ts";
 
 const require = createRequire(import.meta.url);
+const APP = resolvePath(dirname(fileURLToPath(import.meta.url)), "..");
 const RN_WEB = dirname(require.resolve("react-native-web/package.json"));
 
 /** Files Solid's plugin compiles: the Solid folder, and every package that ships Solid JSX, which
@@ -84,6 +86,15 @@ export default {
             resolve: {
                 extensions: WEB_EXTENSIONS,
                 alias: {
+                    // The cases' user events: Playwright's real input under Vitest (a slider
+                    // reads the pointer's position, which `storybook/test`'s synthetic events
+                    // don't give), `storybook/test`'s in Storybook, for the Interactions panel.
+                    "#user-event": resolvePath(
+                        APP,
+                        process.env["VITEST"]
+                            ? "src/renderers/user-event.vitest.ts"
+                            : "src/renderers/user-event.ts",
+                    ),
                     "react-native": RN_WEB,
                     "@react-native/assets-registry/registry": `${RN_WEB}/dist/modules/AssetRegistry/index.js`,
                 },
