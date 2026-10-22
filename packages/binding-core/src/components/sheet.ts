@@ -70,6 +70,16 @@ export interface BottomSheetCloseProps {
     readonly onClose?: CloseQuestion | undefined;
 }
 
+/** What a side sheet asks before it closes. */
+export interface SideSheetCloseProps {
+    /** Asked whenever the sheet would close by itself: Escape (or the back button), a press on
+     *  the scrim, or the close trigger. `true` closes it, `false` keeps it open. Given a
+     *  promise, it stays open until the promise settles (a rejection keeps it open). Without,
+     *  each of these closes it. Closing it through a controlled `open` doesn't ask, by design
+     *  (as in Radix and MUI): the app has already decided. */
+    readonly onClose?: CloseQuestion | undefined;
+}
+
 /** Asks an overlay's `onClose` and acts on the answer, `yes` or `no`, once it comes. */
 export interface CloseAsker {
     /** Asks `onClose` (without one, the answer is yes). A boolean answers at once; a promise
@@ -164,7 +174,7 @@ export interface BottomSheetRootOwnProps
 /** Everything the side sheet's Root takes for itself, besides the element's own props and
  *  `as`. */
 export interface SideSheetRootOwnProps
-    extends SideSheetVariantProps, SheetBehaviorProps {
+    extends SideSheetVariantProps, SheetBehaviorProps, SideSheetCloseProps {
     /** A prefix for every part's test id (`filters` → `filters-trigger`, `filters-content`), or
      *  ids by part. */
     readonly testId?: TestIdOverride<SideSheetPart> | undefined;
@@ -185,6 +195,7 @@ export const SIDE_SHEET_ROOT_PROPS = [
     "modal",
     "coplanar",
     "tokens",
+    "onClose",
     ...DIALOG_BEHAVIOR_PROPS,
 ] as const satisfies readonly (keyof SideSheetRootOwnProps)[];
 
