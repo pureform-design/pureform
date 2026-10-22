@@ -5,12 +5,13 @@
 import type { Decorator } from "@storybook/html-vite";
 
 import type { TransformSource } from "./renderers/hooks";
-import { parseTheme } from "./renderers/multi-render";
+import { storyTheme } from "./renderers/multi-render";
 
-/** The page's scheme from the `theme` global, as the class the Panda target's dark condition
- *  reads; React Native takes it from its provider's `scheme` instead. */
+/** The page's scheme from the `scheme` global, as the class the Panda target's dark condition
+ *  reads; React Native takes it from its provider's `scheme` instead. `system` sets no class:
+ *  the CSS's `prefers-color-scheme` query then decides, live. */
 const withScheme: Decorator = (story, context) => {
-    const { scheme } = parseTheme(context.globals["theme"]);
+    const { scheme } = storyTheme(context.globals);
     const root = document.documentElement;
     root.classList.toggle("dark", scheme === "dark");
     root.classList.toggle("light", scheme === "light");

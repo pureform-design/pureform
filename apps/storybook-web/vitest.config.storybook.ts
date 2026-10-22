@@ -16,6 +16,8 @@ export default defineConfig({
     test: {
         projects: RENDERERS.map((renderer) => ({
             extends: true,
+            // Found late (the preview's docs theme), it would reload the page mid-run.
+            optimizeDeps: { include: ["storybook/theming"] },
             plugins: [
                 storybookTest({
                     configDir: ".storybook",

@@ -1,8 +1,9 @@
 export type Args = Record<string, unknown>;
 
-/** The story's theme from the toolbar: the scheme, and a named theme from the config. */
+/** The story's theme from the toolbar: the scheme (`undefined` follows the system), and a named
+ *  theme from the config. */
 export interface StoryTheme {
-    readonly scheme: "light" | "dark";
+    readonly scheme?: "light" | "dark" | undefined;
     readonly name?: string | undefined;
 }
 

@@ -2,7 +2,8 @@
 
 pureform's components in one Storybook, from every renderer: Solid, React, and React Native
 (through React Native Web). The toolbar's **Renderer** switches between them on the same story,
-and **Theme** picks light, dark, or a named theme from `pureform.config.ts`. Stories, controls
+**Scheme** picks System (the default), Light or Dark, and **Theme** a named theme from
+`pureform.config.ts`. Stories, controls
 and `play` tests are shared, so one interaction test runs against every renderer.
 
 ```sh
@@ -33,6 +34,20 @@ bunx vitest run -c vitest.config.storybook.ts --project storybook/native -t Butt
 - **Tests:** `@storybook/addon-vitest` runs every story in Chromium (Vitest browser mode), one
   project per renderer (`storybook/solid`, `storybook/react`, `storybook/native`, set by the
   `renderer` global). `@storybook/addon-a11y` checks each story; a violation fails it.
+
+## Scheme and theme
+
+- **System** (the default) forces nothing, so every renderer follows the OS, live: the web's CSS
+  writes dark under `prefers-color-scheme: dark` when the root has neither `.light` nor `.dark`,
+  and React Native's provider, given no `scheme`, follows `useColorScheme()` (React Native Web
+  reads the same media query). **Light** and **Dark** set the root's class (the shared hook,
+  `src/hooks.ts`) or React Native's `scheme` prop (its binding hook); System removes them.
+- **Theme** goes to each provider's `theme` prop.
+- The canvas paints the theme's surface (`src/index.css`), in the current scheme.
+- Storybook's UI follows the system too: `.storybook/manager.ts` switches the manager live when
+  the OS changes; docs pages (`parameters.docs.theme` in `preview.ts`) pick it when they load.
+- `scripts/system-scheme.mjs <url>` checks all of this in every renderer with Playwright's
+  `emulateMedia({ colorScheme })`.
 
 Everything the generated stories import is JSX-free (`createComponent`, `createElement`): the
 app's type check uses React's JSX and would read Solid's JSX as React's.
@@ -97,5 +112,6 @@ context)` renders the component under `context.decorators` (each called with the
 ## Scripts
 
 - `scripts/generate-stories.ts`: the codegen above.
-- `scripts/screenshots.mjs <url> [dir] [theme]`: screenshots each component's `Default` in each
-  renderer against a running Storybook, and prints the page's errors.
+- `scripts/screenshots.mjs <url> [dir] [scheme] [theme]`: screenshots each component's
+  `Default` in each renderer against a running Storybook, and prints the page's errors.
+- `scripts/system-scheme.mjs <url> [dir]`: the System scheme check above; exits 1 on a failure.

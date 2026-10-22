@@ -37,13 +37,21 @@ let current:
 export const stats = { mounts: 0, updates: 0 };
 (globalThis as { __sbStats?: typeof stats }).__sbStats = stats;
 
-/** The `theme` global: `light`, `dark`, or a named theme from the config (in light). */
-export const parseTheme = (value: unknown): StoryTheme =>
-    value === "dark"
-        ? { scheme: "dark" }
-        : value === undefined || value === "light"
-          ? { scheme: "light" }
-          : { scheme: "light", name: String(value) };
+/** The `scheme` global (`system`, `light`, `dark`) and the `theme` global (`default` or a named
+ *  theme from the config). `system` forces nothing, so every renderer follows the OS. */
+export const storyTheme = (
+    globals: Readonly<Record<string, unknown>>,
+): StoryTheme => {
+    const scheme = globals["scheme"];
+    const theme = globals["theme"];
+    return {
+        scheme: scheme === "light" || scheme === "dark" ? scheme : undefined,
+        name:
+            theme === undefined || theme === "default"
+                ? undefined
+                : String(theme),
+    };
+};
 
 export const multiRender =
     (impls: Impls, levels: ArgLevels) =>
@@ -57,7 +65,7 @@ export const multiRender =
             levels.component,
         );
         const mount: MountContext = {
-            theme: parseTheme(context.globals["theme"]),
+            theme: storyTheme(context.globals),
             globals: context.globals,
             decorators: impl.hooks.decorators ?? [],
         };

@@ -1,1 +1,9 @@
 @layer reset, base, tokens, recipes, utilities;
+
+/* The canvas (and each docs preview) is the theme's surface, in the current scheme, rather than
+   Storybook's white. */
+.sb-show-main,
+.docs-story {
+    background-color: var(--colors-canvas);
+    color: var(--colors-on-canvas);
+}

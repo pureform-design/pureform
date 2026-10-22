@@ -1,11 +1,12 @@
 // Screenshots every component's Default story in every renderer, against a running Storybook:
-// `node scripts/screenshots.mjs <url> [dir] [theme]` writes `<dir>/sb-web-<component>-<renderer>.png`
+// `node scripts/screenshots.mjs <url> [dir] [scheme] [theme]` writes `<dir>/sb-web-<component>-<renderer>.png`
 // and prints what each canvas holds, with the page's errors.
 import { chromium } from "playwright";
 
 const base = process.argv[2] ?? "http://localhost:6006";
 const dir = process.argv[3] ?? "/tmp/opencode";
-const theme = process.argv[4] ?? "light";
+const scheme = process.argv[4] ?? "light";
+const theme = process.argv[5] ?? "default";
 const components = ["button", "switch", "textfield"];
 const renderers = ["solid", "react", "native"];
 
@@ -25,7 +26,7 @@ page.on("console", (m) => {
 for (const component of components) {
     for (const renderer of renderers) {
         await page.goto(
-            `${base}/?path=/story/${component}--default&globals=renderer:${renderer};theme:${theme}`,
+            `${base}/?path=/story/${component}--default&globals=renderer:${renderer};scheme:${scheme};theme:${theme}`,
         );
         const frame = page.frameLocator("#storybook-preview-iframe");
         await frame
@@ -36,7 +37,7 @@ for (const component of components) {
         const html = await frame
             .locator(`[data-renderer=${renderer}]`)
             .evaluate((el) => el.textContent ?? "");
-        const suffix = theme === "light" ? "" : `-${theme}`;
+        const suffix = `${scheme === "light" ? "" : `-${scheme}`}${theme === "default" ? "" : `-${theme}`}`;
         await page.screenshot({
             path: `${dir}/sb-web-${component}-${renderer}${suffix}.png`,
         });
