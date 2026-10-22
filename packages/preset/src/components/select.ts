@@ -82,6 +82,13 @@ export const selectField = <
     }>()(
         pf.slotComponent({
             name,
+            bindingVariants: [
+                "leadingIcon",
+                "trailingIcon",
+                "prefixText",
+                "suffixText",
+                "density",
+            ],
             $meta: { description },
             tokens,
             slots: [...AFFIX_FIELD_SLOTS],

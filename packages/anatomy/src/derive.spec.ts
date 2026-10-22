@@ -60,6 +60,17 @@ describe("deriveAnatomy", () => {
         expect(deriveAnatomy(card).variants).toEqual({ tone: ["loud"] });
     });
 
+    it("marks the variants the binding sets, and only when there are some", () => {
+        expect(deriveAnatomy(card)).not.toHaveProperty("bindingVariants");
+        expect(
+            deriveAnatomy({ ...card, bindingVariants: ["tone"] })
+                .bindingVariants,
+        ).toEqual(["tone"]);
+        expect(() =>
+            deriveAnatomy({ ...card, bindingVariants: ["size"] }),
+        ).toThrow(/sets "size" as a binding variant, which is not a variant/);
+    });
+
     it("marks a part mirror only when one of its styles reads mirrored", () => {
         const anatomy = deriveAnatomy(card);
         expect(

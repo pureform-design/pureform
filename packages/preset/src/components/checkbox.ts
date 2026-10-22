@@ -144,6 +144,7 @@ export const createCheckbox = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "checkbox",
+            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Material checkbox over a native input. Render the empty checkIcon and indeterminateIcon slots; each draws its mark in its state.",

@@ -310,6 +310,8 @@ interface TypedComponentSpec<
     $meta?: Metadata;
     /** Where it shows indication, its one slot being `root`. */
     indication?: IndicationDeclaration<"root">[];
+    /** Variant groups the binding sets itself rather than taking as props. */
+    bindingVariants?: (keyof NoInfer<V> & string)[];
     tokens?: T;
     /** The variant groups and their values. Each value gets an entry, empty unless the
      *  recipe styles it. */
@@ -356,6 +358,8 @@ interface TypedSlotComponentSpec<
     structure?: { [K in NoInfer<S>]?: NoInfer<S>[] };
     /** Where it shows indication, one entry per interactive surface, naming declared slots. */
     indication?: IndicationDeclaration<NoInfer<S>>[];
+    /** Variant groups the binding sets itself rather than taking as props. */
+    bindingVariants?: (keyof NoInfer<V> & string)[];
     tokens?: T;
     /** The variant groups and their values. Each value gets an entry, empty unless the
      *  recipe styles it. */
@@ -562,6 +566,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                     name: spec.name,
                     $meta: spec.$meta,
                     indication: spec.indication,
+                    bindingVariants: spec.bindingVariants,
                     tokens: spec.tokens,
                     recipe: definedOnly({
                         base: own(recipe.base),
@@ -616,6 +621,7 @@ export const typed = <C extends Vocabulary = RegisteredConfig>(_config?: C) => {
                     name: spec.name,
                     $meta: spec.$meta,
                     indication: spec.indication,
+                    bindingVariants: spec.bindingVariants,
                     tokens: spec.tokens,
                     slots: spec.slots,
                     structure: spec.structure,

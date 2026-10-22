@@ -167,6 +167,7 @@ export const createTable = <D extends string = MaterialDensity>(
     variantsOf<{ density: "inherit" | D }>()(
         pf.slotComponent({
             name: "dataTable",
+            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Data table: header, body and footer rows of cells, sortable column headers with an arrow, and an optional selection column. Striped tables render every other body row as alternateRow; stickyHeader keeps the header in view while the table scrolls.",

@@ -185,6 +185,7 @@ export const createListItem = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "listItem",
+            bindingVariants: ["position", "swipeable", "density"],
             $meta: {
                 description:
                     "Material list item. Set lines to the number of text lines, interactive when it is clickable, leadingType to what the leading part holds, and position in a segmented list. Mark it selected with aria-selected or aria-current. An expandable item is a button marked aria-expanded, with its indicator and the nested region after it. swipeable lets the row slide to uncover an action (its swipeOffset token says how far, in pixels); actionColor error colours a destructive action.",

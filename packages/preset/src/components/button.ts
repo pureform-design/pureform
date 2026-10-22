@@ -324,6 +324,7 @@ export const createButton = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "button",
+            bindingVariants: ["toggle", "position", "density"],
             $meta: {
                 description:
                     'Material common button at M3 Expressive\'s sizes (xsmall to xlarge; compact is deprecated), with round or square corners. Render the icon slot only when there is an icon. A toggle sets toggle to "true" and marks itself selected with aria-pressed="true".',

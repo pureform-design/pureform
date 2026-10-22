@@ -51,6 +51,7 @@ const pf = typed();
 
 export const dialog = pf.slotComponent({
     name: "dialog",
+    bindingVariants: ["icon"],
     $meta: {
         description:
             "Material basic dialog. Turn on icon when you render one; dim the page with the scrim component.",

@@ -96,6 +96,7 @@ export const createMenu = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "menu",
+            bindingVariants: ["grouped", "density"],
             $meta: {
                 description:
                     "Material menu and its items, optionally in labelled groups (grouped draws them as tiles). Mark the chosen item with aria-selected or aria-checked; vibrant swaps to the tertiary colors.",

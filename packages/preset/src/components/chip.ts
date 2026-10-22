@@ -190,6 +190,7 @@ export const createChip = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "chip",
+            bindingVariants: ["toggle", "density"],
             $meta: {
                 description:
                     "Material chip. Mark it selected with aria-selected or aria-pressed. Render the icon slot only when there is an icon.",

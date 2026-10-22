@@ -116,6 +116,13 @@ export const createDockedDatePicker = <
     }>()(
         pf.slotComponent({
             name: "dockedDatePicker",
+            bindingVariants: [
+                "leadingIcon",
+                "trailingIcon",
+                "prefixText",
+                "suffixText",
+                "density",
+            ],
             $meta: {
                 description:
                     "Material docked date picker: a text field whose trailing icon opens a calendar under it, with month and year menu buttons, previous and next buttons, the weekday row over the grid of days (calendarCell), the month or year list, and the actions.",

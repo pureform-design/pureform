@@ -81,6 +81,7 @@ export const createTree = <
     variantsOf<{ color: G | typeof DEFAULT_GROUP; density: "inherit" | D }>()(
         pf.slotComponent({
             name: "tree",
+            bindingVariants: ["density"],
             $meta: {
                 description:
                     "A tree (Angular Material's tree) of Material list rows. Each node is a row; a branch's row ends in the expand indicator and its children sit in a group indented from the start. Mark a row aria-selected or aria-current, and a branch's row aria-expanded.",

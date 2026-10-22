@@ -73,6 +73,7 @@ export const createAccordion = <D extends string = MaterialDensity>(
     variantsOf<{ density: "inherit" | D }>()(
         pf.slotComponent({
             name: "accordion",
+            bindingVariants: ["density"],
             $meta: {
                 description:
                     "Expansion panels (Angular Material's accordion) as Material list rows: each item a tile with a header button and its content. Mark the header aria-expanded while its item is open.",

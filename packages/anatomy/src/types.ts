@@ -63,6 +63,10 @@ export interface ComponentAnatomy<
      *  one is `["true", "false"]` as the recipe keys it): what a story's controls offer. Every
      *  generated anatomy has it (`{}` for none); a composite's, written by hand, leaves it out. */
     readonly variants?: { readonly [variant: string]: readonly string[] };
+    /** Variants the binding sets itself, from other props or its context (a toggle, a group's
+     *  `position`, the provider's `density`), rather than taking them as props: a story offers no
+     *  control for them. The spec's `bindingVariants`; left out when there are none. */
+    readonly bindingVariants?: readonly string[];
 }
 
 /** A component anatomy's part names. */
