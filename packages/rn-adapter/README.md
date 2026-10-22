@@ -114,7 +114,9 @@ generated registry; `PureformProvider` is `StylesProvider` over `stylesSource(st
 factories are `componentFactory(styles, name)` (one per styles and component). Either way every
 instance of a component shares one table in the provider's environment, and a state change is a
 `Map.get`. Token tweening passes each frame's tokens as the selection's `tokens`. A factory's
-`tokens` names the theme key each instance token sets. `useStyleEnvironment()` gives the
+`tokens` names the theme key each instance token sets; a spring instance token
+(`spring({ ... })`) sets the spring's five keys (`<key>.duration`, `.easing`, `.stiffness`,
+`.damping`, `.mass`), as a theme's override does. `useStyleEnvironment()` gives the
 environment the caller renders in, for calling a factory directly.
 
 `pureform generate` with the `native` target (`@pureform/rn-adapter/codegen`) writes one module

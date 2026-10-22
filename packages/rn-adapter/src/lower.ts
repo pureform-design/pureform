@@ -382,7 +382,9 @@ export const springFieldNodes = (
         case "alias": {
             let target: ValueNode;
             try {
-                target = tokenValue(getByPath(ctx.config, value.path)) as ValueNode;
+                target = tokenValue(
+                    getByPath(ctx.config, value.path),
+                ) as ValueNode;
             } catch {
                 return undefined;
             }

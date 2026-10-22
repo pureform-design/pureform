@@ -202,5 +202,7 @@ tests live only there.
 - Nothing here reads a DOM, a global, or a framework: factories must stay pure (§5.7). The
   registry itself isn't module-level state in an app; the provider holds it.
 - A key joins values with `|`, so a variant value can't contain one.
-- `tokenStyle` turns a number into its string: pass a length with its unit.
+- `tokenStyle` turns a number into its string: pass a length with its unit. A spring
+  (`spring({ ... })`, for a spring-valued token such as tabs' `indicatorSpring`) becomes the
+  token's two vars, `<var>-duration` and `<var>-easing`, sampled as a theme's springs are.
 - The hooks (`useClasses`, `useClassFactory`, `useStyles`) are the bindings' (p2a, p2b, p8).

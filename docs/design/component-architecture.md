@@ -1043,7 +1043,11 @@ var(--springs-spatial-default-duration))` and the easing alike, and a theme's or
   `tokens` override sets both, as the role's vars when it aliases one, so a theme's change of
   that role still reaches it. React Native gives each of the five values its own key
   (`components.tabs.indicatorSpring.stiffness`, and so on) falling back to the role's, so the
-  engine still runs a real spring.
+  engine still runs a real spring. A theme override may also alias another component's spring
+  token (`alias("components", "tabs", "indicatorSpring")`), and it resolves as a spring on
+  both (f2e). A factory instance passes one as a spring, `tokens: { indicatorSpring:
+  spring({ ... }) }`: the web factory writes it as the two vars, React Native's as the five
+  keys (f2e). Spring tokens have no `valueType`, so they're never registered with `@property`.
 - **Reduced motion.** A spring times a motion; it doesn't decide whether it moves. So the rule
   above holds unchanged: a spring on a property that moves is instant under reduced motion (its
   part drops out, `transitionMoves`), and a spring on a fade keeps running; an overlay's moving

@@ -17,7 +17,7 @@ import type {
     States,
     StaticComponentName,
     StyleFactory,
-    TokenValue,
+    InstanceTokenValue,
     Variants,
 } from "./types";
 
@@ -98,7 +98,7 @@ describe("registered components", () => {
 
     it("types instance tokens", () => {
         expectTypeOf<InstanceTokens<"button">>().toEqualTypeOf<{
-            accent?: TokenValue | undefined;
+            accent?: InstanceTokenValue | undefined;
         }>();
         expectTypeOf<InstanceTokens<"card">>().toEqualTypeOf<{}>();
         const selection: Selection<"button"> = {
@@ -164,7 +164,7 @@ describe("components described by shape", () => {
         }>();
         expectTypeOf<SlotOf<Progress>>().toEqualTypeOf<"root" | "indicator">();
         expectTypeOf<InstanceTokens<Progress>>().toEqualTypeOf<{
-            value?: TokenValue | undefined;
+            value?: InstanceTokenValue | undefined;
         }>();
     });
 

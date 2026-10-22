@@ -1,3 +1,5 @@
+import { formatLinearEasing, sampleSpring } from "@pureform/core";
+import { spring } from "@pureform/core/ast";
 import { describe, expect, it } from "vitest";
 
 import { joinClasses, tokenStyle, withTokenStyle } from "./tokens";
@@ -12,6 +14,21 @@ describe("tokenStyle", () => {
         expect(tokenStyle({ value: 0.4, accent: "red" }, vars)).toEqual({
             "--components-circularProgress-value": "0.4",
             "--components-circularProgress-accent": "red",
+        });
+    });
+
+    it("writes a spring as the token's duration and easing vars", () => {
+        const fast = spring({ stiffness: 800, damping: 0.6 });
+        const { duration, points } = sampleSpring(fast);
+        expect(
+            tokenStyle(
+                { move: fast },
+                { move: "--components-tabs-indicatorSpring" },
+            ),
+        ).toEqual({
+            "--components-tabs-indicatorSpring-duration": `${duration}ms`,
+            "--components-tabs-indicatorSpring-easing":
+                formatLinearEasing(points),
         });
     });
 
