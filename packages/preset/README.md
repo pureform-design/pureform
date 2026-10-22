@@ -965,6 +965,9 @@ roles out. Heights (56 header, 52 rows and footer) add the density offset; `dens
 A body row tints on hover and while something in it has keyboard focus, and fills with the
 selected colors under `aria-selected`. The arrow fades in on a sorted column (`filled`), and
 faintly on an unsorted one's hovered or focused header; the fade runs under reduced motion too.
+The arrow always points up and turns over while its header cell is sorted descending (core's
+`descending` state, `aria-sort="descending"` on the web), on the chevrons' `spatialFast` spring;
+reduced motion drops the turn.
 No compounds; `stickyHeader` sets header styles and `density` a root token.
 
 ## Toolbar
