@@ -1048,7 +1048,7 @@ describe("nested rows", () => {
         expect(computed("s-section-label").display).toBe("flex");
     });
 
-    it("swipes an expandable item too: its action beside the button, in a frame", async () => {
+    it("swipes an expandable item too: its action after the button, in a frame", async () => {
         await render(
             <ListItem
                 headline="Folders"
@@ -1061,7 +1061,7 @@ describe("nested rows", () => {
         expect(root.getAttribute("role")).toBe("button");
         expect(root.getAttribute("aria-expanded")).toBe("false");
         const frame = byTestId("both-frame");
-        expect([...frame.children]).toEqual([byTestId("both-action"), root]);
+        expect([...frame.children]).toEqual([root, byTestId("both-action")]);
         await interact(() => userEvent.click(root));
         expect(root.getAttribute("aria-expanded")).toBe("true");
         expect(byTestId("both-region")).toBeTruthy();

@@ -221,7 +221,8 @@ function ListItemImpl(props: ListItemProps): ReactNode {
               },
           } as object)
         : {};
-    // A swipeable item's frame: the action under the row, and the row, which takes the drag.
+    // A swipeable item's frame: the row, which takes the drag, and the action after it (so it
+    // comes after the row in the accessibility order), drawn under the row.
     const framed = (row: ReactNode) =>
         swipeable ? (
             <v.frame.View
@@ -229,8 +230,8 @@ function ListItemImpl(props: ListItemProps): ReactNode {
                 style={s.frame}
                 testID={id("frame")}
             >
-                {action}
                 {row}
+                {action}
             </v.frame.View>
         ) : (
             row

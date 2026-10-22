@@ -421,7 +421,7 @@ describe("a swipeable ListItem", () => {
             }),
         );
 
-    it("renders its action before the row, in a frame, out of reach until revealed", async () => {
+    it("renders its action after the row, in a frame, out of reach until revealed", async () => {
         withRegistry(() => (
             <ListItem
                 headline="Message"
@@ -436,7 +436,7 @@ describe("a swipeable ListItem", () => {
         const frame = byTestId(ids.frame);
         expect(frame.className).toBe("list-item__frame");
         const action = byTestId(ids.action);
-        expect([...frame.children]).toEqual([action, root]);
+        expect([...frame.children]).toEqual([root, action]);
         expect(action.hasAttribute("inert")).toBe(true);
         expect(action.textContent).toBe("Delete");
     });
@@ -533,7 +533,7 @@ describe("a swipeable ListItem", () => {
         expect(root.tagName).toBe("BUTTON");
         expect(root.className).toContain("list-item--swipeable-true");
         expect(root.querySelector("button")).toBeNull();
-        expect([...frame.children]).toEqual([byTestId(ids.action), root]);
+        expect([...frame.children]).toEqual([root, byTestId(ids.action)]);
         expect(frame.nextElementSibling).toBe(byTestId(ids.region));
         // A drag reveals the action without expanding.
         pointer(root, "pointerdown", 200);

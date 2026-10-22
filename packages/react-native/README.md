@@ -423,7 +423,7 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
   while `expanded` (`defaultExpanded`, `onExpandedChange`), React state rather than Zag's
   accordion. A `swipeAction`
   makes the item swipeable (`revealed`, `defaultRevealed`, `onRevealedChange`, `swipeWidth`; `actionColor="error"` for a destructive action): the
-  item sits in a `frame` with the action under the row, and the frame takes the drag (a
+  item sits in a `frame` with the action under the row (after it in the accessibility order), and the frame takes the drag (a
   `PanResponder`), so the row isn't also pressable, but for an expandable one (with a `region`),
   which swipes and expands; the action is hidden from assistive technology until revealed. `Avatar` takes a `src` that shows once loaded
   (`onStatusChange`), its children the fallback.

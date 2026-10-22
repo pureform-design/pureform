@@ -32,9 +32,11 @@
 // an expandable item (a button) or a link swipes too:
 //
 //   <div class={frame}>
-//     <div class={action} inert><button>Delete</button></div>
 //     <button class={root} aria-expanded="false">…</button>
+//     <div class={action} inert><button>Delete</button></div>
 //   </div>
+//
+// The action comes after the row, so Tab reaches the row first; the row is stacked over it.
 
 import { typed } from "@pureform/core";
 import {
@@ -341,6 +343,8 @@ export const createListItem = <
                         true: {
                             root: {
                                 ...slides,
+                                // Over the action, which follows it in the frame.
+                                zIndex: unitless(1),
                                 tokens: {
                                     focusIndicatorOuterOffset: mul(
                                         ref("focusIndicatorThickness"),

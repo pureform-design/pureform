@@ -43,6 +43,12 @@ describe("expandable list item", () => {
         expect(Object.keys(region)).not.toContain("display");
     });
 
+    it("stacks a swipeable row over the action that follows it", () => {
+        const swiped = recipe("listItem").variants.swipeable!.true!.root!;
+        expect(swiped).toMatchObject({ zIndex: "1" });
+        expect(recipe("listItem").base.action).not.toHaveProperty("zIndex");
+    });
+
     it("adds no variant group and no compound", () => {
         expect(Object.keys(listItem.recipe.variants ?? {})).toEqual([
             "lines",

@@ -479,8 +479,8 @@ mirrorIcon?, disabled?, content? }`; a tab without a label shows only its icon, 
   are `aria-hidden` (give `aria-hidden={false}` to one that says something). `leadingType` sizes
   the leading part for an icon, avatar, thumbnail, or video, and `position` places a segmented
   list's tile. `swipeAction` puts the item in a `frame` with its `action`
-  (composed: `ListItem.Frame` around `ListItem.Action` and `ListItem.Root`): the action sits
-  under the row, beside it rather than in it, and dragging the row toward the inline start (or
+  (composed: `ListItem.Frame` around `ListItem.Root` and `ListItem.Action`): the action sits
+  under the row (after it in the DOM, so Tab reaches the row first; the row is stacked over it), beside it rather than in it, and dragging the row toward the inline start (or
   the arrow keys on the focused row; Escape closes) slides it over the action, which is `inert`
   until revealed. `revealed`, `defaultRevealed`, `onRevealedChange` and `swipeWidth` (px, 80;
   the preset's `actionWidth` token) control it, on the ready-made item or on `Frame`;

@@ -4,7 +4,8 @@
 // or disabled. Inside a List, it takes the list's variants as its defaults. An expandable item sits
 // in `Expandable`, Zag's accordion with one item: Root is its header (a button, with an
 // `Indicator`), and `Region`, after Root, its content. A swipeable item sits in a `Frame`, with
-// its `Action` beside Root rather than in it, so a link, a button, or an expandable item swipes.
+// its `Action` after Root rather than in it, so a link, a button, or an expandable item swipes,
+// and Tab reaches the row before its action.
 
 import { listItemAnatomy } from "@pureform/anatomy";
 import type { PartName, TestIdOverride } from "@pureform/anatomy";
@@ -400,8 +401,8 @@ function ReadyMade(props: ListItemProps): ReactNode {
             testId={props.testId}
             {...slot("frame")}
         >
-            <Action {...slot("action")}>{props.swipeAction}</Action>
             {row}
+            <Action {...slot("action")}>{props.swipeAction}</Action>
         </Frame>
     ) : (
         row
