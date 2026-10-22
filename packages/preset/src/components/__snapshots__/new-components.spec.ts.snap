@@ -1850,8 +1850,8 @@ exports[`navigationBar > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transition": {
-        "_motionReduce": "opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
-        "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
+        "_motionReduce": "opacity token(springs.effectsDefault.duration) token(springs.effectsDefault.easing), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(springs.spatialDefault.duration) token(springs.spatialDefault.easing), inset-inline-end token(springs.spatialDefault.duration) token(springs.spatialDefault.easing), opacity token(springs.effectsDefault.duration) token(springs.effectsDefault.easing), background-color token(durations.short3) token(easings.standard)",
       },
     },
     "icon": {
@@ -2173,8 +2173,8 @@ exports[`navigationRail > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "top": "0px",
       "transition": {
-        "_motionReduce": "opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
-        "base": "inset-inline-start token(durations.medium2) token(easings.emphasized), inset-inline-end token(durations.medium2) token(easings.emphasized), opacity token(durations.medium2) token(easings.emphasized), background-color token(durations.short3) token(easings.standard)",
+        "_motionReduce": "opacity token(springs.effectsDefault.duration) token(springs.effectsDefault.easing), background-color token(durations.short3) token(easings.standard)",
+        "base": "inset-inline-start token(springs.spatialDefault.duration) token(springs.spatialDefault.easing), inset-inline-end token(springs.spatialDefault.duration) token(springs.spatialDefault.easing), opacity token(springs.effectsDefault.duration) token(springs.effectsDefault.easing), background-color token(durations.short3) token(easings.standard)",
       },
     },
     "header": {
@@ -3143,7 +3143,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
         ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "inset-inline-start token(durations.short3) token(easings.standard), inset-inline-end token(durations.short3) token(easings.standard), inset-block-start token(durations.short3) token(easings.standard), inset-block-end token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-inline-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
         },
       },
     },
@@ -3174,11 +3174,11 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
       "transition": {
         ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "width token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "width token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
         },
         "base": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "inset-inline-start token(durations.short3) token(easings.standard), inset-inline-end token(durations.short3) token(easings.standard), inset-block-start token(durations.short3) token(easings.standard), inset-block-end token(durations.short3) token(easings.standard), width token(durations.short3) token(easings.standard), height token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-inline-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), width token(springs.spatialFast.duration) token(springs.spatialFast.easing), height token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
         },
       },
       "width": {
@@ -3274,7 +3274,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
         ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "inset-inline-start token(durations.short3) token(easings.standard), inset-inline-end token(durations.short3) token(easings.standard), inset-block-start token(durations.short3) token(easings.standard), inset-block-end token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-inline-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
         },
       },
     },
@@ -3314,7 +3314,7 @@ exports[`slider > compiles to a stable Panda slot recipe 1`] = `
         ".slider__root:is(:active, [data-pf-active]):is(:active, [data-pf-active]):is(:active, [data-pf-active]) &": "background-color token(durations.short3) token(easings.standard)",
         "base": {
           "_motionReduce": "background-color token(durations.short3) token(easings.standard)",
-          "base": "inset-inline-start token(durations.short3) token(easings.standard), inset-inline-end token(durations.short3) token(easings.standard), inset-block-start token(durations.short3) token(easings.standard), inset-block-end token(durations.short3) token(easings.standard), background-color token(durations.short3) token(easings.standard)",
+          "base": "inset-inline-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-inline-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-start token(springs.spatialFast.duration) token(springs.spatialFast.easing), inset-block-end token(springs.spatialFast.duration) token(springs.spatialFast.easing), background-color token(durations.short3) token(easings.standard)",
         },
       },
     },
@@ -3937,7 +3937,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "transition": {
         "_motionReduce": "none",
-        "base": "transform var(--components-tabs-indicatorDuration, token(durations.medium1)) var(--components-tabs-indicatorEasing, token(easings.emphasized))",
+        "base": "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
       },
       "zIndex": "1",
     },

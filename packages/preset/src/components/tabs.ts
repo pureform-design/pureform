@@ -24,7 +24,8 @@
 //
 // The indicator slides from the tab selected before to the new one: the bindings start a
 // transform from the old indicator's box (FLIP), timed by the `transform` transition the
-// indicator declares here, so the motion tokens retime it and reduced motion turns it off.
+// indicator declares here (the `spatialDefault` spring, as Compose's `TabRow` slides its
+// indicator with `DefaultSpatial`), so the motion tokens retime it and reduced motion turns it off.
 
 import { typed } from "@pureform/core";
 import {
@@ -46,11 +47,10 @@ import {
 } from "@pureform/core/ast";
 import type { ColorValue } from "@pureform/core/ast";
 import {
-    duration,
-    easing,
     radius,
     size as sizeToken,
     spacing,
+    spring,
     textStyle,
 } from "@pureform/theme";
 
@@ -90,14 +90,11 @@ const { tokens, ref } = componentTokens("tabs", {
     secondaryIndicatorHeight: px(2),
     // A primary indicator is as wide as the tab's content, and never narrower than this.
     indicatorMinWidth: px(24),
-    // How the indicator slides to a newly selected tab, as Material's web tabs time it.
     // Scrollable tabs: the inline padding before the first tab and after the last, and the
     // narrowest a tab gets (Compose's `PrimaryScrollableTabRow` edge padding and minimum tab
     // width, 52dp and 90dp).
     edgePadding: px(52),
     scrollableMinWidth: px(90),
-    indicatorDuration: duration("medium1"),
-    indicatorEasing: easing("emphasized"),
     ...INDICATION_TOKENS,
 });
 
@@ -221,11 +218,9 @@ export const createTabs = <const G extends string = ColorGroup>(
                         // Over every tab, so it draws over the tabs it slides across.
                         zIndex: unitless(1),
                         transition: motionTransition(
-                            tween(
-                                "transform",
-                                ref("indicatorDuration"),
-                                ref("indicatorEasing"),
-                            ),
+                            tween("transform", {
+                                spring: spring("spatialDefault"),
+                            }),
                         ),
                     },
                 },

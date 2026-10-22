@@ -1,13 +1,14 @@
 // The tabs' active indicator moving between tabs (design doc §9.10), as Material's tabs move it:
 // when the selected tab changes, the new tab's indicator slides in from where the old one is
-// drawn, moving and resizing over the indicator's own motion tokens, and ends in its own place.
+// drawn, moving and resizing over the indicator's spring, and ends in its own place.
 // Clicks, the keyboard, and a controlled `value` all slide; a quick change retargets from what's
 // on screen; mounting, hydrating, and reduced motion don't slide; a resize or a new label keeps
 // it aligned. A primary indicator spans its tab's content (at least 24px), as Material's does, so
 // the slide resizes it between tabs whose labels differ; a secondary one spans the tab. The suites' browser asks for reduced motion, so these scenes set the provider's
 // `motion` to `"full"` unless they test reducing it.
 
-import { MATERIAL_DURATIONS, MATERIAL_EASINGS } from "@pureform/material";
+import { sampleSpring } from "@pureform/core";
+import { MATERIAL_SPRINGS } from "@pureform/material";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { userEvent } from "vitest/browser";
 
@@ -21,17 +22,18 @@ import { SERVER_START_TIMEOUT, startServer } from "./harness/server";
 
 const FULL: SceneProvider = { motion: "full" };
 
-// Material's emphasized curve, a `linear()` easing, as the browser serializes it: every stop with
-// its input, the first at 0% and the last at 100%.
-const EMPHASIZED = (() => {
-    const emphasized = MATERIAL_EASINGS.emphasized;
-    if (emphasized.kind !== "linear")
-        throw new Error("emphasized: not linear()");
-    const last = emphasized.points.length - 1;
-    const stops = emphasized.points.map(
+// The `spatialDefault` spring of Material's standard scheme (m2a), sampled as the web runs it: its
+// settle time, and a `linear()` easing as the browser serializes it, every stop with its input,
+// the first at 0% and the last at 100%.
+const SPATIAL_DEFAULT = (() => {
+    const { duration, points } = sampleSpring(
+        MATERIAL_SPRINGS.standard.spatialDefault,
+    );
+    const last = points.length - 1;
+    const stops = points.map(
         ([output, input], i) => `${output} ${input ?? (i === last ? 100 : 0)}%`,
     );
-    return `linear(${stops.join(", ")})`;
+    return { duration, easing: `linear(${stops.join(", ")})` };
 })();
 
 // The hydration scene renders on the server.
@@ -160,19 +162,18 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
             await harness.settle();
             const indicator = indicatorOf(host, "cars");
             const slide = heldSlide(indicator);
-            // Material's medium1, on the emphasized curve, from the tabs' tokens.
+            // Material's spatialDefault spring, as Compose's tab row slides its indicator.
             const timing = slide.effect!.getComputedTiming();
-            expect(timing.duration).toBe(MATERIAL_DURATIONS.medium1);
-            expect(timing.easing).toBe(EMPHASIZED);
+            expect(timing.duration).toBe(SPATIAL_DEFAULT.duration);
+            expect(timing.easing).toBe(SPATIAL_DEFAULT.easing);
 
             slide.currentTime = 0;
             const start = boxOf(indicator);
             expect(start.left).toBeCloseTo(from.left, 0);
             expect(start.width).toBeCloseTo(from.width, 0);
 
-            // A sixth of the way in, the emphasized curve is about 40% of the way along; by half
-            // it's nearly there.
-            slide.currentTime = MATERIAL_DURATIONS.medium1 / 6;
+            // A sixth of the way in, the spring is partway along.
+            slide.currentTime = SPATIAL_DEFAULT.duration / 6;
             const middle = boxOf(indicator);
             expect(isBetween(middle.left, from.left, to.left)).toBe(true);
             expect(isBetween(middle.right, from.right, to.right)).toBe(true);
@@ -202,7 +203,7 @@ describe.each(["primary", "secondary"])("%s tabs", (variant) => {
         await userEvent.click(tabOf(host, "hotels"));
         await harness.settle();
         const slide = heldSlide(indicatorOf(host, "hotels"));
-        slide.currentTime = MATERIAL_DURATIONS.medium1 / 2;
+        slide.currentTime = SPATIAL_DEFAULT.duration / 2;
         // Resized mid-slide, it still ends in its place.
         host.style.width = "420px";
         slide.play();
@@ -350,7 +351,7 @@ describe("the indicator", () => {
         await userEvent.click(tabOf(host, "cars"));
         await harness.settle();
         const first = heldSlide(indicatorOf(host, "cars"));
-        first.currentTime = MATERIAL_DURATIONS.medium1 / 2;
+        first.currentTime = SPATIAL_DEFAULT.duration / 2;
         const midway = boxOf(indicatorOf(host, "cars"));
         await userEvent.click(tabOf(host, "hotels"));
         await harness.settle();

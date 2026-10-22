@@ -24,7 +24,7 @@ import {
     when,
 } from "@pureform/core/ast";
 import type { NumericValue, StyleMap } from "@pureform/core/ast";
-import { duration, easing, radius, spacing } from "@pureform/theme";
+import { radius, spacing, spring } from "@pureform/theme";
 
 import {
     blend,
@@ -97,14 +97,17 @@ export const GROUPED_TOKENS = {
  *  about 15%; a fixed step keeps it a token). */
 export const GROUP_GROWTH = spacing("3");
 
-/** A grouped button's transition: the state colors, and its corners and width, which reduced
- *  motion changes at once. */
+const GROUP_SPRING = { spring: spring("spatialFast") };
+
+/** A grouped button's transition: the state colors, and its corners and width, which settle on
+ *  the `spatialFast` spring, as Compose's `ButtonGroup` animates them (`FastSpatial`), and which
+ *  reduced motion changes at once. */
 export const GROUP_TRANSITION = motionTransition(
     ...STATE_TWEENS,
-    tween("borderRadius", duration("medium1"), easing("emphasized")),
-    tween("paddingInlineStart", duration("medium1"), easing("emphasized")),
-    tween("paddingInlineEnd", duration("medium1"), easing("emphasized")),
-    tween("width", duration("medium1"), easing("emphasized")),
+    tween("borderRadius", GROUP_SPRING),
+    tween("paddingInlineStart", GROUP_SPRING),
+    tween("paddingInlineEnd", GROUP_SPRING),
+    tween("width", GROUP_SPRING),
 );
 
 /** A grouped button's `position` variant: `single` in a standard group (it widens while

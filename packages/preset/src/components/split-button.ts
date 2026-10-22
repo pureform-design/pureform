@@ -34,6 +34,7 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
 import { BUTTON_SIZES } from "./button";
+import { spatialTweens } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
@@ -55,7 +56,6 @@ import {
     sizeTokenName,
     sizeTokens,
     sys,
-    tweens,
     variantsOf,
 } from "./shared";
 import type { ColorGroup, ColorGroups, Densities, Fill } from "./shared";
@@ -244,7 +244,7 @@ export const createSplitButton = <
                                 transform(rotate(numeric(180, "deg"))),
                             )
                             .else(transform(rotate(numeric(0, "deg")))),
-                        transition: tweens("transform"),
+                        transition: spatialTweens("spatialFast", "transform"),
                     },
                 },
                 variants: {

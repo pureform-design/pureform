@@ -49,7 +49,7 @@ import {
     tween,
     unitless,
 } from "@pureform/core/ast";
-import { duration, easing, spacing, textStyle } from "@pureform/theme";
+import { spacing, spring, textStyle } from "@pureform/theme";
 
 import { cornerKeyword } from "../corners";
 import { stateLayer } from "../state-layer";
@@ -75,9 +75,6 @@ const { tokens, ref } = componentTokens("timePicker", {
     handleSize: px(48),
     trackWidth: px(2),
     centerSize: px(8),
-    // How the hand turns to a new value.
-    handDuration: duration("medium2"),
-    handEasing: easing("emphasized"),
     // A scroll field's value and the one on each side of it.
     scrollItemHeight: px(56),
     scrollGap: spacing("1"),
@@ -232,11 +229,11 @@ export const timePicker = pf.slotComponent({
                     backgroundColor: ref("dialHandleColor"),
                     pointerEvents: none,
                     transition: motionTransition(
-                        tween(
-                            "transform",
-                            ref("handDuration"),
-                            ref("handEasing"),
-                        ),
+                        // It turns on the `spatialDefault` spring, as Compose's clock dial
+                        // does (`ClockDialModifier`, `DefaultSpatial`).
+                        tween("transform", {
+                            spring: spring("spatialDefault"),
+                        }),
                     ),
                 },
                 dialHandle: {

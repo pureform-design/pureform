@@ -219,7 +219,7 @@ describe("morphing shapes", () => {
             string
         >;
         expect(transition.base).toContain(
-            "clip-path token(durations.medium2) token(easings.emphasized)",
+            "clip-path token(springs.effectsDefault.duration) token(springs.effectsDefault.easing)",
         );
         expect(transition._motionReduce).not.toContain("clip-path");
         expect(transition._motionReduce).toContain(

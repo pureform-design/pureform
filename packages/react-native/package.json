@@ -470,6 +470,7 @@
         "@pureform/machines": "workspace:^"
     },
     "devDependencies": {
+        "@pureform/core": "workspace:^",
         "@pureform/material": "workspace:^",
         "@pureform/preset": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",

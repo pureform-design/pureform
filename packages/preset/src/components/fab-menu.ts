@@ -41,11 +41,11 @@ import {
 import { INDICATION_TOKENS } from "../state-layer";
 import { FAB_SIZES } from "./fab";
 import { overlayMotion, POPUP_MOTION } from "./overlay";
+import { spatialCornerTransition } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorTokenVariants,
     componentTokens,
-    cornerTransition,
     defaultGroups,
     entriesOf,
     groupTokens,
@@ -159,7 +159,7 @@ export const createFabMenu = <const G extends string = ColorGroup>(
                     },
                     closeTrigger: {
                         ...pressableRoot(ref),
-                        transition: cornerTransition,
+                        transition: spatialCornerTransition,
                         fontSize: ref("closeIconSize"),
                         backgroundColor: slotStateLayer(
                             ref,

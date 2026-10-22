@@ -517,6 +517,7 @@
         "@pureform/machines": "workspace:^",
       },
       "devDependencies": {
+        "@pureform/core": "workspace:^",
         "@pureform/material": "workspace:^",
         "@pureform/preset": "workspace:^",
         "@pureform/rn-adapter": "workspace:^",
@@ -823,6 +824,7 @@
       "devDependencies": {
         "@pandacss/vite": "catalog:",
         "@pureform/anatomy": "workspace:^",
+        "@pureform/core": "workspace:^",
         "@pureform/css-adapter": "workspace:^",
         "@pureform/generate": "workspace:^",
         "@pureform/material": "workspace:^",

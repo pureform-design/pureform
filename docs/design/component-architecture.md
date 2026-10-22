@@ -985,8 +985,17 @@ motion)` keeps the overlay present until the exit's end is reported, never on a 
 
 #### 5.8.1 Springs
 
-Material 3 Expressive times spatial motion with springs. Built (m1): the plumbing, with no
-component moved to springs yet (m2 migrates them).
+Material 3 Expressive times spatial motion with springs. Built (m1): the plumbing; m2 migrates
+the components.
+
+- **Components (m2a).** Each takes the role Compose Material 3's `MotionSchemeKeyTokens` gives it:
+  `effectsDefault` for the corner and clip-path morphs of buttons, icon buttons, FABs and split
+  buttons (`cornerTransition`, Compose picks an effects spring so they never bounce);
+  `spatialFast` for chips' and the FAB menu toggle's corners (`spatialCornerTransition`), the
+  button group's corners, padding and width, the switch handle, the slider's handle and track
+  on keyboard steps, and the split button's chevron turn; `spatialDefault` for the navigation
+  indicator's growth (its fade on `effectsDefault`), the tabs' indicator slide and the time
+  picker's hand. Colors stay on their `short3` tweens (`spatialTweens` in `shaped.ts`).
 
 - **The node.** `SpringNode { type: "spring", stiffness, damping, mass }` in `@pureform/core`:
   damping is the ratio ζ (1 critical, below bounces), mass defaults to 1. `spring({ stiffness,
@@ -2495,9 +2504,9 @@ do; React Native does the same through its motion engines.
   cancels the running slide after reading where it has got to, so the next starts from what's
   on screen. A shared indicator placed by CSS variables (Zag's) was passed over: it measures
   after mount, so the server can't place it without a flash, and it changes the anatomy.
-- **Timing from the style.** The preset gives the indicator a `transform` transition over two new
-  component tokens, `indicatorDuration` (`medium1`, 250ms, material-web's duration) and
-  `indicatorEasing` (`emphasized`), through `motionTransition`, so `reducedMotion` drops it. The
+- **Timing from the style.** The preset gives the indicator a `transform` transition on the
+  `spatialDefault` spring (m2a; Compose's `TabRow` slides with `DefaultSpatial`; it was
+  `medium1` on `emphasized` before), through `motionTransition`, so `reducedMotion` drops it. The
   binding reads the computed `transition` (`transformTiming`), so every web target and an app's
   own CSS time it, reduced motion (the provider's `motion` or the system's) changes at once, and
   an unstyled indicator doesn't slide. Under reduced motion material-web fades the new indicator

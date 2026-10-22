@@ -1,3 +1,5 @@
+import { sampleSpring } from "@pureform/core";
+import { MATERIAL_SPRINGS } from "@pureform/material";
 import { act } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { View } from "react-native";
@@ -19,9 +21,11 @@ beforeAll(async () => {
     registry = await presetRegistry(["tabs", "ripple"]);
 });
 
-// The indicator slides over medium1 (250ms) times this, long enough to look at it partway.
+// The indicator slides on the spatialDefault spring (its sampled settle time, about 317ms) times
+// this, long enough to look at it partway.
 const SLOW = 8;
-const SLIDE = 250 * SLOW;
+const SLIDE =
+    sampleSpring(MATERIAL_SPRINGS.standard.spatialDefault).duration * SLOW;
 
 const ITEMS = [
     { value: "flights", label: "Flights" },

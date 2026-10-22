@@ -347,8 +347,8 @@ dismiss)` closes the topmost on Escape or the back button, and `dismissTopOverla
 - **The tabs' indicator slides as on the web** (design doc §9.10): when the
   selection changes, from a press, a key, or a controlled `value`, the new tab's indicator is
   drawn over the old one's box and moves and resizes into place (a translation and a horizontal
-  scale about its center), over the indicator's `transform` transition (`indicatorDuration`,
-  medium1, and `indicatorEasing`, emphasized), times `timeScale`. The engine runs it: `useSlide`
+  scale about its center), over the indicator's `transform` transition (the `spatialDefault` spring's sampled
+  duration and curve), times `timeScale`. The engine runs it: `useSlide`
   on `MotionEngine` (Animated with the native driver on a device; a Reanimated CSS keyframe
   animation). Where it differs from the web:
     - the boxes come from `onLayout` on each tab, its content, and its indicator, recorded as they

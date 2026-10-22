@@ -32,13 +32,13 @@ import type { MaterialDensity } from "@pureform/theme";
 
 import { INDICATION_TOKENS, stateLayer } from "../state-layer";
 import type { IndicationRef } from "../state-layer";
+import { spatialCornerTransition } from "./shaped";
 import {
     DEFAULT_GROUP,
     colorVariant,
     cornerMorphTokens,
     cornerMorphVariants,
     cornerRadius,
-    cornerTransition,
     componentTokens,
     defaultDensities,
     defaultGroups,
@@ -172,7 +172,7 @@ export const chipShape = (
     height: dense(ref("height")),
     paddingInlineStart: ref("padding"),
     paddingInlineEnd: ref("padding"),
-    transition: cornerTransition,
+    transition: spatialCornerTransition,
     borderRadius: cornerRadius(ref),
 });
 

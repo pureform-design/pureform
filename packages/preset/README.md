@@ -324,8 +324,8 @@ components unless you show every shape.
 
 ### Morphing
 
-`morph(from, to)` makes a shape that changes into another while pressed, easing over `medium2`
-on the emphasized curve; under reduced motion the shape changes at once and the colors still
+`morph(from, to)` makes a shape that changes into another while pressed, settling on the
+`effectsDefault` spring (Compose's buttons and icon buttons morph without bounce); under reduced motion the shape changes at once and the colors still
 fade. It redraws both as the same number
 of curves, running the same direction from the closest starting points, which is what lets
 the browser animate between them.
@@ -752,8 +752,8 @@ do: a primary tab's content is centered and kept `paddingInline` from the tab's 
 spans it; a secondary tab's content spans the tab and pads itself, so its indicator (2px, square)
 spans the tab. The divider under the tabs is an inset shadow on each tab (`dividerColor`), so it
 takes no markup.
-The indicator declares a `transform` transition over `indicatorDuration` (`medium1`) and
-`indicatorEasing` (`emphasized`), none under reduced motion; the bindings slide the new tab's
+The indicator declares a `transform` transition on the `spatialDefault` spring (Compose's
+`TabRow` uses `DefaultSpatial`), none under reduced motion; the bindings slide the new tab's
 indicator in from the old one's box over it (design doc §9.10). It draws over every tab
 (`z-index: 1`) inside the tab list, which is its own stacking context.
 

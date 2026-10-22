@@ -54,6 +54,7 @@ import type { ColorValue, NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, size as sizeToken, textStyle } from "@pureform/theme";
 
 import { INDICATION_TOKENS } from "../state-layer";
+import { spatialTweens } from "./shaped";
 import {
     DEFAULT_GROUP,
     blend,
@@ -134,12 +135,14 @@ const INSETS = [
     "insetBlockEnd",
 ] as const;
 
-// Movement eases for keyboard steps, but follows the pointer directly while it is down, so a
+// Movement settles on the `spatialFast` spring for keyboard steps, but follows the pointer directly while it is down, so a
 // drag doesn't trail behind it. Colors ease either way.
 const follows = (...also: ("width" | "height")[]) =>
     when()
-        .on(PRESSED, tweens(...also, "backgroundColor"))
-        .else(tweens(...INSETS, ...also, "backgroundColor"));
+        .on(PRESSED, spatialTweens("spatialFast", ...also, "backgroundColor"))
+        .else(
+            spatialTweens("spatialFast", ...INSETS, ...also, "backgroundColor"),
+        );
 
 const percent = (token: Parameters<typeof ref>[0]) => mul(ref(token), pct(1));
 const half = (length: NumericValue) => mul(length, unitless(0.5));
