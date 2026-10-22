@@ -85,6 +85,8 @@ const SAME: readonly RnStyleKey[] = [
     "userSelect",
     "width",
     "zIndex",
+    // A stacking context of its own: React Native has it too.
+    "isolation",
 ];
 
 /** Logical and other CSS properties React Native names differently. */
@@ -142,7 +144,6 @@ const DROPPED = new Set([
     // A PureformContainer establishes a container, with its name.
     "containerType",
     "containerName",
-    "isolation",
     // React Native has no variable font axes; an icon reads its fill another way.
     "fontVariationSettings",
 ]);
