@@ -46,6 +46,7 @@ import {
     column,
     flex,
     hidden,
+    isolate,
     mul,
     pct,
     relative,
@@ -268,8 +269,13 @@ export const createListItem = <
                     ),
                     // Its display is left to the `hidden` attribute that collapses it.
                     region: { paddingInlineStart: ref("regionIndent") },
-                    // A swipeable item's frame: the action and the row, clipped to it.
-                    frame: { position: relative, overflow: hidden },
+                    // A swipeable item's frame: the action and the row, clipped to it. It
+                    // isolates them, so the row's `zIndex` stacks only against its action.
+                    frame: {
+                        position: relative,
+                        overflow: hidden,
+                        isolation: isolate,
+                    },
                     // The revealed action, pinned to the frame's end under the row and
                     // uncovered as the row slides away.
                     action: {

@@ -146,7 +146,7 @@ values (c7b), swipe action colour and width (c7c), scrollable tabs' 52/90 (c7a).
 - Avatar: a compatibility path for the old `<img>` root (c7c); Solid runs its machine in `Image`,
   React in Root (c7c; kept, see r6).
 - List swipe: a destructive (`errorContainer`) action, swipe past full width to trigger, a
-  swipeable item as a link or button, React Native `onPress` (c7c).
+  swipeable item as a link or button (c7c; React Native `onPress` done in f2a).
 - Search bar: elevation on scroll in addition to the colour (c7c).
 - Springs: `SlideMotion` and keyframes on `Animated.spring`; two springs per overlay step; settle
   tolerance vs Compose's 0.01; springs as a Tailwind theme namespace (m1).

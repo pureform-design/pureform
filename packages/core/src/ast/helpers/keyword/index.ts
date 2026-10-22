@@ -16,3 +16,4 @@ export * from "./object-fit";
 export * from "./overflow";
 export * from "./color";
 export * from "./common";
+export * from "./isolation";

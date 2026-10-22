@@ -239,6 +239,9 @@ export type PointerEventsKeyword = "auto" | "none";
  *  `contain` fits inside it, `fill` stretches, and `none` keeps its own size. React Native's
  *  `resizeMode` has the same four. */
 export type ObjectFitKeyword = "cover" | "contain" | "fill" | "none";
+/** Whether an element starts its own stacking context: `isolate` keeps its children's
+ *  `zIndex` among themselves, so they can't stack over what's outside it. */
+export type IsolationKeyword = "auto" | "isolate";
 /** How a rounded corner curves, for `cornerShape`. */
 export type CornerShapeKeyword =
     | "round"
