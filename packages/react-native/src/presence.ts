@@ -1,8 +1,9 @@
 // Overlays' enter and exit, as the preset's keyframes run them on the web: a menu, select list,
 // tooltip, or snackbar grows from 80% as it fades in and fades out faster; a dialog comes down
-// 48px as it fades in and goes back up as it fades out; a scrim fades. Each duration and curve
-// is the theme's motion token, so a theme that changes them changes these too. Under reduced
-// motion each moving step gives way to a fade of the same timing, as the web's rule does.
+// 48px as it fades in and goes back up as it fades out; a scrim fades. A step that moves runs
+// its movement on the theme's spring and its fade alongside on the fade's own duration and
+// curve. Each is the theme's motion token, so a theme that changes them changes these too.
+// Under reduced motion each moving step gives way to its fade, as the web's rule does.
 //
 // `usePresence(open)` keeps an overlay present until its exit has run to its end, which the
 // engine reports (Animated's completion, Reanimated's `onCSSAnimationEnd`), so a `Modal` or the
@@ -15,6 +16,8 @@ import type {
     PresenceMotion,
     PresencePhase,
     PresenceStep,
+    PresenceTiming,
+    Spring,
 } from "@pureform/rn-adapter/animated";
 import type { ThemeValues } from "@pureform/rn-adapter/factory";
 import { useReducedMotion, useTokens } from "@pureform/rn-adapter/react";
@@ -25,7 +28,7 @@ import { useEngine, usePureform } from "./provider";
 /** A frame as the theme gives it: a move down in pixels, or by a token's length times a
  *  factor. */
 export interface OverlayFrame {
-    readonly opacity: number;
+    readonly opacity?: number;
     readonly scale?: number;
     readonly translateY?:
         | number
@@ -37,16 +40,16 @@ export const OVERLAY_KEYFRAMES = {
     overlayFadeIn: { from: { opacity: 0 }, to: { opacity: 1 } },
     overlayFadeOut: { from: { opacity: 1 }, to: { opacity: 0 } },
     overlayGrowIn: {
-        from: { opacity: 0, scale: 0.8 },
-        to: { opacity: 1, scale: 1 },
+        from: { scale: 0.8 },
+        to: { scale: 1 },
     },
     dialogSlideIn: {
-        from: { opacity: 0, translateY: { token: "spacing.12", times: -1 } },
-        to: { opacity: 1, translateY: 0 },
+        from: { translateY: { token: "spacing.12", times: -1 } },
+        to: { translateY: 0 },
     },
     dialogSlideOut: {
-        from: { opacity: 1, translateY: 0 },
-        to: { opacity: 0, translateY: { token: "spacing.12", times: -1 } },
+        from: { translateY: 0 },
+        to: { translateY: { token: "spacing.12", times: -1 } },
     },
 } as const satisfies Record<
     string,
@@ -55,9 +58,9 @@ export const OVERLAY_KEYFRAMES = {
 
 type KeyframesName = keyof typeof OVERLAY_KEYFRAMES;
 
-/** One way in or out, as the preset names it: the keyframes, and the theme's duration and
- *  easing roles for them, or its spring role. */
-export type OverlayMotionStep = { readonly keyframes: KeyframesName } & (
+/** A timing as the preset names it: the theme's duration and easing roles, or its spring
+ *  role. */
+export type OverlayTiming =
     | {
           readonly duration: string;
           readonly easing: string;
@@ -67,8 +70,14 @@ export type OverlayMotionStep = { readonly keyframes: KeyframesName } & (
           readonly spring: string;
           readonly duration?: never;
           readonly easing?: never;
-      }
-);
+      };
+
+/** One way in or out, as the preset names it: the keyframes and their timing, and for keyframes
+ *  that only move, the fade's own timing alongside. */
+export type OverlayMotionStep = {
+    readonly keyframes: KeyframesName;
+    readonly fade?: OverlayTiming;
+} & OverlayTiming;
 
 /** The preset's overlay motions (`POPUP_MOTION`, `DIALOG_MOTION`, `SCRIM_MOTION`). */
 export const OVERLAY_MOTIONS = {
@@ -76,8 +85,8 @@ export const OVERLAY_MOTIONS = {
     popup: {
         enter: {
             keyframes: "overlayGrowIn",
-            duration: "short3",
-            easing: "emphasizedDecelerate",
+            spring: "spatialFast",
+            fade: { duration: "short3", easing: "emphasizedDecelerate" },
         },
         exit: {
             keyframes: "overlayFadeOut",
@@ -88,13 +97,13 @@ export const OVERLAY_MOTIONS = {
     dialog: {
         enter: {
             keyframes: "dialogSlideIn",
-            duration: "long2",
-            easing: "emphasizedDecelerate",
+            spring: "spatialDefault",
+            fade: { duration: "long2", easing: "emphasizedDecelerate" },
         },
         exit: {
             keyframes: "dialogSlideOut",
-            duration: "short3",
-            easing: "emphasizedAccelerate",
+            spring: "effectsFast",
+            fade: { duration: "short3", easing: "emphasizedAccelerate" },
         },
     },
     /** The scrim behind a dialog. */
@@ -119,10 +128,10 @@ export const OVERLAY_MOTIONS = {
  *  `dialog`, or `scrim`. */
 export type OverlayMotionName = keyof typeof OVERLAY_MOTIONS;
 
-const FADES: Record<PresencePhase, KeyframesName> = {
+const FADES = {
     enter: "overlayFadeIn",
     exit: "overlayFadeOut",
-};
+} as const satisfies Record<PresencePhase, KeyframesName>;
 
 const MOVES = new Set<KeyframesName>([
     "overlayGrowIn",
@@ -136,10 +145,14 @@ const numberOf = (value: unknown, fallback: number): number => {
     return Number.isFinite(n) ? n : fallback;
 };
 
-const frameOf = (frame: OverlayFrame, tokens: ThemeValues): PresenceFrame => {
+const frameOf = (
+    frame: OverlayFrame,
+    opacity: number,
+    tokens: ThemeValues,
+): PresenceFrame => {
     const move = frame.translateY;
     return {
-        opacity: frame.opacity,
+        opacity: frame.opacity ?? opacity,
         ...(frame.scale === undefined ? {} : { scale: frame.scale }),
         ...(move === undefined
             ? {}
@@ -152,9 +165,54 @@ const frameOf = (frame: OverlayFrame, tokens: ThemeValues): PresenceFrame => {
     };
 };
 
-/** An overlay's motion in a theme: its frames, its durations (`timeScale` times as long) and
- *  curves from the theme's tokens, and under `reducedMotion` a fade in place of each step that
- *  moves. */
+/** A spring role's physics in a theme (its stiffness, damping coefficient, and mass), slowed
+ *  `timeScale` times (`slowSpring`): none at no time at all. */
+export const themeSpring = (
+    role: string,
+    tokens: ThemeValues,
+    timeScale = 1,
+): Spring | undefined => {
+    const field = (name: string) => tokens[`springs.${role}.${name}`];
+    return slowSpring(
+        {
+            type: "spring",
+            stiffness: numberOf(field("stiffness"), 1),
+            damping: numberOf(field("damping"), 0),
+            mass: numberOf(field("mass"), 1),
+        },
+        timeScale,
+    );
+};
+
+// A timing in a theme: its duration (`timeScale` times as long) and curve, and for a spring,
+// its physics, slowed `timeScale` times (`slowSpring`).
+const timingOf = (
+    given: OverlayTiming,
+    tokens: ThemeValues,
+    timeScale: number,
+): PresenceTiming => {
+    const role = given.spring;
+    if (role !== undefined) {
+        const field = (name: string) => tokens[`springs.${role}.${name}`];
+        const easing = field("easing");
+        const spring = themeSpring(role, tokens, timeScale);
+        return {
+            duration: numberOf(field("duration"), 0) * timeScale,
+            easing: typeof easing === "string" ? easing : "linear",
+            ...(spring ? { spring } : {}),
+        };
+    }
+    const easing = tokens[`easings.${given.easing}`];
+    return {
+        duration:
+            numberOf(tokens[`durations.${given.duration}`], 0) * timeScale,
+        easing: typeof easing === "string" ? easing : "linear",
+    };
+};
+
+/** An overlay's motion in a theme: its frames, its durations (`timeScale` times as long),
+ *  curves and springs from the theme's tokens, and under `reducedMotion` its fade alone in
+ *  place of each step that moves. */
 export const overlayMotion = (
     name: OverlayMotionName,
     tokens: ThemeValues,
@@ -162,44 +220,28 @@ export const overlayMotion = (
     timeScale = 1,
 ): PresenceMotion => {
     const step = (phase: PresencePhase): PresenceStep => {
-        const given = OVERLAY_MOTIONS[name][phase] as OverlayMotionStep;
-        const keyframes =
-            reducedMotion && MOVES.has(given.keyframes)
-                ? FADES[phase]
-                : given.keyframes;
-        const frames = OVERLAY_KEYFRAMES[keyframes];
+        const {
+            keyframes: given,
+            fade,
+            ...timing
+        } = OVERLAY_MOTIONS[name][phase] as OverlayMotionStep;
+        const moving = MOVES.has(given);
+        const keyframes = reducedMotion && moving ? FADES[phase] : given;
+        const frames: { from: OverlayFrame; to: OverlayFrame } =
+            OVERLAY_KEYFRAMES[keyframes];
+        const faded = OVERLAY_KEYFRAMES[FADES[phase]];
         const ends = {
-            from: frameOf(frames.from, tokens),
-            to: frameOf(frames.to, tokens),
+            from: frameOf(frames.from, faded.from.opacity, tokens),
+            to: frameOf(frames.to, faded.to.opacity, tokens),
         };
-        const role = given.spring;
-        if (role !== undefined) {
-            // The theme holds a spring as its sampled duration and curve, and its physics,
-            // slowed `timeScale` times (`slowSpring`).
-            const field = (name: string) => tokens[`springs.${role}.${name}`];
-            const easing = field("easing");
-            const spring = slowSpring(
-                {
-                    type: "spring",
-                    stiffness: numberOf(field("stiffness"), 1),
-                    damping: numberOf(field("damping"), 0),
-                    mass: numberOf(field("mass"), 1),
-                },
-                timeScale,
-            );
-            return {
-                ...ends,
-                duration: numberOf(field("duration"), 0) * timeScale,
-                easing: typeof easing === "string" ? easing : "linear",
-                ...(spring ? { spring } : {}),
-            };
+        // Reduced motion leaves the fade, on its own timing.
+        if (reducedMotion && moving) {
+            return { ...ends, ...timingOf(fade ?? timing, tokens, timeScale) };
         }
-        const easing = tokens[`easings.${given.easing}`];
         return {
             ...ends,
-            duration:
-                numberOf(tokens[`durations.${given.duration}`], 0) * timeScale,
-            easing: typeof easing === "string" ? easing : "linear",
+            ...timingOf(timing, tokens, timeScale),
+            ...(fade ? { fade: timingOf(fade, tokens, timeScale) } : {}),
         };
     };
     return { enter: step("enter"), exit: step("exit") };
@@ -275,7 +317,8 @@ export function useOverlayPresence(
         }
         const stop = driver.run(phase, resolved, done);
         // A step that takes no time may never report its end.
-        if (resolved[phase].duration <= 0) done(phase);
+        const step = resolved[phase];
+        if (Math.max(step.duration, step.fade?.duration ?? 0) <= 0) done(phase);
         return stop;
     }, [driver, resolved, phase, shown]);
     if (!driver) return { present: shownNow, style: STILL, props: STILL };

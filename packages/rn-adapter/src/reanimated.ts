@@ -13,6 +13,7 @@ import type {
     PresenceDriver,
     PresencePhase,
     PresenceStep,
+    PresenceTiming,
     PresenceView,
     SlideMotion,
 } from "./motion";
@@ -138,24 +139,56 @@ export const useReanimatedComponentStyles = (
 };
 
 /** An overlay's enter and exit as Reanimated's CSS animations on the UI thread: each step a
- *  keyframe animation between its frames, the exit holding its last, ending each step with the
- *  view's `onCSSAnimationEnd`. Spread the view's props on Reanimated's view. */
+ *  keyframe animation between its frames (with its own fade, two: the movement on its timing,
+ *  the opacity on the fade's), the exit holding its last, ending each step with the view's
+ *  `onCSSAnimationEnd` once every animation of it has. Spread the view's props on Reanimated's
+ *  view. */
 export const reanimatedPresence = (): PresenceDriver => {
     let done: (phase: PresencePhase) => void = () => {};
     const views = new WeakMap<PresenceStep, PresenceView>();
+    // How many of the running step's animations have ended.
+    const finished: Record<PresencePhase, number> = { enter: 0, exit: 0 };
     // A changed animation restarts it, so each step keeps one style.
     const viewOf = (phase: PresencePhase, step: PresenceStep): PresenceView => {
         const [from, to] = presenceFrames(step);
+        // The enter shows its first frame from the start, the exit its last until the overlay
+        // goes.
+        const fillMode = phase === "exit" ? "forwards" : "backwards";
+        const fade = step.fade;
+        const style = fade
+            ? {
+                  animationName: [
+                      {
+                          from: { transform: from.transform },
+                          to: { transform: to.transform },
+                      },
+                      {
+                          from: { opacity: from.opacity },
+                          to: { opacity: to.opacity },
+                      },
+                  ],
+                  animationDuration: [step.duration, fade.duration],
+                  animationTimingFunction: [
+                      cssEasing(step.easing),
+                      cssEasing(fade.easing),
+                  ],
+                  animationFillMode: fillMode,
+              }
+            : {
+                  animationName: { from, to },
+                  animationDuration: step.duration,
+                  animationTimingFunction: cssEasing(step.easing),
+                  animationFillMode: fillMode,
+              };
+        const count = fade ? 2 : 1;
         return {
-            style: {
-                animationName: { from, to },
-                animationDuration: step.duration,
-                animationTimingFunction: cssEasing(step.easing),
-                // The enter shows its first frame from the start, the exit its last until the
-                // overlay goes.
-                animationFillMode: phase === "exit" ? "forwards" : "backwards",
+            style,
+            props: {
+                onCSSAnimationEnd: () => {
+                    finished[phase] += 1;
+                    if (finished[phase] >= count) done(phase);
+                },
             },
-            props: { onCSSAnimationEnd: () => done(phase) },
         };
     };
     return {
@@ -169,7 +202,10 @@ export const reanimatedPresence = (): PresenceDriver => {
             }
             return view;
         },
-        run: () => undefined,
+        run: (phase) => {
+            finished[phase] = 0;
+            return undefined;
+        },
     };
 };
 
