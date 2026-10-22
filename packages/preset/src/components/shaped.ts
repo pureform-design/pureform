@@ -27,7 +27,6 @@ import {
     transparent,
     linearGradient,
     stop,
-    tween,
     unitless,
     when,
 } from "@pureform/core/ast";
@@ -41,15 +40,14 @@ import type {
     ShapeMorph,
     StyleMap,
 } from "@pureform/core/ast";
-import { duration, easing, elevationTint, spring } from "@pureform/theme";
+import { elevationTint } from "@pureform/theme";
 
 import { MATERIAL_SHAPES } from "../shapes";
 import type { IndicationRef } from "../state-layer";
 import {
-    STATE_TWEENS,
     blend,
     disabledColor,
-    motionTransition,
+    shapeTransition,
     slotStateLayer,
     stateTransition,
 } from "./shared";
@@ -65,10 +63,7 @@ const isMorph = (shape: ShapeGeometry | ShapeMorph): shape is ShapeMorph =>
 // A morph changes shape on the `effectsDefault` spring, as Compose's `shapeByInteraction` does
 // for buttons and icon buttons (no bounce), along with the state colors; under reduced motion
 // the shape changes at once and the colors still fade.
-const morphTransition = motionTransition(
-    ...STATE_TWEENS,
-    tween("clipPath", { spring: spring("effectsDefault") }),
-);
+const morphTransition = shapeTransition("effectsDefault", "clipPath");
 
 export const DEFAULT_SHAPES: Shapes = MATERIAL_SHAPES;
 

@@ -781,21 +781,25 @@ export const cornerMorphVariants = (rest: RestingCorner) => ({
     },
 });
 
-// Corner changes that settle on the `role` spring, with the state colors; under reduced motion
-// the corners change at once and the colors still fade.
-const cornersOn = (role: SpringRole) =>
+/** Shape changes that settle on the `role` spring, with the state colors: the corners
+ *  (`borderRadius`), or a clip path's morph (`clipPath`). Under reduced motion the shape
+ *  changes at once and the colors still fade. */
+export const shapeTransition = (
+    role: SpringRole,
+    property: "borderRadius" | "clipPath" = "borderRadius",
+) =>
     motionTransition(
         ...STATE_TWEENS,
-        tween("borderRadius", { spring: spring(role) }),
+        tween(property, { spring: spring(role) }),
     );
 
 /** Corner changes on the `effectsDefault` spring, as Compose's buttons, icon buttons and split
  *  buttons morph their shape (an effects spring on purpose, so the corners never bounce). */
-export const cornerTransition = cornersOn("effectsDefault");
+export const cornerTransition = shapeTransition("effectsDefault");
 
 /** Corner changes on the `spatialFast` spring: Compose's chips (`shapeByInteraction` with
  *  `FastSpatial`) and the FAB menu's toggle (`ToggleFloatingActionButton`, `FastSpatial`). */
-export const spatialCornerTransition = cornersOn("spatialFast");
+export const spatialCornerTransition = shapeTransition("spatialFast");
 
 /** A component token per size for one of its measures, named `<prefix><Size>`
  *  (`heightSmall`), so a theme can retune each size. */
