@@ -38,6 +38,7 @@ import {
     DROP_SHADOW,
     ICON_FILL,
     SHAPE,
+    SPRING_FIELDS,
     TINT,
     PROVIDED,
     TOKEN,
@@ -333,14 +334,6 @@ export const springTokenValues = (
         mass: number(spring.mass),
     };
 };
-
-export const SPRING_FIELDS = [
-    "duration",
-    "easing",
-    "stiffness",
-    "damping",
-    "mass",
-] as const;
 
 type SpringFields = Record<(typeof SPRING_FIELDS)[number], ValueNode>;
 

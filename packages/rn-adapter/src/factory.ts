@@ -34,7 +34,7 @@ import type { Overrides, Styles } from "./resolve";
 import { BOUND, holds, selectWithTransitions } from "./select";
 import type { Drawing, Selected, State, Style } from "./select";
 import type { Scheme } from "./theme";
-import { ANIMATION, SHAPE, TOKEN, TRANSITION } from "./values";
+import { ANIMATION, SHAPE, SPRING_FIELDS, TOKEN, TRANSITION } from "./values";
 import type {
     Animation,
     Concrete,
@@ -291,9 +291,6 @@ const springValues = (spring: SpringNode): Record<string, number | string> => {
         mass: spring.mass,
     };
 };
-
-// A spring token's five keys, as `springValues` gives them (lower's `SPRING_FIELDS`).
-const SPRING_FIELDS = ["duration", "easing", "stiffness", "damping", "mass"];
 
 const isPerScheme = (tokens: object) =>
     Object.entries(tokens).every(

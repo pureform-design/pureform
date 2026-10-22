@@ -20,6 +20,16 @@ export const TINT = "backgroundTint";
 /** A style's transitions, which selection returns beside the style rather than in it. */
 export const TRANSITION = "transition";
 
+/** A spring token's five theme keys, `<token>.<field>`: its sampled duration and curve, and its
+ *  physics. */
+export const SPRING_FIELDS = [
+    "duration",
+    "easing",
+    "stiffness",
+    "damping",
+    "mass",
+] as const;
+
 /** A spring as React Native's engines run it: stiffness, the damping coefficient
  *  (`2ζ√(k·m)`, not the ratio), and mass. */
 export interface Spring {
