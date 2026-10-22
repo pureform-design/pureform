@@ -9,16 +9,23 @@ when the list below looks out of date.
 2. **Preset** (`packages/preset/src/components/<name>.ts`): tokens (`componentTokens`), parts,
    variants, states, using the shared helpers (`shared.ts`, `shaped.ts`, `state-layer`).
    Radii from the theme's roles. Add a spec next to it. Register it in
-   `packages/preset/src/index.ts` and `pureform.ts`.
+   `packages/preset/src/index.ts` and `pureform.ts`, and bump the component count in the gap
+   analysis §1.8 (and the compound count in `component-architecture.md` §5.5 if it moved):
+   `doc-counts.spec.ts` checks both, and `variant-overlap.spec.ts` checks the new groups.
 3. **Anatomy:** run the `generate` task in `packages/anatomy` (rewrites `src/generated.ts`).
    Never edit it by hand.
 4. **Machine** (only with behaviour): `packages/machines/src` wraps a zag machine, or is
    our own. Its `*.anatomy.ts` must match the preset's parts (the drift test, c0b).
 5. **binding-core** (`packages/binding-core/src/components/<name>.ts`): which variants the
-   binding passes through, and the usage entry in `usage.ts`; export it from `index.ts`.
+   binding passes through, and the usage entry in `usage.ts`; export it from `index.ts`. Reuse
+   the shared helpers before writing new ones (`content.ts`, `button-group.ts`'s toggle group
+   helpers, `list-item-swipe.ts`; the r1 to r6 contexts list them).
 6. **Bindings:** `packages/solid`, `packages/react`, `packages/react-native` each get
    `src/<name>/` with the component and a spec, an export in `package.json`, an entry in
-   `vite.config.ts`, a line in the registry fixture, and the README.
+   `vite.config.ts`, a line in the registry fixture, and the README. Build parts with
+   `plainParts`/`machinePart` (`parts.tsx`), actions with `pickerAction`, and React Native
+   icon parts with `iconParts`. A Zag machine the bindings didn't use before goes in both
+   bindings' `optimizeDeps.include` (`@pureform/machines > @zag-js/…`).
 7. **Adapters:** nothing by hand. Rebuild so the Panda, Tailwind, CSS and React Native
    codegen produce it, and extend the sampled codegen tests if the variant space grows.
 8. **Suites:** `tests/component-suites/src/components/<name>.ts` (renders and checks it on
@@ -27,7 +34,8 @@ when the list below looks out of date.
    component belongs in a screen.
 9. **Docs:** the gap analysis (matrix row, verdicts, totals, §7), package READMEs, and the
    output context.
-10. **Verify:** targeted builds and tests for what you touched (the
+10. **Verify:** in a fresh worktree run `bun install`, build, `bun install` again (it links the
+    built CLI), and `omni run generate -f all` before anything else. Then targeted builds and tests for what you touched (the
     [conventions](conventions.md#parallel-work)); the whole run is the
     [phase gate](conventions.md#gate-for-a-phase), done once after the merge.
 

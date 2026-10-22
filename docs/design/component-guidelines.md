@@ -15,13 +15,13 @@ not reverse engineering: nothing is decompiled, scraped from behind a login, or 
 closed binary. We read what the projects publish, and write our own styles, tokens and
 code.
 
-| Source                                                      | License            | What we take from it                                                    |
-| ----------------------------------------------------------- | ------------------ | ----------------------------------------------------------------------- |
-| `material-components-android` docs (`docs/components/*.md`) | Apache-2.0         | The M3 anatomy, variants and Expressive updates, as Google wrote them   |
-| Compose Material 3 release notes (developer.android.com)    | Apache-2.0 content | What changed in the newest spec, and why, before the View docs catch up |
-| Material Web (`material-components/material-web`)           | Apache-2.0         | Part and slot names only (it's in maintenance mode and not Expressive)  |
-| Angular Material (`angular/components`)                     | MIT                | Part names, M3 token sets, and the components M3 doesn't specify        |
-| zag.js (`chakra-ui/zag`)                                    | MIT                | Machines and part lists for behaviour                                   |
+| Source                                                      | License    | What we take from it                                                       |
+| ----------------------------------------------------------- | ---------- | -------------------------------------------------------------------------- |
+| `material-components-android` docs (`docs/components/*.md`) | Apache-2.0 | The M3 anatomy and variants up to 1.14 (in maintenance mode since 2026-05) |
+| Compose Material 3 release notes and `androidx-main` tokens | Apache-2.0 | What changed in the newest spec, and why; token values (`tokens/*.kt`)     |
+| Material Web (`material-components/material-web`)           | Apache-2.0 | Part and slot names only (it's in maintenance mode and not Expressive)     |
+| Angular Material (`angular/components`)                     | MIT        | Part names, M3 token sets, and the components M3 doesn't specify           |
+| zag.js (`chakra-ui/zag`)                                    | MIT        | Machines and part lists for behaviour                                      |
 
 Rules:
 
@@ -30,9 +30,10 @@ Rules:
   small piece is ever needed (keep the notice).
 - **Say where a decision came from.** A part, variant or value that comes from a source is
   named in the doc with the source and date (the gap analysis' "Source" column).
-- **When the sources disagree, the newest canonical one wins.** The order is: the Android
-  View docs, then the Compose release notes (they are ahead on Expressive), then Material
-  Web and Angular for names only. m3.material.io can't be read without a browser; if a value
+- **When the sources disagree, the newest canonical one wins.** The order is: Compose
+  Material 3 (its release notes and the token files on `androidx-main`; Material Android went
+  Compose-first in May 2026 and the View library is in maintenance mode), then the Android View
+  docs, then Material Web and Angular for names only. m3.material.io can't be read without a browser; if a value
   can only be had there, mark it unconfirmed instead of guessing.
 - **Don't invent spec.** A component outside M3 (the Angular parity set) follows the same
   rules, and its design calls are written down in its output context.
@@ -41,9 +42,10 @@ Rules:
 
 Do this before planning a batch of work, and whenever a new Expressive release appears.
 
-1. Read the latest docs: `docs/components/*.md` on `master` (and the commit log of that
-   folder since the last snapshot), the latest release tag, and the Compose Material 3 release
-   notes since the last snapshot.
+1. Read the latest sources: the Compose Material 3 release notes and the commit log of
+   `compose/material3/material3/src/commonMain` on `androidx-main` since the last snapshot
+   (with its `tokens/*.kt` for values), then `docs/components/*.md` on MDC-Android's `master`
+   and its latest release tag.
 2. Diff against the gap analysis: new components, removed or deprecated ones, new parts or
    variants, colour or shape changes, accessibility fixes.
 3. Record each finding in the gap analysis' recheck table with its source and the section it
@@ -159,17 +161,19 @@ not an exception.
 
 A change isn't done until these pass, and until the docs say what the code does.
 
-| Check                | Where                                                                     | What it covers                                                                                                  |
-| -------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Preset specs         | `packages/preset/src/components/*.spec.ts`, `expressive.spec.ts`          | Tokens, variants, states per component                                                                          |
-| Anatomy drift        | `packages/anatomy/src/anatomy.spec.ts` (plus the machines' test, planned) | The preset, the machine and the binding agree on parts                                                          |
-| Radii                | `packages/preset/src/radii.spec.ts`                                       | No fixed radius (§5.1)                                                                                          |
-| Adapter codegen      | `packages/rn-adapter`, `css-adapter`, `tailwind-adapter`, `panda-adapter` | Every target compiles it; large selection spaces are sampled, not enumerated                                    |
-| Browser suite        | `tests/browser-e2e-tests`                                                 | Screenshots, indication fixtures, Panda factories. Fonts are bundled so screenshots don't depend on the machine |
-| Component suites     | `tests/component-suites`                                                  | Each binding on each target; direction (rtl mirrors ltr), hydration                                             |
-| Type check           | `bunx tsc --noEmit -p tsconfig.json` in each package                      | Use `tsconfig.json`; `tsconfig.project.json` is only a fragment                                                 |
-| Targeted build/test  | `omni run build test -p <project>` or `-b <base commit> -w`               | What a change affects; the default while working                                                                |
-| Whole build and test | `omni run build test -f all -o continue`                                  | Once per phase, after merging. `-f all` because omni can replay a stale cache                                   |
+| Check                | Where                                                                        | What it covers                                                                                                  |
+| -------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Preset specs         | `packages/preset/src/components/*.spec.ts`, `expressive.spec.ts`             | Tokens, variants, states per component                                                                          |
+| Anatomy drift        | `packages/anatomy/src/anatomy.spec.ts`, `machines/src/anatomy-drift.spec.ts` | The preset, the machine and the binding agree on parts                                                          |
+| Radii                | `packages/preset/src/radii.spec.ts`                                          | No fixed radius (§5.1)                                                                                          |
+| Variant overlap      | `packages/preset/src/variant-overlap.spec.ts`                                | No two groups set one property on a slot (§4)                                                                   |
+| Doc counts           | `packages/preset/src/doc-counts.spec.ts`                                     | The design docs' component and compound counts match the code                                                   |
+| Adapter codegen      | `packages/rn-adapter`, `css-adapter`, `tailwind-adapter`, `panda-adapter`    | Every target compiles it; large selection spaces are sampled, not enumerated                                    |
+| Browser suite        | `tests/browser-e2e-tests`                                                    | Screenshots, indication fixtures, Panda factories. Fonts are bundled so screenshots don't depend on the machine |
+| Component suites     | `tests/component-suites`                                                     | Each binding on each target; direction (rtl mirrors ltr), hydration                                             |
+| Type check           | `bunx tsc --noEmit -p tsconfig.json` in each package                         | Use `tsconfig.json`; `tsconfig.project.json` is only a fragment                                                 |
+| Targeted build/test  | `omni run build test -p <project>` or `-b <base commit> -w`                  | What a change affects; the default while working                                                                |
+| Whole build and test | `omni run build test -f all -o continue`                                     | Once per phase, after merging. `-f all` because omni can replay a stale cache                                   |
 
 Test hygiene learned the hard way:
 
