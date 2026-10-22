@@ -14,6 +14,7 @@ export const CORE_TRAIN_PACKAGES = [
     "@pureform/binding-core",
     "@pureform/bundler",
     "@pureform/cli",
+    "@pureform/component-cases",
     "@pureform/core",
     "@pureform/css-adapter",
     "@pureform/css-lowering",
