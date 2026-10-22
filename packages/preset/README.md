@@ -286,7 +286,11 @@ target first, and render the icon slot only when there is an icon.
 - `fabMenu` (M3 Expressive): `closeTrigger` is the FAB (`size` `default`, `medium`, `large`),
   which turns into a round close button in the group's main color while `aria-expanded`;
   `list` (the menu's content) sits above it at its end through logical insets, holding `item`
-  pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group.
+  pills (`itemIcon`, `itemLabel`) in the group's container color. `color` takes any group. The
+  items stagger as Compose's do: each grows and fades in (the popup's motion) a `short1` after
+  the one nearer the FAB, and they leave in reverse (the first item goes first); the `list`
+  itself only holds until the last has left (`FAB_MENU_STAGGER`, `FAB_MENU_STAGGERED`: up to
+  eight steps, the rest share the last wait). Under reduced motion they fade together.
 
 ## Shapes
 
