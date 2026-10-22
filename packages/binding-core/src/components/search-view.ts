@@ -76,6 +76,7 @@ export interface SearchViewBehaviorProps
     /** The view's name for assistive technology. @default the placeholder, else "Search" */
     readonly "aria-label"?: string | undefined;
     readonly disabled?: boolean | undefined;
+    /** @control none */
     readonly id?: string | undefined;
     readonly ids?: SearchViewElementIds | undefined;
 }

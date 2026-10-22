@@ -38,11 +38,14 @@ export interface SearchBarBehaviorProps extends Controllable<"value", string> {
     readonly readOnly?: boolean | undefined;
     /** The hint the empty input shows, such as "Search mail". */
     readonly placeholder?: string | undefined;
-    /** The name the input submits its text under. */
+    /** The name the input submits its text under.
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the input belongs to, for a search bar outside it. */
+    /** The id of the form the input belongs to, for a search bar outside it.
+     *  @control none */
     readonly form?: string | undefined;
-    /** Root's id, also the machine's. */
+    /** Root's id, also the machine's.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: SearchBarElementIds | undefined;
 }

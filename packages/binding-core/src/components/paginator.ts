@@ -80,7 +80,8 @@ export interface PaginatorBehaviorProps
     /** Disables every control. */
     readonly disabled?: boolean | undefined;
     readonly translations?: PaginatorTranslations | undefined;
-    /** The group element's id; the machine finds the element by it. */
+    /** The group element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

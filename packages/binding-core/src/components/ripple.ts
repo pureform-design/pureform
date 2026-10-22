@@ -36,7 +36,8 @@ export interface RippleBehaviorProps {
     readonly getSurfaceEl?:
         | ((layer: HTMLElement) => HTMLElement | null)
         | undefined;
-    /** The layer's id, also the machine's. */
+    /** The layer's id, also the machine's.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

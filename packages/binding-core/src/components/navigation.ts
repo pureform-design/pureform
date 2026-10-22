@@ -71,7 +71,8 @@ export interface NavigationBehaviorProps extends Controllable<
 > {
     /** Disables every destination. */
     readonly disabled?: boolean | undefined;
-    /** Root's id; the machine finds the element by it. */
+    /** Root's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: NavigationElementIds | undefined;
 }

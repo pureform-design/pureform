@@ -77,16 +77,19 @@ export interface TextFieldBehaviorProps extends Controllable<"value", string> {
     /** The input's placeholder. The label floats while it isn't shown, so the default is a single
      *  space. */
     readonly placeholder?: string | undefined;
-    /** The name the input submits under. */
+    /** The name the input submits under.
+     *  @control none */
     readonly name?: string | undefined;
-    /** The id of the form the input belongs to, for a field outside it. */
+    /** The id of the form the input belongs to, for a field outside it.
+     *  @control none */
     readonly form?: string | undefined;
     /** The most characters the counter allows: it shows `count / counterMax`, and a longer
      *  value marks the field invalid. Use the input's native `maxLength` to stop typing instead. */
     readonly counterMax?: number | undefined;
     /** The visibility toggle's accessible name in a secure field. @default "Show password" */
     readonly revealLabel?: string | undefined;
-    /** The root element's id; the machine builds the other ids from it. */
+    /** The root element's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: TextFieldElementIds | undefined;
 }

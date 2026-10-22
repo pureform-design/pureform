@@ -56,7 +56,8 @@ export interface CarouselBehaviorProps extends Controllable<"page", number> {
     readonly itemWidth?: number | undefined;
     /** Whether a mouse can drag the row. @default false */
     readonly allowMouseDrag?: boolean | undefined;
-    /** Root's id; the machine builds the other ids from it. */
+    /** Root's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

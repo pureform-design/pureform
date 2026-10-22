@@ -41,7 +41,8 @@ export interface ChipSetBehaviorProps extends Controllable<"value", string[]> {
     readonly deselectable?: boolean | undefined;
     /** Disables every chip. */
     readonly disabled?: boolean | undefined;
-    /** The set element's id; the machine finds the element by it. */
+    /** The set element's id; the machine finds the element by it.
+     *  @control none */
     readonly id?: string | undefined;
 }
 

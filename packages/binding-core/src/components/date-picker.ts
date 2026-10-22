@@ -302,7 +302,8 @@ export interface DatePickerBehaviorProps extends Controllable<
     readonly readOnly?: boolean | undefined;
     readonly required?: boolean | undefined;
     readonly invalid?: boolean | undefined;
-    /** The name the chosen date is submitted under. */
+    /** The name the chosen date is submitted under.
+     *  @control none */
     readonly name?: string | undefined;
 }
 

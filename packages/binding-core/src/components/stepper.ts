@@ -62,7 +62,8 @@ export interface StepperBehaviorProps extends Controllable<"step", number> {
         | undefined;
     /** Called when the last step is done. */
     readonly onStepComplete?: (() => void) | undefined;
-    /** Root's id; the machine builds the other ids from it. */
+    /** Root's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: StepperElementIds | undefined;
 }

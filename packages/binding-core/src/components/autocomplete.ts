@@ -77,10 +77,13 @@ export interface AutocompleteBehaviorProps
     readonly error?: string | undefined;
     readonly required?: boolean | undefined;
     readonly readOnly?: boolean | undefined;
-    /** The name the input submits its text under. */
+    /** The name the input submits its text under.
+     *  @control none */
     readonly name?: string | undefined;
+    /** @control none */
     readonly form?: string | undefined;
     readonly positioning?: SelectPositioning | undefined;
+    /** @control none */
     readonly id?: string | undefined;
     readonly ids?: AutocompleteElementIds | undefined;
 }

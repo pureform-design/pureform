@@ -46,7 +46,8 @@ export interface AccordionBehaviorProps extends Controllable<
     readonly collapsible?: boolean | undefined;
     /** Disables every item. */
     readonly disabled?: boolean | undefined;
-    /** Root's id; the machine builds the other ids from it. */
+    /** Root's id; the machine builds the other ids from it.
+     *  @control none */
     readonly id?: string | undefined;
     readonly ids?: AccordionElementIds | undefined;
 }
