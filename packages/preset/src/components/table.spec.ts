@@ -83,6 +83,13 @@ describe("table", () => {
         expect(arrow).toContain("opacity");
     });
 
+    it("turns the arrow over on the chevrons' spring while sorted descending", () => {
+        const arrow = json(table.recipe.base?.sortIndicator);
+        expect(arrow).toContain('"slot":"headerCell","state":"descending"');
+        expect(arrow).toContain('"value":180');
+        expect(arrow).toContain("spatialFast");
+    });
+
     it("uses logical properties only", () => {
         expect(json(table.recipe)).not.toMatch(
             /"(paddingLeft|paddingRight|marginLeft|marginRight|left|right|top|borderBottomWidth)"/,
