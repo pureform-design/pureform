@@ -57,7 +57,7 @@ const BEHAVIOR_PROPS = [
     "onValueChange",
 ] as const;
 
-/** A list of options to select, one or many (`selectionMode`, `multiple` by default), as
+/** A list of options to select, one or many (`selectionMode`, `single` by default), as
  *  Angular's selection list: `<SelectionList aria-label="Folders" items={[{ value: "inbox",
  *  headline: "Inbox" }, …]} />`. A selected option takes the list item's selected colors. */
 export function SelectionList(props: SelectionListProps): JSX.Element {

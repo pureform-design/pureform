@@ -177,7 +177,7 @@ interface ChipSetRootOwnProps  // singleLine, setTokens, the chips' variant, cor
 interface ChipSetItem { value?; label?; icon?; trailingIcon?; disabled?; onClick?; testId? }
 chipSetSelection(props); chipSetMachineProps(props); chipSetChipVariants(set, chip);
 
-// Selection list: a list on Zag's listbox; `multiple` by default.
+// Selection list: a list on Zag's listbox; `single` by default.
 interface SelectionListRootOwnProps // the list's props, selectionMode, deselectable, loopFocus,
                                     // disabled, id, value
 interface SelectionListItem         // a list item's content and variants, value, textValue?, disabled?

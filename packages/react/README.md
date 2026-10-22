@@ -280,8 +280,8 @@ import { RichTooltip } from "@pureform/react/rich-tooltip";
   chips (`aria-pressed`). `ChipSet.Root` and `ChipSet.Chip` compose it.
 - **The selection list** (`@pureform/react/selection-list`) is a `List` that is Zag's listbox:
   each option is a `ListItem` with `role="option"` and `aria-selected` (the list item's selected
-  colors), in an `li` with `role="presentation"`. `selectionMode` is `multiple` by default, as
-  Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
+  colors), in an `li` with `role="presentation"`. `selectionMode` is `single` by default, as
+  M3 lists mostly select one; `multiple` selects any number, as Angular's selection list. The list takes focus; the arrow keys and typeahead move a highlight,
   shown as hover, and Enter, Space or a press select.
 - **Scrollable tabs** (`scrollable`) scroll the newly selected tab into view
   (`revealInRow` from `@pureform/binding-core/dom`).

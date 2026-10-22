@@ -47,7 +47,6 @@ describe("SelectionList", () => {
         expect(root.tagName).toBe("UL");
         expect(root.getAttribute("role")).toBe("listbox");
         expect(root.getAttribute("aria-label")).toBe("Folders");
-        expect(root.getAttribute("aria-multiselectable")).toBe("true");
         expect(root.tabIndex).toBe(0);
         const [inbox, starred, sent] = options();
         expect(inbox?.parentElement?.getAttribute("role")).toBe("presentation");
@@ -62,9 +61,16 @@ describe("SelectionList", () => {
     it("selects several with clicks, and reports each change", async () => {
         const onValueChange = vi.fn();
         withRegistry(
-            <SelectionList items={ITEMS} onValueChange={onValueChange} />,
+            <SelectionList
+                selectionMode="multiple"
+                items={ITEMS}
+                onValueChange={onValueChange}
+            />,
         );
         await settle();
+        expect(
+            byTestId(testIds.list.root).getAttribute("aria-multiselectable"),
+        ).toBe("true");
         const [inbox, starred, sent] = options();
         await userEvent.click(inbox!);
         await userEvent.click(starred!);
@@ -80,8 +86,8 @@ describe("SelectionList", () => {
         });
     });
 
-    it("selects one at a time in single mode, with the keyboard", async () => {
-        withRegistry(<SelectionList selectionMode="single" items={ITEMS} />);
+    it("selects one at a time by default, with the keyboard", async () => {
+        withRegistry(<SelectionList items={ITEMS} />);
         await settle();
         byTestId(testIds.list.root).focus();
         await userEvent.keyboard("{ArrowDown}{Enter}");

@@ -1,6 +1,6 @@
 // The selection list: a list whose rows are options, each an interactive list item marked with
-// `aria-selected`, which its selected colors read. A press selects one: any number in a
-// `multiple` list (the default), one in a `single` list.
+// `aria-selected`, which its selected colors read. A press selects one: one in a `single` list
+// (the default), any number in a `multiple` list.
 
 import { listAnatomy } from "@pureform/anatomy";
 import {
@@ -104,7 +104,7 @@ function SelectionListImpl(props: SelectionListProps): ReactNode {
     );
 }
 
-/** A list of options to select, one or many (`selectionMode`, `multiple` by default), as
+/** A list of options to select, one or many (`selectionMode`, `single` by default), as
  *  Angular's selection list: `<SelectionList aria-label="Folders" items={[{ value: "inbox",
  *  headline: "Inbox" }]} />`. */
 export const SelectionList = withEngine(SelectionListImpl, "SelectionList");

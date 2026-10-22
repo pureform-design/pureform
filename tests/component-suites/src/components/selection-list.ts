@@ -1,6 +1,6 @@
 // The selection list: a listbox whose options are list items. Its `value` is the selected
-// options' values (`aria-selected`), which a click on an option adds to, or in single mode
-// replaces. The list takes focus, and the keyboard highlights an option, which shows as hovered.
+// options' values (`aria-selected`), which a click on an option replaces (single selection, the
+// default), or in multiple mode adds to. The list takes focus, and the keyboard highlights an option, which shows as hovered.
 
 import { listItemAnatomy, testIds } from "@pureform/anatomy";
 import { userEvent } from "vitest/browser";
@@ -37,8 +37,11 @@ export const selectionList: ComponentCase = {
     props: { "aria-label": "Folders", items: ITEMS },
     root: testIds.list.root,
     examples: {
-        multiple: { defaultValue: ["inbox", "sent"] },
-        single: { selectionMode: "single", defaultValue: ["starred"] },
+        multiple: {
+            selectionMode: "multiple",
+            defaultValue: ["inbox", "sent"],
+        },
+        single: { defaultValue: ["starred"] },
         "segmented, secondary color": {
             variant: "segmented",
             color: "secondary",
@@ -50,7 +53,6 @@ export const selectionList: ComponentCase = {
         prop: "value",
         from: ["inbox"],
         to: ["starred"],
-        props: { selectionMode: "single" },
         act: async (host: HTMLElement, options_: ActOptions = {}) => {
             await userEvent.click(options(host)[1]!, options_);
         },
