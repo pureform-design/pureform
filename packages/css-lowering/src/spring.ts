@@ -55,12 +55,10 @@ export const springTokenEntries = (
     springs: Record<string, Token<SpringNode>> | undefined,
 ): [path: string[], node: ValueNode][] =>
     Object.entries(springTokenGroups(springs)).flatMap(([name, group]) =>
-        Object.entries(group).map(
-            ([field, node]): [string[], ValueNode] => [
-                ["springs", name, field],
-                node,
-            ],
-        ),
+        Object.entries(group).map(([field, node]): [string[], ValueNode] => [
+            ["springs", name, field],
+            node,
+        ]),
     );
 
 /** A spring timing's duration and curve as CSS: a spring token's two vars, or a literal

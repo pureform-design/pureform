@@ -17,14 +17,7 @@
 // split button's four: `filled` (default), `tonal`, `outlined` and `elevated`.
 
 import { typed } from "@pureform/core";
-import {
-    add,
-    inlineFlex,
-    px,
-    row,
-    slot,
-    when,
-} from "@pureform/core/ast";
+import { add, inlineFlex, px, row, slot, when } from "@pureform/core/ast";
 import type { NumericValue, StyleMap } from "@pureform/core/ast";
 import { radius, spacing, textStyle } from "@pureform/theme";
 import type { MaterialDensity } from "@pureform/theme";
