@@ -7,10 +7,10 @@ import { tabs } from "./tabs";
 const recipe = () => compilePreset(configWith(tabs)).theme?.slotRecipes?.tabs;
 
 describe("tabs", () => {
-    it("slides the indicator on the spatialDefault spring, stopped under reduced motion", () => {
+    it("slides the indicator on its spring token, spatialDefault by default, stopped under reduced motion", () => {
         expect(recipe()?.base?.indicator).toMatchObject({
             transition: {
-                base: "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+                base: "transform var(--components-tabs-indicatorSpring-duration, token(springs.spatialDefault.duration)) var(--components-tabs-indicatorSpring-easing, token(springs.spatialDefault.easing))",
                 _motionReduce: "none",
             },
         });

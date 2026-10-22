@@ -95,6 +95,8 @@ const { tokens, ref } = componentTokens("tabs", {
     // width, 52dp and 90dp).
     edgePadding: px(52),
     scrollableMinWidth: px(90),
+    // How the indicator slides to a newly selected tab.
+    indicatorSpring: spring("spatialDefault"),
     ...INDICATION_TOKENS,
 });
 
@@ -219,7 +221,7 @@ export const createTabs = <const G extends string = ColorGroup>(
                         zIndex: unitless(1),
                         transition: motionTransition(
                             tween("transform", {
-                                spring: spring("spatialDefault"),
+                                spring: ref("indicatorSpring"),
                             }),
                         ),
                     },
