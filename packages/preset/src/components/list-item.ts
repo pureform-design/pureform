@@ -252,7 +252,7 @@ export const createListItem = <
                         insetInlineEnd: px(0),
                         insetBlockStart: px(0),
                         insetBlockEnd: px(0),
-                        width: ref("actionWidth"),
+                        width: mul(ref("actionWidth"), px(1)),
                         display: flex,
                         alignItems: center,
                         justifyContent: center,
