@@ -5464,6 +5464,43 @@ export const scrimAnatomy = {
     variants: {},
 } as const satisfies ComponentAnatomy;
 
+export const horizontalSharedAxisAnatomy = {
+    name: "horizontalSharedAxis",
+    scope: "horizontal-shared-axis",
+    root: "root",
+    partNames: ["root", "page", "scrim"],
+    parts: {
+        root: {
+            name: "root",
+            attribute: "root",
+            testId: "pf-horizontal-shared-axis-root",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        page: {
+            name: "page",
+            attribute: "page",
+            testId: "pf-horizontal-shared-axis-page",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+        scrim: {
+            name: "scrim",
+            attribute: "scrim",
+            testId: "pf-horizontal-shared-axis-scrim",
+            parent: null,
+            children: [],
+            styled: true,
+            mirror: false,
+        },
+    },
+    variants: {},
+} as const satisfies ComponentAnatomy;
+
 export const rippleAnatomy = {
     name: "ripple",
     scope: "ripple",
@@ -5642,6 +5679,7 @@ export const anatomy = {
     dataTable: dataTableAnatomy,
     gridList: gridListAnatomy,
     scrim: scrimAnatomy,
+    horizontalSharedAxis: horizontalSharedAxisAnatomy,
     ripple: rippleAnatomy,
     icon: iconAnatomy,
     touchTarget: touchTargetAnatomy,
@@ -6154,6 +6192,11 @@ export const testIds = {
         subhead: "pf-grid-list-subhead",
     },
     scrim: { root: "pf-scrim-root" },
+    horizontalSharedAxis: {
+        root: "pf-horizontal-shared-axis-root",
+        page: "pf-horizontal-shared-axis-page",
+        scrim: "pf-horizontal-shared-axis-scrim",
+    },
     ripple: { root: "pf-ripple-root", ripple: "pf-ripple-ripple" },
     icon: { root: "pf-icon-root" },
     touchTarget: { root: "pf-touch-target-root" },

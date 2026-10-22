@@ -66,6 +66,10 @@ import { createFab } from "./components/fab";
 import { createFabMenu } from "./components/fab-menu";
 import { fullscreenDialog } from "./components/fullscreen-dialog";
 import { gridList } from "./components/grid-list";
+import {
+    createHorizontalSharedAxis,
+    SHARED_AXIS_KEYFRAMES,
+} from "./components/horizontal-shared-axis";
 import { createIcon } from "./components/icon";
 import { createIconButton } from "./components/icon-button";
 import { createInputChip } from "./components/input-chip";
@@ -366,6 +370,7 @@ const defaultComponents = <G extends string>(
         dataTable: createTable<Step>(densities),
         gridList,
         scrim,
+        horizontalSharedAxis: createHorizontalSharedAxis(theme.color),
         ripple,
         icon: createIcon(theme.color.groups),
         touchTarget,
@@ -522,6 +527,7 @@ export const pureform = <
                     ...SHEET_KEYFRAMES,
                     ...SEARCH_VIEW_KEYFRAMES,
                     ...APP_BAR_KEYFRAMES,
+                    ...SHARED_AXIS_KEYFRAMES,
                 },
                 components,
                 ...(Object.keys(themes).length > 0 ? { themes } : {}),

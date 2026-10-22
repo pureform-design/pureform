@@ -79,6 +79,7 @@ describe("pureform", () => {
             "dataTable",
             "gridList",
             "scrim",
+            "horizontalSharedAxis",
             "ripple",
             "icon",
             "touchTarget",
@@ -164,6 +165,7 @@ describe("pureform", () => {
             "dataTable",
             "gridList",
             "scrim",
+            "horizontalSharedAxis",
             "ripple",
         ]);
     });
