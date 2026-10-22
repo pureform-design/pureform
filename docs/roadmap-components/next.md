@@ -15,13 +15,14 @@ phase named.
   the list's and select's chevrons), plus the
   extras in [m2](phases/m2-spring-components.md) (swipe snap-back, sheet drag release,
   snackbar enter and stacking, split button chevron).
-- **A transitions phase** after the small fix phase: Compose's `FadeThrough` and
+- **[m3](phases/m3-transitions.md)**, a transitions phase after the fix phase: Compose's `FadeThrough` and
   `HorizontalSharedAxis` (§1 #5). Predictive back stays here for later.
 - **Before m2:** pre-bundle the dependencies of the component-suites and rn-web-demo e2e runs,
   so a Vite config change doesn't re-optimize mid-run (Solid hydration mismatches, blank page).
 - **Alongside m2:** a fresh-build `tsc` check on main, and formatting the unformatted files.
 - **Gate:** the fixing agent reruns with `-f failed` only ([conventions](conventions.md)).
-- **Small fix phase after m2:**
+- **[f1](phases/f1-fixes.md)**, a fix phase after m2 (also the table sort arrow's descending
+  state from m2c):
     - React Native sheets: slide in from their edge instead of the dialog's motion; a refused
       close after a drag springs back to rest; check the extra drag `Animated.View` doesn't
       change a standalone sheet's layout (m2b).

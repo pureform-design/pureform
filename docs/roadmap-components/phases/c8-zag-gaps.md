@@ -1,6 +1,6 @@
 # c8: Material gaps from Zag
 
-**Depends on:** m2 (sheet springs and the drag settle). **Subphases:** c8a to c8c, parallel.
+**Depends on:** m3, and m2 (sheet springs and the drag settle). **Subphases:** c8a to c8c, parallel.
 **Source:** [next.md §4](../next.md#4-zag-components-we-havent-ported-checked-2026-10-22).
 
 Three M3 behaviours pureform lacks that a Zag machine can back. Each follows the component
