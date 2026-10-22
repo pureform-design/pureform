@@ -63,3 +63,17 @@ when its replacement covers it.
 ## Done when
 
 As for f1, with `context/f2a.md`..`f2e.md` and the merge's `context/f2.md`.
+
+## Answers to the subphases' questions
+
+- **f2a:** `isolation` reaches React Native (kept). A swipeable item with `onPress` loses its
+  pressed look once a drag takes over (fine). Tabs' and the switch's raw `zIndex` move to a
+  shared isolation helper in r8.
+- **f2b:** the clipped ring follows the icon button's `outlineWidth`. The merge drops next.md
+  §2's "slider cut-off following the theme".
+- **f2d:** the header cell doesn't match `aria-sort` for styling (screen readers still get
+  `aria-sort`); only the arrow carries `descending`.
+- **f2e:** an instance passes springs only to spring tokens: the generated registry records which
+  tokens are springs, and a spring on another token is a type error. An instance can also pass a
+  spring role by name (`"spatialSlow"`). React Native slides settle within 0.001 (r7's question).
+  These two go in at the merge.
