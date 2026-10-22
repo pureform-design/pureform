@@ -6,6 +6,28 @@ recorded rather than did, and the open questions from every phase's context that
 open. Nothing here is applied yet. m2 (spring components) is planned separately in
 [phases/m2-spring-components.md](phases/m2-spring-components.md).
 
+## 0. Decisions (2026-10-22)
+
+Answers to the questions below and to the orchestrator's follow-ups. Each applies in the
+phase named.
+
+- **m2** runs next, after r6, starting with groups A (spatial) and B (overlays).
+- **Before m2:** pre-bundle the dependencies of the component-suites and rn-web-demo e2e runs,
+  so a Vite config change doesn't re-optimize mid-run (Solid hydration mismatches, blank page).
+- **Alongside m2:** a fresh-build `tsc` check on main, and formatting the unformatted files.
+- **Gate:** the fixing agent reruns with `-f failed` only ([conventions](conventions.md)).
+- **Small fix phase after m2:**
+    - Selection list: single selection by default; multiple stays an option.
+    - Rail: replace a destination's `sectionLabel` with a `section` tag on every destination.
+      Runs of the same `section` share one heading (grouped like Select's `group`, through
+      `selectItemGroups`); the bar ignores it. `sectionLabel` is removed.
+    - Avatar: stays a non-`<img>` root, with `role="img"` and an accessible name.
+    - Expandable plus swipeable list items: move the swipe action outside the row (§2).
+    - Icon button: the fallback outline width follows the size.
+    - Vibrant toolbar: an unstyled one recolours its icon buttons.
+    - Submenus clipped in grouped menus, the slider cut-off following the theme (§2), and
+      chips' expressive corners (§1 #2).
+
 ## 1. Spec recheck (2026-10-22)
 
 Sources read: Compose Material 3 release notes to `1.5.0-beta02` (2026-10-21); the commit log of
