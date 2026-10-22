@@ -172,6 +172,30 @@ export const buttonGroupItemProps = <P extends object>(
     return rest;
 };
 
+/** What an item of a selectable group (a grouped button, a set's chip) takes from Zag's toggle
+ *  group: its item props (`buttonGroupItemProps`), its `id` and `disabled`, and `selected` as
+ *  its pressed state, which the group changes, not the item. */
+export const toggleGroupItemProps = <I extends object, P extends object>(
+    api: {
+        getItemProps(item: I): P;
+        getItemState(item: I): {
+            readonly id: string;
+            readonly disabled: boolean;
+            readonly pressed: boolean;
+        };
+    },
+    item: I,
+) => {
+    const state = api.getItemState(item);
+    return {
+        ...buttonGroupItemProps(api.getItemProps(item)),
+        id: state.id,
+        disabled: state.disabled,
+        selected: state.pressed,
+        onSelectedChange: () => {},
+    };
+};
+
 /** The variants a grouped button takes from its group, under its own. */
 export const groupedButtonVariants = <
     B extends ButtonGroupButtonVariantProps & {

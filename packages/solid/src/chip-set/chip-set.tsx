@@ -4,8 +4,8 @@
 
 import { chipSetAnatomy } from "@pureform/anatomy";
 import {
-    buttonGroupItemProps,
     buttonGroupRootProps,
+    toggleGroupItemProps,
     CHIP_SET_CONTENT_PROPS,
     CHIP_SET_ROOT_PROPS,
     chipSetChipVariants,
@@ -103,14 +103,7 @@ function SetChip(props: ChipSetChipProps): JSX.Element {
     const selection = () => {
         const one = item();
         if (!set.selectable || !one) return {};
-        const state = api().getItemState(one);
-        return {
-            ...buttonGroupItemProps(api().getItemProps(one)),
-            id: state.id,
-            disabled: state.disabled,
-            selected: state.pressed,
-            onSelectedChange: () => {},
-        };
+        return toggleGroupItemProps(api(), one);
     };
     const merged = merge(
         omit(props, "value"),

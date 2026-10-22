@@ -5,10 +5,10 @@
 import { buttonGroupAnatomy } from "@pureform/anatomy";
 import {
     BUTTON_GROUP_ROOT_PROPS,
-    buttonGroupItemProps,
     buttonGroupMachineProps,
     buttonGroupPosition,
     buttonGroupRootProps,
+    toggleGroupItemProps,
     buttonGroupSelection,
     groupedButtonVariants,
 } from "@pureform/binding-core";
@@ -124,15 +124,10 @@ const useGrouped = <
     };
     if (!group.selectable || value === undefined) return own;
     const item = { value, disabled: props.disabled };
-    const state = api.getItemState(item);
     return {
         ...own,
-        ...buttonGroupItemProps(api.getItemProps(item)),
-        id: state.id,
-        disabled: state.disabled,
+        ...toggleGroupItemProps(api, item),
         toggle: true,
-        selected: state.pressed,
-        onSelectedChange: () => {},
     };
 };
 

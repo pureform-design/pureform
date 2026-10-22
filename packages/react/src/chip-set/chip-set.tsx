@@ -4,8 +4,8 @@
 
 import { chipSetAnatomy } from "@pureform/anatomy";
 import {
-    buttonGroupItemProps,
     buttonGroupRootProps,
+    toggleGroupItemProps,
     CHIP_SET_ROOT_PROPS,
     chipSetChipVariants,
     chipSetMachineProps,
@@ -97,15 +97,10 @@ function SetChip({ value, ...props }: ChipSetChipProps): ReactNode {
         return <Chip {...(own as ChipProps)} />;
     }
     const item = { value, disabled: props.disabled };
-    const state = api.getItemState(item);
     return (
         <Chip
             {...(own as ChipProps)}
-            {...(buttonGroupItemProps(api.getItemProps(item)) as object)}
-            id={state.id}
-            disabled={state.disabled}
-            selected={state.pressed}
-            onSelectedChange={() => {}}
+            {...(toggleGroupItemProps(api, item) as object)}
         />
     );
 }
