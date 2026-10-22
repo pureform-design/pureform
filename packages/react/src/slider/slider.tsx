@@ -18,7 +18,12 @@ import {
     sliderStops,
     sliderThumbTokens,
 } from "@pureform/binding-core";
-import type { SliderRootOwnProps, SliderValue } from "@pureform/binding-core";
+import type {
+    SliderInsetIconMeasures,
+    SliderRootOwnProps,
+    SliderValue,
+} from "@pureform/binding-core";
+import { readSliderInsetIcon } from "@pureform/binding-core/dom";
 import { setNativeDefault } from "@pureform/machines/form";
 import * as slider from "@pureform/machines/slider";
 import { normalizeProps } from "@zag-js/react";
@@ -29,6 +34,7 @@ import {
     type ReactNode,
     useCallback,
     useId,
+    useLayoutEffect,
     useRef,
     useState,
 } from "react";
@@ -182,8 +188,12 @@ function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
     // The root's length along the axis, kept by an observer on the icon's parent (the root).
     const [length, setLength] = useState(0);
     const observer = useRef<ResizeObserver | undefined>(undefined);
+    const icon = useRef<HTMLElement | null>(null);
+    // The theme's `insetIconSize` and `insetIconPadding`, read from the layout once it's drawn.
+    const [measures, setMeasures] = useState<SliderInsetIconMeasures>();
     const measure = useCallback(
         (element: HTMLElement | null) => {
+            icon.current = element;
             observer.current?.disconnect();
             const parent = element?.parentElement;
             if (!parent) return;
@@ -197,17 +207,34 @@ function InsetIcon({ unstyled, ...props }: SliderPartProps): ReactNode {
         },
         [vertical],
     );
+    const overflowing = sliderInsetIconOverflows(
+        length,
+        api.percents,
+        root.centered,
+        measures,
+    );
+    const percentsKey = api.percents.join(",");
+    useLayoutEffect(() => {
+        const element = icon.current;
+        const parent = element?.parentElement;
+        if (!element || !parent) return;
+        const read = readSliderInsetIcon(element, parent, {
+            vertical,
+            overflowing,
+            percents: api.percents,
+            centered: root.centered,
+        });
+        setMeasures((last) =>
+            read?.size === last?.size && read?.padding === last?.padding
+                ? last
+                : read,
+        );
+    }, [length, overflowing, percentsKey, vertical, root.centered]);
     return scope.render("insetIcon", {
         element: "span",
         ref: measure,
         machine: api.getInsetIconProps(),
-        states: {
-            overflowing: sliderInsetIconOverflows(
-                length,
-                api.percents,
-                root.centered,
-            ),
-        },
+        states: { overflowing },
         unstyled,
         props,
     });

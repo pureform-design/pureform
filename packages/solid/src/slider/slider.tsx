@@ -18,12 +18,18 @@ import {
     sliderStops,
     sliderThumbTokens,
 } from "@pureform/binding-core";
-import type { SliderRootOwnProps, SliderValue } from "@pureform/binding-core";
+import type {
+    SliderInsetIconMeasures,
+    SliderRootOwnProps,
+    SliderValue,
+} from "@pureform/binding-core";
+import { readSliderInsetIcon } from "@pureform/binding-core/dom";
 import { setNativeDefault } from "@pureform/machines/form";
 import * as slider from "@pureform/machines/slider";
 import type { JSX, ValidComponent } from "@solidjs/web";
 import {
     type Accessor,
+    createEffect,
     createMemo,
     createSignal,
     createUniqueId,
@@ -181,9 +187,45 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
     const [length, setLength] = createSignal(0);
     let observer: ResizeObserver | undefined;
     onCleanup(() => observer?.disconnect());
+    // The theme's `insetIconSize` and `insetIconPadding`, read from the layout once it's drawn.
+    const [measures, setMeasures] = createSignal<SliderInsetIconMeasures>();
+    const [icon, setIcon] = createSignal<HTMLElement>();
+    const vertical = () => root.orientation === "vertical";
+    const overflowing = () =>
+        sliderInsetIconOverflows(
+            length(),
+            api().percents,
+            root.centered,
+            measures(),
+        );
+    createEffect(
+        () =>
+            [
+                icon(),
+                length(),
+                overflowing(),
+                api().percents.join(","),
+                vertical(),
+                root.centered,
+            ] as const,
+        ([element, , over, , isVertical, centered]) => {
+            const parent = element?.parentElement;
+            if (!element || !parent) return;
+            const read = readSliderInsetIcon(element, parent, {
+                vertical: isVertical,
+                overflowing: over,
+                percents: api().percents,
+                centered,
+            });
+            const last = measures();
+            if (read?.size !== last?.size || read?.padding !== last?.padding)
+                setMeasures(read);
+        },
+    );
     return scope.render("insetIcon", {
         element: "span",
         ref: (element: HTMLElement) => {
+            setIcon(element);
             observer?.disconnect();
             // The ref runs before the element is placed; its parent is there a turn later.
             queueMicrotask(() => {
@@ -203,13 +245,7 @@ function InsetIcon(props: SliderPartProps): JSX.Element {
             });
         },
         machine: () => api().getInsetIconProps(),
-        states: () => ({
-            overflowing: sliderInsetIconOverflows(
-                length(),
-                api().percents,
-                root.centered,
-            ),
-        }),
+        states: () => ({ overflowing: overflowing() }),
         unstyled: () => props.unstyled,
         props: omit(props, "unstyled"),
     });

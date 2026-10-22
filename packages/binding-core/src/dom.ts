@@ -4,6 +4,11 @@
 // DOM readers in the browser, after mount; the root entry stays free of DOM use and of CSS
 // lowering for React Native.
 
+import {
+    SLIDER_INSET_ICON,
+    sliderTrackTokens,
+} from "./components/slider";
+import type { SliderInsetIconMeasures } from "./components/slider";
 import { DEFAULT_ICON_STYLE, sameIconStyle } from "./icon-style";
 import type { IconStyle } from "./icon-style";
 import { REDUCED_MOTION_QUERY } from "./motion";
@@ -225,4 +230,50 @@ export const subscribeScroll = (
     listener();
     target.addEventListener("scroll", listener, { passive: true });
     return () => target.removeEventListener("scroll", listener);
+};
+
+/** The inset icon's size and padding as the theme resolves them, read from where the styles
+ *  put it: its size is its box along the axis, and its padding is how far it sits in from the
+ *  start of the active track (or from the end of it, once it's `overflowing` at the inactive
+ *  track's start, past the handle's clearance). The same on every web target, since it reads
+ *  the layout and not a target's variables. `undefined` where it isn't placed by the preset (unstyled) or has no box. */
+export const readSliderInsetIcon = (
+    icon: Element,
+    parent: Element,
+    {
+        vertical,
+        overflowing,
+        percents,
+        centered = false,
+    }: {
+        vertical: boolean;
+        overflowing: boolean;
+        percents: readonly number[];
+        centered?: boolean | undefined;
+    },
+): SliderInsetIconMeasures | undefined => {
+    // Only the preset's placement (absolute, by insets) can be read back this way.
+    if (getComputedStyle(icon).position !== "absolute") return undefined;
+    const box = icon.getBoundingClientRect();
+    const track = parent.getBoundingClientRect();
+    const size = vertical ? box.height : box.width;
+    if (!(size > 0)) return undefined;
+    const length = vertical ? track.height : track.width;
+    const rtl = getComputedStyle(parent).direction === "rtl";
+    const offset = vertical
+        ? track.bottom - box.bottom
+        : rtl
+          ? track.right - box.right
+          : box.left - track.left;
+    const { activeStart, activeEnd, endGap } = sliderTrackTokens(
+        percents,
+        centered,
+    );
+    const base = overflowing
+        ? (length * activeEnd) / 100 + SLIDER_INSET_ICON.clearance * endGap
+        : (length * activeStart) / 100;
+    return {
+        size: Math.round(size * 100) / 100,
+        padding: Math.max(0, Math.round((offset - base) * 100) / 100),
+    };
 };
