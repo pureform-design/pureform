@@ -358,7 +358,10 @@ export const createIconButton = <
                     ),
                     shape: shapeVariant(shapes, {
                         radius: ref("radius"),
-                        outlineColor: ref("outlineColor"),
+                        outline: {
+                            color: ref("outlineColor"),
+                            width: ref("outlineWidth"),
+                        },
                     }),
                     size: Object.fromEntries(
                         entriesOf(ICON_BUTTON_SIZES).map(([name, s]) => [

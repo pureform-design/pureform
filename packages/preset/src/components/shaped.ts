@@ -240,21 +240,18 @@ export const clipVariant = (
 });
 
 /** The `shape` variant: `none` keeps the rounded corners, and each shape clips the container
- *  to itself, and the outline layer to a ring `outlineWidth` wide along it, filled with the
- *  outline color, when the component has one, and sets the root's `shaped` flag, which
+ *  to itself, and the outline layer to a ring `outline.width` wide along it, filled with
+ *  `outline.color`, when the component has one, and sets the root's `shaped` flag, which
  *  `shapedOutlineStroke` reads for the border. Where a target can't clip to a shape, the
- *  container keeps `radius` and the outline its border. The ring's width is a plain length, since each of its points restates
- *  it. */
+ *  container keeps `radius` and the outline its border, the same width. */
 export const shapeVariant = (
     shapes: Shapes,
     {
         radius,
-        outlineColor,
-        outlineWidth = px(1),
+        outline,
     }: {
         radius: NumericValue;
-        outlineColor?: ColorValue;
-        outlineWidth?: NumericValue;
+        outline?: { color: ColorValue; width: NumericValue };
     },
 ): Record<string, Record<string, StyleMap>> => ({
     none: {},
@@ -265,17 +262,17 @@ export const shapeVariant = (
                 container: clipVariant({ [name]: shape }, radius, PRESSED)[
                     name
                 ]!,
-                ...(outlineColor
+                ...(outline
                     ? {
                           root: { tokens: { shaped: unitless(1) } },
                           outline: {
                               clipPath: isMorph(shape)
                                   ? when(
                                         PRESSED,
-                                        outlineShape(shape.to, outlineWidth),
-                                        outlineShape(shape.from, outlineWidth),
+                                        outlineShape(shape.to, outline.width),
+                                        outlineShape(shape.from, outline.width),
                                     )
-                                  : outlineShape(shape, outlineWidth),
+                                  : outlineShape(shape, outline.width),
                               ...(isMorph(shape)
                                   ? { transition: morphTransition }
                                   : {}),
@@ -284,7 +281,7 @@ export const shapeVariant = (
                                   when(
                                       DISABLED,
                                       disabledColor("disabledContainer"),
-                                      outlineColor,
+                                      outline.color,
                                   ),
                                   transparent,
                               ),
