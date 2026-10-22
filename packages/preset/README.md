@@ -765,8 +765,8 @@ do: a primary tab's content is centered and kept `paddingInline` from the tab's 
 spans it; a secondary tab's content spans the tab and pads itself, so its indicator (2px, square)
 spans the tab. The divider under the tabs is an inset shadow on each tab (`dividerColor`), so it
 takes no markup.
-The indicator declares a `transform` transition on the `spatialDefault` spring (Compose's
-`TabRow` uses `DefaultSpatial`), none under reduced motion; the bindings slide the new tab's
+The indicator declares a `transform` transition on its `indicatorSpring` token, the
+`spatialDefault` spring (Compose's `TabRow` uses `DefaultSpatial`), none under reduced motion; the bindings slide the new tab's
 indicator in from the old one's box over it (design doc §9.10). It draws over every tab
 (`z-index: 1`) inside the tab list, which is its own stacking context.
 
@@ -947,7 +947,7 @@ The dial is a **shape exception** by geometry: the dial, its handle and its cent
 (a style that sets its own `cornerShape` keeps it; see `corners.ts`). The bindings place the
 labels, handle and track from the time in physical coordinates, since a clock doesn't mirror; the
 direction spec allows the translate that centres them. The hand turns with a `transform`
-transition that reduced motion drops.
+transition on its `handSpring` token (the `spatialDefault` spring) that reduced motion drops.
 
 ## Data table
 

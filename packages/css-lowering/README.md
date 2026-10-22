@@ -35,6 +35,11 @@ helpers above. `instanceTokenVars(name, spec, prefix)` names the CSS var of each
 component's instance tokens (a `dynamic` token's own path, else `components.<name>.<token>`);
 the web adapters' generated factories set them on the root.
 
+A component token holding a spring (a literal, or an alias to a `springs` role) is two vars,
+`<token>-duration` and `<token>-easing`. `compileSpring` reads them with the default's as
+fallback (the role's vars, or a literal's sampled timing); `componentTokenVars` and a style's
+`tokens` set both through `springTokenVars`, the role's vars when the value aliases one.
+
 ```ts
 import { conditionKey } from "@pureform/css-lowering";
 
