@@ -6,12 +6,13 @@
 // condition keys, and `rawRules` emit the target's raw nested selectors.
 
 import type { StyleMap } from "@pureform/core/ast";
-import type { Condition, ValueNode } from "@pureform/core/ast";
+import type { Condition, SpringValue, ValueNode } from "@pureform/core/ast";
 
 import { compileNodeToCSS } from "./compile-node";
 import { compileValue, conditionKey } from "./conditions";
 import type { LowerCtx } from "./context";
 import { varName } from "./css";
+import { isSpringValue, springTokenVars } from "./spring";
 
 type ApplyArg = string | ValueNode | Record<string, ValueNode> | ValueNode[];
 
@@ -19,6 +20,23 @@ const isNode = (v: unknown): v is ValueNode =>
     typeof v === "object" &&
     v !== null &&
     typeof (v as ValueNode).type === "string";
+
+// A token's custom property, or a spring's two.
+const setToken = (
+    out: Record<string, unknown>,
+    path: string,
+    value: ValueNode,
+    ctx: LowerCtx,
+) => {
+    if (isSpringValue(value, ctx)) {
+        Object.assign(
+            out,
+            springTokenVars(path.split("."), value as SpringValue, ctx),
+        );
+    } else {
+        out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
+    }
+};
 
 const compileApplyArg = (arg: ApplyArg, ctx: LowerCtx): unknown => {
     if (typeof arg === "string") return arg;
@@ -60,13 +78,13 @@ export const compileStyleMap = (
     // element inside, follow.
     const tokens = m.tokens as Record<string, ValueNode> | undefined;
     for (const [path, value] of Object.entries(tokens ?? {})) {
-        out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
+        setToken(out, path, value, ctx);
     }
     // A token provided to another component is that component's custom property, which it
     // inherits from here. `var()` inside resolves on this element, so it reads this one's tokens.
     const provided = m.providedTokens as Record<string, ValueNode> | undefined;
     for (const [path, value] of Object.entries(provided ?? {})) {
-        out[varName(path.split("."), ctx.prefix)] = compileValue(value, ctx);
+        setToken(out, path, value, ctx);
     }
 
     const states = m.states as

@@ -26,6 +26,9 @@ export { REDUCED_MOTION_RULES, ROOT_REDUCED_MOTION_RULES } from "./motion";
 export { themeVars } from "./runtime";
 export {
     compileSpring,
+    isSpringValue,
+    springTokenVars,
+    springVarNames,
     springTokenEntries,
     springTokenGroups,
     springVars,
