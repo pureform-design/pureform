@@ -3,19 +3,24 @@ import {
     alias,
     animation,
     animations,
+    dynamic,
     linearEasing,
     numeric,
     spring,
     transition,
     tween,
 } from "@pureform/core/ast";
+import type { SpringValue } from "@pureform/core/ast";
 import type { CoreConfig } from "@pureform/core/types";
 import { describe, expect, it } from "vitest";
 
 import { compileNodeToCSS } from "./compile-node";
+import { componentTokenVars } from "./config";
 import type { LowerCtx } from "./context";
 import { varTokenRef } from "./css";
 import { themeVars } from "./runtime";
+import { compileSpring } from "./spring";
+import { compileStyleMap } from "./style-map";
 
 const fast = spring({ stiffness: 800, damping: 0.6 });
 
@@ -117,5 +122,103 @@ describe("springs on the web", () => {
                 .join(", ")})`,
         );
         expect(css).toMatchSnapshot();
+    });
+});
+
+describe("spring component tokens on the web", () => {
+    const withMove = (move: SpringValue): CoreConfig => ({
+        ...config,
+        components: {
+            box: {
+                name: "box",
+                tokens: {
+                    move: dynamic(["components", "box", "move"], move),
+                },
+                recipe: {},
+            } as never,
+        },
+        themes: {
+            slow: {
+                components: {
+                    box: {
+                        tokens: { move: alias("springs", "spatialFast") },
+                    },
+                },
+            },
+            literal: {
+                components: { box: { tokens: { move: fast } } },
+            },
+        },
+    });
+    const move = alias("components", "box", "move");
+
+    it("reads an alias to a spring role through the token's two vars, falling back to the role's", () => {
+        const aliased = withMove(alias("springs", "spatialFast"));
+        expect(compileSpring(move, { ...ctx, config: aliased })).toEqual([
+            "var(--components-box-move-duration, var(--springs-spatial-fast-duration))",
+            "var(--components-box-move-easing, var(--springs-spatial-fast-easing))",
+        ]);
+        expect(
+            compileNodeToCSS(transition(tween("transform", { spring: move })), {
+                ...ctx,
+                config: aliased,
+            }),
+        ).toBe(
+            "transform var(--components-box-move-duration, var(--springs-spatial-fast-duration)) " +
+                "var(--components-box-move-easing, var(--springs-spatial-fast-easing))",
+        );
+    });
+
+    it("falls back to a literal spring's sampled timing", () => {
+        const { duration } = sampleSpring(fast);
+        const [d, e] = compileSpring(move, { ...ctx, config: withMove(fast) });
+        expect(d).toBe(`var(--components-box-move-duration, ${duration}ms)`);
+        expect(e).toMatch(
+            /^var\(--components-box-move-easing, linear\(0, .*, 1\)\)$/,
+        );
+    });
+
+    it("writes a theme's override as the two vars, by reference to a role", () => {
+        const aliased = withMove(fast);
+        expect(
+            componentTokenVars(aliased.themes!.slow!, {
+                ...ctx,
+                config: aliased,
+            }),
+        ).toEqual({
+            "--components-box-move-duration":
+                "var(--springs-spatial-fast-duration)",
+            "--components-box-move-easing":
+                "var(--springs-spatial-fast-easing)",
+        });
+        const literal = componentTokenVars(aliased.themes!.literal!, {
+            ...ctx,
+            config: aliased,
+        });
+        expect(literal["--components-box-move-duration"]).toBe(
+            `${sampleSpring(fast).duration}ms`,
+        );
+        expect(Object.keys(literal)).toEqual([
+            "--components-box-move-duration",
+            "--components-box-move-easing",
+        ]);
+    });
+
+    it("sets a spring token in a style as its two vars", () => {
+        expect(
+            compileStyleMap(
+                {
+                    tokens: {
+                        "components.box.move": alias("springs", "spatialFast"),
+                    },
+                },
+                ctx,
+            ),
+        ).toEqual({
+            "--components-box-move-duration":
+                "var(--springs-spatial-fast-duration)",
+            "--components-box-move-easing":
+                "var(--springs-spatial-fast-easing)",
+        });
     });
 });

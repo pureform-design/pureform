@@ -2,7 +2,7 @@
 // scheme, a theme's component token vars, instance token vars, and how a component's slots nest.
 
 import { tokenValue } from "@pureform/core";
-import type { ValueNode, ValueType } from "@pureform/core/ast";
+import type { SpringValue, ValueNode, ValueType } from "@pureform/core/ast";
 import type {
     AnyComponentSpec,
     CoreConfig,
@@ -12,6 +12,7 @@ import type {
 import { compileNodeToCSS } from "./compile-node";
 import type { LowerCtx, VarPrefix } from "./context";
 import { varName } from "./css";
+import { isSpringValue, springTokenVars } from "./spring";
 
 const hasSchemeCase = (node: ValueNode): boolean =>
     node.type === "conditional" &&
@@ -40,8 +41,16 @@ export const componentTokenVars = (
         override.components ?? {},
     )) {
         for (const [token, entry] of Object.entries(tokens)) {
-            vars[varName(["components", component, token], ctx.prefix)] =
-                compileNodeToCSS(tokenValue(entry) as ValueNode, ctx);
+            const path = ["components", component, token];
+            const node = tokenValue(entry) as ValueNode;
+            if (isSpringValue(node, ctx)) {
+                Object.assign(
+                    vars,
+                    springTokenVars(path, node as SpringValue, ctx),
+                );
+            } else {
+                vars[varName(path, ctx.prefix)] = compileNodeToCSS(node, ctx);
+            }
         }
     }
     return vars;

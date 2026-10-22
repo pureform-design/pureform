@@ -1035,6 +1035,15 @@ damping, mass? })` builds one; `spring({ duration, bounce })` converts a percept
   `linear()` curve (Reanimated's `linear(...)` easing), the same as the web; `withSpring` would
   leave its CSS animation model. `timeScale` slows a spring by dividing its stiffness by the
   scale squared and its damping coefficient by the scale (and the sampled duration times it).
+- **Component tokens.** A component token can hold a spring, a literal or an alias to a role
+  (tabs `indicatorSpring`, time picker `handSpring`, both `spatialDefault`; f1f), and a timing
+  reads it with `ref(token)`. The web writes it as two vars, `<token>-duration` and
+  `<token>-easing`: the timing reads `var(--components-tabs-indicatorSpring-duration,
+var(--springs-spatial-default-duration))` and the easing alike, and a theme's or a style's
+  `tokens` override sets both, as the role's vars when it aliases one, so a theme's change of
+  that role still reaches it. React Native gives each of the five values its own key
+  (`components.tabs.indicatorSpring.stiffness`, and so on) falling back to the role's, so the
+  engine still runs a real spring.
 - **Reduced motion.** A spring times a motion; it doesn't decide whether it moves. So the rule
   above holds unchanged: a spring on a property that moves is instant under reduced motion (its
   part drops out, `transitionMoves`), and a spring on a fade keeps running; an overlay's moving
@@ -2535,8 +2544,8 @@ do; React Native does the same through its motion engines.
   cancels the running slide after reading where it has got to, so the next starts from what's
   on screen. A shared indicator placed by CSS variables (Zag's) was passed over: it measures
   after mount, so the server can't place it without a flash, and it changes the anatomy.
-- **Timing from the style.** The preset gives the indicator a `transform` transition on the
-  `spatialDefault` spring (m2a; Compose's `TabRow` slides with `DefaultSpatial`; it was
+- **Timing from the style.** The preset gives the indicator a `transform` transition on its
+  `indicatorSpring` token, the `spatialDefault` spring (m2a, f1f; Compose's `TabRow` slides with `DefaultSpatial`; it was
   `medium1` on `emphasized` before), through `motionTransition`, so `reducedMotion` drops it. The
   binding reads the computed `transition` (`transformTiming`), so every web target and an app's
   own CSS time it, reduced motion (the provider's `motion` or the system's) changes at once, and

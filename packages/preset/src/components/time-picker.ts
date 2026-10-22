@@ -75,6 +75,8 @@ const { tokens, ref } = componentTokens("timePicker", {
     handleSize: px(48),
     trackWidth: px(2),
     centerSize: px(8),
+    // How the hand turns to a new value.
+    handSpring: spring("spatialDefault"),
     // A scroll field's value and the one on each side of it.
     scrollItemHeight: px(56),
     scrollGap: spacing("1"),
@@ -232,7 +234,7 @@ export const timePicker = pf.slotComponent({
                         // It turns on the `spatialDefault` spring, as Compose's clock dial
                         // does (`ClockDialModifier`, `DefaultSpatial`).
                         tween("transform", {
-                            spring: spring("spatialDefault"),
+                            spring: ref("handSpring"),
                         }),
                     ),
                 },

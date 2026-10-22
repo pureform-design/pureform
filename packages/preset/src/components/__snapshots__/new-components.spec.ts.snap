@@ -3946,7 +3946,7 @@ exports[`tabs > compiles to a stable Panda slot recipe 1`] = `
       "position": "absolute",
       "transition": {
         "_motionReduce": "none",
-        "base": "transform token(springs.spatialDefault.duration) token(springs.spatialDefault.easing)",
+        "base": "transform var(--components-tabs-indicatorSpring-duration, token(springs.spatialDefault.duration)) var(--components-tabs-indicatorSpring-easing, token(springs.spatialDefault.easing))",
       },
       "zIndex": "1",
     },

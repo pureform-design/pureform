@@ -19,6 +19,7 @@ import type {
 import type { Token } from "@pureform/core/types";
 
 import type { LowerCtx } from "./context";
+import { varName } from "./css";
 
 /** The two tokens a spring is written as on the web: its settle duration in ms, and its curve
  *  as a `linear()` easing. */
@@ -86,6 +87,13 @@ export const compileSpring = (
                 ctx,
             );
         }
+        case "dynamic": {
+            // A component token holding a spring: its two vars, falling back to its default's.
+            const [duration, easing] = springVarNames(value.path, ctx);
+            if (!value.default) return [`var(${duration})`, `var(${easing})`];
+            const [d, e] = compileSpring(value.default as SpringValue, ctx);
+            return [`var(${duration}, ${d})`, `var(${easing}, ${e})`];
+        }
         case "platform":
             return compileSpring(
                 (value.values[ctx.target] ?? value.default) as SpringValue,
@@ -98,4 +106,41 @@ export const compileSpring = (
                 `a spring must be a spring or an alias to one, not a ${value.type} value`,
             );
     }
+};
+
+/** The two vars a spring-valued token at `path` is written as: `<token>-duration` and
+ *  `<token>-easing`. */
+export const springVarNames = (
+    path: string[],
+    ctx: LowerCtx,
+): [duration: string, easing: string] => {
+    const name = varName(path, ctx.prefix);
+    return [`${name}-duration`, `${name}-easing`];
+};
+
+/** Whether a token's value is a spring: a literal one, or an alias to a spring role, also
+ *  through a platform's choice. */
+export const isSpringValue = (node: ValueNode, ctx: LowerCtx): boolean => {
+    switch (node.type) {
+        case "spring":
+            return true;
+        case "alias":
+            return node.path[0] === "springs";
+        case "platform":
+            return isSpringValue(node.values[ctx.target] ?? node.default, ctx);
+        default:
+            return false;
+    }
+};
+
+/** A token set to a spring, as its two vars: each of the spring's, so an alias to a spring role
+ *  still follows a theme's change of that role. */
+export const springTokenVars = (
+    path: string[],
+    value: SpringValue,
+    ctx: LowerCtx,
+): Record<string, string> => {
+    const names = springVarNames(path, ctx);
+    const values = compileSpring(value, ctx);
+    return { [names[0]]: values[0], [names[1]]: values[1] };
 };
