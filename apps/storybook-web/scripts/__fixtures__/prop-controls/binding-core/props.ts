@@ -14,6 +14,9 @@ export interface FixtureVariantProps {
 
 export type Controllable<N extends string> = {
     readonly [K in N]?: boolean | undefined;
+} & {
+    /** @control none */
+    readonly [K in `default${Capitalize<N>}`]?: boolean | undefined;
 };
 
 export interface FixtureProps
@@ -27,6 +30,10 @@ export interface FixtureProps
     readonly ids?: { readonly root?: string } | undefined;
     readonly items?: readonly string[] | undefined;
     readonly mixed?: boolean | "indeterminate" | undefined;
+    readonly count?: 1 | 2 | "auto" | undefined;
+    readonly flag?: true | false | undefined;
+    readonly loose?: boolean | string | undefined;
+    readonly tricky?: boolean | { readonly a: string } | undefined;
     /** Through an indexed access to a variant prop. */
     readonly color?: FixtureVariantProps["tone"];
     /** The root's id.

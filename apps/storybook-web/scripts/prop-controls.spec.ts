@@ -60,9 +60,38 @@ describe("prop controls", () => {
     });
 
     it("gives functions, nodes, objects, arrays and mixed unions none", () => {
-        for (const name of ["onChange", "label", "ids", "items", "mixed"]) {
+        for (const name of [
+            "onChange",
+            "label",
+            "ids",
+            "items",
+            "loose",
+            "tricky",
+        ]) {
             expect(byName.get(name)?.control, name).toBe("none");
         }
+    });
+
+    it("gives a union of literals a select with a mapping back to the values", () => {
+        expect(byName.get("mixed")).toEqual({
+            name: "mixed",
+            control: "select",
+            options: ["true", "false", "indeterminate"],
+            mapping: { true: true, false: false },
+        });
+        expect(byName.get("count")).toMatchObject({
+            control: "select",
+            options: ["1", "2", "auto"],
+            mapping: { "1": 1, "2": 2 },
+        });
+        expect(byName.get("flag")?.control).toBe("boolean");
+    });
+
+    it("tags a mapped type's default prop through its mapped type", () => {
+        expect(byName.get("defaultSelected")).toMatchObject({
+            control: "none",
+            tagged: true,
+        });
     });
 
     it("reads a VariantProp's group from the alias, through indexed accesses", () => {
@@ -101,6 +130,24 @@ describe("arg types", () => {
                 variants,
             ),
         ).toEqual({ control: "boolean" });
+    });
+
+    it("passes a select's mapping to Storybook", () => {
+        expect(
+            argTypeFor(
+                {
+                    name: "mixed",
+                    control: "select",
+                    options: ["true", "false", "indeterminate"],
+                    mapping: { true: true, false: false },
+                },
+                variants,
+            ),
+        ).toEqual({
+            control: "select",
+            options: ["true", "false", "indeterminate"],
+            mapping: { true: true, false: false },
+        });
     });
 
     it("follows the type, or a tag over the anatomy", () => {

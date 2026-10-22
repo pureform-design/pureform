@@ -39,7 +39,8 @@ export interface TimeValueChangeDetails {
 export interface TimeBehaviorProps extends IndicationProps {
     /** The controlled time, as `HH:mm` (24-hour, as a native time input's value). */
     readonly value?: string | undefined;
-    /** The time it starts at when `value` isn't controlled. @default "00:00" */
+    /** The time it starts at when `value` isn't controlled. @default "00:00"
+     *  @control none */
     readonly defaultValue?: string | undefined;
     readonly onValueChange?:
         | ((details: TimeValueChangeDetails) => void)
@@ -83,7 +84,8 @@ export interface TimePickerRootOwnProps
     extends TimeBehaviorProps, TimePickerVariantProps {
     /** The controlled view: what the dial sets. */
     readonly view?: TimePickerView | undefined;
-    /** @default "hour" */
+    /** @default "hour"
+     *  @control none */
     readonly defaultView?: TimePickerView | undefined;
     readonly onViewChange?:
         | ((details: { readonly view: TimePickerView }) => void)

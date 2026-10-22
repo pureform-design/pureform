@@ -4,6 +4,9 @@
 // binding adds (DOM, React or Solid attributes, `as`, `children`) are declared elsewhere, so
 // they get none.
 //
+// - A union of literals (string, number, boolean) with a non-boolean member is a select of the
+//   stringified values, with a `mapping` back to the real ones (`boolean | "indeterminate"` →
+//   `["true", "false", "indeterminate"]`); plain `true | false` stays boolean.
 // - A string-literal union is a select, `boolean` a boolean, `string` a text field, `number` a
 //   number field; functions, nodes, objects, arrays and mixed unions get no control.
 // - A prop typed `VariantProp<C, "group">` names the variant group it sets (the text's
@@ -34,6 +37,8 @@ export interface PropControl {
     readonly control: ControlKind;
     /** A select's values, from the resolved type (in the order the checker gives them). */
     readonly options?: readonly string[];
+    /** A select's option → value, for the options that aren't strings (`"true"` → `true`). */
+    readonly mapping?: Readonly<Record<string, unknown>>;
     /** The variant group a `VariantProp<C, "group">` sets. */
     readonly variant?: string;
     /** Whether `control` comes from a `@control` tag. */
@@ -64,17 +69,29 @@ export const declarationFile = (
     return undefined;
 };
 
-/** The `@control` tag on a property's declarations, if any. Throws on an unknown kind. */
+// The `@control` kind in the JSDoc just inside a mapped type's brace. The compiler attaches no
+// JSDoc to a mapped type node, so its text is read.
+const mappedTag = (mapped: ts.Node) =>
+    /^\s*\{\s*\/\*\*[^]*?@control\s+(\w+)/.exec(mapped.getFullText())?.[1];
+
+/** The `@control` tag on a property's declarations, if any; a mapped type's property (the
+ *  `default*` of `Controllable`) reads its mapped type's. Throws on an unknown kind. */
 const tagOf = (
     checker: ts.TypeChecker,
     property: ts.Symbol,
 ): ControlKind | undefined => {
     for (const root of rootsOf(checker, property)) {
+        const mapped = (
+            root as { links?: { mappedType?: { declaration?: ts.Node } } }
+        ).links?.mappedType?.declaration;
         const tag = root
             .getJsDocTags(checker)
             .find((t) => t.name === "control");
-        if (!tag) continue;
-        const kind = ts.displayPartsToString(tag.text).trim() as ControlKind;
+        const text = tag
+            ? ts.displayPartsToString(tag.text)
+            : mapped && mappedTag(mapped);
+        if (!text) continue;
+        const kind = text.trim() as ControlKind;
         if (!KINDS.has(kind)) {
             throw new Error(
                 `prop controls: \`@control ${kind}\` on ${property.name}; expected one of ${[...KINDS].join(", ")}`,
@@ -150,6 +167,32 @@ export const controlOfType = (
     if (members.every((m) => m.flags & ts.TypeFlags.BooleanLiteral)) {
         return { control: "boolean" };
     }
+    const isBool = (m: ts.Type) => !!(m.flags & ts.TypeFlags.BooleanLiteral);
+    if (
+        members.every(
+            (m) => isBool(m) || m.isStringLiteral() || m.isNumberLiteral(),
+        )
+    ) {
+        const mapping: Record<string, unknown> = {};
+        const options: string[] = [];
+        const bools = members
+            .filter(isBool)
+            .map((m) => (m as { intrinsicName?: string }).intrinsicName);
+        for (const value of ["true", "false"]) {
+            if (!bools.includes(value)) continue;
+            options.push(value);
+            mapping[value] = value === "true";
+        }
+        for (const m of members) {
+            if (isBool(m)) continue;
+            const value = m.isStringLiteral()
+                ? m.value
+                : (m as ts.NumberLiteralType).value;
+            options.push(String(value));
+            if (typeof value === "number") mapping[String(value)] = value;
+        }
+        return { control: "select", options, mapping };
+    }
     return { control: "none" };
 };
 
@@ -207,7 +250,11 @@ export const argTypeFor = (
         case "none":
             return { control: false };
         case "select":
-            return { control: "select", options: values ?? prop.options ?? [] };
+            return {
+                control: "select",
+                options: values ?? prop.options ?? [],
+                ...(prop.mapping && !values ? { mapping: prop.mapping } : {}),
+            };
         default:
             return { control: prop.control };
     }

@@ -41,7 +41,8 @@ export interface TableVariantProps {
 export interface TableBehaviorProps extends IndicationProps {
     /** The controlled sort, or `null` for none. */
     readonly sort?: TableSort | null | undefined;
-    /** @default null */
+    /** @default null
+     *  @control none */
     readonly defaultSort?: TableSort | null | undefined;
     readonly onSortChange?:
         | ((details: { readonly sort: TableSort | null }) => void)
@@ -54,7 +55,8 @@ export interface TableBehaviorProps extends IndicationProps {
     readonly selectionMode?: TableSelectionMode | undefined;
     /** The controlled selection: the chosen rows' values. */
     readonly selection?: readonly string[] | undefined;
-    /** @default [] */
+    /** @default []
+     *  @control none */
     readonly defaultSelection?: readonly string[] | undefined;
     readonly onSelectionChange?:
         | ((details: { readonly selection: readonly string[] }) => void)

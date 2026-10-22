@@ -23,6 +23,7 @@ export type Controllable<
     T,
     D extends object = ChangeDetails<N, T>,
 > = { readonly [K in N]?: T | undefined } & {
+    /** @control none */
     readonly [K in DefaultName<N>]?: T | undefined;
 } & {
     readonly [K in ChangeName<N>]?: ((details: D) => void) | undefined;
