@@ -90,6 +90,7 @@ function SortHeader(props: {
         indication: props.indication,
     });
     const sorted = props.sort?.column === props.column;
+    const direction = sorted ? props.sort!.direction : undefined;
     const {
         styles: s,
         selected,
@@ -97,9 +98,11 @@ function SortHeader(props: {
     } = useComponentSlots<TablePart>(
         "dataTable",
         indication.select(props.selection),
-        indication.states({ filled: sorted }),
+        indication.states({
+            filled: sorted,
+            descending: direction === "descending",
+        }),
     );
-    const direction = sorted ? props.sort!.direction : undefined;
     return (
         <v.sortHeader.Pressable
             {...indication.handlers}
@@ -130,7 +133,7 @@ function SortHeader(props: {
                     {...iconSlot(selected, "sortIndicator")}
                     motion={s.sortIndicator}
                 >
-                    <Glyph glyph={direction === "descending" ? "↓" : "↑"} />
+                    <Glyph glyph="↑" />
                 </IconSlot>
             </v.sortIndicator.View>
             {indication.layer(selected)}

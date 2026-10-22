@@ -40,7 +40,7 @@ import {
 
 import { Checkbox } from "../checkbox";
 import { useControllable } from "../controllable";
-import { ArrowDownwardIcon, ArrowUpwardIcon } from "../glyphs";
+import { ArrowUpwardIcon } from "../glyphs";
 import { useMachineButton } from "../interaction";
 import { normalizeProps, useMachine } from "../internal/zag";
 import type { PropTypes } from "../internal/zag";
@@ -267,10 +267,6 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
             Record<string, unknown>
         >,
     ]);
-    const direction = () =>
-        api().sort?.column === props.column
-            ? api().sort!.direction
-            : "ascending";
     return scope.render("sortHeader", {
         ...button,
         states: () => ({ filled: api().sort?.column === props.column }),
@@ -292,15 +288,7 @@ function SortHeader(props: TableSortHeaderProps): JSX.Element {
                                 api().getSortIndicatorProps({
                                     column: props.column,
                                 }),
-                            props: {
-                                get children() {
-                                    return direction() === "descending" ? (
-                                        <ArrowDownwardIcon />
-                                    ) : (
-                                        <ArrowUpwardIcon />
-                                    );
-                                },
-                            },
+                            props: { children: <ArrowUpwardIcon /> },
                         })}
                     </>
                 );
